@@ -1,7 +1,7 @@
-function plotData_MC(xvector, data, monteCarlo, plotTitle, plotXLabel)
-%  plotData_MC(xvector, data, monteCarlo, plotTitle, plotXLabel) 
+function plotData_MC(bins, data, monteCarlo, plotTitle, plotXLabel)
+%  plotData_MC(bins, data, monteCarlo, plotTitle, plotXLabel) 
 %   Author: Ozgur Altinok
-%   Date: 2013-05-30  
+%   Date: 2013-06-27  
 
 %%
 
@@ -17,14 +17,22 @@ axes1 = axes('Parent',figure1,'YScale','linear','YMinorTick','on',...
 box(axes1,'on');
 hold(axes1,'all');
  
-xlim([-5 185]);
+% X-Axis Limits
+bin_width = bins(2)-bins(1);
+x_min = min(bins) - bin_width/2;
+x_max = max(bins) + bin_width/2;
+
+xlim([x_min x_max]);
+
+% Y-Axis Limits are Automatic
 % ylim([0 ylimit]);
 
-nbins = length(xvector);
-
+% Calculate histograms
+data = hist(data,bins);
+monteCarlo = hist(monteCarlo,bins);
 
 % Create bar for MC
-bar(xvector,monteCarlo,...
+bar(bins,monteCarlo,...
     'FaceColor',[0.75 0.75 0],...
     'EdgeColor',[0.75 0.75 0],...
     'BarWidth',0.8',...
@@ -34,7 +42,7 @@ bar(xvector,monteCarlo,...
     'DisplayName','Monte Carlo');
 
 % Create bar for Data
-bar(xvector,data,...
+bar(bins,data,...
     'FaceColor','none',...
     'EdgeColor','k',...
     'BarWidth',0.8',...
@@ -44,8 +52,9 @@ bar(xvector,data,...
     'Parent',axes1,...
     'DisplayName','Data');
 
+% Calculate the statistical error on Data
 statError = sqrt(data + 0.25)+0.5;
-errorbar(xvector,data,statError,...
+errorbar(bins,data,statError,...
     'x','LineWidth',2.0,...
     'DisplayName','Statistical Error');
 
