@@ -31,6 +31,10 @@ xlim([x_min x_max]);
 data = hist(data,bins);
 monteCarlo = hist(monteCarlo,bins);
 
+% Area Normalize the results;
+
+[data, monteCarlo] = areaNormalize(data,monteCarlo);
+
 % Create bar for MC
 bar(bins,monteCarlo,...
     'FaceColor',[0.75 0.75 0],...
