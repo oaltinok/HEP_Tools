@@ -14,10 +14,22 @@
 #include "PDG_List.h"
 #include "Bin_List.h"
 
+const int nChannels = 5;
+
 class ANA_CC {
 public :
    // -------------------------------------------------------------------------
    //     Custom Functions
+   //--------------------------------------------------------------------------
+   
+    
+    
+   // -------------------------------------------------------------------------
+   //     void run(): Generates a .root file with selected histograms
+   //         playlist -> address of the playlist
+   //         filename -> file name for the output .root file
+   //         cutFile -> file name for the cutFile that lists the applied analysis cuts
+   //         readmeFile -> file name for the readme
    //--------------------------------------------------------------------------
     void run(string playlist, char* filename,string cutFile, string readmeFile);
     double getAngle( double x1, double y1, double z1,
@@ -41,7 +53,16 @@ public :
     void closeFiles();
     void writeReadme();
 
-
+    void init_Histograms();
+    void init_TH1F(TH1F* h,  string xAxis, double binWidth);
+    void init_TH2F(TH2F* h,  string xAxisLabel, string yAxisLabel);
+    
+    
+   // -------------------------------------------------------------------------
+   //     void plotHistograms: Generates plots for the output of run() function
+   //         mcFile-> name of the .root file
+   //         plotDir -> folder name for the plots will be created         
+   //--------------------------------------------------------------------------
     void plotHistograms(char* mcFile, string plotDir);
     void plotSingleHist_1D(TH1F* singleHist, string fileName, string plotDir);
     void plot2DHist(TH2F* hist2D, string fileName, string plotDir);
@@ -71,6 +92,9 @@ public :
     int nPi_minus;
     int nPi_zero;
     
+
+
+
 
    // -------------------------------------------------------------------------
    //     Files

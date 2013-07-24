@@ -45,6 +45,8 @@ void ANA_CC::run(string playlist, char* filename, string cutFile, string readmeF
     fChain->SetBranchStatus("ev_run",1);  // activate
     fChain->SetBranchStatus("ev_subrun",1);  // activate
     fChain->SetBranchStatus("ev_gate",1);  // activate
+    fChain->SetBranchStatus("minos_track_match",1);  // activate
+
 
 
     /* Reconstructed Variables */
@@ -80,303 +82,122 @@ void ANA_CC::run(string playlist, char* filename, string cutFile, string readmeF
 
     //------------------------------------------------------------------------
     // Create Histograms
+    //        Array of Histograms
+    //        Each Array hold 5 1D or 2D histograms corresponding to
+    //            0 Pion, 1 Pion, 2 Pion, 3 Pion, 4+ Pions
     //------------------------------------------------------------------------
 
-    // Edit the file "Histogram_List.h"
-    // Copy Here
+
     //------------------------------------------------------------------------
     //  Truth vs Reco Comparisons
     //------------------------------------------------------------------------
 
     // Incoming Neutrino Energy
-
-    TH2F* Ev_reco_Ev_true_t0 = new TH2F("Ev_reco_Ev_true_t0","E_{#nu} True vs E_{#nu} Reco for 0 Pions",
-        NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_Ev, MIN_Ev, MAX_Ev );
-    Ev_reco_Ev_true_t0->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_reco_Ev_true_t0->GetYaxis()->SetTitle("True Neutrino Energy [GeV]");
-
-    TH2F* Ev_reco_Ev_true_t1 = new TH2F("Ev_reco_Ev_true_t1","E_{#nu} True vs E_{#nu} Reco for 1 Pions",
-        NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_Ev, MIN_Ev, MAX_Ev );
-    Ev_reco_Ev_true_t1->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_reco_Ev_true_t1->GetYaxis()->SetTitle("True Neutrino Energy [GeV]");
-
-    TH2F* Ev_reco_Ev_true_t2 = new TH2F("Ev_reco_Ev_true_t2","E_{#nu} True vs E_{#nu} Reco for 2 Pions",
-        NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_Ev, MIN_Ev, MAX_Ev );
-    Ev_reco_Ev_true_t2->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_reco_Ev_true_t2->GetYaxis()->SetTitle("True Neutrino Energy [GeV]");
-
-    TH2F* Ev_reco_Ev_true_t3 = new TH2F("Ev_reco_Ev_true_t3","E_{#nu} True vs E_{#nu} Reco for 3 Pions",
-        NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_Ev, MIN_Ev, MAX_Ev );
-    Ev_reco_Ev_true_t3->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_reco_Ev_true_t3->GetYaxis()->SetTitle("True Neutrino Energy [GeV]");
-
-    TH2F* Ev_reco_Ev_true_t4 = new TH2F("Ev_reco_Ev_true_t4","E_{#nu} True vs E_{#nu} Reco for 4+ Pions",
-        NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_Ev, MIN_Ev, MAX_Ev );
-    Ev_reco_Ev_true_t4->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_reco_Ev_true_t4->GetYaxis()->SetTitle("True Neutrino Energy [GeV]");
-
+    TH2F** Ev_reco_Ev_true = new TH2F*[nChannels];
+    // Create and initialize all histograms
+    for(int i = 0; i < nChannels; i++){
+        char* name = Form("Ev_reco_Ev_true_t%d",i);
+        char* title= Form("E_{#nu} True vs E_{#nu} Reco for %d Pions",i);
+        Ev_reco_Ev_true[i] = new TH2F( name,title,NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_Ev, MIN_Ev, MAX_Ev );
+        Ev_reco_Ev_true[i]->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
+        Ev_reco_Ev_true[i]->GetYaxis()->SetTitle("True Neutrino Energy [GeV]");
+    }
 
     // Q-Square
-
-    TH2F* q_reco_q_true_t0 = new TH2F("q_reco_q_true_t0","Q^{2} True vs Q^{2} Reco for 0 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    q_reco_q_true_t0->GetXaxis()->SetTitle("Q^{2} Reco [GeV]");
-    q_reco_q_true_t0->GetYaxis()->SetTitle("Q^{2} True [GeV]");
-
-    TH2F* q_reco_q_true_t1 = new TH2F("q_reco_q_true_t1","Q^{2} True vs Q^{2} Reco for 1 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    q_reco_q_true_t1->GetXaxis()->SetTitle("Q^{2} Reco [GeV]");
-    q_reco_q_true_t1->GetYaxis()->SetTitle("Q^{2} True [GeV]");
-
-    TH2F* q_reco_q_true_t2 = new TH2F("q_reco_q_true_t2","Q^{2} True vs Q^{2} Reco for 2 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    q_reco_q_true_t2->GetXaxis()->SetTitle("Q^{2} Reco [GeV]");
-    q_reco_q_true_t2->GetYaxis()->SetTitle("Q^{2} True [GeV]");
-
-    TH2F* q_reco_q_true_t3 = new TH2F("q_reco_q_true_t3","Q^{2} True vs Q^{2} Reco for 3 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    q_reco_q_true_t3->GetXaxis()->SetTitle("Q^{2} Reco [GeV]");
-    q_reco_q_true_t3->GetYaxis()->SetTitle("Q^{2} True [GeV]");
-
-    TH2F* q_reco_q_true_t4 = new TH2F("q_reco_q_true_t4","Q^{2} True vs Q^{2} Reco for 4+ Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    q_reco_q_true_t4->GetXaxis()->SetTitle("Q^{2} Reco [GeV]");
-    q_reco_q_true_t4->GetYaxis()->SetTitle("Q^{2} True [GeV]");
-
+    TH2F** q_reco_q_true = new TH2F*[nChannels];
+    // Create and initialize all histograms
+    for(int i = 0; i < nChannels; i++){
+        char* name = Form("q_reco_q_true_t%d",i);
+        char* title= Form("Q^{2} True vs Q^{2} Reco for %d Pions",i);
+        q_reco_q_true[i] = new TH2F( name,title,NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W );
+        q_reco_q_true[i]->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
+        q_reco_q_true[i]->GetYaxis()->SetTitle("True Q^{2} [GeV]");        
+    }
 
     // W
-
-    TH2F* w_reco_w_true_t0 = new TH2F("w_reco_w_true_t0","W True vs W Reco for 0 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    w_reco_w_true_t0->GetXaxis()->SetTitle("W Reco [GeV]");
-    w_reco_w_true_t0->GetYaxis()->SetTitle("W True [GeV]");
-
-    TH2F* w_reco_w_true_t1 = new TH2F("w_reco_w_true_t1","W True vs W Reco for 1 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    w_reco_w_true_t1->GetXaxis()->SetTitle("W Reco [GeV]");
-    w_reco_w_true_t1->GetYaxis()->SetTitle("W True [GeV]");
-
-    TH2F* w_reco_w_true_t2 = new TH2F("w_reco_w_true_t2","W True vs W Reco for 2 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    w_reco_w_true_t2->GetXaxis()->SetTitle("W Reco [GeV]");
-    w_reco_w_true_t2->GetYaxis()->SetTitle("W True [GeV]");
-
-    TH2F* w_reco_w_true_t3 = new TH2F("w_reco_w_true_t3","W True vs W Reco for 3 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    w_reco_w_true_t3->GetXaxis()->SetTitle("W Reco [GeV]");
-    w_reco_w_true_t3->GetYaxis()->SetTitle("W True [GeV]");
-
-    TH2F* w_reco_w_true_t4 = new TH2F("w_reco_w_true_t4","W True vs W Reco for 4+ Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    w_reco_w_true_t4->GetXaxis()->SetTitle("W Reco [GeV]");
-    w_reco_w_true_t4->GetYaxis()->SetTitle("W True [GeV]");
+    TH2F** w_reco_w_true = new TH2F*[nChannels];
+    // Create and initialize all histograms
+    for(int i = 0; i < nChannels; i++){
+        char* name = Form("w_reco_w_true_t%d",i);
+        char* title= Form("W True vs W Reco for %d Pions",i);
+        w_reco_w_true[i] = new TH2F( name,title,NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W );
+        w_reco_w_true[i]->GetXaxis()->SetTitle("Reconstructed W [GeV]");
+        w_reco_w_true[i]->GetYaxis()->SetTitle("True W [GeV]");  
+    }
 
 
     //------------------------------------------------------------------------
     //  1D Histograms
     //------------------------------------------------------------------------
 
-    // Incoming Neutrino Energy Reco
+    // Reconstructed Ev
+    TH1F** Ev_reco = new TH1F*[nChannels];
+    // Create and initialize all histograms
+    for(int i = 0; i < nChannels; i++){
+        char* name = Form("Ev_reco_t%d",i);
+        char* title= Form("Reconstructed E_{#nu} for %d Pions",i);
+        Ev_reco[i] = new TH1F( name,title,NBINS_Ev, MIN_Ev, MAX_Ev );
+        Ev_reco[i]->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
+        Ev_reco[i]->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
+    }
 
-    TH1F *Ev_reco_t0 = new TH1F("Ev_reco_t0","Incoming Neutrino Energy for 0 Pions",NBINS_Ev, MIN_Ev, MAX_Ev);
-    Ev_reco_t0->GetXaxis()->SetTitle("Reconstructed Neutrino Energy E_{#nu} [GeV]");
-    Ev_reco_t0->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
+    // True Ev
+    TH1F** Ev_true = new TH1F*[nChannels];
+    // Create and initialize all histograms
+    for(int i = 0; i < nChannels; i++){
+        char* name = Form("Ev_true_t%d",i);
+        char* title= Form("True E_{#nu} for %d Pions",i);
+        Ev_true[i] = new TH1F( name,title,NBINS_Ev, MIN_Ev, MAX_Ev );
+        Ev_true[i]->GetXaxis()->SetTitle("True E_{#nu} [GeV]");
+        Ev_true[i]->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
+    }
 
-    TH1F *Ev_reco_t1 = new TH1F("Ev_reco_t1","Incoming Neutrino Energy for 1 Pions",NBINS_Ev, MIN_Ev, MAX_Ev);
-    Ev_reco_t1->GetXaxis()->SetTitle("Reconstructed Neutrino Energy E_{#nu} [GeV]");
-    Ev_reco_t1->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
+    // Reconstructed Q
+    TH1F** q_reco = new TH1F*[nChannels];
+    // Create and initialize all histograms
+    for(int i = 0; i < nChannels; i++){
+        char* name = Form("q_reco_t%d",i);
+        char* title= Form("Reconstructed Q^{2} for %d Pions",i);
+        q_reco[i] = new TH1F( name,title,NBINS_W, MIN_W, MAX_W );
+        q_reco[i]->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
+        q_reco[i]->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
+    }
 
-    TH1F *Ev_reco_t2 = new TH1F("Ev_reco_t2","Incoming Neutrino Energy for 2 Pions",NBINS_Ev, MIN_Ev, MAX_Ev);
-    Ev_reco_t2->GetXaxis()->SetTitle("Reconstructed Neutrino Energy E_{#nu} [GeV]");
-    Ev_reco_t2->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
+    // True Q
+    TH1F** q_true = new TH1F*[nChannels];
+    // Create and initialize all histograms
+    for(int i = 0; i < nChannels; i++){
+        char* name = Form("q_true_t%d",i);
+        char* title= Form("True Q^{2} for %d Pions",i);
+        q_true[i] = new TH1F( name,title,NBINS_W, MIN_W, MAX_W );
+        q_true[i]->GetXaxis()->SetTitle("True Q^{2} [GeV]");
+        q_true[i]->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
+    }
 
-    TH1F *Ev_reco_t3 = new TH1F("Ev_reco_t3","Incoming Neutrino Energy for 3 Pions",NBINS_Ev, MIN_Ev, MAX_Ev);
-    Ev_reco_t3->GetXaxis()->SetTitle("Reconstructed Neutrino Energy E_{#nu} [GeV]");
-    Ev_reco_t3->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
-
-    TH1F *Ev_reco_t4 = new TH1F("Ev_reco_t4","Incoming Neutrino Energy for 4+ Pions",NBINS_Ev, MIN_Ev, MAX_Ev);
-    Ev_reco_t4->GetXaxis()->SetTitle("Reconstructed Neutrino Energy E_{#nu} [GeV]");
-    Ev_reco_t4->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
-
-    // Incoming Neutrino Energy True
-
-    TH1F *Ev_true_t0 = new TH1F("Ev_true_t0","Incoming Neutrino Energy for 0 Pions",NBINS_Ev, MIN_Ev, MAX_Ev);
-    Ev_true_t0->GetXaxis()->SetTitle("True Neutrino Energy E_{#nu} [GeV]");
-    Ev_true_t0->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
-
-    TH1F *Ev_true_t1 = new TH1F("Ev_true_t1","Incoming Neutrino Energy for 1 Pions",NBINS_Ev, MIN_Ev, MAX_Ev);
-    Ev_true_t1->GetXaxis()->SetTitle("True Neutrino Energy E_{#nu} [GeV]");
-    Ev_true_t1->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
-
-    TH1F *Ev_true_t2 = new TH1F("Ev_true_t2","Incoming Neutrino Energy for 2 Pions",NBINS_Ev, MIN_Ev, MAX_Ev);
-    Ev_true_t2->GetXaxis()->SetTitle("True Neutrino Energy E_{#nu} [GeV]");
-    Ev_true_t2->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
-
-    TH1F *Ev_true_t3 = new TH1F("Ev_true_t3","Incoming Neutrino Energy for 3 Pions",NBINS_Ev, MIN_Ev, MAX_Ev);
-    Ev_true_t3->GetXaxis()->SetTitle("True Neutrino Energy E_{#nu} [GeV]");
-    Ev_true_t3->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
-
-    TH1F *Ev_true_t4 = new TH1F("Ev_true_t4","Incoming Neutrino Energy for 4+ Pions",NBINS_Ev, MIN_Ev, MAX_Ev);
-    Ev_true_t4->GetXaxis()->SetTitle("True Neutrino Energy E_{#nu} [GeV]");
-    Ev_true_t4->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_Ev) );
-
-
-    
     // Reconstructed W
-
-    TH1F *w_reco_t0 = new TH1F("w_reco_t0","Reconstructed W for 0 Pions",NBINS_W, MIN_W, MAX_W);
-    w_reco_t0->GetXaxis()->SetTitle("Reconstructed W [GeV]");
-    w_reco_t0->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *w_reco_t1 = new TH1F("w_reco_t1","Reconstructed W for 1 Pions",NBINS_W, MIN_W, MAX_W);
-    w_reco_t1->GetXaxis()->SetTitle("Reconstructed W [GeV]");
-    w_reco_t1->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *w_reco_t2 = new TH1F("w_reco_t2","Reconstructed W for 2 Pions",NBINS_W, MIN_W, MAX_W);
-    w_reco_t2->GetXaxis()->SetTitle("Reconstructed W [GeV]");
-    w_reco_t2->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *w_reco_t3 = new TH1F("w_reco_t3","Reconstructed W for 3 Pions",NBINS_W, MIN_W, MAX_W);
-    w_reco_t3->GetXaxis()->SetTitle("Reconstructed W [GeV]");
-    w_reco_t3->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *w_reco_t4 = new TH1F("w_reco_t4","Reconstructed W for 4+ Pions",NBINS_W, MIN_W, MAX_W);
-    w_reco_t4->GetXaxis()->SetTitle("Reconstructed W [GeV]");
-    w_reco_t4->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
+    TH1F** w_reco = new TH1F*[nChannels];
+    // Create and initialize all histograms
+    for(int i = 0; i < nChannels; i++){
+        char* name = Form("w_reco_t%d",i);
+        char* title= Form("Reconstructed W for %d Pions",i);
+        w_reco[i] = new TH1F( name,title,NBINS_W, MIN_W, MAX_W);
+        w_reco[i]->GetXaxis()->SetTitle("Reconstructed W [GeV]");
+        w_reco[i]->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
+    }
 
     // True W
+    TH1F** w_true = new TH1F*[nChannels];
+    // Create and initialize all histograms
+    for(int i = 0; i < nChannels; i++){
+        char* name = Form("w_true_t%d",i);
+        char* title= Form("True W for %d Pions",i);
+        w_true[i] = new TH1F( name,title,NBINS_W, MIN_W, MAX_W );
+        w_true[i]->GetXaxis()->SetTitle("True W [GeV]");
+        w_true[i]->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
+    }
+
+
     
-    TH1F *w_true_t0 = new TH1F("w_true_t0","True W for 0 Pions",NBINS_W, MIN_W, MAX_W);
-    w_true_t0->GetXaxis()->SetTitle("True W [GeV]");
-    w_true_t0->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *w_true_t1 = new TH1F("w_true_t1","True W for 1 Pions",NBINS_W, MIN_W, MAX_W);
-    w_true_t1->GetXaxis()->SetTitle("True W [GeV]");
-    w_true_t1->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *w_true_t2 = new TH1F("w_true_t2","True W for 2 Pions",NBINS_W, MIN_W, MAX_W);
-    w_true_t2->GetXaxis()->SetTitle("True W [GeV]");
-    w_true_t2->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *w_true_t3 = new TH1F("w_true_t3","True W for 3 Pions",NBINS_W, MIN_W, MAX_W);
-    w_true_t3->GetXaxis()->SetTitle("True W [GeV]");
-    w_true_t3->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *w_true_t4 = new TH1F("w_true_t4","True W for 4+ Pions",NBINS_W, MIN_W, MAX_W);
-    w_true_t4->GetXaxis()->SetTitle("True W [GeV]");
-    w_true_t4->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    // Reconstructed Q-Square
-
-    TH1F *q_reco_t0 = new TH1F("q_reco_t0","Reconstructed Q^{2} for 0 Pions",NBINS_W, MIN_W, MAX_W);
-    q_reco_t0->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
-    q_reco_t0->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *q_reco_t1 = new TH1F("q_reco_t1","Reconstructed Q^{2} for 1 Pions",NBINS_W, MIN_W, MAX_W);
-    q_reco_t1->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
-    q_reco_t1->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *q_reco_t2 = new TH1F("q_reco_t2","Reconstructed Q^{2} for 2 Pions",NBINS_W, MIN_W, MAX_W);
-    q_reco_t2->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
-    q_reco_t2->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *q_reco_t3 = new TH1F("q_reco_t3","Reconstructed Q^{2} for 3 Pions",NBINS_W, MIN_W, MAX_W);
-    q_reco_t3->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
-    q_reco_t3->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *q_reco_t4 = new TH1F("q_reco_t4","Reconstructed Q^{2} for 4+ Pions",NBINS_W, MIN_W, MAX_W);
-    q_reco_t4->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
-    q_reco_t4->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    // True Q-Square
-
-    TH1F *q_true_t0 = new TH1F("q_true_t0","TrueQ^{2} for 0 Pions",NBINS_W, MIN_W, MAX_W);
-    q_true_t0->GetXaxis()->SetTitle("True Q^{2} [GeV]");
-    q_true_t0->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *q_true_t1 = new TH1F("q_true_t1","TrueQ^{2} for 1 Pions",NBINS_W, MIN_W, MAX_W);
-    q_true_t1->GetXaxis()->SetTitle("True Q^{2} [GeV]");
-    q_true_t1->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *q_true_t2 = new TH1F("q_true_t2","TrueQ^{2} for 2 Pions",NBINS_W, MIN_W, MAX_W);
-    q_true_t2->GetXaxis()->SetTitle("True Q^{2} [GeV]");
-    q_true_t2->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *q_true_t3 = new TH1F("q_true_t3","TrueQ^{2} for 3 Pions",NBINS_W, MIN_W, MAX_W);
-    q_true_t3->GetXaxis()->SetTitle("True Q^{2} [GeV]");
-    q_true_t3->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-    TH1F *q_true_t4 = new TH1F("q_true_t4","True Q^{2} for 4+ Pions",NBINS_W, MIN_W, MAX_W);
-    q_true_t4->GetXaxis()->SetTitle("True Q^{2} [GeV]");
-    q_true_t4->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",WIDTH_W) );
-
-
-    //------------------------------------------------------------------------
-    //  2D Comparison Histograms
-    //------------------------------------------------------------------------
-
-
-    // Neutrino Energy vs W
-
-    TH2F* Ev_w_t0 = new TH2F("Ev_w_t0","E_{#nu} Reco vs W for 0 Pions",NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_W, MIN_W, MAX_W);
-    Ev_w_t0->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_w_t0->GetYaxis()->SetTitle("Reconstructed W [GeV]");
-
-    TH2F* Ev_w_t1 = new TH2F("Ev_w_t1","E_{#nu} Reco vs W for 1 Pions",NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_W, MIN_W, MAX_W);
-    Ev_w_t1->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_w_t1->GetYaxis()->SetTitle("Reconstructed W [GeV]");
-
-    TH2F* Ev_w_t2 = new TH2F("Ev_w_t2","E_{#nu} Reco vs W for 2 Pions",NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_W, MIN_W, MAX_W);
-    Ev_w_t2->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_w_t2->GetYaxis()->SetTitle("Reconstructed W [GeV]");
-
-    TH2F* Ev_w_t3 = new TH2F("Ev_w_t3","E_{#nu} Reco vs W for 3 Pions",NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_W, MIN_W, MAX_W);
-    Ev_w_t3->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_w_t3->GetYaxis()->SetTitle("Reconstructed W [GeV]");
-
-    TH2F* Ev_w_t4 = new TH2F("Ev_w_t4","E_{#nu} Reco vs W for 4+ Pions",NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_W, MIN_W, MAX_W);
-    Ev_w_t4->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_w_t4->GetYaxis()->SetTitle("Reconstructed W [GeV]");
-
-
-
-    // Neutrino Energy vs Q-Squre
-
-    TH2F* Ev_q_t0 = new TH2F("Ev_q_t0","E_{#nu} Reco vs Q^{2} for 0 Pions",NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_W, MIN_W, MAX_W);
-    Ev_q_t0->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_q_t0->GetYaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
-
-    TH2F* Ev_q_t1 = new TH2F("Ev_q_t1","E_{#nu} Reco vs Q^{2} for 1 Pions",NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_W, MIN_W, MAX_W);
-    Ev_q_t1->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_q_t1->GetYaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
-
-    TH2F* Ev_q_t2 = new TH2F("Ev_q_t2","E_{#nu} Reco vs Q^{2} for 2 Pions",NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_W, MIN_W, MAX_W);
-    Ev_q_t2->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_q_t2->GetYaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
-
-    TH2F* Ev_q_t3 = new TH2F("Ev_q_t3","E_{#nu} Reco vs Q^{2} for 3 Pions",NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_W, MIN_W, MAX_W);
-    Ev_q_t3->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_q_t3->GetYaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
-
-    TH2F* Ev_q_t4 = new TH2F("Ev_q_t4","E_{#nu} Reco vs Q^{2} for 4+ Pions",NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_W, MIN_W, MAX_W);
-    Ev_q_t4->GetXaxis()->SetTitle("Reconstructed Neutrino Energy [GeV]");
-    Ev_q_t4->GetYaxis()->SetTitle("Reconstructed Q^{2} [GeV]");
-
-
-
-    // Q^2 vs W
-
-    TH2F* q_w_t0 = new TH2F("q_w_t0","Q^2 vs W for 0 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    q_w_t0->GetXaxis()->SetTitle("Reconstructed Q^2 [GeV]");
-    q_w_t0->GetYaxis()->SetTitle("Reconstructed W [GeV]");
-
-    TH2F* q_w_t1 = new TH2F("q_w_t1","Q^2 vs W for 1 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    q_w_t1->GetXaxis()->SetTitle("Reconstructed Q^2 [GeV]");
-    q_w_t1->GetYaxis()->SetTitle("Reconstructed W [GeV]");
-
-    TH2F* q_w_t2 = new TH2F("q_w_t2","Q^2 vs W for 2 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    q_w_t2->GetXaxis()->SetTitle("Reconstructed Q^2 [GeV]");
-    q_w_t2->GetYaxis()->SetTitle("Reconstructed W [GeV]");
-
-    TH2F* q_w_t3 = new TH2F("q_w_t3","Q^2 vs W for 3 Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    q_w_t3->GetXaxis()->SetTitle("Reconstructed Q^2 [GeV]");
-    q_w_t3->GetYaxis()->SetTitle("Reconstructed W [GeV]");
-
-    TH2F* q_w_t4 = new TH2F("q_w_t4","Q^2 vs W for 4+ Pions",NBINS_W, MIN_W, MAX_W, NBINS_W, MIN_W, MAX_W);
-    q_w_t4->GetXaxis()->SetTitle("Reconstructed Q^2 [GeV]");
-    q_w_t4->GetYaxis()->SetTitle("Reconstructed W [GeV]");
-
 
     //------------------------------------------------------------------------
     // Loop over Chain
@@ -385,10 +206,10 @@ void ANA_CC::run(string playlist, char* filename, string cutFile, string readmeF
     Long64_t nentries = fChain->GetEntriesFast();
     cout<<"There are "<<nentries<<" entries!"<<endl;
 
-    double nAll, nChargeCut, nFSleptonCut, nIncEnergyCut;
+    double nAll, nChargeCut, nFSleptonCut, nIncEnergyCut, nMinosCut;
     int nPions;
 
-    nAll = 0; nChargeCut = 0; nFSleptonCut = 0; nIncEnergyCut = 0;
+    nAll = 0; nChargeCut = 0; nFSleptonCut = 0; nIncEnergyCut = 0; nMinosCut = 0;
    
     Long64_t nbytes = 0, nb = 0;
     for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -414,129 +235,40 @@ void ANA_CC::run(string playlist, char* filename, string cutFile, string readmeF
                 if( mc_incomingE > minEnergy_Neutrino && 
                     mc_incomingE < maxEnergy_Neutrino){
                     nIncEnergyCut++; // Count events for cut information
-
-                    // Count Nucleons --> Protons + Neutrons
-                    nNucleons = countParticles(proton) + countParticles(neutron);
-                    // Count Meson+ -> Pi_plus + K_plus
-                    nPi_plus = countParticles(pi_plus) + countParticles(kaon_plus);
-                    // Count Meson- -> Pi_minus + K_minus
-                    nPi_minus = countParticles(pi_minus) + countParticles(kaon_minus);
-                    nPi_zero = countParticles(pi_zero) + countParticles(kaon_zero_L) +
+                    if(minos_track_match){
+                        nMinosCut++;
+                
+                        // Count Nucleons --> Protons + Neutrons
+                        nNucleons = countParticles(proton) + countParticles(neutron);
+                        // Count Meson+ -> Pi_plus + K_plus
+                        nPi_plus = countParticles(pi_plus) + countParticles(kaon_plus);
+                        // Count Meson- -> Pi_minus + K_minus
+                        nPi_minus = countParticles(pi_minus) + countParticles(kaon_minus);
+                        // Count Meson0 -> Pi_zero + K_zero
+                        nPi_zero = countParticles(pi_zero) + countParticles(kaon_zero_L) +
                                 countParticles(kaon_zero_S) + countParticles(kaon_zero);
                 
-                    nPions = nPi_plus + nPi_minus + nPi_zero;
+                        nPions = nPi_plus + nPi_minus + nPi_zero;
 
     //------------------------------------------------------------------------
     // Fill Histograms
     //------------------------------------------------------------------------
-                    if(nPions == 0){
+                        if (nPions > 4) nPions = 4; // If nPion 4+ All events are channel 4
+
                         // True vs Reco Comparison
-                        Ev_reco_Ev_true_t0->Fill(CCInclusiveReco_E * mev_to_gev, mc_incomingE * mev_to_gev);
-                        q_reco_q_true_t0->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, mc_Q2 * mevSq_to_gevSq);
-                        w_reco_w_true_t0->Fill(CCInclusiveReco_W * mev_to_gev, mc_w * mev_to_gev);
+                        Ev_reco_Ev_true[nPions]->Fill(CCInclusiveReco_E * mev_to_gev, mc_incomingE * mev_to_gev);
+                        q_reco_q_true[nPions]->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, mc_Q2 * mevSq_to_gevSq);
+                        w_reco_w_true[nPions]->Fill(CCInclusiveReco_W * mev_to_gev, mc_w * mev_to_gev);
 
                         // 1D Histograms
-                        Ev_reco_t0->Fill(CCInclusiveReco_E*mev_to_gev);
-                        Ev_true_t0->Fill(mc_incomingE * mev_to_gev);
+                        Ev_reco[nPions]->Fill(CCInclusiveReco_E*mev_to_gev);
+                        Ev_true[nPions]->Fill(mc_incomingE * mev_to_gev);
  
-                        q_reco_t0->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq);
-                        q_true_t0->Fill(mc_Q2 * mevSq_to_gevSq);
+                        q_reco[nPions]->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq);
+                        q_true[nPions]->Fill(mc_Q2 * mevSq_to_gevSq);
 
-                        w_reco_t0->Fill(CCInclusiveReco_W * mev_to_gev);
-                        w_true_t0->Fill(mc_w * mev_to_gev);
-
-                        // 2D Histograms
-                        Ev_w_t0->Fill(CCInclusiveReco_E * mev_to_gev, CCInclusiveReco_W * mev_to_gev);
-                        Ev_q_t0->Fill(CCInclusiveReco_E * mev_to_gev, CCInclusiveReco_Q2 * mevSq_to_gevSq);
-                        q_w_t0->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, CCInclusiveReco_W * mev_to_gev);
-                    }
-
-                    if(nPions == 1){
-                        // True vs Reco Comparison
-                        Ev_reco_Ev_true_t1->Fill(CCInclusiveReco_E * mev_to_gev, mc_incomingE * mev_to_gev);
-                        q_reco_q_true_t1->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, mc_Q2 * mevSq_to_gevSq);
-                        w_reco_w_true_t1->Fill(CCInclusiveReco_W * mev_to_gev, mc_w * mev_to_gev);
-
-                        // 1D Histograms
-                        Ev_reco_t1->Fill(CCInclusiveReco_E*mev_to_gev);
-                        Ev_true_t1->Fill(mc_incomingE * mev_to_gev);
-
-                        q_reco_t1->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq);
-                        q_true_t1->Fill(mc_Q2 * mevSq_to_gevSq);
-
-                        w_reco_t1->Fill(CCInclusiveReco_W * mev_to_gev);
-                        w_true_t1->Fill(mc_w * mev_to_gev);
-
-                        // 2D Histograms
-                        Ev_w_t1->Fill(CCInclusiveReco_E * mev_to_gev, CCInclusiveReco_W * mev_to_gev);
-                        Ev_q_t1->Fill(CCInclusiveReco_E * mev_to_gev, CCInclusiveReco_Q2 * mevSq_to_gevSq);
-                        q_w_t1->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, CCInclusiveReco_W * mev_to_gev);
-                    } 
-
-                    if(nPions == 2){
-                        // True vs Reco Comparison
-                        Ev_reco_Ev_true_t2->Fill(CCInclusiveReco_E * mev_to_gev, mc_incomingE * mev_to_gev);
-                        q_reco_q_true_t2->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, mc_Q2 * mevSq_to_gevSq);
-                        w_reco_w_true_t2->Fill(CCInclusiveReco_W * mev_to_gev, mc_w * mev_to_gev);
-
-                        // 1D Histograms
-                        Ev_reco_t2->Fill(CCInclusiveReco_E*mev_to_gev);
-                        Ev_true_t2->Fill(mc_incomingE * mev_to_gev);
-
-                        q_reco_t2->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq);
-                        q_true_t2->Fill(mc_Q2 * mevSq_to_gevSq);
-
-                        w_reco_t2->Fill(CCInclusiveReco_W * mev_to_gev);
-                        w_true_t2->Fill(mc_w * mev_to_gev);
-
-                        // 2D Histograms
-                        Ev_w_t2->Fill(CCInclusiveReco_E * mev_to_gev, CCInclusiveReco_W * mev_to_gev);
-                        Ev_q_t2->Fill(CCInclusiveReco_E * mev_to_gev, CCInclusiveReco_Q2 * mevSq_to_gevSq);
-                        q_w_t2->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, CCInclusiveReco_W * mev_to_gev);
-                    } 
-
-                    if(nPions == 3){
-                        //  True vs Reco Comparison
-                        Ev_reco_Ev_true_t3->Fill(CCInclusiveReco_E * mev_to_gev, mc_incomingE * mev_to_gev);
-                        q_reco_q_true_t3->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, mc_Q2 * mevSq_to_gevSq);
-                        w_reco_w_true_t3->Fill(CCInclusiveReco_W * mev_to_gev, mc_w * mev_to_gev);
-
-                        // 1D Histograms
-                        Ev_reco_t3->Fill(CCInclusiveReco_E*mev_to_gev);
-                        Ev_true_t3->Fill(mc_incomingE * mev_to_gev);
-
-                        q_reco_t3->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq);
-                        q_true_t3->Fill(mc_Q2 * mevSq_to_gevSq);
-
-                        w_reco_t3->Fill(CCInclusiveReco_W * mev_to_gev);
-                        w_true_t3->Fill(mc_w * mev_to_gev);
-
-                        // 2D Histograms
-                        Ev_w_t3->Fill(CCInclusiveReco_E * mev_to_gev, CCInclusiveReco_W * mev_to_gev);
-                        Ev_q_t3->Fill(CCInclusiveReco_E * mev_to_gev, CCInclusiveReco_Q2 * mevSq_to_gevSq);
-                        q_w_t3->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, CCInclusiveReco_W * mev_to_gev);
-                    } 
-
-                    if(nPions >= 4){
-                        // True vs Reco Comparison
-                        Ev_reco_Ev_true_t4->Fill(CCInclusiveReco_E * mev_to_gev, mc_incomingE * mev_to_gev);
-                        q_reco_q_true_t4->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, mc_Q2 * mevSq_to_gevSq);
-                        w_reco_w_true_t4->Fill(CCInclusiveReco_W * mev_to_gev, mc_w * mev_to_gev);
-
-                        // 1D Histograms
-                        Ev_reco_t4->Fill(CCInclusiveReco_E*mev_to_gev);
-                        Ev_true_t4->Fill(mc_incomingE * mev_to_gev);
-
-                        q_reco_t4->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq);
-                        q_true_t4->Fill(mc_Q2 * mevSq_to_gevSq);
-
-                        w_reco_t4->Fill(CCInclusiveReco_W * mev_to_gev);
-                        w_true_t4->Fill(mc_w * mev_to_gev);
-
-                        // 2D Histograms
-                        Ev_w_t4->Fill(CCInclusiveReco_E * mev_to_gev, CCInclusiveReco_W * mev_to_gev);
-                        Ev_q_t4->Fill(CCInclusiveReco_E * mev_to_gev, CCInclusiveReco_Q2 * mevSq_to_gevSq);
-                        q_w_t4->Fill(CCInclusiveReco_Q2 * mevSq_to_gevSq, CCInclusiveReco_W * mev_to_gev);
+                        w_reco[nPions]->Fill(CCInclusiveReco_W * mev_to_gev);
+                        w_true[nPions]->Fill(mc_w * mev_to_gev);
                     }
                 }
             }
@@ -549,11 +281,43 @@ void ANA_CC::run(string playlist, char* filename, string cutFile, string readmeF
     cutText<<"nChargeCut: "<<nChargeCut<<" "<<getPercent(nAll,nChargeCut)<<endl;
     cutText<<"nFSleptonCut: "<<nFSleptonCut<<" "<<getPercent(nAll,nFSleptonCut)<<endl;
     cutText<<"nIncEnergyCut: "<<nIncEnergyCut<<" "<<getPercent(nAll,nIncEnergyCut)<<endl;
+    cutText<<"nMinosCut: "<<nMinosCut<<" "<<getPercent(nAll,nMinosCut)<<endl;
 
     closeFiles();
 
     f->Write();
 
+}
+
+void ANA_CC::init_Histograms()
+{
+
+
+//     // Incoming Neutrino Energy
+//     Ev_reco_Ev_true = new TH2F*[nChannels];
+// 
+//     for(int i = 0; i < nChannels; i++){
+//         char* name = Form("Ev_reco_Ev_true_t%d",i);
+//         char* title= Form("E_{#nu} True vs E_{#nu} Reco for %d Pions",i);
+//         Ev_reco_Ev_true[i] = new TH2F( name,title,NBINS_Ev, MIN_Ev, MAX_Ev, NBINS_Ev, MIN_Ev, MAX_Ev );
+//     }
+
+
+
+}
+
+
+
+void ANA_CC::init_TH1F(TH1F* h,  string xAxis, double binWidth)
+{
+    h->GetXaxis()->SetTitle(Form("%s",xAxis));
+    h->GetYaxis()->SetTitle( Form("Candidates / %3.1f ",binWidth) );
+}
+
+void ANA_CC::init_TH2F(TH2F* h,  string xAxisLabel, string yAxisLabel)
+{
+    h->GetXaxis()->SetTitle( Form("%s",xAxisLabel) );
+    h->GetYaxis()->SetTitle( Form("%s",yAxisLabel) );
 }
 
 
@@ -695,44 +459,44 @@ void ANA_CC::plotHistograms(char* mcFile, string plotDir)
     //------------------------------------------------------------------------
 
 
-    // Neutrino Energy vs W
-    TH2F* h_mc_Ev_w_t0 = f_mc->Get("Ev_w_t0");
-    TH2F* h_mc_Ev_w_t1 = f_mc->Get("Ev_w_t1");
-    TH2F* h_mc_Ev_w_t2 = f_mc->Get("Ev_w_t2");
-    TH2F* h_mc_Ev_w_t3 = f_mc->Get("Ev_w_t3");
-    TH2F* h_mc_Ev_w_t4 = f_mc->Get("Ev_w_t4");
-
-    plot2DHist(h_mc_Ev_w_t0,"Ev_w_t0.png",plotDir);
-    plot2DHist(h_mc_Ev_w_t1,"Ev_w_t1.png",plotDir);
-    plot2DHist(h_mc_Ev_w_t2,"Ev_w_t2.png",plotDir);
-    plot2DHist(h_mc_Ev_w_t3,"Ev_w_t3.png",plotDir);
-    plot2DHist(h_mc_Ev_w_t4,"Ev_w_t4.png",plotDir);
-
-    // Neutrino Energy vs Q-Squared
-    TH2F* h_mc_Ev_q_t0 = f_mc->Get("Ev_q_t0");
-    TH2F* h_mc_Ev_q_t1 = f_mc->Get("Ev_q_t1");
-    TH2F* h_mc_Ev_q_t2 = f_mc->Get("Ev_q_t2");
-    TH2F* h_mc_Ev_q_t3 = f_mc->Get("Ev_q_t3");
-    TH2F* h_mc_Ev_q_t4 = f_mc->Get("Ev_q_t4");
-
-    plot2DHist(h_mc_Ev_q_t0,"Ev_q_t0.png",plotDir);
-    plot2DHist(h_mc_Ev_q_t1,"Ev_q_t1.png",plotDir);
-    plot2DHist(h_mc_Ev_q_t2,"Ev_q_t2.png",plotDir);
-    plot2DHist(h_mc_Ev_q_t3,"Ev_q_t3.png",plotDir);
-    plot2DHist(h_mc_Ev_q_t4,"Ev_q_t4.png",plotDir);
-
-    // Q-Squared vs W
-    TH2F* h_mc_q_w_t0 = f_mc->Get("q_w_t0");
-    TH2F* h_mc_q_w_t1 = f_mc->Get("q_w_t1");
-    TH2F* h_mc_q_w_t2 = f_mc->Get("q_w_t2");
-    TH2F* h_mc_q_w_t3 = f_mc->Get("q_w_t3");
-    TH2F* h_mc_q_w_t4 = f_mc->Get("q_w_t4");
-
-    plot2DHist(h_mc_q_w_t0,"q_w_t0.png",plotDir);
-    plot2DHist(h_mc_q_w_t1,"q_w_t1.png",plotDir);
-    plot2DHist(h_mc_q_w_t2,"q_w_t2.png",plotDir);
-    plot2DHist(h_mc_q_w_t3,"q_w_t3.png",plotDir);
-    plot2DHist(h_mc_q_w_t4,"q_w_t4.png",plotDir);
+//     // Neutrino Energy vs W
+//     TH2F* h_mc_Ev_w_t0 = f_mc->Get("Ev_w_t0");
+//     TH2F* h_mc_Ev_w_t1 = f_mc->Get("Ev_w_t1");
+//     TH2F* h_mc_Ev_w_t2 = f_mc->Get("Ev_w_t2");
+//     TH2F* h_mc_Ev_w_t3 = f_mc->Get("Ev_w_t3");
+//     TH2F* h_mc_Ev_w_t4 = f_mc->Get("Ev_w_t4");
+// 
+//     plot2DHist(h_mc_Ev_w_t0,"Ev_w_t0.png",plotDir);
+//     plot2DHist(h_mc_Ev_w_t1,"Ev_w_t1.png",plotDir);
+//     plot2DHist(h_mc_Ev_w_t2,"Ev_w_t2.png",plotDir);
+//     plot2DHist(h_mc_Ev_w_t3,"Ev_w_t3.png",plotDir);
+//     plot2DHist(h_mc_Ev_w_t4,"Ev_w_t4.png",plotDir);
+// 
+//     // Neutrino Energy vs Q-Squared
+//     TH2F* h_mc_Ev_q_t0 = f_mc->Get("Ev_q_t0");
+//     TH2F* h_mc_Ev_q_t1 = f_mc->Get("Ev_q_t1");
+//     TH2F* h_mc_Ev_q_t2 = f_mc->Get("Ev_q_t2");
+//     TH2F* h_mc_Ev_q_t3 = f_mc->Get("Ev_q_t3");
+//     TH2F* h_mc_Ev_q_t4 = f_mc->Get("Ev_q_t4");
+// 
+//     plot2DHist(h_mc_Ev_q_t0,"Ev_q_t0.png",plotDir);
+//     plot2DHist(h_mc_Ev_q_t1,"Ev_q_t1.png",plotDir);
+//     plot2DHist(h_mc_Ev_q_t2,"Ev_q_t2.png",plotDir);
+//     plot2DHist(h_mc_Ev_q_t3,"Ev_q_t3.png",plotDir);
+//     plot2DHist(h_mc_Ev_q_t4,"Ev_q_t4.png",plotDir);
+// 
+//     // Q-Squared vs W
+//     TH2F* h_mc_q_w_t0 = f_mc->Get("q_w_t0");
+//     TH2F* h_mc_q_w_t1 = f_mc->Get("q_w_t1");
+//     TH2F* h_mc_q_w_t2 = f_mc->Get("q_w_t2");
+//     TH2F* h_mc_q_w_t3 = f_mc->Get("q_w_t3");
+//     TH2F* h_mc_q_w_t4 = f_mc->Get("q_w_t4");
+// 
+//     plot2DHist(h_mc_q_w_t0,"q_w_t0.png",plotDir);
+//     plot2DHist(h_mc_q_w_t1,"q_w_t1.png",plotDir);
+//     plot2DHist(h_mc_q_w_t2,"q_w_t2.png",plotDir);
+//     plot2DHist(h_mc_q_w_t3,"q_w_t3.png",plotDir);
+//     plot2DHist(h_mc_q_w_t4,"q_w_t4.png",plotDir);
 
 
 }
@@ -916,7 +680,7 @@ double ANA_CC::radtodeg(double rad)
 #ifdef ANA_CC_cxx
 ANA_CC::ANA_CC()
 {
-    // Do Nothing For Now
+    init_Histograms();
 }
 
 ANA_CC::~ANA_CC()
