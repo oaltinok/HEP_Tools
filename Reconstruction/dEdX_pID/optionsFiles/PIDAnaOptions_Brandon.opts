@@ -1,0 +1,159 @@
+//============================================================
+// MCReco_fCalDigits.opts
+//
+//    options file for running from caldigits through track/vertex, track prong, blob formation
+//============================================================
+
+//------------------------------------------------------------
+// Standard MINERvA-GAUDI Job Setup
+//-----------------------------------------------------------
+#include "$MINERVAOPTS/MinervaApplication.opts"
+
+//------------------------------------------------------------
+// Geometry selection
+//-----------------------------------------------------------
+DetectorDataSvc.DetDbLocation = "$MINERVA_GEOMETRY/MINERVA.xml";
+DetectorDataSvc.ApplyAlignment = false;
+
+
+// Load the GiGaGeom options file, which converts GAUDI geometries
+// into GEANT4 geometries. We use the G4 geometry in the track
+// reconstruction, where it's much faster than GAUDI
+#include "$MNVDETECTORMCOPTS/GiGaGeom.opts"
+
+//------------------------------------------------------------
+// Applications to Run in this job
+//------------------------------------------------------------
+ApplicationMgr.TopAlg += { "GaudiSequencer/Simulation" }; // For G4 geom
+ApplicationMgr.TopAlg += { "PIDStudiesAlg" };
+//ApplicationMgr.TopAlg += { "SPIDTemplateAlg" };
+ApplicationMgr.TopAlg += { "DSTWriterAlg" };
+ApplicationMgr.TopAlg += { "POTCounterAlg" };
+
+
+//------------------------------------------------------------
+// Input File and Event Selection
+//------------------------------------------------------------
+EventSelector.Input   = {"DATAFILE='PFN:RecoData.root' TYP='POOL_ROOTTREE' OPT='READ'" };
+
+EventSelector.PrintFreq  = 1;
+EventSelector.FirstEvent = 1;
+ApplicationMgr.EvtMax    = -1;
+
+
+//--------------------------------------------------------------
+// POOL / DST / Histogram Output Files
+//--------------------------------------------------------------
+PIDStudiesAlg.TupleOutput = "PID.root";
+DSTWriterAlg.OutputFile  =  "DST.root";
+POTCounterAlg.POTTool.Output         = "POT_Summary.txt";
+
+HistogramPersistencySvc.OutputFile = "Histos.root";
+HistogramPersistencySvc.ConvertHistos = {  };  // e.g. { "myHisto", "myOtherHisto" };
+HistogramPersistencySvc.ExcludeHistos = {  };  // e.g. { "noWayMan", "notYouEither" };
+
+DSTWriterAlg.WriteDAQHeader      = true;
+DSTWriterAlg.WriteFPGAs          = false;
+DSTWriterAlg.WriteRawDigits      = true;
+DSTWriterAlg.WriteIDDigits       = true;
+DSTWriterAlg.WriteODDigits       = true;
+DSTWriterAlg.WriteVetoDigits     = true;
+DSTWriterAlg.WriteIDClusters     = true;
+DSTWriterAlg.WriteODClusters     = true;
+DSTWriterAlg.WriteIDBlobs        = false;
+DSTWriterAlg.WriteODBlobs        = false;
+DSTWriterAlg.WriteTracks         = true;
+DSTWriterAlg.WriteVertices       = true;
+DSTWriterAlg.WriteMinos          = false;
+DSTWriterAlg.WriteMinosStrips    = false;
+DSTWriterAlg.WriteBeamData       = false;
+DSTWriterAlg.WriteFlags          = true;
+
+
+DSTWriterAlg.WritePlace          = false;
+DSTWriterAlg.WriteInteraction    = true;
+DSTWriterAlg.WriteFluxRecord     = true;
+DSTWriterAlg.WriteMCIDDigits     = false;
+DSTWriterAlg.WriteMCODDigits     = false;
+DSTWriterAlg.WriteMCVetoDigits   = false;
+DSTWriterAlg.WriteMCTrajectories = false;
+
+
+DSTWriterAlg.NumModules = 120;
+DSTWriterAlg.SaveFrequency = 10;
+
+
+//==============================================================
+//
+//  Algorithm/Tool user-defined parameters
+//
+//==============================================================
+SPIDTemplateAlg.CosThetaCut = 0.98; //only use very forward tracks to generate templates
+ToolSvc.dEdXTool.DistanceBeforeTrackEnd = 22.0; //mm
+ToolSvc.dEdXTool.RemoveOutliers = true;
+ToolSvc.dEdXTool.UseExitingWithoutODMatchAtTrackEnd = false;
+ToolSvc.dEdXParticleScore.UseContinuousScore2 = true;
+
+ToolSvc.EnergyChi2Calculator.RemoveVertexOutliers = true;
+ToolSvc.EnergyChi2Calculator.DoAdaptiveOutlierRemoval = true;
+
+//-------------------------------------------
+// Clustering
+//-------------------------------------------
+
+
+//-------------------------------------------
+// Tracking
+//-------------------------------------------
+
+
+//==============================================================
+//
+//  Verbosity Levels
+//
+//==============================================================
+
+//-----------------------------------------------------------
+// 1=VERBOSE, 2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL
+//-----------------------------------------------------------
+
+MessageSvc.OutputLevel                             = 3;
+
+MinosDataAlg.OutputLevel                           = 3;
+ClusterFormationAlg.OutputLevel                    = 3;
+PrimaryVertexAndTrackBuilder.OutputLevel           = 3;
+PrimaryTrackProngAlg.OutputLevel                   = 3;
+DSTWriterAlg.OutputLevel                           = 3;
+POTCounterAlg.OutputLevel                          = 3;
+PIDStudiesAlg.OutputLevel                          = 3;
+
+ToolSvc.BasicIDClusterCreator.OutputLevel          = 3;
+ToolSvc.BasicODClusterCreator.OutputLevel          = 3;
+
+ToolSvc.TrackKalmanFilter.OutputLevel              = 3;
+ToolSvc.TrackProjector.OutputLevel                 = 3;
+ToolSvc.TrackAddClusters.OutputLevel               = 3;
+ToolSvc.TrackFormation.OutputLevel                 = 3;
+ToolSvc.SeedPatternRecognition.OutputLevel         = 3;
+ToolSvc.StateCorrectionTool.OutputLevel            = 3;
+ToolSvc.TrackPropagator.OutputLevel                = 3;
+ToolSvc.TrackPropagatorKalmanFilter.OutputLevel    = 3;
+ToolSvc.VertexFitterKalman.OutputLevel             = 3;
+
+ToolSvc.dEdXParticleScore.OutputLevel              = 3;
+ToolSvc.dEdXTool.OutputLevel                       = 3;
+ToolSvc.EnergyChi2Calculator.OutputLevel           = 2;
+ToolSvc.GhostTrack.OutputLevel                     = 3;
+ToolSvc.StoppingPIDTool.OutputLevel                = 3;
+ToolSvc.AbsorberStacker.OutputLevel                = 3;
+
+ToolSvc.ProngIntersectionTool.OutputLevel          = 3;
+ToolSvc.MinosGateProngClassifierTool.OutputLevel   = 3;
+ToolSvc.ODTrackMatchTool.OutputLevel                    = 3;
+ToolSvc.VetoProngMatchTool.OutputLevel             = 3;
+ToolSvc.ParticleTool.OutputLevel                   = 3;
+ToolSvc.BlobCreatorUtils.OutputLevel               = 3;
+
+//===========================================================================
+//===========================================================================
+//===========================================================================
