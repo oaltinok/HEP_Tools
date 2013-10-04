@@ -1,13 +1,28 @@
-High Energy Physics Tools
+Packages for Minerva Neutrino Experiment
 ==========================
 
-These following packages are specialized for MINERvA Experiment data format.
+Experiment URL: http://minerva.fnal.gov/
 
-There are analysis packages for 2 different data types:
+Notes:
 
-ana: Analysis Output from a specficic analysis package
+	These packages are specialized for MINERvA Experiment data format.
+	
+DataAnalyze Algorithms: 
 
-dst: Standard output file, can be generated from all analysis packages
+
+	2 Different data types
+	ana: Analysis Output from a specific analysis package
+	dst: Standard output file, can be generated from all analysis packages
+	
+	
+	
+	
+Reconstruction Algorithms:
+
+	
+	dEdX Improved Algorithm for Particle ID calculation
+	
+
 
 DataAnalyze
 ==========================
