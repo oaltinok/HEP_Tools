@@ -3,7 +3,9 @@
 */
 
 #define ANA_CCNuPionInc_cxx
+
 #include "ANA_CCNuPionInc.h"
+#include "Cuts.cpp"
 
 
 ANA_CCNuPionInc::ANA_CCNuPionInc()
@@ -39,28 +41,33 @@ void ANA_CCNuPionInc::run(string playlist, string rootFilename, string cutFile, 
     //------------------------------------------------------------------------
     // Branch Selection for Performance
     //------------------------------------------------------------------------
-    fChain->SetBranchStatus("*",0);  // disable all branches
-    
-    // Analysis Variables
-    fChain->SetBranchStatus("ev_run",1);  // activate
-    fChain->SetBranchStatus("ev_subrun",1);  // activate
-    fChain->SetBranchStatus("ev_gate",1);  // activate
-    
-    // Incoming Particle
-    fChain->SetBranchStatus("mc_incomingPartVec",1);  // activate
-    
-    // Final State Particles
-    fChain->SetBranchStatus("mc_FSPartPx",1);  // activate
-    fChain->SetBranchStatus("mc_FSPartPy",1);  // activate
-    fChain->SetBranchStatus("mc_FSPartPz",1);  // activate
-    fChain->SetBranchStatus("mc_FSPartE",1);  // activate
-    
-    
-    // Reconstruction Variables
-    fChain->SetBranchStatus("CCNuPionInc_muon_px",1);  // activate
-    fChain->SetBranchStatus("CCNuPionInc_muon_py",1);  // activate
-    fChain->SetBranchStatus("CCNuPionInc_muon_pz",1);  // activate
-    fChain->SetBranchStatus("CCNuPionInc_muon_E",1);  // activate
+//     fChain->SetBranchStatus("*",0);  // disable all branches
+//     
+//     // Analysis Variables
+//     fChain->SetBranchStatus("ev_run",1);  // activate
+//     fChain->SetBranchStatus("ev_subrun",1);  // activate
+//     fChain->SetBranchStatus("ev_gate",1);  // activate
+//     
+//     // Cut Variables
+//     fChain->SetBranchStatus("mc_vtx",1);
+//     
+//     // Incoming Particle
+//     fChain->SetBranchStatus("mc_incomingPartVec",1);  // activate
+//     
+//     // Final State Particles
+//     fChain->SetBranchStatus("mc_FSPartPx",1);  // activate
+//     fChain->SetBranchStatus("mc_FSPartPy",1);  // activate
+//     fChain->SetBranchStatus("mc_FSPartPz",1);  // activate
+//     fChain->SetBranchStatus("mc_FSPartE",1);  // activate
+//     fChain->SetBranchStatus("mc_FSPartPDG",1);
+//     
+//     
+//     
+//     // Reconstruction Variables
+//     fChain->SetBranchStatus("CCNuPionInc_muon_px",1);  // activate
+//     fChain->SetBranchStatus("CCNuPionInc_muon_py",1);  // activate
+//     fChain->SetBranchStatus("CCNuPionInc_muon_pz",1);  // activate
+//     fChain->SetBranchStatus("CCNuPionInc_muon_E",1);  // activate
 
 
     //------------------------------------------------------------------------
@@ -109,9 +116,33 @@ void ANA_CCNuPionInc::run(string playlist, string rootFilename, string cutFile, 
             cout<<" Entry "<<jentry<<endl;
         }
         
-        muonL4p.SetPxPyPzE(mc_FSPartPx[0],mc_FSPartPy[0],mc_FSPartPz[0],mc_FSPartE[0]);
         
-        P_muon->Fill(muonL4p.P());
+        if( !isVertexContained()){
+            continue;
+        }
+        
+        muon.ind = findParticle(PDG_List::mu_minus);
+        if(muon.ind == -1){
+            continue;
+        }
+        
+        proton.ind = findProton();
+        if(proton.ind == -1){
+            continue;
+        }
+        
+        pion.ind = findPion();
+        if(pion.ind == -1){
+            continue;
+        }
+        
+        
+        // Fill Muon
+        muon.p4[1].SetPxPyPzE(mc_FSPartPx[0],mc_FSPartPy[0],mc_FSPartPz[0],mc_FSPartE[0]);
+        
+        // Fill Proton
+        proton.p4[1].SetPxPyPzE(mc_FSPartPx[1],mc_FSPartPy[1],mc_FSPartPz[1],mc_FSPartE[1]);
+        
         
       
 
@@ -128,6 +159,13 @@ void ANA_CCNuPionInc::run(string playlist, string rootFilename, string cutFile, 
 //     Specific Functions
 //--------------------------------------------------------------------------
 
+
+
+
+
+
+
+
 void ANA_CCNuPionInc::initHistograms()
 {
     P_muon = new TH1F( "P_muon","P_muon",NBINS_Muon_PTotal, MIN_Muon_PTotal, MAX_Muon_PTotal );
@@ -141,9 +179,9 @@ void ANA_CCNuPionInc::initHistograms()
 void ANA_CCNuPionInc::initVariables()
 {
     // Default Beam Configuration
-    neutrino3p_spherical.SetXYZ(1.0,1.0,1.0);
-    neutrino3p_spherical.SetPhi(-1.554);
-    neutrino3p_spherical.SetTheta(0.059);
+    beam_p3.SetXYZ(1.0,1.0,1.0);
+    beam_p3.SetPhi(-1.554);
+    beam_p3.SetTheta(0.059);
 
     cout<<"Variables are Initialized!"<<endl;
 

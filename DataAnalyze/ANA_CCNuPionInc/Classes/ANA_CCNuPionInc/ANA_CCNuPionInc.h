@@ -10,9 +10,16 @@ Class: ANA_CCNuPionInc
     
     Uses other classes to define variables or to access specific functions
     
+    Main Directory:
+        Classes/ANA_CCNuPionInc
+        
+    Usage:
+        > main.cpp declares and controls the class
+        > See run function Comments
     
     
-    Last Revision: 2014_01_27
+    
+    Last Revision: 2014_01_28
 ================================================================================
 */
 
@@ -31,7 +38,7 @@ Class: ANA_CCNuPionInc
 #include "Libraries/PDG_List.h"
 #include "Libraries/Bin_List.h"
 #include "Classes/HEP_Misc/HEP_Misc.cpp"
-
+#include "Classes/Particle/Particle.cpp"
 
 
 class ANA_CCNuPionInc {
@@ -81,7 +88,15 @@ public :
    //     Analysis Variables
    //--------------------------------------------------------------------------
     HEP_Misc misc;
-    TVector3 neutrino3p_spherical;
+    TVector3 beam_p3;
+    Particle proton;
+    Particle muon;
+    Particle pion;
+    
+   // -------------------------------------------------------------------------
+   //     Cut Numbers 
+   //--------------------------------------------------------------------------
+    // Reserved for future - Possible Class Implementation
     
    // -------------------------------------------------------------------------
    //     Files
