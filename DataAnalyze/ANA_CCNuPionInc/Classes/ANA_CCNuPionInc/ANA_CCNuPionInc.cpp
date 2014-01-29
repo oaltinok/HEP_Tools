@@ -15,7 +15,7 @@ ANA_CCNuPionInc::ANA_CCNuPionInc()
 
 }
 
-void ANA_CCNuPionInc::run(string playlist, string rootFilename, string cutFile, string readmeFile)
+void ANA_CCNuPionInc::run(string playlist, string rootFileName, string cutFile, string readmeFile)
 {
 
    
@@ -26,7 +26,7 @@ void ANA_CCNuPionInc::run(string playlist, string rootFilename, string cutFile, 
 
     openFiles(cutFile,readmeFile);
 
-    TFile* f = new TFile(rootFilename.c_str(),"RECREATE");
+    TFile* f = new TFile(rootFileName.c_str(),"RECREATE");
 
     //------------------------------------------------------------------------
     // Create chain
@@ -115,41 +115,68 @@ void ANA_CCNuPionInc::run(string playlist, string rootFilename, string cutFile, 
         if (jentry%5000 == 0){
             cout<<" Entry "<<jentry<<endl;
         }
+    
+    
+        //----------------------------------------------------------------------
+        // Apply Cuts
+        //----------------------------------------------------------------------
         
+        // Count All Events before Cuts
+        nCutList.nAll.increment();
         
+        // Volume Cut
         if( !isVertexContained()){
             continue;
         }
+        nCutList.nVolume.increment();
         
+        // Muon Cut
         muon.ind = findParticle(PDG_List::mu_minus);
         if(muon.ind == -1){
             continue;
         }
+        nCutList.nMuon.increment();
         
+        // Proton Cut
         proton.ind = findProton();
         if(proton.ind == -1){
             continue;
         }
+        nCutList.nProton.increment();
         
+        // Pion Cut
         pion.ind = findPion();
         if(pion.ind == -1){
             continue;
         }
+        nCutList.nPion.increment();
         
+
+        //----------------------------------------------------------------------
+        // Fill Particles
+        //----------------------------------------------------------------------
+    
+        fillParticle(muon);
+        fillParticle(proton);
+        fillParticle(pion);
         
-        // Fill Muon
-        muon.p4[1].SetPxPyPzE(mc_FSPartPx[0],mc_FSPartPy[0],mc_FSPartPz[0],mc_FSPartE[0]);
-        
-        // Fill Proton
-        proton.p4[1].SetPxPyPzE(mc_FSPartPx[1],mc_FSPartPy[1],mc_FSPartPz[1],mc_FSPartE[1]);
-        
+        //----------------------------------------------------------------------
+        // Fill Histograms
+        //----------------------------------------------------------------------
+       
+        fillHistograms();
         
       
 
     }    
     
-    //Write the Root File
+    // Write the Root File
+    cout<<">> Writing "<<rootFileName<<endl;
     f->Write();
+    
+    // Write Cut Text File
+    cout<<">> Writing "<<cutFile<<endl; 
+    writeCutFile();
     
     closeFiles();
 
@@ -159,22 +186,64 @@ void ANA_CCNuPionInc::run(string playlist, string rootFilename, string cutFile, 
 //     Specific Functions
 //--------------------------------------------------------------------------
 
+void ANA_CCNuPionInc::fillHistograms()
+{
+    P_muon->Fill(muon.p4[1].P());
+    P_proton->Fill(proton.p4[1].P());
+    P_pion->Fill(pion.p4[1].P());
+
+}
+
+void ANA_CCNuPionInc::fillParticle(Particle& part)
+{
+    int ind = part.ind;
+    double angleBeam;
+    
+    // Fill 4-Momentum
+    part.p4[1].SetPxPyPzE(mc_FSPartPx[ind],mc_FSPartPy[ind],mc_FSPartPz[ind],mc_FSPartE[ind]);
+       
+    // Calculate and Fill Angle wrt Beam
+    angleBeam = part.p4[1].Angle(beam_p3);
+    part.angleBeam[1] = angleBeam;
+    
+}
 
 
-
-
-
+void ANA_CCNuPionInc::writeCutFile()
+{
+    cutText<<nCutList.nAll.getLabel()<<nCutList.nAll.getValue();
+    cutText<<"\tPercent : "<<"\t"<<nCutList.getPercent(nCutList.nAll.getValue())<<endl;
+    
+    cutText<<nCutList.nVolume.getLabel()<<nCutList.nVolume.getValue();
+    cutText<<"\tPercent : "<<"\t"<<nCutList.getPercent(nCutList.nVolume.getValue())<<endl;
+    
+    cutText<<nCutList.nMuon.getLabel()<<nCutList.nMuon.getValue();
+    cutText<<"\tPercent : "<<"\t"<<nCutList.getPercent(nCutList.nMuon.getValue())<<endl;
+    
+    cutText<<nCutList.nProton.getLabel()<<nCutList.nProton.getValue();
+    cutText<<"\tPercent : "<<"\t"<<nCutList.getPercent(nCutList.nProton.getValue())<<endl;
+    
+    cutText<<nCutList.nPion.getLabel()<<nCutList.nPion.getValue();
+    cutText<<"\tPercent : "<<"\t"<<nCutList.getPercent(nCutList.nPion.getValue())<<endl;
+}
 
 
 void ANA_CCNuPionInc::initHistograms()
 {
-    P_muon = new TH1F( "P_muon","P_muon",NBINS_Muon_PTotal, MIN_Muon_PTotal, MAX_Muon_PTotal );
+    P_muon = new TH1F( "P_muon","True Muon Momentum",NBINS_Muon_PTotal, MIN_Muon_PTotal, MAX_Muon_PTotal );
     P_muon->GetXaxis()->SetTitle("True Muon Momentum MeV");
     P_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",WIDTH_Muon_PTotal));
     
+    P_proton = new TH1F( "P_proton","True Proton Momentum",NBINS_Proton_PTotal, MIN_Proton_PTotal, MAX_Proton_PTotal );
+    P_proton->GetXaxis()->SetTitle("True Proton Momentum MeV");
+    P_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",WIDTH_Proton_PTotal));
+    
+    P_pion = new TH1F( "P_pion","True Pion Momentum",NBINS_Pion_PTotal, MIN_Pion_PTotal, MAX_Pion_PTotal );
+    P_pion->GetXaxis()->SetTitle("True Pion Momentum MeV");
+    P_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",WIDTH_Pion_PTotal));
+    
     cout<<"Histograms are Initialized!"<<endl;
 }
-
 
 void ANA_CCNuPionInc::initVariables()
 {

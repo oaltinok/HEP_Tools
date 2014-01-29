@@ -12,7 +12,7 @@ Class: HEP_Misc
         > HEP_Misc misc;
         > misc.getError(trueValue,recoValue)
     
-    Last Revision: 2014_01_27
+    Last Revision: 2014_01_29
 ================================================================================
 */
 
@@ -24,7 +24,6 @@ class HEP_Misc
     public:
         HEP_Misc();
         
-        double getPercent(double nAll, double nCurrent);
         double getError(double trueValue, double recoValue);
 
     private:

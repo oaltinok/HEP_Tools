@@ -19,7 +19,7 @@ Class: ANA_CCNuPionInc
     
     
     
-    Last Revision: 2014_01_28
+    Last Revision: 2014_01_29
 ================================================================================
 */
 
@@ -39,6 +39,7 @@ Class: ANA_CCNuPionInc
 #include "Libraries/Bin_List.h"
 #include "Classes/HEP_Misc/HEP_Misc.cpp"
 #include "Classes/Particle/Particle.cpp"
+#include "Classes/CutNumberList/CutNumberList.cpp"
 
 
 class ANA_CCNuPionInc {
@@ -61,10 +62,14 @@ public :
     void initVariables();
     void initHistograms();
     
+    void fillParticle(Particle& part);
     
+    void fillHistograms();
+
     void openFiles(string cutFile, string readmeFile);
     void closeFiles();
     void writeReadme();
+    void writeCutFile();
 
    // -------------------------------------------------------------------------
    //     Default Functions
@@ -83,6 +88,8 @@ public :
    //     Histograms
    //--------------------------------------------------------------------------
     TH1F* P_muon;
+    TH1F* P_proton;
+    TH1F* P_pion;
 
    // -------------------------------------------------------------------------
    //     Analysis Variables
@@ -96,7 +103,7 @@ public :
    // -------------------------------------------------------------------------
    //     Cut Numbers 
    //--------------------------------------------------------------------------
-    // Reserved for future - Possible Class Implementation
+    CutNumberList nCutList;
     
    // -------------------------------------------------------------------------
    //     Files

@@ -11,16 +11,6 @@ HEP_Misc::HEP_Misc()
 }
 
 
-double HEP_Misc::getPercent(double nAll, double nCurrent)
-{
-   double percent;
-
-    percent = (nCurrent / nAll) * 100;
-
-    return percent;
-
-}
-
 double HEP_Misc::getError(double trueValue, double recoValue)
 {
 

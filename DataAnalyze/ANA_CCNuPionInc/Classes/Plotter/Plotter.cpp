@@ -32,6 +32,12 @@ void Plotter::plotHistograms(string mcFile, string plotDir)
      
     TH1F* h_P_muon= f_mc->Get("P_muon");
     plotSingleHist_1D(h_P_muon,"P_muon.png",plotDir);
+    
+    TH1F* h_P_proton= f_mc->Get("P_proton");
+    plotSingleHist_1D(h_P_proton,"P_proton.png",plotDir);
+    
+    TH1F* h_P_pion= f_mc->Get("P_pion");
+    plotSingleHist_1D(h_P_pion,"P_pion.png",plotDir);
 
 
 }
@@ -44,7 +50,7 @@ void Plotter::plotSingleHist_1D(TH1F* singleHist, string fileName, string plotDi
     singleHist->SetFillColor(kRed);
     singleHist->SetFillStyle(3010);
     singleHist->Draw();
-    c1->Print(Form("%s/%s",plotDir.c_str(),fileName.c_str()),"png");
+    c1->Print(Form("%s%s",plotDir.c_str(),fileName.c_str()),"png");
     
 }
 
@@ -53,7 +59,7 @@ void Plotter::plot2DHist(TH2F* hist2D, string fileName, string plotDir)
 {
     TCanvas* c1 = new TCanvas();
     hist2D->Draw("colz");
-    c1->Print(Form("%s/%s",plotDir.c_str(),fileName.c_str()),"png");
+    c1->Print(Form("%s%s",plotDir.c_str(),fileName.c_str()),"png");
 }
 
 
