@@ -230,20 +230,31 @@ void ANA_CCNuPionInc::writeCutFile()
 
 void ANA_CCNuPionInc::initHistograms()
 {
-    P_muon = new TH1F( "P_muon","True Muon Momentum",NBINS_Muon_PTotal, MIN_Muon_PTotal, MAX_Muon_PTotal );
+
+    P_muon = new TH1F( "P_muon","True Muon Momentum",binList.muonP.get_nBins(), binList.muonP.get_min(), binList.muonP.get_max() );
     P_muon->GetXaxis()->SetTitle("True Muon Momentum MeV");
-    P_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",WIDTH_Muon_PTotal));
+    P_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.muonP.get_width()));
     
-    P_proton = new TH1F( "P_proton","True Proton Momentum",NBINS_Proton_PTotal, MIN_Proton_PTotal, MAX_Proton_PTotal );
+    P_proton = new TH1F( "P_proton","True Proton Momentum",binList.protonP.get_nBins(), binList.protonP.get_min(), binList.protonP.get_max() );
     P_proton->GetXaxis()->SetTitle("True Proton Momentum MeV");
-    P_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",WIDTH_Proton_PTotal));
+    P_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.protonP.get_width()));
     
-    P_pion = new TH1F( "P_pion","True Pion Momentum",NBINS_Pion_PTotal, MIN_Pion_PTotal, MAX_Pion_PTotal );
+    P_pion = new TH1F( "P_pion","True Pion Momentum",binList.pionP.get_nBins(), binList.pionP.get_min(), binList.pionP.get_max() );
     P_pion->GetXaxis()->SetTitle("True Pion Momentum MeV");
-    P_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",WIDTH_Pion_PTotal));
+    P_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.pionP.get_width()));
     
     cout<<"Histograms are Initialized!"<<endl;
 }
+
+void ANA_CCNuPionInc::initSingleHistogram(TH1F* hist, string histName, string title, string xLabel, string yLabel, SingleBin bin)
+{
+    hist = new TH1F(histName.c_str(),title.c_str(),bin.get_nBins(), bin.get_min(), bin.get_max());
+    hist->GetXaxis()->SetTitle(xLabel.c_str());
+    hist->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin.get_width()));
+}
+
+
+
 
 void ANA_CCNuPionInc::initVariables()
 {

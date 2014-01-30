@@ -40,6 +40,7 @@ Class: ANA_CCNuPionInc
 #include "Classes/HEP_Misc/HEP_Misc.cpp"
 #include "Classes/Particle/Particle.cpp"
 #include "Classes/CutNumberList/CutNumberList.cpp"
+#include "Classes/BinList/BinList.cpp"
 
 
 class ANA_CCNuPionInc {
@@ -101,9 +102,10 @@ public :
     Particle pion;
     
    // -------------------------------------------------------------------------
-   //     Cut Numbers 
+   //     Cut Numbers and List of Bins
    //--------------------------------------------------------------------------
     CutNumberList nCutList;
+    BinList binList;
     
    // -------------------------------------------------------------------------
    //     Files
