@@ -36,7 +36,6 @@ Class: ANA_CCNuPionInc
 #include <vector>
 
 #include "Libraries/PDG_List.h"
-#include "Libraries/Bin_List.h"
 #include "Classes/HEP_Misc/HEP_Misc.cpp"
 #include "Classes/Particle/Particle.cpp"
 #include "Classes/CutNumberList/CutNumberList.cpp"
