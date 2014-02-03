@@ -34,12 +34,13 @@ class CutNumberList
         // Returns the Percent of input number wrt All Events (No Cut)
         double getPercent(double nCurrent);
         void writeCutTable();
+        void writeCut(SingleCutNumber* cut);
         
-        SingleCutNumber nAll;       // Number of All Events
-        SingleCutNumber nVolume;    // Number of Events After Volume Cut
-        SingleCutNumber nMuon;      // Number of Events After Muon Cut
-        SingleCutNumber nProton;    // Number of Events After Proton Cut
-        SingleCutNumber nPion;      // Number of Events After Pion Cut
+        SingleCutNumber* nAll;       // Number of All Events
+        SingleCutNumber* nVolume;    // Number of Events After Volume Cut
+        SingleCutNumber* nMuon;      // Number of Events After Muon Cut
+        SingleCutNumber* nProton;    // Number of Events After Proton Cut
+        SingleCutNumber* nPion;      // Number of Events After Pion Cut
         
     private:
         string cutFile;

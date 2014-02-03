@@ -61,7 +61,7 @@ public :
     void initVariables();
     void initHistograms();
     
-    void fillParticle(Particle& part);
+    void fillParticle(Particle* part);
     
     void fillHistograms();
 
@@ -106,8 +106,8 @@ public :
    // -------------------------------------------------------------------------
    //     Cut Numbers and List of Bins
    //--------------------------------------------------------------------------
-    CutNumberList nCutList;
-    BinList binList;
+    CutNumberList* nCutList;
+    BinList* binList;
     
    // -------------------------------------------------------------------------
    //     Files

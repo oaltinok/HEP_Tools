@@ -7,24 +7,49 @@ using namespace std;
 
 BinList::BinList()
 {
+    // -------------------------------------------------------------------------
+    //     Memory Allocation
+    //--------------------------------------------------------------------------
     // Standard Bins
-    error.setBin(400, -2.0, 2.0);
-    angle.setBin(180, 0.0, 180.0);
-    trackLength.setBin(200, 0.0, 2000.0 );
-    particleScore.setBin(40, 0.0, 1.0);
-    multiplicity.setBin(11,0.0,11.0);
+    error = new SingleBin;
+    angle = new SingleBin;
+    trackLength = new SingleBin;
+    particleScore = new SingleBin;
+    multiplicity = new SingleBin;
     
     // Neutrino Specific Bins
-    neutrinoP.setBin(50,0.0,5000.0);
+    neutrinoP = new SingleBin;
     
     // Muon Specific Bins
-    muonP.setBin(100,0.0,10000.0);
+    muonP = new SingleBin;
     
     // Proton Specific Bins
-    protonP.setBin(40, 0.0, 4000.0);
+    protonP = new SingleBin;
     
     // Pion Specific Bins
-    pionP.setBin(30, 0.0, 3000.0);
+    pionP = new SingleBin;
+    
+    // -------------------------------------------------------------------------
+    //     Initialization
+    //--------------------------------------------------------------------------
+    // Standard Bins
+    error->setBin(400, -2.0, 2.0);
+    angle->setBin(180, 0.0, 180.0);
+    trackLength->setBin(200, 0.0, 2000.0 );
+    particleScore->setBin(40, 0.0, 1.0);
+    multiplicity->setBin(11,0.0,11.0);
+    
+    // Neutrino Specific Bins
+    neutrinoP->setBin(50,0.0,5000.0);
+    
+    // Muon Specific Bins
+    muonP->setBin(100,0.0,10000.0);
+    
+    // Proton Specific Bins
+    protonP->setBin(40, 0.0, 4000.0);
+    
+    // Pion Specific Bins
+    pionP->setBin(30, 0.0, 3000.0);
 }
 
 

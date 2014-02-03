@@ -7,7 +7,7 @@
 #    Terminal Usage:
 #        > source cleanup.sh
 #    
-#    Last Revision: 2014_01_27
+#    Last Revision: 2014_02_03
 #===============================================================================
 
 echo "Cleanup Process for Output Directories Started!"
@@ -18,7 +18,6 @@ Folder_List=(Output/Plots/*
                 Output/TextFiles/*)
 
 for ilist1 in ${Folder_List[@]}; do
-    echo "--"
     echo "Clean: ${ilist1}"
     rm -frv ${ilist1}
 done

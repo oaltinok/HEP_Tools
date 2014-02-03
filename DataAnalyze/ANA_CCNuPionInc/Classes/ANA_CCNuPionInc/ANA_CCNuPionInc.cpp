@@ -111,34 +111,34 @@ void ANA_CCNuPionInc::run(string playlist, string rootFileName)
         //----------------------------------------------------------------------
         
         // Count All Events before Cuts
-        nCutList.nAll.increment();
+        nCutList->nAll->increment();
         
         // Volume Cut
         if( !isVertexContained()){
             continue;
         }
-        nCutList.nVolume.increment();
+        nCutList->nVolume->increment();
         
         // Muon Cut
         muon->ind = findParticle(PDG_List::mu_minus);
         if(muon->ind == -1){
             continue;
         }
-        nCutList.nMuon.increment();
+        nCutList->nMuon->increment();
         
         // Proton Cut
         proton->ind = findProton();
         if(proton->ind == -1){
             continue;
         }
-        nCutList.nProton.increment();
+        nCutList->nProton->increment();
         
         // Pion Cut
         pion->ind = findPion();
         if(pion->ind == -1){
             continue;
         }
-        nCutList.nPion.increment();
+        nCutList->nPion->increment();
         
 
         //----------------------------------------------------------------------
@@ -163,7 +163,7 @@ void ANA_CCNuPionInc::run(string playlist, string rootFileName)
     cout<<">> Writing "<<rootFileName<<endl;
     f->Write();
     
-    nCutList.writeCutTable();
+    nCutList->writeCutTable();
     
     
     closeFiles();
@@ -203,40 +203,42 @@ void ANA_CCNuPionInc::fillParticleTrue(Particle* part)
 
 void ANA_CCNuPionInc::initHistograms()
 {
-
-    P_muon = new TH1F( "P_muon","True Muon Momentum",binList.muonP.get_nBins(), binList.muonP.get_min(), binList.muonP.get_max() );
+    P_muon = new TH1F( "P_muon","True Muon Momentum",binList->muonP->get_nBins(), binList->muonP->get_min(), binList->muonP->get_max() );
     P_muon->GetXaxis()->SetTitle("True Muon Momentum MeV");
-    P_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.muonP.get_width()));
+    P_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->muonP->get_width()));
     
-    P_proton = new TH1F( "P_proton","True Proton Momentum",binList.protonP.get_nBins(), binList.protonP.get_min(), binList.protonP.get_max() );
+    P_proton = new TH1F( "P_proton","True Proton Momentum",binList->protonP->get_nBins(), binList->protonP->get_min(), binList->protonP->get_max() );
     P_proton->GetXaxis()->SetTitle("True Proton Momentum MeV");
-    P_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.protonP.get_width()));
+    P_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->protonP->get_width()));
     
-    P_pion = new TH1F( "P_pion","True Pion Momentum",binList.pionP.get_nBins(), binList.pionP.get_min(), binList.pionP.get_max() );
+    P_pion = new TH1F( "P_pion","True Pion Momentum",binList->pionP->get_nBins(), binList->pionP->get_min(), binList->pionP->get_max() );
     P_pion->GetXaxis()->SetTitle("True Pion Momentum MeV");
-    P_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.pionP.get_width()));
+    P_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->pionP->get_width()));
     
-    Angle_muon = new TH1F( "Angle_muon","Angle: Beam vs Muon",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+    Angle_muon = new TH1F( "Angle_muon","Angle: Beam vs Muon",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
     Angle_muon->GetXaxis()->SetTitle("Angle");
-    Angle_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.angle.get_width()));
+    Angle_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
     
-    Angle_proton = new TH1F( "Angle_proton","Angle: Beam vs Proton",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+    Angle_proton = new TH1F( "Angle_proton","Angle: Beam vs Proton",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
     Angle_proton->GetXaxis()->SetTitle("Angle");
-    Angle_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.angle.get_width()));
+    Angle_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
     
-    Angle_pion = new TH1F( "Angle_pion","Angle: Beam vs Pion",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+    Angle_pion = new TH1F( "Angle_pion","Angle: Beam vs Pion",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
     Angle_pion->GetXaxis()->SetTitle("Angle");
-    Angle_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.angle.get_width()));
+    Angle_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
     
     
     cout<<"Histograms are Initialized!"<<endl;
 }
 
-void ANA_CCNuPionInc::initSingleHistogram(TH1F* hist, string histName, string title, string xLabel, string yLabel, SingleBin bin)
+void ANA_CCNuPionInc::initSingleHistogram(TH1F* hist, string histName, string title, string xLabel, string yLabel, SingleBin* bin)
 {
-    hist = new TH1F(histName.c_str(),title.c_str(),bin.get_nBins(), bin.get_min(), bin.get_max());
+    // Reserved for a future version - Still needs testing
+    
+    cout<<bin->get_nBins()<<endl;
+    hist = new TH1F(histName.c_str(),title.c_str(),bin->get_nBins(), bin->get_min(), bin->get_max());
     hist->GetXaxis()->SetTitle(xLabel.c_str());
-    hist->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin.get_width()));
+    hist->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin->get_width()));
 }
 
 
@@ -245,12 +247,21 @@ void ANA_CCNuPionInc::initSingleHistogram(TH1F* hist, string histName, string ti
 void ANA_CCNuPionInc::initVariables()
 {
 
-    // Allocate Memory for 
+    // -------------------------------------------------------------------------
+    //     Memory Allocation
+    //--------------------------------------------------------------------------
+    // Allocate Memory
     beam_p3 = new TVector3;
     muon = new Particle;
     proton = new Particle;
     pion = new Particle;
     
+    nCutList = new CutNumberList;
+    binList = new BinList;
+    
+    // -------------------------------------------------------------------------
+    //     Initialization
+    //--------------------------------------------------------------------------
     // Default Beam Configuration
     beam_p3->SetXYZ(1.0,1.0,1.0);
     beam_p3->SetPhi(-1.554);

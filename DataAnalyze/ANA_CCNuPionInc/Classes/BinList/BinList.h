@@ -9,13 +9,13 @@ Class: BinList
     
     Usage:
         > #include "Classes/BinList/BinList.h" 
-        > BinList binList;
-        > binList.error.get_nBins();
-        > binList.error.get_min();
-        > binList.error.get_max();
+        > BinList* binList;
+        > binList->error.get_nBins();
+        > binList->error.get_min();
+        > binList->error.get_max();
             
     
-    Last Revision: 2014_01_30
+    Last Revision: 2014_02_03
 ================================================================================
 */
 #ifndef BinList_h
@@ -29,23 +29,23 @@ class BinList
         BinList();
         
         // Standard Bins
-        SingleBin error;
-        SingleBin angle;
-        SingleBin trackLength;
-        SingleBin particleScore;
-        SingleBin multiplicity;
+        SingleBin* error;
+        SingleBin* angle;
+        SingleBin* trackLength;
+        SingleBin* particleScore;
+        SingleBin* multiplicity;
         
         // Neutrino Specific Bins
-        SingleBin neutrinoP;
+        SingleBin* neutrinoP;
         
         // Muon Specific Bins
-        SingleBin muonP;
+        SingleBin* muonP;
         
         // Proton Specific Bins
-        SingleBin protonP;
+        SingleBin* protonP;
         
         // Pion Specific Bins
-        SingleBin pionP;
+        SingleBin* pionP;
     
     private:
         
