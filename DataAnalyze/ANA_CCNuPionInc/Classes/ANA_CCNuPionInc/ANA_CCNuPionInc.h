@@ -19,7 +19,7 @@ Class: ANA_CCNuPionInc
     
     
     
-    Last Revision: 2014_01_29
+    Last Revision: 2014_02_03
 ================================================================================
 */
 
@@ -36,6 +36,7 @@ Class: ANA_CCNuPionInc
 #include <vector>
 
 #include "Libraries/PDG_List.h"
+#include "Libraries/Folder_List.h"
 #include "Classes/HEP_Misc/HEP_Misc.cpp"
 #include "Classes/Particle/Particle.cpp"
 #include "Classes/CutNumberList/CutNumberList.cpp"
@@ -54,10 +55,8 @@ public :
    //     void run(): Generates a .root file with selected histograms
    //         playlist -> address of the playlist
    //         filename -> file name for the output .root file
-   //         cutFile -> file name for the cutFile that lists the applied analysis cuts
-   //         readmeFile -> file name for the readme
    //--------------------------------------------------------------------------
-    void run(string playlist, string rootFilename, string cutFile, string readmeFile);
+    void run(string playlist, string rootFilename);
     
     void initVariables();
     void initHistograms();
@@ -66,7 +65,7 @@ public :
     
     void fillHistograms();
 
-    void openFiles(string cutFile, string readmeFile);
+    void openFiles();
     void closeFiles();
     void writeReadme();
     void writeCutFile();
@@ -90,15 +89,19 @@ public :
     TH1F* P_muon;
     TH1F* P_proton;
     TH1F* P_pion;
+    TH1F* Angle_muon;
+    TH1F* Angle_proton;
+    TH1F* Angle_pion;
+    
 
    // -------------------------------------------------------------------------
    //     Analysis Variables
    //--------------------------------------------------------------------------
     HEP_Misc misc;
-    TVector3 beam_p3;
-    Particle proton;
-    Particle muon;
-    Particle pion;
+    TVector3* beam_p3;
+    Particle* proton;
+    Particle* muon;
+    Particle* pion;
     
    // -------------------------------------------------------------------------
    //     Cut Numbers and List of Bins
@@ -109,9 +112,8 @@ public :
    // -------------------------------------------------------------------------
    //     Files
    //--------------------------------------------------------------------------
-    ofstream cutText;
+    string readmeFile;
     ofstream readme;
-
 
    // -------------------------------------------------------------------------
    //     Data

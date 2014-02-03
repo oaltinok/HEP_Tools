@@ -38,6 +38,15 @@ void Plotter::plotHistograms(string mcFile, string plotDir)
     
     TH1F* h_P_pion= f_mc->Get("P_pion");
     plotSingleHist_1D(h_P_pion,"P_pion.png",plotDir);
+    
+    TH1F* h_Angle_muon= f_mc->Get("Angle_muon");
+    plotSingleHist_1D(h_Angle_muon,"Angle_muon.png",plotDir);
+    
+    TH1F* h_Angle_proton= f_mc->Get("Angle_proton");
+    plotSingleHist_1D(h_Angle_proton,"Angle_proton.png",plotDir);
+    
+    TH1F* h_Angle_pion= f_mc->Get("Angle_pion");
+    plotSingleHist_1D(h_Angle_pion,"Angle_pion.png",plotDir);
 
 
 }

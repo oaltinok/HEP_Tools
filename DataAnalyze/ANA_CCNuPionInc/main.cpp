@@ -16,7 +16,7 @@ main.cpp
             > main(false) for Running the Analysis
             > main(true) for Generating Plots only
     
-    Last Revision: 2014_01_27
+    Last Revision: 2014_02_03
 ================================================================================
 */
 
@@ -28,9 +28,6 @@ main.cpp
 #include <string>
 
 using namespace std;
-
-string getFileLocation(string s1, string s2);
-string getFileLocation(string s1, string s2, string s3);
 
 void main(bool onlyPlot)
 {
@@ -48,27 +45,15 @@ void main(bool onlyPlot)
     }else{
         if(isTest){
             t.run(getFileLocation(Folder_List::IN, Folder_List::PLAYLIST, Folder_List::F_PL_TEST),
-            getFileLocation(Folder_List::OUT, Folder_List::ROOT, Folder_List::F_ROOT_MC),
-            getFileLocation(Folder_List::OUT, Folder_List::TEXT, Folder_List::F_TEXT_CUT),
-            getFileLocation(Folder_List::OUT, Folder_List::TEXT, Folder_List::F_TEXT_README) );
+            getFileLocation(Folder_List::OUT, Folder_List::ROOT, Folder_List::F_ROOT_MC));
             
         }else{
             t.run(getFileLocation(Folder_List::IN, Folder_List::PLAYLIST, Folder_List::F_PL_FULL),
-            getFileLocation(Folder_List::OUT, Folder_List::ROOT, Folder_List::F_ROOT_MC),
-            getFileLocation(Folder_List::OUT, Folder_List::TEXT, Folder_List::F_TEXT_CUT),
-            getFileLocation(Folder_List::OUT, Folder_List::TEXT, Folder_List::F_TEXT_README) );
+            getFileLocation(Folder_List::OUT, Folder_List::ROOT, Folder_List::F_ROOT_MC));
         }
     }
     
 }
 
-string getFileLocation(string s1, string s2)
-{
-    return s1+s2;
-}
 
-string getFileLocation(string s1, string s2, string s3)
-{
-    return s1+s2+s3;
-}
 

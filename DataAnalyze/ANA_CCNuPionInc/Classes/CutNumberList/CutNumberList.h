@@ -14,7 +14,7 @@ Class: CutNumberList
         > nCutList.nAll.increment();
         > percent = nCutList.getPercent(nCutList.nMuon.getValue());
     
-    Last Revision: 2014_01_29
+    Last Revision: 2014_02_03
 ================================================================================
 */
 #ifndef CutNumberList_h
@@ -22,6 +22,7 @@ Class: CutNumberList
 
 #include <iostream>
 #include "Classes/SingleCutNumber/SingleCutNumber.cpp"
+#include "Libraries/Folder_List.h"
 
 const int initCount = 0.0;
 
@@ -32,6 +33,7 @@ class CutNumberList
         
         // Returns the Percent of input number wrt All Events (No Cut)
         double getPercent(double nCurrent);
+        void writeCutTable();
         
         SingleCutNumber nAll;       // Number of All Events
         SingleCutNumber nVolume;    // Number of Events After Volume Cut
@@ -40,8 +42,8 @@ class CutNumberList
         SingleCutNumber nPion;      // Number of Events After Pion Cut
         
     private:
-
-        
+        string cutFile;
+        ofstream cutText;
 
 };
 

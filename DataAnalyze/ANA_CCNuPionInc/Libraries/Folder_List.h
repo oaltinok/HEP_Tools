@@ -12,14 +12,31 @@ Library: Folder_List
             // Returns the Location of Input Test Playlist
 
     
-    Last Revision: 2014_01_27
+    Last Revision: 2014_02_03
 ================================================================================
 */
 
 #ifndef Folder_List_h
 #define Folder_List_h
 
+#include<string>
+
 using namespace std;
+
+/*
+--------------------------------------------------------------------------------
+Methods for getting Complete File Location
+--------------------------------------------------------------------------------
+*/
+string getFileLocation(string s1, string s2)
+{
+    return s1+s2;
+}
+
+string getFileLocation(string s1, string s2, string s3)
+{
+    return s1+s2+s3;
+}
 
 /*
 --------------------------------------------------------------------------------
@@ -36,7 +53,7 @@ const string F_ROOT_MC = "MC_minerva1.root";
 const string F_ROOT_DATA = "DATA_minerva1.root";
 
 // TEXT Files
-const string F_TEXT_CUT = "CutResults.txt";
+const string F_TEXT_CUT = "CutTable.txt";
 const string F_TEXT_README = "readme.txt";
 
 
