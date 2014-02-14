@@ -1,6 +1,6 @@
 void makeClass(string playlist){
 
-    TChain fChain("CCNuPionInc") ;
+    TChain fChain("CCInclusiveReco") ;
 
     ifstream input_pl( playlist.c_str() );
     string filename;

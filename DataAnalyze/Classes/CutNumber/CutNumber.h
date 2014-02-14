@@ -1,40 +1,45 @@
 /*
 ================================================================================
-Class: SingleCutNumber
+Class: CutNumber
     Class for Cut Number
         Standard Class implementation for a member variable in CutNumberList
         Each Cut Number have private variables: value and label
         Value can be updated using increment() function
     
     Main Directory:
-        Classes/SingleCutNumber
+        Classes/CutNumber
     
     Usage:
-        > #include "Classes/SingleCutNumber/SingleCutNumber.cpp"
-        > SingleCutNumber nAll;
+        > #include "Classes/CutNumber/CutNumber.cpp"
+        > CutNumber nAll;
         > value = nAll.getValue();
     
-    Last Revision: 2014_01_29
+    Last Revision: 2014_02_14
 ================================================================================
 */
 
-#ifndef SingleCutNumber_h
-#define SingleCutNumber_h
+#ifndef CutNumber_h
+#define CutNumber_h
 
 #include<string>
 
-class SingleCutNumber
+const int initCount = 0.0;
+
+class CutNumber
 {
     public:
-        SingleCutNumber();
+        CutNumber();
+        CutNumber(string inputLabel);
         
         void increment();
+        
         void setValue(double input);
         void setLabel(string input);
+        
         double getValue();
         string getLabel();
 
-    private:    
+    private:
         double value;
         string label;
 

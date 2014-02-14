@@ -2,7 +2,7 @@
 ================================================================================
 Class: CutNumberList
     Class which holds CutNumbers and functions related to cutNumbers 
-    Uses SingleCutNumber Class to define Cut Numbers
+    Uses CutNumber Class to define Cut Numbers
     
     
     Main Directory:
@@ -14,17 +14,21 @@ Class: CutNumberList
         > nCutList.nAll.increment();
         > percent = nCutList.getPercent(nCutList.nMuon.getValue());
     
-    Last Revision: 2014_02_03
+    Last Revision: 2014_02_14
 ================================================================================
 */
 #ifndef CutNumberList_h
 #define CutNumberList_h
 
 #include <iostream>
-#include "Classes/SingleCutNumber/SingleCutNumber.cpp"
+#include "Classes/CutNumber/CutNumber.cpp"
 #include "Libraries/Folder_List.h"
 
-const int initCount = 0.0;
+struct Node
+{
+    CutNumber* nCut;
+    Node* next;
+};
 
 class CutNumberList
 {
@@ -34,13 +38,13 @@ class CutNumberList
         // Returns the Percent of input number wrt All Events (No Cut)
         double getPercent(double nCurrent);
         void writeCutTable();
-        void writeCut(SingleCutNumber* cut);
+        void addCutNumber(string label);
+        void printList();
+        CutNumber* getCutNumber(string targetLabel);
         
-        SingleCutNumber* nAll;       // Number of All Events
-        SingleCutNumber* nVolume;    // Number of Events After Volume Cut
-        SingleCutNumber* nMuon;      // Number of Events After Muon Cut
-        SingleCutNumber* nProton;    // Number of Events After Proton Cut
-        SingleCutNumber* nPion;      // Number of Events After Pion Cut
+        
+        Node* head;
+        Node* tail;
         
     private:
         string cutFile;

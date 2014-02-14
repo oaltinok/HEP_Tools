@@ -32,7 +32,7 @@ void ANA_CCNuPionInc::run(string playlist, string rootFileName)
     // Create chain
     //------------------------------------------------------------------------
 
-    TChain* fChain = new TChain("CCNuPionInc");
+    TChain* fChain = new TChain("CCInclusives");
     Init(playlist, fChain);
 
     if (!fChain) return;
@@ -149,6 +149,13 @@ void ANA_CCNuPionInc::run(string playlist, string rootFileName)
         fillParticleTrue(proton);
         fillParticleTrue(pion);
         
+        // Fill Reconstructed Information
+        fillMuon();
+        fillProton();
+        fillPion();
+        
+        
+        
         //----------------------------------------------------------------------
         // Fill Histograms
         //----------------------------------------------------------------------
@@ -174,6 +181,23 @@ void ANA_CCNuPionInc::run(string playlist, string rootFileName)
 //     Specific Functions
 //--------------------------------------------------------------------------
 
+
+void ANA_CCNuPionInc::fillMuon()
+{
+    muon->p4[0].SetPxPyPzE(CCNuPionInc_muon_px,CCNuPionInc_muon_px,mc_FSPartPz[ind],mc_FSPartE[ind]);
+
+}
+
+void ANA_CCNuPionInc::fillProton()
+{
+
+}
+
+void ANA_CCNuPionInc::fillPion()
+{
+
+}
+
 void ANA_CCNuPionInc::fillHistograms()
 {
     P_muon->Fill(muon->p4[1].P());
@@ -183,6 +207,10 @@ void ANA_CCNuPionInc::fillHistograms()
     Angle_muon->Fill(muon->angleBeam[1] * TMath::RadToDeg());
     Angle_proton->Fill(proton->angleBeam[1] * TMath::RadToDeg());
     Angle_pion->Fill(pion->angleBeam[1] * TMath::RadToDeg());
+    
+    AngleMuon_muon->Fill(muon->angleMuon[1] * TMath::RadToDeg());
+    AngleMuon_proton->Fill(proton->angleMuon[1] * TMath::RadToDeg());
+    AngleMuon_pion->Fill(pion->angleMuon[1] * TMath::RadToDeg());
 
 }
 
@@ -190,6 +218,7 @@ void ANA_CCNuPionInc::fillParticleTrue(Particle* part)
 {
     int ind = part->ind;
     double angleBeam;
+    double angleMuon;
     
     // Fill 4-Momentum
     part->p4[1].SetPxPyPzE(mc_FSPartPx[ind],mc_FSPartPy[ind],mc_FSPartPz[ind],mc_FSPartE[ind]);
@@ -198,11 +227,19 @@ void ANA_CCNuPionInc::fillParticleTrue(Particle* part)
     angleBeam = part->p4[1].Angle(*beam_p3);
     part->angleBeam[1] = angleBeam;
     
+    // Calculate and Fill Angle wrt Muon
+    angleMuon = part->p4[1].Angle(muon->p4[1].Vect());
+    part->angleMuon[1] = angleMuon;
+    
+    
 }
 
 
 void ANA_CCNuPionInc::initHistograms()
 {
+    // -------------------------------------------------------------------------
+    //     Momentum
+    //--------------------------------------------------------------------------
     P_muon = new TH1F( "P_muon","True Muon Momentum",binList->muonP->get_nBins(), binList->muonP->get_min(), binList->muonP->get_max() );
     P_muon->GetXaxis()->SetTitle("True Muon Momentum MeV");
     P_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->muonP->get_width()));
@@ -215,6 +252,10 @@ void ANA_CCNuPionInc::initHistograms()
     P_pion->GetXaxis()->SetTitle("True Pion Momentum MeV");
     P_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->pionP->get_width()));
     
+    
+    // -------------------------------------------------------------------------
+    //     Angles
+    //--------------------------------------------------------------------------
     Angle_muon = new TH1F( "Angle_muon","Angle: Beam vs Muon",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
     Angle_muon->GetXaxis()->SetTitle("Angle");
     Angle_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
@@ -226,6 +267,18 @@ void ANA_CCNuPionInc::initHistograms()
     Angle_pion = new TH1F( "Angle_pion","Angle: Beam vs Pion",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
     Angle_pion->GetXaxis()->SetTitle("Angle");
     Angle_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
+    
+    AngleMuon_muon = new TH1F( "AngleMuon_muon","Angle: Muon vs Muon",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
+    AngleMuon_muon->GetXaxis()->SetTitle("Angle");
+    AngleMuon_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
+    
+    AngleMuon_proton = new TH1F( "AngleMuon_proton","Angle: Muon vs Proton",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
+    AngleMuon_proton->GetXaxis()->SetTitle("Angle");
+    AngleMuon_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
+    
+    AngleMuon_pion = new TH1F( "AngleMuon_pion","Angle: Muon vs Pion",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
+    AngleMuon_pion->GetXaxis()->SetTitle("Angle");
+    AngleMuon_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
     
     
     cout<<"Histograms are Initialized!"<<endl;

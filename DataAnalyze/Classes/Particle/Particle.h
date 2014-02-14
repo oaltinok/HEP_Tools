@@ -25,11 +25,20 @@ class Particle
     public:
         Particle();
         
-        // Variables
+
+        // Monte Carlo(MC) and Reconstructed(Reco)
         TLorentzVector* p4;     // 4-Momentum of the Particle (Px,Py,Pz,E)
         double* angleBeam;      // Angle wrt Beam in rads
         double* angleMuon;      // Angle wrt Muon in rads
+        
+        // MC Only
         int ind;                // indice for MC truth information
+        
+        // Reco Only
+        double pID;             // Particle Score from Reconstructed Values
+        double trackLength;     // Track Length in [mm]
+        
+        // Other
     
     
     

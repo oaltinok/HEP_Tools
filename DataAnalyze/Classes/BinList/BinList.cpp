@@ -40,7 +40,7 @@ BinList::BinList()
     multiplicity->setBin(11,0.0,11.0);
     
     // Neutrino Specific Bins
-    neutrinoP->setBin(50,0.0,5000.0);
+    neutrinoP->setBin(120,0.0,12000.0);
     
     // Muon Specific Bins
     muonP->setBin(100,0.0,10000.0);

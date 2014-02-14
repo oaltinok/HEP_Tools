@@ -92,6 +92,9 @@ public :
     TH1F* Angle_muon;
     TH1F* Angle_proton;
     TH1F* Angle_pion;
+    TH1F* AngleMuon_muon;
+    TH1F* AngleMuon_proton;
+    TH1F* AngleMuon_pion;
     
 
    // -------------------------------------------------------------------------
