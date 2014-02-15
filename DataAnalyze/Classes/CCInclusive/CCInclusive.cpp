@@ -108,46 +108,46 @@ void CCInclusive::run(string playlist, string rootFileName)
         //----------------------------------------------------------------------
         
         // Count All Events before Cuts
-        nCutList->incCutNumber("nAll");
+        nCutList->nAll->increment();
         
         // Volume Cut
         if( !isVertexContained()){
             continue;
         }
-        nCutList->incCutNumber("nVolume");
+        nCutList->nVolume->increment();
         
         // Incoming Beam Energy Cut
         if ( !isBeamEnergyLow(maxBeamEnergy) ){
             continue;
         }
-        nCutList->incCutNumber("nBeamEnergy");
+        nCutList->nBeamEnergy->increment();
         
         // Muon Cut
         muon->ind = findParticle(PDG_List::mu_minus);
         if(muon->ind == -1){
             continue;
         }
-        nCutList->incCutNumber("nMuon");
+        nCutList->nMuon->increment();
         
         // Minos Match Cut
         if( !isMinosMatched() ){
             continue;
         }
-        nCutList->incCutNumber("nMinos");
+        nCutList->nMinos->increment();
         
         // Proton Cut
         proton->ind = findProton();
         if(proton->ind == -1){
             continue;
         }
-        nCutList->incCutNumber("nProton");
+        nCutList->nProton->increment();
         
         // Pion Cut
         pion->ind = findPion();
         if(pion->ind == -1){
             continue;
         }
-        nCutList->incCutNumber("nPion");
+        nCutList->nPion->increment();
         
         //----------------------------------------------------------------------
         // Fill Particles
@@ -324,21 +324,12 @@ void CCInclusive::initVariables()
     //--------------------------------------------------------------------------
     // Allocate Memory
     beam_p3 = new TVector3;
-    muon = new Particle;
+    muon = new Muon;
     proton = new Particle;
     pion = new Particle;
     
     nCutList = new CutNumberList;
     binList = new BinList;
-    
-    
-    nCutList->addCutNumber("nAll");
-    nCutList->addCutNumber("nVolume");
-    nCutList->addCutNumber("nBeamEnergy");
-    nCutList->addCutNumber("nMuon");
-    nCutList->addCutNumber("nMinos");
-    nCutList->addCutNumber("nProton");
-    nCutList->addCutNumber("nPion");
     
     nCutList->printList();
     

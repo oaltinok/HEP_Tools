@@ -20,10 +20,27 @@ CutNumberList::CutNumberList()
         exit(1);
     }
     
+    // Initialize Linked List
     head = NULL;
     tail = NULL;
+   
+    // Add Default CutNumbers to the Linked List
+    addCutNumber("nAll");
+    addCutNumber("nVolume");
+    addCutNumber("nBeamEnergy");
+    addCutNumber("nMuon");
+    addCutNumber("nMinos");
+    addCutNumber("nProton");
+    addCutNumber("nPion");
     
-    
+    // Initialize Default CutNumber Pointers
+    nAll = getCutNumber("nAll");
+    nVolume = getCutNumber("nVolume");
+    nBeamEnergy = getCutNumber("nBeamEnergy");
+    nMuon = getCutNumber("nMuon");
+    nMinos = getCutNumber("nMinos");
+    nProton = getCutNumber("nProton");
+    nPion = getCutNumber("nPion");
 }
 
 bool CutNumberList::addCutNumber(string label)
@@ -54,23 +71,6 @@ bool CutNumberList::addCutNumber(string label)
     }
     
     return false;
-
-}
-
-void CutNumberList::incCutNumber(string targetLabel)
-{
-    Node* temp;
-    temp = head;
-    
-    while(  temp != NULL ){
-        if( temp->nCut->getLabel() == targetLabel){
-            temp->nCut->increment();
-            break;
-        }else{
-            temp = temp->next;
-        }
-    }
-       
 
 }
 

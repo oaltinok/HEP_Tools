@@ -19,7 +19,7 @@ Class: CCInclusive
     
     
     
-    Last Revision: 2014_02_14
+    Last Revision: 2014_02_15
 ================================================================================
 */
 
@@ -41,6 +41,7 @@ Class: CCInclusive
 #include "Classes/Particle/Particle.cpp"
 #include "Classes/CutNumberList/CutNumberList.cpp"
 #include "Classes/BinList/BinList.cpp"
+#include "Classes/Muon/Muon.cpp"
 
 
 class CCInclusive {
@@ -120,7 +121,7 @@ public :
     HEP_Misc misc;
     TVector3* beam_p3;
     Particle* proton;
-    Particle* muon;
+    Muon* muon;
     Particle* pion;
     
    // -------------------------------------------------------------------------

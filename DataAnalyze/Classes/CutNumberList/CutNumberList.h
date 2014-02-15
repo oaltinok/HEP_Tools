@@ -14,7 +14,7 @@ Class: CutNumberList
         > nCutList.nAll.increment();
         > percent = nCutList.getPercent(nCutList.nMuon.getValue());
     
-    Last Revision: 2014_02_14
+    Last Revision: 2014_02_15
 ================================================================================
 */
 #ifndef CutNumberList_h
@@ -42,9 +42,19 @@ class CutNumberList
         void printList();
         CutNumber* getCutNumber(string targetLabel);
         
-        
+        // Linked List Implementation
         Node* head;
         Node* tail;
+        
+        // Predefine pointers for Default Cut Numbers
+        // Increases Performance - No Search Needed for Default cut Numbers
+        CutNumber* nAll;
+        CutNumber* nVolume;
+        CutNumber* nBeamEnergy;
+        CutNumber* nMuon;        
+        CutNumber* nMinos;
+        CutNumber* nProton;                
+        CutNumber* nPion;                
         
     private:
         string cutFile;
