@@ -21,6 +21,11 @@ void Muon::set_isMinosMatched(bool input)
     isMinosMatched = input;
 }
 
+void Muon::set_angleMuon(TVector3 muonp3)
+{
+    angleMuon[1] = 0;
+}
+
 
 
 

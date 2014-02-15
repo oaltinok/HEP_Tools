@@ -6,7 +6,7 @@ Class: Particle
    
     Uses ROOT Specific classes
     
-    Last Revision: 2014_01_28
+    Last Revision: 2014_02_15
 ================================================================================
 */
 
@@ -25,7 +25,10 @@ class Particle
     public:
         Particle();
         
-
+        virtual void set_angleMuon(TVector3 muonp3);
+        void set_angleBeam(TVector3 beamp3);
+        
+        
         // Monte Carlo(MC) and Reconstructed(Reco)
         TLorentzVector* p4;     // 4-Momentum of the Particle (Px,Py,Pz,E)
         double* angleBeam;      // Angle wrt Beam in rads
@@ -40,9 +43,9 @@ class Particle
         
         // Other
     
-    
-    
     private:
+        
+        
 
 };
 

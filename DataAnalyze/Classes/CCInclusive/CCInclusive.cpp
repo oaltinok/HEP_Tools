@@ -233,13 +233,14 @@ void CCInclusive::fillParticleTrue(Particle* part)
     // Fill 4-Momentum
     part->p4[1].SetPxPyPzE(mc_FSPartPx[ind],mc_FSPartPy[ind],mc_FSPartPz[ind],mc_FSPartE[ind]);
        
-    // Calculate and Fill Angle wrt Beam
-    angleBeam = part->p4[1].Angle(*beam_p3);
-    part->angleBeam[1] = angleBeam;
+    // set Angle wrt Beam
+    part->set_angleBeam(*beam_p3);
     
-    // Calculate and Fill Angle wrt Muon
-    angleMuon = part->p4[1].Angle(muon->p4[1].Vect());
-    part->angleMuon[1] = angleMuon;
+    // set Angle wrt Muon
+    part->set_angleMuon(muon->p4[1].Vect());
+    
+//     angleMuon = part->p4[1].Angle(muon->p4[1].Vect());
+//     part->angleMuon[1] = angleMuon;
     
     
 }

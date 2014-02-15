@@ -13,4 +13,15 @@ Particle::Particle()
     angleMuon = new double[N_CHANNELS];
 }
 
+virtual void Particle::set_angleMuon(TVector3 muonp3)
+{
+    angleMuon[1] = p4[1].Angle(muonp3);
+
+}
+
+void Particle::set_angleBeam(TVector3 beamp3)
+{
+    angleBeam[1] = p4[1].Angle(beamp3);
+}
+
 
