@@ -15,7 +15,7 @@ Class: BinList
         > binList->error.get_max();
             
     
-    Last Revision: 2014_02_03
+    Last Revision: 2014_03_06
 ================================================================================
 */
 #ifndef BinList_h
@@ -27,6 +27,7 @@ class BinList
 {
     public:
         BinList();
+        ~BinList();
         
         // Standard Bins
         SingleBin* error;
@@ -34,6 +35,7 @@ class BinList
         SingleBin* trackLength;
         SingleBin* particleScore;
         SingleBin* multiplicity;
+        SingleBin* int_channel;
         
         // Neutrino Specific Bins
         SingleBin* neutrinoP;

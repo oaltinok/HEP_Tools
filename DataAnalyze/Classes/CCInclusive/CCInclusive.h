@@ -19,7 +19,7 @@ Class: CCInclusive
     
     
     
-    Last Revision: 2014_02_15
+    Last Revision: 2014_03_11
 ================================================================================
 */
 
@@ -102,13 +102,20 @@ public :
    //--------------------------------------------------------------------------
     // True Analysis Variables
     TH1F* beamEnergy;
+    TH1F* int_channel;
    
     TH1F* P_muon;
     TH1F* P_proton;
     TH1F* P_pion;
+    
+    TH1F* KE_muon;
+    TH1F* KE_proton;
+    TH1F* KE_pion;
+    
     TH1F* Angle_muon;
     TH1F* Angle_proton;
     TH1F* Angle_pion;
+    
     TH1F* AngleMuon_muon;
     TH1F* AngleMuon_proton;
     TH1F* AngleMuon_pion;
@@ -117,11 +124,14 @@ public :
    // -------------------------------------------------------------------------
    //     Analysis Variables
    //--------------------------------------------------------------------------
+    bool isDataAnalysis;
+    bool isMC;
     double maxBeamEnergy;
+    int max_nFSPart;
     HEP_Misc misc;
     TVector3* beam_p3;
     Particle* proton;
-    Muon* muon;
+    Particle* muon;
     Particle* pion;
     
    // -------------------------------------------------------------------------

@@ -12,7 +12,7 @@ Library: Folder_List
             // Returns the Location of Input Test Playlist
 
     
-    Last Revision: 2014_02_14
+    Last Revision: 2014_03_17
 ================================================================================
 */
 
@@ -45,7 +45,7 @@ string getFileLocation(string s1, string s2, string s3)
 --------------------------------------------------------------------------------
 */
 
-const string channelTag = "";
+const string channelTag = "Gold";
 
 /*
 --------------------------------------------------------------------------------
@@ -56,6 +56,7 @@ const string channelTag = "";
 // Playlists
 const string F_PL_TEST = "pl_MC_Test.dat";
 const string F_PL_FULL = "pl_MC_minerva1.dat";
+
 
 // ROOT Files
 const string F_ROOT_MC = "MC_minerva1.root";

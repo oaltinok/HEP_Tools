@@ -21,7 +21,7 @@ main.cpp
 */
 
 // Include Required Classes & Libraries
-#include "Classes/CCInclusive/CCInclusive.cpp"
+#include "Classes/CCPi0/CCPi0.cpp"
 #include "Classes/Plotter/Plotter.cpp"
 #include "Libraries/Folder_List.h"
 
@@ -32,7 +32,7 @@ using namespace std;
 
 void main(bool onlyPlot)
 {
-    CCInclusive t;
+    CCPi0 t;
     Plotter p;
         
         

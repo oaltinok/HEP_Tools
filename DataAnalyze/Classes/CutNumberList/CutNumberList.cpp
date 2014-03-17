@@ -33,6 +33,7 @@ CutNumberList::CutNumberList()
     addCutNumber("nProton");
     addCutNumber("nPion");
     
+    
     // Initialize Default CutNumber Pointers
     nAll = getCutNumber("nAll");
     nVolume = getCutNumber("nVolume");
@@ -41,6 +42,7 @@ CutNumberList::CutNumberList()
     nMinos = getCutNumber("nMinos");
     nProton = getCutNumber("nProton");
     nPion = getCutNumber("nPion");
+    
 }
 
 bool CutNumberList::addCutNumber(string label)

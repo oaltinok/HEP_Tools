@@ -15,6 +15,7 @@ CCInclusive::CCInclusive()
 
 }
 
+
 void CCInclusive::run(string playlist, string rootFileName)
 {
 
@@ -60,6 +61,8 @@ void CCInclusive::run(string playlist, string rootFileName)
     fChain->SetBranchStatus("ev_subrun",1);  // activate
     fChain->SetBranchStatus("ev_gate",1);  // activate
     fChain->SetBranchStatus("minos_track_match",1);  // activate
+    fChain->SetBranchStatus("mc_Q2",1);  // activate
+    
     
     // Cut Variables
     fChain->SetBranchStatus("mc_vtx",1);
@@ -78,6 +81,25 @@ void CCInclusive::run(string playlist, string rootFileName)
     fChain->SetBranchStatus("mc_FSPartPDG",1);
 
 
+    double nMinosMatch = 0;
+    double nMinosMatch_LongProton = 0;
+    double nMinosMatch_ShortProton = 0;
+    
+    double nMinosMiss = 0;
+    double nMinosMiss_LongProton = 0;
+    double nMinosMiss_ShortProton = 0;
+    
+    double nAll = 0;
+    double nVolume = 0;
+    double nBeamEnergy = 0;
+    double nMuon = 0;
+    double nProton = 0;
+    double nPion = 0;
+    double nMinos = 0;
+    
+    int indMuon;
+    int indProton;
+    int indPion;
 
     //------------------------------------------------------------------------
     // Loop over Chain
@@ -108,80 +130,118 @@ void CCInclusive::run(string playlist, string rootFileName)
         //----------------------------------------------------------------------
         
         // Count All Events before Cuts
-        nCutList->nAll->increment();
+        nAll++;
         
         // Volume Cut
         if( !isVertexContained()){
             continue;
         }
-        nCutList->nVolume->increment();
+        nVolume++;
         
         // Incoming Beam Energy Cut
         if ( !isBeamEnergyLow(maxBeamEnergy) ){
             continue;
         }
-        nCutList->nBeamEnergy->increment();
+        nBeamEnergy++;
         
         // Muon Cut
-        muon->ind = findParticle(PDG_List::mu_minus);
-        if(muon->ind == -1){
+        indMuon = findParticle(PDG_List::mu_minus);
+        if(indMuon == -1){
             continue;
         }
-        nCutList->nMuon->increment();
-        
-        // Minos Match Cut
-        if( !isMinosMatched() ){
-            continue;
-        }
-        nCutList->nMinos->increment();
+        nMuon++;
         
         // Proton Cut
-        proton->ind = findProton();
-        if(proton->ind == -1){
+        indProton = findProton();
+        if(indProton == -1){
             continue;
         }
-        nCutList->nProton->increment();
+        nProton++;
         
-        // Pion Cut
-        pion->ind = findPion();
-        if(pion->ind == -1){
+        
+//         // Pion Cut
+//         indPion = findPion();
+//         if(indPion == -1){
+//             continue;
+//         }
+//         nPion++;
+        
+        if(!isNoMeson()){
             continue;
         }
-        nCutList->nPion->increment();
+        nPion++;
+
         
+        // Minos Match Cut
+        if( isMinosMatched() ){
+            continue;
+        }
+        nMinos++;
+
+
+        if ( isDataAnalysis){
         //----------------------------------------------------------------------
         // Fill Particles
         //----------------------------------------------------------------------
-    
-        fillParticleTrue(muon);
-        fillParticleTrue(proton);
-        fillParticleTrue(pion);
         
-        // Fill Reconstructed Information
-        fillMuon();
-        fillProton();
-        fillPion();
+            if( isMC ){
+                fillParticleTrue(muon);
+                fillParticleTrue(proton);
+                fillParticleTrue(pion);
+            }
         
-        
-        
+            // Fill Reconstructed Information
+            fillMuon();
+            fillProton();
+            fillPion();
+            
+            
         //----------------------------------------------------------------------
         // Fill Histograms
         //----------------------------------------------------------------------
        
-        fillHistograms();
+            fillHistograms();            
+        }
+        
+        
+        
+        cout<<mc_Q2<<endl;
+        
+        
+
         
     }    
     cout<<"Done!"<<endl;
     
+    nCutList->nAll->setValue(nAll);
+    nCutList->nVolume->setValue(nVolume);
+    nCutList->nBeamEnergy->setValue(nBeamEnergy);
+    nCutList->nMuon->setValue(nMuon);
+    nCutList->nProton->setValue(nProton);
+    nCutList->nPion->setValue(nPion);
+    nCutList->nMinos->setValue(nMinos);
+    
+    
     // Write the Root File
     cout<<">> Writing "<<rootFileName<<endl;
-    f->Write();
+//     f->Write();
     
     nCutList->writeCutTable();
     
     
     closeFiles();
+   
     
+    
+    
+    
+    // Delete Dynamic Variables - I will modify the destructor for
+    // better Memory Management
+    delete muon;
+    delete proton;
+    delete pion;
+    delete binList;
+    delete nCutList;
 
 }
 
@@ -209,10 +269,15 @@ void CCInclusive::fillPion()
 void CCInclusive::fillHistograms()
 {
     beamEnergy->Fill(mc_incomingE);
+    int_channel->Fill(mc_intType);
     
     P_muon->Fill(muon->p4[1].P());
     P_proton->Fill(proton->p4[1].P());
     P_pion->Fill(pion->p4[1].P());
+    
+    KE_muon->Fill(muon->get_KineticEnergy(isMC));
+    KE_proton->Fill(proton->get_KineticEnergy(isMC));
+    KE_pion->Fill(pion->get_KineticEnergy(isMC));
     
     Angle_muon->Fill(muon->angleBeam[1] * TMath::RadToDeg());
     Angle_proton->Fill(proton->angleBeam[1] * TMath::RadToDeg());
@@ -239,9 +304,6 @@ void CCInclusive::fillParticleTrue(Particle* part)
     // set Angle wrt Muon
     part->set_angleMuon(muon->p4[1].Vect());
     
-//     angleMuon = part->p4[1].Angle(muon->p4[1].Vect());
-//     part->angleMuon[1] = angleMuon;
-    
     
 }
 
@@ -255,6 +317,10 @@ void CCInclusive::initHistograms()
     beamEnergy = new TH1F( "beamEnergy","True Neutrino Energy",binList->neutrinoP->get_nBins(), binList->neutrinoP->get_min(), binList->neutrinoP->get_max() );
     beamEnergy->GetXaxis()->SetTitle("True Neutrino Energy MeV");
     beamEnergy->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->neutrinoP->get_width()));
+    
+    int_channel = new TH1F( "int_channel","Interaction Channel",binList->int_channel->get_nBins(), binList->int_channel->get_min(), binList->int_channel->get_max() );
+    int_channel->GetXaxis()->SetTitle("1 = QE, 2 = Resonant, 3 = DIS, 4 = Coh pi");
+    int_channel->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->int_channel->get_width()));
 
     // -------------------------------------------------------------------------
     //     Momentum
@@ -270,6 +336,22 @@ void CCInclusive::initHistograms()
     P_pion = new TH1F( "P_pion","True Pion Momentum",binList->pionP->get_nBins(), binList->pionP->get_min(), binList->pionP->get_max() );
     P_pion->GetXaxis()->SetTitle("True Pion Momentum MeV");
     P_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->pionP->get_width()));
+    
+    
+    // -------------------------------------------------------------------------
+    //     Kinetic Energy
+    //--------------------------------------------------------------------------
+    KE_muon = new TH1F( "KE_muon","True Muon Kinetic Energy",binList->muonP->get_nBins(), binList->muonP->get_min(), binList->muonP->get_max() );
+    KE_muon->GetXaxis()->SetTitle("True Muon Kinetic Energy MeV");
+    KE_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->muonP->get_width()));
+    
+    KE_proton = new TH1F( "KE_proton","True Proton Kinetic Energy",binList->protonP->get_nBins(), binList->protonP->get_min(), binList->protonP->get_max() );
+    KE_proton->GetXaxis()->SetTitle("True Proton Kinetic Energy MeV");
+    KE_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->protonP->get_width()));
+    
+    KE_pion = new TH1F( "KE_pion","True Pion Kinetic Energy",binList->pionP->get_nBins(), binList->pionP->get_min(), binList->pionP->get_max() );
+    KE_pion->GetXaxis()->SetTitle("True Pion Kinetic Energy MeV");
+    KE_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->pionP->get_width()));
     
     
     // -------------------------------------------------------------------------
@@ -319,6 +401,9 @@ void CCInclusive::initSingleHistogram(TH1F* hist, string histName, string title,
 void CCInclusive::initVariables()
 {
     cout<<"Initializing Variables"<<endl;
+    
+    isDataAnalysis = true;
+    isMC = true;
 
     // -------------------------------------------------------------------------
     //     Memory Allocation
@@ -326,8 +411,8 @@ void CCInclusive::initVariables()
     // Allocate Memory
     beam_p3 = new TVector3;
     muon = new Muon;
-    proton = new Particle;
-    pion = new Particle;
+    proton = new Proton;
+    pion = new Pion;
     
     nCutList = new CutNumberList;
     binList = new BinList;
@@ -342,7 +427,8 @@ void CCInclusive::initVariables()
     beam_p3->SetPhi(-1.554);
     beam_p3->SetTheta(0.059);
     
-    maxBeamEnergy = 10000; //MeV
+    max_nFSPart = 15;
+    maxBeamEnergy = 20000; //MeV
     
 
     cout<<"Done!"<<endl;

@@ -3,18 +3,18 @@
 Function List: Cuts.cpp
     Contains all Data Selection(Cut) Functions
     
-    Functions Defined under CCInclusive Class
+    Functions Defined under CCPi0 Class
 
     Usage:
-        > #include "CCInclusive.cpp"
-        > #ifdef CCInclusive_cxx 
+        > #include "CCPi0.cpp"
+        > #ifdef CCPi0_cxx 
     
-    Last Revision: 2014_02_20
+    Last Revision: 2014_03_17
 ================================================================================
 */
 
-#include "CCInclusive.cpp"
-#ifdef CCInclusive_cxx
+#include "CCPi0.cpp"
+#ifdef CCPi0_cxx
 
 /*
 --------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ Function List: Cuts.cpp
     Vertex of the interaction must be inside Detector Interaction Region
 --------------------------------------------------------------------------------
 */
-bool CCInclusive::isVertexContained()
+bool CCPi0::isVertexContained()
 {
     double rMax = 600*sqrt(2);
     double zMin = 5900;
@@ -46,7 +46,7 @@ bool CCInclusive::isVertexContained()
     Returns False if the muon does NOT matches with MINOS detector
 --------------------------------------------------------------------------------
 */
-bool CCInclusive::isMinosMatched()
+bool CCPi0::isMinosMatched()
 {
     if(minos_track_match){
         return true;
@@ -63,7 +63,7 @@ bool CCInclusive::isMinosMatched()
     Incoming Beam Energy must be lower than a maximum Energy
 --------------------------------------------------------------------------------
 */
-bool CCInclusive::isBeamEnergyLow(double maxEnergy)
+bool CCPi0::isBeamEnergyLow(double maxEnergy)
 {
     if(mc_incomingE > maxEnergy){
         return false;
@@ -79,11 +79,11 @@ bool CCInclusive::isBeamEnergyLow(double maxEnergy)
     Returns the array indice of the Final State Particle for given PDG
 --------------------------------------------------------------------------------
 */
-int CCInclusive::findParticle(int targetPDG)
+int CCPi0::findParticle(int targetPDG)
 {
     int ind = -1;
     
-    for(int i = 0; i < mc_nFSPart; i++){
+    for(int i = 0; i < mc_nFSPart && 1 < max_nFSPart; i++){
         if(  mc_FSPartPDG[i] == targetPDG ){
             ind = i;
             break;
@@ -101,14 +101,14 @@ int CCInclusive::findParticle(int targetPDG)
     Returns the interaction proton indice
 --------------------------------------------------------------------------------
 */
-int CCInclusive::findProton()
+int CCPi0::findProton()
 {
     int currentProtonind = -1;
     double currentProtonP = 0;
     
     TVector3 p3;
     
-    for(int i = 0; i < mc_nFSPart; i++ ){
+    for(int i = 0; i < mc_nFSPart && 1 < max_nFSPart; i++ ){
     
         // Momentum of Proton (No Proton at rest)
         // Update Proton Energy until you find the highest energy
@@ -129,7 +129,7 @@ int CCInclusive::findProton()
 
 }
 
-bool CCInclusive::isProtonLong(int ind)
+bool CCPi0::isProtonShort(int ind)
 {
     const double protonMass = 938; 
     const double minProtonKE = 120;
@@ -138,7 +138,7 @@ bool CCInclusive::isProtonLong(int ind)
     
     protonE = mc_FSPartE[ind];
     protonKE =  protonE - protonMass;
-    if( protonKE > minProtonKE){
+    if( protonKE < minProtonKE){
         return true;
     }else{
         return false;
@@ -151,7 +151,7 @@ bool CCInclusive::isProtonLong(int ind)
     Returns the single pi_plus indice
 --------------------------------------------------------------------------------
 */
-int CCInclusive::findPion()
+int CCPi0::findPion()
 {
   
     // Return a valid indice only if there is only single pi+ in Final State
@@ -162,7 +162,7 @@ int CCInclusive::findPion()
     }
 }
 
-bool CCInclusive::isSinglePion()
+bool CCPi0::isSinglePion()
 {
     int nPlus;
     int nMinus;
@@ -180,7 +180,7 @@ bool CCInclusive::isSinglePion()
 
 }
 
-bool CCInclusive::isNoMeson()
+bool CCPi0::isNoMeson()
 {
     int nPlus;
     int nMinus;
@@ -220,12 +220,12 @@ bool CCInclusive::isNoMeson()
                                 (no particle at rest)
 --------------------------------------------------------------------------------
 */
-int CCInclusive::countParticles(int targetPDG, bool applyPCut)
+int CCPi0::countParticles(int targetPDG, bool applyPCut)
 {
     int count = 0;
     TVector3 p3;
     
-    for(int i = 0; i < mc_nFSPart; i++ ){
+    for(int i = 0; i < mc_nFSPart && 1 < max_nFSPart; i++ ){
         if( mc_FSPartPDG[i] == targetPDG){
             if(applyPCut){
                 p3.SetXYZ(mc_FSPartPx[i],mc_FSPartPy[i],mc_FSPartPz[i]);

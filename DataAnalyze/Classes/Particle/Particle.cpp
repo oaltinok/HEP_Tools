@@ -5,23 +5,78 @@
 
 using namespace std;
 
-
 Particle::Particle()
 {
-    p4 = new TLorentzVector[N_CHANNELS];
-    angleBeam = new double[N_CHANNELS];
-    angleMuon = new double[N_CHANNELS];
-}
-
-virtual void Particle::set_angleMuon(TVector3 muonp3)
-{
-    angleMuon[1] = p4[1].Angle(muonp3);
 
 }
 
-void Particle::set_angleBeam(TVector3 beamp3)
+virtual void Particle::set_angleMuon(Particle &mu, bool isMC)
 {
-    angleBeam[1] = p4[1].Angle(beamp3);
+    int type = getDataType(isMC);
+    TVector3 muonp3 = mu.p4[type].Vect(); // Get Muon 3-Momentum
+    
+    angleMuon[type] = p4[type].Angle( muonp3 );
+}
+
+
+void Particle::set_angleBeam(TVector3 beamp3, bool isMC)
+{
+    int type = getDataType(isMC);
+    angleBeam[type] = p4[type].Angle(beamp3);
+}
+
+
+void Particle::set_p4(double px, double py, double pz, double E, bool isMC)
+{
+    int type = getDataType(isMC);
+    
+    p4[type].SetPxPyPzE(px,py,pz,E);    // Set 4-Momentum
+    set_momentum(isMC);                 // Set 3-Momentum
+    set_kineticEnergy(isMC);            // Set Kinetic Energy
+}
+
+void Particle::set_errors()
+{
+    momentum[2] = calc_error(momentum[1], momentum[0]);
+    kineticEnergy[2] = calc_error(kineticEnergy[1], kineticEnergy[0]);
+    angleMuon[2] = calc_error(angleMuon[1], angleMuon[0]);
+    angleBeam[2] = calc_error(angleBeam[1], angleBeam[0]);
+}
+
+void Particle::set_momentum(bool isMC)
+{
+    int type = getDataType(isMC);
+    
+    momentum[type] = p4[type].P();
+}
+
+
+double Particle::calc_error(double trueValue, double recoValue)
+{
+    double error;
+    
+    error = (trueValue - recoValue) / trueValue;
+    
+    return error;
+}
+
+int Particle::getDataType(bool isMC)
+{
+    int type; // Indice for data type ( reco = 0, mc = 1 )
+    
+    if ( isMC ){
+        type = 1;
+    }else{
+        type = 0;
+    }
+    
+    return type;
+
+}
+
+Particle::~Particle()
+{
+
 }
 
 
