@@ -7,7 +7,27 @@ using namespace std;
 
 Particle::Particle()
 {
+    bin_error.setBin(400, -2.0, 2.0);
+}
 
+void Particle::fill_Histograms()
+{
+    P_reco->Fill(momentum[0]);
+    P_mc->Fill(momentum[1]);
+    P_error->Fill(momentum[2]);
+    P_reco_mc->Fill(momentum[0],momentum[1]);
+    
+    KE_reco->Fill(kineticEnergy[0]);
+    KE_mc->Fill(kineticEnergy[1]);
+    KE_error->Fill(kineticEnergy[2]);
+    KE_reco_mc->Fill(kineticEnergy[0],kineticEnergy[1]);
+
+}
+
+void Particle::write_RootFile()
+{
+    cout<<">> Writing "<<rootDir<<endl;
+    f->Write();
 }
 
 virtual void Particle::set_angleMuon(Particle &mu, bool isMC)
@@ -18,13 +38,11 @@ virtual void Particle::set_angleMuon(Particle &mu, bool isMC)
     angleMuon[type] = p4[type].Angle( muonp3 );
 }
 
-
 void Particle::set_angleBeam(TVector3 beamp3, bool isMC)
 {
     int type = getDataType(isMC);
     angleBeam[type] = p4[type].Angle(beamp3);
 }
-
 
 void Particle::set_p4(double px, double py, double pz, double E, bool isMC)
 {

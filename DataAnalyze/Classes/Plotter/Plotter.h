@@ -12,7 +12,7 @@ Class: Plotter
         > p.plotHistograms(string mcFile, string plotDir)
             
     
-    Last Revision: 2014_03_06
+    Last Revision: 2014_03_18
 ================================================================================
 */
 
@@ -27,6 +27,8 @@ using namespace std;
 #include <TStyle.h>
 #include <TCanvas.h>
 
+#include "Libraries/Folder_List.h" // Contains File and Folder Paths
+
 
 class Plotter
 {
@@ -40,8 +42,18 @@ class Plotter
         //         plotDir -> folder name for the plots will be created         
         //--------------------------------------------------------------------------
         void plotHistograms(string mcFile, string plotDir);
-        void plotSingleHist_1D(TH1F* singleHist, string fileName, string plotDir);
-        void plot2DHist(TH2F* hist2D, string fileName, string plotDir);
+        void plotDefault(  TFile* f_mc, string plotDir, 
+                            bool isMC, bool isReco, bool is2D);
+                            
+        void plotMuon(bool isMC, bool isReco, bool is2D);
+        void plotProton(bool isMC, bool isReco, bool is2D);
+        void plotPion(bool isMC, bool isReco, bool is2D);
+                            
+        void inform(string rootDir, string plotDir);
+        
+        // Plottting Macros
+        void plot1D_Hist(TH1F* hist1D, string fileName, string plotDir);
+        void plot2D_Hist(TH2F* hist2D, string fileName, string plotDir);
     
     private:
         

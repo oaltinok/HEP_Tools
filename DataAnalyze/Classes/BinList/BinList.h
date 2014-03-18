@@ -15,7 +15,7 @@ Class: BinList
         > binList->error.get_max();
             
     
-    Last Revision: 2014_03_06
+    Last Revision: 2014_03_17
 ================================================================================
 */
 #ifndef BinList_h
@@ -30,30 +30,21 @@ class BinList
         ~BinList();
         
         // Standard Bins
-        SingleBin* error;
-        SingleBin* angle;
-        SingleBin* trackLength;
-        SingleBin* particleScore;
-        SingleBin* multiplicity;
-        SingleBin* int_channel;
+        SingleBin error;
+        SingleBin angle;
+        SingleBin trackLength;
+        SingleBin particleScore;
+        SingleBin multiplicity;
+        SingleBin int_channel;
+        SingleBin vertex_z;
         
-        // Neutrino Specific Bins
-        SingleBin* neutrinoP;
+        // Analysis
+        SingleBin beamE;
+        SingleBin q2;
         
-        // Muon Specific Bins
-        SingleBin* muonP;
-        
-        // Proton Specific Bins
-        SingleBin* protonP;
-        
-        // Pion Specific Bins
-        SingleBin* pionP;
     
     private:
         
-        
-    
-
 
 };
 

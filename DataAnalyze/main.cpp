@@ -16,7 +16,7 @@ main.cpp
             > main(false) for Running the Analysis
             > main(true) for Generating Plots only
     
-    Last Revision: 2014_02_14
+    Last Revision: 2014_03_17
 ================================================================================
 */
 
@@ -32,24 +32,21 @@ using namespace std;
 
 void main(bool onlyPlot)
 {
-    CCPi0 t;
-    Plotter p;
-        
-        
+
     // Edit isTest Variable for running Test Samples or complete playlist
     bool isTest;
     isTest = true;
     
-    
     if(onlyPlot){
-            p.plotHistograms(f_Root,
-                                getFileLocation(f_Plot,channelTag,"/"));
+        Plotter p;
+        p.plotHistograms(true,true,true);
     }else{
+        CCPi0 t;
         if(isTest){
-            t.run(f_PL_Test,f_Root);
+            t.run(f_PL_Test);
             
         }else{
-            t.run(f_PL_Full,f_Root);
+            t.run(f_PL_Full);
         }
     }
     

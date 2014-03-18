@@ -13,7 +13,7 @@ Class: SingleBin
         > hadronMomentum.get_nBins();
             
     
-    Last Revision: 2014_01_30
+    Last Revision: 2014_03_17
 ================================================================================
 */
 

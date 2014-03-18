@@ -4,7 +4,7 @@ Class: Muon -> Derived Class from Particle Base Clas
     Muon Class  inherits Particle Behaviours and 
                 extends base class with muon specific parameters
     
-    Last Revision: 2014_03_06
+    Last Revision: 2014_03_17
 ================================================================================
 */
 
@@ -20,9 +20,15 @@ class Muon : public Particle
         bool get_isMinosMatched();
         void set_isMinosMatched(bool input);
         
+        
+        
+        
+        
     private:
         static const double restMass = 105.66;
         bool isMinosMatched;
+        
+         
         
         
 };

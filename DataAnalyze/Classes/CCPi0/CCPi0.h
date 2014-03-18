@@ -19,7 +19,7 @@ Class: CCPi0
     
     
     
-    Last Revision: 2014_03_17
+    Last Revision: 2014_03_18
 ================================================================================
 */
 
@@ -45,6 +45,8 @@ Class: CCPi0
 #include "Classes/Proton/Proton.cpp"
 #include "Classes/Pion/Pion.cpp"
 
+const double mevSq_to_gevSq = pow(10,6);
+
 class CCPi0 {
 public :
    // -------------------------------------------------------------------------
@@ -58,7 +60,7 @@ public :
    //         playlist -> address of the playlist
    //         filename -> file name for the output .root file
    //--------------------------------------------------------------------------
-    void run(string playlist, string rootFilename);
+    void run(string playlist);
     
     
    /* 
@@ -98,38 +100,28 @@ public :
     void Show(Long64_t entry);
     Int_t Cut(Long64_t entry);
     
-   // -------------------------------------------------------------------------
+   //-------------------------------------------------------------------------
    //     Histograms
    //--------------------------------------------------------------------------
-    // True Analysis Variables
-    TH1F* beamEnergy;
+    TFile* f;
+    
+    // Analysis Variables
+    TH1F* beamEnergy_mc;
+    TH1F* beamEnergy_reco;
+    TH1F* beamEnergy_error;
+    TH2F* beamEnergy_reco_mc;
+    
+    TH1F* q2_mc;
+    TH1F* q2_reco;
+    TH1F* q2_error;
+    TH2F* q2_reco_mc;
+    
     TH1F* int_channel;
-   
-   
-    // Muon
-    TH1F* P_muon_mc;
-    TH1F* P_muon_reco;
-    TH1F* P_muon_error;
-    TH2F* P_muon_reco_mc;
+    TH1F* vertex_z;
+    TH1F* n_FSParticles;
+    TH1F* n_gammas;
     
     
-    
-    TH1F* P_proton;
-    TH1F* P_pion;
-    
-    TH1F* KE_muon;
-    TH1F* KE_proton;
-    TH1F* KE_pion;
-    
-    TH1F* Angle_muon;
-    TH1F* Angle_proton;
-    TH1F* Angle_pion;
-    
-    TH1F* AngleMuon_muon;
-    TH1F* AngleMuon_proton;
-    TH1F* AngleMuon_pion;
-    
-
    // -------------------------------------------------------------------------
    //     Analysis Variables
    //--------------------------------------------------------------------------
@@ -146,12 +138,14 @@ public :
    // -------------------------------------------------------------------------
    //     Cut Numbers and List of Bins
    //--------------------------------------------------------------------------
+    BinList binList;
     CutNumberList* nCutList;
-    BinList* binList;
     
    // -------------------------------------------------------------------------
    //     Files
    //--------------------------------------------------------------------------
+    string rootDir;
+    string plotDir;
     string readmeFile;
     ofstream readme;
 

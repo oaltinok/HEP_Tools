@@ -7,21 +7,16 @@
 #include "CCPi0.h"
 #include "Cuts.cpp"
 
-void CCPi0::run(string playlist, string rootFileName)
+
+
+void CCPi0::run(string playlist)
 {
 
-   
- 
     //------------------------------------------------------------------------
     // Open files for writing
     //------------------------------------------------------------------------
-
     openFiles();
-    
-    ofstream f_events;
-    f_events.open("Events_All.dat");
-
-    TFile* f = new TFile(rootFileName.c_str(),"RECREATE");
+   
 
     //------------------------------------------------------------------------
     // Create chain
@@ -41,9 +36,6 @@ void CCPi0::run(string playlist, string rootFileName)
     initVariables();
     initHistograms();
     
-    //------------------------------------------------------------------------
-    // Declare Other Variables
-    //------------------------------------------------------------------------
 
     //------------------------------------------------------------------------
     // Branch Selection for Performance
@@ -91,7 +83,7 @@ void CCPi0::run(string playlist, string rootFileName)
     
     
 
-    
+    // Cut Statistics
     double nAll = 0;
     double nVolume = 0;
     double nBeamEnergy = 0;
@@ -99,9 +91,6 @@ void CCPi0::run(string playlist, string rootFileName)
     double nMinos = 0;
     double nProton = 0;
     double nPion = 0;
-    
-    
-    int nProtons = 0;
 
     //------------------------------------------------------------------------
     // Loop over Chain
@@ -114,6 +103,7 @@ void CCPi0::run(string playlist, string rootFileName)
 
     for (Long64_t jentry=0; jentry<nentries;jentry++) {
     
+
         nb = fChain->GetEntry(jentry);   nbytes += nb;    
         Long64_t ientry = fChain->GetEntry(jentry);
         if (ientry == 0) {
@@ -121,7 +111,7 @@ void CCPi0::run(string playlist, string rootFileName)
             break;
         }
     
-//         Progress Message on Terminal
+        // Progress Message on Terminal
         if (jentry%5000 == 0){
             cout<<"\tEntry "<<jentry<<endl;
         }
@@ -129,7 +119,12 @@ void CCPi0::run(string playlist, string rootFileName)
         if( mc_nFSPart > max_nFSPart){
             continue;
         }
+        
+        if (jentry >= 5000){
+            break;
+        }
     
+        
         //----------------------------------------------------------------------
         // Apply Cuts
         //----------------------------------------------------------------------
@@ -179,6 +174,8 @@ void CCPi0::run(string playlist, string rootFileName)
         }
         nPion++;
         
+      
+//         fillCCPi0();
         
         if ( isDataAnalysis){
         //----------------------------------------------------------------------
@@ -206,18 +203,10 @@ void CCPi0::run(string playlist, string rootFileName)
             fillHistograms();            
         }
         
-        nProtons = countParticles(PDG_List::proton,true);
-        
-        
-    cout<<"Pion = "<<pienergy<<" | "<<pienergy0<<" | "<<pion.p4[1].E()<<endl;
-    cout<<"Muon E = "<<mumom[4]<<" | "<<CCPi0AnaTool_leptonE[3]<<" | "<<muon.p4[1][3]<<endl;
-    cout<<"Muon Px = "<<mumom[0]<<" | "<<CCPi0AnaTool_leptonE[0]<<" | "<<muon.p4[1][0]<<endl;
-    cout<<"Muon Py = "<<mumom[1]<<" | "<<CCPi0AnaTool_leptonE[1]<<" | "<<muon.p4[1][1]<<endl;
-    cout<<"Muon Pz = "<<mumom[2]<<" | "<<CCPi0AnaTool_leptonE[2]<<" | "<<muon.p4[1][2]<<endl;
-    cout<<"Muon P = "<<mumom[3]<<" | "<<" | "<<muon.momentum[1]<<endl;
-    cout<<"Neutrino = "<<Erec<<" | "<<mc_incomingE<<endl;
-    cout<<"Q2 = "<<Q2<<" | "<<mc_Q2<<endl;
-    cout<<"-----"<<endl;
+
+//     cout<<"Neutrino = "<<Erec<<" | "<<mc_incomingE<<endl;
+//     cout<<"Q2 = "<<Q2<<" | "<<mc_Q2<<endl;
+//     cout<<"-----"<<endl;
         
         
 
@@ -235,21 +224,42 @@ void CCPi0::run(string playlist, string rootFileName)
     nCutList->nPion->setValue(nPion);
     
     
-    // Write the Root File
-    cout<<">> Writing "<<rootFileName<<endl;
-    f->Write();
+    // Write the Root Files
+    write_RootFile();           //CCPi0
+    muon.write_RootFile();
+    pion.write_RootFile();
+    
+
     
     nCutList->writeCutTable();
     
-    
     closeFiles();
-    f_events.close();
     
     
     // Delete Dynamic Variables - I will modify the destructor for
     // better Memory Management
-    delete binList;
     delete nCutList;
+
+}
+
+
+void CCPi0::fillCCPi0()
+{
+    beamEnergy_mc->Fill(mc_incomingE);
+    beamEnergy_reco->Fill(Erec);
+    beamEnergy_error->Fill( (mc_incomingE - Erec) / mc_incomingE );
+    beamEnergy_reco_mc->Fill(Erec,mc_incomingE);
+    
+    q2_mc->Fill(mc_Q2 / mevSq_to_gevSq);
+    q2_reco->Fill(Q2 / mevSq_to_gevSq);
+    q2_error->Fill( (mc_Q2 - Q2) / mc_Q2 );
+    q2_reco_mc->Fill(Q2/mevSq_to_gevSq,mc_Q2 /mevSq_to_gevSq);
+    
+    int_channel->Fill(mc_intType);
+    vertex_z->Fill(mc_vtx[3]);
+    n_FSParticles->Fill(mc_nFSPart);
+//     n_gammas->Fill();
+
 
 }
 
@@ -260,8 +270,18 @@ void CCPi0::run(string playlist, string rootFileName)
 
 void CCPi0::initVariables()
 {
-    cout<<"Initializing Variables"<<endl;
+    cout<<"Initializing CCPi0 Class"<<endl;
     
+    // File Locations
+    rootDir =   Folder_List::f_Root_CCPi0;
+    plotDir =   Folder_List::f_Plot_CCPi0;
+    
+    cout<<"\tRoot File: "<<rootDir<<endl;
+    cout<<"\tPlot Output Folder: "<<plotDir<<endl;
+    
+    // Create Root File 
+    f = new TFile(rootDir.c_str(),"RECREATE");
+
     isDataAnalysis = true;
     isMC = true;
 
@@ -271,7 +291,6 @@ void CCPi0::initVariables()
     // Allocate Memory
     
     nCutList = new CutNumberList;
-    binList = new BinList;
     
     nCutList->printList();
     
@@ -335,29 +354,17 @@ void CCPi0::fillPion()
 
 void CCPi0::fillHistograms()
 {
-//     beamEnergy->Fill(mc_incomingE);
-//     int_channel->Fill(mc_intType);
-    
-    P_muon_reco->Fill(muon.momentum[0]);
-    P_muon_mc->Fill(muon.momentum[1]);
-    P_muon_error->Fill(muon.momentum[2]);
-    P_muon_reco_mc->Fill(muon.momentum[0],muon.momentum[1]);
-    
-//     P_proton->Fill(proton.momentum[1]);
-//     P_pion->Fill(pion.momentum[1]);
-//     
-//     KE_muon->Fill(muon.kineticEnergy[1]);
-//     KE_proton->Fill(proton.kineticEnergy[1]);
-//     KE_pion->Fill(pion.kineticEnergy[1]);
-//     
-//     Angle_muon->Fill(muon.angleBeam[1] * TMath::RadToDeg());
-//     Angle_proton->Fill(proton.angleBeam[1] * TMath::RadToDeg());
-//     Angle_pion->Fill(pion.angleBeam[1] * TMath::RadToDeg());
-//     
-//     AngleMuon_muon->Fill(muon.angleMuon[1] * TMath::RadToDeg());
-//     AngleMuon_proton->Fill(proton.angleMuon[1] * TMath::RadToDeg());
-//     AngleMuon_pion->Fill(pion.angleMuon[1] * TMath::RadToDeg());
+    fillCCPi0();
+    muon.fill_Histograms();
+    pion.fill_Histograms();
+//     proton.fill_Histograms();
 
+}
+
+void CCPi0::write_RootFile()
+{
+    cout<<">> Writing "<<rootDir<<endl;
+    f->Write();
 }
 
 void CCPi0::fillParticleTrue(Particle& part)
@@ -384,106 +391,63 @@ void CCPi0::fillParticleTrue(Particle& part)
 void CCPi0::initHistograms()
 {
     cout<<"Initializing Histograms"<<endl;
-    // -------------------------------------------------------------------------
-    //     True Analysis
-    //--------------------------------------------------------------------------
-    beamEnergy = new TH1F( "beamEnergy","True Neutrino Energy",binList->neutrinoP->get_nBins(), binList->neutrinoP->get_min(), binList->neutrinoP->get_max() );
-    beamEnergy->GetXaxis()->SetTitle("True Neutrino Energy MeV");
-    beamEnergy->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->neutrinoP->get_width()));
     
-    int_channel = new TH1F( "int_channel","Interaction Channel",binList->int_channel->get_nBins(), binList->int_channel->get_min(), binList->int_channel->get_max() );
+    beamEnergy_mc = new TH1F( "beamEnergy_mc","True Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    beamEnergy_mc->GetXaxis()->SetTitle("True Beam Energy MeV");
+    beamEnergy_mc->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.beamE.get_width()));
+    
+    beamEnergy_reco = new TH1F( "beamEnergy_reco","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    beamEnergy_reco->GetXaxis()->SetTitle("Reconstructed Beam Energy MeV");
+    beamEnergy_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.beamE.get_width()));
+    
+    beamEnergy_error = new TH1F( "beamEnergy_error","Error on Beam Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    beamEnergy_error->GetXaxis()->SetTitle("(True - Reco) / True");
+    beamEnergy_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.error.get_width()));
+    
+    beamEnergy_reco_mc = new TH2F( "beamEnergy_reco_mc","True vs Reconstructed Beam Energy",
+                                binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),
+                                binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    beamEnergy_reco_mc->GetXaxis()->SetTitle("Reconstructed Beam Energy MeV");
+    beamEnergy_reco_mc->GetYaxis()->SetTitle("True Beam Energy MeV");
+    
+    q2_mc = new TH1F( "q2_mc","True Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
+    q2_mc->GetXaxis()->SetTitle("True Q^{2} MeV");
+    q2_mc->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.q2.get_width()));
+    
+    q2_reco = new TH1F( "q2_reco","Reconstructed Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
+    q2_reco->GetXaxis()->SetTitle("Reconstructed Q^{2} MeV");
+    q2_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.q2.get_width()));
+    
+    q2_error = new TH1F( "q2_error","Error on Q^{2}",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    q2_error->GetXaxis()->SetTitle("(True - Reco) / True");
+    q2_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.error.get_width()));
+    
+    q2_reco_mc = new TH2F( "q2_reco_mc","True vs Reconstructed Q^{2}",
+                                binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max(),
+                                binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max());
+    q2_reco_mc->GetXaxis()->SetTitle("Reconstructed Q^{2} MeV");
+    q2_reco_mc->GetYaxis()->SetTitle("True Q^{2} MeV");
+    
+    int_channel = new TH1F( "int_channel","Interaction Channel",binList.int_channel.get_nBins(), binList.int_channel.get_min(), binList.int_channel.get_max() );
     int_channel->GetXaxis()->SetTitle("1 = QE, 2 = Resonant, 3 = DIS, 4 = Coh pi");
-    int_channel->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->int_channel->get_width()));
+    int_channel->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.int_channel.get_width()));
+    
+    vertex_z = new TH1F( "vertex_z","True Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+    vertex_z->GetXaxis()->SetTitle("True Vertex Z [mm]");
+    vertex_z->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.vertex_z.get_width()));
 
-    // -------------------------------------------------------------------------
-    //     Muon
-    //--------------------------------------------------------------------------
-    P_muon_mc = new TH1F( "P_muon_mc","True Muon Momentum",binList->muonP->get_nBins(), binList->muonP->get_min(), binList->muonP->get_max() );
-    P_muon_mc->GetXaxis()->SetTitle("True Muon Momentum MeV");
-    P_muon_mc->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->muonP->get_width()));
+    n_FSParticles = new TH1F( "n_FSParticles","Number of Final State Particles",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+    n_FSParticles->GetXaxis()->SetTitle("Number of Final State Particles");
+    n_FSParticles->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.multiplicity.get_width()));
     
-    P_muon_reco = new TH1F( "P_muon_reco","Reconstructed Muon Momentum",binList->muonP->get_nBins(), binList->muonP->get_min(), binList->muonP->get_max() );
-    P_muon_reco->GetXaxis()->SetTitle("Reconstructed Muon Momentum MeV");
-    P_muon_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->muonP->get_width()));
-    
-    P_muon_error = new TH1F( "P_muon_error","Error on Muon Momentum",binList->error->get_nBins(), binList->error->get_min(), binList->error->get_max() );
-    P_muon_error->GetXaxis()->SetTitle("(True - Reco) / True");
-    P_muon_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->error->get_width()));
-    
-    P_muon_reco_mc = new TH2F( "P_muon_reco_mc","True vs Reconstructed Muon Momentum",
-                                binList->muonP->get_nBins(), binList->muonP->get_min(), binList->muonP->get_max(),
-                                binList->muonP->get_nBins(), binList->muonP->get_min(), binList->muonP->get_max());
-    P_muon_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Momentum MeV");
-    P_muon_reco_mc->GetYaxis()->SetTitle("True Muon Momentum MeV");
-    
-    
-    
-    P_proton = new TH1F( "P_proton","True Proton Momentum",binList->protonP->get_nBins(), binList->protonP->get_min(), binList->protonP->get_max() );
-    P_proton->GetXaxis()->SetTitle("True Proton Momentum MeV");
-    P_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->protonP->get_width()));
-    
-    P_pion = new TH1F( "P_pion","True Pion Momentum",binList->pionP->get_nBins(), binList->pionP->get_min(), binList->pionP->get_max() );
-    P_pion->GetXaxis()->SetTitle("True Pion Momentum MeV");
-    P_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->pionP->get_width()));
+    n_gammas = new TH1F( "n_gammas","Number of Gammas",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+    n_gammas->GetXaxis()->SetTitle("Number of Gammas");
+    n_gammas->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.multiplicity.get_width()));    
     
 
-    // -------------------------------------------------------------------------
-    //     Kinetic Energy
-    //--------------------------------------------------------------------------
-    KE_muon = new TH1F( "KE_muon","True Muon Kinetic Energy",binList->muonP->get_nBins(), binList->muonP->get_min(), binList->muonP->get_max() );
-    KE_muon->GetXaxis()->SetTitle("True Muon Kinetic Energy MeV");
-    KE_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->muonP->get_width()));
-    
-    KE_proton = new TH1F( "KE_proton","True Proton Kinetic Energy",binList->protonP->get_nBins(), binList->protonP->get_min(), binList->protonP->get_max() );
-    KE_proton->GetXaxis()->SetTitle("True Proton Kinetic Energy MeV");
-    KE_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->protonP->get_width()));
-    
-    KE_pion = new TH1F( "KE_pion","True Pion Kinetic Energy",binList->pionP->get_nBins(), binList->pionP->get_min(), binList->pionP->get_max() );
-    KE_pion->GetXaxis()->SetTitle("True Pion Kinetic Energy MeV");
-    KE_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->pionP->get_width()));
-    
-    // -------------------------------------------------------------------------
-    //     Angles
-    //--------------------------------------------------------------------------
-    Angle_muon = new TH1F( "Angle_muon","Angle: Beam vs Muon",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
-    Angle_muon->GetXaxis()->SetTitle("Angle");
-    Angle_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
-    
-    Angle_proton = new TH1F( "Angle_proton","Angle: Beam vs Proton",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
-    Angle_proton->GetXaxis()->SetTitle("Angle");
-    Angle_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
-    
-    Angle_pion = new TH1F( "Angle_pion","Angle: Beam vs Pion",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
-    Angle_pion->GetXaxis()->SetTitle("Angle");
-    Angle_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
-    
-    AngleMuon_muon = new TH1F( "AngleMuon_muon","Angle: Muon vs Muon",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
-    AngleMuon_muon->GetXaxis()->SetTitle("Angle");
-    AngleMuon_muon->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
-    
-    AngleMuon_proton = new TH1F( "AngleMuon_proton","Angle: Muon vs Proton",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
-    AngleMuon_proton->GetXaxis()->SetTitle("Angle");
-    AngleMuon_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
-    
-    AngleMuon_pion = new TH1F( "AngleMuon_pion","Angle: Muon vs Pion",binList->angle->get_nBins(), binList->angle->get_min(), binList->angle->get_max() );
-    AngleMuon_pion->GetXaxis()->SetTitle("Angle");
-    AngleMuon_pion->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList->angle->get_width()));
-    
     
     cout<<"Done!"<<endl;
 }
-
-void CCPi0::initSingleHistogram(TH1F* hist, string histName, string title, string xLabel, string yLabel, SingleBin* bin)
-{
-    // Reserved for a future version - Still needs testing
-    
-    cout<<bin->get_nBins()<<endl;
-    hist = new TH1F(histName.c_str(),title.c_str(),bin->get_nBins(), bin->get_min(), bin->get_max());
-    hist->GetXaxis()->SetTitle(xLabel.c_str());
-    hist->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin->get_width()));
-}
-
-
 
 
 

@@ -6,14 +6,19 @@ Class: Particle
    
     Uses ROOT Specific classes
     
-    Last Revision: 2014_03_06
+    Last Revision: 2014_03_17
 ================================================================================
 */
 
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
-#include<TMath.h>
+#include <TMath.h>
+#include <TH1.h>
+#include <TH2.h>
+
+#include "Classes/BinList/BinList.cpp"
+#include "Libraries/Folder_List.h"
 
 
 class Particle
@@ -39,8 +44,29 @@ class Particle
         double pID;             // Particle Score from Reconstructed Values
         double trackLength;     // Track Length in [mm]
         
+        TFile* f;
         
         // Histograms
+        TH1F* P_mc;
+        TH1F* P_reco;
+        TH1F* P_error;
+        TH2F* P_reco_mc;
+        
+        TH1F* KE_mc;
+        TH1F* KE_reco;
+        TH1F* KE_error;
+        TH2F* KE_reco_mc;
+        
+        // Bins for Histograms
+        SingleBin bin_error;
+        SingleBin bin_P;
+        SingleBin bin_KE;
+        
+        
+        // File Locations
+        string rootDir;
+        string plotDir;
+        
         
         // Functions
         Particle();
@@ -51,6 +77,9 @@ class Particle
         void set_angleBeam(TVector3 beamp3, bool isMC);
         void set_p4(double px, double py, double pz, double E, bool isMC);
         void set_errors();
+        void fill_Histograms();
+        void write_RootFile();
+        void plot_data();
         
         
         // Other

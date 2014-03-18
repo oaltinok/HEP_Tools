@@ -14,7 +14,11 @@ echo "Setting Up Package"
 Folder_List=(Output
                 Output/Plots
                 Output/RootFiles
-                Output/TextFiles)
+                Output/TextFiles
+                Output/Plots/Muon
+                Output/Plots/Proton
+                Output/Plots/Pion
+                Output/Plots/CCPi0)
 
 for ilist1 in ${Folder_List[@]}; do
     echo "Creating ${ilist1}"
