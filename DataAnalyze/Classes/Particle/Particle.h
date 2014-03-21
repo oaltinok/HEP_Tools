@@ -6,7 +6,7 @@ Class: Particle
    
     Uses ROOT Specific classes
     
-    Last Revision: 2014_03_17
+    Last Revision: 2014_03_20
 ================================================================================
 */
 
@@ -57,10 +57,21 @@ class Particle
         TH1F* KE_error;
         TH2F* KE_reco_mc;
         
+        TH1F* angleBeam_mc;
+        TH1F* angleBeam_reco;
+        TH1F* angleBeam_error;
+        TH2F* angleBeam_reco_mc;
+        
+        TH1F* angleMuon_mc;
+        TH1F* angleMuon_reco;
+        TH1F* angleMuon_error;
+        TH2F* angleMuon_reco_mc;
+        
         // Bins for Histograms
         SingleBin bin_error;
         SingleBin bin_P;
         SingleBin bin_KE;
+        SingleBin bin_angle;
         
         
         // File Locations

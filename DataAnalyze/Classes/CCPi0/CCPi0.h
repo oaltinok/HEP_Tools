@@ -19,7 +19,7 @@ Class: CCPi0
     
     
     
-    Last Revision: 2014_03_18
+    Last Revision: 2014_03_20
 ================================================================================
 */
 
@@ -118,6 +118,7 @@ public :
     
     TH1F* int_channel;
     TH1F* vertex_z;
+    TH2F* vertex_x_y;
     TH1F* n_FSParticles;
     TH1F* n_gammas;
     

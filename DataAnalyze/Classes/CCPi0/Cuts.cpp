@@ -9,7 +9,7 @@ Function List: Cuts.cpp
         > #include "CCPi0.cpp"
         > #ifdef CCPi0_cxx 
     
-    Last Revision: 2014_03_17
+    Last Revision: 2014_03_19
 ================================================================================
 */
 
@@ -24,14 +24,16 @@ Function List: Cuts.cpp
 */
 bool CCPi0::isVertexContained()
 {
-    double rMax = 600*sqrt(2);
-    double zMin = 5900;
-    double zMax = 8000;
+
+    const double fiducialApothem        =  850.0; 
+    const double fiducialUpstreamZ      = 5912.0; 
+    const double fiducialDownstreamZ    = 8445.0; 
+    
     double r;
     
-    if(mc_vtx[2] > zMin && mc_vtx[2] < zMax){
+    if(mc_vtx[2] > fiducialUpstreamZ && mc_vtx[2] < fiducialDownstreamZ ){
         r = sqrt(mc_vtx[0]*mc_vtx[0] + mc_vtx[1]*mc_vtx[1]);
-        if(r < rMax){
+        if(r < fiducialApothem){
             return true;
         }
     }
@@ -46,15 +48,15 @@ bool CCPi0::isVertexContained()
     Returns False if the muon does NOT matches with MINOS detector
 --------------------------------------------------------------------------------
 */
-bool CCPi0::isMinosMatched()
-{
-    if(minos_track_match){
-        return true;
-    }else{
-        return false;
-    }
-
-}
+// bool CCPi0::isMinosMatched()
+// {
+//     if(minos_track_match){
+//         return true;
+//     }else{
+//         return false;
+//     }
+// 
+// }
 
 
 /*

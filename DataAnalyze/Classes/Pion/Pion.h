@@ -4,7 +4,7 @@ Class: Pion -> Derived Class from Particle Base Clas
     Pion Class  inherits Particle Behaviours and 
                 extends base class with pion specific parameters
     
-    Last Revision: 2014_03_17
+    Last Revision: 2014_03_20
 ================================================================================
 */
 

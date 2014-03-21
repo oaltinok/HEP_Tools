@@ -17,10 +17,11 @@ BinList::BinList()
     particleScore.setBin(40, 0.0, 1.0);
     multiplicity.setBin(10,0.0,10.0);
     int_channel.setBin(9,0.0,9.0);
-    vertex_z.setBin(21,5900.0,8000.0);
+    vertex_z.setBin(470,4300.0,9000.0);
+    vertex_x_y.setBin(200,-1000.0,1000.0);
     
     // Neutrino Specific Bins
-    beamE.setBin(200,0.0,20000.0);
+    beamE.setBin(20,0,20000.0);
     q2.setBin(60,0.0,3.0);
 }
 

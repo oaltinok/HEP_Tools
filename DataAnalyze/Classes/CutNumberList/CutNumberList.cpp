@@ -26,22 +26,26 @@ CutNumberList::CutNumberList()
    
     // Add Default CutNumbers to the Linked List
     addCutNumber("nAll");
+    addCutNumber("nFSPart");
     addCutNumber("nVolume");
     addCutNumber("nBeamEnergy");
     addCutNumber("nMuon");
     addCutNumber("nMinos");
     addCutNumber("nProton");
     addCutNumber("nPion");
+    addCutNumber("nBeamEnergyFail");
     
     
     // Initialize Default CutNumber Pointers
     nAll = getCutNumber("nAll");
+    nFSPart = getCutNumber("nFSPart");
     nVolume = getCutNumber("nVolume");
     nBeamEnergy = getCutNumber("nBeamEnergy");
     nMuon = getCutNumber("nMuon");
     nMinos = getCutNumber("nMinos");
     nProton = getCutNumber("nProton");
     nPion = getCutNumber("nPion");
+    nBeamEnergyFail = getCutNumber("nBeamEnergyFail");
     
 }
 

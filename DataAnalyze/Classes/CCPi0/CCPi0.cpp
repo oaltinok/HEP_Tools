@@ -40,47 +40,46 @@ void CCPi0::run(string playlist)
     //------------------------------------------------------------------------
     // Branch Selection for Performance
     //------------------------------------------------------------------------
-//     fChain->SetBranchStatus("*",0);  // disable all branches
-    
-//     // Analysis Variables
-//     fChain->SetBranchStatus("ev_run",1);  // activate
-//     fChain->SetBranchStatus("ev_subrun",1);  // activate
-//     fChain->SetBranchStatus("ev_gate",1);  // activate
-//     fChain->SetBranchStatus("truth_reco_minos_match",1);  // activate
-//     fChain->SetBranchStatus("mc_intType",1);  // activate
-//     
-//     // Q2
-//     
-//     // Cut Variables
-//     fChain->SetBranchStatus("mc_vtx",1);
-//     
-//     // Incoming Particle
-//     fChain->SetBranchStatus("mc_incomingPartVec",1);  // activate
-//     fChain->SetBranchStatus("mc_incomingE",1);  // activate
-//    
-//    
-//     // Final State Particles
-//     fChain->SetBranchStatus("mc_FSPartPx",1);  // activate
-//     fChain->SetBranchStatus("mc_FSPartPy",1);  // activate
-//     fChain->SetBranchStatus("mc_FSPartPz",1);  // activate
-//     fChain->SetBranchStatus("mc_FSPartE",1);  // activate
-//     fChain->SetBranchStatus("mc_nFSPart",1);  // activate
-//     fChain->SetBranchStatus("mc_FSPartPDG",1);
-//     
-//     fChain->SetBranchStatus("CCPi0AnaTool_leptonE",1);
-//     fChain->SetBranchStatus("CCPi0AnaTool_E",1);
-//     fChain->SetBranchStatus("pimom",1);
-//     fChain->SetBranchStatus("pimom0",1);
-//     
-//     fChain->SetBranchStatus("pienergy",1);  // activate
-//     fChain->SetBranchStatus("pienergy0",1);  // activate
-//     fChain->SetBranchStatus("mumom",1);  // activate
-//     fChain->SetBranchStatus("mumom0",1);  // activate
+    fChain->SetBranchStatus("*",0);  // disable all branches
 
+    // Analysis Variables
+    fChain->SetBranchStatus("ev_run",1);  // activate
+    fChain->SetBranchStatus("ev_subrun",1);  // activate
+    fChain->SetBranchStatus("ev_gate",1);  // activate
+    fChain->SetBranchStatus("truth_reco_minos_match",1);  // activate
+    fChain->SetBranchStatus("mc_intType",1);  // activate
     
+    // Q2
+    fChain->SetBranchStatus("mc_Q2",1);  // activate
+    fChain->SetBranchStatus("Q2",1);  // activate
     
+    // Cut Variables
+    fChain->SetBranchStatus("mc_vtx",1);
     
+    // Incoming Particle
+    fChain->SetBranchStatus("mc_incomingPartVec",1);  // activate
+    fChain->SetBranchStatus("mc_incomingE",1);  // activate
+   
+   
+    // Final State Particles
+    fChain->SetBranchStatus("mc_FSPartPx",1);  // activate
+    fChain->SetBranchStatus("mc_FSPartPy",1);  // activate
+    fChain->SetBranchStatus("mc_FSPartPz",1);  // activate
+    fChain->SetBranchStatus("mc_FSPartE",1);  // activate
+    fChain->SetBranchStatus("mc_nFSPart",1);  // activate
+    fChain->SetBranchStatus("mc_FSPartPDG",1);
     
+    fChain->SetBranchStatus("pimom",1);
+    fChain->SetBranchStatus("pienergy",1);  // activate
+    
+    fChain->SetBranchStatus("mumom",1);  // activate
+    
+    fChain->SetBranchStatus("tfiducial",1);  // activate
+    fChain->SetBranchStatus("survive_minos_match",1);  // activate\
+    fChain->SetBranchStatus("survive_fiducial",1);  // activate
+    fChain->SetBranchStatus("Erec",1);  // activate
+    fChain->SetBranchStatus("mc_intType",1);  // activate
+
     
 
     // Cut Statistics
@@ -91,6 +90,10 @@ void CCPi0::run(string playlist)
     double nMinos = 0;
     double nProton = 0;
     double nPion = 0;
+    double nFSPart = 0;
+    double nBeamEnergyFail = 0;
+    
+    
 
     //------------------------------------------------------------------------
     // Loop over Chain
@@ -112,17 +115,15 @@ void CCPi0::run(string playlist)
         }
     
         // Progress Message on Terminal
-        if (jentry%5000 == 0){
+        if (jentry%25000 == 0){
             cout<<"\tEntry "<<jentry<<endl;
         }
     
-        if( mc_nFSPart > max_nFSPart){
-            continue;
-        }
+
         
-        if (jentry >= 5000){
-            break;
-        }
+//         if (jentry >= 20000){
+//             break;
+//         }
     
         
         //----------------------------------------------------------------------
@@ -132,11 +133,17 @@ void CCPi0::run(string playlist)
         // Count All Events before Cuts
         nAll++;
         
+        if( mc_nFSPart > max_nFSPart){
+            continue;
+        }
+        nFSPart++;
+        
         // Volume Cut
         if( !isVertexContained()){
             continue;
         }
         nVolume++;
+
         
         // Incoming Beam Energy Cut
         if ( !isBeamEnergyLow(maxBeamEnergy) ){
@@ -151,8 +158,9 @@ void CCPi0::run(string playlist)
         }
         nMuon++;
         
+
         // Minos Match
-        if ( !truth_reco_minos_match ){
+        if ( survive_minos_match == -1 ){
             continue;
         }
         nMinos++;
@@ -174,8 +182,10 @@ void CCPi0::run(string playlist)
         }
         nPion++;
         
-      
-//         fillCCPi0();
+        if(Erec == -1){
+            continue;
+        }
+        nBeamEnergyFail++;
         
         if ( isDataAnalysis){
         //----------------------------------------------------------------------
@@ -184,13 +194,13 @@ void CCPi0::run(string playlist)
         
             if( isMC ){
                 fillParticleTrue(muon);
-                fillParticleTrue(proton);
+//                 fillParticleTrue(proton);
                 fillParticleTrue(pion);
             }
         
             // Fill Reconstructed Information
             fillMuon();
-            fillProton();
+//             fillProton();
             fillPion();
             
             muon.set_errors();
@@ -203,11 +213,6 @@ void CCPi0::run(string playlist)
             fillHistograms();            
         }
         
-
-//     cout<<"Neutrino = "<<Erec<<" | "<<mc_incomingE<<endl;
-//     cout<<"Q2 = "<<Q2<<" | "<<mc_Q2<<endl;
-//     cout<<"-----"<<endl;
-        
         
 
 
@@ -216,13 +221,14 @@ void CCPi0::run(string playlist)
     
   
     nCutList->nAll->setValue(nAll);
+    nCutList->nFSPart->setValue(nFSPart);
     nCutList->nVolume->setValue(nVolume);
     nCutList->nBeamEnergy->setValue(nBeamEnergy);
     nCutList->nMuon->setValue(nMuon);
     nCutList->nMinos->setValue(nMinos);
     nCutList->nProton->setValue(nProton);
     nCutList->nPion->setValue(nPion);
-    
+    nCutList->nBeamEnergyFail->setValue(nBeamEnergyFail);
     
     // Write the Root Files
     write_RootFile();           //CCPi0
@@ -245,18 +251,21 @@ void CCPi0::run(string playlist)
 
 void CCPi0::fillCCPi0()
 {
+
+
     beamEnergy_mc->Fill(mc_incomingE);
     beamEnergy_reco->Fill(Erec);
     beamEnergy_error->Fill( (mc_incomingE - Erec) / mc_incomingE );
     beamEnergy_reco_mc->Fill(Erec,mc_incomingE);
     
     q2_mc->Fill(mc_Q2 / mevSq_to_gevSq);
-    q2_reco->Fill(Q2 / mevSq_to_gevSq);
+    q2_reco->Fill(Q2/ mevSq_to_gevSq);
     q2_error->Fill( (mc_Q2 - Q2) / mc_Q2 );
     q2_reco_mc->Fill(Q2/mevSq_to_gevSq,mc_Q2 /mevSq_to_gevSq);
     
     int_channel->Fill(mc_intType);
-    vertex_z->Fill(mc_vtx[3]);
+    vertex_z->Fill(mc_vtx[2]);
+    vertex_x_y->Fill(mc_vtx[0],mc_vtx[1]);
     n_FSParticles->Fill(mc_nFSPart);
 //     n_gammas->Fill();
 
@@ -302,7 +311,7 @@ void CCPi0::initVariables()
     beam_p3.SetPhi(-1.554);
     beam_p3.SetTheta(0.059);
     
-    max_nFSPart = 15;
+    max_nFSPart = 3;
     maxBeamEnergy = 20000; //MeV
     
 
@@ -433,8 +442,13 @@ void CCPi0::initHistograms()
     int_channel->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.int_channel.get_width()));
     
     vertex_z = new TH1F( "vertex_z","True Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
-    vertex_z->GetXaxis()->SetTitle("True Vertex Z [mm]");
+    vertex_z->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
     vertex_z->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.vertex_z.get_width()));
+    
+    vertex_x_y = new TH2F( "vertex_x_y","True Vertex X vs Y",   binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max(),
+                                                                binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max());
+    vertex_x_y->GetXaxis()->SetTitle("True Vertex X [mm]");
+    vertex_x_y->GetYaxis()->SetTitle("True Vertex Y [mm]");
 
     n_FSParticles = new TH1F( "n_FSParticles","Number of Final State Particles",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
     n_FSParticles->GetXaxis()->SetTitle("Number of Final State Particles");

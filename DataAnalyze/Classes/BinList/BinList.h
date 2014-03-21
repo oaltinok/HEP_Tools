@@ -37,6 +37,7 @@ class BinList
         SingleBin multiplicity;
         SingleBin int_channel;
         SingleBin vertex_z;
+        SingleBin vertex_x_y;
         
         // Analysis
         SingleBin beamE;

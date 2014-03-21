@@ -8,6 +8,7 @@ using namespace std;
 Particle::Particle()
 {
     bin_error.setBin(400, -2.0, 2.0);
+    bin_angle.setBin(180, 0.0, 180.0);
 }
 
 void Particle::fill_Histograms()
@@ -21,6 +22,16 @@ void Particle::fill_Histograms()
     KE_mc->Fill(kineticEnergy[1]);
     KE_error->Fill(kineticEnergy[2]);
     KE_reco_mc->Fill(kineticEnergy[0],kineticEnergy[1]);
+    
+    angleMuon_reco->Fill(angleMuon[0] * TMath::RadToDeg());
+    angleMuon_mc->Fill(angleMuon[1] * TMath::RadToDeg());
+    angleMuon_error->Fill(angleMuon[2]);
+    angleMuon_reco_mc->Fill(angleMuon[0] * TMath::RadToDeg(),angleMuon[1] * TMath::RadToDeg());
+    
+    angleBeam_reco->Fill(angleBeam[0] * TMath::RadToDeg());
+    angleBeam_mc->Fill(angleBeam[1] * TMath::RadToDeg());
+    angleBeam_error->Fill(angleBeam[2]);
+    angleBeam_reco_mc->Fill(angleBeam[0] * TMath::RadToDeg(),angleBeam[1] * TMath::RadToDeg());
 
 }
 
@@ -57,8 +68,8 @@ void Particle::set_errors()
 {
     momentum[2] = calc_error(momentum[1], momentum[0]);
     kineticEnergy[2] = calc_error(kineticEnergy[1], kineticEnergy[0]);
-    angleMuon[2] = calc_error(angleMuon[1], angleMuon[0]);
-    angleBeam[2] = calc_error(angleBeam[1], angleBeam[0]);
+    angleMuon[2] = calc_error(angleMuon[1] * TMath::RadToDeg(), angleMuon[0] * TMath::RadToDeg());
+    angleBeam[2] = calc_error(angleBeam[1] * TMath::RadToDeg(), angleBeam[0] * TMath::RadToDeg());
 }
 
 void Particle::set_momentum(bool isMC)

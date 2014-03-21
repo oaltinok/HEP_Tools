@@ -35,7 +35,7 @@ void main(bool onlyPlot)
 
     // Edit isTest Variable for running Test Samples or complete playlist
     bool isTest;
-    isTest = true;
+    isTest = false;
     
     if(onlyPlot){
         Plotter p;
