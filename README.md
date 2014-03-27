@@ -1,35 +1,35 @@
-Packages for Minerva Neutrino Experiment
-==========================
+# Packages for Minerva Neutrino Experiment
 
-Experiment URL: http://minerva.fnal.gov/
-
-ROOT URL: http://root.cern.ch/drupal/
-
-Notes:
-
-	These packages are specialized for MINERvA Experiment data format.
-	Requires ROOT Data Analysis Framework
-	
-DataAnalyze Packages: 
-
-	CCNuPionInc
-		
-	
-	
-Reconstruction Algorithms:
-
-	
-	dEdX Improved Algorithm for Particle ID calculation
-	
+|Reconstruction | Data Analysis | Other Algorithms	|
+|-------------- |-------------- |------------------	|
+|CCDeltaPlus	|NTupleAnalysis	| dEdX Improvement	|
 
 
-Reconstruction
-==========================
-Improvements on Minerva Reconstruction
+* These packages are specialized for MINERvA Experiment data format.
+	* Experiment URL: http://minerva.fnal.gov/
+* Requires ROOT Data Analysis Framework
+	* ROOT URL: http://root.cern.ch/drupal/
 
-dEdX_pID
-------------------------
-Improvement on pID Calculation: Algorithm improves the pID in case the particle track overlaps with another particle track.
+### CCDeltaPlus:
+
+* Process raw data to create ntuples for a specific analysis
+* Final State Particles: muon, proton, and pi0
+
+### NTupleAnalysis:
+
+* Reads ntuples created by varios Reconstruction Packages: 
+	* CCDeltaPlus
+	* CCInclusive
+	* CCPi0
+* Uses makeClass.cpp to create a new class for another ntuple
+
+
+
+### Other Algorithms:
+
+##### dEdX_pID
+
+Improvement on pID Calculation: Algorithm improves the pID in case the particle trajectory overlaps with another trajectory.
 
 
   
