@@ -29,7 +29,7 @@
 
 ##### dEdX_pID
 
-Improvement on pID Calculation: Algorithm improves the pID in case the particle trajectory overlaps with another trajectory.
+* Improvement on pID Calculation: Algorithm improves the pID in case the particle trajectory overlaps with another trajectory.
 
 
   
