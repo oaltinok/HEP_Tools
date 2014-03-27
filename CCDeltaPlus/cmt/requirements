@@ -1,0 +1,39 @@
+package CCDeltaPlus
+version ${MINERVA_RELEASE}
+
+branches CCDeltaPlus cmt src doc
+
+#===============================================================================
+use MinervaEvent        v*   Event
+use MinervaGenEvent     v*   Event
+
+use MinervaUtils        v*   Tools
+
+use ProngMaker          v*   Rec
+use ParticleMaker       v*   Rec
+use BlobFormation       v*   Rec
+
+use AnaInterfaces       v*   Ana
+use AnaUtils            v*   Ana
+
+use PlotUtils           v*   Ana
+use UnfoldUtils         v*   Ana
+
+macro_append ROOT_linkopts "-L$(ROOTSYS)/lib -lPhysics -lHist -lGeom -lEG -lGpad -lGraf -lMinuit2"
+
+
+#===============================================================================
+include_dirs ${CCDELTAPLUSROOT}
+
+library CCDeltaPlusLib      *.cpp
+apply_pattern component_library library=CCDeltaPlusLib
+
+private
+apply_pattern application_path
+macro CCDeltaPlus_linkopts      "${application_linkopts}"
+set CCDELTAPLUSDOC "${CCDELTAPLUSROOT}/doc"
+end_private
+
+
+#===============================================================================
+
