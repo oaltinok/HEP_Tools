@@ -1,3 +1,31 @@
+/*
+================================================================================
+CCDeltaPlusAna
+
+    Reconstruction Package:
+        Exclusive Channel for muon,proton,pi0 on the final state
+        Contains Clone of CCPi0 for Pi0 Reconstruction 
+        Contains Clone of NukeCCQE for Short Track Reconstruction 
+        Both Clones may be inherited in future, for now they are just copied
+    
+    Main Package:
+        AnalysisFramework/Ana/CCDeltaPlus/
+        
+    Setup:
+        > getpack -u Ana/CCDeltaPlus
+        > cmt config
+        > cmt make
+        
+    Usage:
+        There is a corresponding Options file under Tools/SystemTests
+        Use Tools/ProductionScripts/ana_scripts/ProcessAna.py
+
+    
+    Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
+    Last Revision:  2014_04_02
+    
+================================================================================
+*/
 #ifndef CCDELTAPLUSANA_H 
 #define CCDELTAPLUSANA_H 1
 
@@ -6,34 +34,76 @@
 // ineritance
 #include "AnaUtils/MinervaAnalysisTool.h"
 
+//-- Forward Declarations
+#include "Event/MinervaEventFwd.h"
 
-// forwards
+
+//=============================================================================
+// NukeCCQE Classes
+//=============================================================================
+class IConeUtilsTool;
+class Cone;
+class ParticleExtraDataDefs;
+class IEnergyLoss;
+class IEnergyCorrectionTool;
+class IAbsorberStacker;
+class IMinervaCoordSysTool;
+class INuclearTargetTool;
+class NuclearTarget;
+class IAnchoredTrackFormation;
+class IPrimaryBlobProngTool;
+class ITrackPropagator;
+class IMinosMinervaTransformer;
+class IVertexFitter;
+class IProngClassificationTool;
+class IODProngClassificationTool;
+class IParticleTool;
+class IParticleMakerTool; 
+class IBlobCreatorUtils; 
+class IVertexEnergyStudyTool;
+class IMichelTool; 
+
+class IHitTaggerTool;
+class MinervaObjectSort;
+
+class IProtonUtils;
+class IMCTrackTool;
+class MCTrack;
+
+//=============================================================================
+// CCPi0 Classes
+//=============================================================================
 class IMuonUtils;
 class IExtraEnergyTool;
 class IIDAnchoredBlobCreator;
 class ITrackLinearPropagator;
-class IHitTaggerTool;
 class IHoughBlob;
 class IHoughTool;
 
 class IClusterUtilsTool;
 class IIDBlobCreator;
 class IODBlobCreator;
-class IBlobCreatorUtils;
 class IIDIsolatedIDBlobCreator;
 class IIDBlobSeedingTool;
 class IGeomUtilSvc;
-class IMinervaCoordSysTool;
 class IMinervaMathTool;
 
+
+
 namespace Minerva {
+  class TimeSlice;
+  class DePlane;
   class DeDetector;
   class DeOuterDetector;
+  class NuclearTarget;
 }
 
 //! This class is for Reconstruct Pi0 using muon match vertex
 class CCDeltaPlusAna : public MinervaAnalysisTool
 {
+ private:
+   typedef std::vector<Minerva::NeutrinoInt*> NeutrinoVect;
+
  public:
 
   //! Standard constructor
@@ -51,13 +121,168 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
   StatusCode reconstructEvent( Minerva::PhysicsEvent* event, Minerva::GenMinInteraction* truth = NULL ) const;
 
   //! Attach an interpretations to the event (mandatory for inheritance)
-  StatusCode interpretEvent( const Minerva::PhysicsEvent* event, const Minerva::GenMinInteraction* truth,
-                             std::vector<Minerva::NeutrinoInt*>& nuInts ) const;
+  StatusCode interpretEvent( const Minerva::PhysicsEvent* event, const Minerva::GenMinInteraction* truth, NeutrinoVect& nuInts ) const;
 
   StatusCode tagTruth( Minerva::GenMinInteraction* truth ) const;
+  
 
 
  private:
+ 
+//=============================================================================
+// NukeCCQE Private Functions
+//=============================================================================
+ 
+  StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
+  StatusCode makeConeVtxBlobProng( SmartRef<Minerva::Vertex>& vertex, std::vector<Minerva::Prong*>* vtxBlobProngVect ) const;
+
+  Minerva::IDClusterVect      getClusters( Minerva::PhysicsEvent* event, Minerva::Track::PatRecHistory pattern ) const;
+  Minerva::Vertex*            getStopPointVertex( Minerva::PhysicsEvent* event, SmartRef<Minerva::Track>& track ) const;
+  SmartRef<Minerva::Particle> findMuonParticleCandidate( SmartRef<Minerva::Prong>& prong ) const;
+
+  std::string odMuonProng( SmartRef<Minerva::Prong>& prong, SmartRef<Minerva::Particle>& particle ) const;
+
+  bool isInsideTargetFiducial( SmartRef<Minerva::Vertex>& vertex, std::string& name, int& passVertexZCut ) const;
+  
+  bool protonProng( Minerva::ProngVect& prongs, SmartRef<Minerva::Prong>& prong, SmartRef<Minerva::Particle>& particle ) const;
+  bool muonProng( Minerva::ProngVect& prongs, SmartRef<Minerva::Prong>& prong, SmartRef<Minerva::Particle>& particle, 
+                  std::string& event_type ) const;
+
+  bool createdAnchoredShortTracks( Minerva::PhysicsEvent* event, Minerva::Vertex* vertex ) const;
+  bool createdKinkedShortTracks( Minerva::PhysicsEvent* event ) const;
+
+  bool createdTrackedProngs( Minerva::PhysicsEvent* event ) const;
+  bool createdTrackedParticles( Minerva::ProngVect& prongs ) const;
+
+  bool createdIDBlobProng( Minerva::PhysicsEvent* event ) const;
+  bool createdODBlobProng( Minerva::PhysicsEvent* event ) const;
+
+  bool classifyProngs( Minerva::PhysicsEvent* event ) const;
+
+  void correctProtonProngEnergy( SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
+  void correctProtonProngEnergy( SmartRef<Minerva::Prong>& protonProng, SmartRef<Minerva::Particle> particle ) const {
+       double p_calCorrection = 0, p_visEnergyCorrection = 0;
+       correctProtonProngEnergy(protonProng,p_calCorrection,p_visEnergyCorrection);
+       double E  = particle->momentumVec().E() + p_calCorrection;
+       double p  = sqrt( E*E - particle->mass()*particle->mass() );
+       double px = p*sin((protonProng->minervaTracks().front())->theta())*cos((protonProng->minervaTracks().front())->phi());
+       double py = p*sin((protonProng->minervaTracks().front())->theta())*sin((protonProng->minervaTracks().front())->phi());
+       double pz = p*cos((protonProng->minervaTracks().front())->theta());
+       Gaudi::XYZTVector updateFourMomentum(px,py,pz,E);
+       particle->setMomentumVec(updateFourMomentum);
+       return;
+  }
+
+  void linkProngToPrimaryProng( Minerva::Prong* prong, Minerva::ProngVect& primaryProngs ) const;
+  void setTrackDirection( Minerva::Track* track, Minerva::Vertex* vertex ) const;
+  void setMuonID( Minerva::NeutrinoInt* neutrino, SmartRef<Minerva::Prong>& prong ) const;
+  void setODMuonParticleData( Minerva::NeutrinoInt* neutrino, SmartRef<Minerva::Particle>& particle ) const;
+  void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, SmartRef<Minerva::Prong>& prong ) const;
+  void setBlobProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
+  void setProtonParticleData( Minerva::NeutrinoInt* nu, SmartRef<Minerva::Prong>& prong, SmartRef<Minerva::Particle>& particle,
+                              double vertex_z ) const;
+  void setPionParticleData( Minerva::NeutrinoInt* neutrino, SmartRef<Minerva::Prong>& prong ) const;
+  void setGenMinTruthInformation( Minerva::PhysicsEvent* event, Minerva::GenMinInteraction* truth ) const;
+  void fillBlobEventData( Minerva::PhysicsEvent* event ) const;
+  void fillMuonMomentumFromProton( Minerva::NeutrinoInt* nu, Minerva::TrackVect& tracks, double proton_theta, double proton_p ) const;
+
+  bool tagMichelElectrons(Minerva::PhysicsEvent* event) const;
+
+  IConeUtilsTool*             m_coneUtilsTool;
+  IEnergyCorrectionTool*      m_energyCorrectionTool;
+  IEnergyLoss*                m_energyLoss;
+  IAbsorberStacker*           m_absorberStacker;
+  IMinervaCoordSysTool*       m_coordSysTool;
+  ITrackPropagator*           m_propagateToMinos;
+  IMinosMinervaTransformer*   m_mmt;
+  IMCTrackTool*               m_mcTrackTool;
+  IHitTaggerTool*             m_hitTagger;
+  Minerva::DeOuterDetector*   m_odDet;
+  Minerva::DeDetector*        m_idDet;
+
+  INuclearTargetTool*         m_nuclearTargetTool;
+  std::string                 m_nuclearTargetToolAlias;
+
+  IProtonUtils*               m_protonUtils;
+  std::string                 m_protonUtilsAlias;
+
+  IPrimaryBlobProngTool*      m_primaryBlobProngTool;
+  std::string                 m_primaryBlobProngAlias;
+
+  IAnchoredTrackFormation*    m_anchoredTracker;
+  std::string                 m_anchorShortTrackerAlias;
+
+  IVertexFitter*              m_vertexFitter;
+  std::string                 m_vertexFitterAlias;
+
+  IProngClassificationTool*   m_prongIntersection;
+  std::string                 m_prongIntersectionAlias;
+
+  IODProngClassificationTool* m_odMatchTool;
+  std::string                 m_odMatchAlias;
+
+  IParticleMakerTool*         m_particleMaker;
+  std::string                 m_particleMakerAlias; 
+
+  IBlobCreatorUtils*          m_blobCreatorUtils; 
+  std::string                 m_blobCreatorUtilsAlias; 
+
+  IVertexEnergyStudyTool*     m_vertexEnergyStudyTool; 
+  std::string                 m_vtxEngStudyToolAlias;
+
+  IMichelTool*                m_michelTool;
+  std::string                 m_michelToolAlias;
+
+  double                      m_fvApothem;
+  double                      m_min_mva_score;
+  double                      m_CCQEBindingEnergyMeV;
+  double                      m_clusMinTimeWindow;
+  double                      m_clusMaxTimeWindow;
+  double                      m_fuzzRadius;
+
+  int                         m_numSearchRadii;
+  double                      m_searchStepSize;
+  double                      m_maxSearchDistance;
+  double 		      m_maxStartingDistance;
+  double 		      m_maxAllowedSearchGap;
+  double 		      m_maxSeparationBlobVertex;
+
+  bool                        m_applyCalCorrection;
+
+  double                      m_tar1VertexZUSCut;
+  double                      m_tar1VertexZDSCut;
+
+  double                      m_tar2VertexZUSCut;
+  double                      m_tar2VertexZDSCut;
+
+  double 		      m_tar3VertexZUSCut;
+  double                      m_tar3VertexZDSCut;
+
+  double                      m_tar4VertexZUSCut;
+  double                      m_tar4VertexZDSCut;
+
+  double                      m_tar5VertexZUSCut;
+  double                      m_tar5VertexZDSCut;
+
+  double                      m_maxSearchDistance_VESTool;
+  double                      m_maxStartingDistance_VESTool;
+  double                      m_maxAllowedSearchGap_VESTool;
+
+  double                      m_michel_downstreamZ;
+  double                      m_michel_upstreamZ;
+
+  std::vector<double>                   m_fvUpstreamZ;
+  std::vector<double>                   m_fvDownstreamZ;
+  std::vector<std::string>              m_targetNames;
+  std::vector<Minerva::NuclearTarget* > m_targets;
+
+  int     m_muonProngColor; 
+  int     m_protonProngColor; 
+  int     m_primaryVertexColor; 
+  int     m_secondaryVertexColor; 
+  int     m_endPointVertexColor; 
+  int     m_unattachedProngColor;
+ 
 
   IExtraEnergyTool*       m_extraEnergyTool;
   IIDAnchoredBlobCreator* m_idConeScanBlob;
@@ -70,8 +295,6 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
   IMinervaCoordSysTool*   m_minervaCoordSysTool;
   IMinervaMathTool*       m_mathTool;
   
-  const Minerva::DeDetector*      m_idDet;                ///< Inner detector
-  const Minerva::DeOuterDetector* m_odDet;                ///< Outer detector
   IGeomUtilSvc*                   m_GeomUtilSvc;          ///< GeomUtilSvc
   
   double m_fiducialApothem;      ///< Vertex Cut (mm) : Is this event signal?

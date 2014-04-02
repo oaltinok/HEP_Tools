@@ -12,12 +12,14 @@ use MinervaUtils        v*   Tools
 use ProngMaker          v*   Rec
 use ParticleMaker       v*   Rec
 use BlobFormation       v*   Rec
+use GeoUtils            v*   Rec
+use EventRecInterfaces  v*   Rec
 
 use AnaInterfaces       v*   Ana
 use AnaUtils            v*   Ana
-
 use PlotUtils           v*   Ana
 use UnfoldUtils         v*   Ana
+use RecoStudies         v*   Ana 
 
 macro_append ROOT_linkopts "-L$(ROOTSYS)/lib -lPhysics -lHist -lGeom -lEG -lGpad -lGraf -lMinuit2"
 

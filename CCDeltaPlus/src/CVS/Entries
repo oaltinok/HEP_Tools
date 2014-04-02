@@ -1,7 +1,5 @@
 /AngleScan.cpp/1.1.1.1/Thu Mar 27 16:30:09 2014//
 /AngleScan.h/1.1.1.1/Thu Mar 27 16:30:09 2014//
-/CCDeltaPlusAna.cpp/1.1.1.1/Thu Mar 27 16:30:09 2014//
-/CCDeltaPlusAna.h/1.1.1.1/Thu Mar 27 16:30:09 2014//
 /ClusterVectorInfo.cpp/1.1.1.1/Thu Mar 27 16:30:09 2014//
 /ClusterVectorInfo.h/1.1.1.1/Thu Mar 27 16:30:09 2014//
 /DigitVectorTruthInfo.cpp/1.1.1.1/Thu Mar 27 16:30:09 2014//
@@ -19,4 +17,6 @@
 /TrackTruthInfo.h/1.1.1.1/Thu Mar 27 16:30:09 2014//
 /TraverseHistory.cpp/1.1.1.1/Thu Mar 27 16:30:09 2014//
 /TraverseHistory.h/1.1.1.1/Thu Mar 27 16:30:09 2014//
+/CCDeltaPlusAna.cpp/1.3/Wed Apr  2 19:41:04 2014//
+/CCDeltaPlusAna.h/1.3/Wed Apr  2 13:43:31 2014//
 D
