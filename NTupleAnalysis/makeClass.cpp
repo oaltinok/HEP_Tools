@@ -1,6 +1,6 @@
 void makeClass(string playlist){
 
-    TChain fChain("CCPi0AnaTool") ;
+    TChain fChain("CCDeltaPlusAna") ;
 
     ifstream input_pl( playlist.c_str() );
     string filename;

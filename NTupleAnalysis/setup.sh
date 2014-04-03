@@ -18,7 +18,7 @@ Folder_List=(Output
                 Output/Plots/Muon
                 Output/Plots/Proton
                 Output/Plots/Pion
-                Output/Plots/CCPi0)
+                Output/Plots/CCDeltaPlus)
 
 for ilist1 in ${Folder_List[@]}; do
     echo "Creating ${ilist1}"

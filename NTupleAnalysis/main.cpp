@@ -16,12 +16,12 @@ main.cpp
             > main(false) for Running the Analysis
             > main(true) for Generating Plots only
     
-    Last Revision: 2014_03_17
+    Last Revision: 2014_04_03
 ================================================================================
 */
 
 // Include Required Classes & Libraries
-#include "Classes/CCPi0/CCPi0.cpp"
+#include "Classes/CCDeltaPlus/CCDeltaPlus.cpp"
 #include "Classes/Plotter/Plotter.cpp"
 #include "Libraries/Folder_List.h"
 
@@ -35,13 +35,13 @@ void main(bool onlyPlot)
 
     // Edit isTest Variable for running Test Samples or complete playlist
     bool isTest;
-    isTest = false;
+    isTest = true;
     
     if(onlyPlot){
         Plotter p;
-        p.plotHistograms(true,true,true);
+        p.plotHistograms(false,false,true);
     }else{
-        CCPi0 t;
+        CCDeltaPlus t;
         if(isTest){
             t.run(f_PL_Test);
             

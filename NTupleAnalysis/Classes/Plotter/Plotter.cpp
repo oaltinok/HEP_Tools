@@ -14,9 +14,9 @@ Plotter::Plotter()
 
 void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
 {
-    plotCCPi0(isMC,isReco, is2D);
+//     plotCCDeltaPlus(isMC,isReco, is2D);
 
-    plotMuon(isMC,isReco, is2D);
+//     plotMuon(isMC,isReco, is2D);
     
 //     plotProton(isMC,isReco, is2D);
     
@@ -24,11 +24,11 @@ void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
     
 }
 
-void Plotter::plotCCPi0(bool isMC, bool isReco, bool is2D)
+void Plotter::plotCCDeltaPlus(bool isMC, bool isReco, bool is2D)
 {
 
-    string rootDir = Folder_List::f_Root_CCPi0;
-    string plotDir = Folder_List::f_Plot_CCPi0;
+    string rootDir = Folder_List::f_Root_CCDeltaPlus;
+    string plotDir = Folder_List::f_Plot_CCDeltaPlus;
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());

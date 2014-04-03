@@ -45,7 +45,7 @@ string getFileLocation(string s1, string s2, string s3)
 --------------------------------------------------------------------------------
 */
 
-const string channelTag = "Gold";
+const string channelTag = "Test";
 
 /*
 --------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ const string F_ROOT_DATA = "DATA_minerva1.root";
 const string F_ROOT_MUON = "Muon.root";
 const string F_ROOT_PION = "Pion.root";
 const string F_ROOT_PROTON = "Proton.root";
-const string F_ROOT_CCPI0 = "CCPi0.root";
+const string F_ROOT_CCDELTAPLUS = "CCDeltaPlus.root";
 
 // TEXT Files
 const string F_TEXT_CUT = "CutTable";
@@ -85,7 +85,7 @@ const string PLOT = "Plots/";
 const string PLOT_MUON = "Plots/Muon/";
 const string PLOT_PROTON = "Plots/Proton/";
 const string PLOT_PION = "Plots/Pion/";
-const string PLOT_CCPI0 = "Plots/CCPi0/";
+const string PLOT_CCDELTAPLUS= "Plots/CCDeltaPlus/";
 
 // Input Folder Locations    
 const string IN = "Input/";
@@ -108,8 +108,8 @@ string f_Plot_Proton =  getFileLocation(Folder_List::OUT, Folder_List::PLOT_PROT
 string f_Plot_Pion =    getFileLocation(Folder_List::OUT, Folder_List::PLOT_PION);
 
 // Default Files and Folders
-string f_Root_CCPi0 =   getFileLocation(Folder_List::OUT, Folder_List::ROOT,Folder_List::F_ROOT_CCPI0);
-string f_Plot_CCPi0 =   getFileLocation(Folder_List::OUT, Folder_List::PLOT_CCPI0);
+string f_Root_CCDeltaPlus =   getFileLocation(Folder_List::OUT, Folder_List::ROOT,Folder_List::F_ROOT_CCDELTAPLUS);
+string f_Plot_CCDeltaPlus =   getFileLocation(Folder_List::OUT, Folder_List::PLOT_CCDELTAPLUS);
 
 // Playlist File Addresses
 string f_PL_Test =      getFileLocation(Folder_List::IN, Folder_List::PLAYLIST, Folder_List::F_PL_TEST);
