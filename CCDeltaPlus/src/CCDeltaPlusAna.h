@@ -22,7 +22,7 @@ CCDeltaPlusAna
 
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_04_02
+    Last Revision:  2014_04_03
     
 ================================================================================
 */
@@ -122,6 +122,7 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
 
   //! Attach an interpretations to the event (mandatory for inheritance)
   StatusCode interpretEvent( const Minerva::PhysicsEvent* event, const Minerva::GenMinInteraction* truth, NeutrinoVect& nuInts ) const;
+  StatusCode tammy_interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truth, NeutrinoVect& nuInts ) const;
 
   StatusCode tagTruth( Minerva::GenMinInteraction* truth ) const;
   

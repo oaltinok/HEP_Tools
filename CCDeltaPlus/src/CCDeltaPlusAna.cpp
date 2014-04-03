@@ -89,10 +89,6 @@
 #include "ClusterVectorInfo.h"
 
 
-
-
-
-
 /* 
     Global variables, instead of class data members so that they can be
     assigned in 'const' methods. In general, we can use 'mutable' members,
@@ -187,14 +183,14 @@ MinervaAnalysisTool( type, name, parent )
     m_hypMeths.push_back( m_anaSignature );
     declareProperty("HypothesisMethods", m_hypMeths);
     
-    debug() << " CCDeltaPlusAna Hypothesis added <oaltinok_version>" << endmsg;
+    debug() << " CCDeltaPlusAna Hypothesis added " << endmsg;
     
     // Vertex Cut : Is this event signal?
     declareProperty( "FiducialApothem",      m_fiducialApothem      =  850.0* CLHEP::millimeter ); 
     declareProperty( "FiducialUpstreamZ",    m_fiducialUpstreamZ    = 5912.0* CLHEP::millimeter ); 
     declareProperty( "FiducialDownstreamZ",  m_fiducialDownstreamZ  = 8445.0* CLHEP::millimeter ); 
     
-        // Vertex blob
+    // Vertex blob
     declareProperty( "UseSphereVertex", 		m_sphereVertex	= true );
     declareProperty( "SphereMaxSearchDistance", 	m_maxSearchD  	=  90.0 * CLHEP::millimeter ); 
     declareProperty( "SphereMaxStartingDistance", m_maxStartingD	=  90.0 * CLHEP::millimeter ); 
@@ -205,18 +201,18 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty( "FilamentMaxAllowedSearchGap", m_maxSearchGapFila  = 51.0 * CLHEP::millimeter ); 
     declareProperty( "FilterClusterTypes",   m_filterClusterTypes    = true );
     
-        //dEdx
+    //dEdx
     declareProperty( "NumberPlanesdEdX", 	m_planesdEdx 	= 4 ); 
     m_distance_dEdx = m_planesdEdx*17 * CLHEP::millimeter; 
     
-        // Ana tools
+    // Ana tools
     declareProperty( "qOverpChargeCut",       m_qOverpChargeCut       = 0   );
     declareProperty( "HoughEnergyLimit",      m_energyHoughlimit      = 900 * CLHEP::MeV ); 
     declareProperty( "RejectedClustersTime",  m_rejectedClustersTime  = 25 * CLHEP::ns );
     
-        /* Number from Cesar Sotelo's studies.
-            For forward-going track, the cylinder starts 20cm DOWNSTREAM of the first track node
-        */
+    /* Number from Cesar Sotelo's studies.
+        For forward-going track, the cylinder starts 20cm DOWNSTREAM of the first track node
+    */
     declareProperty( "ExtraEnergyCylinderUpstreamOffset",  m_extraEnergyCylinderUpstreamLength = -200.0*CLHEP::mm);
     declareProperty( "ExtraEnergyCylinderDownstreamOffset",m_extraEnergyCylinderDownstreamLength = 50.0*CLHEP::mm);
     declareProperty( "ExtraEnergyCylinderRadius",          m_extraEnergyCylinderRadius = 50*CLHEP::mm);
@@ -234,6 +230,8 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty( "UVMatchMoreTolerance", fUVMatchMoreTolerance = 100.0*CLHEP::mm);
     declareProperty( "AllowUVMatchWithMoreTolerance", fAllowUVMatchWithMoreTolerance = true);
     
+    info() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
+    
 }
     
 //=============================================================================
@@ -246,12 +244,23 @@ StatusCode CCDeltaPlusAna::initialize()
     
     //! Initialize the base class.  This will fail if you did not define m_anaSignature.
     StatusCode sc = this->MinervaAnalysisTool::initialize();
-    if( sc.isFailure() ) { return Error( "Failed to initialize!", sc ); }
-    info()<<"   initialized MinervaAnalysisTool"<<endmsg;
-
+    if( sc.isFailure() ) { 
+        return Error( "Failed to initialize!", sc ); 
     
-    //-- analysis tools
-    try{ m_nuclearTargetTool = tool<INuclearTargetTool>("NuclearTargetTool", m_nuclearTargetToolAlias); 
+    }
+    info()<<"   initialized MinervaAnalysisTool"<<endmsg;
+    
+    /*
+    ============================================================================
+        Initializing Analysis Tools
+    ============================================================================
+    */
+
+    debug()<<"Initializing Analysis Tools:"<<endmsg;
+    
+    debug()<<"  Initializing NuclearTargetTool"<<endmsg;
+    try{ 
+        m_nuclearTargetTool = tool<INuclearTargetTool>("NuclearTargetTool", m_nuclearTargetToolAlias); 
             m_nuclearTargetTool->m_locked = false;
             m_nuclearTargetTool->addAllPassiveNuclearTargets();
         
@@ -264,137 +273,184 @@ StatusCode CCDeltaPlusAna::initialize()
     
             m_nuclearTargetTool->lock();
             m_targets = m_nuclearTargetTool->getNuclearTargets();
-    } catch( GaudiException& e ) {
+    } 
+    catch( GaudiException& e ) {
         error() << "Could not obtain NuclearTargetTool: " << m_nuclearTargetToolAlias << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_protonUtils = tool<IProtonUtils>("ProtonUtils", m_protonUtilsAlias); }
+    debug()<<"  Initializing ProtonUtils"<<endmsg;
+    try{ 
+        m_protonUtils = tool<IProtonUtils>("ProtonUtils", m_protonUtilsAlias); 
+    }
     catch( GaudiException& e ){
         error() << "Could not obtain ProtonUtils: " << m_protonUtilsAlias << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_coneUtilsTool = tool<IConeUtilsTool>("ConeUtilsTool"); }
+    debug()<<"  Initializing ConeUtilsTool"<<endmsg;
+    try{ 
+        m_coneUtilsTool = tool<IConeUtilsTool>("ConeUtilsTool"); 
+    }
     catch( GaudiException& e ){
         error() << "Could not obtain ConeUtilsTool!" << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_energyCorrectionTool = tool<IEnergyCorrectionTool>("EnergyCorrectionTool"); }
+    debug()<<"  Initializing EnergyCorrectionTool"<<endmsg;
+    try{ 
+        m_energyCorrectionTool = tool<IEnergyCorrectionTool>("EnergyCorrectionTool"); 
+    }
     catch( GaudiException& e ){
         error() << "Could not obtain EnergyCorrectionTool!" << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_energyLoss = tool<IEnergyLoss>("EnergyLoss"); } 
+    debug()<<"  Initializing EnergyLoss"<<endmsg;
+    try{ 
+        m_energyLoss = tool<IEnergyLoss>("EnergyLoss"); 
+    } 
     catch( GaudiException& e ) {
         error() << "Could not obtain EnergyLoss!" << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_absorberStacker = tool<IAbsorberStacker>("AbsorberStacker"); }
+    debug()<<"  Initializing AbsorberStacker"<<endmsg;
+    try{ 
+        m_absorberStacker = tool<IAbsorberStacker>("AbsorberStacker"); 
+    }
     catch( GaudiException& e ) {
         error() << "Could not obtain AbsorberStacker!" << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_coordSysTool = tool<IMinervaCoordSysTool>("MinervaCoordSysTool"); }
+    debug()<<"  Initializing MinervaCoordSysTool"<<endmsg;
+    try{ 
+        m_coordSysTool = tool<IMinervaCoordSysTool>("MinervaCoordSysTool"); 
+    }
     catch( GaudiException& e ) {
         error() << "Could not obtain MinervaCoordSysTool!" << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_propagateToMinos = tool<ITrackPropagator>("TrackPropagator"); }
+    debug()<<"  Initializing TrackPropagator"<<endmsg;
+    try{ 
+        m_propagateToMinos = tool<ITrackPropagator>("TrackPropagator"); 
+    }
     catch( GaudiException& e ) {
         error() << "Could not obtain TrackPropagator!" << endmsg;
         return StatusCode::FAILURE;
     } 
     
-    try{ m_mmt = tool<IMinosMinervaTransformer>("MinosMinervaTransformer"); }
+    debug()<<"  Initializing MinosMinervaTransformer"<<endmsg;
+    try{ 
+        m_mmt = tool<IMinosMinervaTransformer>("MinosMinervaTransformer"); 
+    }
     catch( GaudiException& e ) {
         error() << "Could not obtain MinosMinervaTransformer!" << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_primaryBlobProngTool = tool<IPrimaryBlobProngTool>("PrimaryBlobProngTool",m_primaryBlobProngAlias); }
+    debug()<<"  Initializing PrimaryBlobProngTool"<<endmsg;
+    try{ 
+        m_primaryBlobProngTool = tool<IPrimaryBlobProngTool>("PrimaryBlobProngTool",m_primaryBlobProngAlias); 
+    }
     catch( GaudiException& e ){
         error() << "Could not obtain PrimaryBlobProngTool: " << m_primaryBlobProngAlias << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_anchoredTracker = tool<IAnchoredTrackFormation>("AnchoredShortTracker",m_anchorShortTrackerAlias); }
+    debug()<<"  Initializing AnchoredShortTracker"<<endmsg;
+    try{ 
+        m_anchoredTracker = tool<IAnchoredTrackFormation>("AnchoredShortTracker",m_anchorShortTrackerAlias); 
+    }
     catch( GaudiException& e ){
         error() << "Could not obtain AnchoredShortTracker: " << m_anchorShortTrackerAlias << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_vertexFitter = tool<IVertexFitter>("VertexFitterKalman",m_vertexFitterAlias); }
+    debug()<<"  Initializing VertexFitterKalman"<<endmsg;
+    try{ 
+        m_vertexFitter = tool<IVertexFitter>("VertexFitterKalman",m_vertexFitterAlias); 
+    }
     catch( GaudiException& e ){
         error() << "Could not obtain VertexFitterKalman: " << m_vertexFitterAlias << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_prongIntersection = tool<IProngClassificationTool>("ProngIntersectionTool", m_prongIntersectionAlias); }
+    debug()<<"  Initializing ProngIntersectionTool"<<endmsg;
+    try{ 
+        m_prongIntersection = tool<IProngClassificationTool>("ProngIntersectionTool", m_prongIntersectionAlias); 
+    }
     catch( GaudiException& e ){
         error() << "Could not obtain ProngClassificationTool: " << m_prongIntersectionAlias << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_odMatchTool = tool<IODProngClassificationTool>("ODTrackMatchTool", m_odMatchAlias); }
+    debug()<<"  Initializing ODTrackMatchTool"<<endmsg;
+    try{ 
+        m_odMatchTool = tool<IODProngClassificationTool>("ODTrackMatchTool", m_odMatchAlias); 
+    }
     catch( GaudiException& e ){
-        error() << "Could not obtain ProngClassificationTool: " << m_odMatchAlias << endmsg;
+        error() << "Could not obtain ODTrackMatchTool: " << m_odMatchAlias << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_particleMaker = tool<IParticleMakerTool>("ParticleMakerTool", m_particleMakerAlias); }
+    debug()<<"  Initializing ParticleMakerTool"<<endmsg;
+    try{ 
+        m_particleMaker = tool<IParticleMakerTool>("ParticleMakerTool", m_particleMakerAlias); 
+    }
     catch( GaudiException& e ){
         error() << "Could not obtain ParticleMakerTool: " << m_particleMakerAlias << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_mcTrackTool = tool<IMCTrackTool>("MCTrackTool"); }
+    debug()<<"  Initializing MCTrackTool"<<endmsg;
+    try{ 
+        m_mcTrackTool = tool<IMCTrackTool>("MCTrackTool"); 
+    }
     catch( GaudiException& e){
-        error() << "Could not obtain MCTrackTool!" << endmsg;
+        error() << "Could not obtain MCTrackTool! " <<endmsg;
         return StatusCode::FAILURE;
     }
-    
-    try{ m_idDet = getDet<Minerva::DeDetector>("/dd/Structure/Minerva/Detector/InnerDetector"); }
-    catch( GaudiException& e ){
-        error() << "Could not retrieve the Inner Detector!" << endmsg;
-        return StatusCode::FAILURE;
+   
+    debug()<<"  Initializing HitTaggerTool"<<endmsg;
+    try{ 
+        m_hitTagger = tool<IHitTaggerTool>( "HitTaggerTool" ); 
     }
-    
-    try{ m_odDet = getDet<Minerva::DeOuterDetector>("/dd/Structure/Minerva/Detector/OuterDetector"); }
-    catch( GaudiException& e ) {
-        error() << "Could not retrieve the Outer Detector!" << endmsg;
-        return StatusCode::FAILURE;
-    }
-    
-    try{ m_hitTagger = tool<IHitTaggerTool>( "HitTaggerTool" ); }
     catch( GaudiException& e ) {
         error() << "Could not obtain tool: HitTaggerTool!" << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_michelTool = tool<IMichelTool>("MichelTool",m_michelToolAlias); }
+    debug()<<"  Initializing MichelTool"<<endmsg;
+    try{ 
+        m_michelTool = tool<IMichelTool>("MichelTool",m_michelToolAlias); 
+    }
     catch( GaudiException& e ) {
         error() << "Could not obtain tool: MichelTool!" << endmsg;
         return StatusCode::FAILURE;
     }
     
-    try{ m_blobCreatorUtils = tool<IBlobCreatorUtils>("BlobCreatorUtils", m_blobCreatorUtilsAlias); }
+    debug()<<"  Initializing BlobCreatorUtils"<<endmsg;
+    try{ 
+        m_blobCreatorUtils = tool<IBlobCreatorUtils>("BlobCreatorUtils", m_blobCreatorUtilsAlias); 
+    }
     catch( GaudiException& e ){
         error() << "Could not obtain BlobCreatorUtils: " << m_blobCreatorUtilsAlias << endmsg;
         return StatusCode::FAILURE;
     } 
     
-    try{ m_vertexEnergyStudyTool = tool<IVertexEnergyStudyTool>("VertexEnergyStudyTool", m_vtxEngStudyToolAlias); }
+    debug()<<"  Initializing VertexEnergyStudyTool"<<endmsg;
+    try{ 
+        m_vertexEnergyStudyTool = tool<IVertexEnergyStudyTool>("VertexEnergyStudyTool", m_vtxEngStudyToolAlias); 
+    }
     catch( GaudiException& e ){
         error() << "Could not obtain VertexEnergyStudyTool: " << m_vtxEngStudyToolAlias << endmsg;
         return StatusCode::FAILURE;
     }
     
+    debug()<<"  Initializing ExtraEnergyTool"<<endmsg;
     try{
         m_extraEnergyTool = tool<IExtraEnergyTool>("ExtraEnergyTool");
     }
@@ -403,14 +459,16 @@ StatusCode CCDeltaPlusAna::initialize()
         return StatusCode::FAILURE;
     }
     
+    debug()<<"  Initializing ConeScanIDBlobCreator"<<endmsg;
     try{
         m_idConeScanBlob = tool<IIDAnchoredBlobCreator>("ConeScanIDBlobCreator");
     } 
     catch (GaudiException& e){
-        error() << " Could not obtain tool: ConeScanIDBlobCreator <oaltinok_version>" << endmsg;
+        error() << " Could not obtain tool: ConeScanIDBlobCreator " << endmsg;
         return StatusCode::FAILURE;
     }
     
+    debug()<<"  Initializing TrackLinearPropagator"<<endmsg;
     try{
         m_trackPropagator = tool<ITrackLinearPropagator>("TrackLinearPropagator");
     } 
@@ -419,41 +477,68 @@ StatusCode CCDeltaPlusAna::initialize()
         return StatusCode::FAILURE;
     }
     
-    
+    debug()<<"  Initializing HTBlob"<<endmsg;
     try{
         m_idHoughBlob = tool<IHoughBlob>("HTBlob");
     }
     catch (GaudiException& e){
-        error() << " Could not obtain tool: HBlob <oaltinok_version>" << endmsg;
+        error() << " Could not obtain tool: HBlob " << endmsg;
         return StatusCode::FAILURE;
     }
     
+    debug()<<"  Initializing HTtool"<<endmsg;
     try{
         m_idHoughTool = tool<IHoughTool>("HTtool");
     }
     catch (GaudiException& e){
-        error() << " Could not obtain tool: HTtool <oaltinok_version>" << endmsg;
+        error() << " Could not obtain tool: HTtool " << endmsg;
         return StatusCode::FAILURE;
     }
     
+    debug()<<"  Initializing BlobSeedingTool"<<endmsg;
     try {
         m_blobSeedingTool = tool<IIDBlobSeedingTool>("BlobSeedingTool"); 
     }
     catch( GaudiException& e ) { 
-        error() << "Could not obtain tool: BlobSeedingTool !<oaltinok_version>" << endmsg;
+        error() << "Could not obtain tool: BlobSeedingTool !" << endmsg;
         return StatusCode::FAILURE;
     }
     
-    
+    debug()<<"  Initializing MinervaMathTool"<<endmsg;
     try {
         m_mathTool = tool<IMinervaMathTool>("MinervaMathTool");
     }
     catch( GaudiException& e ) {
-        error() << "Could not obtain tool: MinervaMathTool!<oaltinok_version>" << endmsg;
+        error() << "Could not obtain tool: MinervaMathTool!" << endmsg;
         return StatusCode::FAILURE;
     }
     
-    service("GeomUtilSvc", m_GeomUtilSvc, true);
+    /*
+    ============================================================================
+        Initializing Detector
+    ============================================================================
+    */
+    debug()<<"Initializing Inner and Outer Detector"<<endmsg;
+    debug()<<"  Initializing /dd/Structure/Minerva/Detector/InnerDetector"<<endmsg;
+    try{ 
+        m_idDet = getDet<Minerva::DeDetector>("/dd/Structure/Minerva/Detector/InnerDetector"); 
+    }
+    catch( GaudiException& e ){
+        error() << "Could not retrieve the Inner Detector!" << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    debug()<<"  Initializing /dd/Structure/Minerva/Detector/OuterDetector"<<endmsg;
+    try{ 
+        m_odDet = getDet<Minerva::DeOuterDetector>("/dd/Structure/Minerva/Detector/OuterDetector"); 
+    }
+    catch( GaudiException& e ) {
+        error() << "Could not retrieve the Outer Detector!" << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    
+//     service("GeomUtilSvc", m_GeomUtilSvc, true);
 //     m_idDet = m_GeomUtilSvc->getIDDet();
 //     m_odDet = m_GeomUtilSvc->getODDet();
     
@@ -1008,8 +1093,7 @@ StatusCode CCDeltaPlusAna::initialize()
     declareDoubleEventBranch("g2blob_vtx_distance",-1.0);
     declareDoubleEventBranch("g2blob_edge_distance",-1.0);
     
-    
-    
+
     declareDoubleEventBranch("pienergy",1.e6);
     declareDoubleEventBranch("pitheta", 1.e6);
     declareDoubleEventBranch("piphi",   1.e6);
@@ -1075,6 +1159,8 @@ StatusCode CCDeltaPlusAna::initialize()
     
     debug() << "Initializing Trungs's Variables Finished!" << endmsg;
     
+    info() <<"Exit CCDeltaPlusAna::initialize()" << endmsg;
+    
     return sc;
 }
     
@@ -1089,11 +1175,10 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     debug() <<" "<<endmsg;
     
     Minerva::NeutrinoInt *nuInt = new Minerva::NeutrinoInt( "CCDeltaPlusAna" );
-    std::vector<Minerva::NeutrinoInt*> defaultHyp;
+    NeutrinoVect defaultHyp;
     defaultHyp.push_back(nuInt);
     addInteractionHyp(event,defaultHyp);
     
-    debug() << "Enter CCDeltaPlusAna::reconstructEvent" << endmsg;
     
     //-- check if this a plausible event ( MC only )
     if( truth && !truthIsPlausible(truth) ) {
@@ -1102,7 +1187,7 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     }
     
     //-- fill in some truth information ( at the moment, prefer not to move information to the Truth ntuple )
-    if( truth ) setGenMinTruthInformation(event,truth);
+//     if( truth ) setGenMinTruthInformation(event,truth);
     
     //-- interaction vertex check
     if( !event->hasInteractionVertex() ) {
@@ -1114,7 +1199,8 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     //-- get the interaction vertex 
     SmartRef<Minerva::Vertex> vertex = event->interactionVertex();
     if( !vertex ) { 
-        bool pass = true; std::string tag = "BadObject";
+        bool pass = true; 
+        std::string tag = "BadObject";
         event->filtertaglist()->addFilterTag(tag,pass);
         event->setIntData("tammy_NullVertex",1);
         error() << "This vertex is NULL! Flag this event as bad!" << endmsg;
@@ -1122,45 +1208,64 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     }
     
     //-- check if vertex is inside passive or active targets fiducial volume 
-    int tammy_passVertexZCut = 0;
-    std::string name   = "";
-    if( !isInsideTargetFiducial(vertex,name,tammy_passVertexZCut) ) { 
-        debug() << "  The vertex is not within any of the targets fiducial volume!" << endmsg; 
-        event->setIntData("tammy_FailFidVolume",1);
-        return interpretFailEvent(event);
-    } else debug() << "  The vertex is inside " << name << " fiducial volume with position = " << vertex->position() << endmsg;
-    event->setIntData(name,1);
+//     int tammy_passVertexZCut = 0;
+//     std::string name   = "";
+//     if( !isInsideTargetFiducial(vertex,name,tammy_passVertexZCut) ) { 
+//         debug() << "  The vertex is not within any of the targets fiducial volume!" << endmsg; 
+//         event->setIntData("tammy_FailFidVolume",1);
+//         return interpretFailEvent(event);
+//     }else{
+//         debug() << "  The vertex is inside " << name << " fiducial volume with position = " << vertex->position() << endmsg;
+//     }
+//     event->setIntData(name,1);
+    
     
     //-- check the number of outgoing tracks 
+    
+    debug() << "  The number of outgoing tracks is = " << vertex->getOutgoingTracks().size() << endmsg;
     if( vertex->getOutgoingTracks().size() > 2 ) {
         debug() << "  This vertex has " << vertex->getOutgoingTracks().size() << " outgoing tracks!" << endmsg;
         event->setIntData("tammy_FailOutTracks",1);
-        return interpretFailEvent(event);
-    } else debug() << "  The number of outgoing tracks is = " << vertex->getOutgoingTracks().size() << endmsg;
+//         return interpretFailEvent(event);
+    } else{
+        debug() << "  The number of outgoing tracks is = " << vertex->getOutgoingTracks().size() << endmsg;
+    }
+    
     
     //-- check the number of unattached prongs in the event with tracks
     int ntracks = 0;
     Minerva::ProngVect unattachedProngs = event->select<Minerva::Prong>("Used:Unused","!IsSubProng");
-    for(unsigned int i = 0; i < unattachedProngs.size(); i++) if( !unattachedProngs[i]->minervaTracks().empty() ) ntracks++;
+    for(unsigned int i = 0; i < unattachedProngs.size(); i++){
+        if( !unattachedProngs[i]->minervaTracks().empty() ){
+            ntracks++;
+        }
+    }
     if( ntracks != 0 ) {
         debug() << "  This event has unattached prongs with tracks!" << endmsg;
         event->setIntData("tammy_UnattachedProngsWithTracks",1);
-        return interpretFailEvent(event);
-    } else debug() << "  The number of unattached prong is = " << unattachedProngs.size() << endmsg;
+//         return interpretFailEvent(event);
+    } else{
+        debug() << "  The number of unattached prong is = " << unattachedProngs.size() << endmsg;
+    }
     
     //-- make tracks using the anchor short tracker and refit the vertex
     bool createdTracks = createdAnchoredShortTracks(event,vertex);
     if( createdTracks ) {
         event->setIntData("tammy_CreatedShortTracks", 1);
         debug() << "  Created short anchored track(s)!" << endmsg;
-    } else debug() << "  Did not create any short tracks." << endmsg;
+    } else{
+        debug() << "  Did not create any short tracks." << endmsg;
+    }
     
     //-- re-check the number of outgoing tracks
-    if( vertex->getOutgoingTracks().size() != 2 ) {
-        debug() << "  The number of outgoing tracks after creating short tracks = " << vertex->getOutgoingTracks().size() << endmsg;
-        event->setIntData("tammy_FailShortOutTrack",1);
-        return interpretFailEvent(event);
-    } else debug() << "  The vertex has 2 outgoing primary tracks!" << endmsg;
+    debug() << "  After createdAnchoredShortTracks() the number of outgoing primary tracks: " << vertex->getOutgoingTracks().size() << endmsg;
+//     if( vertex->getOutgoingTracks().size() != 2 ) {
+//         debug() << "  The number of outgoing tracks after creating short tracks = " << vertex->getOutgoingTracks().size() << endmsg;
+//         event->setIntData("tammy_FailShortOutTrack",1);
+//         return interpretFailEvent(event);
+//     } else{
+//         debug() << "  The vertex has 2 outgoing primary tracks!" << endmsg;
+//     }
     
     //-- set vertex fit information
     double fit_chi2 = 0;
@@ -1183,36 +1288,45 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         if( (trks[0]->patRecHistory() == Minerva::Track::LongPatRec3View && trks[1]->patRecHistory() == Minerva::Track::LongPatRec3View) ||
             (trks[0]->patRecHistory() == Minerva::Track::LongPatRec3View && trks[1]->patRecHistory() == Minerva::Track::LongPatRec2View) ||
             (trks[0]->patRecHistory() == Minerva::Track::LongPatRec2View && trks[1]->patRecHistory() == Minerva::Track::LongPatRec3View) ) {
-        m_vertexFitter->fit(vertex);
-    
-        std::vector<double> tammy_fit_vtx;
-        tammy_fit_vtx.push_back( vertex->position().x() );
-        tammy_fit_vtx.push_back( vertex->position().y() );
-        tammy_fit_vtx.push_back( vertex->position().z() );
-    
-        event->setContainerDoubleData("fit_vtx",tammy_fit_vtx);
-        event->setInteractionVertex(vertex);
-        Minerva::ProngVect prongs = event->primaryProngs();
-        for(unsigned int p = 0; p < prongs.size(); p++) prongs[p]->setSourceVertex(vertex);
+            
+            m_vertexFitter->fit(vertex);
+        
+            std::vector<double> tammy_fit_vtx;
+            tammy_fit_vtx.push_back( vertex->position().x() );
+            tammy_fit_vtx.push_back( vertex->position().y() );
+            tammy_fit_vtx.push_back( vertex->position().z() );
+        
+            event->setContainerDoubleData("fit_vtx",tammy_fit_vtx);
+            event->setInteractionVertex(vertex);
+            Minerva::ProngVect prongs = event->primaryProngs();
+            
+            for(unsigned int p = 0; p < prongs.size(); p++){
+                prongs[p]->setSourceVertex(vertex);
+            }
         }
     }
     
     //-- make sure the update vertex is inside the targets fiducial volume
-    if( createdTracks ) {
-        name.clear();
-        tammy_passVertexZCut = 0;
-        vertex = event->interactionVertex();
-        if( !isInsideTargetFiducial(vertex,name,tammy_passVertexZCut) ) {
-        debug() << "  The update vertex with position = " << vertex->position() << " is not within fiducial volume!" << endmsg;
-        event->setIntData("tammy_FailRefitFidVolume",1);
-        return interpretFailEvent(event);
-        } else debug() << "  The update vertex with position = " << vertex->position() << " is inside the fiducial volume!" << endmsg;
-        event->setIntData(name,1);
-    }
+//     if( createdTracks ) {
+//         name.clear();
+//         tammy_passVertexZCut = 0;
+//         vertex = event->interactionVertex();
+//         
+//         if( !isInsideTargetFiducial(vertex,name,tammy_passVertexZCut) ) {
+//             debug() << "  The update vertex with position = " << vertex->position() << " is not within fiducial volume!" << endmsg;
+//             event->setIntData("tammy_FailRefitFidVolume",1);
+//             return interpretFailEvent(event);
+//         }else{
+//             debug() << "  The update vertex with position = " << vertex->position() << " is inside the fiducial volume!" << endmsg;
+//         }
+//         event->setIntData(name,1);
+//     }
     
     //-- make new prongs to include the new created primary track
     bool makeProngs = false;
-    if( createdTracks ) makeProngs = createdTrackedProngs(event);
+    if( createdTracks ){
+        makeProngs = createdTrackedProngs(event);
+    }
     debug() << "  Was the creation of a new prong successful? " << makeProngs << endmsg;
     
     //-- check if kinked tracks can be made; add them and linked vertices to the prong
@@ -1241,7 +1355,9 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         debug() << "  Didn't find any not exiting in the inner detector bit-positive prong with a muon particle!" << endmsg;
         event->setIntData("tammy_FailExitingProng",1);
         return interpretFailEvent(event);
-    } else debug() << "  Tag the muon's prong with bit-field = " << muon->typeBitsToString() << endmsg;
+    } else{
+        debug() << "  Tag the muon's prong with bit-field = " << muon->typeBitsToString() << endmsg;
+    }
     
     //-- check if one of the primary prong is contained and has a dEdX proton particle 
     SmartRef<Minerva::Prong>    proton;
@@ -1251,73 +1367,67 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         debug() << "  Didn't find any contained in the tracker bit-positive prong with a proton particle!" << endmsg;
         event->setIntData("tammy_FailContainedProng",1);
         return interpretFailEvent(event);
-    } else debug() << "  Tag the proton's prong with bit-field = " << proton->typeBitsToString() << endmsg;
+    } else{
+        debug() << "  Tag the proton's prong with bit-field = " << proton->typeBitsToString() << endmsg;
+    }
     
     //-- check event tammy_classification
-    if( eventType == "golden" )      event->setIntData("tammy_classification",1);
-    else if( eventType == "silver" ) event->setIntData("tammy_classification",2);
-    else { error() << "The event was not classified!" << endmsg; return interpretFailEvent(event); }
+//     if( eventType == "golden" ){
+//         event->setIntData("tammy_classification",1);
+//     }else if( eventType == "silver" ){
+//         event->setIntData("tammy_classification",2);
+//     }else { 
+//         error() << "The event was not classified!" << endmsg; 
+//         return interpretFailEvent(event); 
+//     }
     
     //-- tag if the muon and proton candidates enter front of the detector
-    event->setIntData("tammy_muon_enters_front",int(muon->EnterFrontID()));
-    event->setIntData("tammy_proton_enters_front",int(proton->EnterFrontID()));
+//     event->setIntData("tammy_muon_enters_front",int(muon->EnterFrontID()));
+//     event->setIntData("tammy_proton_enters_front",int(proton->EnterFrontID()));
     
     //-- tag the tammy_timeSlice
     event->setIntData("tammy_timeSlice",int((muon->minervaTracks()[0])->timeSlice()));
     
     //-- tag if the reconstructed vertex passes the vtx cut
-    event->setIntData("passVertexZCut",tammy_passVertexZCut);
+//     event->setIntData("tammy_passVertexZCut",tammy_passVertexZCut);
     
     //-- make idblob based prongs
     if( createdIDBlobProng(event) ) {
         classifyProngs(event);
         debug() << "  The creation of idblob based prong(s) was successful? " << endmsg; 
-    } else debug() << "  No idblob based prongs were created. " << endmsg;
+    } else{
+        debug() << "  No idblob based prongs were created. " << endmsg;
+    }
     
     //-- make odblob based prongs
     if( createdODBlobProng(event) ) {
         classifyProngs(event);
         debug() << "  The creation of odblob based prong(s) was successful? " << endmsg;
-    } else debug() << "  No odblob based prong were created." << endmsg; 
+    } else{
+        debug() << "  No odblob based prong were created." << endmsg; 
+    }
     
     //-- look for michels
     if( tagMichelElectrons(event) ) {
         debug() << "  A Michel electron was found!" << endmsg;
-    } else debug() << "  Did not find a Michel electron." << endmsg;
+    } else{
+        debug() << "  Did not find a Michel electron." << endmsg;
+    }
     
     //-- fill the event anatuple data
     fillBlobEventData(event);
     
     //-- call the interpret event function;
     NeutrinoVect nuInts;
-    interpretEvent(event,truth,nuInts); 
+    tammy_interpretEvent(event,truth,nuInts); 
     
     //-- mark the event
-    markEvent(event);
+//     markEvent(event);
     
     //-- add neutrino interactions to the physics event
     addInteractionHyp(event,nuInts);
     
-    //-- fill AnaNTuple
-    fillCommonPhysicsAnaBranches(event);
-    
-    //-- fill NuMI branches
-    fillNuMIBranches(event);
-    
-    //-- fill vertex activity branches
-    fillVertexActivityStudyBranches(event);
-    
-    //-- fill particle response branches
-    if( haveNeutrinoMC() ) {
-        unattachedProngs.clear();
-        unattachedProngs = event->select<Minerva::Prong>("Used:Unused","All");
-        for(unsigned int p = 0; p < unattachedProngs.size(); p++) {
-        if( unattachedProngs[p]->filtertaglist()->filterTagExists("UnattachedEnergy") ) {
-            Minerva::IDClusterVect clusters = unattachedProngs[p]->getAllIDClusters();
-            fillParticleResponseBranches(event,clusters);
-        }
-        }
-    }
+
     
     debug() << "Exit NukeCCQE::reconstructEvent" << endmsg;
 
@@ -1371,33 +1481,50 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     if ( !DispersedBlob(event) ) return StatusCode::SUCCESS;
     event->setIntData("survive_all",1);
     
-    fillCommonPhysicsAnaBranches( event );
     
-        
+
         //markEvent( event );
     std::cout << "Passing all cuts " << std::endl;
     // Now interpret the event and add NeutrinoInts
-    std::vector<Minerva::NeutrinoInt*> interactions;
+    NeutrinoVect interactions;
     interpretEvent( event, truth, interactions );
     
     // Add the newly create NeutrinoInts to this PhysicsEvent
     StatusCode sc = addInteractionHyp( event, interactions );
     
+    
+    
+    //-- fill AnaNTuple
+    fillCommonPhysicsAnaBranches(event);
+    
+    //-- fill NuMI branches
+    fillNuMIBranches(event);
+    
+    //-- fill vertex activity branches
+    fillVertexActivityStudyBranches(event);
+    
+    //-- fill particle response branches
+    if( haveNeutrinoMC() ) {
+        unattachedProngs.clear();
+        unattachedProngs = event->select<Minerva::Prong>("Used:Unused","All");
+        for(unsigned int p = 0; p < unattachedProngs.size(); p++) {
+            if( unattachedProngs[p]->filtertaglist()->filterTagExists("UnattachedEnergy") ) {
+                Minerva::IDClusterVect clusters = unattachedProngs[p]->getAllIDClusters();
+                fillParticleResponseBranches(event,clusters);
+            }
+        }
+    }
+    
+    
+    
     return StatusCode::SUCCESS;
     
 }
     
-//=============================================================================
-// interpretEvent() --
-//=============================================================================
-StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truth, NeutrinoVect& nuInts ) const
+    
+StatusCode CCDeltaPlusAna::tammy_interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truth, NeutrinoVect& nuInts ) const
 {
-    debug() << " == CCDeltaPlusAna::interpretEvent ==<oaltinok_version>" << endmsg;
-    if( event ) debug() << " working on Interpret Event and pass all cuts <oaltinok_version>" << endmsg;
-    if( truth ) debug() << "This event has a matched MC interaction<oaltinok_version>" << endmsg;
-    
-    
-    debug() << "Enter CCDeltaPlusAna::interpretEvent" << endmsg;
+    debug() << "Enter tammy_interpretEvent()" << endmsg;
     StatusCode sc;
     
     //-- initialize
@@ -1661,12 +1788,22 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
     fillSystematicShiftsBranches(ccqeHyp,event);
     
     //-- store ccqe hypothesis
-//     nuInts.push_back( ccqeHyp );
+    nuInts.push_back( ccqeHyp );
     
-    debug() << "Exit NukeCCQE::interpretEvent" << endmsg;
-        
-        
-        
+    debug() << "Exit tammy_interpretEvent()" << endmsg;
+    
+    return StatusCode::SUCCESS;
+    
+}
+//=============================================================================
+// interpretEvent() --
+//=============================================================================
+StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truth, NeutrinoVect& nuInts ) const
+{
+    debug() << " == CCDeltaPlusAna::interpretEvent ==" << endmsg;
+    if( event ) debug() << " working on Interpret Event and pass all cuts " << endmsg;
+    if( truth ) debug() << "This event has a matched MC interaction<oaltinok_version>" << endmsg;
+    
         // get charge of muon if available
     int muon_charge = 0;
     MuonUtils->muonCharge(m_MuonProng, muon_charge, m_qOverpChargeCut );
@@ -1721,7 +1858,7 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
 StatusCode CCDeltaPlusAna::PreFilter(Minerva::PhysicsEvent *event ) const
 {
         //if ( event->processType() ==  Minerva::PhysicsEvent::RockParticle )  {
-        //info() << " Jumping rock Muon <oaltinok_version>" << endmsg;
+        //info() << " Jumping rock Muon " << endmsg;
         //return StatusCode::FAILURE;
         //}
     
@@ -1773,7 +1910,7 @@ StatusCode CCDeltaPlusAna::DoMuon(Minerva::PhysicsEvent *event, Minerva::GenMinI
     
     if( truth ) truth->filtertaglist()->setOrAddFilterTag( "reco_minos_match", has_muon );
     if( !has_muon ){
-        debug() << "Did not find a muon prong! This cannot be a CCDeltaPlus event.<oaltinok_version>" << endmsg;
+        debug() << "Did not find a muon prong! This cannot be a CCDeltaPlus event." << endmsg;
         return StatusCode::FAILURE; // We didn't crash.
     }
 
@@ -1836,7 +1973,7 @@ StatusCode CCDeltaPlusAna::DoMuon(Minerva::PhysicsEvent *event, Minerva::GenMinI
     Gaudi::XYZPoint position = vertex->position();
     
     if( !FiducialPointTool->isFiducial( position, m_fiducialApothem, m_fiducialUpstreamZ, m_fiducialDownstreamZ ) ){
-        debug() << " Interaction Vertex is not fiducial!<oaltinok_version>" << endmsg;
+        debug() << " Interaction Vertex is not fiducial!" << endmsg;
         return StatusCode::FAILURE; // We didn't crash.
     }
 
@@ -1912,7 +2049,7 @@ StatusCode CCDeltaPlusAna::DoMuon(Minerva::PhysicsEvent *event, Minerva::GenMinI
 StatusCode CCDeltaPlusAna::DoVertex(Minerva::PhysicsEvent *event,
                                 const SmartRef<Minerva::Vertex>& vertex) const
 {
-    debug() << " CCDeltaPlusAna::DoVertex <oaltinok_version>" << endmsg;
+    debug() << " CCDeltaPlusAna::DoVertex " << endmsg;
 
     const Gaudi::XYZPoint& pos = vertex->position();
     
@@ -2067,7 +2204,7 @@ StatusCode CCDeltaPlusAna::DoVertex(Minerva::PhysicsEvent *event,
             std::back_inserter(farTracks));
     
     if (!farTracks.empty()) {
-        debug() << " Discarding " <<  farTracks.size() << " tracks, to get photons <oaltinok_version>" << endmsg;
+        debug() << " Discarding " <<  farTracks.size() << " tracks, to get photons " << endmsg;
         std::size_t oldsize = farTracks.size();
         Minerva::EventMgr *mgr = getEventMgr(allVertices.front());
         discardObject(mgr,farTracks);
@@ -2090,7 +2227,7 @@ StatusCode CCDeltaPlusAna::DoVertex(Minerva::PhysicsEvent *event,
 StatusCode CCDeltaPlusAna::VtxBlob(Minerva::PhysicsEvent *event, const SmartRef<Minerva::Vertex>& vertex ) const
 {
 
-debug() << " CCDeltaPlusAna::VtxBlob <oaltinok_version>" << endmsg;
+debug() << " CCDeltaPlusAna::VtxBlob " << endmsg;
 
     //  --  Vertex blob
 double vertex_energy = 0;
@@ -2162,7 +2299,7 @@ return StatusCode::SUCCESS;
                                     const SmartRef<Minerva::Vertex>& vertex) const
     {
     
-        debug() << " CCDeltaPlusAna::ConeBlobs <oaltinok_version>" << endmsg;
+        debug() << " CCDeltaPlusAna::ConeBlobs " << endmsg;
     
             // variables to clean up the clusters
         SmartRefVector<Minerva::IDCluster> preidClusters
@@ -2466,7 +2603,7 @@ return StatusCode::SUCCESS;
                                         const SmartRef<Minerva::Vertex>& vertex,
                                         std::vector<Minerva::IDBlob*>& outBlobs) const
     {
-        debug() << " CCDeltaPlusAna::AngleScanBlob <oaltinok_version>" << endmsg;
+        debug() << " CCDeltaPlusAna::AngleScanBlob " << endmsg;
     
         const Gaudi::XYZPoint& pos = vertex->position();
         
@@ -2480,7 +2617,7 @@ return StatusCode::SUCCESS;
             outBlobs.push_back(*itBlob);
         }
     
-        info() << " Angle Scan is done <oaltinok_version>" << endmsg;
+        info() << " Angle Scan is done " << endmsg;
         
         return StatusCode::SUCCESS;
     }
@@ -2492,7 +2629,7 @@ return StatusCode::SUCCESS;
                                     const SmartRef<Minerva::Vertex>& vertex,
                                     std::vector<Minerva::IDBlob*>& outBlobs) const
     {
-        debug() << " CCDeltaPlusAna::HoughBlob <oaltinok_version>" << endmsg;
+        debug() << " CCDeltaPlusAna::HoughBlob " << endmsg;
     
         const Gaudi::XYZPoint& pos = vertex->position();
         
@@ -2519,16 +2656,16 @@ return StatusCode::SUCCESS;
             debug() << " Pass Get Hough2d<oaltinok_version>" << endmsg;	
             
             if ( !m_idHoughBlob->Create2dHTSeed( idClusViewX, idHTSeed, r, theta, ref, spX, spZ ) ) break;
-            debug() << " Pass Get Create2dHT <oaltinok_version>" << endmsg;	
+            debug() << " Pass Get Create2dHT " << endmsg;	
             
             Gaudi::XYZPoint startpoint(spX, 0, spZ);
             Gaudi::XYZVector direction(-1/tan(theta*CLHEP::pi/180),0,1);
     
             if ( !m_idHoughBlob->PseudoCone(idHTSeed, idClusViewX, direction, pos ) ) continue;
-            debug() << " Pass PseudoCone <oaltinok_version>" << endmsg;
+            debug() << " Pass PseudoCone " << endmsg;
             
             if ( !m_idHoughBlob->XUVMatch(idHTSeed, idClusViewU, idClusViewV, 50 ) ) continue;
-            debug() << " Pass XUV Match - First <oaltinok_version>" << endmsg;	
+            debug() << " Pass XUV Match - First " << endmsg;	
             
             if ( !m_idHoughBlob->isPhoton(idHTSeed, pos) ) continue;
             
@@ -2549,10 +2686,10 @@ return StatusCode::SUCCESS;
             blobTemp->add(idSeed);
             double Uclusters = blobTemp->nclusters(Minerva::IDCluster::U);
             double Vclusters = blobTemp->nclusters(Minerva::IDCluster::V);
-            debug() << *itBlob << " " << Uclusters << " U clusters; " << Vclusters << " V clusters <oaltinok_version>" << endmsg;
+            debug() << *itBlob << " " << Uclusters << " U clusters; " << Vclusters << " V clusters " << endmsg;
             (*itBlob)->clear();
             if ( Uclusters != .0 || Vclusters != .0 ) {
-                debug() << *itBlob << " inserting to FinalBlobs <oaltinok_version>" << endmsg;
+                debug() << *itBlob << " inserting to FinalBlobs " << endmsg;
                 (*itBlob)->add(idSeed);
                 m_idHoughBlob->GetStartPosition( *itBlob, pos, true );
                 m_idHoughBlob->GetDirection( *itBlob, pos );
@@ -2570,7 +2707,7 @@ return StatusCode::SUCCESS;
                 m_idHoughBlob->AddClusterInsideCone( *it_clus, outBlobs, pos );
     
     
-        info() << " Hough Transform is done! <oaltinok_version>" << endmsg; 
+        info() << " Hough Transform is done! " << endmsg; 
     
         
         return StatusCode::SUCCESS;
@@ -2867,7 +3004,7 @@ return StatusCode::SUCCESS;
 //=============================================================================
 StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truth ) const 
 {
-    debug() << " tagTruth <oaltinok_version>" << endmsg;
+    debug() << " tagTruth " << endmsg;
         
     fillGenieWeightBranches( truth );
         
@@ -2898,7 +3035,7 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truth ) const
     truth->setDoubleData( "fslepton_theta_y", fslepton_theta_y );
     truth->setDoubleData( "fslepton_phi", fslepton_phi );
     
-    debug() << " Filled truth <oaltinok_version>" << endmsg;
+    debug() << " Filled truth " << endmsg;
         // clasify by ccpi0 ccpi0x other
     bool is_ccpi0          = false;
     bool is_cc1pi0         = false;
@@ -3030,7 +3167,7 @@ StatusCode CCDeltaPlusAna::getMCPi0Info(Minerva::GenMinInteraction* truth) const
 
     if( !exist<Minerva::TG4Trajectories>( "MC/TG4Trajectories" ) )
     {
-        warning() << "No TG4Trajectories found in this gate. Skipping to next one.<oaltinok_version>" << endmsg;
+        warning() << "No TG4Trajectories found in this gate. Skipping to next one." << endmsg;
         return StatusCode::SUCCESS;
     }
 
@@ -3183,7 +3320,7 @@ StatusCode CCDeltaPlusAna::getMCPi0Info(Minerva::GenMinInteraction* truth) const
 //=======================================================================
 bool CCDeltaPlusAna::shouldAnalyzeMC( const Minerva::GenMinInteraction *truth ) const
 {
-    debug() << " CCDeltaPlusAna::shouldAnalyzeMC <oaltinok_version>" << endmsg;
+    debug() << " CCDeltaPlusAna::shouldAnalyzeMC " << endmsg;
 
     if( getDAQHeader()->isMCTrigger() && NULL == truth ) return false;
     if( truth ) {
@@ -3264,7 +3401,7 @@ void CCDeltaPlusAna::FillTrajectoryMap() const
     }
     
     if (fTrajectoryMap.empty()) {
-        warning() << "TrajectoryMap empty <oaltinok_version>" << endmsg;
+        warning() << "TrajectoryMap empty " << endmsg;
         return;
     }
     
@@ -4138,7 +4275,7 @@ double CCDeltaPlusAna::CalcDistanceFromVertexToExiting(const Minerva::IDBlob* bl
 //=======================================================================
 StatusCode CCDeltaPlusAna::finalize()
 {
-    debug() << "CCDeltaPlusAna::finalize()<oaltinok_version>" << endmsg;
+    debug() << "CCDeltaPlusAna::finalize()" << endmsg;
     
         // finalize the base class.
     StatusCode sc = this->MinervaAnalysisTool::finalize();
@@ -4166,7 +4303,7 @@ void CCDeltaPlusAna::PrintDigitVectorInfo(const SmartRefVector<Minerva::IDDigit>
 //=======================================================================
 StatusCode CCDeltaPlusAna::ODActivity( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs ) const
 {
-    debug() << " Starting ODActivity::EnergeticTower <oaltinok_version>" << endmsg;
+    debug() << " Starting ODActivity::EnergeticTower " << endmsg;
     
         // get origin of muon
     Gaudi::XYZTVector muon_position = m_MuonParticle->startPos();
@@ -4310,7 +4447,7 @@ StatusCode CCDeltaPlusAna::ODActivity( Minerva::PhysicsEvent *event, std::vector
     event->setContainerDoubleData( "od_towerTimeBlobOD", timeBlobODVector );
     event->setContainerDoubleData( "od_towerTimeBlobMuon", timeBlobMuonVector );
     
-    debug() << " Ending ODActivity::EnergeticTower <oaltinok_version>" << endmsg;
+    debug() << " Ending ODActivity::EnergeticTower " << endmsg;
     
     return StatusCode::SUCCESS;
 }
@@ -5441,75 +5578,75 @@ void CCDeltaPlusAna::setTrackDirection( Minerva::Track* track, Minerva::Vertex* 
 //---------------------------------------------------------------------------------
 void CCDeltaPlusAna::fillBlobEventData( Minerva::PhysicsEvent* event ) const 
 {
-   SmartRef<Minerva::Vertex> vertex    = event->interactionVertex();
-   Minerva::ProngVect primaryProngs    = event->primaryProngs();
-   Minerva::ProngVect unattachedProngs = event->select<Minerva::Prong>("Used:Unused","All");
-
-   Minerva::ProngVect prongs;
-   for(unsigned int p = 0; p < primaryProngs.size(); p++)    prongs.push_back( primaryProngs[p] );
-   for(unsigned int p = 0; p < unattachedProngs.size(); p++) prongs.push_back( unattachedProngs[p] );
-
-   double tammy_primaryVertexEnergy = 0, tammy_secondaryVertexEnergy = 0, tammy_endPointEnergy = 0, tammy_isolatedEnergy = 0;
-   double tammy_isolatedEnergy_tracker = 0, tammy_isolatedEnergy_ecal = 0, tammy_isolatedEnergy_hcal = 0;
-   double tammy_isolatedEnergy_targets = 0, tammy_isolatedEnergy_calorimetry = 0;
-   double tammy_hadronic_energy = 0;
-
-   for(unsigned int p = 0; p < prongs.size(); p++) {
-     if( prongs[p]->filtertaglist()->filterTagExists("PrimaryMuon") ) continue;
-     Minerva::IDClusterVect clusters = prongs[p]->getAllIDClusters();
-     tammy_hadronic_energy += CaloUtils->applyCalConsts(clusters);
-   } 
-
-   for(unsigned int p = 0; p < prongs.size(); p++) {
-     if( prongs[p]->filtertaglist()->filterTagExists("PrimaryVertexEnergy") ) {
-       tammy_primaryVertexEnergy = prongs[p]->minervaVisibleEnergySum();
-     } else if( prongs[p]->filtertaglist()->filterTagExists("SecondaryVertexEnergy") ) {
-       tammy_secondaryVertexEnergy = prongs[p]->minervaVisibleEnergySum();
-     } else if( prongs[p]->filtertaglist()->filterTagExists("EndPointVertexEnergy") ) { 
-       tammy_endPointEnergy = prongs[p]->minervaVisibleEnergySum();
-     } else if( prongs[p]->filtertaglist()->filterTagExists("UnattachedEnergy") ) {     
-       tammy_isolatedEnergy = prongs[p]->minervaVisibleEnergySum();
-       tammy_isolatedEnergy_calorimetry = CaloUtils->applyCalConsts(prongs[p]);
-
-       Minerva::IDClusterVect clusters = prongs[p]->getAllIDClusters();
-       for(unsigned int c = 0; c < clusters.size(); c++) {
-         if( clusters[c]->subdet() == Minerva::IDCluster::NuclTargs ) {
-           tammy_isolatedEnergy_targets += clusters[c]->energy();       
-         } else if( clusters[c]->subdet() == Minerva::IDCluster::Tracker ) {
-           tammy_isolatedEnergy_tracker += clusters[c]->energy();
-         } else if( clusters[c]->subdet() == Minerva::IDCluster::ECAL ) {
-           tammy_isolatedEnergy_ecal += clusters[c]->energy();
-         } else if( clusters[c]->subdet() == Minerva::IDCluster::HCAL ) {
-           tammy_isolatedEnergy_hcal += clusters[c]->energy();
-         }
-       }
-     } 
-   }
-
-   double tammy_muonFuzzEnergy = 0, tammy_protonFuzzEnergy = 0;
-   for(unsigned int p = 0; p < prongs.size(); p++) {
-     Minerva::IDBlobVect blobs = prongs[p]->getAllIDBlobs();
-     for(unsigned int b = 0; b < blobs.size(); b++) {
-       if( !blobs[b]->hasIntData("fuzzAttachedTrack") )      continue;
-       if( !blobs[b]->history() != Minerva::IDBlob::Hidden ) continue;
-       if( prongs[p]->filtertaglist()->filterTagExists("PrimaryProton") )    tammy_protonFuzzEnergy += blobs[b]->energy();
-       else if( prongs[p]->filtertaglist()->filterTagExists("PrimaryMuon") ) tammy_muonFuzzEnergy   += blobs[b]->energy();
-     }
-   }
-
-   event->setDoubleData("muonFuzzEnergy",tammy_muonFuzzEnergy);
-   event->setDoubleData("protonFuzzEnergy",tammy_protonFuzzEnergy);
-   event->setDoubleData("primaryVertexEnergy",tammy_primaryVertexEnergy);
-   event->setDoubleData("secondaryVertexEnergy",tammy_secondaryVertexEnergy);
-   event->setDoubleData("endPointEnergy",tammy_endPointEnergy);
-   event->setDoubleData("isolatedEnergy",tammy_isolatedEnergy);
-   event->setDoubleData("tammy_isolatedEnergy_tracker",tammy_isolatedEnergy_tracker);   
-   event->setDoubleData("tammy_isolatedEnergy_ecal",tammy_isolatedEnergy_ecal);
-   event->setDoubleData("tammy_isolatedEnergy_hcal",tammy_isolatedEnergy_hcal);
-   event->setDoubleData("tammy_isolatedEnergy_targets",tammy_isolatedEnergy_targets);
-   event->setDoubleData("hadronic_energy",tammy_hadronic_energy);
-
-   return;
+    SmartRef<Minerva::Vertex> vertex    = event->interactionVertex();
+    Minerva::ProngVect primaryProngs    = event->primaryProngs();
+    Minerva::ProngVect unattachedProngs = event->select<Minerva::Prong>("Used:Unused","All");
+    
+    Minerva::ProngVect prongs;
+    for(unsigned int p = 0; p < primaryProngs.size(); p++)    prongs.push_back( primaryProngs[p] );
+    for(unsigned int p = 0; p < unattachedProngs.size(); p++) prongs.push_back( unattachedProngs[p] );
+    
+    double tammy_primaryVertexEnergy = 0, tammy_secondaryVertexEnergy = 0, tammy_endPointEnergy = 0, tammy_isolatedEnergy = 0;
+    double tammy_isolatedEnergy_tracker = 0, tammy_isolatedEnergy_ecal = 0, tammy_isolatedEnergy_hcal = 0;
+    double tammy_isolatedEnergy_targets = 0, tammy_isolatedEnergy_calorimetry = 0;
+    double tammy_hadronic_energy = 0;
+    
+    for(unsigned int p = 0; p < prongs.size(); p++) {
+        if( prongs[p]->filtertaglist()->filterTagExists("PrimaryMuon") ) continue;
+        Minerva::IDClusterVect clusters = prongs[p]->getAllIDClusters();
+        tammy_hadronic_energy += CaloUtils->applyCalConsts(clusters);
+    } 
+    
+    for(unsigned int p = 0; p < prongs.size(); p++) {
+        if( prongs[p]->filtertaglist()->filterTagExists("PrimaryVertexEnergy") ) {
+            tammy_primaryVertexEnergy = prongs[p]->minervaVisibleEnergySum();
+        } else if( prongs[p]->filtertaglist()->filterTagExists("SecondaryVertexEnergy") ) {
+            tammy_secondaryVertexEnergy = prongs[p]->minervaVisibleEnergySum();
+        } else if( prongs[p]->filtertaglist()->filterTagExists("EndPointVertexEnergy") ) { 
+            tammy_endPointEnergy = prongs[p]->minervaVisibleEnergySum();
+        } else if( prongs[p]->filtertaglist()->filterTagExists("UnattachedEnergy") ) {     
+            tammy_isolatedEnergy = prongs[p]->minervaVisibleEnergySum();
+            tammy_isolatedEnergy_calorimetry = CaloUtils->applyCalConsts(prongs[p]);
+    
+            Minerva::IDClusterVect clusters = prongs[p]->getAllIDClusters();
+            for(unsigned int c = 0; c < clusters.size(); c++) {
+                if( clusters[c]->subdet() == Minerva::IDCluster::NuclTargs ) {
+                    tammy_isolatedEnergy_targets += clusters[c]->energy();       
+                } else if( clusters[c]->subdet() == Minerva::IDCluster::Tracker ) {
+                    tammy_isolatedEnergy_tracker += clusters[c]->energy();
+                } else if( clusters[c]->subdet() == Minerva::IDCluster::ECAL ) {
+                    tammy_isolatedEnergy_ecal += clusters[c]->energy();
+                } else if( clusters[c]->subdet() == Minerva::IDCluster::HCAL ) {
+                    tammy_isolatedEnergy_hcal += clusters[c]->energy();
+                }
+            }
+        } 
+    }
+    
+    double tammy_muonFuzzEnergy = 0, tammy_protonFuzzEnergy = 0;
+    for(unsigned int p = 0; p < prongs.size(); p++) {
+        Minerva::IDBlobVect blobs = prongs[p]->getAllIDBlobs();
+        for(unsigned int b = 0; b < blobs.size(); b++) {
+            if( !blobs[b]->hasIntData("fuzzAttachedTrack") )      continue;
+            if( !blobs[b]->history() != Minerva::IDBlob::Hidden ) continue;
+            if( prongs[p]->filtertaglist()->filterTagExists("PrimaryProton") )    tammy_protonFuzzEnergy += blobs[b]->energy();
+            else if( prongs[p]->filtertaglist()->filterTagExists("PrimaryMuon") ) tammy_muonFuzzEnergy   += blobs[b]->energy();
+        }
+    }
+    
+    event->setDoubleData("muonFuzzEnergy",tammy_muonFuzzEnergy);
+    event->setDoubleData("protonFuzzEnergy",tammy_protonFuzzEnergy);
+    event->setDoubleData("primaryVertexEnergy",tammy_primaryVertexEnergy);
+    event->setDoubleData("secondaryVertexEnergy",tammy_secondaryVertexEnergy);
+    event->setDoubleData("endPointEnergy",tammy_endPointEnergy);
+    event->setDoubleData("isolatedEnergy",tammy_isolatedEnergy);
+    event->setDoubleData("tammy_isolatedEnergy_tracker",tammy_isolatedEnergy_tracker);   
+    event->setDoubleData("tammy_isolatedEnergy_ecal",tammy_isolatedEnergy_ecal);
+    event->setDoubleData("tammy_isolatedEnergy_hcal",tammy_isolatedEnergy_hcal);
+    event->setDoubleData("tammy_isolatedEnergy_targets",tammy_isolatedEnergy_targets);
+    event->setDoubleData("hadronic_energy",tammy_hadronic_energy);
+    
+    return;
 }
 
 //---------------------------------------------------------------------------------
@@ -5757,155 +5894,161 @@ void CCDeltaPlusAna::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, SmartRe
 //----------------------------------------------------------------------------------
 void CCDeltaPlusAna::setGenMinTruthInformation( Minerva::PhysicsEvent* event, Minerva::GenMinInteraction* truth ) const
 {
-   verbose() << "Enter CCDeltaPlusAna::setGenMinTruthInformation" << endmsg;
-
-   int tammy_genie_n_neutrinos     = 0;
-   int tammy_genie_n_muons         = 0;
-   int tammy_genie_n_mesons        = 0;
-   int tammy_genie_n_heavy_baryons = 0;
-   int tammy_genie_n_photons       = 0;
-   int tammy_genie_n_protons       = 0;
-   int tammy_genie_n_neutrons      = 0;
-   int tammy_genie_n_pions         = 0;
-   int tammy_genie_n_pi_zeros      = 0;
-   int tammy_genie_n_charms        = 0;
-   int tammy_genie_n_kaons         = 0;
-   int tammy_genie_n_others        = 0;
-   int tammy_genie_n_particles     = 0;
-
-   std::vector< std::pair<int,double> > nucleonVect;
-
-   std::vector<double> pxVec = truth->fsParticlesPx();
-   std::vector<double> pyVec = truth->fsParticlesPy();
-   std::vector<double> pzVec = truth->fsParticlesPz();
-   std::vector<int>    pdg   = truth->fSpdg();
-
-   tammy_genie_n_particles = (int)pdg.size();
-
-   for(unsigned int p = 0; p < pdg.size(); p++) {
-     double ptot = sqrt( pxVec[p]*pxVec[p] + pyVec[p]*pyVec[p] + pzVec[p]*pzVec[p] );
-
-     if( fabs( pdg[p] ) == 13 ) tammy_genie_n_muons++;
-     else if( fabs( pdg[p] ) == 14 || fabs( pdg[p] ) == 15 || fabs( pdg[p] ) == 16 ) tammy_genie_n_neutrinos++;
-     else if( fabs( pdg[p] ) == 22 )   tammy_genie_n_photons++;
-     else if( fabs( pdg[p] ) == 2212 ) { tammy_genie_n_protons++;  nucleonVect.push_back( std::make_pair(pdg[p],ptot) ); }
-     else if( fabs( pdg[p] ) == 2112 ) { tammy_genie_n_neutrons++; nucleonVect.push_back( std::make_pair(pdg[p],ptot) ); }
-     else if( fabs( pdg[p] ) == 211 )  { tammy_genie_n_pions++;    tammy_genie_n_mesons++; }
-     else if( fabs( pdg[p] ) == 111 )  { tammy_genie_n_pi_zeros++; tammy_genie_n_mesons++; }
-     else if( fabs( pdg[p] ) == 411 || fabs( pdg[p] ) == 421 || fabs( pdg[p] ) == 431 ) { tammy_genie_n_charms++; tammy_genie_n_mesons++; }
-     else if( fabs( pdg[p] ) == 321 || fabs( pdg[p] ) == 311 || fabs( pdg[p] ) == 310 || fabs( pdg[p] ) == 130 ) {
-       tammy_genie_n_kaons++; tammy_genie_n_mesons++;
-     }
-     else if( fabs( pdg[p] ) > 3000 && fabs( pdg[p] ) < 5000 ) tammy_genie_n_heavy_baryons++;
-     else tammy_genie_n_others++;
-   }
-
-   event->setIntData("genie_n_neutrinos",tammy_genie_n_neutrinos);
-   event->setIntData("genie_n_muons",tammy_genie_n_muons);
-   event->setIntData("genie_n_mesons",tammy_genie_n_mesons);
-   event->setIntData("genie_n_heavy_baryons",tammy_genie_n_heavy_baryons);
-   event->setIntData("genie_n_photons",tammy_genie_n_photons);
-   event->setIntData("genie_n_protons",tammy_genie_n_protons);
-   event->setIntData("genie_n_neutrons",tammy_genie_n_neutrons);
-   event->setIntData("genie_n_pions",tammy_genie_n_pions);
-   event->setIntData("genie_n_pi_zeros",tammy_genie_n_pi_zeros);
-   event->setIntData("genie_n_charms",tammy_genie_n_charms);
-   event->setIntData("genie_n_kaons",tammy_genie_n_kaons);
-   event->setIntData("genie_n_others",tammy_genie_n_others);
-   event->setIntData("genie_n_particles",tammy_genie_n_particles);
-
-   bool isCCQElike = false;
-   if( truth->current()         == Minerva::GenMinInteraction::kChargedCurrent &&
-       truth->interactionType() == Minerva::GenMinInteraction::kQEL && truth->incoming() ==  14 ) isCCQElike = true;
-   else if( tammy_genie_n_muons == 1 && tammy_genie_n_protons != 0 && tammy_genie_n_mesons == 0 &&
-            tammy_genie_n_heavy_baryons == 0 && tammy_genie_n_photons == 0 ) isCCQElike = true;
-
-   double momentum = -1;
-   std::vector< double > momentumVec(4,-1);  
-
-   int index   = -1;
-   int scatter =  0;
-   int delta   =  0; 
-   int other   =  0;
-
-   Minerva::GenMinEventRecord* eventRecord = truth->eventRecord();
-   int n_fs_parts = eventRecord->eRecNParticleGen();
-
-   double leading_tammy_proton_p = 0;
-   for(unsigned int i = 0; i < nucleonVect.size(); i++) {
-     if( nucleonVect[i].first != 2212 ) continue;
-     if( nucleonVect[i].second > leading_tammy_proton_p ) leading_tammy_proton_p = nucleonVect[i].second;
-   }
-
-   if( isCCQElike ) {
-     std::vector< std::pair<int,int> > list;
-     list.clear();
-
-     for(int i = 0; i < n_fs_parts; i++) {
-       if( eventRecord->eRecPartID(i) != 2212 ) continue;
-     
-       double px = eventRecord->eRecMomentumPx(i);
-       double py = eventRecord->eRecMomentumPy(i);
-       double pz = eventRecord->eRecMomentumPz(i);
-       double p  = sqrt( px*px + py*py + pz*pz );
-
-       if( p != leading_tammy_proton_p ) continue;
-       list.push_back( std::make_pair(i,eventRecord->eRecPartID(i)) );
-
-       int mother_index = eventRecord->eRecMother(i);
-       bool foundMother = false;
-
-       while( !foundMother ) {
-          if( mother_index == -1 ) foundMother = true;
-          else {
-            list.push_back( std::make_pair(mother_index,eventRecord->eRecPartID(mother_index)) );
-            mother_index = eventRecord->eRecMother( mother_index );
-          }
-       }
-
-       break;
-     }
-     
-     std::vector< std::pair<int,int> >::reverse_iterator rit;
-     for(rit = list.rbegin(); rit != list.rend(); rit++) {
-       if( eventRecord->eRecPartStatus( (*rit).first ) == 0 ) continue;       
-       
-       if( eventRecord->eRecPartID( (*rit).first )      == 2112 ) scatter = 1;
-       else if( eventRecord->eRecPartID( (*rit).first ) == 2224 ) delta   = 1;
-
-       if( scatter == 1 || delta == 1 ) {
-         rit++;
-         if( (*rit).second == 2212 ) index = (*rit).first;
-         else { scatter = 0; delta = 0; }
-       }
-      
-       break;
-     }
-   }
-
-   if( index != -1 ) {
-     double px = eventRecord->eRecMomentumPx(index);
-     double py = eventRecord->eRecMomentumPy(index);
-     double pz = eventRecord->eRecMomentumPz(index);
-     double p  = sqrt( px*px + py*py + pz*pz );
-     double e  = eventRecord->eRecEnergy(index);
-
-     momentumVec.at(0) = px;
-     momentumVec.at(1) = py;
-     momentumVec.at(2) = pz;
-     momentumVec.at(3) = e;
-     momentum = p;
-   } else other = 1;  
- 
-   event->setDoubleData("tammy_intraNukeProtonMomentum",momentum);
-   event->setContainerDoubleData("tammy_intraNukeProtonMomentumVec",momentumVec);
-   event->setIntData("tammy_intraNukeNParticles",n_fs_parts);
-   event->setIntData("tammy_intraNukeDeltaPlusPlusDecay",delta);
-   event->setIntData("tammy_intraNukeNeutronQuasiElasticScatter",scatter);
-   event->setIntData("tammy_intraNukeOtherProcess",other);
-
-   verbose() << "Exit CCDeltaPlusAna::setGenMinTruthInformation" << endmsg;
-   return;
+    verbose() << "Enter CCDeltaPlusAna::setGenMinTruthInformation" << endmsg;
+    
+    int tammy_genie_n_neutrinos     = 0;
+    int tammy_genie_n_muons         = 0;
+    int tammy_genie_n_mesons        = 0;
+    int tammy_genie_n_heavy_baryons = 0;
+    int tammy_genie_n_photons       = 0;
+    int tammy_genie_n_protons       = 0;
+    int tammy_genie_n_neutrons      = 0;
+    int tammy_genie_n_pions         = 0;
+    int tammy_genie_n_pi_zeros      = 0;
+    int tammy_genie_n_charms        = 0;
+    int tammy_genie_n_kaons         = 0;
+    int tammy_genie_n_others        = 0;
+    int tammy_genie_n_particles     = 0;
+    
+    std::vector< std::pair<int,double> > nucleonVect;
+    
+    std::vector<double> pxVec = truth->fsParticlesPx();
+    std::vector<double> pyVec = truth->fsParticlesPy();
+    std::vector<double> pzVec = truth->fsParticlesPz();
+    std::vector<int>    pdg   = truth->fSpdg();
+    
+    tammy_genie_n_particles = (int)pdg.size();
+    
+    for(unsigned int p = 0; p < pdg.size(); p++) {
+        double ptot = sqrt( pxVec[p]*pxVec[p] + pyVec[p]*pyVec[p] + pzVec[p]*pzVec[p] );
+    
+        if( fabs( pdg[p] ) == 13 ) tammy_genie_n_muons++;
+        else if( fabs( pdg[p] ) == 14 || fabs( pdg[p] ) == 15 || fabs( pdg[p] ) == 16 ) tammy_genie_n_neutrinos++;
+        else if( fabs( pdg[p] ) == 22 )   tammy_genie_n_photons++;
+        else if( fabs( pdg[p] ) == 2212 ) { tammy_genie_n_protons++;  nucleonVect.push_back( std::make_pair(pdg[p],ptot) ); }
+        else if( fabs( pdg[p] ) == 2112 ) { tammy_genie_n_neutrons++; nucleonVect.push_back( std::make_pair(pdg[p],ptot) ); }
+        else if( fabs( pdg[p] ) == 211 )  { tammy_genie_n_pions++;    tammy_genie_n_mesons++; }
+        else if( fabs( pdg[p] ) == 111 )  { tammy_genie_n_pi_zeros++; tammy_genie_n_mesons++; }
+        else if( fabs( pdg[p] ) == 411 || fabs( pdg[p] ) == 421 || fabs( pdg[p] ) == 431 ) { tammy_genie_n_charms++; tammy_genie_n_mesons++; }
+        else if( fabs( pdg[p] ) == 321 || fabs( pdg[p] ) == 311 || fabs( pdg[p] ) == 310 || fabs( pdg[p] ) == 130 ) {
+        tammy_genie_n_kaons++; tammy_genie_n_mesons++;
+        }
+        else if( fabs( pdg[p] ) > 3000 && fabs( pdg[p] ) < 5000 ) tammy_genie_n_heavy_baryons++;
+        else tammy_genie_n_others++;
+    }
+    
+    event->setIntData("tammy_genie_n_neutrinos",tammy_genie_n_neutrinos);
+    event->setIntData("tammy_genie_n_muons",tammy_genie_n_muons);
+    event->setIntData("tammy_genie_n_mesons",tammy_genie_n_mesons);
+    event->setIntData("tammy_genie_n_heavy_baryons",tammy_genie_n_heavy_baryons);
+    event->setIntData("tammy_genie_n_photons",tammy_genie_n_photons);
+    event->setIntData("tammy_genie_n_protons",tammy_genie_n_protons);
+    event->setIntData("tammy_genie_n_neutrons",tammy_genie_n_neutrons);
+    event->setIntData("tammy_genie_n_pions",tammy_genie_n_pions);
+    event->setIntData("tammy_genie_n_pi_zeros",tammy_genie_n_pi_zeros);
+    event->setIntData("tammy_genie_n_charms",tammy_genie_n_charms);
+    event->setIntData("tammy_genie_n_kaons",tammy_genie_n_kaons);
+    event->setIntData("tammy_genie_n_others",tammy_genie_n_others);
+    event->setIntData("tammy_genie_n_particles",tammy_genie_n_particles);
+    
+    bool isCCQElike = false;
+    if( truth->current()         == Minerva::GenMinInteraction::kChargedCurrent &&
+        truth->interactionType() == Minerva::GenMinInteraction::kQEL && truth->incoming() ==  14 ){
+        
+            isCCQElike = true;
+        }
+    else if( tammy_genie_n_muons == 1 && tammy_genie_n_protons != 0 && tammy_genie_n_mesons == 0 &&
+                tammy_genie_n_heavy_baryons == 0 && tammy_genie_n_photons == 0 ){ 
+                
+            isCCQElike = true;
+        }
+    
+    double momentum = -1;
+    std::vector< double > momentumVec(4,-1);  
+    
+    int index   = -1;
+    int scatter =  0;
+    int delta   =  0; 
+    int other   =  0;
+    
+    Minerva::GenMinEventRecord* eventRecord = truth->eventRecord();
+    int n_fs_parts = eventRecord->eRecNParticleGen();
+    
+    double leading_tammy_proton_p = 0;
+    for(unsigned int i = 0; i < nucleonVect.size(); i++) {
+        if( nucleonVect[i].first != 2212 ) continue;
+        if( nucleonVect[i].second > leading_tammy_proton_p ) leading_tammy_proton_p = nucleonVect[i].second;
+    }
+    
+    if( isCCQElike ) {
+        std::vector< std::pair<int,int> > list;
+        list.clear();
+    
+        for(int i = 0; i < n_fs_parts; i++) {
+        if( eventRecord->eRecPartID(i) != 2212 ) continue;
+        
+        double px = eventRecord->eRecMomentumPx(i);
+        double py = eventRecord->eRecMomentumPy(i);
+        double pz = eventRecord->eRecMomentumPz(i);
+        double p  = sqrt( px*px + py*py + pz*pz );
+    
+        if( p != leading_tammy_proton_p ) continue;
+        list.push_back( std::make_pair(i,eventRecord->eRecPartID(i)) );
+    
+        int mother_index = eventRecord->eRecMother(i);
+        bool foundMother = false;
+    
+        while( !foundMother ) {
+            if( mother_index == -1 ) foundMother = true;
+            else {
+                list.push_back( std::make_pair(mother_index,eventRecord->eRecPartID(mother_index)) );
+                mother_index = eventRecord->eRecMother( mother_index );
+            }
+        }
+    
+        break;
+        }
+        
+        std::vector< std::pair<int,int> >::reverse_iterator rit;
+        for(rit = list.rbegin(); rit != list.rend(); rit++) {
+        if( eventRecord->eRecPartStatus( (*rit).first ) == 0 ) continue;       
+        
+        if( eventRecord->eRecPartID( (*rit).first )      == 2112 ) scatter = 1;
+        else if( eventRecord->eRecPartID( (*rit).first ) == 2224 ) delta   = 1;
+    
+        if( scatter == 1 || delta == 1 ) {
+            rit++;
+            if( (*rit).second == 2212 ) index = (*rit).first;
+            else { scatter = 0; delta = 0; }
+        }
+        
+        break;
+        }
+    }
+    
+    if( index != -1 ) {
+        double px = eventRecord->eRecMomentumPx(index);
+        double py = eventRecord->eRecMomentumPy(index);
+        double pz = eventRecord->eRecMomentumPz(index);
+        double p  = sqrt( px*px + py*py + pz*pz );
+        double e  = eventRecord->eRecEnergy(index);
+    
+        momentumVec.at(0) = px;
+        momentumVec.at(1) = py;
+        momentumVec.at(2) = pz;
+        momentumVec.at(3) = e;
+        momentum = p;
+    } else other = 1;  
+    
+    event->setDoubleData("tammy_intraNukeProtonMomentum",momentum);
+    event->setContainerDoubleData("tammy_intraNukeProtonMomentumVec",momentumVec);
+    event->setIntData("tammy_intraNukeNParticles",n_fs_parts);
+    event->setIntData("tammy_intraNukeDeltaPlusPlusDecay",delta);
+    event->setIntData("tammy_intraNukeNeutronQuasiElasticScatter",scatter);
+    event->setIntData("tammy_intraNukeOtherProcess",other);
+    
+    verbose() << "Exit CCDeltaPlusAna::setGenMinTruthInformation" << endmsg;
+    return;
 }
 
 //---------------------------------------------------------------------------------
