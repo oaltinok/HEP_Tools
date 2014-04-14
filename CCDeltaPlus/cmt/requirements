@@ -17,18 +17,16 @@ use EventRecInterfaces  v*   Rec
 
 use AnaInterfaces       v*   Ana
 use AnaUtils            v*   Ana
-use PlotUtils           v*   Ana
-use UnfoldUtils         v*   Ana
 use RecoStudies         v*   Ana 
 
-macro_append ROOT_linkopts "-L$(ROOTSYS)/lib -lPhysics -lHist -lGeom -lEG -lGpad -lGraf -lMinuit2"
+use GiGaCnv             *    Sim  #for geant geometry headers
 
 
 #===============================================================================
 include_dirs ${CCDELTAPLUSROOT}
 
-library CCDeltaPlusLib      *.cpp
-apply_pattern component_library library=CCDeltaPlusLib
+library CCDeltaPlus      *.cpp
+apply_pattern component_library library=CCDeltaPlus
 
 private
 apply_pattern application_path

@@ -4,9 +4,7 @@ CCDeltaPlusAna
 
     Reconstruction Package:
         Exclusive Channel for muon,proton,pi0 on the final state
-        Contains Clone of CCPi0 for Pi0 Reconstruction 
-        Contains Clone of NukeCCQE for Short Track Reconstruction 
-        Both Clones may be inherited in future, for now they are just copied
+        Uses Nightly Build
     
     Main Package:
         AnalysisFramework/Ana/CCDeltaPlus/
@@ -22,7 +20,7 @@ CCDeltaPlusAna
 
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_04_10
+    Last Revision:  2014_04_14
     
 ================================================================================
 */
@@ -37,6 +35,8 @@ CCDeltaPlusAna
 //-- Forward Declarations
 #include "Event/MinervaEventFwd.h"
 
+class IMichelTool;
+class IMinervaCoordSysTool;
 
 //! This class is for Reconstruct Pi0 using muon match vertex
 class CCDeltaPlusAna : public MinervaAnalysisTool
@@ -59,7 +59,7 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         StatusCode reconstructEvent( Minerva::PhysicsEvent* event, Minerva::GenMinInteraction* truth = NULL ) const;
         
         //! Attach an interpretations to the event (mandatory for inheritance)
-        StatusCode interpretEvent( const Minerva::PhysicsEvent* event, const Minerva::GenMinInteraction* truth, NeutrinoVect& nuInts ) const;
+        StatusCode interpretEvent( const Minerva::PhysicsEvent* event, const Minerva::GenMinInteraction* truth, NeutrinoVect& interaction_hyp ) const;
         
         StatusCode tagTruth( Minerva::GenMinInteraction* truth ) const;
         
@@ -67,9 +67,27 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         double m_fidHexApothem;
         double m_fidUpStreamZ;
         double m_fidDownStreamZ;
+        
+        double m_beamAngleBias;
+        
+        double m_minMuonScore;
+        
+        
+        bool m_makeShortTracks;
+        bool m_doPlausibilityCuts;
+        
+        Minerva::DeDetector*        m_InnerDetector;
+        
+        IMinervaCoordSysTool*       m_coordSysTool;
+        IMichelTool*                m_michelTrkTool;
+        IMichelTool*                m_michelVtxTool;
+        
+        
+        //! Private Functions
+        StatusCode getNearestPlane(double z, int & module_return, int & plane_return) const;
+        
+        
   
-  
-        StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
   
   
 };
