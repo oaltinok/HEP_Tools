@@ -17,9 +17,9 @@ DECLARE_TOOL_FACTORY( CCDeltaPlusAna );
 
 using namespace Minerva;
     
-//=============================================================================
+//==============================================================================
 // Standard constructor 
-//=============================================================================
+//==============================================================================
 CCDeltaPlusAna::CCDeltaPlusAna(const std::string& type, const std::string& name, const IInterface* parent ) :
 MinervaAnalysisTool( type, name, parent ) 
 {
@@ -31,13 +31,15 @@ MinervaAnalysisTool( type, name, parent )
     m_anaSignature = "CCDeltaPlusAna";
     
     // Private Properties
-    declareProperty( "BeamAngleBias", m_beamAngleBias = 0.006*CLHEP::radian );
+    declareProperty( "StoreAllEvents",      m_store_all_events =    true);
+    declareProperty( "DoPlausibilityCuts",  m_doPlausibilityCuts =  true );
+    declareProperty( "MakeShortTracks",     m_makeShortTracks =     true );
+
+    declareProperty( "BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian );
     
-    declareProperty( "MinMuonScore", m_minMuonScore = 0.9 );
+    declareProperty( "MinMuonScore",        m_minMuonScore = 0.9 );
     
-    declareProperty( "DoPlausibilityCuts", m_doPlausibilityCuts = true );
-    
-    declareProperty( "MakeShortTracks", m_makeShortTracks = true );
+
     
     
     
@@ -46,16 +48,15 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("HypothesisMethods", m_hypMeths);
     info() << " CCDeltaPlusAna Hypothesis added " << endmsg;
     
-    info() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
     
+    info() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
 }
     
-//=============================================================================
+//==============================================================================
 // Initialize
-//=============================================================================
+//==============================================================================
 StatusCode CCDeltaPlusAna::initialize()
 {
-    
     info() <<"Enter CCDeltaPlusAna::initialize()" << endmsg;
     
     //! Initialize the base class.  This will fail if you did not define m_anaSignature.
@@ -114,10 +115,13 @@ StatusCode CCDeltaPlusAna::initialize()
     
     
     //Event - Cut Results
-    declareIntEventBranch( "Cut_NoInteractionVertex", -1 );
-    declareIntEventBranch( "Cut_NullVertex", -1 );
-    declareIntEventBranch( "Cut_FiducialVertex", -1 );
-    declareIntEventBranch( "is_CCDeltaPlus", -1 );
+    declareIntEventBranch( "Cut_Vertex_None", -1 );
+    declareIntEventBranch( "Cut_Vertex_Null", -1 );
+    declareIntEventBranch( "Cut_Vertex_Not_Fiducial", -1 );
+    declareIntEventBranch( "Cut_Muon_None",-1);
+    declareIntEventBranch( "Cut_Muon_Not_Plausible",-1);
+    declareIntEventBranch( "Cut_Muon_Score_Low",-1);
+    declareIntEventBranch( "Cut_Michel_Exist", -1 );
     
     //Event - general reco
     declareIntEventBranch( "n_startpoint_vertices", -1 );
@@ -133,7 +137,6 @@ StatusCode CCDeltaPlusAna::initialize()
     declareDoubleEventBranch( "time", -1.0 );
   
     //Event - Michel 
-    declareIntEventBranch( "has_vtx_michel", 0 );
     declareIntEventBranch( "n_vtx_michel_views", 0 );
     declareDoubleEventBranch( "vtx_michel_distance", -1.0);
     
@@ -145,8 +148,10 @@ StatusCode CCDeltaPlusAna::initialize()
     declareDoubleEventBranch( "totalODVisibleE", -1.0 );
     declareDoubleEventBranch( "vtxBlobExtraE",  -1.0 );
     declareDoubleEventBranch( "unattachedExtraE", -1.0 );
-    declareDoubleEventBranch( "dispersedExtraE", -1.0 ); 
-    
+    declareDoubleEventBranch( "dispersedExtraE", -1.0 );
+     
+    declareBoolEventBranch( "isMinosMatchTrack");
+    declareBoolEventBranch( "isMinosMatchStub");
     
     //! NeutrinoInt - vtx
     declareIntBranch( m_hypMeths, "vtx_module", -99);
@@ -180,9 +185,9 @@ StatusCode CCDeltaPlusAna::initialize()
     return sc;
 }
     
-//=============================================================================
+//==============================================================================
 // reconstructEvent() --
-//=============================================================================
+//==============================================================================
 StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truth ) const
 {
     
@@ -191,6 +196,12 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     if( truth ){
         debug() << "\tThis is a MC event." << endmsg;
     }
+    
+    //--------------------------------------------------------------------------
+    //! Initialize reco booleans
+    //--------------------------------------------------------------------------
+    event->filtertaglist()->setOrAddFilterTag( "isMinosMatchTrack", false ); 
+    event->filtertaglist()->setOrAddFilterTag( "isMinosMatchStub", false );
     
     //--------------------------------------------------------------------------
     //! Check if this a plausible event ( MC only )
@@ -206,10 +217,11 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     //--------------------------------------------------------------------------
     debug() << "Finding Vertex..." << endmsg;
     
-    if( !event->hasInteractionVertex() ) {
+    if( !(event->hasInteractionVertex()) ) {
         debug() << "The event does not have an interaction vertex!" << endmsg;
-        event->setIntData("Cut_NoInteractionVertex",1);
-        return StatusCode::SUCCESS;
+        event->setIntData("Cut_Vertex_None",1);
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
     } 
        
        
@@ -218,19 +230,22 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         bool pass = true; 
         std::string tag = "BadObject";
         event->filtertaglist()->addFilterTag(tag,pass);
-        event->setIntData("Cut_NullVertex",1);
+        event->setIntData("Cut_Vertex_Null",1);
         error() << "This vertex is NULL! Flag this event as bad!" << endmsg;
-        return StatusCode::SUCCESS;
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
     }
     
     // is Vertex Fiducial?
     Gaudi::XYZPoint vtx_position = interactionVertex->position();
     if( !FiducialPointTool->isFiducial( vtx_position, m_fidHexApothem, m_fidUpStreamZ, m_fidDownStreamZ ) ){
         debug() <<"Interaction Vertex is not in fiducial volume = ("<<vtx_position.x()<<","<<vtx_position.y()<<","<<vtx_position.z()<<")"<< endmsg;
-        event->setIntData("Cut_FiducialVertex",1);
-        return StatusCode::SUCCESS;
+        event->setIntData("Cut_Vertex_Not_Fiducial",1);
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
     }
     
+    debug() << "Finding Vertex End!" << endmsg;
     //--------------------------------------------------------------------------
     //! Get Muon, if it exists
     //--------------------------------------------------------------------------  
@@ -250,11 +265,13 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         double mc_frac = -1.0;
         if ( m_doPlausibilityCuts && !muonIsPlausible( muonProng, mc_frac) ) {
             debug()<<"Muon is not plausible"<<endmsg;
-            return StatusCode::SUCCESS;
+            event->setIntData("Cut_Muon_Not_Plausible",1);
+            if( m_store_all_events ) return interpretFailEvent(event); 
+            else return StatusCode::SUCCESS; 
         }
         
         debug() << "Muon Particle Score: " << muonPart->score() << endmsg;
-        if (muonPart->score() >= m_minMuonScore) {
+        if (muonPart->score() >= m_minMuonScore){
         
             muonProng->filtertaglist()->setOrAddFilterTag( "PrimaryMuon", true );
             muonPart->filtertaglist()->setOrAddFilterTag( "PrimaryMuon", true );
@@ -274,16 +291,23 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         }
         else {
             debug()<<"Muon prong does not pass score cut"<<endmsg;
-            return StatusCode::SUCCESS;
+            event->setIntData("Cut_Muon_Score_Low",1);
+            if( m_store_all_events ) return interpretFailEvent(event); 
+            else return StatusCode::SUCCESS; 
         }
         
     } 
     else{
         debug() << "Did not find a muon prong!" << endmsg;
-        return StatusCode::SUCCESS;
+        event->setIntData("Cut_Muon_None",1);
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
     } // end if findMuonProng
     
+    
     double muon_visible_energy = muonProng->minervaVisibleEnergySum();
+    
+    debug() << "Finding Muon End!" << endmsg;
      
     //--------------------------------------------------------------------------
     //! Determine if vertex has michels
@@ -293,18 +317,22 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     bool foundMichel = m_michelVtxTool->findMichel( interactionVertex, vtx_michel_prong );
     if (foundMichel) {
         debug()<<"Found a Michel Electron!"<<endmsg;
-        event->setIntData("has_vtx_michel",1);
+        event->setIntData("Cut_Michel_Exist",1);
         event->setIntData("n_vtx_michel_views",vtx_michel_prong.getIntData("category"));
         event->setDoubleData("vtx_michel_distance",vtx_michel_prong.getDoubleData("distance"));
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
     }else{
         debug()<<"There are NO Michel Electrons in the event!"<<endmsg;
     }
     
+    debug() << "Finding Michels End!" << endmsg;
     
     
-    //--------------------------------------------------------------
+    
+    //--------------------------------------------------------------------------
     //! Finish filling event portion of ntuple 
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
 //     event->setDoubleData("time", event_time);
 //     
 //     event->setIntData( "dead", dead );
@@ -336,9 +364,9 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
 
     fillCommonPhysicsAnaBranches( event );
 
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //! Call the interpretEvent function.
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     NeutrinoVect interactions;
     StatusCode interpret = this->interpretEvent( event, truth, interactions );
     
@@ -360,9 +388,9 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     
 }
     
-//=============================================================================
-// interpretEvent() --
-//=============================================================================
+//==============================================================================
+// interpretEvent() 
+//==============================================================================
 StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truth, NeutrinoVect& interaction_hyp ) const
 {
     debug() <<"Enter: CCDeltaPlusAna::interpretEvent()" << endmsg;
@@ -376,15 +404,15 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
         return StatusCode::FAILURE;
     }
     
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //! Create interaction hypothesis
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     Minerva::NeutrinoInt* nuInt = new Minerva::NeutrinoInt(m_anaSignature);
     interaction_hyp.push_back( nuInt );
 
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //! Get the Primary Muon Prongs
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     SmartRef<Prong> muonProng = (Prong*)NULL;
     ProngVect hadronProngs;
     ProngVect primaryProngs = event->primaryProngs();
@@ -410,9 +438,9 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
     }
     
     
-    //--------------------------------------------------------------  
+    //--------------------------------------------------------------------------  
     //! Get the muon particle hypotheses and fill some info
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     SmartRefVector<Track>::iterator itTrk;
     SmartRef<Minerva::Particle> muonPart = (Minerva::Particle*)NULL;
     int muon_minervaTrack_types = 0;
@@ -489,9 +517,9 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
         
     debug()<<"Finished muons"<<endmsg;
     
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //! Fill ntuple
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     
     //nuInt->setNeutrinoHelicity( getHelicity( mu_charge ) );
     nuInt->setInteractionCurrent( Minerva::NeutrinoInt::ChargedCurrent );
@@ -540,9 +568,9 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
 }
    
 
-//=============================================================================
-// tagTruth 
-//=============================================================================
+//==============================================================================
+// tagTruth()
+//==============================================================================
 StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truth ) const 
 {
     
@@ -555,9 +583,9 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truth ) const
     }
     
     debug() << "Filling Genie Weight Branches" << endmsg;
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //! Fill GENIE Weight Branches
-    //--------------------------------------------------------------      
+    //--------------------------------------------------------------------------      
     StatusCode sc = fillGenieWeightBranches( truth );
     if (sc.isFailure() ) {
         warning()<<"Genie weight branch filling failed!"<<endmsg;
@@ -569,9 +597,9 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truth ) const
     
 }
 
-//=======================================================================
+//==============================================================================
 //  Finalize
-//=======================================================================
+//==============================================================================
 StatusCode CCDeltaPlusAna::finalize()
 {
     
@@ -587,20 +615,41 @@ StatusCode CCDeltaPlusAna::finalize()
     return sc;
 }
 
-//==============================================================================
+//<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+//
 //  Private Functions
+//
+//<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+    
+
+//----------------------------------------------------------------------------------------
+// interpret Events which fails the reconstructor cuts
+//----------------------------------------------------------------------------------------
+StatusCode CCDeltaPlusAna::interpretFailEvent( Minerva::PhysicsEvent* event ) const
+{  
+   debug() << "Enter interpretFailEvent()" << endmsg;
+
+   Minerva::NeutrinoInt* nuInt = new Minerva::NeutrinoInt(m_anaSignature);
+   NeutrinoVect nuInts;
+   nuInts.push_back( nuInt );
+   markEvent(event);
+   addInteractionHyp(event,nuInts);
+   fillCommonPhysicsAnaBranches(event);
+   fillNuMIBranches(event);
+
+   debug() << "Exit interpretFailEvent()" << endmsg;
+   return StatusCode::SUCCESS;
+}
 //==============================================================================
-    
-    
-//=============================================================================
 // Find the plane nearest to a point
-//=============================================================================
+//==============================================================================
 StatusCode CCDeltaPlusAna::getNearestPlane(double z, int & module_return, int & plane_return) const
 {
-  // Got From Brandon CCNuPionInc - 2014_04_14
-  //testing new MinervaDet routine
-  //works as advertised, but a couple problems:
-  //1) Does not go to more downstream plane (upstream if backwards track) if point is in passive material
+  // Got From Brandon's CCNuPionInc - 2014_04_14
+  // testing new MinervaDet routine
+  // works as advertised, but a couple problems:
+  // 1) Does not go to more downstream plane (upstream if backwards track) if point is in passive material
+  
   DePlane const * pPlane = m_InnerDetector->getClosestDePlane(z);
   if (!pPlane) {
     error()<<"        getClosestDePlane failed on z "<<z<<endmsg;

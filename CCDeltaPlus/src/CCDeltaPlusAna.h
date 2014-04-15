@@ -20,7 +20,8 @@ CCDeltaPlusAna
 
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_04_14
+    Date:           2014_03_27
+    Last Revision:  2014_04_15
     
 ================================================================================
 */
@@ -72,7 +73,7 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         
         double m_minMuonScore;
         
-        
+        bool m_store_all_events;
         bool m_makeShortTracks;
         bool m_doPlausibilityCuts;
         
@@ -84,6 +85,7 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         
         
         //! Private Functions
+        StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
         StatusCode getNearestPlane(double z, int & module_return, int & plane_return) const;
         
         
