@@ -5,12 +5,21 @@
 
 #include "RecInterfaces/IFiducialPointTool.h"
 
+#include "EnergyRecTools/IEnergyCorrectionTool.h"
+
 #include "GeoUtils/IMinervaCoordSysTool.h"
+
 #include "ProngMaker/IMichelTool.h"
+#include "ProngMaker/IProngClassificationTool.h"
+#include "ProngMaker/IODProngClassificationTool.h"
+
+#include "ParticleMaker/IParticleMakerTool.h"
+
+#include "AnaUtils/IProtonUtils.h"
+#include "MinervaUtils/IHitTaggerTool.h"
 
 #include "MinervaDet/IGeomUtilSvc.h"
 #include "MinervaDet/DeDetector.h"
-
 
 
 DECLARE_TOOL_FACTORY( CCDeltaPlusAna );
@@ -23,8 +32,8 @@ using namespace Minerva;
 CCDeltaPlusAna::CCDeltaPlusAna(const std::string& type, const std::string& name, const IInterface* parent ) :
 MinervaAnalysisTool( type, name, parent ) 
 {
-    
-    info() <<"Enter CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
+    info() <<"--------------------------------------------------------------------------"<<endmsg;
+    info() <<"Enter CCDeltaPlusAna::CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
     
     declareInterface<IInteractionHypothesis>(this);
     //! mandatory declaration of analysis signature: CCDeltaPlusAna
@@ -38,6 +47,14 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty( "BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian );
     
     declareProperty( "MinMuonScore",        m_minMuonScore = 0.9 );
+    declareProperty( "MinProtonScore",      m_minProtonScore = 0.1 );
+    
+    declareProperty("MuonProngColor",              m_muonProngColor       = 0x228B22); //-- green
+    declareProperty("ProtonProngColor",            m_protonProngColor     = 0x9932CC); //-- purple
+    declareProperty("PrimaryVertexProngColor",     m_primaryVertexColor   = 0xFF0000); //-- red
+    declareProperty("SecondaryVertexProngColor",   m_secondaryVertexColor = 0xFFA500); //-- orange
+    declareProperty("TrackEndProngColor",          m_endPointVertexColor  = 0xFF1493); //-- pink
+    declareProperty("UnattachedProngColor",        m_unattachedProngColor = 0x0000FF); //-- blue
     
 
     
@@ -49,7 +66,8 @@ MinervaAnalysisTool( type, name, parent )
     info() << " CCDeltaPlusAna Hypothesis added " << endmsg;
     
     
-    info() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
+    info() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
+    info() <<"--------------------------------------------------------------------------"<<endmsg;
 }
     
 //==============================================================================
@@ -57,6 +75,7 @@ MinervaAnalysisTool( type, name, parent )
 //==============================================================================
 StatusCode CCDeltaPlusAna::initialize()
 {
+    info() <<"--------------------------------------------------------------------------"<<endmsg;
     info() <<"Enter CCDeltaPlusAna::initialize()" << endmsg;
     
     //! Initialize the base class.  This will fail if you did not define m_anaSignature.
@@ -77,14 +96,57 @@ StatusCode CCDeltaPlusAna::initialize()
     try {
         m_InnerDetector = getDet<Minerva::DeDetector>("/dd/Structure/Minerva/Detector/InnerDetector");
     } catch(GaudiException& e) {
-        error() << "Could not obtain Inner Detector" << endmsg;
+        error() << "Could not obtain detector: Inner Detector" << endmsg;
         return StatusCode::FAILURE;
     }
     
     try{
         m_coordSysTool = tool<IMinervaCoordSysTool>("MinervaCoordSysTool");
     }catch(GaudiException& e){
-        error() << "Could not obtain MinervaCoordSysTool" << endmsg;
+        error() << "Could not obtain tool: MinervaCoordSysTool" << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    try{ 
+        m_protonUtils = tool<IProtonUtils>("ProtonUtils", m_protonUtils); 
+    }catch( GaudiException& e ){
+        error() << "Could not obtain tool: ProtonUtils" << m_protonUtils<< endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    try{ 
+        m_prongIntersection = tool<IProngClassificationTool>("ProngIntersectionTool"); 
+    }catch( GaudiException& e ){
+        error() << "Could not obtain ProngClassificationTool: " << m_prongIntersection << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    try{ 
+        m_particleMaker = tool<IParticleMakerTool>("ParticleMakerTool"); 
+    }catch( GaudiException& e ){
+        error() << "Could not obtain ParticleMakerTool: " << m_particleMaker << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    try{ 
+        m_odMatchTool = tool<IODProngClassificationTool>("ODTrackMatchTool"); 
+    }catch( GaudiException& e ){
+        error() << "Could not obtain ProngClassificationTool: " << m_odMatchTool << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    try{ 
+        m_energyCorrectionTool = tool<IEnergyCorrectionTool>("EnergyCorrectionTool"); 
+    }catch( GaudiException& e ){
+        error() << "Could not obtain tool: EnergyCorrectionTool" << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    try{ 
+        m_hitTagger = tool<IHitTaggerTool>( "HitTaggerTool" ); 
+    }
+    catch( GaudiException& e ) {
+        error() << "Could not obtain tool: HitTaggerTool" << endmsg;
         return StatusCode::FAILURE;
     }
    
@@ -110,11 +172,13 @@ StatusCode CCDeltaPlusAna::initialize()
     declareGenieWeightBranches();
     
 
-    // Select the branches you want in your AnaTuple
+
+    //--------------------------------------------------------------------------
+    //! Select the branches you want in your AnaTuple
+    //--------------------------------------------------------------------------
     
     
-    
-    //Event - Cut Results
+    // Event - Cut Results
     declareIntEventBranch( "Cut_Vertex_None", -1 );
     declareIntEventBranch( "Cut_Vertex_Null", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Fiducial", -1 );
@@ -122,8 +186,9 @@ StatusCode CCDeltaPlusAna::initialize()
     declareIntEventBranch( "Cut_Muon_Not_Plausible",-1);
     declareIntEventBranch( "Cut_Muon_Score_Low",-1);
     declareIntEventBranch( "Cut_Michel_Exist", -1 );
+    declareIntEventBranch( "Cut_Proton_None", -1 );
     
-    //Event - general reco
+    // Event - General reco
     declareIntEventBranch( "n_startpoint_vertices", -1 );
     declareIntEventBranch( "n_long_tracks", -1);
     declareIntEventBranch( "n_short_tracks", -1);
@@ -136,11 +201,11 @@ StatusCode CCDeltaPlusAna::initialize()
     declareIntEventBranch( "n_us_muon_clusters", 0);
     declareDoubleEventBranch( "time", -1.0 );
   
-    //Event - Michel 
+    // Event - Michel 
     declareIntEventBranch( "n_vtx_michel_views", 0 );
     declareDoubleEventBranch( "vtx_michel_distance", -1.0);
     
-    //Event - energy
+    //Event - Energy
     declareDoubleEventBranch( "muonVisibleE", -1.0 );
     declareDoubleEventBranch( "hadronVisibleE", -1.0 );
     declareDoubleEventBranch( "totalVisibleE", -1.0 );
@@ -153,14 +218,14 @@ StatusCode CCDeltaPlusAna::initialize()
     declareBoolEventBranch( "isMinosMatchTrack");
     declareBoolEventBranch( "isMinosMatchStub");
     
-    //! NeutrinoInt - vtx
+    //! NeutrinoInt - Vertex
     declareIntBranch( m_hypMeths, "vtx_module", -99);
     declareIntBranch( m_hypMeths, "vtx_plane",-1);
     declareDoubleBranch( m_hypMeths, "vtx_x",0.0);
     declareDoubleBranch( m_hypMeths, "vtx_y",0.0);
     declareDoubleBranch( m_hypMeths, "vtx_z",0.0);
     
-    //! NeutrinoInt - muon
+    //! NeutrinoInt - Muon
     declareIntBranch( m_hypMeths, "muon_minervaTrack_types", -1);
     declareIntBranch( m_hypMeths, "muon_N_minosTracks", -1);
     declareIntBranch( m_hypMeths, "muon_minosTrackQuality", -1);
@@ -179,8 +244,37 @@ StatusCode CCDeltaPlusAna::initialize()
     declareDoubleBranch( m_hypMeths, "muon_qpqpe", 99.0);
     declareDoubleBranch( m_hypMeths, "muon_E_shift", 0.0);
     
+    //! NeutrinoInt - Proton
+    declareContainerIntBranch(m_hypMeths,    "proton_trk_pat_history", 10, -1);
+    declareContainerIntBranch(m_hypMeths,    "proton_kinked",      10, -1);
+    declareContainerIntBranch(m_hypMeths,    "proton_odMatch",     10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_startPointX", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_startPointY", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_startPointZ", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_endPointX",   10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_endPointY",   10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_endPointZ",   10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_score",    10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_score1",   10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_score2",   10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_chi2_ndf", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_theta",    10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_thetaX",   10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_thetaY",   10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_phi",      10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_ekin",     10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_E",        10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p",        10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_px",       10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_py",       10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_pz",       10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p_calCorrection", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p_visEnergy",     10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p_dEdXTool",      10, -1);
+    
     
     info() <<"Exit CCDeltaPlusAna::initialize()" << endmsg;
+    info() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return sc;
 }
@@ -190,11 +284,11 @@ StatusCode CCDeltaPlusAna::initialize()
 //==============================================================================
 StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truth ) const
 {
-    
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCDeltaPlusAna::reconstructEvent()" << endmsg;
     
     if( truth ){
-        debug() << "\tThis is a MC event." << endmsg;
+        debug() << "This is a MC event." << endmsg;
     }
     
     //--------------------------------------------------------------------------
@@ -246,6 +340,26 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     }
     
     debug() << "Finding Vertex End!" << endmsg;
+    
+    //--------------------------------------------------------------------------
+    //! Determine if vertex has michels
+    //--------------------------------------------------------------------------
+    debug() << "Finding Michels..." << endmsg;
+    Minerva::Prong vtx_michel_prong;
+    bool foundMichel = m_michelVtxTool->findMichel( interactionVertex, vtx_michel_prong );
+    if (foundMichel) {
+        debug()<<"Found a Michel Electron!"<<endmsg;
+        event->setIntData("Cut_Michel_Exist",1);
+        event->setIntData("n_vtx_michel_views",vtx_michel_prong.getIntData("category"));
+        event->setDoubleData("vtx_michel_distance",vtx_michel_prong.getDoubleData("distance"));
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
+    }else{
+        debug()<<"There are NO Michel Electrons in the event!"<<endmsg;
+    }
+    
+    debug() << "Finding Michels End!" << endmsg;
+    
     //--------------------------------------------------------------------------
     //! Get Muon, if it exists
     //--------------------------------------------------------------------------  
@@ -308,28 +422,37 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     double muon_visible_energy = muonProng->minervaVisibleEnergySum();
     
     debug() << "Finding Muon End!" << endmsg;
-     
+    
     //--------------------------------------------------------------------------
-    //! Determine if vertex has michels
+    //! Get Proton, if it exists
     //--------------------------------------------------------------------------
-    debug() << "Finding Michels..." << endmsg;
-    Minerva::Prong vtx_michel_prong;
-    bool foundMichel = m_michelVtxTool->findMichel( interactionVertex, vtx_michel_prong );
-    if (foundMichel) {
-        debug()<<"Found a Michel Electron!"<<endmsg;
-        event->setIntData("Cut_Michel_Exist",1);
-        event->setIntData("n_vtx_michel_views",vtx_michel_prong.getIntData("category"));
-        event->setDoubleData("vtx_michel_distance",vtx_michel_prong.getDoubleData("distance"));
+    debug() << "Finding Protons..." << endmsg;
+    //-- get all of the primary prongs in the event
+    Minerva::ProngVect primaryProngs = event->primaryProngs();
+    
+    //-- create new particles
+    debug() << "Creating particles with Proton and Pion hypotheses" <<endmsg;
+    bool makeParticles = createTrackedParticles(primaryProngs);
+    debug() << "Was the creation of particles successful? " << makeParticles << endmsg;
+
+    //-- check if one of the primary prong is contained and has a dEdX proton particle 
+    Minerva::ProngVect protonProngs;
+    Minerva::ParticleVect protonParticles;
+    bool foundProton = getProtonProng(primaryProngs, protonProngs, protonParticles);
+    if( foundProton ) {
+        for(unsigned int i = 0; i < protonProngs.size(); i++) {
+            debug() << "Tag the proton's prong with bit-field = " << protonProngs[i]->typeBitsToString() << endmsg;
+        }
+    } else {
+        debug() << "Didn't find any contained in the tracker bit-positive prong with a proton particle!" << endmsg;
+        event->setIntData("Cut_Proton_None",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
-    }else{
-        debug()<<"There are NO Michel Electrons in the event!"<<endmsg;
     }
     
-    debug() << "Finding Michels End!" << endmsg;
+    debug() << "Finding Protons End!" << endmsg;
     
-    
-    
+
     //--------------------------------------------------------------------------
     //! Finish filling event portion of ntuple 
     //--------------------------------------------------------------------------
@@ -384,6 +507,7 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     
 
     debug() <<"Exit CCDeltaPlusAna::reconstructEvent()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return sc;
     
 }
@@ -393,14 +517,15 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
 //==============================================================================
 StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truth, NeutrinoVect& interaction_hyp ) const
 {
-    debug() <<"Enter: CCDeltaPlusAna::interpretEvent()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() <<"Enter CCDeltaPlusAna::interpretEvent()" << endmsg;
     
     if( truth ){
-        debug() << "\tThis is a MC event." << endmsg;
+        debug() << "This is a MC event." << endmsg;
     }
     
     if( !event ){
-        debug() << "\tNULL Event" << endmsg;
+        debug() << "NULL Event" << endmsg;
         return StatusCode::FAILURE;
     }
     
@@ -514,32 +639,8 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
         //the shifts are so small compared to MINOS-matched momentum that we can approximate the momentum shift as the energy shift (with ~0.2% at 1.5 GeV/c)
         muon_E_shift = MuonUtils->calculateMomentumCorrection(muonProng);
     }
-        
-    debug()<<"Finished muons"<<endmsg;
     
-    //--------------------------------------------------------------------------
-    //! Fill ntuple
-    //--------------------------------------------------------------------------
-    
-    //nuInt->setNeutrinoHelicity( getHelicity( mu_charge ) );
-    nuInt->setInteractionCurrent( Minerva::NeutrinoInt::ChargedCurrent );
-    nuInt->setInteractionType( Minerva::NeutrinoInt::UnknownInt );
-    Gaudi::XYZTVector position( event->interactionVertex()->position().x(), 
-                                event->interactionVertex()->position().y(),
-                                event->interactionVertex()->position().z(),
-                                event->time() );     
-    nuInt->setVertex( position );
-    nuInt->setScore( 1.0 );
-    nuInt->setLeptonEnergy( muon_4p );
-    
-    int vtx_module, vtx_plane;
-    debug()<<"Calling getNearestPlane, vtx is "<<position.z()<<endmsg;
-    getNearestPlane(position.z(), vtx_module, vtx_plane); 
-    nuInt->setIntData("vtx_module", vtx_module);
-    nuInt->setIntData("vtx_plane", vtx_plane);
-    nuInt->setDoubleData("vtx_x", position.x() );
-    nuInt->setDoubleData("vtx_y", position.y() );
-    nuInt->setDoubleData("vtx_z", position.z() );
+    debug()<<"Filling Muon Ntuple Variables"<<endmsg;
     
     //! ntuple muon variables
     nuInt->setIntData("muon_minervaTrack_types", muon_minervaTrack_types);
@@ -561,8 +662,70 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
     nuInt->setDoubleData("muon_E_shift",muon_E_shift);
     
     fillMinosMuonBranches(nuInt, muonProng);
+        
+    debug()<<"Finished muons"<<endmsg;
+    
+    //--------------------------------------------------------------------------  
+    //! Get the Proton particle hypotheses and fill some info
+    //--------------------------------------------------------------------------
+    
+    // Create Proton Data Storage
+    Minerva::ProngVect protonProngs;
+    Minerva::ParticleVect protonParticles;
+    protonProngs.clear();
+    protonParticles.clear();
+    
+   //-- loop over primaryProngs and retrieve best proton particle
+    for(unsigned int prong = 0; prong < primaryProngs.size(); prong++) {
+    
+        //-- get prong blobs
+        Minerva::IDBlobVect blobs = primaryProngs[prong]->idblobs();
+    
+        //-- proton prong
+        if( primaryProngs[prong]->filtertaglist()->filterTagExists("PrimaryProton") ) {
+            protonProngs.push_back( primaryProngs[prong] );
+            protonParticles.push_back( primaryProngs[prong]->bestParticle() );
+            m_hitTagger->applyColorTag(protonProngs.back(),m_protonProngColor);
+            for(unsigned int b = 0; b < blobs.size(); b++) {
+                if( blobs[b]->history() == Minerva::IDBlob::Hidden ) m_hitTagger->applyColorTag(blobs[b],m_protonProngColor);
+            }
+        }
+    }
+    
+    // VertexZ Required for setProtonParticleData()
+    double vertexZ = event->interactionVertex()->position().z();
+    
+    setProtonParticleData(nuInt,protonProngs,protonParticles,vertexZ);
+    
+    //--------------------------------------------------------------------------
+    //! Vertex
+    //--------------------------------------------------------------------------
+    
+    //nuInt->setNeutrinoHelicity( getHelicity( mu_charge ) );
+    nuInt->setInteractionCurrent( Minerva::NeutrinoInt::ChargedCurrent );
+    nuInt->setInteractionType( Minerva::NeutrinoInt::UnknownInt );
+    Gaudi::XYZTVector vtx_position( event->interactionVertex()->position().x(), 
+                                event->interactionVertex()->position().y(),
+                                event->interactionVertex()->position().z(),
+                                event->time() );     
+    nuInt->setVertex( vtx_position );
+    nuInt->setScore( 1.0 );
+    nuInt->setLeptonEnergy( muon_4p );
+    
+    int vtx_module, vtx_plane;
+    debug()<<"Calling getNearestPlane, vtx is "<<vtx_position.z()<<endmsg;
+    getNearestPlane(vtx_position.z(), vtx_module, vtx_plane); 
+    nuInt->setIntData("vtx_module", vtx_module);
+    nuInt->setIntData("vtx_plane", vtx_plane);
+    nuInt->setDoubleData("vtx_x", vtx_position.x() );
+    nuInt->setDoubleData("vtx_y", vtx_position.y() );
+    nuInt->setDoubleData("vtx_z", vtx_position.z() );
+    
+
+    
 
     debug() <<"Exit CCDeltaPlusAna::interpretEvent()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
     
 }
@@ -573,7 +736,7 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
 //==============================================================================
 StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truth ) const 
 {
-    
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter: tagTruth()" << endmsg;
 
     
@@ -592,7 +755,8 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truth ) const
         return sc;
     }
     
-    debug() <<"Exit CCDeltaPlusAna::tagTruth()" << endmsg;
+    debug() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna::tagTruth()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
     
 }
@@ -602,7 +766,7 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truth ) const
 //==============================================================================
 StatusCode CCDeltaPlusAna::finalize()
 {
-    
+    info() <<"--------------------------------------------------------------------------"<<endmsg;
     info() << "Enter: finalize()" << endmsg;
     
     
@@ -611,7 +775,8 @@ StatusCode CCDeltaPlusAna::finalize()
     if( sc.isFailure() ) return Error( "Failed to finalize!", sc );
     
     
-    info() <<"Exit CCDeltaPlusAna::finalize()" << endmsg;
+    info() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna::finalize()" << endmsg;
+    info() <<"--------------------------------------------------------------------------"<<endmsg;
     return sc;
 }
 
@@ -627,41 +792,432 @@ StatusCode CCDeltaPlusAna::finalize()
 //----------------------------------------------------------------------------------------
 StatusCode CCDeltaPlusAna::interpretFailEvent( Minerva::PhysicsEvent* event ) const
 {  
-   debug() << "Enter interpretFailEvent()" << endmsg;
 
-   Minerva::NeutrinoInt* nuInt = new Minerva::NeutrinoInt(m_anaSignature);
-   NeutrinoVect nuInts;
-   nuInts.push_back( nuInt );
-   markEvent(event);
-   addInteractionHyp(event,nuInts);
-   fillCommonPhysicsAnaBranches(event);
-   fillNuMIBranches(event);
-
-   debug() << "Exit interpretFailEvent()" << endmsg;
-   return StatusCode::SUCCESS;
+    debug() <<"Exit CCDeltaPlusAna::reconstructEvent() through interpretFailEvent()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCDeltaPlusAna::interpretFailEvent()" << endmsg;
+    
+    Minerva::NeutrinoInt* nuInt = new Minerva::NeutrinoInt(m_anaSignature);
+    NeutrinoVect nuInts;
+    nuInts.push_back( nuInt );
+    markEvent(event);
+    addInteractionHyp(event,nuInts);
+    fillCommonPhysicsAnaBranches(event);
+    fillNuMIBranches(event);
+    
+    debug() << "Exit CCDeltaPlusAna::interpretFailEvent()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    return StatusCode::SUCCESS;
 }
+
 //==============================================================================
 // Find the plane nearest to a point
 //==============================================================================
 StatusCode CCDeltaPlusAna::getNearestPlane(double z, int & module_return, int & plane_return) const
 {
-  // Got From Brandon's CCNuPionInc - 2014_04_14
-  // testing new MinervaDet routine
-  // works as advertised, but a couple problems:
-  // 1) Does not go to more downstream plane (upstream if backwards track) if point is in passive material
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCDeltaPlusAna::getNearestPlane()" << endmsg;
+    
+    // Got From Brandon's CCNuPionInc - 2014_04_14
+    // testing new MinervaDet routine
+    // works as advertised, but a couple problems:
+    // 1) Does not go to more downstream plane (upstream if backwards track) if point is in passive material
+    
+    DePlane const * pPlane = m_InnerDetector->getClosestDePlane(z);
+    if (!pPlane) {
+        error()<<"getClosestDePlane failed on z "<<z<<endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    PlaneID planeid = pPlane->getPlaneID();
+    module_return = planeid.module();
+    plane_return = planeid.plane();
+
+    debug() << "Exit CCDeltaPlusAna::getNearestPlane()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    return StatusCode::SUCCESS;
   
-  DePlane const * pPlane = m_InnerDetector->getClosestDePlane(z);
-  if (!pPlane) {
-    error()<<"        getClosestDePlane failed on z "<<z<<endmsg;
-    return StatusCode::FAILURE;
-  }
+}
+
+//==============================================================================
+// Created particles for negative bit Minos prongs
+//==============================================================================
+bool CCDeltaPlusAna::createTrackedParticles( Minerva::ProngVect& prongs ) const
+{
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() <<"Enter CCDeltaPlusAna::createTrackedParticles()" << endmsg;
+    bool makeParticles = false;
+    
+    //-- check if the prongs are odMatch
+    Minerva::EventMgr* mgr = getEventMgr(prongs[0]);
+    Minerva::ODClusterVect odClusters = mgr->select<Minerva::ODCluster>("Unused","!LowActivity&!XTalkCandidate");
+    m_odMatchTool->classifyProngs(prongs,odClusters);
+    
+    //-- loop over prongs
+    for(unsigned int p = 0; p < prongs.size(); p++) {
+        debug() << "The prong of bit-field = " << prongs[p]->typeBitsToString() << endmsg;
+    
+        //-- make sure the prong is not a bad object
+        bool pass = true; std::string tag = "BadObject";
+        if( prongs[p]->filtertaglist()->filterTagExists(tag) ) {
+            if( prongs[p]->filtertaglist()->checkFilterTag(tag,pass) ) {
+                error() << "This prong = " << prongs[p]->typeBitsToString() << " has been flag as a \"BadObject\", skipping!" << endmsg;
+                continue;
+            }
+        }
+        
+        //-- skipped prongs with particles
+        debug() << "The prong has n particles = " << prongs[p]->particles().size() << endmsg;
+        if( !prongs[p]->particles().empty() ) continue;
+    
+        //! select the particle hypotheses candidates and particle tools
+        std::vector< Minerva::Particle::ID > hypotheses;
+        IParticleMakerTool::NameAliasListType toolsToUse;
+
+        if( !prongs[p]->OdMatch() ) {
+            hypotheses.push_back( Minerva::Particle::Proton );
+            hypotheses.push_back( Minerva::Particle::Pion );
+            toolsToUse.push_back( std::make_pair("dEdXTool","dEdXTool") );
+        }
+
+        //-- make particles
+        Minerva::Prong* prong = prongs[p];
+        bool isParticleCreated = m_particleMaker->makeParticles(prong,hypotheses,toolsToUse);
+    
+        if( isParticleCreated ) {
+            debug() << "The prong of bit-field = " << prongs[p]->typeBitsToString() 
+                    << " has " << prong->particles().size() << " number of particles attached." << endmsg; 
+            makeParticles = true;
+        } else{
+            debug() << "Did not make particles for the prong type = " << prongs[p]->typeBitsToString() << endmsg;
+        }
+    
+        hypotheses.clear();
+    }
+    
+    debug() << "Exit CCDeltaPlusAna::createTrackedParticles()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    return makeParticles;
+}
+
+//==============================================================================
+// Return the momentum analyzable contained ( proton candidate ) prong/particle
+//==============================================================================
+bool CCDeltaPlusAna::getProtonProng(    Minerva::ProngVect& primaryProngs, 
+                                        Minerva::ProngVect& hadronProngs,
+                                        Minerva::ParticleVect& hadronParticles ) const
+{
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCDeltaPlusAna::getProtonProng()" << endmsg;
   
-  PlaneID planeid = pPlane->getPlaneID();
-  module_return = planeid.module();
-  plane_return = planeid.plane();
-  
-  return StatusCode::SUCCESS;
-  
+    debug() << "N(primaryProngs) =  " << primaryProngs.size() << endmsg;
+    
+    // Initialize
+    bool isProton = false;
+    int nProtons = 0;
+    int nGoodProtons = 0; 
+    
+    // Get All Proton Candidates
+    for(unsigned int p = 0; p < primaryProngs.size(); p++) {
+        debug() <<"Checking prong "<<p<<endmsg;
+        
+        if( primaryProngs[p]->filtertaglist()->filterTagExists("PrimaryMuon") ){
+            debug() << "Muon Prong, skipping this prong! "<< endmsg;
+            continue;
+        }
+    
+        // Temp Storage for ProngVect, Single Prong and Single Particle
+        Minerva::ProngVect tmpProngs;
+        SmartRef<Minerva::Prong> prong       = (Minerva::Prong*)NULL;
+        SmartRef<Minerva::Particle> particle = (Minerva::Particle*)NULL;
+        
+        // Push current Prong to temp ProngVect
+        tmpProngs.push_back( primaryProngs[p] );
+        
+        // Find Proton using m_protonUtils
+        isProton = m_protonUtils->findProtonProng(tmpProngs,prong,particle); 
+        
+        if( isProton ) {
+            nProtons++;
+            debug() <<"Found a proton prong!"<< endmsg;
+            debug() <<"Proton Particle Score: " << particle->score() << endmsg;
+            prong->filtertaglist()->setOrAddFilterTag("PrimaryProton",true);
+            particle->filtertaglist()->setOrAddFilterTag("PrimaryProton",true);
+            prong->updateBestParticle(particle);
+            hadronProngs.push_back( prong );
+            hadronParticles.push_back( particle );
+        }
+    }
+
+    debug() << "Found "<<nProtons<<" Proton Candidates!"<<endmsg;
+    debug() << "Applying minProtonScore Cut with = "<<m_minProtonScore<<endmsg;
+    
+    // Apply Score Cut
+    for(unsigned int p = 0; p < hadronParticles.size(); p++) {
+        if (hadronParticles[p]->score() > m_minProtonScore){
+            nGoodProtons++;
+        }else{
+            hadronProngs.erase(hadronProngs.begin()+p);
+            hadronParticles.erase(hadronParticles.begin()+p);
+        }
+    }
+   
+    
+    debug() << "Found "<<nGoodProtons<<" Good Protons!"<<endmsg;
+    
+   
+    
+    debug() << "Exit CCDeltaPlusAna::getProtonProng()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    
+    return isProton;
+}
+
+//==============================================================================
+// Set proton particle data
+//==============================================================================
+void CCDeltaPlusAna::setProtonParticleData(     Minerva::NeutrinoInt* nuInt, 
+                                                Minerva::ProngVect& protonProngs,
+                                                Minerva::ParticleVect& protonParticles, 
+                                                double vertexZ ) const 
+{
+    // Got from Tammy's NukeCCQETwoTrack - 2014_04_15
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCDeltaPlusAna::setProtonParticleData()" << endmsg;
+    
+    std::vector<double> p_calCorrection(10,-1);
+    std::vector<double> p_visEnergyCorrection(10,-1);
+    std::vector<double> p_dedx(10,-1);
+    
+    std::vector<double> proton_theta(10,-1);
+    std::vector<double> proton_thetaX(10,-1);
+    std::vector<double> proton_thetaY(10,-1);
+    std::vector<double> proton_phi(10,-1);
+    
+    std::vector<double> E(10,-1);
+    std::vector<double> px(10,-1);
+    std::vector<double> py(10,-1);
+    std::vector<double> pz(10,-1);
+    std::vector<double> p(10,-1);
+    
+    std::vector<double> ekin(10,-1);
+    std::vector<double> enu(10,-1);
+    std::vector<double> Q2(10,-1);
+    
+    std::vector<double> proton_end_x(10,-1);
+    std::vector<double> proton_end_y(10,-1);
+    std::vector<double> proton_end_z(10,-1);
+    
+    std::vector<double> proton_start_x(10,-1);
+    std::vector<double> proton_start_y(10,-1);
+    std::vector<double> proton_start_z(10,-1);
+    
+    std::vector<int> kinked(10,-1);
+    std::vector<int> odMatch(10,-1);
+    
+    std::vector<double> score(10,-1);
+    std::vector<double> score1(10,-1);
+    std::vector<double> score2(10,-1);
+    std::vector<double> chi2(10,-1);
+    
+//     std::map< std::string, std::vector<double> > dedxMapMomentum;
+//     std::map< std::string, std::vector<double> > dedxMapScore;
+    
+//     for(unsigned int i = 0; i < m_dedx_uncertainties.size(); i++) {
+//         std::string name = m_dedx_uncertainties[i];
+//         std::vector<double> tmp(10,-1);
+//         dedxMapMomentum.insert( std::pair< std::string,std::vector<double> >(name,tmp) );
+//         dedxMapScore.insert( std::pair< std::string,std::vector<double> >(name,tmp) );
+//     }
+    
+    for(unsigned int i = 0; i < protonProngs.size(); i++) {
+        double theta = protonProngs[i]->minervaTracks().front()->theta();
+        double phi   = protonProngs[i]->minervaTracks().front()->phi();
+    
+        proton_theta[i]  = m_coordSysTool->thetaWRTBeam(protonParticles[i]->momentumVec());
+        proton_thetaX[i] = m_coordSysTool->thetaXWRTBeam(protonParticles[i]->momentumVec());
+        proton_thetaY[i] = m_coordSysTool->thetaYWRTBeam(protonParticles[i]->momentumVec());
+        proton_phi[i]    = m_coordSysTool->phiWRTBeam(protonParticles[i]->momentumVec());
+//         double p_original = sqrt( pow(protonParticles[i]->momentumVec().E(),2) - MinervaUnits::M_p*MinervaUnits::M_p );
+    
+        Gaudi::LorentzVector dEdXprotonfourVec;
+        StatusCode sc = m_energyCorrectionTool->getCorrectedEnergy(protonProngs[i],protonParticles[i],vertexZ,dEdXprotonfourVec);
+        if( !sc ) dEdXprotonfourVec = protonParticles[i]->momentumVec();
+        else protonParticles[i]->setMomentumVec(dEdXprotonfourVec);
+    
+        p_dedx[i] = sqrt( dEdXprotonfourVec.E()*dEdXprotonfourVec.E() - MinervaUnits::M_proton*MinervaUnits::M_proton );
+        correctProtonProngEnergy(protonProngs[i],p_calCorrection[i],p_visEnergyCorrection[i]);
+    
+        E[i]  = sqrt( p_calCorrection[i]*p_calCorrection[i] + MinervaUnits::M_proton*MinervaUnits::M_proton );
+        px[i] = p_calCorrection[i]*sin(theta)*cos(phi);
+        py[i] = p_calCorrection[i]*sin(theta)*sin(phi);
+        pz[i] = p_calCorrection[i]*cos(theta);
+        p[i]  = sqrt( px[i]*px[i] + py[i]*py[i] + pz[i]*pz[i] );
+    
+        if( protonProngs[i]->minervaTracks().front()->direction() == Minerva::Track::Backward && pz[i] > 0. ) pz[i] *= -1.0;
+        Gaudi::LorentzVector protonfourVec(px[i],py[i],pz[i],E[i]);
+    
+        ekin[i] = protonfourVec.E() - MinervaUnits::M_p;
+    
+        proton_end_x[i]   = (protonProngs[i]->minervaTracks().back())->lastState().x();
+        proton_end_y[i]   = (protonProngs[i]->minervaTracks().back())->lastState().y();
+        proton_end_z[i]   = (protonProngs[i]->minervaTracks().back())->lastState().z();
+    
+        proton_start_x[i] = (protonProngs[i]->minervaTracks().back())->firstState().x();
+        proton_start_y[i] = (protonProngs[i]->minervaTracks().back())->firstState().y();
+        proton_start_z[i] = (protonProngs[i]->minervaTracks().back())->firstState().z();
+    
+        kinked[i]  = (int)protonProngs[i]->Kinked();
+        odMatch[i] = (int)protonProngs[i]->OdMatch();
+        score[i]   = protonParticles[i]->score();
+        score1[i]  = protonParticles[i]->getDoubleData("score1");
+        score2[i]  = protonParticles[i]->getDoubleData("score2");
+        chi2[i]    = protonParticles[i]->getDoubleData("chi2_ndf");
+    
+//         for(unsigned int j = 0; j < m_dedx_uncertainties.size(); j++) {
+//         std::string name = m_dedx_uncertainties[j];
+//     
+//         double score_varied  = protonParticles[i]->hasDoubleData("score1_" + name) ? protonParticles[i]->getDoubleData("score1_" + name) : 0.0;
+//         double energy_varied = protonParticles[i]->hasDoubleData("FitE_"   + name) ? protonParticles[i]->getDoubleData("FitE_"   + name) : 0.0;
+//         double p_varied      = sqrt( energy_varied*energy_varied - MinervaUnits::M_proton*MinervaUnits::M_proton );
+//     
+//         double score_shift   = protonParticles[i]->getDoubleData("score1") - score_varied;
+//         double p_shift       = p_original - p_varied;
+//         
+//         (dedxMapMomentum.find(name))->second.at(i) = p_shift;
+//         (dedxMapScore.find(name))->second.at(i)    = score_shift;
+//         }
+    }
+    
+    nuInt->setContainerDoubleData("proton_p_calCorrection",p_calCorrection);
+    nuInt->setContainerDoubleData("proton_p_visEnergy",p_visEnergyCorrection);
+    nuInt->setContainerDoubleData("proton_p_dEdXTool",p_dedx);
+    
+    nuInt->setContainerDoubleData("proton_endPointX",proton_end_x);
+    nuInt->setContainerDoubleData("proton_endPointY",proton_end_y);
+    nuInt->setContainerDoubleData("proton_endPointZ",proton_end_z);
+    
+    nuInt->setContainerDoubleData("proton_startPointX",proton_start_x);
+    nuInt->setContainerDoubleData("proton_startPointY",proton_start_y);
+    nuInt->setContainerDoubleData("proton_startPointZ",proton_start_z);
+    
+    nuInt->setContainerDoubleData("proton_p",p);
+    nuInt->setContainerDoubleData("proton_px",px);
+    nuInt->setContainerDoubleData("proton_py",py);
+    nuInt->setContainerDoubleData("proton_pz",pz);
+    nuInt->setContainerDoubleData("proton_E",E);
+    
+    nuInt->setContainerIntData("proton_kinked",kinked);
+    nuInt->setContainerIntData("proton_odMatch",odMatch);
+    
+    nuInt->setContainerDoubleData("proton_score",score);
+    nuInt->setContainerDoubleData("proton_score1",score1);
+    nuInt->setContainerDoubleData("proton_score2",score2);
+    nuInt->setContainerDoubleData("proton_chi2_ndf",chi2);
+    
+    nuInt->setContainerDoubleData("proton_theta",proton_theta);
+    nuInt->setContainerDoubleData("proton_thetaX",proton_thetaX);
+    nuInt->setContainerDoubleData("proton_thetaY",proton_thetaY);
+    nuInt->setContainerDoubleData("proton_phi",proton_phi);
+    
+    nuInt->setContainerDoubleData("proton_ekin",ekin);
+    
+//     for(unsigned int j = 0; j < m_dedx_uncertainties.size(); j++) {
+//         std::string name = m_dedx_uncertainties[j];
+//     
+//         std::vector<double> p_shift_vect     = dedxMapMomentum.find(name)->second;
+//         std::vector<double> score_shift_vect = dedxMapScore.find(name)->second;
+//     
+//         nuInt->setContainerDoubleData("proton_momentum_shift_" + name, p_shift_vect);
+//         nuInt->setContainerDoubleData("proton_score1_shift_" + name, score_shift_vect);
+//     }
+    
+    debug() << "Exit CCDeltaPlusAna::setProtonParticleData()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    
+    return;
+}
+
+//==============================================================================
+// Correct Proton Energy
+//==============================================================================
+void CCDeltaPlusAna::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
+                                                double& p_calCorrection, 
+                                                double& p_visEnergyCorrection ) const
+{
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCDeltaPlusAna::correctProtonProngEnergy()" << endmsg;
+    
+    //-- initialize
+    double calEnergy = 0.0;
+    double visEnergy = 0.0;
+        
+    //-- get the proton prong subprongs
+    Minerva::ProngVect subProngs = protonProng->subProngs();
+    if( !subProngs.empty() ) {
+        debug() << "The number of subProngs = " << subProngs.size() << endmsg;
+    
+        //-- loop over sub prongs
+        for(unsigned int p = 0; p < subProngs.size(); p++) {
+    
+        //-- get the subprong link vertex
+        Minerva::Vertex* vertex      = (Minerva::Vertex*)NULL;
+        Minerva::VertexVect vertices = subProngs[p]->linkVertices();
+        
+        //-- skip subprongs attached to secondary vertex -- add back in energy at the dEdX stage 
+        for(unsigned int v = 0; v < vertices.size(); ++v) {
+            if( vertices[v]->type() == Minerva::Vertex::Kinked ) vertex = vertices[v];
+        }
+        if( vertex ) continue;
+    
+        //-- apply polyline calorimetric energy correction to the subProngs
+        calEnergy += CaloUtils->applyCalConsts(subProngs[p]);
+        debug() << "The calorimetric energy = " << calEnergy << " MeV" << endmsg;
+    
+        //-- get the total visible energy of the sub prongs
+        Minerva::IDClusterVect clusters = subProngs[p]->getAllIDClusters();
+        for(unsigned int clus = 0; clus < clusters.size(); clus++) visEnergy += clusters[clus]->energy();
+        debug() << "The visible energy = " << visEnergy << " MeV" << endmsg;
+        }
+    }
+
+    //-- get the proton prong fuzz energy
+    Minerva::IDBlobVect fuzzBlobs = protonProng->getAllIDBlobs();
+    for(unsigned int blob = 0; blob < fuzzBlobs.size(); blob++) {
+        if( !fuzzBlobs[blob]->hasIntData("fuzzAttachedTrack") ) continue;
+        
+        //-- apply polyline calorimetric energy correction to the fuzz energy  
+        calEnergy += CaloUtils->applyCalConsts(fuzzBlobs[blob]);
+    
+        //-- get the total visible energy of the fuzz blobs
+        Minerva::IDClusterVect clusters = fuzzBlobs[blob]->clusters();
+        for(unsigned int clus = 0; clus < clusters.size(); clus++) visEnergy += clusters[clus]->energy();
+    }
+    
+    //-- get the prong first track
+    SmartRef<Minerva::Track> track = (*protonProng->minervaTracks().begin());
+    
+    //-- update the particles four momentum
+    Minerva::ParticleVect particles = protonProng->particles();
+    for(unsigned int part = 0; part < particles.size(); part++) {
+        if( particles[part]->idcode() != Minerva::Particle::Proton ) continue;
+    
+        Gaudi::XYZTVector fourMomentum = particles[part]->momentumVec();
+        debug() << "particle idcode = " << particles[part]->idcode() << ", and four momentum = " << fourMomentum << endmsg;
+    
+        double E_calCorrection = fourMomentum.E() + calEnergy;
+        p_calCorrection = sqrt( pow(E_calCorrection,2) - pow(particles[part]->mass(),2) );
+        debug() << "update energy using calorimetric correction = " << E_calCorrection << endmsg;
+    
+        double E_visEnergyCorrection = fourMomentum.E() + visEnergy;
+        p_visEnergyCorrection = sqrt( pow(E_visEnergyCorrection,2) - pow(particles[part]->mass(),2) );     
+        debug() << "update energy using visible energy correction = " << E_visEnergyCorrection << endmsg;
+    }     
+            
+    debug() << "Exit CCDeltaPlusAna::correctProtonProngEnergy()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    return;
 }
 
     
