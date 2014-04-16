@@ -4,7 +4,7 @@ Class: Proton -> Derived Class from Particle Base Clas
     Proton Class  inherits Particle Behaviours and 
                 extends base class with proton specific parameters
     
-    Last Revision: 2014_03_17
+    Last Revision: 2014_04_16
 ================================================================================
 */
 #ifndef Proton_h

@@ -16,7 +16,7 @@ main.cpp
             > main(false) for Running the Analysis
             > main(true) for Generating Plots only
     
-    Last Revision: 2014_04_03
+    Last Revision: 2014_04_16
 ================================================================================
 */
 
@@ -32,19 +32,21 @@ using namespace std;
 
 void main(bool onlyPlot)
 {
-
     // Edit isTest Variable for running Test Samples or complete playlist
-    bool isTest;
-    isTest = true;
+    bool isTest = true;
+    
+    // Plot Selection
+    bool plotsMC    = true;
+    bool plotsReco  = false;
+    bool plots2D    = false;
     
     if(onlyPlot){
         Plotter p;
-        p.plotHistograms(false,false,true);
+        p.plotHistograms(plotsMC,plotsReco,plots2D); 
     }else{
         CCDeltaPlus t;
         if(isTest){
             t.run(f_PL_Test);
-            
         }else{
             t.run(f_PL_Full);
         }

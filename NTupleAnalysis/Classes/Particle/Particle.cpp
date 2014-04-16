@@ -7,12 +7,15 @@ using namespace std;
 
 Particle::Particle()
 {
+    bin_partScore.setBin(101,0.0,1.1);
     bin_error.setBin(400, -2.0, 2.0);
     bin_angle.setBin(180, 0.0, 180.0);
 }
 
 void Particle::fill_Histograms()
 {
+    partScore->Fill(particleScore);
+
     P_reco->Fill(momentum[0]);
     P_mc->Fill(momentum[1]);
     P_error->Fill(momentum[2]);

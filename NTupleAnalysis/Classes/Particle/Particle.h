@@ -6,7 +6,7 @@ Class: Particle
    
     Uses ROOT Specific classes
     
-    Last Revision: 2014_03_20
+    Last Revision: 2014_04_16
 ================================================================================
 */
 
@@ -41,12 +41,14 @@ class Particle
         int ind;                // indice for MC truth information (mc_FSPart)
         
         // Reco Only
-        double pID;             // Particle Score from Reconstructed Values
-        double trackLength;     // Track Length in [mm]
+        double particleScore;       // Particle Score from Reconstructed Values
+        double trackLength;         // Track Length in [mm]
         
         TFile* f;
         
         // Histograms
+        TH1F* partScore;
+        
         TH1F* P_mc;
         TH1F* P_reco;
         TH1F* P_error;
@@ -72,6 +74,7 @@ class Particle
         SingleBin bin_P;
         SingleBin bin_KE;
         SingleBin bin_angle;
+        SingleBin bin_partScore;
         
         
         // File Locations

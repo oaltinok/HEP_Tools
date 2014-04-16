@@ -24,6 +24,10 @@ Proton::Proton()
     bin_KE.setBin(40, 0.0, 4000.0);
 
     cout<<"\tInitializing Histograms "<<endl;
+    partScore = new TH1F( "partScore","Proton Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
+    partScore->GetXaxis()->SetTitle("Particle Score");
+    partScore->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_P.get_width()));
+    
     P_mc = new TH1F( "P_mc","True Proton Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
     P_mc->GetXaxis()->SetTitle("True Proton Momentum MeV");
     P_mc->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_P.get_width()));

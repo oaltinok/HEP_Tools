@@ -1,5 +1,6 @@
-void makeClass(string playlist){
+void makeClass(){
 
+    string playlist = "Input/Playlists/pl_MC_Test.dat";
     TChain fChain("CCDeltaPlusAna") ;
 
     ifstream input_pl( playlist.c_str() );
