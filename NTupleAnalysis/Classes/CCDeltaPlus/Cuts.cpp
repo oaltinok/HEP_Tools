@@ -9,7 +9,7 @@ Function List: Cuts.cpp
         > #include "CCDeltaPlus.cpp"
         > #ifdef CCDeltaPlus_cxx 
     
-    Last Revision: 2014_03_19
+    Last Revision: 2014_04_17
 ================================================================================
 */
 
@@ -26,8 +26,8 @@ bool CCDeltaPlus::isVertexContained()
 {
 
     const double fiducialApothem        =  850.0; 
-    const double fiducialUpstreamZ      = 5912.0; 
-    const double fiducialDownstreamZ    = 8445.0; 
+    const double fiducialUpstreamZ      = 5990.0; 
+    const double fiducialDownstreamZ    = 8340.0; 
     
     double r;
     
@@ -85,7 +85,7 @@ int CCDeltaPlus::findParticle(int targetPDG)
 {
     int ind = -1;
     
-    for(int i = 0; i < mc_nFSPart && 1 < max_nFSPart; i++){
+    for(int i = 0; i < mc_nFSPart && i < max_nFSPart; i++){
         if(  mc_FSPartPDG[i] == targetPDG ){
             ind = i;
             break;
@@ -110,7 +110,7 @@ int CCDeltaPlus::findProton()
     
     TVector3 p3;
     
-    for(int i = 0; i < mc_nFSPart && 1 < max_nFSPart; i++ ){
+    for(int i = 0; i < mc_nFSPart && i < max_nFSPart; i++ ){
     
         // Momentum of Proton (No Proton at rest)
         // Update Proton Energy until you find the highest energy
@@ -227,7 +227,7 @@ int CCDeltaPlus::countParticles(int targetPDG, bool applyPCut)
     int count = 0;
     TVector3 p3;
     
-    for(int i = 0; i < mc_nFSPart && 1 < max_nFSPart; i++ ){
+    for(int i = 0; i < mc_nFSPart && i < max_nFSPart; i++ ){
         if( mc_FSPartPDG[i] == targetPDG){
             if(applyPCut){
                 p3.SetXYZ(mc_FSPartPx[i],mc_FSPartPy[i],mc_FSPartPz[i]);

@@ -4,7 +4,7 @@ main.cpp
     Main Function that controls the Analysis Package
     
     Classes Used:
-        ANA_CCNuPionInc core class for the package
+        CDeltaPlus core class for the package
         Plotter class includes functions specific to generate Plots
     
     Input and Output folders assigned in this function
@@ -16,7 +16,7 @@ main.cpp
             > main(false) for Running the Analysis
             > main(true) for Generating Plots only
     
-    Last Revision: 2014_04_16
+    Last Revision: 2014_04_17
 ================================================================================
 */
 
@@ -37,8 +37,8 @@ void main(bool onlyPlot)
     
     // Plot Selection
     bool plotsMC    = true;
-    bool plotsReco  = false;
-    bool plots2D    = false;
+    bool plotsReco  = true;
+    bool plots2D    = true;
     
     if(onlyPlot){
         Plotter p;

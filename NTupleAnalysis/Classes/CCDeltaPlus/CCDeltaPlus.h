@@ -19,7 +19,7 @@ Class: CCDeltaPlus
     
     
     
-    Last Revision: 2014_04_16
+    Last Revision: 2014_04_17
 ================================================================================
 */
 
@@ -116,8 +116,10 @@ public :
     TH2F* q2_reco_mc;
     
     TH1F* int_channel;
-    TH1F* vertex_z;
-    TH2F* vertex_x_y;
+    TH1F* vertex_z_true;
+    TH1F* vertex_z_reco;
+    TH2F* vertex_x_y_true;
+    TH2F* vertex_x_y_reco;
     TH1F* n_FSParticles;
     TH1F* n_gammas;
     
@@ -158,7 +160,7 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
-  // Declaration of leaf types
+    // Declaration of leaf types
    Double_t        eventID;
    Int_t           physEvtNum;
    Int_t           n_hyps;
@@ -426,26 +428,26 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[21];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[21];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[21];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[21];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[21];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[28];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[28];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[28];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[28];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[28];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[49];   //[mc_er_nPart]
-   Int_t           mc_er_status[49];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[49];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[49];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[49];   //[mc_er_nPart]
-   Double_t        mc_er_Px[49];   //[mc_er_nPart]
-   Double_t        mc_er_Py[49];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[49];   //[mc_er_nPart]
-   Double_t        mc_er_E[49];   //[mc_er_nPart]
-   Int_t           mc_er_FD[49];   //[mc_er_nPart]
-   Int_t           mc_er_LD[49];   //[mc_er_nPart]
-   Int_t           mc_er_mother[49];   //[mc_er_nPart]
+   Int_t           mc_er_ID[60];   //[mc_er_nPart]
+   Int_t           mc_er_status[60];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[60];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[60];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[60];   //[mc_er_nPart]
+   Double_t        mc_er_Px[60];   //[mc_er_nPart]
+   Double_t        mc_er_Py[60];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[60];   //[mc_er_nPart]
+   Double_t        mc_er_E[60];   //[mc_er_nPart]
+   Int_t           mc_er_FD[60];   //[mc_er_nPart]
+   Int_t           mc_er_LD[60];   //[mc_er_nPart]
+   Int_t           mc_er_mother[60];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[7];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[9];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -791,7 +793,7 @@ public :
    TBranch        *b_prong_part_pid;   //!
    TBranch        *b_prong_part_E;   //!
    TBranch        *b_prong_part_pos;   //!
-
+   
    CCDeltaPlus(TTree *tree=0);
    virtual ~CCDeltaPlus();
    virtual Int_t    Cut(Long64_t entry);

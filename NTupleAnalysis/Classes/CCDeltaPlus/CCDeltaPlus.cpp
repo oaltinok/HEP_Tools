@@ -42,12 +42,22 @@ void CCDeltaPlus::run(string playlist)
     double nAll = 0;
     double nCut_Vertex_None = 0;
     double nCut_Vertex_Null = 0;
-    double nCut_Vertex_Not_Fiducial = 0;
-    double nCut_Michel_Exist = 0;
-    double nCut_Muon_None = 0;
+    double nCut_Vertex_Not_Fiducial = 0;    
+    double nCut_Michel_Exist = 0;           
+    double nCut_Muon_None = 0;              
     double nCut_Muon_Not_Plausible = 0;
     double nCut_Muon_Score_Low = 0;
-    double nCut_Proton_None = 0;
+    double nCut_Proton_None = 0;            
+    double nCut_Proton_Score = 0;
+    
+    double nTrue_Muon_None = 0;             double nReco_Muon_None = 0;
+    double nTrue_Michel_Exist = 0;          double nReco_Michel_Exist = 0;
+    double nTrue_Proton_None = 0;           double nReco_Proton_None = 0;
+    
+    int tempInd;
+    int indRecoProton;
+    int nRecoProtons = 0;
+    int nTrueProtons = 0;
 
     //------------------------------------------------------------------------
     // Loop over Chain
@@ -71,6 +81,11 @@ void CCDeltaPlus::run(string playlist)
         if (jentry%25000 == 0){
             cout<<"\tEntry "<<jentry<<endl;
         }
+        
+        //----------------------------------------------------------------------
+        // Plausibility Cuts
+        //----------------------------------------------------------------------
+        if (mc_nFSPart > max_nFSPart) continue;
 
         //----------------------------------------------------------------------
         // Count Events after each Reconstruction Cut
@@ -86,22 +101,57 @@ void CCDeltaPlus::run(string playlist)
         nCut_Vertex_Null++;
         
         if( Cut_Vertex_Not_Fiducial == 1) continue;
+
         nCut_Vertex_Not_Fiducial++;
            
-        if( Cut_Michel_Exist == 1) continue;
+        if( Cut_Michel_Exist == 1){
+//             nReco_Michel_Exist++;
+//             tempInd = findParticle(PDG_List::pi_plus); 
+//             if( tempInd != -1 ){
+//                 nTrue_Michel_Exist++;
+//             }
+            continue;
+        }
         nCut_Michel_Exist++;
 
-        if( Cut_Muon_None == 1) continue;
+        if( Cut_Muon_None == 1){
+//             nReco_Muon_None++;
+//             tempInd = findParticle(PDG_List::mu_minus);
+//             if( tempInd == -1 ){
+//                 nTrue_Muon_None++;
+//             }
+            continue;
+        }
         nCut_Muon_None++;
 
-        if( Cut_Muon_Not_Plausible == 1) continue;
+        if( Cut_Muon_Not_Plausible == 1){
+            continue;
+        }
         nCut_Muon_Not_Plausible++;
 
-        if( Cut_Muon_Score_Low == 1) continue;
+        if( Cut_Muon_Score_Low == 1){
+            continue;
+        }
         nCut_Muon_Score_Low++;
         
-        if( Cut_Proton_None == 1) continue;
+        if( Cut_Proton_None == 1){
+//             nReco_Proton_None++;
+//             tempInd = findProton();
+//             if( tempInd == -1  ){
+//                 nTrue_Proton_None++;
+//             }else if (isProtonShort(tempInd) ){
+//                 nTrue_Proton_None++;
+//             }
+            continue;
+        }
         nCut_Proton_None++;
+        
+        // Find Best Proton in Reco
+        indRecoProton = findBestProton();
+        
+        if ( CCDeltaPlusAna_proton_score[indRecoProton] < 0.5 ) continue;
+        nCut_Proton_Score++;
+        
         
         if ( isDataAnalysis){
             //------------------------------------------------------------------
@@ -119,9 +169,11 @@ void CCDeltaPlus::run(string playlist)
 //                 fillParticleTrue(pion);
             }
         
+
+            
             // Fill Reconstructed Information
             fillMuon();
-            fillProton(0);
+            fillProton(indRecoProton);
 //             fillPion();
             
             muon.set_errors();
@@ -142,13 +194,21 @@ void CCDeltaPlus::run(string playlist)
     cutText<<"nAll                      "<<nAll<<endl;
     cutText<<"Cut_Vertex_None           "<<nCut_Vertex_None<<endl;
     cutText<<"Cut_Vertex_Null           "<<nCut_Vertex_Null<<endl;
-    cutText<<"Cut_Vertex_Not_Fiducial   "<<nCut_Vertex_Not_Fiducial<<endl;
+    cutText<<"Cut_Vertex_Not_Fiducial   "<<nCut_Vertex_Not_Fiducial<<endl;;
     cutText<<"Cut_Michel_Exist          "<<nCut_Michel_Exist<<endl;
     cutText<<"Cut_Muon_None             "<<nCut_Muon_None<<endl;
     cutText<<"Cut_Muon_Not_Plausible    "<<nCut_Muon_Not_Plausible<<endl;
     cutText<<"Cut_Muon_Score_Low        "<<nCut_Muon_Score_Low<<endl; 
     cutText<<"Cut_Proton_None           "<<nCut_Proton_None<<endl;
+    cutText<<"nCut_Proton_Score         "<<nCut_Proton_Score  <<endl;
     
+    cutText<<"True_Michel_Exist         "<<nTrue_Michel_Exist<<"\t\t";
+    cutText<<"Reco_Michel_Exist         "<<nReco_Michel_Exist<<endl;
+    cutText<<"True_Muon_None            "<<nTrue_Muon_None<<"\t\t";
+    cutText<<"Reco_Muon_None            "<<nReco_Muon_None<<endl;
+    cutText<<"True_Proton_None          "<<nTrue_Proton_None<<"\t\t";
+    cutText<<"Reco_Proton_None          "<<nReco_Proton_None<<endl;
+   
     // Write the Root Files
     write_RootFile();           //CCDeltaPlus
     muon.write_RootFile();
@@ -166,6 +226,24 @@ void CCDeltaPlus::run(string playlist)
 //
 //<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
+
+int CCDeltaPlus::findBestProton()
+{
+    double tempScore = CCDeltaPlusAna_proton_score[0];
+    int tempInd = 0;
+    
+    for( int i = 1; i < 10; i++){
+        if ( i == -1 ) break;
+        if( CCDeltaPlusAna_proton_score[i] > tempScore){
+            tempScore = CCDeltaPlusAna_proton_score[i];
+            tempInd = i;
+        }
+    }
+    
+    return tempInd;
+
+}
+
 void CCDeltaPlus::fillCCDeltaPlus()
 {
     beamEnergy_mc->Fill(mc_incomingE);
@@ -177,10 +255,17 @@ void CCDeltaPlus::fillCCDeltaPlus()
 //     q2_reco->Fill(Q2/ mevSq_to_gevSq);
 //     q2_error->Fill( (mc_Q2 - Q2) / mc_Q2 );
 //     q2_reco_mc->Fill(Q2/mevSq_to_gevSq,mc_Q2 /mevSq_to_gevSq);
+
+    vertex_z_true->Fill(mc_vtx[2]);
+    vertex_z_reco->Fill(CCDeltaPlusAna_vtx[2]);
+    vertex_z_error->Fill((mc_vtx[2] - CCDeltaPlusAna_vtx[2])/mc_vtx[2]);
+    vertex_z_reco_mc->Fill(CCDeltaPlusAna_vtx[2],mc_vtx[2]);
+    
+    vertex_x_y_true->Fill(mc_vtx[0],mc_vtx[1]);
+    vertex_x_y_reco->Fill(CCDeltaPlusAna_vtx[0],CCDeltaPlusAna_vtx[1]);
     
     int_channel->Fill(mc_intType);
-    vertex_z->Fill(mc_vtx[2]);
-    vertex_x_y->Fill(mc_vtx[0],mc_vtx[1]);
+
     n_FSParticles->Fill(mc_nFSPart);
 //     n_gammas->Fill();
 
@@ -211,7 +296,7 @@ void CCDeltaPlus::initVariables()
     beam_p3.SetPhi(-1.554);
     beam_p3.SetTheta(0.059);
     
-    max_nFSPart = 3;
+    max_nFSPart = 15;
     maxBeamEnergy = 20000; //MeV
     
 
@@ -243,7 +328,7 @@ void CCDeltaPlus::fillMuon()
 void CCDeltaPlus::fillProton(int ind)
 {
     // Set Particle Score
-    proton.particleScore = CCDeltaPlusAna_proton_score[0];
+    proton.particleScore = CCDeltaPlusAna_proton_score[ind];
     
     // Fill 4-Momentum
     proton.set_p4(  CCDeltaPlusAna_proton_px[ind],
@@ -356,14 +441,33 @@ void CCDeltaPlus::initHistograms()
     int_channel->GetXaxis()->SetTitle("1 = QE, 2 = Resonant, 3 = DIS, 4 = Coh pi");
     int_channel->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.int_channel.get_width()));
     
-    vertex_z = new TH1F( "vertex_z","True Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
-    vertex_z->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
-    vertex_z->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.vertex_z.get_width()));
-    
-    vertex_x_y = new TH2F( "vertex_x_y","True Vertex X vs Y",   binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max(),
+    vertex_x_y_true = new TH2F( "vertex_x_y_true","True Vertex X vs Y",   binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max(),
                                                                 binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max());
-    vertex_x_y->GetXaxis()->SetTitle("True Vertex X [mm]");
-    vertex_x_y->GetYaxis()->SetTitle("True Vertex Y [mm]");
+    vertex_x_y_true->GetXaxis()->SetTitle("True Vertex X [mm]");
+    vertex_x_y_true->GetYaxis()->SetTitle("True Vertex Y [mm]");
+
+    vertex_x_y_reco = new TH2F( "vertex_x_y_reco","Reconstructed Vertex X vs Y",   binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max(),
+                                                                binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max());
+    vertex_x_y_reco->GetXaxis()->SetTitle("Reconstructed Vertex X [mm]");
+    vertex_x_y_reco->GetYaxis()->SetTitle("Reconstructed Vertex Y [mm]");
+    
+    vertex_z_true = new TH1F( "vertex_z_true","True Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+    vertex_z_true->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
+    vertex_z_true->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.vertex_z.get_width()));
+    
+    vertex_z_reco = new TH1F( "vertex_z_reco","Reconstructed Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+    vertex_z_reco->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
+    vertex_z_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.vertex_z.get_width()));
+    
+    vertex_z_error = new TH1F( "vertex_z_error","Error on Vertex Z",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    vertex_z_error->GetXaxis()->SetTitle("(True - Reco) / True");
+    vertex_z_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.error.get_width()));
+    
+    vertex_z_reco_mc = new TH2F( "vertex_z_reco_mc","True vs Reconstructed Vertex Z",
+                                binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max(),
+                                binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max());
+    vertex_z_reco_mc->GetXaxis()->SetTitle("Reconstructed Vertex Z");
+    vertex_z_reco_mc->GetYaxis()->SetTitle("True Vertex Z");
 
     n_FSParticles = new TH1F( "n_FSParticles","Number of Final State Particles",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
     n_FSParticles->GetXaxis()->SetTitle("Number of Final State Particles");
@@ -486,7 +590,6 @@ void CCDeltaPlus::Init(string playlist, TChain* fChain)
 
    // Set branch addresses and branch pointers
    fChain->SetMakeClass(1);
-   
    fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("physEvtNum", &physEvtNum, &b_physEvtNum);
    fChain->SetBranchAddress("n_hyps", &n_hyps, &b_n_hyps);

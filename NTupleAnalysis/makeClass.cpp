@@ -1,5 +1,22 @@
+/*
+================================================================================
+Function: makeClass()
+    Reads the ROOT files exist in the playlist
+    Outputs MC_Sample.C and MC_Sample.h files
+    MC_Sample.h contains member variables for the ROOT File
+    Copy these member variables and branch addresses to Corresponding Class
+    
+    Usage:
+        > .L makeClass.cpp
+        > makeClass()
+    
+    Last Revision: 2014_04_17
+================================================================================
+*/
+
 void makeClass(){
 
+//     string playlist = "Input/Playlists/pl_MC_Test_Sample.dat";
     string playlist = "Input/Playlists/pl_MC_Test.dat";
     TChain fChain("CCDeltaPlusAna") ;
 
