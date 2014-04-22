@@ -21,7 +21,7 @@ CCDeltaPlusAna
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_04_16
+    Last Revision:  2014_04_22
     
 ================================================================================
 */
@@ -36,6 +36,7 @@ CCDeltaPlusAna
 //-- Forward Declarations
 #include "Event/MinervaEventFwd.h"
 
+class TRandom3;
 class IMichelTool;
 class IMinervaCoordSysTool;
 class IProtonUtils;
@@ -44,6 +45,7 @@ class IHitTaggerTool;
 class IProngClassificationTool;
 class IODProngClassificationTool;
 class IParticleMakerTool;
+class ICCPionIncUtils;
 
 //! This class is for Reconstruct Pi0 using muon match vertex
 class CCDeltaPlusAna : public MinervaAnalysisTool
@@ -63,17 +65,23 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         StatusCode finalize();
         
         //! Reconstruct the event (mandatory for inheritance)
-        StatusCode reconstructEvent( Minerva::PhysicsEvent* event, Minerva::GenMinInteraction* truth = NULL ) const;
+        StatusCode reconstructEvent( Minerva::PhysicsEvent* event, Minerva::GenMinInteraction* truthEvent = NULL ) const;
         
         //! Attach an interpretations to the event (mandatory for inheritance)
-        StatusCode interpretEvent( const Minerva::PhysicsEvent* event, const Minerva::GenMinInteraction* truth, NeutrinoVect& interaction_hyp ) const;
+        StatusCode interpretEvent( const Minerva::PhysicsEvent* event, const Minerva::GenMinInteraction* truthEvent, NeutrinoVect& interaction_hyp ) const;
         
-        StatusCode tagTruth( Minerva::GenMinInteraction* truth ) const;
+        StatusCode tagTruth( Minerva::GenMinInteraction* truthEvent ) const;
         
     private:
+        // Fiducial Volume
         double m_fidHexApothem;
         double m_fidUpStreamZ;
         double m_fidDownStreamZ;
+        
+        // Analysable Volume
+        double m_recoHexApothem;
+        double m_recoUpStreamZ;
+        double m_recoDownStreamZ;
         
         double m_beamAngleBias;
         
@@ -84,12 +92,15 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         bool m_makeShortTracks;
         bool m_doPlausibilityCuts;
         
-        int     m_muonProngColor; 
-        int     m_protonProngColor; 
-        int     m_primaryVertexColor; 
-        int     m_secondaryVertexColor; 
-        int     m_endPointVertexColor; 
-        int     m_unattachedProngColor;
+        int m_muonProngColor; 
+        int m_protonProngColor; 
+        int m_primaryVertexColor; 
+        int m_secondaryVertexColor; 
+        int m_endPointVertexColor; 
+        int m_unattachedProngColor;
+        
+        TRandom3*                 m_randomGen;
+        unsigned long int         m_randomSeed;
         
         Minerva::DeDetector*        m_InnerDetector;
         
@@ -102,6 +113,7 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         IProngClassificationTool*   m_prongIntersection;
         IODProngClassificationTool* m_odMatchTool;
         IParticleMakerTool*         m_particleMaker;
+        ICCPionIncUtils*            m_ccPionIncUtils;
         
         //! Private Functions
         StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;

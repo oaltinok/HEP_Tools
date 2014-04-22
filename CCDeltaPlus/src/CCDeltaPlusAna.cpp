@@ -3,6 +3,8 @@
 */
 #include "CCDeltaPlusAna.h"
 
+#include "TRandom3.h"
+
 #include "RecInterfaces/IFiducialPointTool.h"
 
 #include "EnergyRecTools/IEnergyCorrectionTool.h"
@@ -16,6 +18,8 @@
 #include "ParticleMaker/IParticleMakerTool.h"
 
 #include "AnaUtils/IProtonUtils.h"
+#include "AnaUtils/ICCPionIncUtils.h"
+
 #include "MinervaUtils/IHitTaggerTool.h"
 
 #include "MinervaDet/IGeomUtilSvc.h"
@@ -82,14 +86,22 @@ StatusCode CCDeltaPlusAna::initialize()
     StatusCode sc = this->MinervaAnalysisTool::initialize();
     if( sc.isFailure() ) { 
         return Error( "Failed to initialize!", sc ); 
-    
     }
     info()<<"   initialized MinervaAnalysisTool"<<endmsg;
     
-
+    //Seed the RNG
+    m_randomGen = new TRandom3( m_randomSeed );   
+    if ( m_randomGen == NULL ) return StatusCode::FAILURE;
+    
+    // Fiducial Volume
     m_fidHexApothem  = 850.0*CLHEP::mm;
     m_fidUpStreamZ   = 5990.0*CLHEP::mm;   // ~middle of module 27, plane 1
     m_fidDownStreamZ = 8340.0*CLHEP::mm;   // ~middle of module 79, plane 1
+    
+    // Analysable Volume
+    m_recoHexApothem  = 1000.0*CLHEP::mm; 
+    m_recoUpStreamZ   = 5750.0*CLHEP::mm;
+    m_recoDownStreamZ = 8700.0*CLHEP::mm;
     
     
     //! Initializing Analysis Tools
@@ -162,7 +174,15 @@ StatusCode CCDeltaPlusAna::initialize()
     } catch(GaudiException& e){
         error()<<"Could not obtain tool: MichelTool" << endmsg;
         return StatusCode::FAILURE;
-    } 
+    }
+     
+    try {
+        m_ccPionIncUtils = tool<ICCPionIncUtils>("CCPionIncUtils");
+    } catch( GaudiException& e ) {
+        error() << "Could not obtain tool: CCPionIncUtils" << endmsg;
+        return StatusCode::FAILURE;
+    }
+
     
 
     
@@ -177,10 +197,20 @@ StatusCode CCDeltaPlusAna::initialize()
     //! Select the branches you want in your AnaTuple
     //--------------------------------------------------------------------------
     
+    //! truth  
+    declareBoolTruthBranch( "reco_hasGoodObjects");
+    declareBoolTruthBranch( "reco_isGoodVertex");  
+    declareBoolTruthBranch( "reco_isWellFitVertex");
+    declareBoolTruthBranch( "reco_isFidVol");
+    declareBoolTruthBranch( "reco_isFidVol_smeared");
+    declareBoolTruthBranch( "reco_isMinosMatch");
+    declareBoolTruthBranch( "reco_isBrokenTrack");
+    declareIntTruthBranch(  "reco_muonCharge", 0);
     
-    // Event - Cut Results
+    //! Event - Cut Results
     declareIntEventBranch( "Cut_Vertex_None", -1 );
     declareIntEventBranch( "Cut_Vertex_Null", -1 );
+    declareIntEventBranch( "Cut_Vertex_Not_Analyzable", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Fiducial", -1 );
     declareIntEventBranch( "Cut_Muon_None",-1);
     declareIntEventBranch( "Cut_Muon_Not_Plausible",-1);
@@ -188,7 +218,7 @@ StatusCode CCDeltaPlusAna::initialize()
     declareIntEventBranch( "Cut_Michel_Exist", -1 );
     declareIntEventBranch( "Cut_Proton_None", -1 );
     
-    // Event - General reco
+    //! Event - General reco
     declareIntEventBranch( "n_startpoint_vertices", -1 );
     declareIntEventBranch( "n_long_tracks", -1);
     declareIntEventBranch( "n_short_tracks", -1);
@@ -201,11 +231,11 @@ StatusCode CCDeltaPlusAna::initialize()
     declareIntEventBranch( "n_us_muon_clusters", 0);
     declareDoubleEventBranch( "time", -1.0 );
   
-    // Event - Michel 
+    //! Event - Michel 
     declareIntEventBranch( "n_vtx_michel_views", 0 );
     declareDoubleEventBranch( "vtx_michel_distance", -1.0);
     
-    //Event - Energy
+    //! Event - Energy
     declareDoubleEventBranch( "muonVisibleE", -1.0 );
     declareDoubleEventBranch( "hadronVisibleE", -1.0 );
     declareDoubleEventBranch( "totalVisibleE", -1.0 );
@@ -217,6 +247,9 @@ StatusCode CCDeltaPlusAna::initialize()
      
     declareBoolEventBranch( "isMinosMatchTrack");
     declareBoolEventBranch( "isMinosMatchStub");
+    declareBoolEventBranch( "well_fit_vertex");
+    declareDoubleEventBranch( "well_fit_vertex_angle", -99.9 );
+    declareBoolEventBranch( "isBrokenTrack");
     
     //! NeutrinoInt - Vertex
     declareIntBranch( m_hypMeths, "vtx_module", -99);
@@ -282,35 +315,63 @@ StatusCode CCDeltaPlusAna::initialize()
 //==============================================================================
 // reconstructEvent() --
 //==============================================================================
-StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truth ) const
+StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCDeltaPlusAna::reconstructEvent()" << endmsg;
     
-    if( truth ){
-        debug() << "This is a MC event." << endmsg;
+    //--------------------------------------------------------------------------
+    //! Initialize truthEvent reco booleans
+    //--------------------------------------------------------------------------
+    if (truthEvent) {
+        truthEvent->filtertaglist()->setOrAddFilterTag( "reco_hasGoodObjects", false );
+        truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isGoodVertex", false );
+        truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isWellFitVertex", false );
+        truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isFidVol", false );
+        truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isMinosMatch", false );
+        truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isBrokenTrack", false );
+        truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isFidVol_smeared", false );
     }
     
     //--------------------------------------------------------------------------
     //! Initialize reco booleans
     //--------------------------------------------------------------------------
+    event->filtertaglist()->setOrAddFilterTag( "well_fit_vertex", false );
     event->filtertaglist()->setOrAddFilterTag( "isMinosMatchTrack", false ); 
     event->filtertaglist()->setOrAddFilterTag( "isMinosMatchStub", false );
+    event->filtertaglist()->setOrAddFilterTag( "isBrokenTrack", false ); 
+    
+    if( truthEvent ){
+        info() << "This is a MC event." << endmsg;
+    }
     
     //--------------------------------------------------------------------------
     //! Check if this a plausible event ( MC only )
     //--------------------------------------------------------------------------
-    if( truth && !truthIsPlausible(truth) ) {
-        debug() << "   This is not a plausible MC event! returning!" << endmsg;
+    // default plausibility means that underlying truth is likely something to be rejected by standard Minos Match CC analysis
+    if( truthEvent && m_doPlausibilityCuts && !truthIsPlausible(truthEvent) ) {
+        debug() << "This is not a plausible MC event! returning!" << endmsg;
         return StatusCode::SUCCESS;
     }
     
     
     //--------------------------------------------------------------------------
-    //! Get the interaction vertex, if it exists
+    //! Does this event carry a reco object with a BadObject flag?
     //--------------------------------------------------------------------------
-    debug() << "Finding Vertex..." << endmsg;
+    if( event->filtertaglist()->isFilterTagTrue( AnaFilterTags::BadObject() ) ) { 
+        error() << "Found an event flagged with a BadObject! Refusing to analyze..." << endmsg;
+        counter("REFUSED_A_BADOBJECT") += 1;
+        return StatusCode::SUCCESS; // Things are bad, but we didn't crash.
+    }
+    counter("REFUSED_A_BADOBJECT") += 0;
+    if (truthEvent){
+        truthEvent->filtertaglist()->setOrAddFilterTag( "reco_hasGoodObjects", true); 
+    }
     
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - Get the interaction vertex, if it exists
+    //--------------------------------------------------------------------------
+        debug() << "START: Vertex Reconstruction..." << endmsg;
     if( !(event->hasInteractionVertex()) ) {
         debug() << "The event does not have an interaction vertex!" << endmsg;
         event->setIntData("Cut_Vertex_None",1);
@@ -318,9 +379,11 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         else return StatusCode::SUCCESS; 
     } 
        
-       
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - Does interactionVertex() is NULL
+    //--------------------------------------------------------------------------
     SmartRef<Minerva::Vertex> interactionVertex = event->interactionVertex();
-    if( !interactionVertex ) { 
+    if( interactionVertex == NULL ) { 
         bool pass = true; 
         std::string tag = "BadObject";
         event->filtertaglist()->addFilterTag(tag,pass);
@@ -330,8 +393,66 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         else return StatusCode::SUCCESS; 
     }
     
-    // is Vertex Fiducial?
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - Require vertex analyzability so that we don't run as much reco
+    //--------------------------------------------------------------------------
+    if ( !FiducialPointTool->isFiducial(interactionVertex->position(), m_recoHexApothem, m_recoUpStreamZ, m_recoDownStreamZ ) ) {
+        Gaudi::XYZPoint vtx_position = interactionVertex->position();
+        debug() <<"Interaction Vertex is NOT in analyzable volume = ("<<vtx_position.x()<<","<<vtx_position.y()<<","<<vtx_position.z()<<")"<< endmsg;
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
+    }
+    
+    //--------------------------------------------------------------
+    //! Create vertex-anchored short track Prongs, refit vertex
+    //--------------------------------------------------------------
+    int n_anchored_long_trk_prongs = event->primaryProngs().size() - 1;
+    if (m_makeShortTracks) {
+        debug()<<"making short tracks"<<endmsg;
+        m_ccPionIncUtils->makeShortTracks(event); 
+        debug()<<"finished making short tracks"<<endmsg;
+    }  
+    int n_anchored_short_trk_prongs = event->primaryProngs().size() - n_anchored_long_trk_prongs - 1;
+    int n_iso_trk_prongs = (event->select<Prong>("Used:Unused","All")).size() - event->primaryProngs().size();
+    
+    Minerva::TrackVect all_tracks = event->select<Track>("Used:Unused","All");
+    for (Minerva::TrackVect::iterator itTrk = all_tracks.begin(); itTrk != all_tracks.end(); ++itTrk) {
+        Minerva::Track::NodeContainer nodes = (*itTrk)->nodes();
+        Minerva::Track::NodeContainer::const_iterator node = nodes.begin();
+        for (  ;node != nodes.end() -1; ++node) {
+            if ( (*node)->z() == (*(node+1))->z()) {
+                warning()<<"Duplicate node at "<<(*node)->z()<<" on track with type: "<<(*itTrk)->patRecHistory()<<endmsg;
+                warning()<<"  Energies: "<<(*node)->idcluster()->energy()<<" "<<(*(node+1))->idcluster()->energy()<<endmsg;
+            }
+        }
+    }
+    
+    //--------------------------------------------------------------
+    //! MAKE CUT - Check to see if the Interaction Vertex is Fiducial.
+    //--------------------------------------------------------------  
+    debug()<<"Making fiducial volume cut"<<endmsg;
+    
+    // check for NaN first
     Gaudi::XYZPoint vtx_position = interactionVertex->position();
+    if (vtx_position.z() != vtx_position.z()) {
+        warning()<<"NaN vertex!"<<endmsg;
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
+    }
+    
+    //smear the vertex position by 1mm 1mm 10mm, then record whether the smeared vertex passes the fiducial volume cut
+    if (truthEvent) {
+        Gaudi::XYZPoint vtx_smear(  vtx_position.x() + m_randomGen->Gaus(0.0,0.91*CLHEP::mm), 
+                                    vtx_position.y() + m_randomGen->Gaus(0.0,1.25*CLHEP::mm), 
+                                    vtx_position.z() + m_randomGen->Gaus(0.0, 10.0*CLHEP::mm));
+        if ( FiducialPointTool->isFiducial(vtx_smear, m_fidHexApothem, m_fidUpStreamZ, m_fidDownStreamZ ) ) {
+            truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isFidVol_smeared", true );
+        }
+        else{
+            truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isFidVol_smeared", false );
+        }
+    }  
+    
     if( !FiducialPointTool->isFiducial( vtx_position, m_fidHexApothem, m_fidUpStreamZ, m_fidDownStreamZ ) ){
         debug() <<"Interaction Vertex is not in fiducial volume = ("<<vtx_position.x()<<","<<vtx_position.y()<<","<<vtx_position.z()<<")"<< endmsg;
         event->setIntData("Cut_Vertex_Not_Fiducial",1);
@@ -339,27 +460,8 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         else return StatusCode::SUCCESS; 
     }
     
-    debug() << "Finding Vertex End!" << endmsg;
-    
-    //--------------------------------------------------------------------------
-    //! Determine if vertex has michels
-    //--------------------------------------------------------------------------
-    debug() << "Finding Michels..." << endmsg;
-    Minerva::Prong vtx_michel_prong;
-    bool foundMichel = m_michelVtxTool->findMichel( interactionVertex, vtx_michel_prong );
-    if (foundMichel) {
-        debug()<<"Found a Michel Electron!"<<endmsg;
-        event->setIntData("Cut_Michel_Exist",1);
-        event->setIntData("n_vtx_michel_views",vtx_michel_prong.getIntData("category"));
-        event->setDoubleData("vtx_michel_distance",vtx_michel_prong.getDoubleData("distance"));
-        if( m_store_all_events ) return interpretFailEvent(event); 
-        else return StatusCode::SUCCESS; 
-    }else{
-        debug()<<"There are NO Michel Electrons in the event!"<<endmsg;
-    }
-    
-    debug() << "Finding Michels End!" << endmsg;
-    
+    debug() << "END: Vertex Reconstruction!" << endmsg;
+
     //--------------------------------------------------------------------------
     //! Get Muon, if it exists
     //--------------------------------------------------------------------------  
@@ -399,7 +501,7 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
             
             event->filtertaglist()->setOrAddFilterTag("isMinosMatchTrack", is_minos_track );
             event->filtertaglist()->setOrAddFilterTag("isMinosMatchStub", is_minos_stub );
-            if (truth) truth->filtertaglist()->setOrAddFilterTag( "reco_isMinosMatch", true );
+            if (truthEvent) truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isMinosMatch", true );
             
             //! @todo - also determine whether there is a minos track in event, if there is no minos match track or stub
         }
@@ -422,6 +524,25 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     double muon_visible_energy = muonProng->minervaVisibleEnergySum();
     
     debug() << "Finding Muon End!" << endmsg;
+    
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - Determine if vertex has michels
+    //--------------------------------------------------------------------------
+    debug() << "Finding Michels..." << endmsg;
+    Minerva::Prong vtx_michel_prong;
+    bool foundMichel = m_michelVtxTool->findMichel( interactionVertex, vtx_michel_prong );
+    if (foundMichel) {
+        debug()<<"Found a Michel Electron!"<<endmsg;
+        event->setIntData("Cut_Michel_Exist",1);
+        event->setIntData("n_vtx_michel_views",vtx_michel_prong.getIntData("category"));
+        event->setDoubleData("vtx_michel_distance",vtx_michel_prong.getDoubleData("distance"));
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
+    }else{
+        debug()<<"There are NO Michel Electrons in the event!"<<endmsg;
+    }
+    
+    debug() << "Finding Michels End!" << endmsg;
     
     //--------------------------------------------------------------------------
     //! Get Proton, if it exists
@@ -466,10 +587,10 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
 //     event->setIntData("n_startpoint_vertices", n_startpoint_vertices);
 //     event->setIntData("n_long_tracks", n_long_tracks);
 //     event->setIntData("n_short_tracks", n_short_tracks);
-//     event->setIntData("n_anchored_long_trk_prongs", n_anchored_long_trk_prongs);
-//     event->setIntData("n_anchored_short_trk_prongs", n_anchored_short_trk_prongs);
+    event->setIntData("n_anchored_long_trk_prongs", n_anchored_long_trk_prongs);
+    event->setIntData("n_anchored_short_trk_prongs", n_anchored_short_trk_prongs);
 //     event->setIntData("n_vtx_blob_prongs", n_vtx_blob_prongs);
-//     event->setIntData("n_iso_trk_prongs", n_iso_trk_prongs);
+    event->setIntData("n_iso_trk_prongs", n_iso_trk_prongs);
 //     event->setIntData("n_iso_blob_prongs", n_iso_blob_prongs);
 //     event->setIntData("n_dsp_blob_prongs", n_dsp_blob_prongs);
 //     
@@ -491,7 +612,7 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     //! Call the interpretEvent function.
     //--------------------------------------------------------------------------
     NeutrinoVect interactions;
-    StatusCode interpret = this->interpretEvent( event, truth, interactions );
+    StatusCode interpret = this->interpretEvent( event, truthEvent, interactions );
     
     //! If there were any neutrino interactions reconstructed, mark the event.
     if( interactions.size() == 1 ){
@@ -515,12 +636,12 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
 //==============================================================================
 // interpretEvent() 
 //==============================================================================
-StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truth, NeutrinoVect& interaction_hyp ) const
+StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truthEvent, NeutrinoVect& interaction_hyp ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCDeltaPlusAna::interpretEvent()" << endmsg;
     
-    if( truth ){
+    if( truthEvent ){
         debug() << "This is a MC event." << endmsg;
     }
     
@@ -734,13 +855,13 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
 //==============================================================================
 // tagTruth()
 //==============================================================================
-StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truth ) const 
+StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truthEvent ) const 
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter: tagTruth()" << endmsg;
 
     
-    if( !truth ) {
+    if( !truthEvent ) {
         warning() << "The GenMinInteraction is NULL!" << endmsg;
         return StatusCode::SUCCESS;
     }
@@ -749,7 +870,7 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truth ) const
     //--------------------------------------------------------------------------
     //! Fill GENIE Weight Branches
     //--------------------------------------------------------------------------      
-    StatusCode sc = fillGenieWeightBranches( truth );
+    StatusCode sc = fillGenieWeightBranches( truthEvent );
     if (sc.isFailure() ) {
         warning()<<"Genie weight branch filling failed!"<<endmsg;
         return sc;
