@@ -12,16 +12,14 @@
 
 ### CCDeltaPlus:
 
-* Process raw data to create ntuples for a specific analysis
+* Process raw data to create ntuples for a specific analysis focused on Delta Plus Production
 * Final State Particles: muon, proton, and pi0
 
 ### NTupleAnalysis:
 
-* Reads ntuples created by varios Reconstruction Packages: 
-	* CCDeltaPlus
-	* CCInclusive
-	* CCPi0
-* Uses makeClass.cpp to create a new class for another ntuple
+* Reads ntuples created by CCDeltaPlus
+
+* Uses makeClass.cpp to get CCDeltaPlus Member Variables
 
 
 
