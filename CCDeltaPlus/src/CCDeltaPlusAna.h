@@ -21,7 +21,7 @@ CCDeltaPlusAna
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_04_22
+    Last Revision:  2014_04_24
     
 ================================================================================
 */
@@ -46,6 +46,15 @@ class IProngClassificationTool;
 class IODProngClassificationTool;
 class IParticleMakerTool;
 class ICCPionIncUtils;
+class IRecoObjectTimeTool;
+class IMinervaObjectAssociator;
+class ICalorimetryUtils;
+class IIDAnchoredBlobCreator;
+class IParticleTool;
+class IExtraEnergyTool;
+class IGetDeadTime;
+class IMCTrackTool;
+
 
 //! This class is for Reconstruct Pi0 using muon match vertex
 class CCDeltaPlusAna : public MinervaAnalysisTool
@@ -114,15 +123,27 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         IODProngClassificationTool* m_odMatchTool;
         IParticleMakerTool*         m_particleMaker;
         ICCPionIncUtils*            m_ccPionIncUtils;
+        IRecoObjectTimeTool*        m_recoTimeTool;
+        IMinervaObjectAssociator*   m_objectAssociator;
+        ICalorimetryUtils*          m_caloUtils;
+        IIDAnchoredBlobCreator*     m_stopPointBlobTool;
+        IExtraEnergyTool*           m_extraEnergyTool;
+        IGetDeadTime*               m_getDeadTimeTool;
+        IMCTrackTool*               m_MCTrackTool;
+        
+        IParticleTool*        m_particleTool;
+        std::string           m_particleToolName;
+        std::string           m_particleToolAlias;
+
         
         //! Private Functions
         StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
         StatusCode getNearestPlane(double z, int & module_return, int & plane_return) const;        
         bool createTrackedParticles( Minerva::ProngVect& prongs ) const;
         
-        bool getProtonProng(    Minerva::ProngVect& primaryProngs, 
-                                Minerva::ProngVect& hadronProngs,
-                                Minerva::ParticleVect& hadrons ) const;
+        bool getProtonProng(    Minerva::ProngVect& hadronProngs, 
+                                Minerva::ProngVect& protonProngs,
+                                Minerva::ParticleVect& protonParticles ) const;
                                                 
         void setProtonParticleData( Minerva::NeutrinoInt* nuInt, 
                                     Minerva::ProngVect& protonProngs,
@@ -141,5 +162,5 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
   
 };
 
-#endif
+#endif // CCDELTAPLUSANA_H 
 

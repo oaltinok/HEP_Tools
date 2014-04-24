@@ -6,6 +6,7 @@ branches CCDeltaPlus cmt src doc
 #===============================================================================
 use MinervaEvent        v*   Event
 use MinervaGenEvent     v*   Event
+use MinervaMCEvent      v*   Event
 
 use MinervaUtils        v*   Tools
 
