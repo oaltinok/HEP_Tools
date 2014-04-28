@@ -21,7 +21,7 @@ CCDeltaPlusAna
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_04_24
+    Last Revision:  2014_04_28
     
 ================================================================================
 */
@@ -140,6 +140,8 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
         StatusCode getNearestPlane(double z, int & module_return, int & plane_return) const;        
         bool createTrackedParticles( Minerva::ProngVect& prongs ) const;
+        
+        StatusCode setMuonParticleData(   Minerva::NeutrinoInt* nuInt, SmartRef<Minerva::Prong>& muonProng) const;
         
         bool getProtonProng(    Minerva::ProngVect& hadronProngs, 
                                 Minerva::ProngVect& protonProngs,
