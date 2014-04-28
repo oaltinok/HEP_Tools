@@ -54,7 +54,7 @@ class IParticleTool;
 class IExtraEnergyTool;
 class IGetDeadTime;
 class IMCTrackTool;
-
+class IGiGaGeomCnvSvc;
 
 //! This class is for Reconstruct Pi0 using muon match vertex
 class CCDeltaPlusAna : public MinervaAnalysisTool
@@ -94,6 +94,10 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         
         double m_beamAngleBias;
         
+        double m_detectableGammaE;
+        double m_detectablePi0KE;
+        double m_detectableProtonKE;
+        
         double m_minMuonScore;
         double m_minProtonScore;
         
@@ -130,6 +134,7 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         IExtraEnergyTool*           m_extraEnergyTool;
         IGetDeadTime*               m_getDeadTimeTool;
         IMCTrackTool*               m_MCTrackTool;
+        IGiGaGeomCnvSvc*            m_gigaCnvSvc;
         
         IParticleTool*        m_particleTool;
         std::string           m_particleToolName;
@@ -155,6 +160,7 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
                                         double& p_calCorrection, 
                                         double& p_visEnergyCorrection ) const;
+                                        
                                         
 
         

@@ -33,6 +33,12 @@
 #include "BlobFormation/IIDAnchoredBlobCreator.h"
 #include "BadChannels/IGetDeadTime.h"
 
+#include "GiGaCnv/IGiGaGeomCnvSvc.h"
+#include "G4Navigator.hh"
+#include "G4ThreeVector.hh"
+#include "G4VPhysicalVolume.hh"
+#include "G4Material.hh"
+
 DECLARE_TOOL_FACTORY( CCDeltaPlusAna );
 
 using namespace Minerva;
@@ -100,6 +106,11 @@ StatusCode CCDeltaPlusAna::initialize()
     //Seed the RNG
     m_randomGen = new TRandom3( m_randomSeed );   
     if ( m_randomGen == NULL ) return StatusCode::FAILURE;
+    
+    
+    m_detectableGammaE      = 0;        // MeV
+    m_detectablePi0KE       = 0;        // MeV
+    m_detectableProtonKE    = 120;      // MeV
     
     // Fiducial Volume
     m_fidHexApothem  = 850.0*CLHEP::mm;
@@ -240,6 +251,14 @@ StatusCode CCDeltaPlusAna::initialize()
         return StatusCode::FAILURE;
     } 
     
+    try {
+        m_gigaCnvSvc = svc<IGiGaGeomCnvSvc>("GiGaGeo", true);
+    } catch( GaudiException& e ){
+        error() <<"Could not obtain GiGaGeo"<<endmsg;
+        return StatusCode::FAILURE;
+    }  
+  info()<<"Retrieved gigaCnvSvc"<<endmsg;
+    
     m_recoTimeTool = tool<IRecoObjectTimeTool>( "RecoObjectTimeTool" );
 
     
@@ -265,6 +284,54 @@ StatusCode CCDeltaPlusAna::initialize()
     declareBoolTruthBranch( "reco_isMinosMatch");
     declareBoolTruthBranch( "reco_isBrokenTrack");
     declareIntTruthBranch(  "reco_muonCharge", 0);
+    
+    declareBoolTruthBranch( "isSignal");
+    declareBoolTruthBranch( "isFidVol");
+    declareBoolTruthBranch( "isPlausible");
+    
+    declareIntTruthBranch( "vertex_module", 500);
+    declareIntTruthBranch( "vertex_plane", 0);
+    declareIntTruthBranch( "target_material", -1);
+    
+    declareIntTruthBranch("N_proton", -1 );
+    declareIntTruthBranch("N_neutron", -1 );
+    declareIntTruthBranch("N_muminus", -1 );
+    declareIntTruthBranch("N_muplus", -1 );
+    declareIntTruthBranch("N_pi0", -1 );
+    declareIntTruthBranch("N_piplus", -1 );
+    declareIntTruthBranch("N_piminus", -1 );
+    declareIntTruthBranch("N_deltaplus", -1 );
+    declareIntTruthBranch("N_gamma", -1 );
+    declareIntTruthBranch("N_other", -1 );
+
+    declareDoubleTruthBranch("muon_px", 0 );
+    declareDoubleTruthBranch("muon_py", 0 );
+    declareDoubleTruthBranch("muon_pz", 0 );
+    declareDoubleTruthBranch("muon_E", -9.0 );
+    declareDoubleTruthBranch("muon_theta_wrtbeam", -9.0 );
+    declareIntTruthBranch("muon_charge", 0 );
+    declareIntTruthBranch("muon_primaryPlanes", -1 );
+    declareIntTruthBranch("muon_totPlanes", -1 );
+    declareIntTruthBranch("muon_trackID", -1 );
+    
+    declareContainerDoubleTruthBranch("pi0_px", 20, 0 );
+    declareContainerDoubleTruthBranch("pi0_py", 20, 0 );
+    declareContainerDoubleTruthBranch("pi0_pz", 20, 0 );
+    declareContainerDoubleTruthBranch("pi0_E",  20, -9.0 );
+    declareContainerDoubleTruthBranch("pi0_theta_wrtbeam",  20, -9.0 );
+    declareContainerIntTruthBranch("pi0_primaryPlanes", 20, -1 );
+    declareContainerIntTruthBranch("pi0_totPlanes", 20, -1 );
+    declareContainerIntTruthBranch("pi0_trackID", 20, -1 );
+    
+    declareContainerDoubleTruthBranch("proton_px", 20, 0 );
+    declareContainerDoubleTruthBranch("proton_py", 20, 0 );
+    declareContainerDoubleTruthBranch("proton_pz", 20, 0 );
+    declareContainerDoubleTruthBranch("proton_E",  20, -9.0 );
+    declareContainerDoubleTruthBranch("proton_theta_wrtbeam",  20, -9.0 );
+    declareContainerIntTruthBranch("proton_charge", 20, 0 );
+    declareContainerIntTruthBranch("proton_primaryPlanes", 20, -1 );
+    declareContainerIntTruthBranch("proton_totPlanes", 20, -1 );
+    declareContainerIntTruthBranch("proton_trackID", 20, -1 );    
     
     //! Event - Cut Results
     declareIntEventBranch( "Cut_Vertex_None", -1 );
@@ -364,6 +431,8 @@ StatusCode CCDeltaPlusAna::initialize()
     declareContainerDoubleBranch(m_hypMeths, "proton_p_calCorrection", 10, -1);
     declareContainerDoubleBranch(m_hypMeths, "proton_p_visEnergy",     10, -1);
     declareContainerDoubleBranch(m_hypMeths, "proton_p_dEdXTool",      10, -1);
+    
+    
     
     info() <<"Exit CCDeltaPlusAna::initialize()" << endmsg;
     info() <<"--------------------------------------------------------------------------"<<endmsg;
@@ -947,25 +1016,226 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
 StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truthEvent ) const 
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter: tagTruth()" << endmsg;
+    debug() << "Enter: CCDeltaPlusAna::tagTruth()" << endmsg;
 
-    
-    if( !truthEvent ) {
-        warning() << "The GenMinInteraction is NULL!" << endmsg;
+    if (!truthEvent) {
+        warning()<<"Passed a null truthEvent to tagTruth()!"<<endmsg;
         return StatusCode::SUCCESS;
     }
     
-    debug() << "Filling Genie Weight Branches" << endmsg;
     //--------------------------------------------------------------------------
     //! Fill GENIE Weight Branches
-    //--------------------------------------------------------------------------      
+    //--------------------------------------------------------------------------
     StatusCode sc = fillGenieWeightBranches( truthEvent );
     if (sc.isFailure() ) {
         warning()<<"Genie weight branch filling failed!"<<endmsg;
         return sc;
     }
     
-    debug() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna::tagTruth()" << endmsg;
+    
+    //--------------------------------------------------------------------------
+    //! MC Plausibility
+    //--------------------------------------------------------------------------
+    bool isPlausible = truthIsPlausible(truthEvent);
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isPlausible", isPlausible); 
+    
+    
+    //--------------------------------------------------------------------------
+    //! is Fiducial volume
+    //--------------------------------------------------------------------------
+    bool isFidVol = FiducialPointTool->isFiducial(truthEvent, m_fidHexApothem, m_fidUpStreamZ, m_fidDownStreamZ );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isFidVol", isFidVol );
+    debug()<<"Finished determining true_isFidVol: "<<isFidVol<<endmsg;
+    
+    
+    //--------------------------------------------------------------------------
+    //! get TG4Trajectories
+    //--------------------------------------------------------------------------
+    const SmartRefVector<Minerva::TG4Trajectory> pri_trajectories = truthEvent->trajectories();
+    SmartRefVector<Minerva::TG4Trajectory>::const_iterator it_mcpart;
+    if (pri_trajectories.size() != truthEvent->fSpdg().size() && pri_trajectories.size() + 1 != truthEvent->fSpdg().size() ) {
+        warning()<<"Number of GENIE FS particles "<<truthEvent->fSpdg().size()<<
+                " does not match number of Geant4 primary trajectories "<<pri_trajectories.size()<<"!"<<endmsg;
+                
+        for ( SmartRefVector<Minerva::TG4Trajectory>::const_iterator itTraj = pri_trajectories.begin(); itTraj != pri_trajectories.end(); ++itTraj ) {
+        warning()<<"    G4 particle: "<<(*itTraj)->GetPDGCode()<<endmsg;
+        }
+        for ( std::vector<int>::const_iterator itGENIE = truthEvent->fSpdg().begin(); itGENIE != truthEvent->fSpdg().end(); ++itGENIE ) {
+        warning()<<"    GENIE part:  "<<(*itGENIE)<<endmsg;
+        }
+    }
+      
+    //--------------------------------------------------------------------------
+    //! Print the List of FS Particles
+    //--------------------------------------------------------------------------
+    debug()<<"Final State Particle List"<<endmsg;
+    debug()<<"Parent\t|\tParticle"<<endmsg;
+    for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart) {
+        debug()<<(*it_mcpart)->GetParentId()<<"\t|\t"<<(*it_mcpart)->GetPDGCode()<<endmsg;
+    }
+    
+    //--------------------------------------------------------------------------
+    //! Count the Number of FS Particles
+    //--------------------------------------------------------------------------
+    int N_proton    = 0;
+    int N_neutron   = 0;
+    int N_muminus   = 0;
+    int N_muplus    = 0;
+    int N_pi0       = 0;
+    int N_piplus    = 0;
+    int N_piminus   = 0;
+    int N_deltaplus = 0;
+    int N_gamma     = 0;
+    int N_other     = 0;
+
+    for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart) {
+    
+        if ( ( (*it_mcpart)->GetPDGCode() ) == 2212 ) N_proton++;
+        else if( ( (*it_mcpart)->GetPDGCode() ) == 2112 ) N_neutron++;
+        else if( ( (*it_mcpart)->GetPDGCode() ) == 13 ) N_muminus++;
+        else if( ( (*it_mcpart)->GetPDGCode() ) == -13 ) N_muplus++;
+        else if( ( (*it_mcpart)->GetPDGCode() ) == 111 ) N_pi0++;
+        else if( ( (*it_mcpart)->GetPDGCode() ) == 211 ) N_piplus++;
+        else if( ( (*it_mcpart)->GetPDGCode() ) == -211 ) N_piminus++;
+        else if( ( (*it_mcpart)->GetPDGCode() ) == 2214 ) N_deltaplus++;
+        else if( ( (*it_mcpart)->GetPDGCode() ) == 22 ) N_gamma++;
+        else N_other++;
+        
+    }
+    
+    //--------------------------------------------------------------------------
+    //! Find Signal -- CC Neutrino Interaction with FS Particles: muon, proton, pi0
+    //--------------------------------------------------------------------------
+    bool isSignal = false;
+
+    int t_current = truthEvent->current();
+    int t_neutrinoPDG = truthEvent->incoming();
+    
+    // CC Neutrino Interaction
+    if ( t_current==1 && t_neutrinoPDG == 14 ) {
+        // Atleast 1 proton, 1 pi0, 0 pi+, 0 pi-
+        if(N_proton > 0 && N_pi0 == 1 && N_piplus == 0 && N_piminus == 0){
+            isSignal = true;
+        }
+    }
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal", isSignal );
+    
+    //------------------------------------------------------------
+    //! Target Material
+    //------------------------------------------------------------
+    Gaudi::LorentzVector t_vtx = truthEvent->Vtx(); 
+    int t_targetMaterial = -1; 
+    
+    G4ThreeVector G4vtx(t_vtx.x(), t_vtx.y(), t_vtx.z());
+    G4ThreeVector G4vec(0, 0, 1); // The next function needs a direction vector as argument. Here's a dummy.
+    G4Navigator* geantNav = new G4Navigator;
+    geantNav->SetWorldVolume(m_gigaCnvSvc->world());
+    G4VPhysicalVolume* physVol=geantNav->LocateGlobalPointAndSetup(G4vtx, &G4vec, false, true);
+    G4Material* material=physVol->GetLogicalVolume()->GetMaterial(); 
+    delete geantNav;
+    
+    if ( material->GetName() == "/dd/Materials/Minerva/PlasticScint" ) {
+        t_targetMaterial = 0;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/PSTitaniumDioxide" ) {
+        t_targetMaterial = 1;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/GreyEpoxy" ) {
+        t_targetMaterial = 2;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/Lexan" ) {
+        t_targetMaterial = 3;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/GreenFiber" ) {
+        t_targetMaterial = 4;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/PureLead" ) {
+        t_targetMaterial = 5;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/PureCarbon" ) {
+        t_targetMaterial = 6;
+    }  
+    else if ( material->GetName() == "/dd/Materials/Minerva/PureAluminum" ) {
+        t_targetMaterial = 7;
+    }   
+    else if ( material->GetName() == "/dd/Materials/Minerva/StainlessSteel" ) {
+        t_targetMaterial = 8;
+    }   
+    else if ( material->GetName() == "/dd/Materials/Air" ) {
+        t_targetMaterial = 9;
+    }
+    else t_targetMaterial = 10; 
+    
+    //--------------------------------------------------------------
+    //! Vertex module and plane
+    //--------------------------------------------------------------   
+    debug()<<"Calling getNearestPlane, t_vtx is "<<t_vtx.z()<<endmsg;    
+    int vertex_module;
+    int vertex_plane;
+    getNearestPlane(t_vtx.z(), vertex_module, vertex_plane);  
+    plot1D(2*vertex_module + vertex_plane + 0.5,"nearest_plane","Nearest Plane to point in z",-40,260, 300);
+    plot2D(t_vtx.z(), 2*vertex_module + vertex_plane +0.5,"nearest_plane_v_z","",4000.0,10000.0, 120, -40, 260, 300);
+    
+    //--------------------------------------------------------------------------
+    //! Get Muon, Proton and Pi0 Kinematics
+    //--------------------------------------------------------------------------
+    
+    //!Get all trajectories
+    Minerva::TG4Trajectories* all_trajectories = NULL;
+    if (exist<Minerva::TG4Trajectories>(Minerva::TG4TrajectoryLocation::Default)) {
+        all_trajectories = get<Minerva::TG4Trajectories>(Minerva::TG4TrajectoryLocation::Default);
+        debug() <<"There are "<<all_trajectories->size()<<" TG4Trajectories"<<endmsg; 
+    }
+    if (!all_trajectories) {
+        warning()<<"Could not find trajectories in TES"<<endmsg;
+    }
+    
+    Gaudi::XYZPoint endPt;
+    
+    //! Primary Muon
+    Gaudi::LorentzVector t_mu4p = truthEvent->PrimFSLepton();
+    double t_mu_px = t_mu4p.px();
+    double t_mu_py = t_mu4p.py();
+    double t_mu_pz = t_mu4p.pz();
+    double t_mu_E = t_mu4p.E();
+    double t_mu_theta=m_coordSysTool->thetaWRTBeam(t_mu4p);
+    int t_mu_charge = 0;
+    
+    if (t_current==1 && t_neutrinoPDG==14) t_mu_charge = -1;
+    else if ( t_current==1 && t_neutrinoPDG==-14) t_mu_charge = 1;
+    
+    
+
+
+    //--------------------------------------------------------------------------
+    //! fill the truthEvent info
+    //--------------------------------------------------------------------------
+    debug()<<"Filling ntuple"<<endmsg;
+    
+    truthEvent->setIntData("vertex_module", vertex_module);
+    truthEvent->setIntData("vertex_plane", vertex_plane);  
+    truthEvent->setIntData("target_material", t_targetMaterial);
+    
+    truthEvent->setDoubleData("muon_px", t_mu_px);
+    truthEvent->setDoubleData("muon_py", t_mu_py);
+    truthEvent->setDoubleData("muon_pz", t_mu_pz);
+    truthEvent->setDoubleData("muon_E",  t_mu_E);
+    truthEvent->setDoubleData("muon_theta_wrtbeam",  t_mu_theta);
+    truthEvent->setIntData("muon_charge", t_mu_charge);
+    
+    truthEvent->setIntData("N_proton",  N_proton);
+    truthEvent->setIntData("N_neutron",  N_neutron);
+    truthEvent->setIntData("N_muminus",  N_muminus);
+    truthEvent->setIntData("N_muplus",  N_muplus);
+    truthEvent->setIntData("N_pi0",  N_pi0);
+    truthEvent->setIntData("N_piplus",  N_piplus);
+    truthEvent->setIntData("N_piminus",  N_piminus);
+    truthEvent->setIntData("N_deltaplus",N_deltaplus);
+    truthEvent->setIntData("N_gamma", N_gamma);
+    truthEvent->setIntData("N_other", N_other );
+
+    
+    debug() <<"Exit CCDeltaPlusAna::tagTruth()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
     
@@ -1019,6 +1289,8 @@ StatusCode CCDeltaPlusAna::interpretFailEvent( Minerva::PhysicsEvent* event ) co
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
 }
+
+
 
 
 //==============================================================================

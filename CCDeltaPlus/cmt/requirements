@@ -19,6 +19,7 @@ use EventRecInterfaces  v*   Rec
 use AnaInterfaces       v*   Ana
 use AnaUtils            v*   Ana
 use RecoStudies         v*   Ana 
+use MCReweight          v*   Ana
 
 use GiGaCnv             *    Sim  #for geant geometry headers
 
