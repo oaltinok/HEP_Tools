@@ -21,7 +21,7 @@ CCDeltaPlusAna
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_04_28
+    Last Revision:  2014_05_01
     
 ================================================================================
 */
@@ -55,6 +55,11 @@ class IExtraEnergyTool;
 class IGetDeadTime;
 class IMCTrackTool;
 class IGiGaGeomCnvSvc;
+
+namespace Minerva {
+  class DeDetector;
+  class DeOuterDetector;
+}
 
 //! This class is for Reconstruct Pi0 using muon match vertex
 class CCDeltaPlusAna : public MinervaAnalysisTool
@@ -105,6 +110,14 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         bool m_makeShortTracks;
         bool m_doPlausibilityCuts;
         
+        // Tool Names
+        std::string m_particleToolName;
+        std::string m_particleToolAlias;
+        std::string m_protonUtilsAlias;
+        std::string m_michelTrkToolAlias;
+        std::string m_michelVtxToolAlias;
+        
+        
         int m_muonProngColor; 
         int m_protonProngColor; 
         int m_primaryVertexColor; 
@@ -116,6 +129,7 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         unsigned long int         m_randomSeed;
         
         Minerva::DeDetector*        m_InnerDetector;
+        Minerva::DeOuterDetector*   m_OuterDetector;
         
         IMinervaCoordSysTool*       m_coordSysTool;
         IMichelTool*                m_michelTrkTool;
@@ -135,10 +149,8 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         IGetDeadTime*               m_getDeadTimeTool;
         IMCTrackTool*               m_MCTrackTool;
         IGiGaGeomCnvSvc*            m_gigaCnvSvc;
-        
-        IParticleTool*        m_particleTool;
-        std::string           m_particleToolName;
-        std::string           m_particleToolAlias;
+        IParticleTool*              m_particleTool;
+
 
         
         //! Private Functions
@@ -160,6 +172,8 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
                                         double& p_calCorrection, 
                                         double& p_visEnergyCorrection ) const;
+                                        
+        void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
                                         
                                         
 

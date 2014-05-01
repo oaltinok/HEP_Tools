@@ -28,6 +28,7 @@
 
 #include "MinervaDet/IGeomUtilSvc.h"
 #include "MinervaDet/DeDetector.h"
+#include "ODDet/DeOuterDetector.h"
 
 #include "GeoUtils/IMinervaCoordSysTool.h"
 #include "BlobFormation/IIDAnchoredBlobCreator.h"
@@ -50,21 +51,21 @@ CCDeltaPlusAna::CCDeltaPlusAna(const std::string& type, const std::string& name,
 MinervaAnalysisTool( type, name, parent ) 
 {
     info() <<"--------------------------------------------------------------------------"<<endmsg;
-    info() <<"Enter CCDeltaPlusAna::CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
+    info() <<"Enter CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
     
     declareInterface<IInteractionHypothesis>(this);
     //! mandatory declaration of analysis signature: CCDeltaPlusAna
     m_anaSignature = "CCDeltaPlusAna";
     
     // Private Properties
-    declareProperty( "StoreAllEvents",      m_store_all_events =    true);
-    declareProperty( "DoPlausibilityCuts",  m_doPlausibilityCuts =  true );
-    declareProperty( "MakeShortTracks",     m_makeShortTracks =     true );
-
-    declareProperty( "BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian );
+    declareProperty("StoreAllEvents",      m_store_all_events =    true);
+    declareProperty("DoPlausibilityCuts",  m_doPlausibilityCuts =  true);
+    declareProperty("MakeShortTracks",     m_makeShortTracks =     true);
     
-    declareProperty( "MinMuonScore",        m_minMuonScore = 0.9 );
-    declareProperty( "MinProtonScore",      m_minProtonScore = 0.1 );
+    declareProperty("BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian );
+    
+    declareProperty("MinMuonScore",        m_minMuonScore = 0.9 );
+    declareProperty("MinProtonScore",      m_minProtonScore = 0.0 );
     
     declareProperty("MuonProngColor",              m_muonProngColor       = 0x228B22); //-- green
     declareProperty("ProtonProngColor",            m_protonProngColor     = 0x9932CC); //-- purple
@@ -74,8 +75,11 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("UnattachedProngColor",        m_unattachedProngColor = 0x0000FF); //-- blue
     
     
-    declareProperty( "ParticleToolName", m_particleToolName = "dEdXTool" );
-    declareProperty( "ParticleToolAlias",m_particleToolAlias = "dEdXTool" );
+    declareProperty("MichelTrkToolAlias",   m_michelTrkToolAlias    = "CCDeltaMichelTrackTool");
+    declareProperty("MichelVtxToolAlias",   m_michelVtxToolAlias    = "CCDeltaMichelVertexTool");
+    declareProperty("ProtonUtilsAlias",     m_protonUtilsAlias      = "CCDeltaPlusProtonUtils");
+    declareProperty("ParticleToolName",     m_particleToolName      = "dEdXTool" );
+    declareProperty("ParticleToolAlias",    m_particleToolAlias     = "dEdXTool" );
     
 
     // Protected properties from IInteractionHypothesis.
@@ -84,7 +88,7 @@ MinervaAnalysisTool( type, name, parent )
     info() << " CCDeltaPlusAna Hypothesis added " << endmsg;
     
     
-    info() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
+    info() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
     info() <<"--------------------------------------------------------------------------"<<endmsg;
 }
     
@@ -117,7 +121,7 @@ StatusCode CCDeltaPlusAna::initialize()
     m_fidUpStreamZ   = 5990.0*CLHEP::mm;   // ~middle of module 27, plane 1
     m_fidDownStreamZ = 8340.0*CLHEP::mm;   // ~middle of module 79, plane 1
     
-    // Analysable Volume
+    // Analyzable Volume
     m_recoHexApothem  = 1000.0*CLHEP::mm; 
     m_recoUpStreamZ   = 5750.0*CLHEP::mm;
     m_recoDownStreamZ = 8700.0*CLHEP::mm;
@@ -131,6 +135,12 @@ StatusCode CCDeltaPlusAna::initialize()
         return StatusCode::FAILURE;
     }
     
+    try{ m_OuterDetector = getDet<Minerva::DeOuterDetector>("/dd/Structure/Minerva/Detector/OuterDetector"); }
+    catch( GaudiException& e ) {
+        error() << "Could not retrieve the Outer Detector!" << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
     try{
         m_coordSysTool = tool<IMinervaCoordSysTool>("MinervaCoordSysTool");
     }catch(GaudiException& e){
@@ -139,9 +149,9 @@ StatusCode CCDeltaPlusAna::initialize()
     }
     
     try{ 
-        m_protonUtils = tool<IProtonUtils>("ProtonUtils", m_protonUtils); 
+        m_protonUtils = tool<IProtonUtils>("ProtonUtils", m_protonUtilsAlias); 
     }catch( GaudiException& e ){
-        error() << "Could not obtain tool: ProtonUtils" << m_protonUtils<< endmsg;
+        error() << "Could not obtain tool: ProtonUtils" << m_protonUtilsAlias<< endmsg;
         return StatusCode::FAILURE;
     }
     
@@ -189,14 +199,14 @@ StatusCode CCDeltaPlusAna::initialize()
     }
    
     try {
-        m_michelTrkTool = tool<IMichelTool>("MichelTool","CCDeltaMichelTrackTool");
+        m_michelTrkTool = tool<IMichelTool>("MichelTool",m_michelTrkToolAlias);
     } catch(GaudiException& e){
         error()<<"Could not obtain tool: MichelTool" << endmsg;
         return StatusCode::FAILURE;
     } 
     
     try {
-        m_michelVtxTool = tool<IMichelTool>("MichelTool","CCDeltaMichelVtxTool");
+        m_michelVtxTool = tool<IMichelTool>("MichelTool",m_michelVtxToolAlias);
     } catch(GaudiException& e){
         error()<<"Could not obtain tool: MichelTool" << endmsg;
         return StatusCode::FAILURE;
@@ -310,17 +320,12 @@ StatusCode CCDeltaPlusAna::initialize()
     declareDoubleTruthBranch("muon_E", -9.0 );
     declareDoubleTruthBranch("muon_theta_wrtbeam", -9.0 );
     declareIntTruthBranch("muon_charge", 0 );
-    declareIntTruthBranch("muon_primaryPlanes", -1 );
-    declareIntTruthBranch("muon_totPlanes", -1 );
-    declareIntTruthBranch("muon_trackID", -1 );
     
     declareContainerDoubleTruthBranch("pi0_px", 20, 0 );
     declareContainerDoubleTruthBranch("pi0_py", 20, 0 );
     declareContainerDoubleTruthBranch("pi0_pz", 20, 0 );
     declareContainerDoubleTruthBranch("pi0_E",  20, -9.0 );
     declareContainerDoubleTruthBranch("pi0_theta_wrtbeam",  20, -9.0 );
-    declareContainerIntTruthBranch("pi0_primaryPlanes", 20, -1 );
-    declareContainerIntTruthBranch("pi0_totPlanes", 20, -1 );
     declareContainerIntTruthBranch("pi0_trackID", 20, -1 );
     
     declareContainerDoubleTruthBranch("proton_px", 20, 0 );
@@ -328,10 +333,39 @@ StatusCode CCDeltaPlusAna::initialize()
     declareContainerDoubleTruthBranch("proton_pz", 20, 0 );
     declareContainerDoubleTruthBranch("proton_E",  20, -9.0 );
     declareContainerDoubleTruthBranch("proton_theta_wrtbeam",  20, -9.0 );
-    declareContainerIntTruthBranch("proton_charge", 20, 0 );
-    declareContainerIntTruthBranch("proton_primaryPlanes", 20, -1 );
-    declareContainerIntTruthBranch("proton_totPlanes", 20, -1 );
     declareContainerIntTruthBranch("proton_trackID", 20, -1 );    
+    
+    //! Truth Match for Prongs
+    declareIntBranch(m_hypMeths,    "isMuonInsideOD",        -1);
+    declareIntBranch(m_hypMeths,    "ntrajMuonProng",        -1);
+    declareIntBranch(m_hypMeths,    "trajMuonProngPrimary",  -1);
+    declareIntBranch(m_hypMeths,    "trajMuonProngPDG",      -1);
+    declareDoubleBranch(m_hypMeths, "trajMuonProngPx", -1);
+    declareDoubleBranch(m_hypMeths, "trajMuonProngPy", -1);
+    declareDoubleBranch(m_hypMeths, "trajMuonProngPz", -1);
+    declareDoubleBranch(m_hypMeths, "trajMuonProngMomentum", -1);
+    declareDoubleBranch(m_hypMeths, "trajMuonTheta",         -1);
+    declareDoubleBranch(m_hypMeths, "trajMuonPhi",           -1);
+    declareDoubleBranch(m_hypMeths, "endMuonTrajMomentum",   -9999);
+    declareDoubleBranch(m_hypMeths, "endMuonTrajXPosition",  -9999);
+    declareDoubleBranch(m_hypMeths, "endMuonTrajYPosition",  -9999);
+    declareDoubleBranch(m_hypMeths, "endMuonTrajZPosition",  -9999);
+    
+    declareContainerIntBranch(m_hypMeths,    "isProtonInsideOD",        10, -1);
+    declareContainerIntBranch(m_hypMeths,    "ntrajProtonProng",         10, -1);
+    declareContainerIntBranch(m_hypMeths,    "trajProtonProngPrimary",  10, -1);
+    declareContainerIntBranch(m_hypMeths,    "trajProtonProngPDG",      10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "trajProtonProngPx", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "trajProtonProngPy", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "trajProtonProngPz", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "trajProtonProngMomentum", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "trajProtonTheta",         10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "trajProtonPhi",           10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "endProtonTrajMomentum",   10, -9999);
+    declareContainerDoubleBranch(m_hypMeths, "endProtonTrajXPosition",  10, -9999);
+    declareContainerDoubleBranch(m_hypMeths, "endProtonTrajYPosition",  10, -9999);
+    declareContainerDoubleBranch(m_hypMeths, "endProtonTrajZPosition",  10, -9999);
+    
     
     //! Event - Cut Results
     declareIntEventBranch( "Cut_Vertex_None", -1 );
@@ -1002,6 +1036,20 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
     nuInt->setDoubleData("vtx_y", vtx_position.y() );
     nuInt->setDoubleData("vtx_z", vtx_position.z() );
     
+    //--------------------------------------------------------------------------
+    //! Truth Matching for Muon and Proton Prongs
+    //--------------------------------------------------------------------------
+    if( haveNeutrinoMC() ) {
+        Minerva::ProngVect muonProngs;
+        muonProngs.push_back( muonProng );
+        
+        setTrackProngTruth(nuInt,muonProngs);
+        debug() << "       set the muon prong track truth information" << endmsg;
+    
+        setTrackProngTruth(nuInt,protonProngs);
+        debug() << "       set the proton prong track truth information" << endmsg;
+    }
+    
 
     debug() <<"Exit CCDeltaPlusAna::interpretEvent()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
@@ -1176,9 +1224,7 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
     plot1D(2*vertex_module + vertex_plane + 0.5,"nearest_plane","Nearest Plane to point in z",-40,260, 300);
     plot2D(t_vtx.z(), 2*vertex_module + vertex_plane +0.5,"nearest_plane_v_z","",4000.0,10000.0, 120, -40, 260, 300);
     
-    //--------------------------------------------------------------------------
-    //! Get Muon, Proton and Pi0 Kinematics
-    //--------------------------------------------------------------------------
+
     
     //!Get all trajectories
     Minerva::TG4Trajectories* all_trajectories = NULL;
@@ -1190,22 +1236,84 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
         warning()<<"Could not find trajectories in TES"<<endmsg;
     }
     
-    Gaudi::XYZPoint endPt;
-    
-    //! Primary Muon
+    //--------------------------------------------------------------------------
+    //! Get Muon Kinematics
+    //--------------------------------------------------------------------------
     Gaudi::LorentzVector t_mu4p = truthEvent->PrimFSLepton();
-    double t_mu_px = t_mu4p.px();
-    double t_mu_py = t_mu4p.py();
-    double t_mu_pz = t_mu4p.pz();
-    double t_mu_E = t_mu4p.E();
-    double t_mu_theta=m_coordSysTool->thetaWRTBeam(t_mu4p);
-    int t_mu_charge = 0;
+    double t_muon_px = t_mu4p.px();
+    double t_muon_py = t_mu4p.py();
+    double t_muon_pz = t_mu4p.pz();
+    double t_muon_E = t_mu4p.E();
+    double t_muon_theta=m_coordSysTool->thetaWRTBeam(t_mu4p);
+    int t_muon_charge = 0;
     
-    if (t_current==1 && t_neutrinoPDG==14) t_mu_charge = -1;
-    else if ( t_current==1 && t_neutrinoPDG==-14) t_mu_charge = 1;
+    if (t_current==1 && t_neutrinoPDG==14) t_muon_charge = -1;
+    else if ( t_current==1 && t_neutrinoPDG==-14) t_muon_charge = 1;
     
+    //--------------------------------------------------------------------------
+    //! Get Proton and Pi0 Kinematics
+    //--------------------------------------------------------------------------
+    int nMaxParticles = 20;
     
-
+    std::vector<double> t_proton_px;
+    std::vector<double> t_proton_py;
+    std::vector<double> t_proton_pz;
+    std::vector<double> t_proton_E;
+    std::vector<double> t_proton_theta;
+    std::vector<int> t_proton_trackID;
+    
+    std::vector<double> t_pi0_px;
+    std::vector<double> t_pi0_py;
+    std::vector<double> t_pi0_pz;
+    std::vector<double> t_pi0_E;
+    std::vector<double> t_pi0_theta;
+    std::vector<int> t_pi0_trackID;
+    
+    // Initialize Vectors
+    for (int i = 0; i < nMaxParticles; i++){
+        t_proton_px.push_back(-1.0);
+        t_proton_py.push_back(-1.0);
+        t_proton_pz.push_back(-1.0);
+        t_proton_E.push_back(-1.0);
+        t_proton_theta.push_back(-9.0);
+        t_proton_trackID.push_back(-1);
+        
+        t_pi0_px.push_back(-1.0);
+        t_pi0_py.push_back(-1.0);
+        t_pi0_pz.push_back(-1.0);
+        t_pi0_E.push_back(-1.0);
+        t_pi0_theta.push_back(-9.0);
+        t_pi0_trackID.push_back(-1);
+    }
+    
+    int nPi0 = 0;
+    int nProton = 0;
+    
+    for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart) {
+        
+        Gaudi::LorentzVector temp_4p = (*it_mcpart)->GetInitialMomentum();
+        int partPDG = (*it_mcpart)->GetPDGCode();
+        
+        if ( (partPDG == 2212) && nProton < nMaxParticles){
+            t_proton_px[nProton] = temp_4p.px();
+            t_proton_py[nProton] = temp_4p.py();
+            t_proton_pz[nProton] = temp_4p.pz();
+            t_proton_E[nProton]  = temp_4p.E();
+            t_proton_theta[nProton] = m_coordSysTool->thetaWRTBeam(temp_4p); 
+            t_proton_trackID[nProton] = (*it_mcpart)->GetTrackId();
+            nProton++;
+        }else if ( (partPDG == 111) && nPi0 < nMaxParticles){
+            t_pi0_px[nPi0] = temp_4p.px();
+            t_pi0_py[nPi0] = temp_4p.py();
+            t_pi0_pz[nPi0] = temp_4p.pz();
+            t_pi0_E[nPi0]  = temp_4p.E();
+            t_pi0_theta[nPi0] = m_coordSysTool->thetaWRTBeam(temp_4p); 
+            t_pi0_trackID[nPi0] = (*it_mcpart)->GetTrackId();
+            nPi0++;
+        }
+        
+    }
+    
 
     //--------------------------------------------------------------------------
     //! fill the truthEvent info
@@ -1216,12 +1324,26 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
     truthEvent->setIntData("vertex_plane", vertex_plane);  
     truthEvent->setIntData("target_material", t_targetMaterial);
     
-    truthEvent->setDoubleData("muon_px", t_mu_px);
-    truthEvent->setDoubleData("muon_py", t_mu_py);
-    truthEvent->setDoubleData("muon_pz", t_mu_pz);
-    truthEvent->setDoubleData("muon_E",  t_mu_E);
-    truthEvent->setDoubleData("muon_theta_wrtbeam",  t_mu_theta);
-    truthEvent->setIntData("muon_charge", t_mu_charge);
+    truthEvent->setDoubleData("muon_px", t_muon_px);
+    truthEvent->setDoubleData("muon_py", t_muon_py);
+    truthEvent->setDoubleData("muon_pz", t_muon_pz);
+    truthEvent->setDoubleData("muon_E",  t_muon_E);
+    truthEvent->setDoubleData("muon_theta_wrtbeam",  t_muon_theta);
+    truthEvent->setIntData("muon_charge", t_muon_charge);
+    
+    truthEvent->setContainerDoubleData("proton_px", t_proton_px);
+    truthEvent->setContainerDoubleData("proton_py", t_proton_py);
+    truthEvent->setContainerDoubleData("proton_pz", t_proton_pz);
+    truthEvent->setContainerDoubleData("proton_E",  t_proton_E);
+    truthEvent->setContainerDoubleData("proton_theta_wrtbeam",  t_proton_theta);
+    truthEvent->setContainerIntData("proton_trackID", t_proton_trackID);
+    
+    truthEvent->setContainerDoubleData("pi0_px", t_pi0_px);
+    truthEvent->setContainerDoubleData("pi0_py", t_pi0_py);
+    truthEvent->setContainerDoubleData("pi0_pz", t_pi0_pz);
+    truthEvent->setContainerDoubleData("pi0_E",  t_pi0_E);
+    truthEvent->setContainerDoubleData("pi0_theta_wrtbeam",  t_pi0_theta);
+    truthEvent->setContainerIntData("pi0_trackID", t_pi0_trackID);
     
     truthEvent->setIntData("N_proton",  N_proton);
     truthEvent->setIntData("N_neutron",  N_neutron);
@@ -1288,6 +1410,199 @@ StatusCode CCDeltaPlusAna::interpretFailEvent( Minerva::PhysicsEvent* event ) co
     debug() << "Exit CCDeltaPlusAna::interpretFailEvent()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
+}
+
+//---------------------------------------------------------------------------------
+// set the track prong Geant4 truth information
+//---------------------------------------------------------------------------------
+void CCDeltaPlusAna::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const
+{
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCDeltaPlusAna::setTrackProngTruth()" << endmsg;
+    
+    std::vector<const Minerva::TG4Trajectory*> parent;
+    Minerva::TG4Trajectories* mc_trajectories = get<Minerva::TG4Trajectories>( "MC/TG4Trajectories" );
+    for(Minerva::TG4Trajectories::iterator iter = mc_trajectories->begin(); iter != mc_trajectories->end(); ++iter) {
+        if( (*iter)->GetParentId() == 0 ) parent.push_back( (*iter) );
+    }
+    
+    std::vector< std::pair<const Minerva::TG4Trajectory*,double> > trajectories;
+    std::vector<int> ntraj(10,-1);
+    std::vector<int> nprim(10,-1);
+    std::vector<int> pdg(10,-1);
+    std::vector<int> inside_od(10,-1);
+    std::vector<double> traj_Px(10,-1);
+    std::vector<double> traj_Py(10,-1);
+    std::vector<double> traj_Pz(10,-1);
+    std::vector<double> traj_P(10,-1);
+    std::vector<double> traj_theta(10,-1);
+    std::vector<double> traj_phi(10,-1);
+    std::vector<double> end_trajMomentum(10,-1);
+    std::vector<double> end_trajX(10,-1);
+    std::vector<double> end_trajY(10,-1);
+    std::vector<double> end_trajZ(10,-1);
+    
+    for(unsigned int p = 0; p < prongs.size(); p++) {
+        SmartRef<Minerva::Prong> prong = prongs[p];
+        Minerva::TrackVect tracks = prong->minervaTracks();
+    
+        for(unsigned int trk = 0; trk < tracks.size(); trk++) {
+            double other_energy = 0.0;
+            std::map<const Minerva::TG4Trajectory*,double> trajMap = TruthMatcher->getTG4Trajectories(tracks[trk],other_energy);
+            std::map<const Minerva::TG4Trajectory*,double>::iterator it;
+        
+            if( trajMap.empty() ) continue;
+        
+            std::vector< std::pair<const Minerva::TG4Trajectory*,double> > parentVect;
+            for(it = trajMap.begin(); it != trajMap.end(); it++) {
+        
+                const Minerva::TG4Trajectory* tmp = (*it).first;    
+                double fraction = (*it).second;
+        
+                if( tmp->GetParentId() == 0 ){
+                    parentVect.push_back( std::make_pair(tmp,fraction) );
+                }else {
+                    int  attempts = 0;
+                    bool foundPrimary = false;
+                    while( !foundPrimary ) {
+                    
+                        bool foundMatch = false;
+                        Gaudi::XYZPoint start( tmp->GetInitialPosition().x(), tmp->GetInitialPosition().y(), tmp->GetInitialPosition().z() );
+            
+                        for(Minerva::TG4Trajectories::iterator tj = mc_trajectories->begin(); tj != mc_trajectories->end(); ++tj) {
+                            Gaudi::XYZPoint end( (*tj)->GetFinalPosition().x(), (*tj)->GetFinalPosition().y(), (*tj)->GetFinalPosition().z() );
+                            if( end == start ) { 
+                                tmp = (*tj); foundMatch = true; 
+                                break; 
+                            }
+                        }
+            
+                        if( !foundMatch ) break;
+                        else attempts++;
+            
+                        if( foundMatch && attempts == 10 ) break;
+                        if( tmp->GetParentId() == 0 ) { 
+                            parentVect.push_back( std::make_pair(tmp,fraction) ); 
+                            foundPrimary = true; 
+                            break; 
+                        }
+                    } //! end of while loop
+                } //! end of else
+            } //! end loop over traj 
+    
+            std::vector< std::pair<const Minerva::TG4Trajectory*,double> > updateParentVect;
+            for(unsigned int i = 0; i < parent.size(); i++) {
+                double energy = 0.0;
+                for(unsigned int j = 0; j < parentVect.size(); j++) {
+                    if( parentVect[j].first->GetTrackId() == parent[i]->GetTrackId() ){
+                        energy += parentVect[j].second; 
+                    }
+                }
+                updateParentVect.push_back( std::make_pair(parent[i],energy) );
+            }
+            
+            const Minerva::TG4Trajectory* tmp_traj = NULL;
+            double frac_energy = 0.0; 
+            for(unsigned int i = 0; i < updateParentVect.size(); i++) {
+                if( updateParentVect[i].second < frac_energy ) continue;
+                frac_energy = updateParentVect[i].second; 
+                tmp_traj    = updateParentVect[i].first; 
+            }
+            trajectories.push_back( std::make_pair(tmp_traj,frac_energy) );
+        }
+    
+        if( trajectories.empty() ) return;
+        
+        const Minerva::TG4Trajectory* traj = NULL;
+        double max = 0;
+        for(unsigned int i = 0; i < trajectories.size(); i++) {
+            if( trajectories[i].second < max ) continue;
+            max  = trajectories[i].second;
+            traj = trajectories[i].first;
+        }
+    
+        if( !traj ) continue;
+    
+        Gaudi::LorentzVector traj_4p = traj->GetInitialMomentum();
+        double tj_p     = sqrt( traj_4p.px()*traj_4p.px() + traj_4p.py()*traj_4p.py() + traj_4p.pz()*traj_4p.pz() );
+        double tj_theta = traj->GetInitialMomentum().Theta();
+        double tj_phi   = traj->GetInitialMomentum().Phi();
+    
+        int primary = 0;
+        if( traj->GetProcessName().find("Primary") != std::string::npos ) primary = 1; 
+    
+        ntraj[p]      = int(trajectories.size());
+        nprim[p]      = primary;
+        pdg[p]        = traj->GetPDGCode();
+        traj_Px[p]    = traj_4p.px();
+        traj_Py[p]    = traj_4p.py();
+        traj_Pz[p]    = traj_4p.pz();
+        traj_P[p]     = tj_p;
+        traj_theta[p] = tj_theta;
+        traj_phi[p]   = tj_phi;
+    
+        const Minerva::TG4Trajectory* endTraj = trajectories[trajectories.size()-1].first;
+        if( !endTraj ) continue;
+    
+        const Minerva::TG4TrajectoryPoints& points = endTraj->GetTrajectoryPoints();
+    
+        if( !points.empty() ) {
+            Minerva::TG4TrajectoryPoint* endPoint = *points.rbegin();
+            if( endPoint ) {
+                double end_trajPx = endPoint->GetMomentum().px();
+                double end_trajPy = endPoint->GetMomentum().py();
+                double end_trajPz = endPoint->GetMomentum().pz();
+                end_trajMomentum[p]  = sqrt(    end_trajPx*end_trajPx + 
+                                                end_trajPy*end_trajPy + 
+                                                end_trajPz*end_trajPz );
+        
+                end_trajX[p] = endPoint->GetPosition().x();
+                end_trajY[p] = endPoint->GetPosition().y();
+                end_trajZ[p] = endPoint->GetPosition().z();
+                Gaudi::XYZPoint point(end_trajX[p],end_trajY[p],end_trajZ[p]);
+                inside_od[p] = int(m_OuterDetector->isInside(point));
+            } 
+        }
+    } //! end loop over prongs
+    
+    //-- fill
+    if( prongs[0]->filtertaglist()->filterTagExists("PrimaryProton") ) {
+        neutrino->setContainerIntData("ntrajProtonProng",ntraj);
+        neutrino->setContainerIntData("trajProtonProngPrimary",nprim);
+        neutrino->setContainerIntData("trajProtonProngPDG",pdg);
+        neutrino->setContainerDoubleData("trajProtonProngPx",traj_Px);
+        neutrino->setContainerDoubleData("trajProtonProngPy",traj_Py);
+        neutrino->setContainerDoubleData("trajProtonProngPz",traj_Pz);
+        neutrino->setContainerDoubleData("trajProtonProngMomentum",traj_P);
+        neutrino->setContainerDoubleData("trajProtonTheta",traj_theta);
+        neutrino->setContainerDoubleData("trajProtonPhi",traj_phi);
+        neutrino->setContainerIntData("isProtonInsideOD",inside_od);
+        neutrino->setContainerDoubleData("endProtonTrajMomentum",end_trajMomentum);
+        neutrino->setContainerDoubleData("endProtonTrajXPosition",end_trajX);
+        neutrino->setContainerDoubleData("endProtonTrajYPosition",end_trajY);
+        neutrino->setContainerDoubleData("endProtonTrajZPosition",end_trajZ);
+    } else if( prongs[0]->filtertaglist()->filterTagExists("PrimaryMuon") ) {
+        neutrino->setIntData("ntrajMuonProng",ntraj[0]);
+        neutrino->setIntData("trajMuonProngPrimary",nprim[0]);
+        neutrino->setIntData("trajMuonProngPDG",pdg[0]);
+        neutrino->setDoubleData("trajMuonProngPx",traj_Px[0]);
+        neutrino->setDoubleData("trajMuonProngPy",traj_Py[0]);
+        neutrino->setDoubleData("trajMuonProngPz",traj_Pz[0]);
+        neutrino->setDoubleData("trajMuonProngMomentum",traj_P[0]);
+        neutrino->setDoubleData("trajMuonTheta",traj_theta[0]);
+        neutrino->setDoubleData("trajMuonPhi",traj_phi[0]);
+        neutrino->setIntData("isMuonInsideOD",inside_od[0]);
+        neutrino->setDoubleData("endMuonTrajMomentum",end_trajMomentum[0]);
+        neutrino->setDoubleData("endMuonTrajXPosition",end_trajX[0]);
+        neutrino->setDoubleData("endMuonTrajYPosition",end_trajY[0]);
+        neutrino->setDoubleData("endMuonTrajZPosition",end_trajZ[0]);
+    }
+    
+    
+    debug() << "Exit CCDeltaPlusAna::setTrackProngTruth()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    
+    return;
 }
 
 
