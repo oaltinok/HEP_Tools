@@ -11,7 +11,7 @@ Library: Folder_List
         > Folder_List::IN + Folder_List::PLAYLIST + Folder_List::F_PL_TEST
             // Returns the Location of Input Test Playlist
 
-    
+    Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
     Last Revision: 2014_03_18
 ================================================================================
 */

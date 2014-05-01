@@ -16,7 +16,8 @@ main.cpp
             > main(false) for Running the Analysis
             > main(true) for Generating Plots only
     
-    Last Revision: 2014_04_17
+    Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
+    Last Revision: 2014_05_01
 ================================================================================
 */
 

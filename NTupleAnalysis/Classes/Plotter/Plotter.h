@@ -12,7 +12,8 @@ Class: Plotter
         > p.plotHistograms(string mcFile, string plotDir)
             
     
-    Last Revision: 2014_04_17
+    Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
+    Last Revision: 2014_05_01
 ================================================================================
 */
 

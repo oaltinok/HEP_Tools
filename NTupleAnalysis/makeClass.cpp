@@ -10,14 +10,14 @@ Function: makeClass()
         > .L makeClass.cpp
         > makeClass()
     
-    Last Revision: 2014_04_17
+    Last Revision: 2014_04_30
 ================================================================================
 */
 
 void makeClass(){
 
 //     string playlist = "Input/Playlists/pl_MC_Test_Sample.dat";
-    string playlist = "Input/Playlists/pl_MC_Test.dat";
+    string playlist = "Input/Playlists/pl_MC_Test_Sample.dat";
     TChain fChain("CCDeltaPlusAna") ;
 
     ifstream input_pl( playlist.c_str() );

@@ -18,8 +18,8 @@ Class: CCDeltaPlus
         > See run function Comments
     
     
-    
-    Last Revision: 2014_04_17
+    Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
+    Last Revision:  2014_05_01
 ================================================================================
 */
 
@@ -123,14 +123,23 @@ public :
     TH1F* n_FSParticles;
     TH1F* n_gammas;
     
+    TH1F* pID_purity;
+    TH1F* pID_efficiency;
+    TH1F* pID_piplus;
+    TH1F* pID_piminus;
+    TH1F* pID_proton;
+    TH1F* pID_other;
     
    // -------------------------------------------------------------------------
    //     Analysis Variables
    //--------------------------------------------------------------------------
     bool isDataAnalysis;
     bool isMC;
+    bool applyProtonScore;
+    bool is_pID_Studies;
     double maxBeamEnergy;
     int max_nFSPart;
+    int minProtonScore;
     HEP_Misc misc;
     TVector3 beam_p3;
     Proton proton;
@@ -184,14 +193,18 @@ public :
    Bool_t          prim_vtx_has_broken_track;
    Bool_t          isMinosMatchTrack;
    Bool_t          isMinosMatchStub;
-   Int_t           Cut_Michel_Exist;
+   Bool_t          well_fit_vertex;
+   Bool_t          isBrokenTrack;
+   Int_t           Cut_EndPoint_Michel_Exist;
    Int_t           Cut_Muon_None;
-   Int_t           Cut_Muon_Not_Plausible;
    Int_t           Cut_Muon_Score_Low;
    Int_t           Cut_Proton_None;
+   Int_t           Cut_Vertex_Michel_Exist;
    Int_t           Cut_Vertex_None;
+   Int_t           Cut_Vertex_Not_Analyzable;
    Int_t           Cut_Vertex_Not_Fiducial;
    Int_t           Cut_Vertex_Null;
+   Int_t           Cut_secEndPoint_Michel_Exist;
    Int_t           broken_track_most_us_plane;
    Int_t           n_anchored_long_trk_prongs;
    Int_t           n_anchored_short_trk_prongs;
@@ -234,7 +247,40 @@ public :
    Double_t        unattachedExtraE;
    Double_t        vtxBlobExtraE;
    Double_t        vtx_michel_distance;
+   Double_t        well_fit_vertex_angle;
    Bool_t          truth_has_physics_event;
+   Bool_t          truth_reco_hasGoodObjects;
+   Bool_t          truth_reco_isGoodVertex;
+   Bool_t          truth_reco_isWellFitVertex;
+   Bool_t          truth_reco_isFidVol;
+   Bool_t          truth_reco_isFidVol_smeared;
+   Bool_t          truth_reco_isMinosMatch;
+   Bool_t          truth_reco_isBrokenTrack;
+   Bool_t          truth_isSignal;
+   Bool_t          truth_isFidVol;
+   Bool_t          truth_isPlausible;
+   Int_t           truth_N_deltaplus;
+   Int_t           truth_N_gamma;
+   Int_t           truth_N_muminus;
+   Int_t           truth_N_muplus;
+   Int_t           truth_N_neutron;
+   Int_t           truth_N_other;
+   Int_t           truth_N_pi0;
+   Int_t           truth_N_piminus;
+   Int_t           truth_N_piplus;
+   Int_t           truth_N_proton;
+   Int_t           truth_muon_charge;
+   Int_t           truth_reco_muonCharge;
+   Int_t           truth_target_material;
+   Int_t           truth_vertex_module;
+   Int_t           truth_vertex_plane;
+   Double_t        truth_muon_E;
+   Double_t        truth_muon_px;
+   Double_t        truth_muon_py;
+   Double_t        truth_muon_pz;
+   Double_t        truth_muon_theta_wrtbeam;
+   Int_t           truth_pi0_trackID[20];
+   Int_t           truth_proton_trackID[20];
    Int_t           genie_wgt_n_shifts;
    Double_t        truth_genie_wgt_AGKYxF1pi[7];   //[genie_wgt_n_shifts]
    Double_t        truth_genie_wgt_AhtBY[7];   //[genie_wgt_n_shifts]
@@ -272,6 +318,16 @@ public :
    Double_t        truth_genie_wgt_Theta_Delta2Npi[7];   //[genie_wgt_n_shifts]
    Double_t        truth_genie_wgt_VecFFCCQEshape[7];   //[genie_wgt_n_shifts]
    Double_t        truth_genie_wgt_shifts[7];   //[genie_wgt_n_shifts]
+   Double_t        truth_pi0_E[20];
+   Double_t        truth_pi0_px[20];
+   Double_t        truth_pi0_py[20];
+   Double_t        truth_pi0_pz[20];
+   Double_t        truth_pi0_theta_wrtbeam[20];
+   Double_t        truth_proton_E[20];
+   Double_t        truth_proton_px[20];
+   Double_t        truth_proton_py[20];
+   Double_t        truth_proton_pz[20];
+   Double_t        truth_proton_theta_wrtbeam[20];
    Int_t           CCDeltaPlusAna_nuFlavor;
    Int_t           CCDeltaPlusAna_nuHelicity;
    Int_t           CCDeltaPlusAna_intCurrent;
@@ -288,17 +344,25 @@ public :
    Bool_t          CCDeltaPlusAna_minos_trk_is_ok;
    Bool_t          CCDeltaPlusAna_minos_used_range;
    Bool_t          CCDeltaPlusAna_minos_used_curvature;
+   Int_t           CCDeltaPlusAna_isMuonInsideOD;
    Int_t           CCDeltaPlusAna_minos_trk_end_plane;
    Int_t           CCDeltaPlusAna_minos_trk_quality;
    Int_t           CCDeltaPlusAna_muon_N_minosTracks;
    Int_t           CCDeltaPlusAna_muon_minervaTrack_types;
    Int_t           CCDeltaPlusAna_muon_minosTrackQuality;
    Int_t           CCDeltaPlusAna_muon_roadUpstreamPlanes;
+   Int_t           CCDeltaPlusAna_ntrajMuonProng;
    Int_t           CCDeltaPlusAna_r_minos_trk_vtx_plane;
    Int_t           CCDeltaPlusAna_t_minos_trk_numFSMuons;
    Int_t           CCDeltaPlusAna_t_minos_trk_primFSLeptonPDG;
+   Int_t           CCDeltaPlusAna_trajMuonProngPDG;
+   Int_t           CCDeltaPlusAna_trajMuonProngPrimary;
    Int_t           CCDeltaPlusAna_vtx_module;
    Int_t           CCDeltaPlusAna_vtx_plane;
+   Double_t        CCDeltaPlusAna_endMuonTrajMomentum;
+   Double_t        CCDeltaPlusAna_endMuonTrajXPosition;
+   Double_t        CCDeltaPlusAna_endMuonTrajYPosition;
+   Double_t        CCDeltaPlusAna_endMuonTrajZPosition;
    Double_t        CCDeltaPlusAna_minos_trk_bave;
    Double_t        CCDeltaPlusAna_minos_trk_chi2;
    Double_t        CCDeltaPlusAna_minos_trk_end_u;
@@ -355,12 +419,23 @@ public :
    Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitX;
    Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitY;
    Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ;
+   Double_t        CCDeltaPlusAna_trajMuonPhi;
+   Double_t        CCDeltaPlusAna_trajMuonProngMomentum;
+   Double_t        CCDeltaPlusAna_trajMuonTheta;
    Double_t        CCDeltaPlusAna_vtx_x;
    Double_t        CCDeltaPlusAna_vtx_y;
    Double_t        CCDeltaPlusAna_vtx_z;
+   Int_t           CCDeltaPlusAna_isProtonInsideOD[10];
+   Int_t           CCDeltaPlusAna_ntrajProngProng[10];
    Int_t           CCDeltaPlusAna_proton_kinked[10];
    Int_t           CCDeltaPlusAna_proton_odMatch[10];
    Int_t           CCDeltaPlusAna_proton_trk_pat_history[10];
+   Int_t           CCDeltaPlusAna_trajProtonProngPDG[10];
+   Int_t           CCDeltaPlusAna_trajProtonProngPrimary[10];
+   Double_t        CCDeltaPlusAna_endProtonTrajMomentum[10];
+   Double_t        CCDeltaPlusAna_endProtonTrajXPosition[10];
+   Double_t        CCDeltaPlusAna_endProtonTrajYPosition[10];
+   Double_t        CCDeltaPlusAna_endProtonTrajZPosition[10];
    Double_t        CCDeltaPlusAna_proton_E[10];
    Double_t        CCDeltaPlusAna_proton_chi2_ndf[10];
    Double_t        CCDeltaPlusAna_proton_ekin[10];
@@ -384,6 +459,9 @@ public :
    Double_t        CCDeltaPlusAna_proton_theta[10];
    Double_t        CCDeltaPlusAna_proton_thetaX[10];
    Double_t        CCDeltaPlusAna_proton_thetaY[10];
+   Double_t        CCDeltaPlusAna_trajProtonPhi[10];
+   Double_t        CCDeltaPlusAna_trajProtonProngMomentum[10];
+   Double_t        CCDeltaPlusAna_trajProtonTheta[10];
    Int_t           ev_run;
    Int_t           ev_subrun;
    Int_t           ev_detector;
@@ -501,14 +579,18 @@ public :
    TBranch        *b_prim_vtx_has_broken_track;   //!
    TBranch        *b_isMinosMatchTrack;   //!
    TBranch        *b_isMinosMatchStub;   //!
-   TBranch        *b_Cut_Michel_Exist;   //!
+   TBranch        *b_well_fit_vertex;   //!
+   TBranch        *b_isBrokenTrack;   //!
+   TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
    TBranch        *b_Cut_Muon_None;   //!
-   TBranch        *b_Cut_Muon_Not_Plausible;   //!
    TBranch        *b_Cut_Muon_Score_Low;   //!
    TBranch        *b_Cut_Proton_None;   //!
+   TBranch        *b_Cut_Vertex_Michel_Exist;   //!
    TBranch        *b_Cut_Vertex_None;   //!
+   TBranch        *b_Cut_Vertex_Not_Analyzable;   //!
    TBranch        *b_Cut_Vertex_Not_Fiducial;   //!
    TBranch        *b_Cut_Vertex_Null;   //!
+   TBranch        *b_Cut_secEndPoint_Michel_Exist;   //!
    TBranch        *b_broken_track_most_us_plane;   //!
    TBranch        *b_n_anchored_long_trk_prongs;   //!
    TBranch        *b_n_anchored_short_trk_prongs;   //!
@@ -551,7 +633,40 @@ public :
    TBranch        *b_unattachedExtraE;   //!
    TBranch        *b_vtxBlobExtraE;   //!
    TBranch        *b_vtx_michel_distance;   //!
+   TBranch        *b_well_fit_vertex_angle;   //!
    TBranch        *b_truth_has_physics_event;   //!
+   TBranch        *b_truth_reco_hasGoodObjects;   //!
+   TBranch        *b_truth_reco_isGoodVertex;   //!
+   TBranch        *b_truth_reco_isWellFitVertex;   //!
+   TBranch        *b_truth_reco_isFidVol;   //!
+   TBranch        *b_truth_reco_isFidVol_smeared;   //!
+   TBranch        *b_truth_reco_isMinosMatch;   //!
+   TBranch        *b_truth_reco_isBrokenTrack;   //!
+   TBranch        *b_truth_isSignal;   //!
+   TBranch        *b_truth_isFidVol;   //!
+   TBranch        *b_truth_isPlausible;   //!
+   TBranch        *b_truth_N_deltaplus;   //!
+   TBranch        *b_truth_N_gamma;   //!
+   TBranch        *b_truth_N_muminus;   //!
+   TBranch        *b_truth_N_muplus;   //!
+   TBranch        *b_truth_N_neutron;   //!
+   TBranch        *b_truth_N_other;   //!
+   TBranch        *b_truth_N_pi0;   //!
+   TBranch        *b_truth_N_piminus;   //!
+   TBranch        *b_truth_N_piplus;   //!
+   TBranch        *b_truth_N_proton;   //!
+   TBranch        *b_truth_muon_charge;   //!
+   TBranch        *b_truth_reco_muonCharge;   //!
+   TBranch        *b_truth_target_material;   //!
+   TBranch        *b_truth_vertex_module;   //!
+   TBranch        *b_truth_vertex_plane;   //!
+   TBranch        *b_truth_muon_E;   //!
+   TBranch        *b_truth_muon_px;   //!
+   TBranch        *b_truth_muon_py;   //!
+   TBranch        *b_truth_muon_pz;   //!
+   TBranch        *b_truth_muon_theta_wrtbeam;   //!
+   TBranch        *b_truth_pi0_trackID;   //!
+   TBranch        *b_truth_proton_trackID;   //!
    TBranch        *b_genie_wgt_n_shifts;   //!
    TBranch        *b_truth_genie_wgt_AGKYxF1pi;   //!
    TBranch        *b_truth_genie_wgt_AhtBY;   //!
@@ -589,6 +704,16 @@ public :
    TBranch        *b_truth_genie_wgt_Theta_Delta2Npi;   //!
    TBranch        *b_truth_genie_wgt_VecFFCCQEshape;   //!
    TBranch        *b_truth_genie_wgt_shifts;   //!
+   TBranch        *b_truth_pi0_E;   //!
+   TBranch        *b_truth_pi0_px;   //!
+   TBranch        *b_truth_pi0_py;   //!
+   TBranch        *b_truth_pi0_pz;   //!
+   TBranch        *b_truth_pi0_theta_wrtbeam;   //!
+   TBranch        *b_truth_proton_E;   //!
+   TBranch        *b_truth_proton_px;   //!
+   TBranch        *b_truth_proton_py;   //!
+   TBranch        *b_truth_proton_pz;   //!
+   TBranch        *b_truth_proton_theta_wrtbeam;   //!
    TBranch        *b_CCDeltaPlusAna_nuFlavor;   //!
    TBranch        *b_CCDeltaPlusAna_nuHelicity;   //!
    TBranch        *b_CCDeltaPlusAna_intCurrent;   //!
@@ -605,17 +730,25 @@ public :
    TBranch        *b_CCDeltaPlusAna_minos_trk_is_ok;   //!
    TBranch        *b_CCDeltaPlusAna_minos_used_range;   //!
    TBranch        *b_CCDeltaPlusAna_minos_used_curvature;   //!
+   TBranch        *b_CCDeltaPlusAna_isMuonInsideOD;   //!
    TBranch        *b_CCDeltaPlusAna_minos_trk_end_plane;   //!
    TBranch        *b_CCDeltaPlusAna_minos_trk_quality;   //!
    TBranch        *b_CCDeltaPlusAna_muon_N_minosTracks;   //!
    TBranch        *b_CCDeltaPlusAna_muon_minervaTrack_types;   //!
    TBranch        *b_CCDeltaPlusAna_muon_minosTrackQuality;   //!
    TBranch        *b_CCDeltaPlusAna_muon_roadUpstreamPlanes;   //!
+   TBranch        *b_CCDeltaPlusAna_ntrajMuonProng;   //!
    TBranch        *b_CCDeltaPlusAna_r_minos_trk_vtx_plane;   //!
    TBranch        *b_CCDeltaPlusAna_t_minos_trk_numFSMuons;   //!
    TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLeptonPDG;   //!
+   TBranch        *b_CCDeltaPlusAna_trajMuonProngPDG;   //!
+   TBranch        *b_CCDeltaPlusAna_trajMuonProngPrimary;   //!
    TBranch        *b_CCDeltaPlusAna_vtx_module;   //!
    TBranch        *b_CCDeltaPlusAna_vtx_plane;   //!
+   TBranch        *b_CCDeltaPlusAna_endMuonTrajMomentum;   //!
+   TBranch        *b_CCDeltaPlusAna_endMuonTrajXPosition;   //!
+   TBranch        *b_CCDeltaPlusAna_endMuonTrajYPosition;   //!
+   TBranch        *b_CCDeltaPlusAna_endMuonTrajZPosition;   //!
    TBranch        *b_CCDeltaPlusAna_minos_trk_bave;   //!
    TBranch        *b_CCDeltaPlusAna_minos_trk_chi2;   //!
    TBranch        *b_CCDeltaPlusAna_minos_trk_end_u;   //!
@@ -672,12 +805,23 @@ public :
    TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitX;   //!
    TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitY;   //!
    TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ;   //!
+   TBranch        *b_CCDeltaPlusAna_trajMuonPhi;   //!
+   TBranch        *b_CCDeltaPlusAna_trajMuonProngMomentum;   //!
+   TBranch        *b_CCDeltaPlusAna_trajMuonTheta;   //!
    TBranch        *b_CCDeltaPlusAna_vtx_x;   //!
    TBranch        *b_CCDeltaPlusAna_vtx_y;   //!
    TBranch        *b_CCDeltaPlusAna_vtx_z;   //!
+   TBranch        *b_CCDeltaPlusAna_isProtonInsideOD;   //!
+   TBranch        *b_CCDeltaPlusAna_ntrajProngProng;   //!
    TBranch        *b_CCDeltaPlusAna_proton_kinked;   //!
    TBranch        *b_CCDeltaPlusAna_proton_odMatch;   //!
    TBranch        *b_CCDeltaPlusAna_proton_trk_pat_history;   //!
+   TBranch        *b_CCDeltaPlusAna_trajProtonProngPDG;   //!
+   TBranch        *b_CCDeltaPlusAna_trajProtonProngPrimary;   //!
+   TBranch        *b_CCDeltaPlusAna_endProtonTrajMomentum;   //!
+   TBranch        *b_CCDeltaPlusAna_endProtonTrajXPosition;   //!
+   TBranch        *b_CCDeltaPlusAna_endProtonTrajYPosition;   //!
+   TBranch        *b_CCDeltaPlusAna_endProtonTrajZPosition;   //!
    TBranch        *b_CCDeltaPlusAna_proton_E;   //!
    TBranch        *b_CCDeltaPlusAna_proton_chi2_ndf;   //!
    TBranch        *b_CCDeltaPlusAna_proton_ekin;   //!
@@ -701,6 +845,9 @@ public :
    TBranch        *b_CCDeltaPlusAna_proton_theta;   //!
    TBranch        *b_CCDeltaPlusAna_proton_thetaX;   //!
    TBranch        *b_CCDeltaPlusAna_proton_thetaY;   //!
+   TBranch        *b_CCDeltaPlusAna_trajProtonPhi;   //!
+   TBranch        *b_CCDeltaPlusAna_trajProtonProngMomentum;   //!
+   TBranch        *b_CCDeltaPlusAna_trajProtonTheta;   //!
    TBranch        *b_ev_run;   //!
    TBranch        *b_ev_subrun;   //!
    TBranch        *b_ev_detector;   //!

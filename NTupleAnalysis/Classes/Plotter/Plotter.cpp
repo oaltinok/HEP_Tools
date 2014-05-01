@@ -14,15 +14,17 @@ Plotter::Plotter()
 
 void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
 {
-//     plotCCDeltaPlus(isMC,isReco, is2D);
+    
+    plotCCDeltaPlus(isMC,isReco, is2D);
 
-//     plotMuon(isMC,isReco, is2D);
+    plotMuon(isMC,isReco, is2D);
     
     plotProton(isMC,isReco, is2D);
     
 //     plotPion(isMC,isReco, is2D);
     
 }
+
 
 void Plotter::plotCCDeltaPlus(bool isMC, bool isReco, bool is2D)
 {

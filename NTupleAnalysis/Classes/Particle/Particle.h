@@ -6,7 +6,8 @@ Class: Particle
    
     Uses ROOT Specific classes
     
-    Last Revision: 2014_04_16
+    Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
+    Last Revision: 2014_05_01
 ================================================================================
 */
 

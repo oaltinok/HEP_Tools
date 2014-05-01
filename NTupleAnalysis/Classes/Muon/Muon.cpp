@@ -26,7 +26,7 @@ Muon::Muon()
     cout<<"\tInitializing Histograms "<<endl;
     partScore = new TH1F( "partScore","Muon Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");
-    partScore->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_P.get_width()));
+    partScore->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_partScore.get_width()));
     
     P_mc = new TH1F( "P_mc","True Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
     P_mc->GetXaxis()->SetTitle("True Muon Momentum MeV");
