@@ -16,7 +16,7 @@ Study: pID_Studies
         > pID_Studies()
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_04_30
+    Last Revision:  2014_05_02
 ================================================================================
 */
 
@@ -74,6 +74,9 @@ void get_pID_Plots(TFile* f_Root, string plotDir)
     hs->Add(h_pID_piplus);
     hs->Add(h_pID_proton);
     hs->Draw();
+    hs->GetXaxis()->SetTitle("Proton Score");
+    hs->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",0.05));
+    
     
     c1->Print(Form("%s%s",plotDir.c_str(),"stacked_pID"),"png");
 }
@@ -93,21 +96,22 @@ void get_pID_Stats(TFile* f_Root)
     double nEvents = 0;
     double purity;
     double efficiency;
+    int nBins = 20;
     
     //Get Total Proton
-    for(int i = 40; i >= 1; i--){
+    for(int i = nBins; i >= 1; i--){
         
     }
     cout<<"nTotalProton = "<<nTotalProton<<endl;
     
     //Get Total Proton
-    for(int i = 40; i >= 1; i--){
+    for(int i = nBins; i >= 1; i--){
         nTotalProton = nTotalProton + pID_proton->GetBinContent(i);
     }
     cout<<"nTotalProton = "<<nTotalProton<<endl;
     
     
-    for(int i = 40; i >= 1; i--){
+    for(int i = nBins; i >= 1; i--){
         nProton = nProton + pID_proton->GetBinContent(i);
         nCapturedEvents =   nCapturedEvents+
                             pID_proton->GetBinContent(i) +

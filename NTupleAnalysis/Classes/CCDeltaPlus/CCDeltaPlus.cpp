@@ -15,8 +15,8 @@ void CCDeltaPlus::specifyRunTime()
 {
     isDataAnalysis = true;
     isMC = true;
-    applyProtonScore = false;
-    minProtonScore = 0.35;
+    applyProtonScore = true;
+    minProtonScore = 0.3;
     is_pID_Studies = false;
 }
 
@@ -47,10 +47,48 @@ void CCDeltaPlus::run(string playlist)
     //------------------------------------------------------------------------
     // Branch Selection for Performance
     //------------------------------------------------------------------------
-//     fChain->SetBranchStatus("*",0);  // disable all branches
+    fChain->SetBranchStatus("*",0);  // disable all branches
 
-//     fChain->SetBranchStatus("ev_run",1);  // activate
-
+    fChain->SetBranchStatus("ev_run",1);  // activate
+    
+    fChain->SetBranchStatus("Cut_EndPoint_Michel_Exist",1);  // activate
+    fChain->SetBranchStatus("Cut_Muon_None",1);  // activate
+    fChain->SetBranchStatus("Cut_Muon_Score_Low",1);  // activate
+    fChain->SetBranchStatus("Cut_Proton_None",1);  // activate
+    fChain->SetBranchStatus("Cut_Vertex_Michel_Exist",1);  // activate
+    fChain->SetBranchStatus("Cut_Vertex_None",1);  // activate
+    fChain->SetBranchStatus("Cut_Vertex_Not_Analyzable",1);  // activate
+    fChain->SetBranchStatus("Cut_Vertex_Not_Fiducial",1);  // activate
+    fChain->SetBranchStatus("Cut_Vertex_Null",1);  // activate
+    fChain->SetBranchStatus("Cut_secEndPoint_Michel_Exist",1);  // activate
+    
+    fChain->SetBranchStatus("CCDeltaPlusAna_muon_px",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_muon_py",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_muon_pz",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_muon_E",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_muon_muScore",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_trajMuonProngPx",1);
+    fChain->SetBranchStatus("CCDeltaPlusAna_trajMuonProngPy",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_trajMuonProngPz",1);  // activate
+    
+    fChain->SetBranchStatus("CCDeltaPlusAna_trajProtonProngPx",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_trajProtonProngPy",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_trajProtonProngPz",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_proton_px",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_proton_py",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_proton_pz",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_proton_E",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_proton_score",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_trajProtonProngPDG",1);  // activate
+    
+    fChain->SetBranchStatus("mc_Q2",1);  // activate
+    fChain->SetBranchStatus("mc_incomingE",1);  // activate
+    fChain->SetBranchStatus("mc_vtx",1);  // activate
+    fChain->SetBranchStatus("mc_intType",1);  // activate
+    fChain->SetBranchStatus("mc_nFSPart",1);  // activate
+    fChain->SetBranchStatus("CCDeltaPlusAna_vtx",1);  // activate
+    
+    
     // Cut Statistics
     double nAll = 0;
     double nCut_Vertex_None = 0;
@@ -64,13 +102,7 @@ void CCDeltaPlus::run(string playlist)
     double nCut_secEndPoint_Michel_Exist = 0;
     double nCut_Proton_None = 0;            
     double nCut_Proton_Score = 0;
-    double nCut_True_Muon = 0;
-    double nCut_True_Proton = 0;
     double nCut_Reco_Muon_NoProblem = 0;
-    
-    double nTrue_Muon_None = 0;             double nReco_Muon_None = 0;
-    double nTrue_Michel_Exist = 0;          double nReco_Michel_Exist = 0;
-    double nTrue_Proton_None = 0;           double nReco_Proton_None = 0;
     
     int tempInd;
     int indRecoProton;
@@ -146,20 +178,12 @@ void CCDeltaPlus::run(string playlist)
         // Find Best Proton in Reco
         indRecoProton = findBestProton();
         
-        if ( applyProtonScore && CCDeltaPlusAna_proton_score[indRecoProton] < minProtonScore ) continue;
+        if ( applyProtonScore && (CCDeltaPlusAna_proton_score[indRecoProton] < minProtonScore) ) continue;
         nCut_Proton_Score++;
         
         //------------------------------------------------------------------
-        // Get True Particle Indices and Some Sanity Checks
+        // Sanity Checks
         //------------------------------------------------------------------
-        muon.ind = findTrueParticle(PDG_List::mu_minus);
-        if(muon.ind == -1) continue;
-        nCut_True_Muon++;
-        
-        proton.ind = findTrueParticle(PDG_List::proton);
-        if(proton.ind == -1) continue;
-        nCut_True_Proton++;
-        
         if(CCDeltaPlusAna_muon_pz == 0) continue;
         nCut_Reco_Muon_NoProblem++;
       
@@ -167,7 +191,6 @@ void CCDeltaPlus::run(string playlist)
         // pID Studies
         //------------------------------------------------------------------
         if( is_pID_Studies){
-            cout<<"Collecting Data for pID Studies"<<endl;
             for(int i = 0; i < 10; i++){
                 if(CCDeltaPlusAna_proton_score[i] == -1) break;
                 if(CCDeltaPlusAna_trajProtonProngPDG[i] == 2212){
@@ -192,9 +215,6 @@ void CCDeltaPlus::run(string playlist)
                 fillProtonTrue();
 //                 fillPionTrue();
             }
-        
-            double truthMatchMomentum = CCDeltaPlusAna_trajProtonProngMomentum[indRecoProton];
-            proton.momentum[1] = truthMatchMomentum;
             
             // Fill Reconstructed Information
             fillMuonReco();
@@ -230,8 +250,6 @@ void CCDeltaPlus::run(string playlist)
     cutText<<"Cut_secEndPoint_Michel_Exist  "<<nCut_secEndPoint_Michel_Exist<<endl;
     cutText<<"Cut_Proton_None               "<<nCut_Proton_None<<endl;
     cutText<<"Cut_Proton_Score              "<<nCut_Proton_Score<<endl;
-    cutText<<"Cut_True_Muon                 "<<nCut_True_Muon<<endl;
-    cutText<<"Cut_True_Proton               "<<nCut_True_Proton<<endl;
     cutText<<"Cut_Reco_Muon_NoProblem       "<<nCut_Reco_Muon_NoProblem<<endl;
     
     

@@ -304,12 +304,15 @@ void CCDeltaPlus::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ);
    fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonPhi", &CCDeltaPlusAna_trajMuonPhi, &b_CCDeltaPlusAna_trajMuonPhi);
    fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonProngMomentum", &CCDeltaPlusAna_trajMuonProngMomentum, &b_CCDeltaPlusAna_trajMuonProngMomentum);
+   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonProngPx", &CCDeltaPlusAna_trajMuonProngPx, &b_CCDeltaPlusAna_trajMuonProngPx);
+   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonProngPy", &CCDeltaPlusAna_trajMuonProngPy, &b_CCDeltaPlusAna_trajMuonProngPy);
+   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonProngPz", &CCDeltaPlusAna_trajMuonProngPz, &b_CCDeltaPlusAna_trajMuonProngPz);
    fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonTheta", &CCDeltaPlusAna_trajMuonTheta, &b_CCDeltaPlusAna_trajMuonTheta);
    fChain->SetBranchAddress("CCDeltaPlusAna_vtx_x", &CCDeltaPlusAna_vtx_x, &b_CCDeltaPlusAna_vtx_x);
    fChain->SetBranchAddress("CCDeltaPlusAna_vtx_y", &CCDeltaPlusAna_vtx_y, &b_CCDeltaPlusAna_vtx_y);
    fChain->SetBranchAddress("CCDeltaPlusAna_vtx_z", &CCDeltaPlusAna_vtx_z, &b_CCDeltaPlusAna_vtx_z);
    fChain->SetBranchAddress("CCDeltaPlusAna_isProtonInsideOD", CCDeltaPlusAna_isProtonInsideOD, &b_CCDeltaPlusAna_isProtonInsideOD);
-   fChain->SetBranchAddress("CCDeltaPlusAna_ntrajProngProng", CCDeltaPlusAna_ntrajProngProng, &b_CCDeltaPlusAna_ntrajProngProng);
+   fChain->SetBranchAddress("CCDeltaPlusAna_ntrajProtonProng", CCDeltaPlusAna_ntrajProtonProng, &b_CCDeltaPlusAna_ntrajProtonProng);
    fChain->SetBranchAddress("CCDeltaPlusAna_proton_kinked", CCDeltaPlusAna_proton_kinked, &b_CCDeltaPlusAna_proton_kinked);
    fChain->SetBranchAddress("CCDeltaPlusAna_proton_odMatch", CCDeltaPlusAna_proton_odMatch, &b_CCDeltaPlusAna_proton_odMatch);
    fChain->SetBranchAddress("CCDeltaPlusAna_proton_trk_pat_history", CCDeltaPlusAna_proton_trk_pat_history, &b_CCDeltaPlusAna_proton_trk_pat_history);
@@ -344,6 +347,9 @@ void CCDeltaPlus::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCDeltaPlusAna_proton_thetaY", CCDeltaPlusAna_proton_thetaY, &b_CCDeltaPlusAna_proton_thetaY);
    fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonPhi", CCDeltaPlusAna_trajProtonPhi, &b_CCDeltaPlusAna_trajProtonPhi);
    fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonProngMomentum", CCDeltaPlusAna_trajProtonProngMomentum, &b_CCDeltaPlusAna_trajProtonProngMomentum);
+   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonProngPx", CCDeltaPlusAna_trajProtonProngPx, &b_CCDeltaPlusAna_trajProtonProngPx);
+   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonProngPy", CCDeltaPlusAna_trajProtonProngPy, &b_CCDeltaPlusAna_trajProtonProngPy);
+   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonProngPz", CCDeltaPlusAna_trajProtonProngPz, &b_CCDeltaPlusAna_trajProtonProngPz);
    fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonTheta", CCDeltaPlusAna_trajProtonTheta, &b_CCDeltaPlusAna_trajProtonTheta);
    fChain->SetBranchAddress("ev_run", &ev_run, &b_ev_run);
    fChain->SetBranchAddress("ev_subrun", &ev_subrun, &b_ev_subrun);

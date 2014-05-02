@@ -37,7 +37,7 @@ void main(bool onlyPlot)
     bool isTest = true;
     
     // Plot Selection
-    bool plotsMC    = true;
+    bool plotsMC    = false;
     bool plotsReco  = true;
     bool plots2D    = true;
     

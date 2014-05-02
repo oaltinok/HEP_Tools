@@ -15,9 +15,9 @@ Plotter::Plotter()
 void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
 {
     
-    plotCCDeltaPlus(isMC,isReco, is2D);
+//     plotCCDeltaPlus(isMC,isReco, is2D);
 
-    plotMuon(isMC,isReco, is2D);
+//     plotMuon(isMC,isReco, is2D);
     
     plotProton(isMC,isReco, is2D);
     
@@ -114,8 +114,8 @@ void Plotter::plotDefault(  string rootDir, string plotDir,
         TH1F* h_P_mc= f_Root->Get("P_mc");
         plot1D_Hist(h_P_mc,"P_mc.png",plotDir);
         
-        TH1F* h_KE_mc= f_Root->Get("KE_mc");
-        plot1D_Hist(h_KE_mc,"KE_mc.png",plotDir);
+//         TH1F* h_KE_mc= f_Root->Get("KE_mc");
+//         plot1D_Hist(h_KE_mc,"KE_mc.png",plotDir);
         
         TH1F* h_angleBeam_mc= f_Root->Get("angleBeam_mc");
         plot1D_Hist(h_angleBeam_mc,"angleBeam_mc.png",plotDir);
@@ -132,8 +132,8 @@ void Plotter::plotDefault(  string rootDir, string plotDir,
         TH1F* h_P_reco= f_Root->Get("P_reco");
         plot1D_Hist(h_P_reco,"P_reco.png",plotDir);
         
-        TH1F* h_KE_reco= f_Root->Get("KE_reco");
-        plot1D_Hist(h_KE_reco,"KE_reco.png",plotDir);    
+//         TH1F* h_KE_reco= f_Root->Get("KE_reco");
+//         plot1D_Hist(h_KE_reco,"KE_reco.png",plotDir);    
         
         TH1F* h_angleBeam_reco= f_Root->Get("angleBeam_reco");
         plot1D_Hist(h_angleBeam_reco,"angleBeam_reco.png",plotDir);
@@ -151,11 +151,11 @@ void Plotter::plotDefault(  string rootDir, string plotDir,
         TH1F* h_P_error= f_Root->Get("P_error");
         plot1D_Hist(h_P_error,"P_error.png",plotDir);
         
-        TH2F* h_KE_reco_mc= f_Root->Get("KE_reco_mc");
-        plot2D_Hist(h_KE_reco_mc,"KE_reco_mc.png",plotDir);
-        
-        TH1F* h_KE_error= f_Root->Get("KE_error");
-        plot1D_Hist(h_KE_error,"KE_error.png",plotDir);
+//         TH2F* h_KE_reco_mc= f_Root->Get("KE_reco_mc");
+//         plot2D_Hist(h_KE_reco_mc,"KE_reco_mc.png",plotDir);
+//         
+//         TH1F* h_KE_error= f_Root->Get("KE_error");
+//         plot1D_Hist(h_KE_error,"KE_error.png",plotDir);
         
         TH2F* h_angleBeam_reco_mc= f_Root->Get("angleBeam_reco_mc");
         plot2D_Hist(h_angleBeam_reco_mc,"angleBeam_reco_mc.png",plotDir);

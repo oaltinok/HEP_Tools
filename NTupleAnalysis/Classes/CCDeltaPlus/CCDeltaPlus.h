@@ -19,7 +19,7 @@ Class: CCDeltaPlus
     
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_05_01
+    Last Revision:  2014_05_02
 ================================================================================
 */
 
@@ -139,7 +139,7 @@ public :
     bool is_pID_Studies;
     double maxBeamEnergy;
     int max_nFSPart;
-    int minProtonScore;
+    double minProtonScore;
     HEP_Misc misc;
     TVector3 beam_p3;
     Proton proton;
@@ -169,7 +169,7 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
-    // Declaration of leaf types
+// Declaration of leaf types
    Double_t        eventID;
    Int_t           physEvtNum;
    Int_t           n_hyps;
@@ -421,12 +421,15 @@ public :
    Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ;
    Double_t        CCDeltaPlusAna_trajMuonPhi;
    Double_t        CCDeltaPlusAna_trajMuonProngMomentum;
+   Double_t        CCDeltaPlusAna_trajMuonProngPx;
+   Double_t        CCDeltaPlusAna_trajMuonProngPy;
+   Double_t        CCDeltaPlusAna_trajMuonProngPz;
    Double_t        CCDeltaPlusAna_trajMuonTheta;
    Double_t        CCDeltaPlusAna_vtx_x;
    Double_t        CCDeltaPlusAna_vtx_y;
    Double_t        CCDeltaPlusAna_vtx_z;
    Int_t           CCDeltaPlusAna_isProtonInsideOD[10];
-   Int_t           CCDeltaPlusAna_ntrajProngProng[10];
+   Int_t           CCDeltaPlusAna_ntrajProtonProng[10];
    Int_t           CCDeltaPlusAna_proton_kinked[10];
    Int_t           CCDeltaPlusAna_proton_odMatch[10];
    Int_t           CCDeltaPlusAna_proton_trk_pat_history[10];
@@ -461,6 +464,9 @@ public :
    Double_t        CCDeltaPlusAna_proton_thetaY[10];
    Double_t        CCDeltaPlusAna_trajProtonPhi[10];
    Double_t        CCDeltaPlusAna_trajProtonProngMomentum[10];
+   Double_t        CCDeltaPlusAna_trajProtonProngPx[10];
+   Double_t        CCDeltaPlusAna_trajProtonProngPy[10];
+   Double_t        CCDeltaPlusAna_trajProtonProngPz[10];
    Double_t        CCDeltaPlusAna_trajProtonTheta[10];
    Int_t           ev_run;
    Int_t           ev_subrun;
@@ -547,11 +553,11 @@ public :
    Int_t           mc_wgt_Flux_NA49_sz;
    Double_t        mc_wgt_Flux_NA49[100];   //[mc_wgt_Flux_NA49_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[7];   //[n_prongs]
-   Double_t        prong_part_score[7];   //[n_prongs]
-   Double_t        prong_part_mass[7];   //[n_prongs]
-   Int_t           prong_part_charge[7];   //[n_prongs]
-   Int_t           prong_part_pid[7];   //[n_prongs]
+   Int_t           prong_nParticles[6];   //[n_prongs]
+   Double_t        prong_part_score[6];   //[n_prongs]
+   Double_t        prong_part_mass[6];   //[n_prongs]
+   Int_t           prong_part_charge[6];   //[n_prongs]
+   Int_t           prong_part_pid[6];   //[n_prongs]
    vector<vector<double> > *prong_part_E;
    vector<vector<double> > *prong_part_pos;
 
@@ -807,12 +813,15 @@ public :
    TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ;   //!
    TBranch        *b_CCDeltaPlusAna_trajMuonPhi;   //!
    TBranch        *b_CCDeltaPlusAna_trajMuonProngMomentum;   //!
+   TBranch        *b_CCDeltaPlusAna_trajMuonProngPx;   //!
+   TBranch        *b_CCDeltaPlusAna_trajMuonProngPy;   //!
+   TBranch        *b_CCDeltaPlusAna_trajMuonProngPz;   //!
    TBranch        *b_CCDeltaPlusAna_trajMuonTheta;   //!
    TBranch        *b_CCDeltaPlusAna_vtx_x;   //!
    TBranch        *b_CCDeltaPlusAna_vtx_y;   //!
    TBranch        *b_CCDeltaPlusAna_vtx_z;   //!
    TBranch        *b_CCDeltaPlusAna_isProtonInsideOD;   //!
-   TBranch        *b_CCDeltaPlusAna_ntrajProngProng;   //!
+   TBranch        *b_CCDeltaPlusAna_ntrajProtonProng;   //!
    TBranch        *b_CCDeltaPlusAna_proton_kinked;   //!
    TBranch        *b_CCDeltaPlusAna_proton_odMatch;   //!
    TBranch        *b_CCDeltaPlusAna_proton_trk_pat_history;   //!
@@ -847,6 +856,9 @@ public :
    TBranch        *b_CCDeltaPlusAna_proton_thetaY;   //!
    TBranch        *b_CCDeltaPlusAna_trajProtonPhi;   //!
    TBranch        *b_CCDeltaPlusAna_trajProtonProngMomentum;   //!
+   TBranch        *b_CCDeltaPlusAna_trajProtonProngPx;   //!
+   TBranch        *b_CCDeltaPlusAna_trajProtonProngPy;   //!
+   TBranch        *b_CCDeltaPlusAna_trajProtonProngPz;   //!
    TBranch        *b_CCDeltaPlusAna_trajProtonTheta;   //!
    TBranch        *b_ev_run;   //!
    TBranch        *b_ev_subrun;   //!

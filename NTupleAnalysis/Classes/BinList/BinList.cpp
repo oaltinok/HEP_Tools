@@ -14,7 +14,7 @@ BinList::BinList()
     error.setBin(400, -2.0, 2.0);
     angle.setBin(180, 0.0, 180.0);
     trackLength.setBin(200, 0.0, 2000.0 );
-    particleScore.setBin(40, 0.0, 1.0);
+    particleScore.setBin(20,0.0,1.0);
     multiplicity.setBin(10,0.0,10.0);
     int_channel.setBin(9,0.0,9.0);
     vertex_z.setBin(470,4300.0,9000.0);

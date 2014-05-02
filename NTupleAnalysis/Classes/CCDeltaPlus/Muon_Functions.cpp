@@ -10,12 +10,31 @@ Function List: Muon_Functions.cpp
         > #ifdef CCDeltaPlus_cxx 
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_05_01
+    Last Revision:  2014_05_02
 ================================================================================
 */
 
 #include "CCDeltaPlus.cpp"
 #ifdef CCDeltaPlus_cxx
+
+
+void CCDeltaPlus::fillMuonTrue()
+{
+
+    // Fill 4-Momentum
+    muon.set_p4(    CCDeltaPlusAna_trajMuonProngPx,
+                    CCDeltaPlusAna_trajMuonProngPy,
+                    CCDeltaPlusAna_trajMuonProngPz,
+                    -1.0, 
+                    true);
+       
+    // set Angle wrt Beam
+    muon.set_angleBeam(beam_p3, true);
+    
+    // set Angle wrt Muon
+    muon.set_angleMuon(muon, true);
+    
+}
 
 void CCDeltaPlus::fillMuonReco()
 {
@@ -36,22 +55,4 @@ void CCDeltaPlus::fillMuonReco()
     muon.set_angleMuon(muon, false);
 }
 
-void CCDeltaPlus::fillMuonTrue()
-{
-    int ind = muon.ind;
-    
-    // Fill 4-Momentum
-    muon.set_p4(    mc_FSPartPx[ind],
-                    mc_FSPartPy[ind],
-                    mc_FSPartPz[ind],
-                    mc_FSPartE[ind], 
-                    true);
-       
-    // set Angle wrt Beam
-    muon.set_angleBeam(beam_p3, true);
-    
-    // set Angle wrt Muon
-    muon.set_angleMuon(muon, true);
-    
-}
 #endif // #ifdef CCDeltaPlus_cxx

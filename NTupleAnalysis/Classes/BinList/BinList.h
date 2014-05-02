@@ -15,7 +15,7 @@ Class: BinList
         > binList->error.get_max();
             
     
-    Last Revision: 2014_03_17
+    Last Revision: 2014_05_02
 ================================================================================
 */
 #ifndef BinList_h

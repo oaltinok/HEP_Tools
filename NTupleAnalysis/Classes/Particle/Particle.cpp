@@ -7,7 +7,7 @@ using namespace std;
 
 Particle::Particle()
 {
-    bin_partScore.setBin(101,0.0,1.1);
+    bin_partScore.setBin(20,0.0,1.0);
     bin_error.setBin(400, -2.0, 2.0);
     bin_angle.setBin(180, 0.0, 180.0);
 }

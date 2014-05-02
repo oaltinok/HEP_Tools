@@ -10,7 +10,7 @@ Function List: Proton_Functions.cpp
         > #ifdef CCDeltaPlus_cxx 
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_05_01
+    Last Revision:  2014_05_02
 ================================================================================
 */
 
@@ -22,10 +22,10 @@ void CCDeltaPlus::fillProtonTrue()
     int ind = proton.ind;
     
     // Fill 4-Momentum
-    proton.set_p4(  mc_FSPartPx[ind],
-                    mc_FSPartPy[ind],
-                    mc_FSPartPz[ind],
-                    mc_FSPartE[ind], 
+    proton.set_p4(  CCDeltaPlusAna_trajProtonProngPx[ind],
+                    CCDeltaPlusAna_trajProtonProngPy[ind],
+                    CCDeltaPlusAna_trajProtonProngPz[ind],
+                    -1.0, 
                     true);
        
     // set Angle wrt Beam
