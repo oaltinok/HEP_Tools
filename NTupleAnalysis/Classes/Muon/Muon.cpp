@@ -1,6 +1,9 @@
 /*
     See Muon.h header for Class Information
 */
+#ifndef Muon_cpp
+#define Muon_cpp
+
 #include "Muon.h"
 
 using namespace std;
@@ -10,8 +13,9 @@ Muon::Muon()
     cout<<"Initializing Muon Particle"<<endl;
     
     // File Locations
-    rootDir =   Folder_List::f_Root_Muon;
-    plotDir =   Folder_List::f_Plot_Muon;
+    rootDir =   "Output/RootFiles/Muon.root";
+    plotDir =   "Output/Plots/Muon/";
+
     
     cout<<"\tRoot File: "<<rootDir<<endl;
     cout<<"\tPlot Output Folder: "<<plotDir<<endl;
@@ -22,6 +26,7 @@ Muon::Muon()
     // Initialize Bins
     bin_P.setBin(100,0.0,10000.0);
     bin_KE.setBin(100,0.0,10000.0);
+    bin_AngleBeam.setBin(90,0.0,90.0);
 
     cout<<"\tInitializing Histograms "<<endl;
     partScore = new TH1F( "partScore","Muon Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
@@ -37,7 +42,7 @@ Muon::Muon()
     P_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_P.get_width()));
     
     P_error = new TH1F( "P_error","Error on Muon Momentum",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
-    P_error->GetXaxis()->SetTitle("(True - Reco) / True");
+    P_error->GetXaxis()->SetTitle("(Reco- True) / True");
     P_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_error.get_width()));
     
     P_reco_mc = new TH2F( "P_reco_mc","True vs Reconstructed Muon Momentum",
@@ -55,7 +60,7 @@ Muon::Muon()
     KE_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_P.get_width()));
     
     KE_error = new TH1F( "KE_error","Error on Muon Kinetic Energy",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
-    KE_error->GetXaxis()->SetTitle("(True - Reco) / True");
+    KE_error->GetXaxis()->SetTitle("(Reco- True) / True");
     KE_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_error.get_width()));
     
     KE_reco_mc = new TH2F( "KE_reco_mc","True vs Reconstructed Muon Kinetic Energy",
@@ -64,39 +69,39 @@ Muon::Muon()
     KE_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Kinetic Energy MeV");
     KE_reco_mc->GetYaxis()->SetTitle("True Muon Kinetic Energy MeV");
     
-    angleMuon_mc = new TH1F( "angleMuon_mc","True Muon Angle wrt. Muon",bin_angle.get_nBins(), bin_angle.get_min(), bin_angle.get_max() );
+    angleMuon_mc = new TH1F( "angleMuon_mc","True Muon Angle wrt. Muon",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
     angleMuon_mc->GetXaxis()->SetTitle("True Muon Angle wrt. Muon");
-    angleMuon_mc->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_angle.get_width()));
+    angleMuon_mc->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_AngleBeam.get_width()));
     
-    angleMuon_reco = new TH1F( "angleMuon_reco","Reconstructed Muon Angle wrt. Muon",bin_angle.get_nBins(), bin_angle.get_min(), bin_angle.get_max() );
+    angleMuon_reco = new TH1F( "angleMuon_reco","Reconstructed Muon Angle wrt. Muon",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
     angleMuon_reco->GetXaxis()->SetTitle("Reconstructed Muon Angle wrt. Muon");
-    angleMuon_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_angle.get_width()));
+    angleMuon_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_AngleBeam.get_width()));
     
     angleMuon_error = new TH1F( "angleMuon_error","Error on Muon Angle wrt. Muon",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
-    angleMuon_error->GetXaxis()->SetTitle("(True - Reco) / True");
+    angleMuon_error->GetXaxis()->SetTitle("(Reco- True) / True");
     angleMuon_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_error.get_width()));
     
     angleMuon_reco_mc = new TH2F( "angleMuon_reco_mc","True vs Reconstructed Muon Angle wrt. Muon",
-                                bin_angle.get_nBins(), bin_angle.get_min(), bin_angle.get_max(),
-                                bin_angle.get_nBins(), bin_angle.get_min(), bin_angle.get_max());
+                                bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max(),
+                                bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max());
     angleMuon_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Angle wrt. Muon");
     angleMuon_reco_mc->GetYaxis()->SetTitle("True Muon Angle wrt. Muon");
     
-    angleBeam_mc = new TH1F( "angleBeam_mc","True Muon Angle wrt. Beam",bin_angle.get_nBins(), bin_angle.get_min(), bin_angle.get_max() );
+    angleBeam_mc = new TH1F( "angleBeam_mc","True Muon Angle wrt. Beam",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
     angleBeam_mc->GetXaxis()->SetTitle("True Muon Angle wrt. Beam");
-    angleBeam_mc->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_angle.get_width()));
+    angleBeam_mc->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_AngleBeam.get_width()));
     
-    angleBeam_reco = new TH1F( "angleBeam_reco","Reconstructed Muon Angle wrt. Beam",bin_angle.get_nBins(), bin_angle.get_min(), bin_angle.get_max() );
+    angleBeam_reco = new TH1F( "angleBeam_reco","Reconstructed Muon Angle wrt. Beam",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
     angleBeam_reco->GetXaxis()->SetTitle("Reconstructed Muon Angle wrt. Beam");
-    angleBeam_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_angle.get_width()));
+    angleBeam_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_AngleBeam.get_width()));
     
     angleBeam_error = new TH1F( "angleBeam_error","Error on Muon Angle wrt. Beam",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
-    angleBeam_error->GetXaxis()->SetTitle("(True - Reco) / True");
-    angleBeam_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_error.get_width()));
+    angleBeam_error->GetXaxis()->SetTitle("(Reco- True) / True");
+    angleBeam_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_AngleBeam.get_width()));
     
     angleBeam_reco_mc = new TH2F( "angleBeam_reco_mc","True vs Reconstructed Muon Angle wrt. Beam",
-                                bin_angle.get_nBins(), bin_angle.get_min(), bin_angle.get_max(),
-                                bin_angle.get_nBins(), bin_angle.get_min(), bin_angle.get_max());
+                                bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max(),
+                                bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max());
     angleBeam_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Angle wrt. Beam");
     angleBeam_reco_mc->GetYaxis()->SetTitle("True Muon Angle wrt. Beam");
     
@@ -121,6 +126,7 @@ void Muon::set_angleMuon(Particle &mu, bool isMC)
     for( int i = 0; i < N_DATA_TYPE; i++){
         angleMuon[i] = 0.0;
     }
+    
 }
 
 void Muon::set_kineticEnergy(bool isMC)
@@ -130,6 +136,7 @@ void Muon::set_kineticEnergy(bool isMC)
     kineticEnergy[type] = p4[type].Energy() - restMass;
 }
 
+#endif
 
 
 

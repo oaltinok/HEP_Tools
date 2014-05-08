@@ -7,20 +7,24 @@ Class: Particle
     Uses ROOT Specific classes
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_05_02
+    Last Revision: 2014_05_08
 ================================================================================
 */
 
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
+#include <iostream>
+#include <string>
+
 #include <TMath.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TLorentzVector.h>
+#include <TFile.h>
 
-#include "Classes/BinList/BinList.cpp"
-#include "Libraries/Folder_List.h"
-
+#include "Libraries/Data_Functions.h"
+#include "Classes/SingleBin/SingleBin.cpp"
 
 class Particle
 {
@@ -79,8 +83,8 @@ class Particle
         
         
         // File Locations
-        string rootDir;
-        string plotDir;
+        std::string rootDir;
+        std::string plotDir;
         
         
         // Functions
@@ -92,15 +96,10 @@ class Particle
         void set_angleBeam(TVector3 beamp3, bool isMC);
         void set_p4(double px, double py, double pz, double E, bool isMC);
         void set_errors();
+        void set_momentum(bool isMC);
         void fill_Histograms();
         void write_RootFile();
         void plot_data();
-        
-        
-        // Other
-        double calc_error(double trueValue, double recoValue);
-        
-       
         
     
     protected:

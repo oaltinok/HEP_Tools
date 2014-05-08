@@ -1,6 +1,6 @@
 /*
 ================================================================================
-Library: PDG_List
+Namespace: PDG_List
     Particle Data Group Particle Identification List
     List of Commonly used particles PDGs
     
@@ -13,15 +13,16 @@ Library: PDG_List
         > #include "Libraries/PDG_List.h" 
         > PDG_List::proton      // Returns proton PDG (2212)
             
-    
-    Last Revision: 2014_01_27
+    Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
+    Last Revision:  2014_05_07
 ================================================================================
 */
 
-#ifndef PDG_List.h
-#define PDG_List.h
+#ifndef PDG_List_h
+#define PDG_List_h
 
-using namespace std;
+namespace PDG_List
+{
 
 const int gamma = 22;
 
@@ -59,7 +60,6 @@ const int kaon_plus = 321;
 const int kaon_minus = -kaon_plus;
 
 
-
 // -----------------------------------------------------------------------------
 //      Light Mesons
 //------------------------------------------------------------------------------
@@ -67,6 +67,7 @@ const int pi_zero = 111;
 const int pi_plus = 211;
 const int pi_minus = -pi_plus;
 
+}
 
 #endif
 

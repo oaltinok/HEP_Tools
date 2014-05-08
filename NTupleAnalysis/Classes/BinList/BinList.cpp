@@ -1,6 +1,10 @@
 /*
     See BinList.h header for Class Information
 */
+
+#ifndef BinList_cpp
+#define BinList_cpp
+
 #include "BinList.h"
 
 using namespace std;
@@ -25,10 +29,7 @@ BinList::BinList()
     q2.setBin(60,0.0,3.0);
 }
 
-BinList::~BinList()
-{
-
-}
+#endif
 
 
 

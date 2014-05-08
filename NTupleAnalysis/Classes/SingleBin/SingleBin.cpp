@@ -1,6 +1,8 @@
 /*
     See SingleBin.h header for Class Information
 */
+#ifndef SingleBin_cpp
+#define SingleBin_cpp
 #include "SingleBin.h"
 
 using namespace std;
@@ -54,3 +56,5 @@ void SingleBin::set_min(double input)
 {
     min = input;
 }
+
+#endif

@@ -5,7 +5,7 @@ Class: Proton -> Derived Class from Particle Base Clas
                 extends base class with proton specific parameters
 
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_05_01
+    Last Revision: 2014_05_08
 ================================================================================
 */
 #ifndef Proton_h
@@ -16,7 +16,7 @@ Class: Proton -> Derived Class from Particle Base Clas
 class Proton : public Particle
 {
     public:
-        Proton() : Particle() {};
+        Proton();
         
     private:
         static const double restMass = 938.27;

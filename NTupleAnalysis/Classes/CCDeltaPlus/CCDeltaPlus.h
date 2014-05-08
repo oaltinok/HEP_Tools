@@ -19,7 +19,7 @@ Class: CCDeltaPlus
     
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_05_02
+    Last Revision:  2014_05_08
 ================================================================================
 */
 
@@ -34,15 +34,17 @@ Class: CCDeltaPlus
 #include <TMath.h>
 
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include <string>
 
 #include "Libraries/PDG_List.h"
-#include "Libraries/Folder_List.h"
-#include "Classes/HEP_Misc/HEP_Misc.cpp"
-#include "Classes/Particle/Particle.cpp"
+
 #include "Classes/BinList/BinList.cpp"
 #include "Classes/Muon/Muon.cpp"
 #include "Classes/Proton/Proton.cpp"
 #include "Classes/Pion/Pion.cpp"
+
 
 const double mevSq_to_gevSq = pow(10,6);
 
@@ -52,56 +54,69 @@ public :
    //     Specific Functions
    //--------------------------------------------------------------------------
    
-    
-    
    // -------------------------------------------------------------------------
    //     void run(): Generates a .root file with selected histograms
    //         playlist -> address of the playlist
    //         filename -> file name for the output .root file
    //--------------------------------------------------------------------------
-    void run(string playlist);
+    void run(std::string playlist);
     
-    
-   /* 
-   -----------------------------------------------------------------------------
-        void initVariables();
-        void initHistograms();
-         
-            Initialize all variables will be used in your analysis
-            1) Initiliaze the CutNumbers you want to use
-            2) Initiliaze the Histograms that will be created
-            
-                
-   -----------------------------------------------------------------------------
-   */
+    //--------------------------------------------------------------------------
+    //  Runtime and CCDeltaPlus Functions
+    //      File: CCDeltaPlus.cpp
+    //--------------------------------------------------------------------------
+    void specifyRunTime();
     void initVariables();
-    void initHistograms();
-    
-    void fillParticleTrue(Particle& part);
-    
-    void fillHistograms();
-
-    void openFiles();
+    void initHistograms(); // File: initHistograms.cpp
     void closeFiles();
+    void openFiles();
+    void fillHistograms();
+    void write_RootFile();
     void writeReadme();
-    void writeCutFile();
+    bool isBeamEnergyLow(double maxEnergy);
+    int findTrueParticle(int targetPDG);
+    int countParticles(int targetPDG, bool applyPCut);
+    void get_pID_Stats();
+    void fillCCDeltaPlus();
+    
+    //--------------------------------------------------------------------------
+    //  Muon Specific Functions
+    //      File: Muon_Functions.cpp
+    //--------------------------------------------------------------------------
+    void fillMuonTrue();
+    void fillMuonReco();
+    //--------------------------------------------------------------------------
+    //  Proton Specific Functions
+    //      File: Proton_Functions.cpp
+    //--------------------------------------------------------------------------
+    void fillProtonTrue();
+    void fillProtonReco(int ind);
+    int findBestProton();
+    bool isProtonShort(int ind);
+    //--------------------------------------------------------------------------
+    //  Pion Specific Functions
+    //      File: Pion_Functions.cpp
+    //--------------------------------------------------------------------------
+    void fillPionTrue();
+    void fillPionReco();
+    bool isSinglePion();
+    bool isNoMeson();
 
-   // -------------------------------------------------------------------------
-   //     Default Functions
-   //--------------------------------------------------------------------------
-    CCDeltaPlus();
+
+    //--------------------------------------------------------------------------
+    //     Default Functions
+    //--------------------------------------------------------------------------
     ~CCDeltaPlus();
-
-    void Init(string playlist, TChain* fChain);
+    void Init(std::string playlist, TChain* fChain);
     Int_t GetEntry(Long64_t entry);
     Long64_t LoadTree(Long64_t entry);
     Bool_t Notify();
     void Show(Long64_t entry);
     Int_t Cut(Long64_t entry);
     
-   //-------------------------------------------------------------------------
-   //     Histograms
-   //--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    //     Histograms
+    //--------------------------------------------------------------------------
     TFile* f;
     
     // Analysis Variables
@@ -115,9 +130,12 @@ public :
     TH1F* q2_error;
     TH2F* q2_reco_mc;
     
-    TH1F* int_channel;
     TH1F* vertex_z_true;
     TH1F* vertex_z_reco;
+    TH1F* vertex_z_error;
+    TH2F* vertex_z_reco_mc;
+    
+    TH1F* int_channel;
     TH2F* vertex_x_y_true;
     TH2F* vertex_x_y_reco;
     TH1F* n_FSParticles;
@@ -140,7 +158,6 @@ public :
     double maxBeamEnergy;
     int max_nFSPart;
     double minProtonScore;
-    HEP_Misc misc;
     TVector3 beam_p3;
     Proton proton;
     Muon muon;
@@ -154,11 +171,12 @@ public :
    // -------------------------------------------------------------------------
    //     Files
    //--------------------------------------------------------------------------
-    string rootDir;
-    string plotDir;
-    string readmeFile;
+    std::string rootDir;
+    std::string plotDir;
+    std::string readmeFile;
+    std::string cutFile;
+    std::string channelTag;
     ofstream readme;
-    string cutFile;
     ofstream cutText;
 
    // -------------------------------------------------------------------------
@@ -558,8 +576,8 @@ public :
    Double_t        prong_part_mass[6];   //[n_prongs]
    Int_t           prong_part_charge[6];   //[n_prongs]
    Int_t           prong_part_pid[6];   //[n_prongs]
-   vector<vector<double> > *prong_part_E;
-   vector<vector<double> > *prong_part_pos;
+   std::vector<std::vector<double> > *prong_part_E;
+   std::vector<std::vector<double> > *prong_part_pos;
 
    // List of branches
    TBranch        *b_eventID;   //!
@@ -882,7 +900,7 @@ public :
    TBranch        *b_mc_charm;   //!
    TBranch        *b_mc_weight;   //!
    TBranch        *b_mc_XSec;   //!
-   TBranch        *b_mc_diffXSec;   //!
+   TBranch        *b_mc_diffXSec;   //!virtual 
    TBranch        *b_mc_incoming;   //!
    TBranch        *b_mc_fluxDriverProb;   //!
    TBranch        *b_mc_targetNucleus;   //!
@@ -952,16 +970,7 @@ public :
    TBranch        *b_prong_part_pid;   //!
    TBranch        *b_prong_part_E;   //!
    TBranch        *b_prong_part_pos;   //!
-   
-   CCDeltaPlus(TTree *tree=0);
-   virtual ~CCDeltaPlus();
-   virtual Int_t    Cut(Long64_t entry);
-   virtual Int_t    GetEntry(Long64_t entry);
-   virtual Long64_t LoadTree(Long64_t entry);
-   virtual void     Init(TTree *tree);
-   virtual void     Loop();
-   virtual Bool_t   Notify();
-   virtual void     Show(Long64_t entry = -1);
+  
 };
 
 #endif

@@ -15,7 +15,7 @@ Class: BinList
         > binList->error.get_max();
             
     
-    Last Revision: 2014_05_02
+    Last Revision: 2014_05_08
 ================================================================================
 */
 #ifndef BinList_h
@@ -27,7 +27,6 @@ class BinList
 {
     public:
         BinList();
-        ~BinList();
         
         // Standard Bins
         SingleBin error;

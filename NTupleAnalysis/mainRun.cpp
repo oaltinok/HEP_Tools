@@ -17,28 +17,28 @@ main.cpp
             > main(true) for Generating Plots only
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_05_01
+    Last Revision: 2014_05_08
 ================================================================================
 */
 
 // Include Required Classes & Libraries
 #include "Classes/CCDeltaPlus/CCDeltaPlus.cpp"
 #include "Classes/Plotter/Plotter.cpp"
-#include "Libraries/Folder_List.h"
 
 #include <string>
 
 using namespace std;
 
-
-void main(bool onlyPlot)
+void mainRun(bool onlyPlot )
 {
+
+//     bool onlyPlot = false;
     // Edit isTest Variable for running Test Samples or complete playlist
     bool isTest = true;
     
     // Plot Selection
     bool plotsMC    = false;
-    bool plotsReco  = true;
+    bool plotsReco  = false;
     bool plots2D    = true;
     
     if(onlyPlot){
@@ -47,11 +47,12 @@ void main(bool onlyPlot)
     }else{
         CCDeltaPlus t;
         if(isTest){
-            t.run(f_PL_Test);
+            t.run("Input/Playlists/pl_MC_Test.dat");
         }else{
-            t.run(f_PL_Full);
+            t.run("Input/Playlists/pl_MC_minerva1.dat");
         }
     }
+    
     
 }
 

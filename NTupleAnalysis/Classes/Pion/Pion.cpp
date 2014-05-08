@@ -1,8 +1,12 @@
 /*
     See Pion.h header for Class Information
 */
+#ifndef Pion_cpp
+#define Pion_cpp
 
 #include "Pion.h"
+
+using namespace std;
 
 Pion::Pion()
 {
@@ -10,8 +14,8 @@ Pion::Pion()
     cout<<"Initializing Pion Particle"<<endl;
     
     // File Locations
-    rootDir =   Folder_List::f_Root_Pion;
-    plotDir =   Folder_List::f_Plot_Pion;
+    rootDir =   "Output/RootFiles/Pion.root";
+    plotDir =   "Output/Plots/Pion/";
     
     cout<<"\tRoot File: "<<rootDir<<endl;
     cout<<"\tPlot Output Folder: "<<plotDir<<endl;
@@ -37,7 +41,7 @@ Pion::Pion()
     P_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_P.get_width()));
     
     P_error = new TH1F( "P_error","Error on Pion Momentum",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
-    P_error->GetXaxis()->SetTitle("(True - Reco) / True");
+    P_error->GetXaxis()->SetTitle("(Reco- True) / True");
     P_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_error.get_width()));
     
     P_reco_mc = new TH2F( "P_reco_mc","True vs Reconstructed Pion Momentum",
@@ -55,7 +59,7 @@ Pion::Pion()
     KE_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_P.get_width()));
     
     KE_error = new TH1F( "KE_error","Error on Pion Kinetic Energy",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
-    KE_error->GetXaxis()->SetTitle("(True - Reco) / True");
+    KE_error->GetXaxis()->SetTitle("(Reco- True) / True");
     KE_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_error.get_width()));
     
     KE_reco_mc = new TH2F( "KE_reco_mc","True vs Reconstructed Pion Kinetic Energy",
@@ -73,7 +77,7 @@ Pion::Pion()
     angleBeam_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_angle.get_width()));
     
     angleBeam_error = new TH1F( "angleBeam_error","Error on Pion Angle wrt. Beam",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
-    angleBeam_error->GetXaxis()->SetTitle("(True - Reco) / True");
+    angleBeam_error->GetXaxis()->SetTitle("(Reco- True) / True");
     angleBeam_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_error.get_width()));
     
     angleBeam_reco_mc = new TH2F( "angleBeam_reco_mc","True vs Reconstructed Pion Angle wrt. Beam",
@@ -91,7 +95,7 @@ Pion::Pion()
     angleMuon_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_angle.get_width()));
     
     angleMuon_error = new TH1F( "angleMuon_error","Error on Pion Angle wrt. Muon",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
-    angleMuon_error->GetXaxis()->SetTitle("(True - Reco) / True");
+    angleMuon_error->GetXaxis()->SetTitle("(Reco- True) / True");
     angleMuon_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_error.get_width()));
     
     angleMuon_reco_mc = new TH2F( "angleMuon_reco_mc","True vs Reconstructed Pion Angle wrt. Muon",
@@ -110,3 +114,4 @@ void Pion::set_kineticEnergy(bool isMC)
     kineticEnergy[type] = p4[type].Energy() - restMass;
 }
 
+#endif

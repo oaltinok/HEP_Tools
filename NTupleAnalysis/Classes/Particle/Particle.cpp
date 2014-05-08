@@ -1,6 +1,10 @@
 /*
     See Particle.h header for Class Information
 */
+
+#ifndef PARTICLE_CPP
+#define PARTICLE_CPP
+
 #include "Particle.h"
 
 using namespace std;
@@ -40,11 +44,11 @@ void Particle::fill_Histograms()
 
 void Particle::write_RootFile()
 {
-    cout<<">> Writing "<<rootDir<<endl;
+    std::cout<<">> Writing "<<rootDir<<endl;
     f->Write();
 }
 
-virtual void Particle::set_angleMuon(Particle &mu, bool isMC)
+void Particle::set_angleMuon(Particle &mu, bool isMC)
 {
     int type = getDataType(isMC);
     TVector3 muonp3 = mu.p4[type].Vect(); // Get Muon 3-Momentum
@@ -69,10 +73,10 @@ void Particle::set_p4(double px, double py, double pz, double E, bool isMC)
 
 void Particle::set_errors()
 {
-    momentum[2] = calc_error(momentum[1], momentum[0]);
-    kineticEnergy[2] = calc_error(kineticEnergy[1], kineticEnergy[0]);
-    angleMuon[2] = calc_error(angleMuon[1] * TMath::RadToDeg(), angleMuon[0] * TMath::RadToDeg());
-    angleBeam[2] = calc_error(angleBeam[1] * TMath::RadToDeg(), angleBeam[0] * TMath::RadToDeg());
+    momentum[2] = Data_Functions::getError(momentum[1], momentum[0]);
+    kineticEnergy[2] = Data_Functions::getError(kineticEnergy[1], kineticEnergy[0]);
+    angleMuon[2] = Data_Functions::getError(angleMuon[1] * TMath::RadToDeg(), angleMuon[0] * TMath::RadToDeg());
+    angleBeam[2] = Data_Functions::getError(angleBeam[1] * TMath::RadToDeg(), angleBeam[0] * TMath::RadToDeg());
 }
 
 void Particle::set_momentum(bool isMC)
@@ -82,15 +86,6 @@ void Particle::set_momentum(bool isMC)
     momentum[type] = p4[type].P();
 }
 
-
-double Particle::calc_error(double trueValue, double recoValue)
-{
-    double error;
-    
-    error = (trueValue - recoValue) / trueValue;
-    
-    return error;
-}
 
 int Particle::getDataType(bool isMC)
 {
@@ -110,5 +105,6 @@ Particle::~Particle()
 {
 
 }
+#endif
 
 

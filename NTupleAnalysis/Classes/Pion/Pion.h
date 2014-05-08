@@ -4,7 +4,7 @@ Class: Pion -> Derived Class from Particle Base Clas
     Pion Class  inherits Particle Behaviours and 
                 extends base class with pion specific parameters
     
-    Last Revision: 2014_04_16
+    Last Revision: 2014_05_08
 ================================================================================
 */
 
@@ -16,12 +16,11 @@ Class: Pion -> Derived Class from Particle Base Clas
 class Pion : public Particle
 {
     public:
-        Pion() : Particle() {};
-
+        Pion();
+        
 
     private:
         static const double restMass = 134.98;
-
 
 };
 
