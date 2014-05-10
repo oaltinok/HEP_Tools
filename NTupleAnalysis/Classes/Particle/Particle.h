@@ -7,7 +7,7 @@ Class: Particle
     Uses ROOT Specific classes
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_05_08
+    Last Revision: 2014_05_10
 ================================================================================
 */
 
@@ -23,8 +23,11 @@ Class: Particle
 #include <TLorentzVector.h>
 #include <TFile.h>
 
-#include "Libraries/Data_Functions.h"
-#include "Classes/SingleBin/SingleBin.cpp"
+// Libraries
+#include "../../Libraries/Data_Functions.h"
+
+//Classes
+#include "../SingleBin/SingleBin.h"
 
 class Particle
 {
@@ -92,7 +95,7 @@ class Particle
         ~Particle();
         int getDataType(bool isMC); // Returns the indice of arrays reco = 0, mc = 1
         virtual void set_angleMuon(Particle &mu, bool isMC);
-        virtual void set_kineticEnergy(bool isMC) = 0;
+        virtual void set_kineticEnergy(bool isMC);
         void set_angleBeam(TVector3 beamp3, bool isMC);
         void set_p4(double px, double py, double pz, double E, bool isMC);
         void set_errors();

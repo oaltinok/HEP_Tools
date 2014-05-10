@@ -17,22 +17,51 @@ main.cpp
             > main(true) for Generating Plots only
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_05_08
+    Last Revision: 2014_05_10
 ================================================================================
 */
 
-// Include Required Classes & Libraries
-#include "Classes/CCDeltaPlus/CCDeltaPlus.cpp"
-#include "Classes/Plotter/Plotter.cpp"
+// Include Required Classes
+#include "Classes/CCDeltaPlus/CCDeltaPlus.h"
+#include "Classes/Plotter/Plotter.h"
 
 #include <string>
 
+const    string option1 = "run";
+const    string option2 = "plot";
+
+void showInputError(char *argv[]);
+
 using namespace std;
 
-void mainRun(bool onlyPlot )
+int main(int argc, char *argv[] )
 {
+    bool onlyPlot = true;
+    string input;
+    
+    if ( argc != 2 || argc > 2) /* argc should be 2 for correct execution */
+    {
+        /* We print argv[0] assuming it is the program name */
+        showInputError(argv);
+        return 0;
+    }else{
+        input = argv[1];
+    }
+    
+    if(input.compare(option1) == 0){
+        cout<<"Run Option Selected!"<<endl;
+        onlyPlot = false;
+    }
+    else if(input.compare(option2) == 0){
+        cout<<"Plot Option Selected!"<<endl;
+        onlyPlot = true;
+    }
+    else{ 
+        showInputError(argv);
+        return 0;
+    }
+    
 
-//     bool onlyPlot = false;
     // Edit isTest Variable for running Test Samples or complete playlist
     bool isTest = true;
     
@@ -53,7 +82,14 @@ void mainRun(bool onlyPlot )
         }
     }
     
-    
+    return 0;
+}
+
+void showInputError(char *argv[])
+{
+    cout<<"Not a valid option!"<<endl;
+    cout<<"Run: "<<argv[0]<<" "<<option1<<endl;
+    cout<<"Plot: "<<argv[0]<<" "<<option1<<endl;
 }
 
 

@@ -3,15 +3,16 @@
 Class: Muon -> Derived Class from Particle Base Clas
     Muon Class  inherits Particle Behaviours and 
                 extends base class with muon specific parameters
-    
-    Last Revision: 2014_05_08
+                
+    Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
+    Last Revision: 2014_05_10
 ================================================================================
 */
 
 #ifndef Muon_h
 #define Muon_h
 
-#include "Classes/Particle/Particle.cpp"
+#include "../Particle/Particle.h"
 
 class Muon : public Particle
 {
@@ -19,6 +20,8 @@ class Muon : public Particle
         Muon();
         bool get_isMinosMatched();
         void set_isMinosMatched(bool input);
+        void set_angleMuon(Particle &mu, bool isMC);
+        void set_kineticEnergy(bool isMC);
 
         
     private:

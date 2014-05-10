@@ -44,7 +44,7 @@ void Particle::fill_Histograms()
 
 void Particle::write_RootFile()
 {
-    std::cout<<">> Writing "<<rootDir<<endl;
+    cout<<">> Writing "<<rootDir<<endl;
     f->Write();
 }
 
@@ -54,6 +54,13 @@ void Particle::set_angleMuon(Particle &mu, bool isMC)
     TVector3 muonp3 = mu.p4[type].Vect(); // Get Muon 3-Momentum
     
     angleMuon[type] = p4[type].Angle( muonp3 );
+}
+
+void Particle::set_kineticEnergy(bool isMC)
+{
+    int type = getDataType(isMC);
+    cout<<"Warning using Particle::set_kineticEnergy!"<<endl;
+    kineticEnergy[type] = -1.0;
 }
 
 void Particle::set_angleBeam(TVector3 beamp3, bool isMC)

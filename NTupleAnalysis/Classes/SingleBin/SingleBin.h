@@ -12,7 +12,8 @@ Class: SingleBin
         > hadronMomentum.set_nBins(40);
         > hadronMomentum.get_nBins();
             
-    
+
+    Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Last Revision: 2014_03_17
 ================================================================================
 */

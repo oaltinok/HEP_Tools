@@ -12,7 +12,7 @@ Namespace: Data_Functions
         > Data_Functions::getError(trueValue,recoValue)
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_05_07
+    Last Revision:  2014_05_10
 ================================================================================
 */
 
@@ -22,7 +22,7 @@ Namespace: Data_Functions
 namespace Data_Functions
 {
 
-double getError(double trueValue, double recoValue)
+inline double getError(double trueValue, double recoValue)
 {
     double error;
     error = (recoValue- trueValue) / trueValue;

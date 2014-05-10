@@ -3,6 +3,7 @@
 */
 #ifndef SingleBin_cpp
 #define SingleBin_cpp
+
 #include "SingleBin.h"
 
 using namespace std;

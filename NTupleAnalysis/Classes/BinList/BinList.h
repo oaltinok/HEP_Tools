@@ -14,14 +14,14 @@ Class: BinList
         > binList->error.get_min();
         > binList->error.get_max();
             
-    
-    Last Revision: 2014_05_08
+    Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
+    Last Revision: 2014_05_10
 ================================================================================
 */
 #ifndef BinList_h
 #define BinList_h
 
-#include "Classes/SingleBin/SingleBin.cpp"
+#include "../SingleBin/SingleBin.h"
 
 class BinList
 {

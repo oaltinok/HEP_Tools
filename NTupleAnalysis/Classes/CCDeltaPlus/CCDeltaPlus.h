@@ -19,7 +19,7 @@ Class: CCDeltaPlus
     
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_05_08
+    Last Revision:  2014_05_10
 ================================================================================
 */
 
@@ -38,12 +38,15 @@ Class: CCDeltaPlus
 #include <fstream>
 #include <string>
 
-#include "Libraries/PDG_List.h"
+// Libraries
+#include "../../Libraries/PDG_List.h"
+#include "../../Libraries/Data_Functions.h"
 
-#include "Classes/BinList/BinList.cpp"
-#include "Classes/Muon/Muon.cpp"
-#include "Classes/Proton/Proton.cpp"
-#include "Classes/Pion/Pion.cpp"
+// Classes
+#include "../BinList/BinList.h"
+#include "../Muon/Muon.h"
+#include "../Proton/Proton.h"
+#include "../Pion/Pion.h"
 
 
 const double mevSq_to_gevSq = pow(10,6);

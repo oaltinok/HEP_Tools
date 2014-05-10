@@ -21,11 +21,6 @@ void CCDeltaPlus::specifyRunTime()
 void CCDeltaPlus::run(string playlist)
 {
     //------------------------------------------------------------------------
-    // Open files for writing
-    //------------------------------------------------------------------------
-    openFiles();
-   
-    //------------------------------------------------------------------------
     // Create chain
     //------------------------------------------------------------------------
 
@@ -43,12 +38,18 @@ void CCDeltaPlus::run(string playlist)
     initHistograms();
     
     //------------------------------------------------------------------------
+    // Open files for writing
+    //------------------------------------------------------------------------
+    openFiles();
+    
+    //------------------------------------------------------------------------
     // Branch Selection for Performance
     //------------------------------------------------------------------------
     fChain->SetBranchStatus("*",0);  // disable all branches
 
     fChain->SetBranchStatus("ev_run",1);  // activate
     
+    fChain->SetBranchStatus("truth_isSignal",1);  // activate
     fChain->SetBranchStatus("Cut_EndPoint_Michel_Exist",1);  // activate
     fChain->SetBranchStatus("Cut_Muon_None",1);  // activate
     fChain->SetBranchStatus("Cut_Muon_Score_Low",1);  // activate
@@ -86,9 +87,14 @@ void CCDeltaPlus::run(string playlist)
     fChain->SetBranchStatus("mc_nFSPart",1);  // activate
     fChain->SetBranchStatus("CCDeltaPlusAna_vtx",1);  // activate
     
+    fChain->SetBranchStatus("truth_muon_charge",1);  // activate
+    fChain->SetBranchStatus("truth_reco_muonCharge",1);  // activate
+    
+    
     
     // Cut Statistics
     double nAll = 0;
+
     double nCut_Vertex_None = 0;
     double nCut_Vertex_Null = 0;
     double nCut_Vertex_Not_Analyzable = 0; 
@@ -101,6 +107,22 @@ void CCDeltaPlus::run(string playlist)
     double nCut_Proton_None = 0;            
     double nCut_Proton_Score = 0;
     double nCut_Reco_Muon_NoProblem = 0;
+    
+    double nSignal = 0;
+    double nSignal_Vertex_None = 0;
+    double nSignal_Vertex_Null = 0;
+    double nSignal_Vertex_Not_Analyzable = 0; 
+    double nSignal_Vertex_Not_Fiducial = 0;    
+    double nSignal_Vertex_Michel_Exist = 0;           
+    double nSignal_Muon_None = 0;              
+    double nSignal_Muon_Score_Low = 0;
+    double nSignal_EndPoint_Michel_Exist = 0;
+    double nSignal_secEndPoint_Michel_Exist = 0;
+    double nSignal_Proton_None = 0;            
+    double nSignal_Proton_Score = 0;
+    double nSignal_Reco_Muon_NoProblem = 0;
+    
+    double nAntiMuon = 0;
     
     int indRecoProton;
 
@@ -138,48 +160,65 @@ void CCDeltaPlus::run(string playlist)
         
         // Count All Events before Cuts
         nAll++;
+        if (truth_isSignal) nSignal++;
         
         if( Cut_Vertex_None == 1) continue;
         nCut_Vertex_None++;
+        if(truth_isSignal) nSignal_Vertex_None ++;
         
         if( Cut_Vertex_Null == 1) continue;
         nCut_Vertex_Null++;
+        if(truth_isSignal) nSignal_Vertex_Null++;
         
         if( Cut_Vertex_Not_Analyzable == 1) continue;
         nCut_Vertex_Not_Analyzable++;
+        if(truth_isSignal) nSignal_Vertex_Not_Analyzable++;
         
         if( Cut_Vertex_Not_Fiducial == 1) continue;
         nCut_Vertex_Not_Fiducial++;
+        if(truth_isSignal) nSignal_Vertex_Not_Fiducial++;
         
         if( Cut_Muon_None == 1) continue;
         nCut_Muon_None++;
+        if(truth_isSignal) nSignal_Muon_None++;
         
         if( Cut_Muon_Score_Low == 1) continue;
         nCut_Muon_Score_Low++;
+        if(truth_isSignal) nSignal_Muon_Score_Low++;
+        
            
         if( Cut_Vertex_Michel_Exist == 1) continue;
         nCut_Vertex_Michel_Exist++;
+        if(truth_isSignal) nSignal_Vertex_Michel_Exist++;
 
         if( Cut_EndPoint_Michel_Exist == 1) continue;
         nCut_EndPoint_Michel_Exist++;
+        if(truth_isSignal) nSignal_EndPoint_Michel_Exist++;
  
         if( Cut_secEndPoint_Michel_Exist == 1) continue;
         nCut_secEndPoint_Michel_Exist++;
+        if(truth_isSignal) nSignal_secEndPoint_Michel_Exist++;
         
         if( Cut_Proton_None == 1) continue;
         nCut_Proton_None++;
+        if(truth_isSignal) nSignal_Proton_None++;
         
         // Find Best Proton in Reco
         indRecoProton = findBestProton();
         
         if ( applyProtonScore && (CCDeltaPlusAna_proton_score[indRecoProton] < minProtonScore) ) continue;
         nCut_Proton_Score++;
+        if(truth_isSignal) nSignal_Proton_Score++;
+        
+        if(truth_muon_charge == 1 && truth_isSignal) nAntiMuon++;
+        
         
         //------------------------------------------------------------------
         // Sanity Checks
         //------------------------------------------------------------------
         if(CCDeltaPlusAna_muon_pz == 0) continue;
         nCut_Reco_Muon_NoProblem++;
+        if(truth_isSignal) nSignal_Reco_Muon_NoProblem++;
       
         //------------------------------------------------------------------
         // pID Studies
@@ -229,7 +268,7 @@ void CCDeltaPlus::run(string playlist)
     
     if(is_pID_Studies) get_pID_Stats();
     
-    
+    cout<<nAntiMuon<<endl;
     
     cout<<"Done!"<<endl;
     
@@ -247,6 +286,20 @@ void CCDeltaPlus::run(string playlist)
     cutText<<"Cut_Proton_None               "<<nCut_Proton_None<<endl;
     cutText<<"Cut_Proton_Score              "<<nCut_Proton_Score<<endl;
     cutText<<"Cut_Reco_Muon_NoProblem       "<<nCut_Reco_Muon_NoProblem<<endl;
+    cutText<<endl;
+    cutText<<"nSignal                          "<<nSignal<<endl;
+    cutText<<"Signal_Vertex_None               "<<nSignal_Vertex_None<<endl;
+    cutText<<"Signal_Vertex_Null               "<<nSignal_Vertex_Null<<endl;
+    cutText<<"Signal_Vertex_Not_Analyzable     "<<nSignal_Vertex_Not_Analyzable<<endl;
+    cutText<<"Signal_Vertex_Not_Fiducial       "<<nSignal_Vertex_Not_Fiducial<<endl;
+    cutText<<"Signal_Muon_None                 "<<nSignal_Muon_None<<endl;
+    cutText<<"Signal_Muon_Score_Low            "<<nSignal_Muon_Score_Low<<endl; 
+    cutText<<"Signal_Vertex_Michel_Exist       "<<nSignal_Vertex_Michel_Exist<<endl;
+    cutText<<"Signal_EndPoint_Michel_Exist     "<<nSignal_EndPoint_Michel_Exist<<endl;
+    cutText<<"Signal_secEndPoint_Michel_Exist  "<<nSignal_secEndPoint_Michel_Exist<<endl;
+    cutText<<"Signal_Proton_None               "<<nSignal_Proton_None<<endl;
+    cutText<<"Signal_Proton_Score              "<<nSignal_Proton_Score<<endl;
+    cutText<<"Signal_Reco_Muon_NoProblem       "<<nSignal_Reco_Muon_NoProblem<<endl;
     
     
     // Write the Root Files
@@ -257,6 +310,7 @@ void CCDeltaPlus::run(string playlist)
     
     
     closeFiles();
+    
     
 }
 
@@ -337,7 +391,7 @@ void CCDeltaPlus::initVariables()
     
     // Create Root File 
     f = new TFile(rootDir.c_str(),"RECREATE");
-
+    
     // -------------------------------------------------------------------------
     //     Initialization
     //--------------------------------------------------------------------------
