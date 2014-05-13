@@ -343,7 +343,9 @@ StatusCode CCDeltaPlusAna::initialize()
     declareDoubleBranch(m_hypMeths, "trajMuonProngPx", -1);
     declareDoubleBranch(m_hypMeths, "trajMuonProngPy", -1);
     declareDoubleBranch(m_hypMeths, "trajMuonProngPz", -1);
+    declareDoubleBranch(m_hypMeths, "trajMuonProngEnergy", -1);
     declareDoubleBranch(m_hypMeths, "trajMuonProngMomentum", -1);
+    declareDoubleBranch(m_hypMeths, "trajMuonProngPSelf", -1);
     declareDoubleBranch(m_hypMeths, "trajMuonTheta",         -1);
     declareDoubleBranch(m_hypMeths, "trajMuonPhi",           -1);
     declareDoubleBranch(m_hypMeths, "endMuonTrajMomentum",   -9999);
@@ -358,7 +360,9 @@ StatusCode CCDeltaPlusAna::initialize()
     declareContainerDoubleBranch(m_hypMeths, "trajProtonProngPx", 10, -1);
     declareContainerDoubleBranch(m_hypMeths, "trajProtonProngPy", 10, -1);
     declareContainerDoubleBranch(m_hypMeths, "trajProtonProngPz", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "trajProtonProngEnergy", 10, -1);
     declareContainerDoubleBranch(m_hypMeths, "trajProtonProngMomentum", 10, -1);
+    declareContainerDoubleBranch(m_hypMeths, "trajProtonProngPSelf", 10, -1);
     declareContainerDoubleBranch(m_hypMeths, "trajProtonTheta",         10, -1);
     declareContainerDoubleBranch(m_hypMeths, "trajProtonPhi",           10, -1);
     declareContainerDoubleBranch(m_hypMeths, "endProtonTrajMomentum",   10, -9999);
@@ -370,10 +374,11 @@ StatusCode CCDeltaPlusAna::initialize()
     //! Event - Cut Results
     declareIntEventBranch( "Cut_Vertex_None", -1 );
     declareIntEventBranch( "Cut_Vertex_Null", -1 );
-    declareIntEventBranch( "Cut_Vertex_Not_Analyzable", -1 );
+    declareIntEventBranch( "Cut_Vertex_Not_Reconstructable", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Fiducial", -1 );
     declareIntEventBranch( "Cut_Muon_None",-1);
     declareIntEventBranch( "Cut_Muon_Score_Low",-1);
+    declareIntEventBranch( "Cut_Muon_Charge",-1);
     declareIntEventBranch( "Cut_Vertex_Michel_Exist", -1 );
     declareIntEventBranch( "Cut_EndPoint_Michel_Exist", -1 );
     declareIntEventBranch( "Cut_secEndPoint_Michel_Exist", -1 );
@@ -415,6 +420,7 @@ StatusCode CCDeltaPlusAna::initialize()
     //! NeutrinoInt - Vertex
     declareIntBranch( m_hypMeths, "vtx_module", -99);
     declareIntBranch( m_hypMeths, "vtx_plane",-1);
+    declareIntBranch( m_hypMeths, "vertex_count",-1);
     declareDoubleBranch( m_hypMeths, "vtx_x",0.0);
     declareDoubleBranch( m_hypMeths, "vtx_y",0.0);
     declareDoubleBranch( m_hypMeths, "vtx_z",0.0);
@@ -424,6 +430,7 @@ StatusCode CCDeltaPlusAna::initialize()
     declareIntBranch( m_hypMeths, "muon_N_minosTracks", -1);
     declareIntBranch( m_hypMeths, "muon_minosTrackQuality", -1);
     declareIntBranch( m_hypMeths, "muon_roadUpstreamPlanes", -1);
+    declareIntBranch( m_hypMeths, "muon_charge", -99);
     declareDoubleBranch( m_hypMeths, "muon_roadUpstreamEnergy", 0.0);
     declareDoubleBranch( m_hypMeths, "muon_E", 0.0);
     declareDoubleBranch( m_hypMeths, "muon_p", 0.0);
@@ -437,6 +444,7 @@ StatusCode CCDeltaPlusAna::initialize()
     declareDoubleBranch( m_hypMeths, "muon_qp", 99.0);
     declareDoubleBranch( m_hypMeths, "muon_qpqpe", 99.0);
     declareDoubleBranch( m_hypMeths, "muon_E_shift", 0.0);
+    
     
     //! NeutrinoInt - Proton
     declareContainerIntBranch(m_hypMeths,    "proton_trk_pat_history", 10, -1);
@@ -532,6 +540,12 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         truthEvent->filtertaglist()->setOrAddFilterTag( "reco_hasGoodObjects", true); 
     }
     
+    //==========================================================================
+    //
+    // Vertex Reconstruction
+    //
+    //==========================================================================
+    
     //--------------------------------------------------------------------------
     //! MAKE CUT - if NO Interaction Vertex
     //--------------------------------------------------------------------------
@@ -558,12 +572,15 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     }
     
     //--------------------------------------------------------------------------
-    //! MAKE CUT - if Interaction Vertex is NOT in Analyzable Volume
+    //! MAKE CUT - if Interaction Vertex is NOT in Reconstructable Volume
     //--------------------------------------------------------------------------
+    // "Vertex is NOT in Reconstructable Volume" means we can not run vertex-anchored
+    // short tracker with a meaningful result outside of that volume.
+    // Only the events that pass this CUT are used in vertex-anchored short tracker 
     if ( !FiducialPointTool->isFiducial(interactionVertex->position(), m_recoHexApothem, m_recoUpStreamZ, m_recoDownStreamZ ) ) {
         Gaudi::XYZPoint vtx_position = interactionVertex->position();
-        debug() <<"Interaction Vertex is NOT in analyzable volume = ("<<vtx_position.x()<<","<<vtx_position.y()<<","<<vtx_position.z()<<")"<< endmsg;
-        event->setIntData("Cut_Vertex_Not_Analyzable",1);
+        debug() <<"Interaction Vertex is NOT in reconstructable volume = ("<<vtx_position.x()<<","<<vtx_position.y()<<","<<vtx_position.z()<<")"<< endmsg;
+        event->setIntData("Cut_Vertex_Not_Reconstructable",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
@@ -625,73 +642,107 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         else return StatusCode::SUCCESS; 
     }
     
+    //--------------------------------------------------------------------------
+    //! VERTEX Passes all CUTS - extend reconstruction
+    //--------------------------------------------------------------------------
+    // Get Vertex Count
+    SmartRefVector<Minerva::Vertex> allVertices  = event->select<Minerva::Vertex>( "All","StartPoint" );
+    event->setIntData("vertex_count",allVertices.size());
+    
     debug() << "FINISH: Vertex Reconstruction!" << endmsg;
 
-    //--------------------------------------------------------------------------
-    //! MAKE CUT - if NO GOOD MUON (MINOS Matched)
-    //--------------------------------------------------------------------------  
+    //==========================================================================
+    //
+    // Muon Reconstruction
+    //
+    //==========================================================================
+
     debug() << "START: Muon" << endmsg;
-    
     SmartRef<Minerva::Prong>    muonProng = (Minerva::Prong*)NULL;
     SmartRef<Minerva::Particle> muonPart = (Minerva::Particle*)NULL;
     
     bool foundMuon = MuonUtils->findMuonProng( event, muonProng, muonPart );
     bool is_minos_track = false, is_minos_stub = false;
-    if ( foundMuon ){
-        if ( !muonProng ) { 
-            warning() << "Identified a muon Prong, but it is NULL!" << endmsg;
-            return StatusCode::FAILURE; // We sort of did crash... 
-        }
-        
-        double mc_frac = -1.0;
-        if ( m_doPlausibilityCuts && !muonIsPlausible( muonProng, mc_frac) ) {
-            debug()<<"Muon is not plausible"<<endmsg;
-            if( m_store_all_events ) return interpretFailEvent(event); 
-            else return StatusCode::SUCCESS; 
-        }
-        
-        debug() << "Muon Particle Score: " << muonPart->score() << endmsg;
-        if (muonPart->score() >= m_minMuonScore){
-        
-            muonProng->filtertaglist()->setOrAddFilterTag( "PrimaryMuon", true );
-            muonPart->filtertaglist()->setOrAddFilterTag( "PrimaryMuon", true );
-            
-            if (muonProng->MinosTrack()) is_minos_track = true;
-            if (muonProng->MinosStub()) is_minos_stub = true;
-            if (is_minos_stub && is_minos_track) counter("MuonHasMinosStubAndTrack")++;
-            else counter("MuonHasMinosStubAndTrack")+=0;
-            if (!is_minos_stub && !is_minos_track) counter("MuonIsNotMinosMatched")++;
-            else counter("MuonIsNotMinosMatched")+=0;
-            
-            event->filtertaglist()->setOrAddFilterTag("isMinosMatchTrack", is_minos_track );
-            event->filtertaglist()->setOrAddFilterTag("isMinosMatchStub", is_minos_stub );
-            if (truthEvent) truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isMinosMatch", true );
-            
-            //! @todo - also determine whether there is a minos track in event, if there is no minos match track or stub
-        }
-        else {
-            debug()<<"Muon prong does not pass score cut"<<endmsg;
-            event->setIntData("Cut_Muon_Score_Low",1);
-            if( m_store_all_events ) return interpretFailEvent(event); 
-            else return StatusCode::SUCCESS; 
-        }
-        
-    } 
-    else{
+    
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - if NO GOOD MUON (MINOS Matched)
+    //--------------------------------------------------------------------------  
+    if( !foundMuon ){
         debug() << "Did not find a muon prong!" << endmsg;
         event->setIntData("Cut_Muon_None",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
-    } // end if findMuonProng
+    }
     
+    if ( !muonProng ) { 
+        warning() << "Identified a muon Prong, but it is NULL!" << endmsg;
+        return StatusCode::FAILURE; // We sort of did crash... 
+    }
     
+    //--------------------------------------------------------------------------
+    //! Check if this a plausible Muon ( MC only )
+    //--------------------------------------------------------------------------
+    double mc_frac = -1.0;
+    if ( m_doPlausibilityCuts && !muonIsPlausible( muonProng, mc_frac) ) {
+        debug()<<"Muon is not plausible"<<endmsg;
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
+    }
+    
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - if MUON Score is LOW
+    //--------------------------------------------------------------------------  
+    debug() << "Muon Particle Score: " << muonPart->score() << endmsg;
+    if(muonPart->score() < m_minMuonScore){
+        debug()<<"Muon prong does not pass score cut"<<endmsg;
+        event->setIntData("Cut_Muon_Score_Low",1);
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
+    }
+    
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - if Muon has positive charge (AntiMuon)
+    //--------------------------------------------------------------------------
+    int charge = -99;
+    MuonUtils->muonCharge(muonProng,charge);
+    if(charge == 1){
+        debug()<<"AntiMuon Contamination"<<endmsg;
+        event->setIntData("Cut_Muon_Charge",1);
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
+    }
+        
+    //--------------------------------------------------------------------------
+    //! MUON Passed All Cuts tag it as "PrimaryMuon"
+    //--------------------------------------------------------------------------
+    muonProng->filtertaglist()->setOrAddFilterTag( "PrimaryMuon", true );
+    muonPart->filtertaglist()->setOrAddFilterTag( "PrimaryMuon", true );
+     
+    if (muonProng->MinosTrack()) is_minos_track = true;
+    if (muonProng->MinosStub()) is_minos_stub = true;
+    if (is_minos_stub && is_minos_track) counter("MuonHasMinosStubAndTrack")++;
+    else counter("MuonHasMinosStubAndTrack")+=0;
+    if (!is_minos_stub && !is_minos_track) counter("MuonIsNotMinosMatched")++;
+    else counter("MuonIsNotMinosMatched")+=0;
+    
+    event->filtertaglist()->setOrAddFilterTag("isMinosMatchTrack", is_minos_track );
+    event->filtertaglist()->setOrAddFilterTag("isMinosMatchStub", is_minos_stub );
+    if (truthEvent) truthEvent->filtertaglist()->setOrAddFilterTag( "reco_isMinosMatch", true );
+    
+
+    // Get Muon Energy
     double muon_visible_energy = muonProng->minervaVisibleEnergySum();
     m_hitTagger->applyColorTag(muonProng, m_muonProngColor);
     event->setTime( m_recoTimeTool->prongBestTime(muonProng) );
     SmartRefVector<Track> muonTracks = muonProng->minervaTracks(); 
     
-    
     debug() << "FINISH: Muon" << endmsg;
+    
+    //==========================================================================
+    //
+    // Michel Electrons
+    //
+    //==========================================================================
     
     //--------------------------------------------------------------------------
     //! MAKE CUT - Vertex Michels
@@ -778,11 +829,16 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     
     debug()<<"FINISH: End Point Michel"<<endmsg;
     
+    //==========================================================================
+    //
+    // Proton Reconstruction
+    //
+    //==========================================================================
     
     //--------------------------------------------------------------------------
     //! MAKE CUT - if NO GOOD Proton
     //--------------------------------------------------------------------------
-    debug() << "Finding Protons..." << endmsg;
+    debug() << "START: Proton Reconstruction" << endmsg;
     //-- get all of the primary prongs in the event
     primaryProngs = event->primaryProngs();
     
@@ -807,7 +863,7 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
         else return StatusCode::SUCCESS; 
     }
     
-    debug() << "Finding Protons End!" << endmsg;
+    debug()<<"FINISH: Proton Reconstruction"<<endmsg;
     
     //--------------------------------------------------------------------------
     //! @todo Determine if vertex has broken track
@@ -1016,17 +1072,14 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
     //--------------------------------------------------------------------------
     //! Calculate and Set Vertex Parameters
     //--------------------------------------------------------------------------
-    //nuInt->setNeutrinoHelicity( getHelicity( mu_charge ) );
-    nuInt->setInteractionCurrent( Minerva::NeutrinoInt::ChargedCurrent );
-    nuInt->setInteractionType( Minerva::NeutrinoInt::UnknownInt );
     Gaudi::XYZTVector vtx_position( event->interactionVertex()->position().x(), 
-                                event->interactionVertex()->position().y(),
-                                event->interactionVertex()->position().z(),
-                                event->time() );     
+                                    event->interactionVertex()->position().y(),
+                                    event->interactionVertex()->position().z(),
+                                    event->time() );     
     nuInt->setVertex( vtx_position );
     nuInt->setScore( 1.0 );
-
-
+    
+    // Set primaryVertexData
     int vtx_module, vtx_plane;
     debug()<<"Calling getNearestPlane, vtx is "<<vtx_position.z()<<endmsg;
     getNearestPlane(vtx_position.z(), vtx_module, vtx_plane); 
@@ -1035,6 +1088,18 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
     nuInt->setDoubleData("vtx_x", vtx_position.x() );
     nuInt->setDoubleData("vtx_y", vtx_position.y() );
     nuInt->setDoubleData("vtx_z", vtx_position.z() );
+    
+
+    
+
+    
+    
+    //--------------------------------------------------------------------------
+    //! Interaction Parameters
+    //--------------------------------------------------------------------------
+    //nuInt->setNeutrinoHelicity( getHelicity( mu_charge ) );
+    nuInt->setInteractionCurrent( Minerva::NeutrinoInt::ChargedCurrent );
+    nuInt->setInteractionType( Minerva::NeutrinoInt::UnknownInt );
     
     //--------------------------------------------------------------------------
     //! Truth Matching for Muon and Proton Prongs
@@ -1434,7 +1499,9 @@ void CCDeltaPlusAna::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva
     std::vector<double> traj_Px(10,-1);
     std::vector<double> traj_Py(10,-1);
     std::vector<double> traj_Pz(10,-1);
+    std::vector<double> traj_E(10,-1);
     std::vector<double> traj_P(10,-1);
+    std::vector<double> traj_PSelf(10,-1);
     std::vector<double> traj_theta(10,-1);
     std::vector<double> traj_phi(10,-1);
     std::vector<double> end_trajMomentum(10,-1);
@@ -1524,22 +1591,24 @@ void CCDeltaPlusAna::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva
         if( !traj ) continue;
     
         Gaudi::LorentzVector traj_4p = traj->GetInitialMomentum();
-        double tj_p     = sqrt( traj_4p.px()*traj_4p.px() + traj_4p.py()*traj_4p.py() + traj_4p.pz()*traj_4p.pz() );
-        double tj_theta = traj->GetInitialMomentum().Theta();
-        double tj_phi   = traj->GetInitialMomentum().Phi();
-    
+        double PSelf = sqrt(traj_4p.Px()*traj_4p.Px() +
+                            traj_4p.Py()*traj_4p.Py() +
+                            traj_4p.Pz()*traj_4p.Pz());
+        
         int primary = 0;
         if( traj->GetProcessName().find("Primary") != std::string::npos ) primary = 1; 
     
         ntraj[p]      = int(trajectories.size());
         nprim[p]      = primary;
         pdg[p]        = traj->GetPDGCode();
-        traj_Px[p]    = traj_4p.px();
-        traj_Py[p]    = traj_4p.py();
-        traj_Pz[p]    = traj_4p.pz();
-        traj_P[p]     = tj_p;
-        traj_theta[p] = tj_theta;
-        traj_phi[p]   = tj_phi;
+        traj_Px[p]    = traj_4p.Px();
+        traj_Py[p]    = traj_4p.Py();
+        traj_Pz[p]    = traj_4p.Pz();
+        traj_E[p]     = traj_4p.E();
+        traj_P[p]     = traj_4p.P();
+        traj_PSelf[p] = PSelf;
+        traj_theta[p] = traj_4p.Theta();
+        traj_phi[p]   = traj_4p.Phi();
     
         const Minerva::TG4Trajectory* endTraj = trajectories[trajectories.size()-1].first;
         if( !endTraj ) continue;
@@ -1573,7 +1642,9 @@ void CCDeltaPlusAna::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva
         neutrino->setContainerDoubleData("trajProtonProngPx",traj_Px);
         neutrino->setContainerDoubleData("trajProtonProngPy",traj_Py);
         neutrino->setContainerDoubleData("trajProtonProngPz",traj_Pz);
+        neutrino->setContainerDoubleData("trajProtonProngEnergy",traj_E);
         neutrino->setContainerDoubleData("trajProtonProngMomentum",traj_P);
+        neutrino->setContainerDoubleData("trajProtonProngPSelf",traj_PSelf);
         neutrino->setContainerDoubleData("trajProtonTheta",traj_theta);
         neutrino->setContainerDoubleData("trajProtonPhi",traj_phi);
         neutrino->setContainerIntData("isProtonInsideOD",inside_od);
@@ -1588,7 +1659,9 @@ void CCDeltaPlusAna::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva
         neutrino->setDoubleData("trajMuonProngPx",traj_Px[0]);
         neutrino->setDoubleData("trajMuonProngPy",traj_Py[0]);
         neutrino->setDoubleData("trajMuonProngPz",traj_Pz[0]);
+        neutrino->setDoubleData("trajMuonProngEnergy",traj_E[0]);
         neutrino->setDoubleData("trajMuonProngMomentum",traj_P[0]);
+        neutrino->setDoubleData("trajMuonProngPSelf",traj_PSelf[0]);
         neutrino->setDoubleData("trajMuonTheta",traj_theta[0]);
         neutrino->setDoubleData("trajMuonPhi",traj_phi[0]);
         neutrino->setIntData("isMuonInsideOD",inside_od[0]);
@@ -1653,6 +1726,7 @@ StatusCode CCDeltaPlusAna::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, S
     
     //! muon energy in road upstream info
     int muon_roadUpstreamPlanes = -1;
+    int charge = -99;
     double muon_roadUpstreamEnergy = AnaToolUtils->energyInTheRoadUpstream(muonProng, muon_roadUpstreamPlanes);  
     
     //! Fill muon particle hypothesis info
@@ -1688,6 +1762,9 @@ StatusCode CCDeltaPlusAna::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, S
         
         //the shifts are so small compared to MINOS-matched momentum that we can approximate the momentum shift as the energy shift (with ~0.2% at 1.5 GeV/c)
         muon_E_shift = MuonUtils->calculateMomentumCorrection(muonProng);
+        
+        //Get Muon Charge
+        MuonUtils->muonCharge(muonProng,charge); 
     }
     
     debug()<<"Filling Muon Ntuple Variables"<<endmsg;
@@ -1699,6 +1776,7 @@ StatusCode CCDeltaPlusAna::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, S
     nuInt->setIntData("muon_N_minosTracks", muon_N_minosTracks);
     nuInt->setIntData("muon_minosTrackQuality", muon_minosTrackQuality);
     nuInt->setIntData("muon_roadUpstreamPlanes", muon_roadUpstreamPlanes);
+    nuInt->setIntData("muon_charge",charge);
     nuInt->setDoubleData("muon_roadUpstreamEnergy", muon_roadUpstreamEnergy);
     nuInt->setDoubleData("muon_E",muon_E);
     nuInt->setDoubleData("muon_p",muon_p);
@@ -1712,6 +1790,7 @@ StatusCode CCDeltaPlusAna::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, S
     nuInt->setDoubleData("muon_qp",muon_qp );
     nuInt->setDoubleData("muon_qpqpe",muon_qpqpe);
     nuInt->setDoubleData("muon_E_shift",muon_E_shift);
+
     
     fillMinosMuonBranches(nuInt, muonProng);
 
