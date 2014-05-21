@@ -1,7 +1,7 @@
-package CCDeltaPlus
+package CCProtonPi0
 version ${MINERVA_RELEASE}
 
-branches CCDeltaPlus cmt src doc
+branches CCProtonPi0 cmt src doc
 
 #===============================================================================
 use MinervaEvent        v*   Event
@@ -25,15 +25,15 @@ use GiGaCnv             *    Sim  #for geant geometry headers
 
 
 #===============================================================================
-include_dirs ${CCDELTAPLUSROOT}
+include_dirs ${CCPROTONPI0ROOT}
 
-library CCDeltaPlus      *.cpp
-apply_pattern component_library library=CCDeltaPlus
+library CCProtonPi0      *.cpp
+apply_pattern component_library library=CCProtonPi0
 
 private
 apply_pattern application_path
-macro CCDeltaPlus_linkopts      "${application_linkopts}"
-set CCDELTAPLUSDOC "${CCDELTAPLUSROOT}/doc"
+macro CCProtonPi0_linkopts      "${application_linkopts}"
+set CCPROTONPI0DOC "${CCPROTONPI0ROOT}/doc"
 end_private
 
 

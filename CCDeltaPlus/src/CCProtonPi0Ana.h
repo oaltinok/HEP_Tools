@@ -1,16 +1,16 @@
 /*
 ================================================================================
-CCDeltaPlusAna
+CCProtonPi0Ana
 
     Reconstruction Package:
         Exclusive Channel for muon,proton,pi0 on the final state
         Uses Nightly Build
     
     Main Package:
-        AnalysisFramework/Ana/CCDeltaPlus/
+        AnalysisFramework/Ana/CCProtonPi0/
         
     Setup:
-        > getpack -u Ana/CCDeltaPlus
+        > getpack -u Ana/CCProtonPi0
         > cmt config
         > cmt make
         
@@ -21,12 +21,12 @@ CCDeltaPlusAna
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_05_13
+    Last Revision:  2014_05_21
     
 ================================================================================
 */
-#ifndef CCDELTAPLUSANA_H 
-#define CCDELTAPLUSANA_H 1
+#ifndef CCPROTONPI0ANA_H 
+#define CCPROTONPI0ANA_H 1
 
 #include <utility>
 
@@ -62,7 +62,7 @@ namespace Minerva {
 }
 
 //! This class is for Reconstruct Pi0 using muon match vertex
-class CCDeltaPlusAna : public MinervaAnalysisTool
+class CCProtonPi0Ana : public MinervaAnalysisTool
 {
     private:
         typedef std::vector<Minerva::NeutrinoInt*> NeutrinoVect;
@@ -70,10 +70,10 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
     public:
         
         //! Standard constructor
-        CCDeltaPlusAna( const std::string& type, const std::string& name, const IInterface* parent );
+        CCProtonPi0Ana( const std::string& type, const std::string& name, const IInterface* parent );
         
         //! Destructor (mandatory for inheritance)
-        virtual ~CCDeltaPlusAna(){};
+        virtual ~CCProtonPi0Ana(){};
         
         StatusCode initialize();
         StatusCode finalize();
@@ -184,5 +184,5 @@ class CCDeltaPlusAna : public MinervaAnalysisTool
   
 };
 
-#endif // CCDELTAPLUSANA_H 
+#endif // CCPROTONPI0ANA_H 
 

@@ -1,7 +1,7 @@
 /*
-    See CCDeltaPlusAna.h header for Class Information
+    See CCProtonPi0Ana.h header for Class Information
 */
-#include "CCDeltaPlusAna.h"
+#include "CCProtonPi0Ana.h"
 
 #include "TRandom3.h"
 
@@ -40,22 +40,22 @@
 #include "G4VPhysicalVolume.hh"
 #include "G4Material.hh"
 
-DECLARE_TOOL_FACTORY( CCDeltaPlusAna );
+DECLARE_TOOL_FACTORY( CCProtonPi0Ana );
 
 using namespace Minerva;
     
 //==============================================================================
 // Standard constructor 
 //==============================================================================
-CCDeltaPlusAna::CCDeltaPlusAna(const std::string& type, const std::string& name, const IInterface* parent ) :
+CCProtonPi0Ana::CCProtonPi0Ana(const std::string& type, const std::string& name, const IInterface* parent ) :
 MinervaAnalysisTool( type, name, parent ) 
 {
     info() <<"--------------------------------------------------------------------------"<<endmsg;
-    info() <<"Enter CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
+    info() <<"Enter CCProtonPi0Ana::CCProtonPi0Ana() -- Default Constructor" << endmsg;
     
     declareInterface<IInteractionHypothesis>(this);
-    //! mandatory declaration of analysis signature: CCDeltaPlusAna
-    m_anaSignature = "CCDeltaPlusAna";
+    //! mandatory declaration of analysis signature: CCProtonPi0Ana
+    m_anaSignature = "CCProtonPi0Ana";
     
     // Private Properties
     declareProperty("StoreAllEvents",      m_store_all_events =    true);
@@ -85,20 +85,20 @@ MinervaAnalysisTool( type, name, parent )
     // Protected properties from IInteractionHypothesis.
     m_hypMeths.push_back( m_anaSignature );
     declareProperty("HypothesisMethods", m_hypMeths);
-    info() << " CCDeltaPlusAna Hypothesis added " << endmsg;
+    info() << " CCProtonPi0Ana Hypothesis added " << endmsg;
     
     
-    info() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna() -- Default Constructor" << endmsg;
+    info() <<"Exit CCProtonPi0Ana::CCProtonPi0Ana() -- Default Constructor" << endmsg;
     info() <<"--------------------------------------------------------------------------"<<endmsg;
 }
     
 //==============================================================================
 // Initialize
 //==============================================================================
-StatusCode CCDeltaPlusAna::initialize()
+StatusCode CCProtonPi0Ana::initialize()
 {
     info() <<"--------------------------------------------------------------------------"<<endmsg;
-    info() <<"Enter CCDeltaPlusAna::initialize()" << endmsg;
+    info() <<"Enter CCProtonPi0Ana::initialize()" << endmsg;
     
     //! Initialize the base class.  This will fail if you did not define m_anaSignature.
     StatusCode sc = this->MinervaAnalysisTool::initialize();
@@ -420,7 +420,10 @@ StatusCode CCDeltaPlusAna::initialize()
     //! NeutrinoInt - Vertex
     declareIntBranch( m_hypMeths, "vtx_module", -99);
     declareIntBranch( m_hypMeths, "vtx_plane",-1);
-    declareIntBranch( m_hypMeths, "vertex_count",-1);
+    declareIntBranch( m_hypMeths, "vtx_total_count",-1);
+    declareIntBranch( m_hypMeths, "vtx_secondary_count",-1);
+    declareIntBranch( m_hypMeths, "vtx_primary_index",-1);
+    declareIntBranch( m_hypMeths, "vtx_primary_multiplicity",-1);
     declareDoubleBranch( m_hypMeths, "vtx_x",0.0);
     declareDoubleBranch( m_hypMeths, "vtx_y",0.0);
     declareDoubleBranch( m_hypMeths, "vtx_z",0.0);
@@ -476,7 +479,7 @@ StatusCode CCDeltaPlusAna::initialize()
     
     
     
-    info() <<"Exit CCDeltaPlusAna::initialize()" << endmsg;
+    info() <<"Exit CCProtonPi0Ana::initialize()" << endmsg;
     info() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return sc;
@@ -487,10 +490,10 @@ StatusCode CCDeltaPlusAna::initialize()
 // reconstructEvent() --
 //
 //==============================================================================
-StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const
+StatusCode CCProtonPi0Ana::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() <<"Enter CCDeltaPlusAna::reconstructEvent()" << endmsg;
+    debug() <<"Enter CCProtonPi0Ana::reconstructEvent()" << endmsg;
     
     //--------------------------------------------------------------------------
     //! Initialize truthEvent reco booleans
@@ -643,11 +646,24 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     }
     
     //--------------------------------------------------------------------------
-    //! VERTEX Passes all CUTS - extend reconstruction
+    //! VERTEX Passed all CUTS - Extend Vertex Reconstruction
     //--------------------------------------------------------------------------
     // Get Vertex Count
     SmartRefVector<Minerva::Vertex> allVertices  = event->select<Minerva::Vertex>( "All","StartPoint" );
-    event->setIntData("vertex_count",allVertices.size());
+    debug()<<"N(vertices) = "<<allVertices.size()<<endmsg;
+    event->setIntData("vtx_total_count",allVertices.size());
+    
+    SmartRefVector<Minerva::Vertex>::iterator iter_primary_vtx = allVertices.end();
+    SmartRefVector<Minerva::Vertex>::iterator iter_vtx;
+    for ( iter_vtx = allVertices.begin(); iter_vtx != allVertices.end(); ++iter_vtx ){
+        if (*iter_vtx == interactionVertex) {
+            iter_primary_vtx = iter_vtx;
+            break;
+        }
+    }
+    event->setIntData("vtx_primary_index", std::distance(allVertices.begin(),iter_primary_vtx));
+    if (iter_primary_vtx != allVertices.end()) allVertices.erase(iter_primary_vtx);
+    event->setIntData("vtx_secondary_count", allVertices.size()); /* Number of secondary vertices */
     
     debug() << "FINISH: Vertex Reconstruction!" << endmsg;
 
@@ -865,6 +881,7 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     
     debug()<<"FINISH: Proton Reconstruction"<<endmsg;
     
+    
     //--------------------------------------------------------------------------
     //! @todo Determine if vertex has broken track
     //--------------------------------------------------------------------------
@@ -975,7 +992,7 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     StatusCode sc = addInteractionHyp( event, interactions );
     
 
-    debug() <<"Exit CCDeltaPlusAna::reconstructEvent()" << endmsg;
+    debug() <<"Exit CCProtonPi0Ana::reconstructEvent()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return sc;
     
@@ -986,10 +1003,10 @@ StatusCode CCDeltaPlusAna::reconstructEvent( Minerva::PhysicsEvent *event, Miner
 // interpretEvent()
 //
 //==============================================================================
-StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truthEvent, NeutrinoVect& interaction_hyp ) const
+StatusCode CCProtonPi0Ana::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truthEvent, NeutrinoVect& interaction_hyp ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() <<"Enter CCDeltaPlusAna::interpretEvent()" << endmsg;
+    debug() <<"Enter CCProtonPi0Ana::interpretEvent()" << endmsg;
     
     if( truthEvent ){
         debug() << "This is a MC event." << endmsg;
@@ -1116,7 +1133,7 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
     }
     
 
-    debug() <<"Exit CCDeltaPlusAna::interpretEvent()" << endmsg;
+    debug() <<"Exit CCProtonPi0Ana::interpretEvent()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
     
@@ -1126,10 +1143,10 @@ StatusCode CCDeltaPlusAna::interpretEvent( const Minerva::PhysicsEvent *event, c
 //==============================================================================
 // tagTruth()
 //==============================================================================
-StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truthEvent ) const 
+StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) const 
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter: CCDeltaPlusAna::tagTruth()" << endmsg;
+    debug() << "Enter: CCProtonPi0Ana::tagTruth()" << endmsg;
 
     if (!truthEvent) {
         warning()<<"Passed a null truthEvent to tagTruth()!"<<endmsg;
@@ -1422,7 +1439,7 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
     truthEvent->setIntData("N_other", N_other );
 
     
-    debug() <<"Exit CCDeltaPlusAna::tagTruth()" << endmsg;
+    debug() <<"Exit CCProtonPi0Ana::tagTruth()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
     
@@ -1431,7 +1448,7 @@ StatusCode CCDeltaPlusAna::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
 //==============================================================================
 //  Finalize
 //==============================================================================
-StatusCode CCDeltaPlusAna::finalize()
+StatusCode CCProtonPi0Ana::finalize()
 {
     info() <<"--------------------------------------------------------------------------"<<endmsg;
     info() << "Enter: finalize()" << endmsg;
@@ -1442,7 +1459,7 @@ StatusCode CCDeltaPlusAna::finalize()
     if( sc.isFailure() ) return Error( "Failed to finalize!", sc );
     
     
-    info() <<"Exit CCDeltaPlusAna::CCDeltaPlusAna::finalize()" << endmsg;
+    info() <<"Exit CCProtonPi0Ana::CCProtonPi0Ana::finalize()" << endmsg;
     info() <<"--------------------------------------------------------------------------"<<endmsg;
     return sc;
 }
@@ -1456,13 +1473,13 @@ StatusCode CCDeltaPlusAna::finalize()
 //----------------------------------------------------------------------------------------
 // interpret Events which fails the reconstructor cuts
 //----------------------------------------------------------------------------------------
-StatusCode CCDeltaPlusAna::interpretFailEvent( Minerva::PhysicsEvent* event ) const
+StatusCode CCProtonPi0Ana::interpretFailEvent( Minerva::PhysicsEvent* event ) const
 {  
 
-    debug() <<"Exit CCDeltaPlusAna::reconstructEvent() through interpretFailEvent()" << endmsg;
+    debug() <<"Exit CCProtonPi0Ana::reconstructEvent() through interpretFailEvent()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCDeltaPlusAna::interpretFailEvent()" << endmsg;
+    debug() << "Enter CCProtonPi0Ana::interpretFailEvent()" << endmsg;
     
     Minerva::NeutrinoInt* nuInt = new Minerva::NeutrinoInt(m_anaSignature);
     NeutrinoVect nuInts;
@@ -1472,7 +1489,7 @@ StatusCode CCDeltaPlusAna::interpretFailEvent( Minerva::PhysicsEvent* event ) co
     fillCommonPhysicsAnaBranches(event);
     fillNuMIBranches(event);
     
-    debug() << "Exit CCDeltaPlusAna::interpretFailEvent()" << endmsg;
+    debug() << "Exit CCProtonPi0Ana::interpretFailEvent()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
 }
@@ -1480,10 +1497,10 @@ StatusCode CCDeltaPlusAna::interpretFailEvent( Minerva::PhysicsEvent* event ) co
 //---------------------------------------------------------------------------------
 // set the track prong Geant4 truth information
 //---------------------------------------------------------------------------------
-void CCDeltaPlusAna::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const
+void CCProtonPi0Ana::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCDeltaPlusAna::setTrackProngTruth()" << endmsg;
+    debug() << "Enter CCProtonPi0Ana::setTrackProngTruth()" << endmsg;
     
     std::vector<const Minerva::TG4Trajectory*> parent;
     Minerva::TG4Trajectories* mc_trajectories = get<Minerva::TG4Trajectories>( "MC/TG4Trajectories" );
@@ -1672,7 +1689,7 @@ void CCDeltaPlusAna::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva
     }
     
     
-    debug() << "Exit CCDeltaPlusAna::setTrackProngTruth()" << endmsg;
+    debug() << "Exit CCProtonPi0Ana::setTrackProngTruth()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return;
@@ -1684,10 +1701,10 @@ void CCDeltaPlusAna::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva
 //==============================================================================
 // Set Muon particle data
 //==============================================================================
-StatusCode CCDeltaPlusAna::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, SmartRef<Minerva::Prong>& muonProng) const 
+StatusCode CCProtonPi0Ana::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, SmartRef<Minerva::Prong>& muonProng) const 
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCDeltaPlusAna::setMuonParticleData()" << endmsg;
+    debug() << "Enter CCProtonPi0Ana::setMuonParticleData()" << endmsg;
     
     Gaudi::LorentzVector muon_4p;
     
@@ -1794,7 +1811,7 @@ StatusCode CCDeltaPlusAna::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, S
     
     fillMinosMuonBranches(nuInt, muonProng);
 
-    debug() << "Exit CCDeltaPlusAna::setMuonParticleData()" << endmsg;
+    debug() << "Exit CCProtonPi0Ana::setMuonParticleData()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
 }
@@ -1802,10 +1819,10 @@ StatusCode CCDeltaPlusAna::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, S
 //==============================================================================
 // Find the plane nearest to a point
 //==============================================================================
-StatusCode CCDeltaPlusAna::getNearestPlane(double z, int & module_return, int & plane_return) const
+StatusCode CCProtonPi0Ana::getNearestPlane(double z, int & module_return, int & plane_return) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCDeltaPlusAna::getNearestPlane()" << endmsg;
+    debug() << "Enter CCProtonPi0Ana::getNearestPlane()" << endmsg;
     
     // Got From Brandon's CCNuPionInc - 2014_04_14
     // testing new MinervaDet routine
@@ -1822,7 +1839,7 @@ StatusCode CCDeltaPlusAna::getNearestPlane(double z, int & module_return, int & 
     module_return = planeid.module();
     plane_return = planeid.plane();
 
-    debug() << "Exit CCDeltaPlusAna::getNearestPlane()" << endmsg;
+    debug() << "Exit CCProtonPi0Ana::getNearestPlane()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
   
@@ -1831,10 +1848,10 @@ StatusCode CCDeltaPlusAna::getNearestPlane(double z, int & module_return, int & 
 //==============================================================================
 // Created particles for negative bit Minos prongs
 //==============================================================================
-bool CCDeltaPlusAna::createTrackedParticles( Minerva::ProngVect& prongs ) const
+bool CCProtonPi0Ana::createTrackedParticles( Minerva::ProngVect& prongs ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() <<"Enter CCDeltaPlusAna::createTrackedParticles()" << endmsg;
+    debug() <<"Enter CCProtonPi0Ana::createTrackedParticles()" << endmsg;
     bool makeParticles = false;
     
     //-- check if the prongs are odMatch
@@ -1884,7 +1901,7 @@ bool CCDeltaPlusAna::createTrackedParticles( Minerva::ProngVect& prongs ) const
         hypotheses.clear();
     }
     
-    debug() << "Exit CCDeltaPlusAna::createTrackedParticles()" << endmsg;
+    debug() << "Exit CCProtonPi0Ana::createTrackedParticles()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return makeParticles;
 }
@@ -1892,12 +1909,12 @@ bool CCDeltaPlusAna::createTrackedParticles( Minerva::ProngVect& prongs ) const
 //==============================================================================
 // Return the momentum analyzable contained ( proton candidate ) prong/particle
 //==============================================================================
-bool CCDeltaPlusAna::getProtonProng(    Minerva::ProngVect& hadronProngs, 
+bool CCProtonPi0Ana::getProtonProng(    Minerva::ProngVect& hadronProngs, 
                                         Minerva::ProngVect& protonProngs,
                                         Minerva::ParticleVect& protonParticles ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCDeltaPlusAna::getProtonProng()" << endmsg;
+    debug() << "Enter CCProtonPi0Ana::getProtonProng()" << endmsg;
   
     debug() << "N(hadronProngs) =  " << hadronProngs.size() << endmsg;
     
@@ -1958,7 +1975,7 @@ bool CCDeltaPlusAna::getProtonProng(    Minerva::ProngVect& hadronProngs,
     debug() << "N(protonParticles) =  " << protonParticles.size() << endmsg;
    
     
-    debug() << "Exit CCDeltaPlusAna::getProtonProng()" << endmsg;
+    debug() << "Exit CCProtonPi0Ana::getProtonProng()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return isProton;
@@ -1967,14 +1984,14 @@ bool CCDeltaPlusAna::getProtonProng(    Minerva::ProngVect& hadronProngs,
 //==============================================================================
 // Set proton particle data
 //==============================================================================
-void CCDeltaPlusAna::setProtonParticleData(     Minerva::NeutrinoInt* nuInt, 
+void CCProtonPi0Ana::setProtonParticleData(     Minerva::NeutrinoInt* nuInt, 
                                                 Minerva::ProngVect& protonProngs,
                                                 Minerva::ParticleVect& protonParticles, 
                                                 double vertexZ ) const 
 {
     // Got from Tammy's NukeCCQETwoTrack - 2014_04_15
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCDeltaPlusAna::setProtonParticleData()" << endmsg;
+    debug() << "Enter CCProtonPi0Ana::setProtonParticleData()" << endmsg;
     
     std::vector<double> p_calCorrection(10,-1);
     std::vector<double> p_visEnergyCorrection(10,-1);
@@ -2123,7 +2140,7 @@ void CCDeltaPlusAna::setProtonParticleData(     Minerva::NeutrinoInt* nuInt,
 //         nuInt->setContainerDoubleData("proton_score1_shift_" + name, score_shift_vect);
 //     }
     
-    debug() << "Exit CCDeltaPlusAna::setProtonParticleData()" << endmsg;
+    debug() << "Exit CCProtonPi0Ana::setProtonParticleData()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return;
@@ -2132,12 +2149,12 @@ void CCDeltaPlusAna::setProtonParticleData(     Minerva::NeutrinoInt* nuInt,
 //==============================================================================
 // Correct Proton Energy
 //==============================================================================
-void CCDeltaPlusAna::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
+void CCProtonPi0Ana::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
                                                 double& p_calCorrection, 
                                                 double& p_visEnergyCorrection ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCDeltaPlusAna::correctProtonProngEnergy()" << endmsg;
+    debug() << "Enter CCProtonPi0Ana::correctProtonProngEnergy()" << endmsg;
     
     //-- initialize
     double calEnergy = 0.0;
@@ -2205,7 +2222,7 @@ void CCDeltaPlusAna::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& proton
         debug() << "update energy using visible energy correction = " << E_visEnergyCorrection << endmsg;
     }     
             
-    debug() << "Exit CCDeltaPlusAna::correctProtonProngEnergy()" << endmsg;
+    debug() << "Exit CCProtonPi0Ana::correctProtonProngEnergy()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return;
 }
