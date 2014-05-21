@@ -17,12 +17,12 @@ main.cpp
             > main(true) for Generating Plots only
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_05_10
+    Last Revision: 2014_05_13
 ================================================================================
 */
 
 // Include Required Classes
-#include "Classes/CCDeltaPlus/CCDeltaPlus.h"
+#include "Classes/CCProtonPi0/CCProtonPi0.h"
 #include "Classes/Plotter/Plotter.h"
 
 #include <string>
@@ -36,7 +36,7 @@ using namespace std;
 
 int main(int argc, char *argv[] )
 {
-    bool onlyPlot = true;
+    bool onlyPlot;
     string input;
     
     if ( argc != 2 || argc > 2) /* argc should be 2 for correct execution */
@@ -74,7 +74,7 @@ int main(int argc, char *argv[] )
         Plotter p;
         p.plotHistograms(plotsMC,plotsReco,plots2D); 
     }else{
-        CCDeltaPlus t;
+        CCProtonPi0 t;
         if(isTest){
             t.run("Input/Playlists/pl_MC_Test.dat");
         }else{

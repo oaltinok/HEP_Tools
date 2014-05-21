@@ -1,30 +1,30 @@
 /*
-    See CCDeltaPlus.h header for Class Information
+    See CCProtonPi0.h header for Class Information
 */
 
-#ifndef CCDeltaPlus_cpp
-#define CCDeltaPlus_cpp
+#ifndef CCProtonPi0_cpp
+#define CCProtonPi0_cpp
 
-#include "CCDeltaPlus.h"
+#include "CCProtonPi0.h"
 
 using namespace std;
 
-void CCDeltaPlus::specifyRunTime()
+void CCProtonPi0::specifyRunTime()
 {
-    isDataAnalysis = true;
+    isDataAnalysis = false;
     isMC = true;
     applyProtonScore = true;
     minProtonScore = 0.3;
     is_pID_Studies = false;
 }
 
-void CCDeltaPlus::run(string playlist)
+void CCProtonPi0::run(string playlist)
 {
     //------------------------------------------------------------------------
     // Create chain
     //------------------------------------------------------------------------
 
-    TChain* fChain = new TChain("CCDeltaPlusAna");
+    TChain* fChain = new TChain("CCProtonPi0Ana");
     Init(playlist, fChain);
 
     if (!fChain) return;
@@ -45,50 +45,50 @@ void CCDeltaPlus::run(string playlist)
     //------------------------------------------------------------------------
     // Branch Selection for Performance
     //------------------------------------------------------------------------
-    fChain->SetBranchStatus("*",0);  // disable all branches
+//     fChain->SetBranchStatus("*",0);  // disable all branches
 
-    fChain->SetBranchStatus("ev_run",1);  // activate
+//     fChain->SetBranchStatus("ev_run",1);  // activate
+//     
+//     fChain->SetBranchStatus("truth_isSignal",1);  // activate
+//     fChain->SetBranchStatus("Cut_EndPoint_Michel_Exist",1);  // activate
+//     fChain->SetBranchStatus("Cut_Muon_None",1);  // activate
+//     fChain->SetBranchStatus("Cut_Muon_Score_Low",1);  // activate
+//     fChain->SetBranchStatus("Cut_Proton_None",1);  // activate
+//     fChain->SetBranchStatus("Cut_Vertex_Michel_Exist",1);  // activate
+//     fChain->SetBranchStatus("Cut_Vertex_None",1);  // activate
+//     fChain->SetBranchStatus("Cut_Vertex_Not_Reconstructable",1);  // activate
+//     fChain->SetBranchStatus("Cut_Vertex_Not_Fiducial",1);  // activate
+//     fChain->SetBranchStatus("Cut_Vertex_Null",1);  // activate
+//     fChain->SetBranchStatus("Cut_secEndPoint_Michel_Exist",1);  // activate
+//     
+//     fChain->SetBranchStatus("CCProtonPi0Ana_muon_px",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_muon_py",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_muon_pz",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_muon_E",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_muon_muScore",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_trajMuonProngPx",1);
+//     fChain->SetBranchStatus("CCProtonPi0Ana_trajMuonProngPy",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_trajMuonProngPz",1);  // activate
+//     
+//     fChain->SetBranchStatus("CCProtonPi0Ana_trajProtonProngPx",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_trajProtonProngPy",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_trajProtonProngPz",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_proton_px",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_proton_py",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_proton_pz",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_proton_E",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_proton_score",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_trajProtonProngPDG",1);  // activate
     
-    fChain->SetBranchStatus("truth_isSignal",1);  // activate
-    fChain->SetBranchStatus("Cut_EndPoint_Michel_Exist",1);  // activate
-    fChain->SetBranchStatus("Cut_Muon_None",1);  // activate
-    fChain->SetBranchStatus("Cut_Muon_Score_Low",1);  // activate
-    fChain->SetBranchStatus("Cut_Proton_None",1);  // activate
-    fChain->SetBranchStatus("Cut_Vertex_Michel_Exist",1);  // activate
-    fChain->SetBranchStatus("Cut_Vertex_None",1);  // activate
-    fChain->SetBranchStatus("Cut_Vertex_Not_Analyzable",1);  // activate
-    fChain->SetBranchStatus("Cut_Vertex_Not_Fiducial",1);  // activate
-    fChain->SetBranchStatus("Cut_Vertex_Null",1);  // activate
-    fChain->SetBranchStatus("Cut_secEndPoint_Michel_Exist",1);  // activate
-    
-    fChain->SetBranchStatus("CCDeltaPlusAna_muon_px",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_muon_py",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_muon_pz",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_muon_E",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_muon_muScore",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_trajMuonProngPx",1);
-    fChain->SetBranchStatus("CCDeltaPlusAna_trajMuonProngPy",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_trajMuonProngPz",1);  // activate
-    
-    fChain->SetBranchStatus("CCDeltaPlusAna_trajProtonProngPx",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_trajProtonProngPy",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_trajProtonProngPz",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_proton_px",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_proton_py",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_proton_pz",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_proton_E",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_proton_score",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_trajProtonProngPDG",1);  // activate
-    
-    fChain->SetBranchStatus("mc_Q2",1);  // activate
-    fChain->SetBranchStatus("mc_incomingE",1);  // activate
-    fChain->SetBranchStatus("mc_vtx",1);  // activate
-    fChain->SetBranchStatus("mc_intType",1);  // activate
-    fChain->SetBranchStatus("mc_nFSPart",1);  // activate
-    fChain->SetBranchStatus("CCDeltaPlusAna_vtx",1);  // activate
-    
-    fChain->SetBranchStatus("truth_muon_charge",1);  // activate
-    fChain->SetBranchStatus("truth_reco_muonCharge",1);  // activate
+//     fChain->SetBranchStatus("mc_Q2",1);  // activate
+//     fChain->SetBranchStatus("mc_incomingE",1);  // activate
+//     fChain->SetBranchStatus("mc_vtx",1);  // activate
+//     fChain->SetBranchStatus("mc_intType",1);  // activate
+//     fChain->SetBranchStatus("mc_nFSPart",1);  // activate
+//     fChain->SetBranchStatus("CCProtonPi0Ana_vtx",1);  // activate
+//     
+//     fChain->SetBranchStatus("truth_muon_charge",1);  // activate
+//     fChain->SetBranchStatus("truth_reco_muonCharge",1);  // activate
     
     
     
@@ -97,7 +97,7 @@ void CCDeltaPlus::run(string playlist)
 
     double nCut_Vertex_None = 0;
     double nCut_Vertex_Null = 0;
-    double nCut_Vertex_Not_Analyzable = 0; 
+    double nCut_Vertex_Not_Reconstructable = 0; 
     double nCut_Vertex_Not_Fiducial = 0;    
     double nCut_Vertex_Michel_Exist = 0;           
     double nCut_Muon_None = 0;              
@@ -111,7 +111,7 @@ void CCDeltaPlus::run(string playlist)
     double nSignal = 0;
     double nSignal_Vertex_None = 0;
     double nSignal_Vertex_Null = 0;
-    double nSignal_Vertex_Not_Analyzable = 0; 
+    double nSignal_Vertex_Not_Reconstructable = 0; 
     double nSignal_Vertex_Not_Fiducial = 0;    
     double nSignal_Vertex_Michel_Exist = 0;           
     double nSignal_Muon_None = 0;              
@@ -123,6 +123,7 @@ void CCDeltaPlus::run(string playlist)
     double nSignal_Reco_Muon_NoProblem = 0;
     
     double nAntiMuon = 0;
+    double nMuonChargeDiff = 0;
     
     int indRecoProton;
 
@@ -170,9 +171,9 @@ void CCDeltaPlus::run(string playlist)
         nCut_Vertex_Null++;
         if(truth_isSignal) nSignal_Vertex_Null++;
         
-        if( Cut_Vertex_Not_Analyzable == 1) continue;
-        nCut_Vertex_Not_Analyzable++;
-        if(truth_isSignal) nSignal_Vertex_Not_Analyzable++;
+        if( Cut_Vertex_Not_Reconstructable == 1) continue;
+        nCut_Vertex_Not_Reconstructable++;
+        if(truth_isSignal) nSignal_Vertex_Not_Reconstructable++;
         
         if( Cut_Vertex_Not_Fiducial == 1) continue;
         nCut_Vertex_Not_Fiducial++;
@@ -186,7 +187,6 @@ void CCDeltaPlus::run(string playlist)
         nCut_Muon_Score_Low++;
         if(truth_isSignal) nSignal_Muon_Score_Low++;
         
-           
         if( Cut_Vertex_Michel_Exist == 1) continue;
         nCut_Vertex_Michel_Exist++;
         if(truth_isSignal) nSignal_Vertex_Michel_Exist++;
@@ -206,34 +206,53 @@ void CCDeltaPlus::run(string playlist)
         // Find Best Proton in Reco
         indRecoProton = findBestProton();
         
-        if ( applyProtonScore && (CCDeltaPlusAna_proton_score[indRecoProton] < minProtonScore) ) continue;
+        if ( applyProtonScore && (CCProtonPi0Ana_proton_score[indRecoProton] < minProtonScore) ) continue;
         nCut_Proton_Score++;
         if(truth_isSignal) nSignal_Proton_Score++;
         
-        if(truth_muon_charge == 1 && truth_isSignal) nAntiMuon++;
         
         
+        
+//         cout<<truth_muon_charge<<" | "<<CCProtonPi0Ana_muon_charge<<endl;
+//         cout<<"P(proton) = "<<CCProtonPi0Ana_trajProtonProngMomentum[0]<<" | "<<CCProtonPi0Ana_proton_p[0]<<endl;
+//         cout<<"E(proton) = "<<CCProtonPi0Ana_trajProtonProngEnergy[0]<<" | "<<CCProtonPi0Ana_proton_E[0]<<endl;
+//         cout<<"Ecalc(proton) = "<<HEP_Functions::calcEnergy(CCProtonPi0Ana_trajProtonProngMomentum[0],938.27)<<endl;
+//         
+//         
+//         cout<<"P(muon) = "<<CCProtonPi0Ana_trajMuonProngMomentum<<" | "<<CCProtonPi0Ana_muon_p<<endl;
+//         cout<<"E(muon) = "<<CCProtonPi0Ana_trajMuonProngEnergy<<" | "<<CCProtonPi0Ana_muon_E<<endl;
+//         cout<<"Ecalc(muon) = "<<HEP_Functions::calcEnergy(CCProtonPi0Ana_trajMuonProngMomentum,105.66)<<endl;
+        
+//         cout<<"-----------"<<endl;
+
+
         //------------------------------------------------------------------
         // Sanity Checks
         //------------------------------------------------------------------
-        if(CCDeltaPlusAna_muon_pz == 0) continue;
+        if(CCProtonPi0Ana_muon_pz == 0) continue;
         nCut_Reco_Muon_NoProblem++;
         if(truth_isSignal) nSignal_Reco_Muon_NoProblem++;
+        
+        if((truth_muon_charge - CCProtonPi0Ana_muon_charge) != 0){
+            cout<<truth_muon_charge<<" | "<<CCProtonPi0Ana_muon_charge<<endl;
+            nMuonChargeDiff++;
+        }
+        if(truth_muon_charge == 1) nAntiMuon++;
       
         //------------------------------------------------------------------
         // pID Studies
         //------------------------------------------------------------------
         if( is_pID_Studies){
             for(int i = 0; i < 10; i++){
-                if(CCDeltaPlusAna_proton_score[i] == -1) break;
-                if(CCDeltaPlusAna_trajProtonProngPDG[i] == 2212){
-                    pID_proton->Fill(CCDeltaPlusAna_proton_score[i]);
-                }else if(CCDeltaPlusAna_trajProtonProngPDG[i] == 211){
-                    pID_piplus->Fill(CCDeltaPlusAna_proton_score[i]);
-                }else if(CCDeltaPlusAna_trajProtonProngPDG[i] == -211){
-                    pID_piminus->Fill(CCDeltaPlusAna_proton_score[i]);
+                if(CCProtonPi0Ana_proton_score[i] == -1) break;
+                if(CCProtonPi0Ana_trajProtonProngPDG[i] == 2212){
+                    pID_proton->Fill(CCProtonPi0Ana_proton_score[i]);
+                }else if(CCProtonPi0Ana_trajProtonProngPDG[i] == 211){
+                    pID_piplus->Fill(CCProtonPi0Ana_proton_score[i]);
+                }else if(CCProtonPi0Ana_trajProtonProngPDG[i] == -211){
+                    pID_piminus->Fill(CCProtonPi0Ana_proton_score[i]);
                 }else{
-                    pID_other->Fill(CCDeltaPlusAna_proton_score[i]);
+                    pID_other->Fill(CCProtonPi0Ana_proton_score[i]);
                 }
             }
         }
@@ -269,6 +288,7 @@ void CCDeltaPlus::run(string playlist)
     if(is_pID_Studies) get_pID_Stats();
     
     cout<<nAntiMuon<<endl;
+    cout<<nMuonChargeDiff<<endl;
     
     cout<<"Done!"<<endl;
     
@@ -276,7 +296,7 @@ void CCDeltaPlus::run(string playlist)
     cutText<<"nAll                          "<<nAll<<endl;
     cutText<<"Cut_Vertex_None               "<<nCut_Vertex_None<<endl;
     cutText<<"Cut_Vertex_Null               "<<nCut_Vertex_Null<<endl;
-    cutText<<"Cut_Vertex_Not_Analyzable     "<<nCut_Vertex_Not_Analyzable<<endl;
+    cutText<<"Cut_Vertex_Not_Reconstructable     "<<nCut_Vertex_Not_Reconstructable<<endl;
     cutText<<"Cut_Vertex_Not_Fiducial       "<<nCut_Vertex_Not_Fiducial<<endl;
     cutText<<"Cut_Muon_None                 "<<nCut_Muon_None<<endl;
     cutText<<"Cut_Muon_Score_Low            "<<nCut_Muon_Score_Low<<endl; 
@@ -290,7 +310,7 @@ void CCDeltaPlus::run(string playlist)
     cutText<<"nSignal                          "<<nSignal<<endl;
     cutText<<"Signal_Vertex_None               "<<nSignal_Vertex_None<<endl;
     cutText<<"Signal_Vertex_Null               "<<nSignal_Vertex_Null<<endl;
-    cutText<<"Signal_Vertex_Not_Analyzable     "<<nSignal_Vertex_Not_Analyzable<<endl;
+    cutText<<"Signal_Vertex_Not_Reconstructable     "<<nSignal_Vertex_Not_Reconstructable<<endl;
     cutText<<"Signal_Vertex_Not_Fiducial       "<<nSignal_Vertex_Not_Fiducial<<endl;
     cutText<<"Signal_Muon_None                 "<<nSignal_Muon_None<<endl;
     cutText<<"Signal_Muon_Score_Low            "<<nSignal_Muon_Score_Low<<endl; 
@@ -303,7 +323,7 @@ void CCDeltaPlus::run(string playlist)
     
     
     // Write the Root Files
-    write_RootFile();           //CCDeltaPlus
+    write_RootFile();           //CCProtonPi0
     muon.write_RootFile();
     proton.write_RootFile();
     pion.write_RootFile();
@@ -320,7 +340,7 @@ void CCDeltaPlus::run(string playlist)
 //
 //<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
-void CCDeltaPlus::get_pID_Stats()
+void CCProtonPi0::get_pID_Stats()
 {
     cout<<"Calculating pID Statististics"<<endl;
     double nProton = 0;
@@ -348,7 +368,7 @@ void CCDeltaPlus::get_pID_Stats()
     }
 }
 
-void CCDeltaPlus::fillCCDeltaPlus()
+void CCProtonPi0::fillCCProtonPi0()
 {
     beamEnergy_mc->Fill(mc_incomingE);
 //     beamEnergy_reco->Fill(Erec);
@@ -361,12 +381,12 @@ void CCDeltaPlus::fillCCDeltaPlus()
 //     q2_reco_mc->Fill(Q2/mevSq_to_gevSq,mc_Q2 /mevSq_to_gevSq);
 
     vertex_z_true->Fill(mc_vtx[2]);
-    vertex_z_reco->Fill(CCDeltaPlusAna_vtx[2]);
-    vertex_z_error->Fill( Data_Functions::getError(mc_vtx[2],CCDeltaPlusAna_vtx[2]) );
-    vertex_z_reco_mc->Fill(CCDeltaPlusAna_vtx[2],mc_vtx[2]);
+    vertex_z_reco->Fill(CCProtonPi0Ana_vtx[2]);
+    vertex_z_error->Fill( Data_Functions::getError(mc_vtx[2],CCProtonPi0Ana_vtx[2]) );
+    vertex_z_reco_mc->Fill(CCProtonPi0Ana_vtx[2],mc_vtx[2]);
     
     vertex_x_y_true->Fill(mc_vtx[0],mc_vtx[1]);
-    vertex_x_y_reco->Fill(CCDeltaPlusAna_vtx[0],CCDeltaPlusAna_vtx[1]);
+    vertex_x_y_reco->Fill(CCProtonPi0Ana_vtx[0],CCProtonPi0Ana_vtx[1]);
     
     int_channel->Fill(mc_intType);
 
@@ -375,15 +395,15 @@ void CCDeltaPlus::fillCCDeltaPlus()
 
 }
 
-void CCDeltaPlus::initVariables()
+void CCProtonPi0::initVariables()
 {
-    cout<<"Initializing CCDeltaPlus Class"<<endl;
+    cout<<"Initializing CCProtonPi0 Class"<<endl;
     
     channelTag = "Test";
     
     // File Locations
-    rootDir =   "Output/RootFiles/CCDeltaPlus.root";
-    plotDir =   "Output/Plots/CCDeltaPlus/";
+    rootDir =   "Output/RootFiles/CCProtonPi0.root";
+    plotDir =   "Output/Plots/CCProtonPi0/";
     
     
     cout<<"\tRoot File: "<<rootDir<<endl;
@@ -407,26 +427,26 @@ void CCDeltaPlus::initVariables()
 }
 
 
-void CCDeltaPlus::fillHistograms()
+void CCProtonPi0::fillHistograms()
 {
-    fillCCDeltaPlus();
+    fillCCProtonPi0();
     muon.fill_Histograms();
     pion.fill_Histograms();
     proton.fill_Histograms();
 }
 
-void CCDeltaPlus::write_RootFile()
+void CCProtonPi0::write_RootFile()
 {
     cout<<">> Writing "<<rootDir<<endl;
     f->Write();
 }
 
-void CCDeltaPlus::closeFiles()
+void CCProtonPi0::closeFiles()
 {
     readme.close();
 }
 
-void CCDeltaPlus::openFiles()
+void CCProtonPi0::openFiles()
 {
     // Open Readme File
     readmeFile = "Output/TextFiles/readme.txt";
@@ -450,7 +470,7 @@ void CCDeltaPlus::openFiles()
     writeReadme();
 }
 
-void CCDeltaPlus::writeReadme()
+void CCProtonPi0::writeReadme()
 {
     readme<<"Test"<<endl;
 }
@@ -461,7 +481,7 @@ void CCDeltaPlus::writeReadme()
     Incoming Beam Energy must be lower than a maximum Energy
 --------------------------------------------------------------------------------
 */
-bool CCDeltaPlus::isBeamEnergyLow(double maxEnergy)
+bool CCProtonPi0::isBeamEnergyLow(double maxEnergy)
 {
     if(mc_incomingE > maxEnergy){
         return false;
@@ -477,7 +497,7 @@ bool CCDeltaPlus::isBeamEnergyLow(double maxEnergy)
     Returns the array indice of the Final State Particle for given PDG
 --------------------------------------------------------------------------------
 */
-int CCDeltaPlus::findTrueParticle(int targetPDG)
+int CCProtonPi0::findTrueParticle(int targetPDG)
 {
     int current_ind = -1;
     double current_P = 0;
@@ -515,7 +535,7 @@ int CCDeltaPlus::findTrueParticle(int targetPDG)
                                 (no particle at rest)
 --------------------------------------------------------------------------------
 */
-int CCDeltaPlus::countParticles(int targetPDG, bool applyPCut)
+int CCProtonPi0::countParticles(int targetPDG, bool applyPCut)
 {
     int count = 0;
     TVector3 p3;
@@ -538,14 +558,14 @@ int CCDeltaPlus::countParticles(int targetPDG, bool applyPCut)
 
 }
 
-void CCDeltaPlus::fillProtonTrue()
+void CCProtonPi0::fillProtonTrue()
 {
     int ind = proton.ind;
     
     // Fill 4-Momentum
-    proton.set_p4(  CCDeltaPlusAna_trajProtonProngPx[ind],
-                    CCDeltaPlusAna_trajProtonProngPy[ind],
-                    CCDeltaPlusAna_trajProtonProngPz[ind],
+    proton.set_p4(  CCProtonPi0Ana_trajProtonProngPx[ind],
+                    CCProtonPi0Ana_trajProtonProngPy[ind],
+                    CCProtonPi0Ana_trajProtonProngPz[ind],
                     -1.0, 
                     true);
        
@@ -557,16 +577,16 @@ void CCDeltaPlus::fillProtonTrue()
     
 }
 
-void CCDeltaPlus::fillProtonReco(int ind)
+void CCProtonPi0::fillProtonReco(int ind)
 {
     // Set Particle Score
-    proton.particleScore = CCDeltaPlusAna_proton_score[ind];
+    proton.particleScore = CCProtonPi0Ana_proton_score[ind];
     
     // Fill 4-Momentum
-    proton.set_p4(  CCDeltaPlusAna_proton_px[ind],
-                    CCDeltaPlusAna_proton_py[ind],
-                    CCDeltaPlusAna_proton_pz[ind],
-                    CCDeltaPlusAna_proton_E[ind],
+    proton.set_p4(  CCProtonPi0Ana_proton_px[ind],
+                    CCProtonPi0Ana_proton_py[ind],
+                    CCProtonPi0Ana_proton_pz[ind],
+                    CCProtonPi0Ana_proton_E[ind],
                     false);
                     
     // set Angle wrt Beam
@@ -576,15 +596,15 @@ void CCDeltaPlus::fillProtonReco(int ind)
     proton.set_angleMuon(muon, false);
 }
 
-int CCDeltaPlus::findBestProton()
+int CCProtonPi0::findBestProton()
 {
-    double tempScore = CCDeltaPlusAna_proton_score[0];
+    double tempScore = CCProtonPi0Ana_proton_score[0];
     int tempInd = 0;
     
     for( int i = 1; i < 10; i++){
-        if ( CCDeltaPlusAna_proton_score[i] == -1 ) break;
-        if( CCDeltaPlusAna_proton_score[i] > tempScore){
-            tempScore = CCDeltaPlusAna_proton_score[i];
+        if ( CCProtonPi0Ana_proton_score[i] == -1 ) break;
+        if( CCProtonPi0Ana_proton_score[i] > tempScore){
+            tempScore = CCProtonPi0Ana_proton_score[i];
             tempInd = i;
         }
     }
@@ -593,7 +613,7 @@ int CCDeltaPlus::findBestProton()
 
 }
 
-bool CCDeltaPlus::isProtonShort(int ind)
+bool CCProtonPi0::isProtonShort(int ind)
 {
     const double protonMass = 938; 
     const double minProtonKE = 120;
@@ -611,7 +631,7 @@ bool CCDeltaPlus::isProtonShort(int ind)
 }
 
 
-void CCDeltaPlus::fillPionReco()
+void CCProtonPi0::fillPionReco()
 {
     // Fill 4-Momentum
 //     pion.set_p4(    pimom[0],
@@ -627,13 +647,13 @@ void CCDeltaPlus::fillPionReco()
     pion.set_angleMuon(muon, false);
 }
 
-void CCDeltaPlus::fillPionTrue()
+void CCProtonPi0::fillPionTrue()
 {
     
 }
 
 
-bool CCDeltaPlus::isSinglePion()
+bool CCProtonPi0::isSinglePion()
 {
     int nPlus;
     int nMinus;
@@ -651,7 +671,7 @@ bool CCDeltaPlus::isSinglePion()
 
 }
 
-bool CCDeltaPlus::isNoMeson()
+bool CCProtonPi0::isNoMeson()
 {
     int nPlus;
     int nMinus;
@@ -681,13 +701,13 @@ bool CCDeltaPlus::isNoMeson()
 
 }
 
-void CCDeltaPlus::fillMuonTrue()
+void CCProtonPi0::fillMuonTrue()
 {
 
     // Fill 4-Momentum
-    muon.set_p4(    CCDeltaPlusAna_trajMuonProngPx,
-                    CCDeltaPlusAna_trajMuonProngPy,
-                    CCDeltaPlusAna_trajMuonProngPz,
+    muon.set_p4(    CCProtonPi0Ana_trajMuonProngPx,
+                    CCProtonPi0Ana_trajMuonProngPy,
+                    CCProtonPi0Ana_trajMuonProngPz,
                     -1.0, 
                     true);
        
@@ -699,16 +719,16 @@ void CCDeltaPlus::fillMuonTrue()
     
 }
 
-void CCDeltaPlus::fillMuonReco()
+void CCProtonPi0::fillMuonReco()
 {
     // Set Particle Score
-    muon.particleScore = CCDeltaPlusAna_muon_muScore;
+    muon.particleScore = CCProtonPi0Ana_muon_muScore;
     
     // Fill 4-Momentum
-    muon.set_p4(    CCDeltaPlusAna_muon_px,
-                    CCDeltaPlusAna_muon_py,
-                    CCDeltaPlusAna_muon_pz,
-                    CCDeltaPlusAna_muon_E,
+    muon.set_p4(    CCProtonPi0Ana_muon_px,
+                    CCProtonPi0Ana_muon_py,
+                    CCProtonPi0Ana_muon_pz,
+                    CCProtonPi0Ana_muon_E,
                     false);
     
     // set Angle wrt Beam
@@ -718,7 +738,7 @@ void CCDeltaPlus::fillMuonReco()
     muon.set_angleMuon(muon, false);
 }
 
-void CCDeltaPlus::Init(string playlist, TChain* fChain)
+void CCProtonPi0::Init(string playlist, TChain* fChain)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -784,8 +804,8 @@ void CCDeltaPlus::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("Cut_Proton_None", &Cut_Proton_None, &b_Cut_Proton_None);
    fChain->SetBranchAddress("Cut_Vertex_Michel_Exist", &Cut_Vertex_Michel_Exist, &b_Cut_Vertex_Michel_Exist);
    fChain->SetBranchAddress("Cut_Vertex_None", &Cut_Vertex_None, &b_Cut_Vertex_None);
-   fChain->SetBranchAddress("Cut_Vertex_Not_Analyzable", &Cut_Vertex_Not_Analyzable, &b_Cut_Vertex_Not_Analyzable);
    fChain->SetBranchAddress("Cut_Vertex_Not_Fiducial", &Cut_Vertex_Not_Fiducial, &b_Cut_Vertex_Not_Fiducial);
+   fChain->SetBranchAddress("Cut_Vertex_Not_Reconstructable", &Cut_Vertex_Not_Reconstructable, &b_Cut_Vertex_Not_Reconstructable);
    fChain->SetBranchAddress("Cut_Vertex_Null", &Cut_Vertex_Null, &b_Cut_Vertex_Null);
    fChain->SetBranchAddress("Cut_secEndPoint_Michel_Exist", &Cut_secEndPoint_Michel_Exist, &b_Cut_secEndPoint_Michel_Exist);
    fChain->SetBranchAddress("broken_track_most_us_plane", &broken_track_most_us_plane, &b_broken_track_most_us_plane);
@@ -911,146 +931,149 @@ void CCDeltaPlus::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("truth_proton_py", truth_proton_py, &b_truth_proton_py);
    fChain->SetBranchAddress("truth_proton_pz", truth_proton_pz, &b_truth_proton_pz);
    fChain->SetBranchAddress("truth_proton_theta_wrtbeam", truth_proton_theta_wrtbeam, &b_truth_proton_theta_wrtbeam);
-   fChain->SetBranchAddress("CCDeltaPlusAna_nuFlavor", &CCDeltaPlusAna_nuFlavor, &b_CCDeltaPlusAna_nuFlavor);
-   fChain->SetBranchAddress("CCDeltaPlusAna_nuHelicity", &CCDeltaPlusAna_nuHelicity, &b_CCDeltaPlusAna_nuHelicity);
-   fChain->SetBranchAddress("CCDeltaPlusAna_intCurrent", &CCDeltaPlusAna_intCurrent, &b_CCDeltaPlusAna_intCurrent);
-   fChain->SetBranchAddress("CCDeltaPlusAna_intType", &CCDeltaPlusAna_intType, &b_CCDeltaPlusAna_intType);
-   fChain->SetBranchAddress("CCDeltaPlusAna_E", &CCDeltaPlusAna_E, &b_CCDeltaPlusAna_E);
-   fChain->SetBranchAddress("CCDeltaPlusAna_Q2", &CCDeltaPlusAna_Q2, &b_CCDeltaPlusAna_Q2);
-   fChain->SetBranchAddress("CCDeltaPlusAna_x", &CCDeltaPlusAna_x, &b_CCDeltaPlusAna_x);
-   fChain->SetBranchAddress("CCDeltaPlusAna_y", &CCDeltaPlusAna_y, &b_CCDeltaPlusAna_y);
-   fChain->SetBranchAddress("CCDeltaPlusAna_W", &CCDeltaPlusAna_W, &b_CCDeltaPlusAna_W);
-   fChain->SetBranchAddress("CCDeltaPlusAna_score", &CCDeltaPlusAna_score, &b_CCDeltaPlusAna_score);
-   fChain->SetBranchAddress("CCDeltaPlusAna_leptonE", CCDeltaPlusAna_leptonE, &b_CCDeltaPlusAna_leptonE);
-   fChain->SetBranchAddress("CCDeltaPlusAna_vtx", CCDeltaPlusAna_vtx, &b_CCDeltaPlusAna_vtx);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_is_contained", &CCDeltaPlusAna_minos_trk_is_contained, &b_CCDeltaPlusAna_minos_trk_is_contained);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_is_ok", &CCDeltaPlusAna_minos_trk_is_ok, &b_CCDeltaPlusAna_minos_trk_is_ok);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_used_range", &CCDeltaPlusAna_minos_used_range, &b_CCDeltaPlusAna_minos_used_range);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_used_curvature", &CCDeltaPlusAna_minos_used_curvature, &b_CCDeltaPlusAna_minos_used_curvature);
-   fChain->SetBranchAddress("CCDeltaPlusAna_isMuonInsideOD", &CCDeltaPlusAna_isMuonInsideOD, &b_CCDeltaPlusAna_isMuonInsideOD);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_end_plane", &CCDeltaPlusAna_minos_trk_end_plane, &b_CCDeltaPlusAna_minos_trk_end_plane);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_quality", &CCDeltaPlusAna_minos_trk_quality, &b_CCDeltaPlusAna_minos_trk_quality);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_N_minosTracks", &CCDeltaPlusAna_muon_N_minosTracks, &b_CCDeltaPlusAna_muon_N_minosTracks);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_minervaTrack_types", &CCDeltaPlusAna_muon_minervaTrack_types, &b_CCDeltaPlusAna_muon_minervaTrack_types);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_minosTrackQuality", &CCDeltaPlusAna_muon_minosTrackQuality, &b_CCDeltaPlusAna_muon_minosTrackQuality);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_roadUpstreamPlanes", &CCDeltaPlusAna_muon_roadUpstreamPlanes, &b_CCDeltaPlusAna_muon_roadUpstreamPlanes);
-   fChain->SetBranchAddress("CCDeltaPlusAna_ntrajMuonProng", &CCDeltaPlusAna_ntrajMuonProng, &b_CCDeltaPlusAna_ntrajMuonProng);
-   fChain->SetBranchAddress("CCDeltaPlusAna_r_minos_trk_vtx_plane", &CCDeltaPlusAna_r_minos_trk_vtx_plane, &b_CCDeltaPlusAna_r_minos_trk_vtx_plane);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_numFSMuons", &CCDeltaPlusAna_t_minos_trk_numFSMuons, &b_CCDeltaPlusAna_t_minos_trk_numFSMuons);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLeptonPDG", &CCDeltaPlusAna_t_minos_trk_primFSLeptonPDG, &b_CCDeltaPlusAna_t_minos_trk_primFSLeptonPDG);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonProngPDG", &CCDeltaPlusAna_trajMuonProngPDG, &b_CCDeltaPlusAna_trajMuonProngPDG);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonProngPrimary", &CCDeltaPlusAna_trajMuonProngPrimary, &b_CCDeltaPlusAna_trajMuonProngPrimary);
-   fChain->SetBranchAddress("CCDeltaPlusAna_vtx_module", &CCDeltaPlusAna_vtx_module, &b_CCDeltaPlusAna_vtx_module);
-   fChain->SetBranchAddress("CCDeltaPlusAna_vtx_plane", &CCDeltaPlusAna_vtx_plane, &b_CCDeltaPlusAna_vtx_plane);
-   fChain->SetBranchAddress("CCDeltaPlusAna_endMuonTrajMomentum", &CCDeltaPlusAna_endMuonTrajMomentum, &b_CCDeltaPlusAna_endMuonTrajMomentum);
-   fChain->SetBranchAddress("CCDeltaPlusAna_endMuonTrajXPosition", &CCDeltaPlusAna_endMuonTrajXPosition, &b_CCDeltaPlusAna_endMuonTrajXPosition);
-   fChain->SetBranchAddress("CCDeltaPlusAna_endMuonTrajYPosition", &CCDeltaPlusAna_endMuonTrajYPosition, &b_CCDeltaPlusAna_endMuonTrajYPosition);
-   fChain->SetBranchAddress("CCDeltaPlusAna_endMuonTrajZPosition", &CCDeltaPlusAna_endMuonTrajZPosition, &b_CCDeltaPlusAna_endMuonTrajZPosition);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_bave", &CCDeltaPlusAna_minos_trk_bave, &b_CCDeltaPlusAna_minos_trk_bave);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_chi2", &CCDeltaPlusAna_minos_trk_chi2, &b_CCDeltaPlusAna_minos_trk_chi2);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_end_u", &CCDeltaPlusAna_minos_trk_end_u, &b_CCDeltaPlusAna_minos_trk_end_u);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_end_v", &CCDeltaPlusAna_minos_trk_end_v, &b_CCDeltaPlusAna_minos_trk_end_v);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_end_x", &CCDeltaPlusAna_minos_trk_end_x, &b_CCDeltaPlusAna_minos_trk_end_x);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_end_y", &CCDeltaPlusAna_minos_trk_end_y, &b_CCDeltaPlusAna_minos_trk_end_y);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_end_z", &CCDeltaPlusAna_minos_trk_end_z, &b_CCDeltaPlusAna_minos_trk_end_z);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_eqp", &CCDeltaPlusAna_minos_trk_eqp, &b_CCDeltaPlusAna_minos_trk_eqp);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_eqp_qp", &CCDeltaPlusAna_minos_trk_eqp_qp, &b_CCDeltaPlusAna_minos_trk_eqp_qp);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_fit_pass", &CCDeltaPlusAna_minos_trk_fit_pass, &b_CCDeltaPlusAna_minos_trk_fit_pass);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_ndf", &CCDeltaPlusAna_minos_trk_ndf, &b_CCDeltaPlusAna_minos_trk_ndf);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_p", &CCDeltaPlusAna_minos_trk_p, &b_CCDeltaPlusAna_minos_trk_p);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_p_curvature", &CCDeltaPlusAna_minos_trk_p_curvature, &b_CCDeltaPlusAna_minos_trk_p_curvature);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_p_range", &CCDeltaPlusAna_minos_trk_p_range, &b_CCDeltaPlusAna_minos_trk_p_range);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_qp", &CCDeltaPlusAna_minos_trk_qp, &b_CCDeltaPlusAna_minos_trk_qp);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_vtx_x", &CCDeltaPlusAna_minos_trk_vtx_x, &b_CCDeltaPlusAna_minos_trk_vtx_x);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_vtx_y", &CCDeltaPlusAna_minos_trk_vtx_y, &b_CCDeltaPlusAna_minos_trk_vtx_y);
-   fChain->SetBranchAddress("CCDeltaPlusAna_minos_trk_vtx_z", &CCDeltaPlusAna_minos_trk_vtx_z, &b_CCDeltaPlusAna_minos_trk_vtx_z);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_E", &CCDeltaPlusAna_muon_E, &b_CCDeltaPlusAna_muon_E);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_E_shift", &CCDeltaPlusAna_muon_E_shift, &b_CCDeltaPlusAna_muon_E_shift);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_muScore", &CCDeltaPlusAna_muon_muScore, &b_CCDeltaPlusAna_muon_muScore);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_p", &CCDeltaPlusAna_muon_p, &b_CCDeltaPlusAna_muon_p);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_px", &CCDeltaPlusAna_muon_px, &b_CCDeltaPlusAna_muon_px);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_py", &CCDeltaPlusAna_muon_py, &b_CCDeltaPlusAna_muon_py);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_pz", &CCDeltaPlusAna_muon_pz, &b_CCDeltaPlusAna_muon_pz);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_qp", &CCDeltaPlusAna_muon_qp, &b_CCDeltaPlusAna_muon_qp);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_qpqpe", &CCDeltaPlusAna_muon_qpqpe, &b_CCDeltaPlusAna_muon_qpqpe);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_roadUpstreamEnergy", &CCDeltaPlusAna_muon_roadUpstreamEnergy, &b_CCDeltaPlusAna_muon_roadUpstreamEnergy);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_theta", &CCDeltaPlusAna_muon_theta, &b_CCDeltaPlusAna_muon_theta);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_theta_biasDown", &CCDeltaPlusAna_muon_theta_biasDown, &b_CCDeltaPlusAna_muon_theta_biasDown);
-   fChain->SetBranchAddress("CCDeltaPlusAna_muon_theta_biasUp", &CCDeltaPlusAna_muon_theta_biasUp, &b_CCDeltaPlusAna_muon_theta_biasUp);
-   fChain->SetBranchAddress("CCDeltaPlusAna_r_minos_trk_bdL", &CCDeltaPlusAna_r_minos_trk_bdL, &b_CCDeltaPlusAna_r_minos_trk_bdL);
-   fChain->SetBranchAddress("CCDeltaPlusAna_r_minos_trk_end_dcosx", &CCDeltaPlusAna_r_minos_trk_end_dcosx, &b_CCDeltaPlusAna_r_minos_trk_end_dcosx);
-   fChain->SetBranchAddress("CCDeltaPlusAna_r_minos_trk_end_dcosy", &CCDeltaPlusAna_r_minos_trk_end_dcosy, &b_CCDeltaPlusAna_r_minos_trk_end_dcosy);
-   fChain->SetBranchAddress("CCDeltaPlusAna_r_minos_trk_end_dcosz", &CCDeltaPlusAna_r_minos_trk_end_dcosz, &b_CCDeltaPlusAna_r_minos_trk_end_dcosz);
-   fChain->SetBranchAddress("CCDeltaPlusAna_r_minos_trk_vtx_dcosx", &CCDeltaPlusAna_r_minos_trk_vtx_dcosx, &b_CCDeltaPlusAna_r_minos_trk_vtx_dcosx);
-   fChain->SetBranchAddress("CCDeltaPlusAna_r_minos_trk_vtx_dcosy", &CCDeltaPlusAna_r_minos_trk_vtx_dcosy, &b_CCDeltaPlusAna_r_minos_trk_vtx_dcosy);
-   fChain->SetBranchAddress("CCDeltaPlusAna_r_minos_trk_vtx_dcosz", &CCDeltaPlusAna_r_minos_trk_vtx_dcosz, &b_CCDeltaPlusAna_r_minos_trk_vtx_dcosz);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPx", &CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPx, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPx);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPy", &CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPy, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPy);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPz", &CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPz, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPz);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjX", &CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjX, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjX);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjY", &CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjY, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjY);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjZ", &CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjZ, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjZ);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPx", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPx, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPx);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPy", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPy, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPy);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPz", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPz, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPz);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalX", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalX, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalX);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalY", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalY, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalY);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalZ", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalZ, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalZ);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPx", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPx, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPx);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPy", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPy, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPy);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPz", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPz, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPz);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitX", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitX, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitX);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitY", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitY, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitY);
-   fChain->SetBranchAddress("CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ", &CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ, &b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonPhi", &CCDeltaPlusAna_trajMuonPhi, &b_CCDeltaPlusAna_trajMuonPhi);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonProngMomentum", &CCDeltaPlusAna_trajMuonProngMomentum, &b_CCDeltaPlusAna_trajMuonProngMomentum);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonProngPx", &CCDeltaPlusAna_trajMuonProngPx, &b_CCDeltaPlusAna_trajMuonProngPx);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonProngPy", &CCDeltaPlusAna_trajMuonProngPy, &b_CCDeltaPlusAna_trajMuonProngPy);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonProngPz", &CCDeltaPlusAna_trajMuonProngPz, &b_CCDeltaPlusAna_trajMuonProngPz);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajMuonTheta", &CCDeltaPlusAna_trajMuonTheta, &b_CCDeltaPlusAna_trajMuonTheta);
-   fChain->SetBranchAddress("CCDeltaPlusAna_vtx_x", &CCDeltaPlusAna_vtx_x, &b_CCDeltaPlusAna_vtx_x);
-   fChain->SetBranchAddress("CCDeltaPlusAna_vtx_y", &CCDeltaPlusAna_vtx_y, &b_CCDeltaPlusAna_vtx_y);
-   fChain->SetBranchAddress("CCDeltaPlusAna_vtx_z", &CCDeltaPlusAna_vtx_z, &b_CCDeltaPlusAna_vtx_z);
-   fChain->SetBranchAddress("CCDeltaPlusAna_isProtonInsideOD", CCDeltaPlusAna_isProtonInsideOD, &b_CCDeltaPlusAna_isProtonInsideOD);
-   fChain->SetBranchAddress("CCDeltaPlusAna_ntrajProtonProng", CCDeltaPlusAna_ntrajProtonProng, &b_CCDeltaPlusAna_ntrajProtonProng);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_kinked", CCDeltaPlusAna_proton_kinked, &b_CCDeltaPlusAna_proton_kinked);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_odMatch", CCDeltaPlusAna_proton_odMatch, &b_CCDeltaPlusAna_proton_odMatch);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_trk_pat_history", CCDeltaPlusAna_proton_trk_pat_history, &b_CCDeltaPlusAna_proton_trk_pat_history);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonProngPDG", CCDeltaPlusAna_trajProtonProngPDG, &b_CCDeltaPlusAna_trajProtonProngPDG);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonProngPrimary", CCDeltaPlusAna_trajProtonProngPrimary, &b_CCDeltaPlusAna_trajProtonProngPrimary);
-   fChain->SetBranchAddress("CCDeltaPlusAna_endProtonTrajMomentum", CCDeltaPlusAna_endProtonTrajMomentum, &b_CCDeltaPlusAna_endProtonTrajMomentum);
-   fChain->SetBranchAddress("CCDeltaPlusAna_endProtonTrajXPosition", CCDeltaPlusAna_endProtonTrajXPosition, &b_CCDeltaPlusAna_endProtonTrajXPosition);
-   fChain->SetBranchAddress("CCDeltaPlusAna_endProtonTrajYPosition", CCDeltaPlusAna_endProtonTrajYPosition, &b_CCDeltaPlusAna_endProtonTrajYPosition);
-   fChain->SetBranchAddress("CCDeltaPlusAna_endProtonTrajZPosition", CCDeltaPlusAna_endProtonTrajZPosition, &b_CCDeltaPlusAna_endProtonTrajZPosition);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_E", CCDeltaPlusAna_proton_E, &b_CCDeltaPlusAna_proton_E);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_chi2_ndf", CCDeltaPlusAna_proton_chi2_ndf, &b_CCDeltaPlusAna_proton_chi2_ndf);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_ekin", CCDeltaPlusAna_proton_ekin, &b_CCDeltaPlusAna_proton_ekin);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_endPointX", CCDeltaPlusAna_proton_endPointX, &b_CCDeltaPlusAna_proton_endPointX);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_endPointY", CCDeltaPlusAna_proton_endPointY, &b_CCDeltaPlusAna_proton_endPointY);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_endPointZ", CCDeltaPlusAna_proton_endPointZ, &b_CCDeltaPlusAna_proton_endPointZ);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_p", CCDeltaPlusAna_proton_p, &b_CCDeltaPlusAna_proton_p);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_p_calCorrection", CCDeltaPlusAna_proton_p_calCorrection, &b_CCDeltaPlusAna_proton_p_calCorrection);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_p_dEdXTool", CCDeltaPlusAna_proton_p_dEdXTool, &b_CCDeltaPlusAna_proton_p_dEdXTool);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_p_visEnergy", CCDeltaPlusAna_proton_p_visEnergy, &b_CCDeltaPlusAna_proton_p_visEnergy);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_phi", CCDeltaPlusAna_proton_phi, &b_CCDeltaPlusAna_proton_phi);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_px", CCDeltaPlusAna_proton_px, &b_CCDeltaPlusAna_proton_px);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_py", CCDeltaPlusAna_proton_py, &b_CCDeltaPlusAna_proton_py);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_pz", CCDeltaPlusAna_proton_pz, &b_CCDeltaPlusAna_proton_pz);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_score", CCDeltaPlusAna_proton_score, &b_CCDeltaPlusAna_proton_score);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_score1", CCDeltaPlusAna_proton_score1, &b_CCDeltaPlusAna_proton_score1);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_score2", CCDeltaPlusAna_proton_score2, &b_CCDeltaPlusAna_proton_score2);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_startPointX", CCDeltaPlusAna_proton_startPointX, &b_CCDeltaPlusAna_proton_startPointX);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_startPointY", CCDeltaPlusAna_proton_startPointY, &b_CCDeltaPlusAna_proton_startPointY);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_startPointZ", CCDeltaPlusAna_proton_startPointZ, &b_CCDeltaPlusAna_proton_startPointZ);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_theta", CCDeltaPlusAna_proton_theta, &b_CCDeltaPlusAna_proton_theta);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_thetaX", CCDeltaPlusAna_proton_thetaX, &b_CCDeltaPlusAna_proton_thetaX);
-   fChain->SetBranchAddress("CCDeltaPlusAna_proton_thetaY", CCDeltaPlusAna_proton_thetaY, &b_CCDeltaPlusAna_proton_thetaY);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonPhi", CCDeltaPlusAna_trajProtonPhi, &b_CCDeltaPlusAna_trajProtonPhi);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonProngMomentum", CCDeltaPlusAna_trajProtonProngMomentum, &b_CCDeltaPlusAna_trajProtonProngMomentum);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonProngPx", CCDeltaPlusAna_trajProtonProngPx, &b_CCDeltaPlusAna_trajProtonProngPx);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonProngPy", CCDeltaPlusAna_trajProtonProngPy, &b_CCDeltaPlusAna_trajProtonProngPy);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonProngPz", CCDeltaPlusAna_trajProtonProngPz, &b_CCDeltaPlusAna_trajProtonProngPz);
-   fChain->SetBranchAddress("CCDeltaPlusAna_trajProtonTheta", CCDeltaPlusAna_trajProtonTheta, &b_CCDeltaPlusAna_trajProtonTheta);
+   fChain->SetBranchAddress("CCProtonPi0Ana_nuFlavor", &CCProtonPi0Ana_nuFlavor, &b_CCProtonPi0Ana_nuFlavor);
+   fChain->SetBranchAddress("CCProtonPi0Ana_nuHelicity", &CCProtonPi0Ana_nuHelicity, &b_CCProtonPi0Ana_nuHelicity);
+   fChain->SetBranchAddress("CCProtonPi0Ana_intCurrent", &CCProtonPi0Ana_intCurrent, &b_CCProtonPi0Ana_intCurrent);
+   fChain->SetBranchAddress("CCProtonPi0Ana_intType", &CCProtonPi0Ana_intType, &b_CCProtonPi0Ana_intType);
+   fChain->SetBranchAddress("CCProtonPi0Ana_E", &CCProtonPi0Ana_E, &b_CCProtonPi0Ana_E);
+   fChain->SetBranchAddress("CCProtonPi0Ana_Q2", &CCProtonPi0Ana_Q2, &b_CCProtonPi0Ana_Q2);
+   fChain->SetBranchAddress("CCProtonPi0Ana_x", &CCProtonPi0Ana_x, &b_CCProtonPi0Ana_x);
+   fChain->SetBranchAddress("CCProtonPi0Ana_y", &CCProtonPi0Ana_y, &b_CCProtonPi0Ana_y);
+   fChain->SetBranchAddress("CCProtonPi0Ana_W", &CCProtonPi0Ana_W, &b_CCProtonPi0Ana_W);
+   fChain->SetBranchAddress("CCProtonPi0Ana_score", &CCProtonPi0Ana_score, &b_CCProtonPi0Ana_score);
+   fChain->SetBranchAddress("CCProtonPi0Ana_leptonE", CCProtonPi0Ana_leptonE, &b_CCProtonPi0Ana_leptonE);
+   fChain->SetBranchAddress("CCProtonPi0Ana_vtx", CCProtonPi0Ana_vtx, &b_CCProtonPi0Ana_vtx);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_is_contained", &CCProtonPi0Ana_minos_trk_is_contained, &b_CCProtonPi0Ana_minos_trk_is_contained);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_is_ok", &CCProtonPi0Ana_minos_trk_is_ok, &b_CCProtonPi0Ana_minos_trk_is_ok);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_used_range", &CCProtonPi0Ana_minos_used_range, &b_CCProtonPi0Ana_minos_used_range);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_used_curvature", &CCProtonPi0Ana_minos_used_curvature, &b_CCProtonPi0Ana_minos_used_curvature);
+   fChain->SetBranchAddress("CCProtonPi0Ana_isMuonInsideOD", &CCProtonPi0Ana_isMuonInsideOD, &b_CCProtonPi0Ana_isMuonInsideOD);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_end_plane", &CCProtonPi0Ana_minos_trk_end_plane, &b_CCProtonPi0Ana_minos_trk_end_plane);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_quality", &CCProtonPi0Ana_minos_trk_quality, &b_CCProtonPi0Ana_minos_trk_quality);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_N_minosTracks", &CCProtonPi0Ana_muon_N_minosTracks, &b_CCProtonPi0Ana_muon_N_minosTracks);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_charge", &CCProtonPi0Ana_muon_charge, &b_CCProtonPi0Ana_muon_charge);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_minervaTrack_types", &CCProtonPi0Ana_muon_minervaTrack_types, &b_CCProtonPi0Ana_muon_minervaTrack_types);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_minosTrackQuality", &CCProtonPi0Ana_muon_minosTrackQuality, &b_CCProtonPi0Ana_muon_minosTrackQuality);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_roadUpstreamPlanes", &CCProtonPi0Ana_muon_roadUpstreamPlanes, &b_CCProtonPi0Ana_muon_roadUpstreamPlanes);
+   fChain->SetBranchAddress("CCProtonPi0Ana_ntrajMuonProng", &CCProtonPi0Ana_ntrajMuonProng, &b_CCProtonPi0Ana_ntrajMuonProng);
+   fChain->SetBranchAddress("CCProtonPi0Ana_r_minos_trk_vtx_plane", &CCProtonPi0Ana_r_minos_trk_vtx_plane, &b_CCProtonPi0Ana_r_minos_trk_vtx_plane);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_numFSMuons", &CCProtonPi0Ana_t_minos_trk_numFSMuons, &b_CCProtonPi0Ana_t_minos_trk_numFSMuons);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLeptonPDG", &CCProtonPi0Ana_t_minos_trk_primFSLeptonPDG, &b_CCProtonPi0Ana_t_minos_trk_primFSLeptonPDG);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajMuonProngPDG", &CCProtonPi0Ana_trajMuonProngPDG, &b_CCProtonPi0Ana_trajMuonProngPDG);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajMuonProngPrimary", &CCProtonPi0Ana_trajMuonProngPrimary, &b_CCProtonPi0Ana_trajMuonProngPrimary);
+   fChain->SetBranchAddress("CCProtonPi0Ana_vtx_module", &CCProtonPi0Ana_vtx_module, &b_CCProtonPi0Ana_vtx_module);
+   fChain->SetBranchAddress("CCProtonPi0Ana_vtx_plane", &CCProtonPi0Ana_vtx_plane, &b_CCProtonPi0Ana_vtx_plane);
+   fChain->SetBranchAddress("CCProtonPi0Ana_endMuonTrajMomentum", &CCProtonPi0Ana_endMuonTrajMomentum, &b_CCProtonPi0Ana_endMuonTrajMomentum);
+   fChain->SetBranchAddress("CCProtonPi0Ana_endMuonTrajXPosition", &CCProtonPi0Ana_endMuonTrajXPosition, &b_CCProtonPi0Ana_endMuonTrajXPosition);
+   fChain->SetBranchAddress("CCProtonPi0Ana_endMuonTrajYPosition", &CCProtonPi0Ana_endMuonTrajYPosition, &b_CCProtonPi0Ana_endMuonTrajYPosition);
+   fChain->SetBranchAddress("CCProtonPi0Ana_endMuonTrajZPosition", &CCProtonPi0Ana_endMuonTrajZPosition, &b_CCProtonPi0Ana_endMuonTrajZPosition);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_bave", &CCProtonPi0Ana_minos_trk_bave, &b_CCProtonPi0Ana_minos_trk_bave);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_chi2", &CCProtonPi0Ana_minos_trk_chi2, &b_CCProtonPi0Ana_minos_trk_chi2);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_end_u", &CCProtonPi0Ana_minos_trk_end_u, &b_CCProtonPi0Ana_minos_trk_end_u);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_end_v", &CCProtonPi0Ana_minos_trk_end_v, &b_CCProtonPi0Ana_minos_trk_end_v);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_end_x", &CCProtonPi0Ana_minos_trk_end_x, &b_CCProtonPi0Ana_minos_trk_end_x);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_end_y", &CCProtonPi0Ana_minos_trk_end_y, &b_CCProtonPi0Ana_minos_trk_end_y);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_end_z", &CCProtonPi0Ana_minos_trk_end_z, &b_CCProtonPi0Ana_minos_trk_end_z);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_eqp", &CCProtonPi0Ana_minos_trk_eqp, &b_CCProtonPi0Ana_minos_trk_eqp);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_eqp_qp", &CCProtonPi0Ana_minos_trk_eqp_qp, &b_CCProtonPi0Ana_minos_trk_eqp_qp);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_fit_pass", &CCProtonPi0Ana_minos_trk_fit_pass, &b_CCProtonPi0Ana_minos_trk_fit_pass);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_ndf", &CCProtonPi0Ana_minos_trk_ndf, &b_CCProtonPi0Ana_minos_trk_ndf);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_p", &CCProtonPi0Ana_minos_trk_p, &b_CCProtonPi0Ana_minos_trk_p);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_p_curvature", &CCProtonPi0Ana_minos_trk_p_curvature, &b_CCProtonPi0Ana_minos_trk_p_curvature);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_p_range", &CCProtonPi0Ana_minos_trk_p_range, &b_CCProtonPi0Ana_minos_trk_p_range);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_qp", &CCProtonPi0Ana_minos_trk_qp, &b_CCProtonPi0Ana_minos_trk_qp);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_vtx_x", &CCProtonPi0Ana_minos_trk_vtx_x, &b_CCProtonPi0Ana_minos_trk_vtx_x);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_vtx_y", &CCProtonPi0Ana_minos_trk_vtx_y, &b_CCProtonPi0Ana_minos_trk_vtx_y);
+   fChain->SetBranchAddress("CCProtonPi0Ana_minos_trk_vtx_z", &CCProtonPi0Ana_minos_trk_vtx_z, &b_CCProtonPi0Ana_minos_trk_vtx_z);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_E", &CCProtonPi0Ana_muon_E, &b_CCProtonPi0Ana_muon_E);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_E_shift", &CCProtonPi0Ana_muon_E_shift, &b_CCProtonPi0Ana_muon_E_shift);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_muScore", &CCProtonPi0Ana_muon_muScore, &b_CCProtonPi0Ana_muon_muScore);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_p", &CCProtonPi0Ana_muon_p, &b_CCProtonPi0Ana_muon_p);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_px", &CCProtonPi0Ana_muon_px, &b_CCProtonPi0Ana_muon_px);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_py", &CCProtonPi0Ana_muon_py, &b_CCProtonPi0Ana_muon_py);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_pz", &CCProtonPi0Ana_muon_pz, &b_CCProtonPi0Ana_muon_pz);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_qp", &CCProtonPi0Ana_muon_qp, &b_CCProtonPi0Ana_muon_qp);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_qpqpe", &CCProtonPi0Ana_muon_qpqpe, &b_CCProtonPi0Ana_muon_qpqpe);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_roadUpstreamEnergy", &CCProtonPi0Ana_muon_roadUpstreamEnergy, &b_CCProtonPi0Ana_muon_roadUpstreamEnergy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_theta", &CCProtonPi0Ana_muon_theta, &b_CCProtonPi0Ana_muon_theta);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_theta_biasDown", &CCProtonPi0Ana_muon_theta_biasDown, &b_CCProtonPi0Ana_muon_theta_biasDown);
+   fChain->SetBranchAddress("CCProtonPi0Ana_muon_theta_biasUp", &CCProtonPi0Ana_muon_theta_biasUp, &b_CCProtonPi0Ana_muon_theta_biasUp);
+   fChain->SetBranchAddress("CCProtonPi0Ana_r_minos_trk_bdL", &CCProtonPi0Ana_r_minos_trk_bdL, &b_CCProtonPi0Ana_r_minos_trk_bdL);
+   fChain->SetBranchAddress("CCProtonPi0Ana_r_minos_trk_end_dcosx", &CCProtonPi0Ana_r_minos_trk_end_dcosx, &b_CCProtonPi0Ana_r_minos_trk_end_dcosx);
+   fChain->SetBranchAddress("CCProtonPi0Ana_r_minos_trk_end_dcosy", &CCProtonPi0Ana_r_minos_trk_end_dcosy, &b_CCProtonPi0Ana_r_minos_trk_end_dcosy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_r_minos_trk_end_dcosz", &CCProtonPi0Ana_r_minos_trk_end_dcosz, &b_CCProtonPi0Ana_r_minos_trk_end_dcosz);
+   fChain->SetBranchAddress("CCProtonPi0Ana_r_minos_trk_vtx_dcosx", &CCProtonPi0Ana_r_minos_trk_vtx_dcosx, &b_CCProtonPi0Ana_r_minos_trk_vtx_dcosx);
+   fChain->SetBranchAddress("CCProtonPi0Ana_r_minos_trk_vtx_dcosy", &CCProtonPi0Ana_r_minos_trk_vtx_dcosy, &b_CCProtonPi0Ana_r_minos_trk_vtx_dcosy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_r_minos_trk_vtx_dcosz", &CCProtonPi0Ana_r_minos_trk_vtx_dcosz, &b_CCProtonPi0Ana_r_minos_trk_vtx_dcosz);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPx", &CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPx, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPx);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPy", &CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPy, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPz", &CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPz, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPz);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjX", &CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjX, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjX);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjY", &CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjY, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjY);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjZ", &CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjZ, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjZ);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPx", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPx, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPx);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPy", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPy, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPz", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPz, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPz);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalX", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalX, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalX);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalY", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalY, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalY);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalZ", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalZ, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalZ);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPx", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPx, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPx);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPy", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPy, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPz", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPz, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPz);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitX", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitX, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitX);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitY", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitY, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitY);
+   fChain->SetBranchAddress("CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitZ", &CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitZ, &b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitZ);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajMuonPhi", &CCProtonPi0Ana_trajMuonPhi, &b_CCProtonPi0Ana_trajMuonPhi);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajMuonProngEnergy", &CCProtonPi0Ana_trajMuonProngEnergy, &b_CCProtonPi0Ana_trajMuonProngEnergy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajMuonProngMomentum", &CCProtonPi0Ana_trajMuonProngMomentum, &b_CCProtonPi0Ana_trajMuonProngMomentum);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajMuonProngPx", &CCProtonPi0Ana_trajMuonProngPx, &b_CCProtonPi0Ana_trajMuonProngPx);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajMuonProngPy", &CCProtonPi0Ana_trajMuonProngPy, &b_CCProtonPi0Ana_trajMuonProngPy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajMuonProngPz", &CCProtonPi0Ana_trajMuonProngPz, &b_CCProtonPi0Ana_trajMuonProngPz);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajMuonTheta", &CCProtonPi0Ana_trajMuonTheta, &b_CCProtonPi0Ana_trajMuonTheta);
+   fChain->SetBranchAddress("CCProtonPi0Ana_vtx_x", &CCProtonPi0Ana_vtx_x, &b_CCProtonPi0Ana_vtx_x);
+   fChain->SetBranchAddress("CCProtonPi0Ana_vtx_y", &CCProtonPi0Ana_vtx_y, &b_CCProtonPi0Ana_vtx_y);
+   fChain->SetBranchAddress("CCProtonPi0Ana_vtx_z", &CCProtonPi0Ana_vtx_z, &b_CCProtonPi0Ana_vtx_z);
+   fChain->SetBranchAddress("CCProtonPi0Ana_isProtonInsideOD", CCProtonPi0Ana_isProtonInsideOD, &b_CCProtonPi0Ana_isProtonInsideOD);
+   fChain->SetBranchAddress("CCProtonPi0Ana_ntrajProtonProng", CCProtonPi0Ana_ntrajProtonProng, &b_CCProtonPi0Ana_ntrajProtonProng);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_kinked", CCProtonPi0Ana_proton_kinked, &b_CCProtonPi0Ana_proton_kinked);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_odMatch", CCProtonPi0Ana_proton_odMatch, &b_CCProtonPi0Ana_proton_odMatch);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_trk_pat_history", CCProtonPi0Ana_proton_trk_pat_history, &b_CCProtonPi0Ana_proton_trk_pat_history);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajProtonProngPDG", CCProtonPi0Ana_trajProtonProngPDG, &b_CCProtonPi0Ana_trajProtonProngPDG);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajProtonProngPrimary", CCProtonPi0Ana_trajProtonProngPrimary, &b_CCProtonPi0Ana_trajProtonProngPrimary);
+   fChain->SetBranchAddress("CCProtonPi0Ana_endProtonTrajMomentum", CCProtonPi0Ana_endProtonTrajMomentum, &b_CCProtonPi0Ana_endProtonTrajMomentum);
+   fChain->SetBranchAddress("CCProtonPi0Ana_endProtonTrajXPosition", CCProtonPi0Ana_endProtonTrajXPosition, &b_CCProtonPi0Ana_endProtonTrajXPosition);
+   fChain->SetBranchAddress("CCProtonPi0Ana_endProtonTrajYPosition", CCProtonPi0Ana_endProtonTrajYPosition, &b_CCProtonPi0Ana_endProtonTrajYPosition);
+   fChain->SetBranchAddress("CCProtonPi0Ana_endProtonTrajZPosition", CCProtonPi0Ana_endProtonTrajZPosition, &b_CCProtonPi0Ana_endProtonTrajZPosition);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_E", CCProtonPi0Ana_proton_E, &b_CCProtonPi0Ana_proton_E);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_chi2_ndf", CCProtonPi0Ana_proton_chi2_ndf, &b_CCProtonPi0Ana_proton_chi2_ndf);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_ekin", CCProtonPi0Ana_proton_ekin, &b_CCProtonPi0Ana_proton_ekin);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_endPointX", CCProtonPi0Ana_proton_endPointX, &b_CCProtonPi0Ana_proton_endPointX);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_endPointY", CCProtonPi0Ana_proton_endPointY, &b_CCProtonPi0Ana_proton_endPointY);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_endPointZ", CCProtonPi0Ana_proton_endPointZ, &b_CCProtonPi0Ana_proton_endPointZ);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_p", CCProtonPi0Ana_proton_p, &b_CCProtonPi0Ana_proton_p);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_p_calCorrection", CCProtonPi0Ana_proton_p_calCorrection, &b_CCProtonPi0Ana_proton_p_calCorrection);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_p_dEdXTool", CCProtonPi0Ana_proton_p_dEdXTool, &b_CCProtonPi0Ana_proton_p_dEdXTool);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_p_visEnergy", CCProtonPi0Ana_proton_p_visEnergy, &b_CCProtonPi0Ana_proton_p_visEnergy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_phi", CCProtonPi0Ana_proton_phi, &b_CCProtonPi0Ana_proton_phi);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_px", CCProtonPi0Ana_proton_px, &b_CCProtonPi0Ana_proton_px);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_py", CCProtonPi0Ana_proton_py, &b_CCProtonPi0Ana_proton_py);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_pz", CCProtonPi0Ana_proton_pz, &b_CCProtonPi0Ana_proton_pz);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_score", CCProtonPi0Ana_proton_score, &b_CCProtonPi0Ana_proton_score);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_score1", CCProtonPi0Ana_proton_score1, &b_CCProtonPi0Ana_proton_score1);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_score2", CCProtonPi0Ana_proton_score2, &b_CCProtonPi0Ana_proton_score2);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_startPointX", CCProtonPi0Ana_proton_startPointX, &b_CCProtonPi0Ana_proton_startPointX);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_startPointY", CCProtonPi0Ana_proton_startPointY, &b_CCProtonPi0Ana_proton_startPointY);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_startPointZ", CCProtonPi0Ana_proton_startPointZ, &b_CCProtonPi0Ana_proton_startPointZ);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_theta", CCProtonPi0Ana_proton_theta, &b_CCProtonPi0Ana_proton_theta);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_thetaX", CCProtonPi0Ana_proton_thetaX, &b_CCProtonPi0Ana_proton_thetaX);
+   fChain->SetBranchAddress("CCProtonPi0Ana_proton_thetaY", CCProtonPi0Ana_proton_thetaY, &b_CCProtonPi0Ana_proton_thetaY);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajProtonPhi", CCProtonPi0Ana_trajProtonPhi, &b_CCProtonPi0Ana_trajProtonPhi);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajProtonProngEnergy", CCProtonPi0Ana_trajProtonProngEnergy, &b_CCProtonPi0Ana_trajProtonProngEnergy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajProtonProngMomentum", CCProtonPi0Ana_trajProtonProngMomentum, &b_CCProtonPi0Ana_trajProtonProngMomentum);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajProtonProngPx", CCProtonPi0Ana_trajProtonProngPx, &b_CCProtonPi0Ana_trajProtonProngPx);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajProtonProngPy", CCProtonPi0Ana_trajProtonProngPy, &b_CCProtonPi0Ana_trajProtonProngPy);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajProtonProngPz", CCProtonPi0Ana_trajProtonProngPz, &b_CCProtonPi0Ana_trajProtonProngPz);
+   fChain->SetBranchAddress("CCProtonPi0Ana_trajProtonTheta", CCProtonPi0Ana_trajProtonTheta, &b_CCProtonPi0Ana_trajProtonTheta);
    fChain->SetBranchAddress("ev_run", &ev_run, &b_ev_run);
    fChain->SetBranchAddress("ev_subrun", &ev_subrun, &b_ev_subrun);
    fChain->SetBranchAddress("ev_detector", &ev_detector, &b_ev_detector);
@@ -1147,20 +1170,20 @@ void CCDeltaPlus::Init(string playlist, TChain* fChain)
 }
 
 
-CCDeltaPlus::~CCDeltaPlus()
+CCProtonPi0::~CCProtonPi0()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t CCDeltaPlus::GetEntry(Long64_t entry)
+Int_t CCProtonPi0::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
 
-Long64_t CCDeltaPlus::LoadTree(Long64_t entry)
+Long64_t CCProtonPi0::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -1173,7 +1196,7 @@ Long64_t CCDeltaPlus::LoadTree(Long64_t entry)
    return centry;
 }
 
-Bool_t CCDeltaPlus::Notify()
+Bool_t CCProtonPi0::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -1185,7 +1208,7 @@ Bool_t CCDeltaPlus::Notify()
    return kTRUE;
 }
 
-void CCDeltaPlus::Show(Long64_t entry)
+void CCProtonPi0::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
@@ -1193,7 +1216,7 @@ void CCDeltaPlus::Show(Long64_t entry)
    fChain->Show(entry);
 }
 
-Int_t CCDeltaPlus::Cut(Long64_t entry)
+Int_t CCProtonPi0::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
@@ -1201,7 +1224,7 @@ Int_t CCDeltaPlus::Cut(Long64_t entry)
    return 1;
 }
 
-void CCDeltaPlus::initHistograms()
+void CCProtonPi0::initHistograms()
 {
     cout<<"Initializing Histograms"<<endl;
     
@@ -1309,4 +1332,4 @@ void CCDeltaPlus::initHistograms()
     cout<<"Done!"<<endl;
 }
 
-#endif //CCDeltaPlus_cpp
+#endif //CCProtonPi0_cpp

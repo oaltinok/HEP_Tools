@@ -8,8 +8,8 @@ BINLISTO = Classes/BinList/BinList.o
 SINGLEBINCPP = Classes/SingleBin/SingleBin.cpp
 SINGLEBINO = Classes/SingleBin/SingleBin.o
 
-CCDELTAPLUSCPP = Classes/CCDeltaPlus/CCDeltaPlus.cpp
-CCDELTAPLUSO = Classes/CCDeltaPlus/CCDeltaPlus.o
+CCDELTAPLUSCPP = Classes/CCProtonPi0/CCProtonPi0.cpp
+CCDELTAPLUSO = Classes/CCProtonPi0/CCProtonPi0.o
 
 PARTICLECPP = Classes/Particle/Particle.cpp 
 PARTICLEO = Classes/Particle/Particle.o

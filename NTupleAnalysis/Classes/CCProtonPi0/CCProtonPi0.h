@@ -1,7 +1,7 @@
 /*
 ================================================================================
-Class: CCDeltaPlus
-    Core Class for CCDeltaPlus Analysis Package
+Class: CCProtonPi0
+    Core Class for CCProtonPi0 Analysis Package
     Includes all data variables for Data Analysis
     Member functions uses member data variables
     
@@ -11,7 +11,7 @@ Class: CCDeltaPlus
     Uses other classes to define variables or to access specific functions
     
     Main Directory:
-        Classes/CCDeltaPlus
+        Classes/CCProtonPi0
         
     Usage:
         > main.cpp declares and controls the class
@@ -19,12 +19,12 @@ Class: CCDeltaPlus
     
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_05_10
+    Last Revision:  2014_05_13
 ================================================================================
 */
 
-#ifndef CCDeltaPlus_h
-#define CCDeltaPlus_h
+#ifndef CCProtonPi0_h
+#define CCProtonPi0_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -41,6 +41,7 @@ Class: CCDeltaPlus
 // Libraries
 #include "../../Libraries/PDG_List.h"
 #include "../../Libraries/Data_Functions.h"
+#include "../../Libraries/HEP_Functions.h"
 
 // Classes
 #include "../BinList/BinList.h"
@@ -51,7 +52,7 @@ Class: CCDeltaPlus
 
 const double mevSq_to_gevSq = pow(10,6);
 
-class CCDeltaPlus {
+class CCProtonPi0 {
 public :
    // -------------------------------------------------------------------------
    //     Specific Functions
@@ -65,8 +66,8 @@ public :
     void run(std::string playlist);
     
     //--------------------------------------------------------------------------
-    //  Runtime and CCDeltaPlus Functions
-    //      File: CCDeltaPlus.cpp
+    //  Runtime and CCProtonPi0 Functions
+    //      File: CCProtonPi0.cpp
     //--------------------------------------------------------------------------
     void specifyRunTime();
     void initVariables();
@@ -80,7 +81,7 @@ public :
     int findTrueParticle(int targetPDG);
     int countParticles(int targetPDG, bool applyPCut);
     void get_pID_Stats();
-    void fillCCDeltaPlus();
+    void fillCCProtonPi0();
     
     //--------------------------------------------------------------------------
     //  Muon Specific Functions
@@ -109,7 +110,7 @@ public :
     //--------------------------------------------------------------------------
     //     Default Functions
     //--------------------------------------------------------------------------
-    ~CCDeltaPlus();
+    ~CCProtonPi0();
     void Init(std::string playlist, TChain* fChain);
     Int_t GetEntry(Long64_t entry);
     Long64_t LoadTree(Long64_t entry);
@@ -222,8 +223,8 @@ public :
    Int_t           Cut_Proton_None;
    Int_t           Cut_Vertex_Michel_Exist;
    Int_t           Cut_Vertex_None;
-   Int_t           Cut_Vertex_Not_Analyzable;
    Int_t           Cut_Vertex_Not_Fiducial;
+   Int_t           Cut_Vertex_Not_Reconstructable;
    Int_t           Cut_Vertex_Null;
    Int_t           Cut_secEndPoint_Michel_Exist;
    Int_t           broken_track_most_us_plane;
@@ -349,146 +350,149 @@ public :
    Double_t        truth_proton_py[20];
    Double_t        truth_proton_pz[20];
    Double_t        truth_proton_theta_wrtbeam[20];
-   Int_t           CCDeltaPlusAna_nuFlavor;
-   Int_t           CCDeltaPlusAna_nuHelicity;
-   Int_t           CCDeltaPlusAna_intCurrent;
-   Int_t           CCDeltaPlusAna_intType;
-   Double_t        CCDeltaPlusAna_E;
-   Double_t        CCDeltaPlusAna_Q2;
-   Double_t        CCDeltaPlusAna_x;
-   Double_t        CCDeltaPlusAna_y;
-   Double_t        CCDeltaPlusAna_W;
-   Double_t        CCDeltaPlusAna_score;
-   Double_t        CCDeltaPlusAna_leptonE[4];
-   Double_t        CCDeltaPlusAna_vtx[4];
-   Bool_t          CCDeltaPlusAna_minos_trk_is_contained;
-   Bool_t          CCDeltaPlusAna_minos_trk_is_ok;
-   Bool_t          CCDeltaPlusAna_minos_used_range;
-   Bool_t          CCDeltaPlusAna_minos_used_curvature;
-   Int_t           CCDeltaPlusAna_isMuonInsideOD;
-   Int_t           CCDeltaPlusAna_minos_trk_end_plane;
-   Int_t           CCDeltaPlusAna_minos_trk_quality;
-   Int_t           CCDeltaPlusAna_muon_N_minosTracks;
-   Int_t           CCDeltaPlusAna_muon_minervaTrack_types;
-   Int_t           CCDeltaPlusAna_muon_minosTrackQuality;
-   Int_t           CCDeltaPlusAna_muon_roadUpstreamPlanes;
-   Int_t           CCDeltaPlusAna_ntrajMuonProng;
-   Int_t           CCDeltaPlusAna_r_minos_trk_vtx_plane;
-   Int_t           CCDeltaPlusAna_t_minos_trk_numFSMuons;
-   Int_t           CCDeltaPlusAna_t_minos_trk_primFSLeptonPDG;
-   Int_t           CCDeltaPlusAna_trajMuonProngPDG;
-   Int_t           CCDeltaPlusAna_trajMuonProngPrimary;
-   Int_t           CCDeltaPlusAna_vtx_module;
-   Int_t           CCDeltaPlusAna_vtx_plane;
-   Double_t        CCDeltaPlusAna_endMuonTrajMomentum;
-   Double_t        CCDeltaPlusAna_endMuonTrajXPosition;
-   Double_t        CCDeltaPlusAna_endMuonTrajYPosition;
-   Double_t        CCDeltaPlusAna_endMuonTrajZPosition;
-   Double_t        CCDeltaPlusAna_minos_trk_bave;
-   Double_t        CCDeltaPlusAna_minos_trk_chi2;
-   Double_t        CCDeltaPlusAna_minos_trk_end_u;
-   Double_t        CCDeltaPlusAna_minos_trk_end_v;
-   Double_t        CCDeltaPlusAna_minos_trk_end_x;
-   Double_t        CCDeltaPlusAna_minos_trk_end_y;
-   Double_t        CCDeltaPlusAna_minos_trk_end_z;
-   Double_t        CCDeltaPlusAna_minos_trk_eqp;
-   Double_t        CCDeltaPlusAna_minos_trk_eqp_qp;
-   Double_t        CCDeltaPlusAna_minos_trk_fit_pass;
-   Double_t        CCDeltaPlusAna_minos_trk_ndf;
-   Double_t        CCDeltaPlusAna_minos_trk_p;
-   Double_t        CCDeltaPlusAna_minos_trk_p_curvature;
-   Double_t        CCDeltaPlusAna_minos_trk_p_range;
-   Double_t        CCDeltaPlusAna_minos_trk_qp;
-   Double_t        CCDeltaPlusAna_minos_trk_vtx_x;
-   Double_t        CCDeltaPlusAna_minos_trk_vtx_y;
-   Double_t        CCDeltaPlusAna_minos_trk_vtx_z;
-   Double_t        CCDeltaPlusAna_muon_E;
-   Double_t        CCDeltaPlusAna_muon_E_shift;
-   Double_t        CCDeltaPlusAna_muon_muScore;
-   Double_t        CCDeltaPlusAna_muon_p;
-   Double_t        CCDeltaPlusAna_muon_px;
-   Double_t        CCDeltaPlusAna_muon_py;
-   Double_t        CCDeltaPlusAna_muon_pz;
-   Double_t        CCDeltaPlusAna_muon_qp;
-   Double_t        CCDeltaPlusAna_muon_qpqpe;
-   Double_t        CCDeltaPlusAna_muon_roadUpstreamEnergy;
-   Double_t        CCDeltaPlusAna_muon_theta;
-   Double_t        CCDeltaPlusAna_muon_theta_biasDown;
-   Double_t        CCDeltaPlusAna_muon_theta_biasUp;
-   Double_t        CCDeltaPlusAna_r_minos_trk_bdL;
-   Double_t        CCDeltaPlusAna_r_minos_trk_end_dcosx;
-   Double_t        CCDeltaPlusAna_r_minos_trk_end_dcosy;
-   Double_t        CCDeltaPlusAna_r_minos_trk_end_dcosz;
-   Double_t        CCDeltaPlusAna_r_minos_trk_vtx_dcosx;
-   Double_t        CCDeltaPlusAna_r_minos_trk_vtx_dcosy;
-   Double_t        CCDeltaPlusAna_r_minos_trk_vtx_dcosz;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPx;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPy;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPz;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjX;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjY;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjZ;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPx;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPy;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPz;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalX;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalY;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalZ;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPx;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPy;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPz;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitX;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitY;
-   Double_t        CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ;
-   Double_t        CCDeltaPlusAna_trajMuonPhi;
-   Double_t        CCDeltaPlusAna_trajMuonProngMomentum;
-   Double_t        CCDeltaPlusAna_trajMuonProngPx;
-   Double_t        CCDeltaPlusAna_trajMuonProngPy;
-   Double_t        CCDeltaPlusAna_trajMuonProngPz;
-   Double_t        CCDeltaPlusAna_trajMuonTheta;
-   Double_t        CCDeltaPlusAna_vtx_x;
-   Double_t        CCDeltaPlusAna_vtx_y;
-   Double_t        CCDeltaPlusAna_vtx_z;
-   Int_t           CCDeltaPlusAna_isProtonInsideOD[10];
-   Int_t           CCDeltaPlusAna_ntrajProtonProng[10];
-   Int_t           CCDeltaPlusAna_proton_kinked[10];
-   Int_t           CCDeltaPlusAna_proton_odMatch[10];
-   Int_t           CCDeltaPlusAna_proton_trk_pat_history[10];
-   Int_t           CCDeltaPlusAna_trajProtonProngPDG[10];
-   Int_t           CCDeltaPlusAna_trajProtonProngPrimary[10];
-   Double_t        CCDeltaPlusAna_endProtonTrajMomentum[10];
-   Double_t        CCDeltaPlusAna_endProtonTrajXPosition[10];
-   Double_t        CCDeltaPlusAna_endProtonTrajYPosition[10];
-   Double_t        CCDeltaPlusAna_endProtonTrajZPosition[10];
-   Double_t        CCDeltaPlusAna_proton_E[10];
-   Double_t        CCDeltaPlusAna_proton_chi2_ndf[10];
-   Double_t        CCDeltaPlusAna_proton_ekin[10];
-   Double_t        CCDeltaPlusAna_proton_endPointX[10];
-   Double_t        CCDeltaPlusAna_proton_endPointY[10];
-   Double_t        CCDeltaPlusAna_proton_endPointZ[10];
-   Double_t        CCDeltaPlusAna_proton_p[10];
-   Double_t        CCDeltaPlusAna_proton_p_calCorrection[10];
-   Double_t        CCDeltaPlusAna_proton_p_dEdXTool[10];
-   Double_t        CCDeltaPlusAna_proton_p_visEnergy[10];
-   Double_t        CCDeltaPlusAna_proton_phi[10];
-   Double_t        CCDeltaPlusAna_proton_px[10];
-   Double_t        CCDeltaPlusAna_proton_py[10];
-   Double_t        CCDeltaPlusAna_proton_pz[10];
-   Double_t        CCDeltaPlusAna_proton_score[10];
-   Double_t        CCDeltaPlusAna_proton_score1[10];
-   Double_t        CCDeltaPlusAna_proton_score2[10];
-   Double_t        CCDeltaPlusAna_proton_startPointX[10];
-   Double_t        CCDeltaPlusAna_proton_startPointY[10];
-   Double_t        CCDeltaPlusAna_proton_startPointZ[10];
-   Double_t        CCDeltaPlusAna_proton_theta[10];
-   Double_t        CCDeltaPlusAna_proton_thetaX[10];
-   Double_t        CCDeltaPlusAna_proton_thetaY[10];
-   Double_t        CCDeltaPlusAna_trajProtonPhi[10];
-   Double_t        CCDeltaPlusAna_trajProtonProngMomentum[10];
-   Double_t        CCDeltaPlusAna_trajProtonProngPx[10];
-   Double_t        CCDeltaPlusAna_trajProtonProngPy[10];
-   Double_t        CCDeltaPlusAna_trajProtonProngPz[10];
-   Double_t        CCDeltaPlusAna_trajProtonTheta[10];
+   Int_t           CCProtonPi0Ana_nuFlavor;
+   Int_t           CCProtonPi0Ana_nuHelicity;
+   Int_t           CCProtonPi0Ana_intCurrent;
+   Int_t           CCProtonPi0Ana_intType;
+   Double_t        CCProtonPi0Ana_E;
+   Double_t        CCProtonPi0Ana_Q2;
+   Double_t        CCProtonPi0Ana_x;
+   Double_t        CCProtonPi0Ana_y;
+   Double_t        CCProtonPi0Ana_W;
+   Double_t        CCProtonPi0Ana_score;
+   Double_t        CCProtonPi0Ana_leptonE[4];
+   Double_t        CCProtonPi0Ana_vtx[4];
+   Bool_t          CCProtonPi0Ana_minos_trk_is_contained;
+   Bool_t          CCProtonPi0Ana_minos_trk_is_ok;
+   Bool_t          CCProtonPi0Ana_minos_used_range;
+   Bool_t          CCProtonPi0Ana_minos_used_curvature;
+   Int_t           CCProtonPi0Ana_isMuonInsideOD;
+   Int_t           CCProtonPi0Ana_minos_trk_end_plane;
+   Int_t           CCProtonPi0Ana_minos_trk_quality;
+   Int_t           CCProtonPi0Ana_muon_N_minosTracks;
+   Int_t           CCProtonPi0Ana_muon_charge;
+   Int_t           CCProtonPi0Ana_muon_minervaTrack_types;
+   Int_t           CCProtonPi0Ana_muon_minosTrackQuality;
+   Int_t           CCProtonPi0Ana_muon_roadUpstreamPlanes;
+   Int_t           CCProtonPi0Ana_ntrajMuonProng;
+   Int_t           CCProtonPi0Ana_r_minos_trk_vtx_plane;
+   Int_t           CCProtonPi0Ana_t_minos_trk_numFSMuons;
+   Int_t           CCProtonPi0Ana_t_minos_trk_primFSLeptonPDG;
+   Int_t           CCProtonPi0Ana_trajMuonProngPDG;
+   Int_t           CCProtonPi0Ana_trajMuonProngPrimary;
+   Int_t           CCProtonPi0Ana_vtx_module;
+   Int_t           CCProtonPi0Ana_vtx_plane;
+   Double_t        CCProtonPi0Ana_endMuonTrajMomentum;
+   Double_t        CCProtonPi0Ana_endMuonTrajXPosition;
+   Double_t        CCProtonPi0Ana_endMuonTrajYPosition;
+   Double_t        CCProtonPi0Ana_endMuonTrajZPosition;
+   Double_t        CCProtonPi0Ana_minos_trk_bave;
+   Double_t        CCProtonPi0Ana_minos_trk_chi2;
+   Double_t        CCProtonPi0Ana_minos_trk_end_u;
+   Double_t        CCProtonPi0Ana_minos_trk_end_v;
+   Double_t        CCProtonPi0Ana_minos_trk_end_x;
+   Double_t        CCProtonPi0Ana_minos_trk_end_y;
+   Double_t        CCProtonPi0Ana_minos_trk_end_z;
+   Double_t        CCProtonPi0Ana_minos_trk_eqp;
+   Double_t        CCProtonPi0Ana_minos_trk_eqp_qp;
+   Double_t        CCProtonPi0Ana_minos_trk_fit_pass;
+   Double_t        CCProtonPi0Ana_minos_trk_ndf;
+   Double_t        CCProtonPi0Ana_minos_trk_p;
+   Double_t        CCProtonPi0Ana_minos_trk_p_curvature;
+   Double_t        CCProtonPi0Ana_minos_trk_p_range;
+   Double_t        CCProtonPi0Ana_minos_trk_qp;
+   Double_t        CCProtonPi0Ana_minos_trk_vtx_x;
+   Double_t        CCProtonPi0Ana_minos_trk_vtx_y;
+   Double_t        CCProtonPi0Ana_minos_trk_vtx_z;
+   Double_t        CCProtonPi0Ana_muon_E;
+   Double_t        CCProtonPi0Ana_muon_E_shift;
+   Double_t        CCProtonPi0Ana_muon_muScore;
+   Double_t        CCProtonPi0Ana_muon_p;
+   Double_t        CCProtonPi0Ana_muon_px;
+   Double_t        CCProtonPi0Ana_muon_py;
+   Double_t        CCProtonPi0Ana_muon_pz;
+   Double_t        CCProtonPi0Ana_muon_qp;
+   Double_t        CCProtonPi0Ana_muon_qpqpe;
+   Double_t        CCProtonPi0Ana_muon_roadUpstreamEnergy;
+   Double_t        CCProtonPi0Ana_muon_theta;
+   Double_t        CCProtonPi0Ana_muon_theta_biasDown;
+   Double_t        CCProtonPi0Ana_muon_theta_biasUp;
+   Double_t        CCProtonPi0Ana_r_minos_trk_bdL;
+   Double_t        CCProtonPi0Ana_r_minos_trk_end_dcosx;
+   Double_t        CCProtonPi0Ana_r_minos_trk_end_dcosy;
+   Double_t        CCProtonPi0Ana_r_minos_trk_end_dcosz;
+   Double_t        CCProtonPi0Ana_r_minos_trk_vtx_dcosx;
+   Double_t        CCProtonPi0Ana_r_minos_trk_vtx_dcosy;
+   Double_t        CCProtonPi0Ana_r_minos_trk_vtx_dcosz;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPx;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPy;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPz;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjX;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjY;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjZ;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPx;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPy;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPz;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalX;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalY;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalZ;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPx;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPy;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPz;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitX;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitY;
+   Double_t        CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitZ;
+   Double_t        CCProtonPi0Ana_trajMuonPhi;
+   Double_t        CCProtonPi0Ana_trajMuonProngEnergy;
+   Double_t        CCProtonPi0Ana_trajMuonProngMomentum;
+   Double_t        CCProtonPi0Ana_trajMuonProngPx;
+   Double_t        CCProtonPi0Ana_trajMuonProngPy;
+   Double_t        CCProtonPi0Ana_trajMuonProngPz;
+   Double_t        CCProtonPi0Ana_trajMuonTheta;
+   Double_t        CCProtonPi0Ana_vtx_x;
+   Double_t        CCProtonPi0Ana_vtx_y;
+   Double_t        CCProtonPi0Ana_vtx_z;
+   Int_t           CCProtonPi0Ana_isProtonInsideOD[10];
+   Int_t           CCProtonPi0Ana_ntrajProtonProng[10];
+   Int_t           CCProtonPi0Ana_proton_kinked[10];
+   Int_t           CCProtonPi0Ana_proton_odMatch[10];
+   Int_t           CCProtonPi0Ana_proton_trk_pat_history[10];
+   Int_t           CCProtonPi0Ana_trajProtonProngPDG[10];
+   Int_t           CCProtonPi0Ana_trajProtonProngPrimary[10];
+   Double_t        CCProtonPi0Ana_endProtonTrajMomentum[10];
+   Double_t        CCProtonPi0Ana_endProtonTrajXPosition[10];
+   Double_t        CCProtonPi0Ana_endProtonTrajYPosition[10];
+   Double_t        CCProtonPi0Ana_endProtonTrajZPosition[10];
+   Double_t        CCProtonPi0Ana_proton_E[10];
+   Double_t        CCProtonPi0Ana_proton_chi2_ndf[10];
+   Double_t        CCProtonPi0Ana_proton_ekin[10];
+   Double_t        CCProtonPi0Ana_proton_endPointX[10];
+   Double_t        CCProtonPi0Ana_proton_endPointY[10];
+   Double_t        CCProtonPi0Ana_proton_endPointZ[10];
+   Double_t        CCProtonPi0Ana_proton_p[10];
+   Double_t        CCProtonPi0Ana_proton_p_calCorrection[10];
+   Double_t        CCProtonPi0Ana_proton_p_dEdXTool[10];
+   Double_t        CCProtonPi0Ana_proton_p_visEnergy[10];
+   Double_t        CCProtonPi0Ana_proton_phi[10];
+   Double_t        CCProtonPi0Ana_proton_px[10];
+   Double_t        CCProtonPi0Ana_proton_py[10];
+   Double_t        CCProtonPi0Ana_proton_pz[10];
+   Double_t        CCProtonPi0Ana_proton_score[10];
+   Double_t        CCProtonPi0Ana_proton_score1[10];
+   Double_t        CCProtonPi0Ana_proton_score2[10];
+   Double_t        CCProtonPi0Ana_proton_startPointX[10];
+   Double_t        CCProtonPi0Ana_proton_startPointY[10];
+   Double_t        CCProtonPi0Ana_proton_startPointZ[10];
+   Double_t        CCProtonPi0Ana_proton_theta[10];
+   Double_t        CCProtonPi0Ana_proton_thetaX[10];
+   Double_t        CCProtonPi0Ana_proton_thetaY[10];
+   Double_t        CCProtonPi0Ana_trajProtonPhi[10];
+   Double_t        CCProtonPi0Ana_trajProtonProngEnergy[10];
+   Double_t        CCProtonPi0Ana_trajProtonProngMomentum[10];
+   Double_t        CCProtonPi0Ana_trajProtonProngPx[10];
+   Double_t        CCProtonPi0Ana_trajProtonProngPy[10];
+   Double_t        CCProtonPi0Ana_trajProtonProngPz[10];
+   Double_t        CCProtonPi0Ana_trajProtonTheta[10];
    Int_t           ev_run;
    Int_t           ev_subrun;
    Int_t           ev_detector;
@@ -533,26 +537,26 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[28];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[28];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[28];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[28];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[28];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[21];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[21];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[21];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[21];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[21];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[60];   //[mc_er_nPart]
-   Int_t           mc_er_status[60];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[60];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[60];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[60];   //[mc_er_nPart]
-   Double_t        mc_er_Px[60];   //[mc_er_nPart]
-   Double_t        mc_er_Py[60];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[60];   //[mc_er_nPart]
-   Double_t        mc_er_E[60];   //[mc_er_nPart]
-   Int_t           mc_er_FD[60];   //[mc_er_nPart]
-   Int_t           mc_er_LD[60];   //[mc_er_nPart]
-   Int_t           mc_er_mother[60];   //[mc_er_nPart]
+   Int_t           mc_er_ID[49];   //[mc_er_nPart]
+   Int_t           mc_er_status[49];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[49];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[49];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[49];   //[mc_er_nPart]
+   Double_t        mc_er_Px[49];   //[mc_er_nPart]
+   Double_t        mc_er_Py[49];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[49];   //[mc_er_nPart]
+   Double_t        mc_er_E[49];   //[mc_er_nPart]
+   Int_t           mc_er_FD[49];   //[mc_er_nPart]
+   Int_t           mc_er_LD[49];   //[mc_er_nPart]
+   Int_t           mc_er_mother[49];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[9];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[7];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -574,13 +578,13 @@ public :
    Int_t           mc_wgt_Flux_NA49_sz;
    Double_t        mc_wgt_Flux_NA49[100];   //[mc_wgt_Flux_NA49_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[6];   //[n_prongs]
-   Double_t        prong_part_score[6];   //[n_prongs]
-   Double_t        prong_part_mass[6];   //[n_prongs]
-   Int_t           prong_part_charge[6];   //[n_prongs]
-   Int_t           prong_part_pid[6];   //[n_prongs]
-   std::vector<std::vector<double> > *prong_part_E;
-   std::vector<std::vector<double> > *prong_part_pos;
+   Int_t           prong_nParticles[7];   //[n_prongs]
+   Double_t        prong_part_score[7];   //[n_prongs]
+   Double_t        prong_part_mass[7];   //[n_prongs]
+   Int_t           prong_part_charge[7];   //[n_prongs]
+   Int_t           prong_part_pid[7];   //[n_prongs]
+   std::vector< std::vector<double> > *prong_part_E;
+   std::vector< std::vector<double> > *prong_part_pos;
 
    // List of branches
    TBranch        *b_eventID;   //!
@@ -614,8 +618,8 @@ public :
    TBranch        *b_Cut_Proton_None;   //!
    TBranch        *b_Cut_Vertex_Michel_Exist;   //!
    TBranch        *b_Cut_Vertex_None;   //!
-   TBranch        *b_Cut_Vertex_Not_Analyzable;   //!
    TBranch        *b_Cut_Vertex_Not_Fiducial;   //!
+   TBranch        *b_Cut_Vertex_Not_Reconstructable;   //!
    TBranch        *b_Cut_Vertex_Null;   //!
    TBranch        *b_Cut_secEndPoint_Michel_Exist;   //!
    TBranch        *b_broken_track_most_us_plane;   //!
@@ -741,146 +745,149 @@ public :
    TBranch        *b_truth_proton_py;   //!
    TBranch        *b_truth_proton_pz;   //!
    TBranch        *b_truth_proton_theta_wrtbeam;   //!
-   TBranch        *b_CCDeltaPlusAna_nuFlavor;   //!
-   TBranch        *b_CCDeltaPlusAna_nuHelicity;   //!
-   TBranch        *b_CCDeltaPlusAna_intCurrent;   //!
-   TBranch        *b_CCDeltaPlusAna_intType;   //!
-   TBranch        *b_CCDeltaPlusAna_E;   //!
-   TBranch        *b_CCDeltaPlusAna_Q2;   //!
-   TBranch        *b_CCDeltaPlusAna_x;   //!
-   TBranch        *b_CCDeltaPlusAna_y;   //!
-   TBranch        *b_CCDeltaPlusAna_W;   //!
-   TBranch        *b_CCDeltaPlusAna_score;   //!
-   TBranch        *b_CCDeltaPlusAna_leptonE;   //!
-   TBranch        *b_CCDeltaPlusAna_vtx;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_is_contained;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_is_ok;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_used_range;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_used_curvature;   //!
-   TBranch        *b_CCDeltaPlusAna_isMuonInsideOD;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_end_plane;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_quality;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_N_minosTracks;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_minervaTrack_types;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_minosTrackQuality;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_roadUpstreamPlanes;   //!
-   TBranch        *b_CCDeltaPlusAna_ntrajMuonProng;   //!
-   TBranch        *b_CCDeltaPlusAna_r_minos_trk_vtx_plane;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_numFSMuons;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLeptonPDG;   //!
-   TBranch        *b_CCDeltaPlusAna_trajMuonProngPDG;   //!
-   TBranch        *b_CCDeltaPlusAna_trajMuonProngPrimary;   //!
-   TBranch        *b_CCDeltaPlusAna_vtx_module;   //!
-   TBranch        *b_CCDeltaPlusAna_vtx_plane;   //!
-   TBranch        *b_CCDeltaPlusAna_endMuonTrajMomentum;   //!
-   TBranch        *b_CCDeltaPlusAna_endMuonTrajXPosition;   //!
-   TBranch        *b_CCDeltaPlusAna_endMuonTrajYPosition;   //!
-   TBranch        *b_CCDeltaPlusAna_endMuonTrajZPosition;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_bave;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_chi2;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_end_u;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_end_v;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_end_x;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_end_y;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_end_z;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_eqp;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_eqp_qp;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_fit_pass;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_ndf;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_p;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_p_curvature;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_p_range;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_qp;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_vtx_x;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_vtx_y;   //!
-   TBranch        *b_CCDeltaPlusAna_minos_trk_vtx_z;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_E;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_E_shift;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_muScore;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_p;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_px;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_py;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_pz;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_qp;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_qpqpe;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_roadUpstreamEnergy;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_theta;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_theta_biasDown;   //!
-   TBranch        *b_CCDeltaPlusAna_muon_theta_biasUp;   //!
-   TBranch        *b_CCDeltaPlusAna_r_minos_trk_bdL;   //!
-   TBranch        *b_CCDeltaPlusAna_r_minos_trk_end_dcosx;   //!
-   TBranch        *b_CCDeltaPlusAna_r_minos_trk_end_dcosy;   //!
-   TBranch        *b_CCDeltaPlusAna_r_minos_trk_end_dcosz;   //!
-   TBranch        *b_CCDeltaPlusAna_r_minos_trk_vtx_dcosx;   //!
-   TBranch        *b_CCDeltaPlusAna_r_minos_trk_vtx_dcosy;   //!
-   TBranch        *b_CCDeltaPlusAna_r_minos_trk_vtx_dcosz;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPx;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPy;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjPz;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjX;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjY;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMinosInitProjZ;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPx;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPy;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalPz;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalX;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalY;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvFinalZ;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPx;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPy;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitPz;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitX;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitY;   //!
-   TBranch        *b_CCDeltaPlusAna_t_minos_trk_primFSLepMnvInitZ;   //!
-   TBranch        *b_CCDeltaPlusAna_trajMuonPhi;   //!
-   TBranch        *b_CCDeltaPlusAna_trajMuonProngMomentum;   //!
-   TBranch        *b_CCDeltaPlusAna_trajMuonProngPx;   //!
-   TBranch        *b_CCDeltaPlusAna_trajMuonProngPy;   //!
-   TBranch        *b_CCDeltaPlusAna_trajMuonProngPz;   //!
-   TBranch        *b_CCDeltaPlusAna_trajMuonTheta;   //!
-   TBranch        *b_CCDeltaPlusAna_vtx_x;   //!
-   TBranch        *b_CCDeltaPlusAna_vtx_y;   //!
-   TBranch        *b_CCDeltaPlusAna_vtx_z;   //!
-   TBranch        *b_CCDeltaPlusAna_isProtonInsideOD;   //!
-   TBranch        *b_CCDeltaPlusAna_ntrajProtonProng;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_kinked;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_odMatch;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_trk_pat_history;   //!
-   TBranch        *b_CCDeltaPlusAna_trajProtonProngPDG;   //!
-   TBranch        *b_CCDeltaPlusAna_trajProtonProngPrimary;   //!
-   TBranch        *b_CCDeltaPlusAna_endProtonTrajMomentum;   //!
-   TBranch        *b_CCDeltaPlusAna_endProtonTrajXPosition;   //!
-   TBranch        *b_CCDeltaPlusAna_endProtonTrajYPosition;   //!
-   TBranch        *b_CCDeltaPlusAna_endProtonTrajZPosition;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_E;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_chi2_ndf;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_ekin;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_endPointX;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_endPointY;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_endPointZ;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_p;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_p_calCorrection;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_p_dEdXTool;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_p_visEnergy;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_phi;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_px;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_py;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_pz;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_score;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_score1;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_score2;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_startPointX;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_startPointY;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_startPointZ;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_theta;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_thetaX;   //!
-   TBranch        *b_CCDeltaPlusAna_proton_thetaY;   //!
-   TBranch        *b_CCDeltaPlusAna_trajProtonPhi;   //!
-   TBranch        *b_CCDeltaPlusAna_trajProtonProngMomentum;   //!
-   TBranch        *b_CCDeltaPlusAna_trajProtonProngPx;   //!
-   TBranch        *b_CCDeltaPlusAna_trajProtonProngPy;   //!
-   TBranch        *b_CCDeltaPlusAna_trajProtonProngPz;   //!
-   TBranch        *b_CCDeltaPlusAna_trajProtonTheta;   //!
+   TBranch        *b_CCProtonPi0Ana_nuFlavor;   //!
+   TBranch        *b_CCProtonPi0Ana_nuHelicity;   //!
+   TBranch        *b_CCProtonPi0Ana_intCurrent;   //!
+   TBranch        *b_CCProtonPi0Ana_intType;   //!
+   TBranch        *b_CCProtonPi0Ana_E;   //!
+   TBranch        *b_CCProtonPi0Ana_Q2;   //!
+   TBranch        *b_CCProtonPi0Ana_x;   //!
+   TBranch        *b_CCProtonPi0Ana_y;   //!
+   TBranch        *b_CCProtonPi0Ana_W;   //!
+   TBranch        *b_CCProtonPi0Ana_score;   //!
+   TBranch        *b_CCProtonPi0Ana_leptonE;   //!
+   TBranch        *b_CCProtonPi0Ana_vtx;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_is_contained;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_is_ok;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_used_range;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_used_curvature;   //!
+   TBranch        *b_CCProtonPi0Ana_isMuonInsideOD;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_end_plane;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_quality;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_N_minosTracks;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_charge;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_minervaTrack_types;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_minosTrackQuality;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_roadUpstreamPlanes;   //!
+   TBranch        *b_CCProtonPi0Ana_ntrajMuonProng;   //!
+   TBranch        *b_CCProtonPi0Ana_r_minos_trk_vtx_plane;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_numFSMuons;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLeptonPDG;   //!
+   TBranch        *b_CCProtonPi0Ana_trajMuonProngPDG;   //!
+   TBranch        *b_CCProtonPi0Ana_trajMuonProngPrimary;   //!
+   TBranch        *b_CCProtonPi0Ana_vtx_module;   //!
+   TBranch        *b_CCProtonPi0Ana_vtx_plane;   //!
+   TBranch        *b_CCProtonPi0Ana_endMuonTrajMomentum;   //!
+   TBranch        *b_CCProtonPi0Ana_endMuonTrajXPosition;   //!
+   TBranch        *b_CCProtonPi0Ana_endMuonTrajYPosition;   //!
+   TBranch        *b_CCProtonPi0Ana_endMuonTrajZPosition;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_bave;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_chi2;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_end_u;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_end_v;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_end_x;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_end_y;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_end_z;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_eqp;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_eqp_qp;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_fit_pass;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_ndf;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_p;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_p_curvature;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_p_range;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_qp;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_vtx_x;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_vtx_y;   //!
+   TBranch        *b_CCProtonPi0Ana_minos_trk_vtx_z;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_E;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_E_shift;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_muScore;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_p;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_px;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_py;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_pz;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_qp;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_qpqpe;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_roadUpstreamEnergy;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_theta;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_theta_biasDown;   //!
+   TBranch        *b_CCProtonPi0Ana_muon_theta_biasUp;   //!
+   TBranch        *b_CCProtonPi0Ana_r_minos_trk_bdL;   //!
+   TBranch        *b_CCProtonPi0Ana_r_minos_trk_end_dcosx;   //!
+   TBranch        *b_CCProtonPi0Ana_r_minos_trk_end_dcosy;   //!
+   TBranch        *b_CCProtonPi0Ana_r_minos_trk_end_dcosz;   //!
+   TBranch        *b_CCProtonPi0Ana_r_minos_trk_vtx_dcosx;   //!
+   TBranch        *b_CCProtonPi0Ana_r_minos_trk_vtx_dcosy;   //!
+   TBranch        *b_CCProtonPi0Ana_r_minos_trk_vtx_dcosz;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPx;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPy;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjPz;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjX;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjY;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMinosInitProjZ;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPx;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPy;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalPz;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalX;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalY;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvFinalZ;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPx;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPy;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitPz;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitX;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitY;   //!
+   TBranch        *b_CCProtonPi0Ana_t_minos_trk_primFSLepMnvInitZ;   //!
+   TBranch        *b_CCProtonPi0Ana_trajMuonPhi;   //!
+   TBranch        *b_CCProtonPi0Ana_trajMuonProngEnergy;   //!
+   TBranch        *b_CCProtonPi0Ana_trajMuonProngMomentum;   //!
+   TBranch        *b_CCProtonPi0Ana_trajMuonProngPx;   //!
+   TBranch        *b_CCProtonPi0Ana_trajMuonProngPy;   //!
+   TBranch        *b_CCProtonPi0Ana_trajMuonProngPz;   //!
+   TBranch        *b_CCProtonPi0Ana_trajMuonTheta;   //!
+   TBranch        *b_CCProtonPi0Ana_vtx_x;   //!
+   TBranch        *b_CCProtonPi0Ana_vtx_y;   //!
+   TBranch        *b_CCProtonPi0Ana_vtx_z;   //!
+   TBranch        *b_CCProtonPi0Ana_isProtonInsideOD;   //!
+   TBranch        *b_CCProtonPi0Ana_ntrajProtonProng;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_kinked;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_odMatch;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_trk_pat_history;   //!
+   TBranch        *b_CCProtonPi0Ana_trajProtonProngPDG;   //!
+   TBranch        *b_CCProtonPi0Ana_trajProtonProngPrimary;   //!
+   TBranch        *b_CCProtonPi0Ana_endProtonTrajMomentum;   //!
+   TBranch        *b_CCProtonPi0Ana_endProtonTrajXPosition;   //!
+   TBranch        *b_CCProtonPi0Ana_endProtonTrajYPosition;   //!
+   TBranch        *b_CCProtonPi0Ana_endProtonTrajZPosition;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_E;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_chi2_ndf;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_ekin;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_endPointX;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_endPointY;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_endPointZ;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_p;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_p_calCorrection;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_p_dEdXTool;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_p_visEnergy;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_phi;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_px;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_py;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_pz;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_score;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_score1;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_score2;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_startPointX;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_startPointY;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_startPointZ;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_theta;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_thetaX;   //!
+   TBranch        *b_CCProtonPi0Ana_proton_thetaY;   //!
+   TBranch        *b_CCProtonPi0Ana_trajProtonPhi;   //!
+   TBranch        *b_CCProtonPi0Ana_trajProtonProngEnergy;   //!
+   TBranch        *b_CCProtonPi0Ana_trajProtonProngMomentum;   //!
+   TBranch        *b_CCProtonPi0Ana_trajProtonProngPx;   //!
+   TBranch        *b_CCProtonPi0Ana_trajProtonProngPy;   //!
+   TBranch        *b_CCProtonPi0Ana_trajProtonProngPz;   //!
+   TBranch        *b_CCProtonPi0Ana_trajProtonTheta;   //!
    TBranch        *b_ev_run;   //!
    TBranch        *b_ev_subrun;   //!
    TBranch        *b_ev_detector;   //!
@@ -903,7 +910,7 @@ public :
    TBranch        *b_mc_charm;   //!
    TBranch        *b_mc_weight;   //!
    TBranch        *b_mc_XSec;   //!
-   TBranch        *b_mc_diffXSec;   //!virtual 
+   TBranch        *b_mc_diffXSec;   //!
    TBranch        *b_mc_incoming;   //!
    TBranch        *b_mc_fluxDriverProb;   //!
    TBranch        *b_mc_targetNucleus;   //!

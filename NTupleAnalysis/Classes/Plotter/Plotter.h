@@ -43,7 +43,7 @@ class Plotter
         void plotParticleInfo(  string rootDir, string plotDir, 
                                 bool isMC, bool isReco, bool is2D);
                             
-        void plotCCDeltaPlus(bool isMC, bool isReco, bool is2D);
+        void plotCCProtonPi0(bool isMC, bool isReco, bool is2D);
         void plotMuon(bool isMC, bool isReco, bool is2D);
         void plotProton(bool isMC, bool isReco, bool is2D);
         void plotPion(bool isMC, bool isReco, bool is2D);

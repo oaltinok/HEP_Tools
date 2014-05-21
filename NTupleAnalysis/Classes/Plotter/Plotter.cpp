@@ -12,7 +12,7 @@ using namespace std;
 void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
 {
     
-//     plotCCDeltaPlus(isMC,isReco, is2D);
+//     plotCCProtonPi0(isMC,isReco, is2D);
 
     plotMuon(isMC,isReco, is2D);
     
@@ -23,11 +23,11 @@ void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
 }
 
 
-void Plotter::plotCCDeltaPlus(bool isMC, bool isReco, bool is2D)
+void Plotter::plotCCProtonPi0(bool isMC, bool isReco, bool is2D)
 {
 
-    string rootDir = "Output/RootFiles/CCDeltaPlus.root";
-    string plotDir = "Output/Plots/CCDeltaPlus/";
+    string rootDir = "Output/RootFiles/CCProtonPi0.root";
+    string plotDir = "Output/Plots/CCProtonPi0/";
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());
