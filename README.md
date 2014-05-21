@@ -2,7 +2,7 @@
 
 |Reconstruction | Data Analysis | Other Algorithms	|
 |-------------- |-------------- |------------------	|
-|CCDeltaPlus	|NTupleAnalysis	| dEdX Improvement	|
+|CCProtonPi0	|NTupleAnalysis	| dEdX Improvement	|
 
 
 * These packages are specialized for MINERvA Experiment data format.
