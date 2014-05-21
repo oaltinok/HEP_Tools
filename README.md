@@ -10,16 +10,16 @@
 * Requires ROOT Data Analysis Framework
 	* ROOT URL: http://root.cern.ch/drupal/
 
-### CCDeltaPlus:
+### CCProtonPi0:
 
-* Process raw data to create ntuples for a specific analysis focused on Delta Plus Production
+* Process raw data to create ntuples for a specific analysis focused on Charged Current Proton Pi0 Final States
 * Final State Particles: muon, proton, and pi0
 
 ### NTupleAnalysis:
 
-* Reads ntuples created by CCDeltaPlus
+* Reads ntuples created by CCProtonPi0
 
-* Uses makeClass.cpp to get CCDeltaPlus Member Variables
+* Uses makeClass.cpp to get CCProtonPi0 Member Variables
 
 
 
