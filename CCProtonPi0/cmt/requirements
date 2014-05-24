@@ -20,7 +20,6 @@ use AnaInterfaces       v*  Ana
 use AnaUtils            v*  Ana
 use RecoStudies         v*  Ana 
 use MCReweight          v*  Ana
-use CCPi0               v*  Ana
 use PlotUtils           v*  Ana
 use UnfoldUtils         v*  Ana
 

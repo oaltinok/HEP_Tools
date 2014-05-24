@@ -27,8 +27,8 @@
 #include "AnaUtils/IMCTrackTool.h"
 #include "AnaUtils/MCTrack.h"
 
-#include "CCPi0/IHoughBlob.h"
-#include "CCPi0/IHoughTool.h"
+#include "CCProtonPi0/IHoughBlob.h"
+#include "CCProtonPi0/IHoughTool.h"
 
 #include "MinervaUtils/IMinervaMathTool.h"
 #include "MinervaUtils/IHitTaggerTool.h"
@@ -326,6 +326,7 @@ StatusCode CCProtonPi0Ana::initialize()
     }
   
     
+    debug() <<" Obtained all tools!"<<endmsg;
     
     //! Services
     try{
@@ -336,19 +337,11 @@ StatusCode CCProtonPi0Ana::initialize()
     }  
     
     
-    
-    
-
-
-
-    
     //! declare common branches
     declareCommonPhysicsAnaBranches();
     declareMinosMuonBranches();
     declareGenieWeightBranches();
     
-
-
     //--------------------------------------------------------------------------
     //! Select the branches you want in your AnaTuple
     //--------------------------------------------------------------------------
@@ -504,7 +497,7 @@ StatusCode CCProtonPi0Ana::initialize()
     declareDoubleEventBranch( "well_fit_vertex_angle", -99.9 );
     declareBoolEventBranch( "isBrokenTrack");
     
-    //! Event - VtxBlob
+    //! Event - VtxBlob()
     declareContainerDoubleEventBranch("Vertex_energy_radii");
     declareDoubleEventBranch( "Vertex_blob_energy", -9999 );
     declareDoubleEventBranch( "Filament_Vertex_energy", -9999 );
@@ -976,6 +969,26 @@ StatusCode CCProtonPi0Ana::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     }
     
     debug()<<"FINISH: Proton Reconstruction"<<endmsg;
+    
+    
+    //==========================================================================
+    //
+    // Blob Reconstruction
+    //
+    //==========================================================================
+    debug() << "START: Blob Reconstruction" << endmsg;
+    
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - if fails VtxBlob()
+    //--------------------------------------------------------------------------
+    if ( VtxBlob(event, interactionVertex) ){
+        debug()<<"Succesful VtxBlob Reconstruction!"<<endmsg;
+    }else{
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS;  
+    }
+    
+    debug()<<"FINISH: Blob Reconstruction"<<endmsg;
     
     
     //--------------------------------------------------------------------------
