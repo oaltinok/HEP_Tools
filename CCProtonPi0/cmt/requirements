@@ -4,35 +4,38 @@ version ${MINERVA_RELEASE}
 branches CCProtonPi0 cmt src doc
 
 #===============================================================================
-use MinervaEvent        v*   Event
-use MinervaGenEvent     v*   Event
-use MinervaMCEvent      v*   Event
+use MinervaEvent        v*  Event
+use MinervaGenEvent     v*  Event
+use MinervaMCEvent      v*  Event
 
-use MinervaUtils        v*   Tools
+use MinervaUtils        v*  Tools
 
-use ProngMaker          v*   Rec
-use ParticleMaker       v*   Rec
-use BlobFormation       v*   Rec
-use GeoUtils            v*   Rec
-use EventRecInterfaces  v*   Rec
+use ProngMaker          v*  Rec
+use ParticleMaker       v*  Rec
+use BlobFormation       v*  Rec
+use GeoUtils            v*  Rec
+use EventRecInterfaces  v*  Rec
 
-use AnaInterfaces       v*   Ana
-use AnaUtils            v*   Ana
-use RecoStudies         v*   Ana 
-use MCReweight          v*   Ana
+use AnaInterfaces       v*  Ana
+use AnaUtils            v*  Ana
+use RecoStudies         v*  Ana 
+use MCReweight          v*  Ana
+use CCPi0               v*  Ana
+use PlotUtils           v*  Ana
+use UnfoldUtils         v*  Ana
 
-use GiGaCnv             *    Sim  #for geant geometry headers
-
+use GiGaCnv              *  Sim  #for geant geometry headers
 
 #===============================================================================
 include_dirs ${CCPROTONPI0ROOT}
 
-library CCProtonPi0      *.cpp
-apply_pattern component_library library=CCProtonPi0
+library CCProtonPi0Lib      *.cpp
+apply_pattern component_library library=CCProtonPi0Lib
 
 private
 apply_pattern application_path
 macro CCProtonPi0_linkopts      "${application_linkopts}"
+
 set CCPROTONPI0DOC "${CCPROTONPI0ROOT}/doc"
 end_private
 

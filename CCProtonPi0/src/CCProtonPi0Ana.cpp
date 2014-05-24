@@ -3,6 +3,10 @@
 */
 #include "CCProtonPi0Ana.h"
 
+#include "TString.h"
+#include "TDatabasePDG.h"
+#include "TVector3.h"
+#include "TMath.h"
 #include "TRandom3.h"
 
 #include "RecInterfaces/IFiducialPointTool.h"
@@ -23,6 +27,10 @@
 #include "AnaUtils/IMCTrackTool.h"
 #include "AnaUtils/MCTrack.h"
 
+#include "CCPi0/IHoughBlob.h"
+#include "CCPi0/IHoughTool.h"
+
+#include "MinervaUtils/IMinervaMathTool.h"
 #include "MinervaUtils/IHitTaggerTool.h"
 #include "MinervaUtils/IMinervaObjectAssociator.h"
 
@@ -30,8 +38,11 @@
 #include "MinervaDet/DeDetector.h"
 #include "ODDet/DeOuterDetector.h"
 
-#include "GeoUtils/IMinervaCoordSysTool.h"
 #include "BlobFormation/IIDAnchoredBlobCreator.h"
+#include "BlobFormation/IBlobCreatorUtils.h"
+
+#include "GeoUtils/IMinervaCoordSysTool.h"
+
 #include "BadChannels/IGetDeadTime.h"
 
 #include "GiGaCnv/IGiGaGeomCnvSvc.h"
@@ -81,6 +92,19 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("ParticleToolName",     m_particleToolName      = "dEdXTool" );
     declareProperty("ParticleToolAlias",    m_particleToolAlias     = "dEdXTool" );
     
+    // Vertex blob
+    declareProperty( "SkipLowEnergyClusterVtxEnergy", fSkipLowEnergyClusterVtxEnergy = true);
+    declareProperty( "ThresholdVertexEnergy",         fThresholdVertexEnergy = 1.0*CLHEP::MeV);
+    declareProperty( "UseSphereVertex", 		m_sphereVertex	= true );
+    declareProperty( "SphereMaxSearchDistance", 	m_maxSearchD  	=  90.0 * CLHEP::millimeter ); 
+    declareProperty( "SphereMaxStartingDistance", m_maxStartingD	=  90.0 * CLHEP::millimeter ); 
+    declareProperty( "SphereMaxAllowedSearchGap", m_maxSearchGap	= 180.0 * CLHEP::millimeter ); 
+    declareProperty( "UseFilamentVertex", 	m_filamentVertex = false );
+    declareProperty( "FilamentMaxSearchDistance",   m_maxSearchDFila    = 500.0 * CLHEP::millimeter );
+    declareProperty( "FilamentMaxStartingDistance", m_maxStartingDFila  = 68.0 * CLHEP::millimeter ); 
+    declareProperty( "FilamentMaxAllowedSearchGap", m_maxSearchGapFila  = 51.0 * CLHEP::millimeter ); 
+    declareProperty( "FilterClusterTypes",   m_filterClusterTypes    = true );
+    
 
     // Protected properties from IInteractionHypothesis.
     m_hypMeths.push_back( m_anaSignature );
@@ -121,7 +145,7 @@ StatusCode CCProtonPi0Ana::initialize()
     m_fidUpStreamZ   = 5990.0*CLHEP::mm;   // ~middle of module 27, plane 1
     m_fidDownStreamZ = 8340.0*CLHEP::mm;   // ~middle of module 79, plane 1
     
-    // Analyzable Volume
+    // Reconstructable Volume
     m_recoHexApothem  = 1000.0*CLHEP::mm; 
     m_recoUpStreamZ   = 5750.0*CLHEP::mm;
     m_recoDownStreamZ = 8700.0*CLHEP::mm;
@@ -255,23 +279,67 @@ StatusCode CCProtonPi0Ana::initialize()
     }
     
     try {
-        m_MCTrackTool = tool<IMCTrackTool>("MCTrackTool");
-    } catch (GaudiException& e) {
-        error() << "Could not obtain tool: MCTrackTool" << endmsg;
+        m_recoTimeTool = tool<IRecoObjectTimeTool>( "RecoObjectTimeTool" );
+    }catch (GaudiException& e) {
+        error() << "Could not obtain tool: RecoObjectTimeTool" << endmsg;
         return StatusCode::FAILURE;
     } 
     
     try {
+        m_MCTrackTool = tool<IMCTrackTool>("MCTrackTool");
+    } catch (GaudiException& e) {
+        error() << "Could not obtain tool: MCTrackTool" << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    try {
+        m_mathTool = tool<IMinervaMathTool>("MinervaMathTool");
+    }
+    catch( GaudiException& e ) {
+        error() << "Could not obtain tool: MinervaMathTool!" << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    //! Blob Tools
+    try{
+        m_blobUtils = tool<IBlobCreatorUtils>("BlobCreatorUtils");
+    } 
+    catch( GaudiException& e ){
+        error() << "Could not obtain tool: BlobCreatorUtils! " << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    try{
+        m_idHoughBlob = tool<IHoughBlob>("HTBlob");
+    }
+    catch (GaudiException& e){
+        error() << " Could not obtain tool: HTBlob " << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    try{
+        m_idHoughTool = tool<IHoughTool>("HTtool");
+    }
+    catch (GaudiException& e){
+        error() << " Could not obtain tool: HTtool " << endmsg;
+        return StatusCode::FAILURE;
+    }
+  
+    
+    
+    //! Services
+    try{
         m_gigaCnvSvc = svc<IGiGaGeomCnvSvc>("GiGaGeo", true);
     } catch( GaudiException& e ){
         error() <<"Could not obtain GiGaGeo"<<endmsg;
         return StatusCode::FAILURE;
     }  
-  info()<<"Retrieved gigaCnvSvc"<<endmsg;
     
-    m_recoTimeTool = tool<IRecoObjectTimeTool>( "RecoObjectTimeTool" );
+    
+    
+    
 
-    
+
 
     
     //! declare common branches
@@ -321,19 +389,38 @@ StatusCode CCProtonPi0Ana::initialize()
     declareDoubleTruthBranch("muon_theta_wrtbeam", -9.0 );
     declareIntTruthBranch("muon_charge", 0 );
     
-    declareContainerDoubleTruthBranch("pi0_px", 20, 0 );
-    declareContainerDoubleTruthBranch("pi0_py", 20, 0 );
-    declareContainerDoubleTruthBranch("pi0_pz", 20, 0 );
-    declareContainerDoubleTruthBranch("pi0_E",  20, -9.0 );
-    declareContainerDoubleTruthBranch("pi0_theta_wrtbeam",  20, -9.0 );
-    declareContainerIntTruthBranch("pi0_trackID", 20, -1 );
-    
     declareContainerDoubleTruthBranch("proton_px", 20, 0 );
     declareContainerDoubleTruthBranch("proton_py", 20, 0 );
     declareContainerDoubleTruthBranch("proton_pz", 20, 0 );
     declareContainerDoubleTruthBranch("proton_E",  20, -9.0 );
+    declareContainerDoubleTruthBranch("proton_vtx_x", 20, 0 );
+    declareContainerDoubleTruthBranch("proton_vtx_y", 20, 0 );
+    declareContainerDoubleTruthBranch("proton_vtx_z", 20, 0 );
     declareContainerDoubleTruthBranch("proton_theta_wrtbeam",  20, -9.0 );
     declareContainerIntTruthBranch("proton_trackID", 20, -1 );    
+    declareContainerIntTruthBranch("proton_parentID", 20, -1 );
+    
+    declareContainerDoubleTruthBranch("pi0_px", 20, 0 );
+    declareContainerDoubleTruthBranch("pi0_py", 20, 0 );
+    declareContainerDoubleTruthBranch("pi0_pz", 20, 0 );
+    declareContainerDoubleTruthBranch("pi0_E",  20, -9.0 );
+    declareContainerDoubleTruthBranch("pi0_vtx_x", 20, 0 );
+    declareContainerDoubleTruthBranch("pi0_vtx_y", 20, 0 );
+    declareContainerDoubleTruthBranch("pi0_vtx_z", 20, 0 );    
+    declareContainerDoubleTruthBranch("pi0_theta_wrtbeam",  20, -9.0 );
+    declareContainerIntTruthBranch("pi0_trackID", 20, -1 );
+    declareContainerIntTruthBranch("pi0_parentID", 20, -1 );
+    
+    declareContainerDoubleTruthBranch("gamma_px", 20, 0 );
+    declareContainerDoubleTruthBranch("gamma_py", 20, 0 );
+    declareContainerDoubleTruthBranch("gamma_pz", 20, 0 );
+    declareContainerDoubleTruthBranch("gamma_E",  20, -9.0 );
+    declareContainerDoubleTruthBranch("gamma_vtx_x", 20, 0 );
+    declareContainerDoubleTruthBranch("gamma_vtx_y", 20, 0 );
+    declareContainerDoubleTruthBranch("gamma_vtx_z", 20, 0 );    
+    declareContainerDoubleTruthBranch("gamma_theta_wrtbeam",  20, -9.0 );
+    declareContainerIntTruthBranch("gamma_trackID", 20, -1 );
+    declareContainerIntTruthBranch("gamma_parentID", 20, -1 );
     
     //! Truth Match for Prongs
     declareIntBranch(m_hypMeths,    "isMuonInsideOD",        -1);
@@ -417,6 +504,12 @@ StatusCode CCProtonPi0Ana::initialize()
     declareDoubleEventBranch( "well_fit_vertex_angle", -99.9 );
     declareBoolEventBranch( "isBrokenTrack");
     
+    //! Event - VtxBlob
+    declareContainerDoubleEventBranch("Vertex_energy_radii");
+    declareDoubleEventBranch( "Vertex_blob_energy", -9999 );
+    declareDoubleEventBranch( "Filament_Vertex_energy", -9999 );
+    declareDoubleEventBranch( "Sphere_Vertex_energy", -9999 );
+    
     //! NeutrinoInt - Vertex
     declareIntBranch( m_hypMeths, "vtx_module", -99);
     declareIntBranch( m_hypMeths, "vtx_plane",-1);
@@ -478,6 +571,9 @@ StatusCode CCProtonPi0Ana::initialize()
     declareContainerDoubleBranch(m_hypMeths, "proton_p_dEdXTool",      10, -1);
     
     
+    
+    
+
     
     info() <<"Exit CCProtonPi0Ana::initialize()" << endmsg;
     info() <<"--------------------------------------------------------------------------"<<endmsg;
@@ -548,11 +644,11 @@ StatusCode CCProtonPi0Ana::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     // Vertex Reconstruction
     //
     //==========================================================================
+    debug() << "START: Vertex Reconstruction..." << endmsg;
     
     //--------------------------------------------------------------------------
     //! MAKE CUT - if NO Interaction Vertex
     //--------------------------------------------------------------------------
-    debug() << "START: Vertex Reconstruction..." << endmsg;
     if( !(event->hasInteractionVertex()) ) {
         debug() << "The event does not have an interaction vertex!" << endmsg;
         event->setIntData("Cut_Vertex_None",1);
@@ -593,9 +689,9 @@ StatusCode CCProtonPi0Ana::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     //--------------------------------------------------------------------------
     int n_anchored_long_trk_prongs = event->primaryProngs().size() - 1;
     if (m_makeShortTracks) {
-        debug()<<"making short tracks"<<endmsg;
+        debug()<<"Making short tracks"<<endmsg;
         m_ccPionIncUtils->makeShortTracks(event); 
-        debug()<<"finished making short tracks"<<endmsg;
+        debug()<<"Finished making short tracks"<<endmsg;
     }  
     int n_anchored_short_trk_prongs = event->primaryProngs().size() - n_anchored_long_trk_prongs - 1;
     int n_iso_trk_prongs = (event->select<Prong>("Used:Unused","All")).size() - event->primaryProngs().size();
@@ -1333,7 +1429,7 @@ StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
     else if ( t_current==1 && t_neutrinoPDG==-14) t_muon_charge = 1;
     
     //--------------------------------------------------------------------------
-    //! Get Proton and Pi0 Kinematics
+    //! Get Proton, Pi0 and Gamma Kinematics
     //--------------------------------------------------------------------------
     int nMaxParticles = 20;
     
@@ -1341,15 +1437,34 @@ StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
     std::vector<double> t_proton_py;
     std::vector<double> t_proton_pz;
     std::vector<double> t_proton_E;
+    std::vector<double> t_proton_vtx_x;
+    std::vector<double> t_proton_vtx_y;
+    std::vector<double> t_proton_vtx_z;
     std::vector<double> t_proton_theta;
     std::vector<int> t_proton_trackID;
+    std::vector<int> t_proton_parentID;
     
     std::vector<double> t_pi0_px;
     std::vector<double> t_pi0_py;
     std::vector<double> t_pi0_pz;
     std::vector<double> t_pi0_E;
+    std::vector<double> t_pi0_vtx_x;
+    std::vector<double> t_pi0_vtx_y;
+    std::vector<double> t_pi0_vtx_z;
     std::vector<double> t_pi0_theta;
     std::vector<int> t_pi0_trackID;
+    std::vector<int> t_pi0_parentID;
+    
+    std::vector<double> t_gamma_px;
+    std::vector<double> t_gamma_py;
+    std::vector<double> t_gamma_pz;
+    std::vector<double> t_gamma_E;
+    std::vector<double> t_gamma_vtx_x;
+    std::vector<double> t_gamma_vtx_y;
+    std::vector<double> t_gamma_vtx_z;
+    std::vector<double> t_gamma_theta;
+    std::vector<int> t_gamma_trackID;
+    std::vector<int> t_gamma_parentID;
     
     // Initialize Vectors
     for (int i = 0; i < nMaxParticles; i++){
@@ -1357,23 +1472,44 @@ StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
         t_proton_py.push_back(-1.0);
         t_proton_pz.push_back(-1.0);
         t_proton_E.push_back(-1.0);
+        t_proton_vtx_x.push_back(-1.0);
+        t_proton_vtx_y.push_back(-1.0);
+        t_proton_vtx_z.push_back(-1.0);
         t_proton_theta.push_back(-9.0);
         t_proton_trackID.push_back(-1);
+        t_proton_parentID.push_back(-1);
         
         t_pi0_px.push_back(-1.0);
         t_pi0_py.push_back(-1.0);
         t_pi0_pz.push_back(-1.0);
         t_pi0_E.push_back(-1.0);
+        t_pi0_vtx_x.push_back(-1.0);
+        t_pi0_vtx_y.push_back(-1.0);
+        t_pi0_vtx_z.push_back(-1.0);
         t_pi0_theta.push_back(-9.0);
         t_pi0_trackID.push_back(-1);
+        t_pi0_parentID.push_back(-1);
+        
+        t_gamma_px.push_back(-1.0);
+        t_gamma_py.push_back(-1.0);
+        t_gamma_pz.push_back(-1.0);
+        t_gamma_E.push_back(-1.0);
+        t_gamma_vtx_x.push_back(-1.0);
+        t_gamma_vtx_y.push_back(-1.0);
+        t_gamma_vtx_z.push_back(-1.0);
+        t_gamma_theta.push_back(-9.0);
+        t_gamma_trackID.push_back(-1);
+        t_gamma_parentID.push_back(-1);
     }
     
     int nPi0 = 0;
     int nProton = 0;
+    int nGamma = 0;
     
     for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart) {
         
         Gaudi::LorentzVector temp_4p = (*it_mcpart)->GetInitialMomentum();
+        Gaudi::LorentzVector temp_vtx = (*it_mcpart)->GetFinalPosition();
         int partPDG = (*it_mcpart)->GetPDGCode();
         
         if ( (partPDG == 2212) && nProton < nMaxParticles){
@@ -1381,6 +1517,9 @@ StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
             t_proton_py[nProton] = temp_4p.py();
             t_proton_pz[nProton] = temp_4p.pz();
             t_proton_E[nProton]  = temp_4p.E();
+            t_proton_vtx_x[nProton] = temp_vtx.x();
+            t_proton_vtx_y[nProton] = temp_vtx.y();
+            t_proton_vtx_z[nProton] = temp_vtx.z();
             t_proton_theta[nProton] = m_coordSysTool->thetaWRTBeam(temp_4p); 
             t_proton_trackID[nProton] = (*it_mcpart)->GetTrackId();
             nProton++;
@@ -1389,18 +1528,31 @@ StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
             t_pi0_py[nPi0] = temp_4p.py();
             t_pi0_pz[nPi0] = temp_4p.pz();
             t_pi0_E[nPi0]  = temp_4p.E();
+            t_pi0_vtx_x[nPi0] = temp_vtx.x();
+            t_pi0_vtx_y[nPi0] = temp_vtx.y();
+            t_pi0_vtx_z[nPi0] = temp_vtx.z();
             t_pi0_theta[nPi0] = m_coordSysTool->thetaWRTBeam(temp_4p); 
             t_pi0_trackID[nPi0] = (*it_mcpart)->GetTrackId();
             nPi0++;
+        }else if ( (partPDG == 22) && nGamma < nMaxParticles){
+            t_gamma_px[nGamma] = temp_4p.px();
+            t_gamma_py[nGamma] = temp_4p.py();
+            t_gamma_pz[nGamma] = temp_4p.pz();
+            t_gamma_E[nGamma]  = temp_4p.E();
+            t_gamma_vtx_x[nGamma] = temp_vtx.x();
+            t_gamma_vtx_y[nGamma] = temp_vtx.y();
+            t_gamma_vtx_z[nGamma] = temp_vtx.z();
+            t_gamma_theta[nGamma] = m_coordSysTool->thetaWRTBeam(temp_4p); 
+            t_gamma_trackID[nGamma] = (*it_mcpart)->GetTrackId();
+            t_gamma_parentID[nGamma] = (*it_mcpart)->GetParentId();
+            nGamma++;
         }
-        
     }
     
-
     //--------------------------------------------------------------------------
     //! fill the truthEvent info
     //--------------------------------------------------------------------------
-    debug()<<"Filling ntuple"<<endmsg;
+    debug()<<"Filling ntuple for truth information!"<<endmsg;
     
     truthEvent->setIntData("vertex_module", vertex_module);
     truthEvent->setIntData("vertex_plane", vertex_plane);  
@@ -1417,15 +1569,34 @@ StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
     truthEvent->setContainerDoubleData("proton_py", t_proton_py);
     truthEvent->setContainerDoubleData("proton_pz", t_proton_pz);
     truthEvent->setContainerDoubleData("proton_E",  t_proton_E);
+    truthEvent->setContainerDoubleData("proton_vtx_x", t_proton_vtx_x);
+    truthEvent->setContainerDoubleData("proton_vtx_y", t_proton_vtx_y);
+    truthEvent->setContainerDoubleData("proton_vtx_z", t_proton_vtx_z);
     truthEvent->setContainerDoubleData("proton_theta_wrtbeam",  t_proton_theta);
     truthEvent->setContainerIntData("proton_trackID", t_proton_trackID);
+    truthEvent->setContainerIntData("proton_parentID", t_proton_parentID);
     
     truthEvent->setContainerDoubleData("pi0_px", t_pi0_px);
     truthEvent->setContainerDoubleData("pi0_py", t_pi0_py);
     truthEvent->setContainerDoubleData("pi0_pz", t_pi0_pz);
     truthEvent->setContainerDoubleData("pi0_E",  t_pi0_E);
+    truthEvent->setContainerDoubleData("pi0_vtx_x", t_pi0_vtx_x);
+    truthEvent->setContainerDoubleData("pi0_vtx_y", t_pi0_vtx_y);
+    truthEvent->setContainerDoubleData("pi0_vtx_z", t_pi0_vtx_z);
     truthEvent->setContainerDoubleData("pi0_theta_wrtbeam",  t_pi0_theta);
     truthEvent->setContainerIntData("pi0_trackID", t_pi0_trackID);
+    truthEvent->setContainerIntData("pi0_parentID", t_pi0_parentID);
+    
+    truthEvent->setContainerDoubleData("gamma_px", t_gamma_px);
+    truthEvent->setContainerDoubleData("gamma_py", t_gamma_py);
+    truthEvent->setContainerDoubleData("gamma_pz", t_gamma_pz);
+    truthEvent->setContainerDoubleData("gamma_E",  t_gamma_E);
+    truthEvent->setContainerDoubleData("gamma_vtx_x", t_gamma_vtx_x);
+    truthEvent->setContainerDoubleData("gamma_vtx_y", t_gamma_vtx_y);
+    truthEvent->setContainerDoubleData("gamma_vtx_z", t_gamma_vtx_z);
+    truthEvent->setContainerDoubleData("gamma_theta_wrtbeam",  t_gamma_theta);
+    truthEvent->setContainerIntData("gamma_trackID", t_gamma_trackID);
+    truthEvent->setContainerIntData("gamma_parentID", t_gamma_parentID);
     
     truthEvent->setIntData("N_proton",  N_proton);
     truthEvent->setIntData("N_neutron",  N_neutron);
@@ -1437,7 +1608,6 @@ StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
     truthEvent->setIntData("N_deltaplus",N_deltaplus);
     truthEvent->setIntData("N_gamma", N_gamma);
     truthEvent->setIntData("N_other", N_other );
-
     
     debug() <<"Exit CCProtonPi0Ana::tagTruth()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
@@ -2227,7 +2397,176 @@ void CCProtonPi0Ana::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& proton
     return;
 }
 
+//<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+//
+//  CCPi0 Functions -- Blob Tools
+//
+//<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+
+//==============================================================================
+//  VtxBlob
+//==============================================================================
+StatusCode CCProtonPi0Ana::VtxBlob(Minerva::PhysicsEvent *event, const SmartRef<Minerva::Vertex>& vertex ) const
+{
     
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCProtonPi0Ana::VtxBlob()" << endmsg;
+    
+    //  --  Vertex blob
+    double vertex_energy = 0;
+    double vertex_energy_sphere = 0;
+    double vertex_energy_filament= 0;
+    
+    const Gaudi::XYZPoint& pos = vertex->position();
+    
+    if ( m_filamentVertex ){
+        
+        SmartRefVector<Minerva::IDCluster> analyFilaClusters 
+            = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
+    
+        SmartRefVector<Minerva::IDCluster> filaClusters;
+        m_blobUtils->fillProximateClusterVec(pos,analyFilaClusters,filaClusters,
+                                            m_maxSearchDFila,m_maxStartingDFila,m_maxSearchGapFila);
+    
+        if (!filaClusters.empty()) {
+            
+            Minerva::IDBlob* vtxFilaBlob = new Minerva::IDBlob();
+            m_blobUtils->insertIDClusters( filaClusters, vtxFilaBlob, Minerva::IDBlob::VertexBlobPatRec );
+            double dummy_trkrevis = 0.0;
+            double dummy_ecalevis = 0.0;
+            double dummy_hcalevis = 0.0;
+            double dummy_scalevis = 0.0;
+            m_idHoughBlob->getBlobEnergyTime(vtxFilaBlob,vertex_energy_filament, 
+                                            dummy_trkrevis,dummy_ecalevis, dummy_hcalevis, dummy_scalevis);
+    
+            debug() << " Adding Filament vertex " << vtxFilaBlob->nclusters()
+                    << " clusters; energy = "  << vertex_energy_filament << endmsg;
+            addObject( event, vtxFilaBlob );
+            m_hitTagger->applyColorTag( vtxFilaBlob, 0x9900FF );
+        }
+    } // if (m_filamentVertex)
+    
+    
+    if ( m_sphereVertex ){
+    
+        SmartRefVector<Minerva::IDCluster> unusedClusters
+            = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
+    
+        std::vector<double> radii;
+        radii.push_back(50.0);
+        radii.push_back(100.0);
+        radii.push_back(150.0);
+        radii.push_back(200.0);
+        radii.push_back(250.0);
+        radii.push_back(300.0);
+        radii.push_back(500.0);
+    
+        // Note: return the vertex energies within these 'shells' in the parameter 'radii'
+        SmartRefVector<Minerva::IDCluster> sphereClusters = FilterInSphereClusters(vertex,unusedClusters,m_maxSearchD,radii);
+    
+        event->setContainerDoubleData("Vertex_energy_radii", radii);
+        
+        if (!sphereClusters.empty()) {
+    
+            Minerva::IDBlob* vtxSphereBlob = new Minerva::IDBlob();
+            m_blobUtils->insertIDClusters( sphereClusters, vtxSphereBlob, Minerva::IDBlob::VertexBlobPatRec );
+            double dummy_trkrevis = 0.0;
+            double dummy_ecalevis = 0.0;
+            double dummy_hcalevis = 0.0;
+            double dummy_scalevis = 0.0;
+            m_idHoughBlob->getBlobEnergyTime(vtxSphereBlob,vertex_energy_sphere,
+                                            dummy_trkrevis, dummy_ecalevis, dummy_hcalevis, dummy_scalevis);
+    
+            debug() << " Adding Sphere vertex " << vtxSphereBlob->nclusters()
+                    << " clusters; energy = "  <<  vertex_energy_sphere << endmsg;
+            addObject( event, vtxSphereBlob );
+            m_hitTagger->applyColorTag( vtxSphereBlob, 0x9900FF );
+        }
+    } // if ( m_sphereVertex )
+    
+    vertex_energy = vertex_energy_sphere + vertex_energy_filament;
+    event->setDoubleData( "Vertex_blob_energy", vertex_energy );
+    event->setDoubleData( "Filament_Vertex_energy", vertex_energy_filament );
+    event->setDoubleData( "Sphere_Vertex_energy", vertex_energy_sphere );
+  
+    debug() << "Exit CCProtonPi0Ana::VtxBlob()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+
+  return StatusCode::SUCCESS;
+
+}
+
+//==============================================================================
+//  FilterInSphereClusters()
+//==============================================================================
+SmartRefVector<Minerva::IDCluster> CCProtonPi0Ana::FilterInSphereClusters(const SmartRef<Minerva::Vertex>& vertex,
+                                     const SmartRefVector<Minerva::IDCluster>& clusters,
+                                     const double sphereRadius,
+                                     std::vector<double>& radii) const
+{
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCProtonPi0Ana::FilterInSphereClusters" << endmsg;
+    
+    const Gaudi::XYZPoint& pos = vertex->position();
+    const double x0 = pos.X();
+    const double y0 = pos.Y();
+    const double z0 = pos.Z();
+    double u0 = m_mathTool->calcUfromXY(x0,y0);
+    double v0 = m_mathTool->calcVfromXY(x0,y0);
+
+    std::vector<double> vertexEnergyVector(radii.size(),0.0);
+    SmartRefVector<Minerva::IDCluster> sphereClusters;
+    
+    for (SmartRefVector<Minerva::IDCluster>::const_iterator c = clusters.begin();
+            c != clusters.end(); ++c) {
+        const double energy = (*c)->energy();
+        const double z      = (*c)->z();
+        const double t      = (*c)->position();
+            /* Skip low-energy clusters, normal MIP cluster has 1.7*2 MeV = 3.4 MeV */
+        if (fSkipLowEnergyClusterVtxEnergy && energy < fThresholdVertexEnergy) continue;
+        
+            /* Tranverse position: X,U,or V */
+        double t0  = 0.0; 
+        switch ((*c)->view()) {
+            
+            case Minerva::IDCluster::X:
+                t0 = x0;
+                break;
+                
+            case Minerva::IDCluster::U:
+                t0 = u0;
+                break;
+                
+            case Minerva::IDCluster::V:
+                t0 = v0;
+                break;
+                
+            default:
+                warning() << "Invalid view" << endmsg;
+                exit(1);
+                
+        }
+            /* Distance from this cluster to the primary vertex */
+        double radius = sqrt(pow(z-z0,2) + pow(t-t0,2));
+        if (radius < sphereRadius) sphereClusters.push_back(*c);
+
+
+        for (std::size_t i = 0; i < radii.size(); ++i) {
+            if (radius < radii[i]) vertexEnergyVector[i] += energy;
+        }
+                
+    }
+
+    vertexEnergyVector.swap(radii);
+    
+    debug() << "Exit CCProtonPi0Ana::FilterInSphereClusters" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    
+    return sphereClusters;
+    
+}
+
 
 
 

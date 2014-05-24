@@ -21,7 +21,7 @@ CCProtonPi0Ana
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_05_21
+    Last Revision:  2014_05_23
     
 ================================================================================
 */
@@ -42,6 +42,7 @@ class IMinervaCoordSysTool;
 class IProtonUtils;
 class IEnergyCorrectionTool;
 class IHitTaggerTool;
+class IMinervaMathTool;
 class IProngClassificationTool;
 class IODProngClassificationTool;
 class IParticleMakerTool;
@@ -55,6 +56,10 @@ class IExtraEnergyTool;
 class IGetDeadTime;
 class IMCTrackTool;
 class IGiGaGeomCnvSvc;
+
+class IBlobCreatorUtils;
+class IHoughBlob;
+class IHoughTool;
 
 namespace Minerva {
   class DeDetector;
@@ -117,13 +122,26 @@ class CCProtonPi0Ana : public MinervaAnalysisTool
         std::string m_michelTrkToolAlias;
         std::string m_michelVtxToolAlias;
         
-        
+        // Prong Colors
         int m_muonProngColor; 
         int m_protonProngColor; 
         int m_primaryVertexColor; 
         int m_secondaryVertexColor; 
         int m_endPointVertexColor; 
         int m_unattachedProngColor;
+        
+        // VtxBlob
+        bool 	 m_sphereVertex;
+        double  m_maxSearchD;
+        double  m_maxStartingD;
+        double  m_maxSearchGap;		
+        bool	 m_filamentVertex;
+        double  m_maxSearchDFila;
+        double  m_maxStartingDFila;
+        double  m_maxSearchGapFila;
+        bool    m_filterClusterTypes;
+        bool    fSkipLowEnergyClusterVtxEnergy;
+        bool    fThresholdVertexEnergy;
         
         TRandom3*                 m_randomGen;
         unsigned long int         m_randomSeed;
@@ -150,6 +168,11 @@ class CCProtonPi0Ana : public MinervaAnalysisTool
         IMCTrackTool*               m_MCTrackTool;
         IGiGaGeomCnvSvc*            m_gigaCnvSvc;
         IParticleTool*              m_particleTool;
+        IMinervaMathTool*           m_mathTool;
+        
+        IBlobCreatorUtils*          m_blobUtils;
+        IHoughBlob*                 m_idHoughBlob;
+        IHoughTool*                 m_idHoughTool;
 
 
         
@@ -172,8 +195,15 @@ class CCProtonPi0Ana : public MinervaAnalysisTool
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
                                         double& p_calCorrection, 
                                         double& p_visEnergyCorrection ) const;
-                                        
+
         void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
+        
+        //! CCPi0 Functions
+        StatusCode VtxBlob(Minerva::PhysicsEvent *event, const SmartRef<Minerva::Vertex>& vertex ) const;
+        SmartRefVector<Minerva::IDCluster> FilterInSphereClusters(  const SmartRef<Minerva::Vertex>& vertex,
+                                                                    const SmartRefVector<Minerva::IDCluster>& clusters,
+                                                                    const double sphereRadius,
+                                                                    std::vector<double>& radii) const;
                                         
                                         
 
