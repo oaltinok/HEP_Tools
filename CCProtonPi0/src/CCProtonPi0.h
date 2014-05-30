@@ -1,6 +1,6 @@
 /*
 ================================================================================
-CCProtonPi0Ana
+CCProtonPi0
 
     Reconstruction Package:
         Exclusive Channel for muon,proton,pi0 on the final state
@@ -21,12 +21,12 @@ CCProtonPi0Ana
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_05_24
+    Last Revision:  2014_05_30
     
 ================================================================================
 */
-#ifndef CCPROTONPI0ANA_H 
-#define CCPROTONPI0ANA_H 1
+#ifndef CCPROTONPI0_H 
+#define CCPROTONPI0_H 1
 
 #include <utility>
 
@@ -67,7 +67,7 @@ namespace Minerva {
 }
 
 //! This class is for Reconstruct Pi0 using muon match vertex
-class CCProtonPi0Ana : public MinervaAnalysisTool
+class CCProtonPi0 : public MinervaAnalysisTool
 {
     private:
         typedef std::vector<Minerva::NeutrinoInt*> NeutrinoVect;
@@ -75,10 +75,10 @@ class CCProtonPi0Ana : public MinervaAnalysisTool
     public:
         
         //! Standard constructor
-        CCProtonPi0Ana( const std::string& type, const std::string& name, const IInterface* parent );
+        CCProtonPi0( const std::string& type, const std::string& name, const IInterface* parent );
         
         //! Destructor (mandatory for inheritance)
-        virtual ~CCProtonPi0Ana(){};
+        virtual ~CCProtonPi0(){};
         
         StatusCode initialize();
         StatusCode finalize();
@@ -214,5 +214,5 @@ class CCProtonPi0Ana : public MinervaAnalysisTool
   
 };
 
-#endif // CCPROTONPI0ANA_H 
+#endif // CCPROTONPI0_H 
 

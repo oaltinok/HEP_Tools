@@ -1,2 +1,2 @@
-cvs commit -m "* IHoughBlob.h and IHoughTool.h also duplicated under CCProtonPi0"
-.
+cvs commit -m "* Renamed Analysis Tool as CCProtonPi0
+* CCProtonPi0Ana -> CCProtonPi0" .

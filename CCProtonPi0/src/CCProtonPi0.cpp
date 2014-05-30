@@ -1,7 +1,7 @@
 /*
-    See CCProtonPi0Ana.h header for Class Information
+    See CCProtonPi0.h header for Class Information
 */
-#include "CCProtonPi0Ana.h"
+#include "CCProtonPi0.h"
 
 #include "TString.h"
 #include "TDatabasePDG.h"
@@ -51,22 +51,22 @@
 #include "G4VPhysicalVolume.hh"
 #include "G4Material.hh"
 
-DECLARE_TOOL_FACTORY( CCProtonPi0Ana );
+DECLARE_TOOL_FACTORY( CCProtonPi0 );
 
 using namespace Minerva;
     
 //==============================================================================
 // Standard constructor 
 //==============================================================================
-CCProtonPi0Ana::CCProtonPi0Ana(const std::string& type, const std::string& name, const IInterface* parent ) :
+CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const IInterface* parent ) :
 MinervaAnalysisTool( type, name, parent ) 
 {
     info() <<"--------------------------------------------------------------------------"<<endmsg;
-    info() <<"Enter CCProtonPi0Ana::CCProtonPi0Ana() -- Default Constructor" << endmsg;
+    info() <<"Enter CCProtonPi0::CCProtonPi0() -- Default Constructor" << endmsg;
     
     declareInterface<IInteractionHypothesis>(this);
-    //! mandatory declaration of analysis signature: CCProtonPi0Ana
-    m_anaSignature = "CCProtonPi0Ana";
+    //! mandatory declaration of analysis signature: CCProtonPi0
+    m_anaSignature = "CCProtonPi0";
     
     // Private Properties
     declareProperty("StoreAllEvents",      m_store_all_events =    true);
@@ -86,9 +86,9 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("UnattachedProngColor",        m_unattachedProngColor = 0x0000FF); //-- blue
     
     
-    declareProperty("MichelTrkToolAlias",   m_michelTrkToolAlias    = "CCDeltaMichelTrackTool");
-    declareProperty("MichelVtxToolAlias",   m_michelVtxToolAlias    = "CCDeltaMichelVertexTool");
-    declareProperty("ProtonUtilsAlias",     m_protonUtilsAlias      = "CCDeltaPlusProtonUtils");
+    declareProperty("MichelTrkToolAlias",   m_michelTrkToolAlias    = "CCProtonPi0_MichelTrackTool");
+    declareProperty("MichelVtxToolAlias",   m_michelVtxToolAlias    = "CCProtonPi0_MichelVertexTool");
+    declareProperty("ProtonUtilsAlias",     m_protonUtilsAlias      = "CCProtonPi0_ProtonUtils");
     declareProperty("ParticleToolName",     m_particleToolName      = "dEdXTool" );
     declareProperty("ParticleToolAlias",    m_particleToolAlias     = "dEdXTool" );
     
@@ -109,20 +109,20 @@ MinervaAnalysisTool( type, name, parent )
     // Protected properties from IInteractionHypothesis.
     m_hypMeths.push_back( m_anaSignature );
     declareProperty("HypothesisMethods", m_hypMeths);
-    info() << " CCProtonPi0Ana Hypothesis added " << endmsg;
+    info() << " CCProtonPi0 Hypothesis added " << endmsg;
     
     
-    info() <<"Exit CCProtonPi0Ana::CCProtonPi0Ana() -- Default Constructor" << endmsg;
+    info() <<"Exit CCProtonPi0::CCProtonPi0() -- Default Constructor" << endmsg;
     info() <<"--------------------------------------------------------------------------"<<endmsg;
 }
     
 //==============================================================================
 // Initialize
 //==============================================================================
-StatusCode CCProtonPi0Ana::initialize()
+StatusCode CCProtonPi0::initialize()
 {
     info() <<"--------------------------------------------------------------------------"<<endmsg;
-    info() <<"Enter CCProtonPi0Ana::initialize()" << endmsg;
+    info() <<"Enter CCProtonPi0::initialize()" << endmsg;
     
     //! Initialize the base class.  This will fail if you did not define m_anaSignature.
     StatusCode sc = this->MinervaAnalysisTool::initialize();
@@ -568,7 +568,7 @@ StatusCode CCProtonPi0Ana::initialize()
     
 
     
-    info() <<"Exit CCProtonPi0Ana::initialize()" << endmsg;
+    info() <<"Exit CCProtonPi0::initialize()" << endmsg;
     info() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return sc;
@@ -579,10 +579,10 @@ StatusCode CCProtonPi0Ana::initialize()
 // reconstructEvent() --
 //
 //==============================================================================
-StatusCode CCProtonPi0Ana::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const
+StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() <<"Enter CCProtonPi0Ana::reconstructEvent()" << endmsg;
+    debug() <<"Enter CCProtonPi0::reconstructEvent()" << endmsg;
     
     //--------------------------------------------------------------------------
     //! Initialize truthEvent reco booleans
@@ -1101,7 +1101,7 @@ StatusCode CCProtonPi0Ana::reconstructEvent( Minerva::PhysicsEvent *event, Miner
     StatusCode sc = addInteractionHyp( event, interactions );
     
 
-    debug() <<"Exit CCProtonPi0Ana::reconstructEvent()" << endmsg;
+    debug() <<"Exit CCProtonPi0::reconstructEvent()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return sc;
     
@@ -1112,10 +1112,10 @@ StatusCode CCProtonPi0Ana::reconstructEvent( Minerva::PhysicsEvent *event, Miner
 // interpretEvent()
 //
 //==============================================================================
-StatusCode CCProtonPi0Ana::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truthEvent, NeutrinoVect& interaction_hyp ) const
+StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truthEvent, NeutrinoVect& interaction_hyp ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() <<"Enter CCProtonPi0Ana::interpretEvent()" << endmsg;
+    debug() <<"Enter CCProtonPi0::interpretEvent()" << endmsg;
     
     if( truthEvent ){
         debug() << "This is a MC event." << endmsg;
@@ -1242,7 +1242,7 @@ StatusCode CCProtonPi0Ana::interpretEvent( const Minerva::PhysicsEvent *event, c
     }
     
 
-    debug() <<"Exit CCProtonPi0Ana::interpretEvent()" << endmsg;
+    debug() <<"Exit CCProtonPi0::interpretEvent()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
     
@@ -1252,10 +1252,10 @@ StatusCode CCProtonPi0Ana::interpretEvent( const Minerva::PhysicsEvent *event, c
 //==============================================================================
 // tagTruth()
 //==============================================================================
-StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) const 
+StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const 
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter: CCProtonPi0Ana::tagTruth()" << endmsg;
+    debug() << "Enter: CCProtonPi0::tagTruth()" << endmsg;
 
     if (!truthEvent) {
         warning()<<"Passed a null truthEvent to tagTruth()!"<<endmsg;
@@ -1622,7 +1622,7 @@ StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
     truthEvent->setIntData("N_gamma", N_gamma);
     truthEvent->setIntData("N_other", N_other );
     
-    debug() <<"Exit CCProtonPi0Ana::tagTruth()" << endmsg;
+    debug() <<"Exit CCProtonPi0::tagTruth()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
     
@@ -1631,7 +1631,7 @@ StatusCode CCProtonPi0Ana::tagTruth( Minerva::GenMinInteraction* truthEvent ) co
 //==============================================================================
 //  Finalize
 //==============================================================================
-StatusCode CCProtonPi0Ana::finalize()
+StatusCode CCProtonPi0::finalize()
 {
     info() <<"--------------------------------------------------------------------------"<<endmsg;
     info() << "Enter: finalize()" << endmsg;
@@ -1642,7 +1642,7 @@ StatusCode CCProtonPi0Ana::finalize()
     if( sc.isFailure() ) return Error( "Failed to finalize!", sc );
     
     
-    info() <<"Exit CCProtonPi0Ana::CCProtonPi0Ana::finalize()" << endmsg;
+    info() <<"Exit CCProtonPi0::CCProtonPi0::finalize()" << endmsg;
     info() <<"--------------------------------------------------------------------------"<<endmsg;
     return sc;
 }
@@ -1656,13 +1656,13 @@ StatusCode CCProtonPi0Ana::finalize()
 //----------------------------------------------------------------------------------------
 // interpret Events which fails the reconstructor cuts
 //----------------------------------------------------------------------------------------
-StatusCode CCProtonPi0Ana::interpretFailEvent( Minerva::PhysicsEvent* event ) const
+StatusCode CCProtonPi0::interpretFailEvent( Minerva::PhysicsEvent* event ) const
 {  
 
-    debug() <<"Exit CCProtonPi0Ana::reconstructEvent() through interpretFailEvent()" << endmsg;
+    debug() <<"Exit CCProtonPi0::reconstructEvent() through interpretFailEvent()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0Ana::interpretFailEvent()" << endmsg;
+    debug() << "Enter CCProtonPi0::interpretFailEvent()" << endmsg;
     
     Minerva::NeutrinoInt* nuInt = new Minerva::NeutrinoInt(m_anaSignature);
     NeutrinoVect nuInts;
@@ -1672,7 +1672,7 @@ StatusCode CCProtonPi0Ana::interpretFailEvent( Minerva::PhysicsEvent* event ) co
     fillCommonPhysicsAnaBranches(event);
     fillNuMIBranches(event);
     
-    debug() << "Exit CCProtonPi0Ana::interpretFailEvent()" << endmsg;
+    debug() << "Exit CCProtonPi0::interpretFailEvent()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
 }
@@ -1680,10 +1680,10 @@ StatusCode CCProtonPi0Ana::interpretFailEvent( Minerva::PhysicsEvent* event ) co
 //---------------------------------------------------------------------------------
 // set the track prong Geant4 truth information
 //---------------------------------------------------------------------------------
-void CCProtonPi0Ana::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const
+void CCProtonPi0::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0Ana::setTrackProngTruth()" << endmsg;
+    debug() << "Enter CCProtonPi0::setTrackProngTruth()" << endmsg;
     
     std::vector<const Minerva::TG4Trajectory*> parent;
     Minerva::TG4Trajectories* mc_trajectories = get<Minerva::TG4Trajectories>( "MC/TG4Trajectories" );
@@ -1872,7 +1872,7 @@ void CCProtonPi0Ana::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva
     }
     
     
-    debug() << "Exit CCProtonPi0Ana::setTrackProngTruth()" << endmsg;
+    debug() << "Exit CCProtonPi0::setTrackProngTruth()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return;
@@ -1884,10 +1884,10 @@ void CCProtonPi0Ana::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva
 //==============================================================================
 // Set Muon particle data
 //==============================================================================
-StatusCode CCProtonPi0Ana::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, SmartRef<Minerva::Prong>& muonProng) const 
+StatusCode CCProtonPi0::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, SmartRef<Minerva::Prong>& muonProng) const 
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0Ana::setMuonParticleData()" << endmsg;
+    debug() << "Enter CCProtonPi0::setMuonParticleData()" << endmsg;
     
     Gaudi::LorentzVector muon_4p;
     
@@ -1994,7 +1994,7 @@ StatusCode CCProtonPi0Ana::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, S
     
     fillMinosMuonBranches(nuInt, muonProng);
 
-    debug() << "Exit CCProtonPi0Ana::setMuonParticleData()" << endmsg;
+    debug() << "Exit CCProtonPi0::setMuonParticleData()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
 }
@@ -2002,10 +2002,10 @@ StatusCode CCProtonPi0Ana::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, S
 //==============================================================================
 // Find the plane nearest to a point
 //==============================================================================
-StatusCode CCProtonPi0Ana::getNearestPlane(double z, int & module_return, int & plane_return) const
+StatusCode CCProtonPi0::getNearestPlane(double z, int & module_return, int & plane_return) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0Ana::getNearestPlane()" << endmsg;
+    debug() << "Enter CCProtonPi0::getNearestPlane()" << endmsg;
     
     // Got From Brandon's CCNuPionInc - 2014_04_14
     // testing new MinervaDet routine
@@ -2022,7 +2022,7 @@ StatusCode CCProtonPi0Ana::getNearestPlane(double z, int & module_return, int & 
     module_return = planeid.module();
     plane_return = planeid.plane();
 
-    debug() << "Exit CCProtonPi0Ana::getNearestPlane()" << endmsg;
+    debug() << "Exit CCProtonPi0::getNearestPlane()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
   
@@ -2031,10 +2031,10 @@ StatusCode CCProtonPi0Ana::getNearestPlane(double z, int & module_return, int & 
 //==============================================================================
 // Created particles for negative bit Minos prongs
 //==============================================================================
-bool CCProtonPi0Ana::createTrackedParticles( Minerva::ProngVect& prongs ) const
+bool CCProtonPi0::createTrackedParticles( Minerva::ProngVect& prongs ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() <<"Enter CCProtonPi0Ana::createTrackedParticles()" << endmsg;
+    debug() <<"Enter CCProtonPi0::createTrackedParticles()" << endmsg;
     bool makeParticles = false;
     
     //-- check if the prongs are odMatch
@@ -2084,7 +2084,7 @@ bool CCProtonPi0Ana::createTrackedParticles( Minerva::ProngVect& prongs ) const
         hypotheses.clear();
     }
     
-    debug() << "Exit CCProtonPi0Ana::createTrackedParticles()" << endmsg;
+    debug() << "Exit CCProtonPi0::createTrackedParticles()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return makeParticles;
 }
@@ -2092,12 +2092,12 @@ bool CCProtonPi0Ana::createTrackedParticles( Minerva::ProngVect& prongs ) const
 //==============================================================================
 // Return the momentum analyzable contained ( proton candidate ) prong/particle
 //==============================================================================
-bool CCProtonPi0Ana::getProtonProng(    Minerva::ProngVect& hadronProngs, 
+bool CCProtonPi0::getProtonProng(    Minerva::ProngVect& hadronProngs, 
                                         Minerva::ProngVect& protonProngs,
                                         Minerva::ParticleVect& protonParticles ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0Ana::getProtonProng()" << endmsg;
+    debug() << "Enter CCProtonPi0::getProtonProng()" << endmsg;
   
     debug() << "N(hadronProngs) =  " << hadronProngs.size() << endmsg;
     
@@ -2158,7 +2158,7 @@ bool CCProtonPi0Ana::getProtonProng(    Minerva::ProngVect& hadronProngs,
     debug() << "N(protonParticles) =  " << protonParticles.size() << endmsg;
    
     
-    debug() << "Exit CCProtonPi0Ana::getProtonProng()" << endmsg;
+    debug() << "Exit CCProtonPi0::getProtonProng()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return isProton;
@@ -2167,14 +2167,14 @@ bool CCProtonPi0Ana::getProtonProng(    Minerva::ProngVect& hadronProngs,
 //==============================================================================
 // Set proton particle data
 //==============================================================================
-void CCProtonPi0Ana::setProtonParticleData(     Minerva::NeutrinoInt* nuInt, 
+void CCProtonPi0::setProtonParticleData(     Minerva::NeutrinoInt* nuInt, 
                                                 Minerva::ProngVect& protonProngs,
                                                 Minerva::ParticleVect& protonParticles, 
                                                 double vertexZ ) const 
 {
     // Got from Tammy's NukeCCQETwoTrack - 2014_04_15
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0Ana::setProtonParticleData()" << endmsg;
+    debug() << "Enter CCProtonPi0::setProtonParticleData()" << endmsg;
     
     std::vector<double> p_calCorrection(10,-1);
     std::vector<double> p_visEnergyCorrection(10,-1);
@@ -2323,7 +2323,7 @@ void CCProtonPi0Ana::setProtonParticleData(     Minerva::NeutrinoInt* nuInt,
 //         nuInt->setContainerDoubleData("proton_score1_shift_" + name, score_shift_vect);
 //     }
     
-    debug() << "Exit CCProtonPi0Ana::setProtonParticleData()" << endmsg;
+    debug() << "Exit CCProtonPi0::setProtonParticleData()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return;
@@ -2332,12 +2332,12 @@ void CCProtonPi0Ana::setProtonParticleData(     Minerva::NeutrinoInt* nuInt,
 //==============================================================================
 // Correct Proton Energy
 //==============================================================================
-void CCProtonPi0Ana::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
+void CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
                                                 double& p_calCorrection, 
                                                 double& p_visEnergyCorrection ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0Ana::correctProtonProngEnergy()" << endmsg;
+    debug() << "Enter CCProtonPi0::correctProtonProngEnergy()" << endmsg;
     
     //-- initialize
     double calEnergy = 0.0;
@@ -2405,7 +2405,7 @@ void CCProtonPi0Ana::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& proton
         debug() << "update energy using visible energy correction = " << E_visEnergyCorrection << endmsg;
     }     
             
-    debug() << "Exit CCProtonPi0Ana::correctProtonProngEnergy()" << endmsg;
+    debug() << "Exit CCProtonPi0::correctProtonProngEnergy()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return;
 }
@@ -2420,11 +2420,11 @@ void CCProtonPi0Ana::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& proton
 //==============================================================================
 //  VtxBlob
 //==============================================================================
-StatusCode CCProtonPi0Ana::VtxBlob(Minerva::PhysicsEvent *event, const SmartRef<Minerva::Vertex>& vertex ) const
+StatusCode CCProtonPi0::VtxBlob(Minerva::PhysicsEvent *event, const SmartRef<Minerva::Vertex>& vertex ) const
 {
     
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0Ana::VtxBlob()" << endmsg;
+    debug() << "Enter CCProtonPi0::VtxBlob()" << endmsg;
     
     //  --  Vertex blob
     double vertex_energy = 0;
@@ -2503,7 +2503,7 @@ StatusCode CCProtonPi0Ana::VtxBlob(Minerva::PhysicsEvent *event, const SmartRef<
     event->setDoubleData( "Filament_Vertex_energy", vertex_energy_filament );
     event->setDoubleData( "Sphere_Vertex_energy", vertex_energy_sphere );
   
-    debug() << "Exit CCProtonPi0Ana::VtxBlob()" << endmsg;
+    debug() << "Exit CCProtonPi0::VtxBlob()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
 
   return StatusCode::SUCCESS;
@@ -2513,13 +2513,13 @@ StatusCode CCProtonPi0Ana::VtxBlob(Minerva::PhysicsEvent *event, const SmartRef<
 //==============================================================================
 //  FilterInSphereClusters()
 //==============================================================================
-SmartRefVector<Minerva::IDCluster> CCProtonPi0Ana::FilterInSphereClusters(const SmartRef<Minerva::Vertex>& vertex,
+SmartRefVector<Minerva::IDCluster> CCProtonPi0::FilterInSphereClusters(const SmartRef<Minerva::Vertex>& vertex,
                                      const SmartRefVector<Minerva::IDCluster>& clusters,
                                      const double sphereRadius,
                                      std::vector<double>& radii) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0Ana::FilterInSphereClusters" << endmsg;
+    debug() << "Enter CCProtonPi0::FilterInSphereClusters" << endmsg;
     
     const Gaudi::XYZPoint& pos = vertex->position();
     const double x0 = pos.X();
@@ -2573,7 +2573,7 @@ SmartRefVector<Minerva::IDCluster> CCProtonPi0Ana::FilterInSphereClusters(const 
 
     vertexEnergyVector.swap(radii);
     
-    debug() << "Exit CCProtonPi0Ana::FilterInSphereClusters" << endmsg;
+    debug() << "Exit CCProtonPi0::FilterInSphereClusters" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return sphereClusters;
