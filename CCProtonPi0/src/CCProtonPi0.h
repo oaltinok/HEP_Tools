@@ -21,7 +21,7 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_06_10
+    Last Revision:  2014_06_11
     
 ================================================================================
 */
@@ -77,7 +77,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
     public:
         
         //! Standard constructor
-        CCProtonPi0( const std::string& type, const std::string& name, const IInterface* parent );
+        CCProtonPi0(const std::string& type, 
+                    const std::string& name, 
+                    const IInterface* parent );
         
         //! Destructor (mandatory for inheritance)
         virtual ~CCProtonPi0(){};
@@ -86,10 +88,13 @@ class CCProtonPi0 : public MinervaAnalysisTool
         StatusCode finalize();
         
         //! Reconstruct the event (mandatory for inheritance)
-        StatusCode reconstructEvent( Minerva::PhysicsEvent* event, Minerva::GenMinInteraction* truthEvent = NULL ) const;
+        StatusCode reconstructEvent(Minerva::PhysicsEvent* event, 
+                                    Minerva::GenMinInteraction* truthEvent = NULL ) const;
         
         //! Attach an interpretations to the event (mandatory for inheritance)
-        StatusCode interpretEvent( const Minerva::PhysicsEvent* event, const Minerva::GenMinInteraction* truthEvent, NeutrinoVect& interaction_hyp ) const;
+        StatusCode interpretEvent(  const Minerva::PhysicsEvent* event, 
+                                    const Minerva::GenMinInteraction* truthEvent, 
+                                    NeutrinoVect& interaction_hyp ) const;
         
         StatusCode tagTruth( Minerva::GenMinInteraction* truthEvent ) const;
         
@@ -204,73 +209,76 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IGetCalAttenuation*         m_AttenuationCorrectionTool;
 
 
-        
         //! Private Functions
         StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
-        StatusCode getNearestPlane(double z, int & module_return, int & plane_return) const;        
+        StatusCode getNearestPlane( double z, 
+                                    int & module_return, 
+                                    int & plane_return) const;        
+        StatusCode setMuonParticleData( Minerva::NeutrinoInt* nuInt, 
+                                        SmartRef<Minerva::Prong>& muonProng) const;
+        StatusCode setPi0ParticleData(  Minerva::PhysicsEvent *event, 
+                                        Minerva::IDBlob* idblob1, 
+                                        Minerva::IDBlob* idblob2,
+                                        const SmartRef<Minerva::Vertex>& vertex ) const;
+        
         bool createTrackedParticles( Minerva::ProngVect& prongs ) const;
-        
-        StatusCode setMuonParticleData(   Minerva::NeutrinoInt* nuInt, SmartRef<Minerva::Prong>& muonProng) const;
-        
         bool getProtonProng(    Minerva::ProngVect& hadronProngs, 
                                 Minerva::ProngVect& protonProngs,
                                 Minerva::ParticleVect& protonParticles ) const;
-                                                
+
         void setProtonParticleData( Minerva::NeutrinoInt* nuInt, 
                                     Minerva::ProngVect& protonProngs,
                                     Minerva::ParticleVect& protonParticles, 
                                     double vertexZ ) const;
-                                                    
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
                                         double& p_calCorrection, 
                                         double& p_visEnergyCorrection ) const;
-
         void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
         
-        StatusCode setPi0ParticleData( Minerva::PhysicsEvent *event, 
-                                            Minerva::IDBlob* idblob1, 
-                                            Minerva::IDBlob* idblob2,
-                                            const SmartRef<Minerva::Vertex>& vertex ) const;
+
         
         //! CCPi0 Functions
-        StatusCode VtxBlob(Minerva::PhysicsEvent *event, const SmartRef<Minerva::Vertex>& vertex ) const;
         SmartRefVector<Minerva::IDCluster> FilterInSphereClusters(  const SmartRef<Minerva::Vertex>& vertex,
-                                                                    const SmartRefVector<Minerva::IDCluster>& clusters,
-                                                                    const double sphereRadius,
-                                                                    std::vector<double>& radii) const;
-        StatusCode ConeBlobs(Minerva::PhysicsEvent *event,
-                                   const SmartRef<Minerva::Vertex>& vertex) const;
-        StatusCode AngleScanBlob(SmartRefVector<Minerva::IDCluster> idClusters,
-                                       const SmartRef<Minerva::Vertex>& vertex,
-                                       std::vector<Minerva::IDBlob*>& outBlobs) const;
-        StatusCode HoughBlob(SmartRefVector<Minerva::IDCluster> idClusters,
-                                   const SmartRef<Minerva::Vertex>& vertex,
-                                   std::vector<Minerva::IDBlob*>& outBlobs) const;
-        StatusCode processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs) const;
+                                                            const SmartRefVector<Minerva::IDCluster>& clusters,
+                                                            const double sphereRadius,
+                                                            std::vector<double>& radii) const;
+        StatusCode VtxBlob(Minerva::PhysicsEvent *event, 
+                            const SmartRef<Minerva::Vertex>& vertex ) const;
+        StatusCode ConeBlobs(   Minerva::PhysicsEvent *event,
+                                const SmartRef<Minerva::Vertex>& vertex) const;
+        StatusCode AngleScanBlob(   SmartRefVector<Minerva::IDCluster> idClusters,
+                                    const SmartRef<Minerva::Vertex>& vertex,
+                                    std::vector<Minerva::IDBlob*>& outBlobs) const;
+        StatusCode HoughBlob(   SmartRefVector<Minerva::IDCluster> idClusters,
+                                const SmartRef<Minerva::Vertex>& vertex,
+                                std::vector<Minerva::IDBlob*>& outBlobs) const;
+        StatusCode processBlobs(    Minerva::PhysicsEvent *event, 
+                                    std::vector<Minerva::IDBlob*> idBlobs) const;
         StatusCode ODActivity( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs ) const;
       
+        double CalcMinBlobSeparation(  const Minerva::IDBlob* blob,
+                                            const SmartRef<Minerva::Vertex>& vertex) const;
+        double CalcDistanceFromBlobAxisToVertex(   const Minerva::IDBlob* blob,
+                                                    const SmartRef<Minerva::Vertex>& vertex) const;
+        double CalcDistanceFromVertexToExiting(    const Minerva::IDBlob* blob,
+                                                    const SmartRef<Minerva::Vertex>& vertex) const;
+
+        void CalculatedEdx( const Minerva::IDBlob* blob,
+                            Minerva::PhysicsEvent* event, 
+                            unsigned int blob_number) const;
         void ApplyAttenuationCorrection(Minerva::IDBlob* blob) const;
-        double CalcMinBlobSeparation(const Minerva::IDBlob* blob,
-                                           const SmartRef<Minerva::Vertex>& vertex) const;
+
         std::vector<double> GetBlobClusterEnergy(const Minerva::IDBlob* blob) const;
         
-       
-                                   
+        bool InsideHexagon(double x, double y, double w) const;
         
         //! Fit Functions
         std::pair<int,double> OneParLineFitBlob(const Minerva::IDBlob* blob, 
-                             const SmartRef<Minerva::Vertex>& vertex,
-                             const SmartRef<Minerva::Track>& muonTrack) const;
+                                                const SmartRef<Minerva::Vertex>& vertex,
+                                                const SmartRef<Minerva::Track>& muonTrack) const;
         double TwoParLineFitBlobVtxDistance(const Minerva::IDBlob* blob,
-                                                  const SmartRef<Minerva::Vertex>& vertex) const;
-                                        
-                                        
+                                            const SmartRef<Minerva::Vertex>& vertex) const;
 
-        
-        
-  
-  
-  
 };
 
 #endif // CCPROTONPI0_H 
