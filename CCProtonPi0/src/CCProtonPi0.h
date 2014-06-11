@@ -21,7 +21,7 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_05_30
+    Last Revision:  2014_06_10
     
 ================================================================================
 */
@@ -56,10 +56,12 @@ class IExtraEnergyTool;
 class IGetDeadTime;
 class IMCTrackTool;
 class IGiGaGeomCnvSvc;
+class IGeomUtilSvc;
 
 class IBlobCreatorUtils;
 class IHoughBlob;
 class IHoughTool;
+class IGetCalAttenuation;
 
 namespace Minerva {
   class DeDetector;
@@ -143,12 +145,37 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool    fSkipLowEnergyClusterVtxEnergy;
         bool    fThresholdVertexEnergy;
         
+        // ConeBlobs
+        double m_qOverpChargeCut;      ///< q/p charge cut
+        double m_energyHoughlimit;     ///< Energy limit to start using Hough T.
+        double m_rejectedClustersTime; ///< window time  to allow clusters
+        
+        bool   new_impl_;
+        bool   try_to_recover_;
+        bool   attenuation_correction_;
+        
+        bool   fAllowUVMatchWithMoreTolerance;
+        double fUVMatchTolerance;
+        double fUVMatchMoreTolerance;
+  
+        double m_extraEnergyCylinderRadius;           ///< Cylinder Cut (mm) 
+        double m_extraEnergyCylinderUpstreamLength;   ///< Cylinder Cut (mm) 
+        double m_extraEnergyCylinderDownstreamLength; ///< Cylinder Cut (mm) 
+        double m_extraEnergyLowerTimeWindow;          ///< Cylinder Cut (ns) 
+        double m_extraEnergyUpperTimeWindow;          ///< Cylinder Cut (ns) 
+        double m_extraEnergyPECut;                    ///< Cylinder Cut (MeV)?
+        
         TRandom3*                 m_randomGen;
         unsigned long int         m_randomSeed;
         
         Minerva::DeDetector*        m_InnerDetector;
         Minerva::DeOuterDetector*   m_OuterDetector;
         
+        // Duplicated variables -- will fix in future
+        const Minerva::DeDetector*      m_idDet;                ///< Inner detector
+        const Minerva::DeOuterDetector* m_odDet;                ///< Outer detector
+        
+        IGeomUtilSvc*               m_GeomUtilSvc;          ///< GeomUtilSvc
         IMinervaCoordSysTool*       m_coordSysTool;
         IMichelTool*                m_michelTrkTool;
         IMichelTool*                m_michelVtxTool;
@@ -173,6 +200,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IBlobCreatorUtils*          m_blobUtils;
         IHoughBlob*                 m_idHoughBlob;
         IHoughTool*                 m_idHoughTool;
+        IIDAnchoredBlobCreator*     m_idConeScanBlob;
+        IGetCalAttenuation*         m_AttenuationCorrectionTool;
 
 
         
@@ -198,12 +227,42 @@ class CCProtonPi0 : public MinervaAnalysisTool
 
         void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
         
+        StatusCode setPi0ParticleData( Minerva::PhysicsEvent *event, 
+                                            Minerva::IDBlob* idblob1, 
+                                            Minerva::IDBlob* idblob2,
+                                            const SmartRef<Minerva::Vertex>& vertex ) const;
+        
         //! CCPi0 Functions
         StatusCode VtxBlob(Minerva::PhysicsEvent *event, const SmartRef<Minerva::Vertex>& vertex ) const;
         SmartRefVector<Minerva::IDCluster> FilterInSphereClusters(  const SmartRef<Minerva::Vertex>& vertex,
                                                                     const SmartRefVector<Minerva::IDCluster>& clusters,
                                                                     const double sphereRadius,
                                                                     std::vector<double>& radii) const;
+        StatusCode ConeBlobs(Minerva::PhysicsEvent *event,
+                                   const SmartRef<Minerva::Vertex>& vertex) const;
+        StatusCode AngleScanBlob(SmartRefVector<Minerva::IDCluster> idClusters,
+                                       const SmartRef<Minerva::Vertex>& vertex,
+                                       std::vector<Minerva::IDBlob*>& outBlobs) const;
+        StatusCode HoughBlob(SmartRefVector<Minerva::IDCluster> idClusters,
+                                   const SmartRef<Minerva::Vertex>& vertex,
+                                   std::vector<Minerva::IDBlob*>& outBlobs) const;
+        StatusCode processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs) const;
+        StatusCode ODActivity( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs ) const;
+      
+        void ApplyAttenuationCorrection(Minerva::IDBlob* blob) const;
+        double CalcMinBlobSeparation(const Minerva::IDBlob* blob,
+                                           const SmartRef<Minerva::Vertex>& vertex) const;
+        std::vector<double> GetBlobClusterEnergy(const Minerva::IDBlob* blob) const;
+        
+       
+                                   
+        
+        //! Fit Functions
+        std::pair<int,double> OneParLineFitBlob(const Minerva::IDBlob* blob, 
+                             const SmartRef<Minerva::Vertex>& vertex,
+                             const SmartRef<Minerva::Track>& muonTrack) const;
+        double TwoParLineFitBlobVtxDistance(const Minerva::IDBlob* blob,
+                                                  const SmartRef<Minerva::Vertex>& vertex) const;
                                         
                                         
 

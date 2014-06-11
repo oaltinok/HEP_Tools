@@ -25,6 +25,8 @@ use UnfoldUtils         v*  Ana
 
 use GiGaCnv              *  Sim  #for geant geometry headers
 
+macro_append ROOT_linkopts " -lPhysics -lHist -lGeom -lEG -lGpad -lGraf -lMinuit2 "
+
 #===============================================================================
 include_dirs ${CCPROTONPI0ROOT}
 
@@ -37,6 +39,7 @@ macro CCProtonPi0_linkopts      "${application_linkopts}"
 
 set CCPROTONPI0DOC "${CCPROTONPI0ROOT}/doc"
 end_private
+
 
 
 #===============================================================================

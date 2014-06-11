@@ -1,0 +1,65 @@
+/*
+    DigitVectorTruthInfo.h Duplicated from CCPi0 Package on 2014-06-10
+        Purpose: Make CCProtonPi0 Package independent of CCPi0 Package
+        Future: Common Tools and Functions will be combined under AnaUtils or
+                PionUtils
+                
+    Original Author:    Trung Le
+    Author:             Ozgur Altinok  - ozgur.altinok@tufts.edu
+    Date:               2014_06_10
+    Last Revision:      2014_06_10
+*/
+#ifndef DigitVectorTruthInfo_h
+#define DigitVectorTruthInfo_h
+
+#include <map>
+
+#include <GaudiKernel/SmartRef.h>
+
+namespace Minerva {
+    class TG4Trajectory;
+    class IDDigit;
+}
+
+class DigitVectorTruthInfo {
+  public:
+    DigitVectorTruthInfo();
+    ~DigitVectorTruthInfo() {}
+
+    void ParseTruth(const SmartRefVector<Minerva::IDDigit>& digits,
+                    const std::map<int,Minerva::TG4Trajectory*>& trajectories);
+
+    double GetTotalNormEnergy() const;
+    double GetDataNormEnergy() const;
+    double GetMCNormEnergy() const;
+    double GetMCXtalkNormEnergy() const;
+    double GetTotalTruthEnergy() const;
+    double GetSharedTruthEnergy() const;
+
+    double GetDataFraction() const;
+    double GetXtalkFraction() const;
+    double GetSharedFraction() const;
+
+    double GetEdepByPdg(int pdg) const;
+    double GetEdepByTrackId(int trackId) const;
+    int    GetMostEvisPdg() const;
+    
+    
+    const std::map<int,double>& GetPdgEdepMap() const;
+    const std::map<int,double>& GetNextToPrimaryIdEdepMap() const;
+    
+    void PrintMap() const;
+    
+  private:
+    double fTotalNormEnergy;
+    double fDataNormEnergy;
+    double fMCNormEnergy;
+    double fMCXtalkNormEnergy;
+    double fTotalTruthEnergy;
+    double fSharedTruthEnergy;
+
+    std::map<int,double> fPdgEdepMap;
+    std::map<int,double> fNextToPrimaryIdEdepMap; 
+};
+
+#endif
