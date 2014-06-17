@@ -95,7 +95,9 @@ namespace
         bool operator() (const SmartRef<Minerva::IDCluster>& lhs,
                          const SmartRef<Minerva::IDCluster>& rhs) const {
 
+            
             const double z0 = fVertex.Z();
+            std::cout<<z0<<std::endl;
 
             return std::abs(lhs->z()-z0) < std::abs(rhs->z()-z0);
         }
@@ -565,6 +567,7 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch( "Cut_EndPoint_Michel_Exist", -1 );
     declareIntEventBranch( "Cut_secEndPoint_Michel_Exist", -1 );
     declareIntEventBranch( "Cut_Proton_None", -1 );
+    declareIntEventBranch( "Cut_PreFilter_Pi0", -1 );
     
     //! Event - General reco
     declareIntEventBranch( "n_startpoint_vertices", -1 );
@@ -601,6 +604,23 @@ StatusCode CCProtonPi0::initialize()
     
     //! Event - Pi0 
     // May convert to NuInt type variable
+    // Additional Branches CCProtonPi0 Styles
+    declareDoubleEventBranch("pi0_px",-1.0);
+    declareDoubleEventBranch("pi0_py",-1.0);
+    declareDoubleEventBranch("pi0_pz",-1.0);
+    declareDoubleEventBranch("pi0_E",-1.0);
+    
+    declareDoubleEventBranch("gamma1_px",-1.0);
+    declareDoubleEventBranch("gamma1_py",-1.0);
+    declareDoubleEventBranch("gamma1_pz",-1.0);
+    declareDoubleEventBranch("gamma1_E",-1.0);
+    
+    declareDoubleEventBranch("gamma2_px",-1.0);
+    declareDoubleEventBranch("gamma2_py",-1.0);
+    declareDoubleEventBranch("gamma2_pz",-1.0);
+    declareDoubleEventBranch("gamma2_E",-1.0);
+
+    // CCPi0 Default Branches
     declareDoubleEventBranch("pienergy",1.e6);
     declareDoubleEventBranch("pitheta", 1.e6);
     declareDoubleEventBranch("piphi",   1.e6);
@@ -622,9 +642,9 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("g2theta", 1.e6);
     declareDoubleEventBranch("g2phi",   1.e6);
     
-    declareContainerDoubleEventBranch("pimom");
-    declareContainerDoubleEventBranch("g1mom");
-    declareContainerDoubleEventBranch("g2mom");
+    declareContainerDoubleEventBranch("pimom",4,-1);
+    declareContainerDoubleEventBranch("g1mom",3,-1);
+    declareContainerDoubleEventBranch("g2mom",3,-1);
    
     declareDoubleEventBranch( "RE_scalar", -9999);
     declareDoubleEventBranch( "RE_photon_energy_1", -9999 );
@@ -644,6 +664,37 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleEventBranch( "RE_photon_direction_2");
     declareContainerDoubleEventBranch( "RE_photon_vertex_1");
     declareContainerDoubleEventBranch( "RE_photon_vertex_2");
+    
+    //! Event - PreFilterPi0()
+    declareDoubleEventBranch("evis_nearvtx_total", -1.0);
+    declareDoubleEventBranch("evis_nearvtx_x", -1.0);
+    declareDoubleEventBranch("evis_nearvtx_u", -1.0);
+    declareDoubleEventBranch("evis_nearvtx_v", -1.0);
+    
+    declareDoubleEventBranch("evis_total_x", -1.0);
+    declareDoubleEventBranch("evis_ntgt_x",  -1.0);
+    declareDoubleEventBranch("evis_trkr_x",  -1.0);
+    declareDoubleEventBranch("evis_ecal_x",  -1.0);
+    declareDoubleEventBranch("evis_hcal_x",  -1.0);
+    
+    declareDoubleEventBranch("evis_total_u", -1.0);
+    declareDoubleEventBranch("evis_ntgt_u",  -1.0);
+    declareDoubleEventBranch("evis_trkr_u",  -1.0);
+    declareDoubleEventBranch("evis_ecal_u",  -1.0);
+    declareDoubleEventBranch("evis_hcal_u",  -1.0);
+    
+    declareDoubleEventBranch("evis_total_v", -1.0);
+    declareDoubleEventBranch("evis_ntgt_v",  -1.0);
+    declareDoubleEventBranch("evis_trkr_v",  -1.0);
+    declareDoubleEventBranch("evis_ecal_v",  -1.0);
+    declareDoubleEventBranch("evis_hcal_v",  -1.0);
+    
+    declareDoubleEventBranch("evis_total", -1.0);
+    declareDoubleEventBranch("evis_ntgt",  -1.0);
+    declareDoubleEventBranch("evis_trkr",  -1.0);
+    declareDoubleEventBranch("evis_ecal",  -1.0);
+    declareDoubleEventBranch("evis_hcal",  -1.0);
+    declareDoubleEventBranch("evis_other", -1.0);
     
     //! Event - VtxBlob()
     declareContainerDoubleEventBranch("Vertex_energy_radii");
@@ -954,9 +1005,9 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //--------------------------------------------------------------------------
     //! MAKE CUT - if NULL Interaction Vertex
     //--------------------------------------------------------------------------
-    SmartRef<Minerva::Vertex> m_PrimaryVertex = event->interactionVertex();
+    
 
-    if( m_PrimaryVertex == NULL ) { 
+    if( event->interactionVertex() == NULL ) { 
         bool pass = true; 
         std::string tag = "BadObject";
         event->filtertaglist()->addFilterTag(tag,pass);
@@ -965,6 +1016,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
+    SmartRef<Minerva::Vertex> m_PrimaryVertex = event->interactionVertex();
     
     //--------------------------------------------------------------------------
     //! MAKE CUT - if Interaction Vertex is NOT in Reconstructable Volume
@@ -1065,14 +1117,11 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //
     //==========================================================================
 
-    debug() << "START: Muon" << endmsg;
+    debug() << "START: Muon Reconstruction..." << endmsg;
 
-    
-    bool foundMuon = MuonUtils->findMuonProng( event, m_MuonProng, m_MuonParticle );
     bool is_minos_track = false, is_minos_stub = false;
+    bool foundMuon = MuonUtils->findMuonProng( event, m_MuonProng, m_MuonParticle );
     debug() << "m_MuonProng and m_MuonParticle is Saved!" << endmsg;
-    
-
     
     //--------------------------------------------------------------------------
     //! MAKE CUT - if NO GOOD MUON (MINOS Matched)
@@ -1123,7 +1172,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     }
         
     //--------------------------------------------------------------------------
-    //! MUON Passed All Cuts tag it as "PrimaryMuon"
+    //! MUON Passed All Cuts -- tag it as "PrimaryMuon"
     //--------------------------------------------------------------------------
     m_MuonProng->filtertaglist()->setOrAddFilterTag( "PrimaryMuon", true );
     m_MuonParticle->filtertaglist()->setOrAddFilterTag( "PrimaryMuon", true );
@@ -1151,7 +1200,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     event->setTime( m_recoTimeTool->prongBestTime(m_MuonProng) );
     SmartRefVector<Track> muonTracks = m_MuonProng->minervaTracks(); 
     
-    debug() << "FINISH: Muon" << endmsg;
+    debug() << "FINISH: Muon Reconstruction" << endmsg;
     
     //==========================================================================
     //
@@ -1183,6 +1232,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //--------------------------------------------------------------------------
     debug()<<"START: End Point Michel"<<endmsg;
   
+    // Get All Prongs to search for end point michels
     ProngVect primaryProngs = event->primaryProngs();
 
     for (ProngVect::iterator iterProngs = primaryProngs.begin(); iterProngs != primaryProngs.end(); ++iterProngs) {
@@ -1260,8 +1310,12 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //-- create new particles
     debug() << "Creating particles with Proton and Pion hypotheses" <<endmsg;
     bool makeParticles = createTrackedParticles(primaryProngs);
-    debug() << "Was the creation of particles successful? " << makeParticles << endmsg;
-
+    if (makeParticles){
+        debug() << "Creation of Particles are SUCCESFUL!"<< endmsg;
+    }else{
+        warning() << "Creation of Particles are FAILED!"<< endmsg;
+    }
+    
     //-- check if one of the primary prong is contained and has a dEdX proton particle 
     Minerva::ProngVect protonProngs;
     Minerva::ParticleVect protonParticles;
@@ -1283,9 +1337,20 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     
     //==========================================================================
     //
-    // Blob Reconstruction
+    // Pi0 Reconstruction
     //
     //==========================================================================
+    
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - if fails PreFilterPi0()
+    //--------------------------------------------------------------------------
+    if ( PreFilterPi0(event) ){
+        debug()<<"Passed PreFilterPi0()"<<endmsg;
+    }else{
+        event->setIntData("Cut_PreFilter_Pi0",1);
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS;  
+    }
     
     //--------------------------------------------------------------------------
     //! MAKE CUT - if fails VtxBlob()
@@ -2757,7 +2822,11 @@ StatusCode CCProtonPi0::setPi0ParticleData( Minerva::PhysicsEvent *event,
     bool goodDirection2 = m_idHoughBlob->GetDirection(idblob2, pos );
     bool isGoodBlob2 = false;
     if (goodPosition2 && goodDirection2) isGoodBlob2 = true;
-    if (!isGoodBlob1 || !isGoodBlob2) return StatusCode::SUCCESS;
+    // Process only if we have 2 Bood Blobs
+    if (!isGoodBlob1 || !isGoodBlob2){
+        debug() << "Don't have 2 Good Blobs! -- CANNOT Set Pi0 Particle Data!" <<endmsg; 
+        return StatusCode::SUCCESS;
+    }
 
     if (attenuation_correction_) {
         ApplyAttenuationCorrection(idblob1);
@@ -2857,17 +2926,33 @@ StatusCode CCProtonPi0::setPi0ParticleData( Minerva::PhysicsEvent *event,
     
     const double oangle = g1mom.Angle(g2mom)*TMath::RadToDeg();
     event->setDoubleData("oangle", oangle);
+    
     const double mgg = std::sqrt(2*g1energy*g2energy*(1-cos_oangle));
     event->setDoubleData("mgg", mgg);
 
+    // CCProtonPi0 Style Branches
+    event->setDoubleData("pi0_px",pimom.x());
+    event->setDoubleData("pi0_py",pimom.y());
+    event->setDoubleData("pi0_pz",pimom.z());
+    event->setDoubleData("pi0_E",g1energy+g2energy);
     
+    event->setDoubleData("gamma1_px",g1mom.x());
+    event->setDoubleData("gamma1_py",g1mom.y());
+    event->setDoubleData("gamma1_pz",g1mom.z());
+    event->setDoubleData("gamma1_E",g1energy);
+    
+    event->setDoubleData("gamma2_px",g2mom.x());
+    event->setDoubleData("gamma2_py",g2mom.y());
+    event->setDoubleData("gamma2_pz",g2mom.z());
+    event->setDoubleData("gamma2_E",g2energy);
+
+    // CCPi0 Default Branches
     event->setDoubleData("pienergy", g1energy+g2energy);
     event->setDoubleData("pitheta",  pimom.Theta()*TMath::RadToDeg());
     event->setDoubleData("piphi",    pimom.Phi()*TMath::RadToDeg());
     event->setDoubleData("pithetax", std::atan2(pimom.X(),pimom.Z())*TMath::RadToDeg());
     event->setDoubleData("pithetay", std::atan2(pimom.Y(),pimom.Z())*TMath::RadToDeg());
 
-    
     event->setDoubleData("g1e",    g1energy);
     event->setDoubleData("g1theta",g1mom.Theta()*TMath::RadToDeg());
     event->setDoubleData("g1phi",  g1mom.Phi()*TMath::RadToDeg());
@@ -2916,8 +3001,8 @@ StatusCode CCProtonPi0::setPi0ParticleData( Minerva::PhysicsEvent *event,
     event->setDoubleData("g1blob_edge_distance",dmax1);
     event->setDoubleData("g2blob_edge_distance",dmax2);
 
-    CalculatedEdx(idblob1,event,1);
-    CalculatedEdx(idblob2,event,2);
+    CalculatedEdx(idblob1,event,1,vertex);
+    CalculatedEdx(idblob2,event,2,vertex);
     
 //     CheckBlobDigitAssignment(event,idblob1,1);
 //     CheckBlobDigitAssignment(event,idblob2,2);
@@ -3193,6 +3278,7 @@ StatusCode CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event,
     bool isHough = false;
     bool isHoughApplied = false;
     
+    // Get the Energy to analyze on all Clusters: Tracker, ECAL, HCAL
     SmartRefVector<Minerva::IDCluster>::iterator it_clus;
     for ( it_clus = preidClusters.begin(); it_clus != preidClusters.end(); it_clus++){
         
@@ -3202,19 +3288,19 @@ StatusCode CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event,
         if ( (*it_clus)->subdet() ==  Minerva::IDCluster::ECAL )    energyECAL += (*it_clus)->energy();
         if ( (*it_clus)->subdet() ==  Minerva::IDCluster::HCAL )    energyHCAL += (*it_clus)->energy();
         
-            // must include clusters close to MUON vertex time < 25 ns
+        // must include clusters close to MUON vertex time < 25 ns
         if ( std::abs( (*it_clus)->time() -  muon_position.T() ) < m_rejectedClustersTime ) {
             usableClusters.push_back(*it_clus);
         } else {
             outTimeClusters.push_back(*it_clus);
         }
     }
-
+    // Save Energy Information
     event->setDoubleData( "RE_energy_Tracker", energyTracker );
     event->setDoubleData( "RE_energy_ECAL", energyECAL );
     event->setDoubleData( "RE_energy_HCAL", energyHCAL );
 
-    info() << " Energy to analyze " << energyTracker + energyECAL + energyHCAL << endmsg;
+    debug() << " Energy to analyze " << energyTracker + energyECAL + energyHCAL << endmsg;
 
     std::vector<Minerva::IDBlob*> foundBlobs;
     unsigned int nblob_anglescan = 0;
@@ -3323,9 +3409,7 @@ StatusCode CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event,
             
         } // end if new_impl
         else {
-            
             StatusCode sc = AngleScanBlob(usableClusters, vertex, foundBlobs );
-         
         }
 
         nblob_anglescan = foundBlobs.size();
@@ -3410,7 +3494,7 @@ StatusCode CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event,
 
                 //additional = good_masses.size() == 1;
                 //if (good_masses.size() == 1) foundBlobs.swap(bestBlobs);
-            additional = bestBlobs.size() == 2;
+            additional = ( bestBlobs.size() == 2 );
             if (bestBlobs.size() == 2) foundBlobs.swap(bestBlobs);
             
             event->setContainerDoubleData("mgg_vector", masses);
@@ -3519,9 +3603,9 @@ StatusCode CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event,
         event->setContainerIntData("final_blob_ndx",blob_ndx);
         event->setContainerIntData("final_blob_ndu",blob_ndu);
         event->setContainerIntData("final_blob_ndv",blob_ndv);
-
-        std::vector<double> blob_cluster_energy1 = GetBlobClusterEnergy(foundBlobs[0]);
-        std::vector<double> blob_cluster_energy2 = GetBlobClusterEnergy(foundBlobs[1]);
+        
+        std::vector<double> blob_cluster_energy1 = GetBlobClusterEnergy(foundBlobs[0],vertex);
+        std::vector<double> blob_cluster_energy2 = GetBlobClusterEnergy(foundBlobs[1],vertex);
         event->setContainerDoubleData("blob_cluster_energy1", blob_cluster_energy1);
         event->setContainerDoubleData("blob_cluster_energy2", blob_cluster_energy2);
             
@@ -3546,7 +3630,7 @@ StatusCode CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event,
     event->setDoubleData("g1blob_minsep", minBlobSep1);
     event->setDoubleData("g2blob_minsep", minBlobSep2);
     
-        //storing rejected id Clusters
+    //storing rejected id Clusters
     Minerva::IDBlob* rejectedBlob = new Minerva::IDBlob();
     
     if (!outTimeClusters.empty()) {
@@ -4011,7 +4095,7 @@ double CCProtonPi0::CalcMinBlobSeparation(const Minerva::IDBlob* blob,
 //==============================================================================
 //  GetBlobClusterEnergy
 //==============================================================================
-std::vector<double> CCProtonPi0::GetBlobClusterEnergy(const Minerva::IDBlob* blob) const
+std::vector<double> CCProtonPi0::GetBlobClusterEnergy(const Minerva::IDBlob* blob, const SmartRef<Minerva::Vertex>& vertex) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::GetBlobClusterEnergy()" << endmsg;
@@ -4020,7 +4104,10 @@ std::vector<double> CCProtonPi0::GetBlobClusterEnergy(const Minerva::IDBlob* blo
     
     SmartRefVector<Minerva::IDCluster> clusters = blob->clusters();
 
-//     std::sort(clusters.begin(), clusters.end(), increasingDistanceFromVertex(m_PrimaryVertex->position()));
+    Gaudi::XYZPoint pos = vertex->position();
+    debug()<<"Vertex to increasingDistanceFromVertex = ("<<pos.X()<<","<<pos.Y()<<","<<pos.Z()<<")"<<endmsg;
+    
+    std::sort(clusters.begin(), clusters.end(), increasingDistanceFromVertex(pos));
 
     for (SmartRefVector<Minerva::IDCluster>::iterator c = clusters.begin();
          c != clusters.end(); ++c) {
@@ -4285,7 +4372,8 @@ double CCProtonPi0::CalcDistanceFromVertexToExiting(const Minerva::IDBlob* blob,
 //  CalculatedEdx
 //==============================================================================
 void CCProtonPi0::CalculatedEdx(const Minerva::IDBlob* blob,
-                                  Minerva::PhysicsEvent* event, unsigned int blob_number) const
+                                  Minerva::PhysicsEvent* event, unsigned int blob_number,
+                                  const SmartRef<Minerva::Vertex>& vertex) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::CalculatedEdx()" << endmsg;
@@ -4295,8 +4383,10 @@ void CCProtonPi0::CalculatedEdx(const Minerva::IDBlob* blob,
               << endmsg;
     std::map<int, std::vector<double> > planeClusterEnergyMap;
     SmartRefVector<Minerva::IDCluster> clusters = blob->clusters();
+    Gaudi::XYZPoint pos = vertex->position();
+    debug()<<"Vertex to increasingDistanceFromVertex = ("<<pos.X()<<","<<pos.Y()<<","<<pos.Z()<<")"<<endmsg;
     
-//     std::sort(clusters.begin(), clusters.end(), increasingDistanceFromVertex(m_PrimaryVertex->position()));
+    std::sort(clusters.begin(), clusters.end(), increasingDistanceFromVertex(pos));
     
     for (SmartRefVector<Minerva::IDCluster>::iterator c = clusters.begin();
          c != clusters.end(); ++c) {
@@ -4469,6 +4559,153 @@ bool CCProtonPi0::InsideHexagon(double x, double y, double w) const
     return true;
     
 }
+
+//==============================================================================
+//  PreFilterPi0
+//==============================================================================
+StatusCode CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event ) const
+{
+
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() <<"Enter CCProtonPi0::PreFilterPi0()" << endmsg;
+        //if ( event->processType() ==  Minerva::PhysicsEvent::RockParticle )  {
+        //info() << " Jumping rock Muon " << endmsg;
+        //return StatusCode::FAILURE;
+        //}
+
+    SmartRefVector<Minerva::IDCluster> unusedClusters
+        = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
+
+    const Gaudi::XYZPoint& vertex = event->interactionVertex()->position();
+    const double inter_mod_z   = 45.0; // From geometry spreadsheet
+    const double inter_plane_z = inter_mod_z/2.0;
+    const double z0 = vertex.Z();
+
+    SmartRefVector<Minerva::IDCluster> nearVertexClusters;
+    for (SmartRefVector<Minerva::IDCluster>::iterator c = unusedClusters.begin();
+         c != unusedClusters.end(); c++ ){
+        const double c_z = (*c)->z();
+        if (std::abs(c_z-z0) < 5*inter_plane_z) nearVertexClusters.push_back(*c);
+    }
+
+    std::cout << "Total near-vertex cluster: " << nearVertexClusters.size() << std::endl;
+
+    double nearvtx_total  = 0.0;
+    double nearvtx_evisX = 0.0;
+    double nearvtx_evisU = 0.0;
+    double nearvtx_evisV = 0.0;
+    
+    for (SmartRefVector<Minerva::IDCluster>::iterator c = nearVertexClusters.begin();
+         c != nearVertexClusters.end(); c++ ){
+        const double energy = (*c)->energy();
+        nearvtx_total += energy;
+        if ((*c)->view() == Minerva::IDCluster::X) nearvtx_evisX += energy;
+        if ((*c)->view() == Minerva::IDCluster::U) nearvtx_evisU += energy;
+        if ((*c)->view() == Minerva::IDCluster::V) nearvtx_evisV += energy;
+    }
+
+    event->setDoubleData("evis_nearvtx_total", nearvtx_total);
+    event->setDoubleData("evis_nearvtx_x", nearvtx_evisX);
+    event->setDoubleData("evis_nearvtx_u", nearvtx_evisU);
+    event->setDoubleData("evis_nearvtx_u", nearvtx_evisV);
+
+    
+    double ntgtEvis = 0.0;
+    double trkrEvis = 0.0;
+    double ecalEvis = 0.0;
+    double hcalEvis = 0.0;
+    double total = 0.0;
+    
+    double ntgtEvisX = 0.0;
+    double trkrEvisX = 0.0;
+    double ecalEvisX = 0.0;
+    double hcalEvisX = 0.0;
+    double totalX = 0.0;
+    
+    double ntgtEvisU = 0.0;
+    double trkrEvisU = 0.0;
+    double ecalEvisU = 0.0;
+    double hcalEvisU = 0.0;
+    double totalU = 0.0;
+    
+    double ntgtEvisV = 0.0;
+    double trkrEvisV = 0.0;
+    double ecalEvisV = 0.0;
+    double hcalEvisV = 0.0;
+    double totalV = 0.0;
+
+    for (SmartRefVector<Minerva::IDCluster>::iterator c = unusedClusters.begin();
+         c != unusedClusters.end(); c++ ){
+        const double energy = (*c)->energy();
+        Minerva::IDCluster::Subdet subdet = (*c)->subdet();
+        total += energy;
+        if      (subdet == Minerva::IDCluster::NuclTargs) {
+            ntgtEvis += energy;
+            if ((*c)->view() == Minerva::IDCluster::X) ntgtEvisX += energy;
+            if ((*c)->view() == Minerva::IDCluster::U) ntgtEvisU += energy;
+            if ((*c)->view() == Minerva::IDCluster::V) ntgtEvisV += energy;
+        }
+        else if (subdet == Minerva::IDCluster::Tracker) {
+            trkrEvis += energy;
+            if ((*c)->view() == Minerva::IDCluster::X) trkrEvisX += energy;
+            if ((*c)->view() == Minerva::IDCluster::U) trkrEvisU += energy;
+            if ((*c)->view() == Minerva::IDCluster::V) trkrEvisV += energy;
+        }
+        else if (subdet == Minerva::IDCluster::ECAL) {
+            ecalEvis += energy;
+            if ((*c)->view() == Minerva::IDCluster::X) ecalEvisX += energy;
+            if ((*c)->view() == Minerva::IDCluster::U) ecalEvisU += energy;
+            if ((*c)->view() == Minerva::IDCluster::V) ecalEvisV += energy;
+        }
+        else if (subdet == Minerva::IDCluster::HCAL) {
+            hcalEvis += energy;
+            if ((*c)->view() == Minerva::IDCluster::X) hcalEvisX += energy;
+            if ((*c)->view() == Minerva::IDCluster::U) hcalEvisU += energy;
+            if ((*c)->view() == Minerva::IDCluster::V) hcalEvisV += energy;
+        }
+        
+        else {}
+    }
+    
+    const double otherevis = trkrEvis + ecalEvis + hcalEvis;
+    
+    event->setDoubleData("evis_total_x", totalX);
+    event->setDoubleData("evis_ntgt_x",  ntgtEvisX);
+    event->setDoubleData("evis_trkr_x",  trkrEvisX);
+    event->setDoubleData("evis_ecal_x",  ecalEvisX);
+    event->setDoubleData("evis_hcal_x",  hcalEvisX);
+    
+    event->setDoubleData("evis_total_u", totalU);
+    event->setDoubleData("evis_ntgt_u",  ntgtEvisU);
+    event->setDoubleData("evis_trkr_u",  trkrEvisU);
+    event->setDoubleData("evis_ecal_u",  ecalEvisU);
+    event->setDoubleData("evis_hcal_u",  hcalEvisU);
+    
+    event->setDoubleData("evis_total_v", totalV);
+    event->setDoubleData("evis_ntgt_v",  ntgtEvisV);
+    event->setDoubleData("evis_trkr_v",  trkrEvisV);
+    event->setDoubleData("evis_ecal_v",  ecalEvisV);
+    event->setDoubleData("evis_hcal_v",  hcalEvisV);
+    
+    event->setDoubleData("evis_total", total);
+    event->setDoubleData("evis_ntgt",  ntgtEvis);
+    event->setDoubleData("evis_trkr",  trkrEvis);
+    event->setDoubleData("evis_ecal",  ecalEvis);
+    event->setDoubleData("evis_hcal",  hcalEvis);
+    event->setDoubleData("evis_other", otherevis);
+    
+    debug() <<"Exit CCProtonPi0::PreFilterPi0()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+
+    if      ( ntgtEvis > 20)    return StatusCode::FAILURE;
+    else if ( otherevis > 2000) return StatusCode::FAILURE; // energy bigger than 1.7*1.2 GeV must be ignored
+    else if ( otherevis < 80 )  return StatusCode::FAILURE; // energy smaller than 80*1.2 Mev must be ignored
+    else return StatusCode::SUCCESS;
+    
+    return StatusCode::SUCCESS;
+    
+}
+
 
 
 

@@ -21,7 +21,7 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_06_11
+    Last Revision:  2014_06_17
     
 ================================================================================
 */
@@ -242,6 +242,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
                                                             const SmartRefVector<Minerva::IDCluster>& clusters,
                                                             const double sphereRadius,
                                                             std::vector<double>& radii) const;
+        StatusCode PreFilterPi0(Minerva::PhysicsEvent *event ) const;
         StatusCode VtxBlob(Minerva::PhysicsEvent *event, 
                             const SmartRef<Minerva::Vertex>& vertex ) const;
         StatusCode ConeBlobs(   Minerva::PhysicsEvent *event,
@@ -265,10 +266,12 @@ class CCProtonPi0 : public MinervaAnalysisTool
 
         void CalculatedEdx( const Minerva::IDBlob* blob,
                             Minerva::PhysicsEvent* event, 
-                            unsigned int blob_number) const;
+                            unsigned int blob_number,
+                            const SmartRef<Minerva::Vertex>& vertex) const;
         void ApplyAttenuationCorrection(Minerva::IDBlob* blob) const;
 
-        std::vector<double> GetBlobClusterEnergy(const Minerva::IDBlob* blob) const;
+        std::vector<double> GetBlobClusterEnergy(   const Minerva::IDBlob* blob,
+                                                    const SmartRef<Minerva::Vertex>& vertex) const;
         
         bool InsideHexagon(double x, double y, double w) const;
         
