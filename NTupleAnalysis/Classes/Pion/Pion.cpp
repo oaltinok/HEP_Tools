@@ -104,6 +104,25 @@ Pion::Pion()
     angleMuon_reco_mc->GetXaxis()->SetTitle("Reconstructed Pion Angle wrt. Muon");
     angleMuon_reco_mc->GetYaxis()->SetTitle("True Pion Angle wrt. Muon");
     
+    P_reco_0Pi0 = new TH1F( "P_reco_0Pi0","True N(Pi0) = 0",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    P_reco_0Pi0->GetXaxis()->SetTitle("Reconstructed Pion Momentum MeV");
+    P_reco_0Pi0->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_P.get_width()));
+    
+    P_reco_1Pi0 = new TH1F( "P_reco_1Pi0","True N(Pi0) = 1",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    P_reco_1Pi0->GetXaxis()->SetTitle("Reconstructed Pion Momentum MeV");
+    P_reco_1Pi0->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_P.get_width()));
+    
+    P_reco_MultPi0 = new TH1F( "P_reco_MultPi0","True N(Pi0) = 2+",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    P_reco_MultPi0->GetXaxis()->SetTitle("Reconstructed Pion Momentum MeV");
+    P_reco_MultPi0->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",bin_P.get_width()));
+    
+    P_reco_mc_1Pi0 = new TH2F( "P_reco_mc_1Pi0","True N(Pi0) = 1",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(),bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    P_reco_mc_1Pi0->GetXaxis()->SetTitle("Reconstructed Pion Momentum MeV");
+    P_reco_mc_1Pi0->GetYaxis()->SetTitle("True Pion Momentum MeV");
+    
+    P_reco_mc_MultPi0 = new TH2F( "P_reco_mc_MultPi0","True N(Pi0) = 2+",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(),bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    P_reco_mc_MultPi0->GetXaxis()->SetTitle("Reconstructed Pion Momentum MeV");
+    P_reco_mc_MultPi0->GetYaxis()->SetTitle("True Pion Momentum MeV");
     cout<<"Initialization Complete! "<<endl;
 }
 

@@ -12,7 +12,7 @@ Namespace: HEP_Functions
         > HEP_Functions::calcEnergy(momentum,restMass);
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_05_13
+    Last Revision:  2014_06_18
 ================================================================================
 */
 
@@ -27,6 +27,13 @@ inline double calcEnergy(double P, double restMass)
     double energy;
     energy = sqrt(P*P + restMass*restMass);
     return energy;
+}
+
+inline double calcMomentum(double px, double py, double pz)
+{
+    double P;
+    P = sqrt(px*px + py*py + pz*pz);
+    return P;
 }
 
     

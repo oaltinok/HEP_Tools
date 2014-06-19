@@ -13,7 +13,7 @@ Class: Plotter
             
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_05_07
+    Last Revision: 2014_06_18
 ================================================================================
 */
 
@@ -27,6 +27,7 @@ Class: Plotter
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <TFile.h>
+#include <THStack.h>
 
 using namespace std;
 
@@ -43,11 +44,12 @@ class Plotter
         void plotParticleInfo(  string rootDir, string plotDir, 
                                 bool isMC, bool isReco, bool is2D);
                             
-        void plotCCProtonPi0(bool isMC, bool isReco, bool is2D);
+        void plotInteraction(bool isMC, bool isReco, bool is2D);
         void plotMuon(bool isMC, bool isReco, bool is2D);
         void plotProton(bool isMC, bool isReco, bool is2D);
         void plotPion(bool isMC, bool isReco, bool is2D);
                             
+        void plotSpecial();
         void inform(string rootDir, string plotDir);
         
         // Plottting Macros

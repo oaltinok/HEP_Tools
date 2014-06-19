@@ -10,7 +10,7 @@ Function: makeClass()
         > .L makeClass.cpp
         > makeClass()
     
-    Last Revision: 2014_04_30
+    Last Revision: 2014_06_16
 ================================================================================
 */
 
@@ -18,7 +18,7 @@ void makeClass(){
 
 //     string playlist = "Input/Playlists/pl_MC_Test_Sample.dat";
     string playlist = "Input/Playlists/pl_MC_Test_Sample.dat";
-    TChain fChain("CCDeltaPlusAna") ;
+    TChain fChain("CCProtonPi0") ;
 
     ifstream input_pl( playlist.c_str() );
     string filename;

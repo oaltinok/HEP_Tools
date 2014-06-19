@@ -17,7 +17,7 @@ main.cpp
             > main(true) for Generating Plots only
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_05_13
+    Last Revision: 2014_06_18
 ================================================================================
 */
 
@@ -26,6 +26,7 @@ main.cpp
 #include "Classes/Plotter/Plotter.h"
 
 #include <string>
+#include <ctime>
 
 const    string option1 = "run";
 const    string option2 = "plot";
@@ -36,6 +37,12 @@ using namespace std;
 
 int main(int argc, char *argv[] )
 {
+    clock_t timeStart;
+    timeStart = clock();
+    clock_t timeEnd;
+    double timeDiff;
+    int timeDiff_m;
+    int timeDiff_s;
     bool onlyPlot;
     string input;
     
@@ -63,11 +70,12 @@ int main(int argc, char *argv[] )
     
 
     // Edit isTest Variable for running Test Samples or complete playlist
-    bool isTest = true;
+    bool isTest     = false;
+    bool isComplete = true;
     
     // Plot Selection
-    bool plotsMC    = false;
-    bool plotsReco  = false;
+    bool plotsMC    = true;
+    bool plotsReco  = true;
     bool plots2D    = true;
     
     if(onlyPlot){
@@ -76,12 +84,24 @@ int main(int argc, char *argv[] )
     }else{
         CCProtonPi0 t;
         if(isTest){
-            t.run("Input/Playlists/pl_MC_Test.dat");
+//             t.run("Input/Playlists/MC_minerva1_CCProtonPi0.txt");
+            t.run("Input/Playlists/pl_MC_Test_Sample.dat");
+        }else if(isComplete){
+            t.run("Input/Playlists/MC_minerva1_CCProtonPi0.dat");
         }else{
-            t.run("Input/Playlists/pl_MC_minerva1.dat");
+            t.run("Input/Playlists/pl_MC_Test.dat");
         }
     }
     
+    
+    timeEnd = clock();
+    timeDiff = ( timeEnd - timeStart ) / (double)CLOCKS_PER_SEC;
+    
+
+    timeDiff_m = (int)timeDiff / 60;
+    timeDiff_s = (int)timeDiff % 60;
+    
+    cout<<"Time to Complete = "<<timeDiff_m<<"\' "<<timeDiff_s<<"\" or "<<timeDiff<<" seconds"<<endl;
     return 0;
 }
 
@@ -89,7 +109,7 @@ void showInputError(char *argv[])
 {
     cout<<"Not a valid option!"<<endl;
     cout<<"Run: "<<argv[0]<<" "<<option1<<endl;
-    cout<<"Plot: "<<argv[0]<<" "<<option1<<endl;
+    cout<<"Plot: "<<argv[0]<<" "<<option2<<endl;
 }
 
 
