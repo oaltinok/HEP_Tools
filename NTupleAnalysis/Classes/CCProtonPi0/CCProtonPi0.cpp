@@ -12,11 +12,15 @@ using namespace std;
 void CCProtonPi0::specifyRunTime()
 {
     // Control Flow
-    isDataAnalysis = true;
-    isMC = true;
+    isMC            = true;
+    isDataAnalysis  = true;
+    is_pID_Studies  = true;
+    
     applyProtonScore = true;
-    minProtonScore = 0.0;
-    is_pID_Studies = false;
+    minProtonScore = 0.3;
+    
+    applyPhotonDistance = true;
+    minPhotonDistance = 150; //mm
 
     //Select Branches to Activate
     m_ActivateMC            = true;
@@ -64,8 +68,7 @@ void CCProtonPi0::run(string playlist)
         fChain->SetBranchStatus("CCProtonPi0_traj*",1);
     }
     
-    fChain->SetBranchStatus("mgg",1);
-    
+
     if(m_ActivateInteraction){
         fChain->SetBranchStatus("CCProtonPi0_vtx*",1);
     }
@@ -79,7 +82,9 @@ void CCProtonPi0::run(string playlist)
     }
     
     if(m_ActivatePi0){
+        fChain->SetBranchStatus("mgg",1);
         fChain->SetBranchStatus("pi0_*",1);
+        fChain->SetBranchStatus("RE_photon_vertex_*",1);
     }
    
 
@@ -100,6 +105,7 @@ void CCProtonPi0::run(string playlist)
     double nCut_PreFilter_Pi0 = 0;
     double nCut_Reco_Muon_NoProblem = 0;
     double nCut_Reco_Pi0_NoProblem = 0;
+    double nCut_PhotonDistanceLow = 0;
     
     double nSignal = 0;
     double nSignal_Vertex_None = 0;
@@ -116,6 +122,10 @@ void CCProtonPi0::run(string playlist)
     double nSignal_PreFilter_Pi0 = 0;
     double nSignal_Reco_Muon_NoProblem = 0;
     double nSignal_Reco_Pi0_NoProblem = 0;
+    double nSignal_PhotonDistanceLow= 0;
+    
+    int indRecoProton;
+    int indTruePion;
     
     // Fail Checks
         double nAntiMuon = 0;
@@ -129,10 +139,8 @@ void CCProtonPi0::run(string playlist)
         double n0Pi0_Test = 0;
         double n1Pi0_Test = 0;
         double nMultPi0_Test = 0;
+        
     
-
-    
-    int indRecoProton;
 
     //------------------------------------------------------------------------
     // Loop over Chain
@@ -232,8 +240,11 @@ void CCProtonPi0::run(string playlist)
         nCut_Reco_Pi0_NoProblem++;
         if(truth_isSignal) nSignal_Reco_Pi0_NoProblem++;
         
+        if( applyPhotonDistance && isPhotonDistanceLow()) continue;
+        nCut_PhotonDistanceLow++;
+        if(truth_isSignal) nSignal_PhotonDistanceLow++;
         
-
+        
         //----------------------------------------------------------------------
         // Fail Checks
         //----------------------------------------------------------------------
@@ -254,22 +265,18 @@ void CCProtonPi0::run(string playlist)
         if(nPi0Count == 1) n1Pi0_Test++;
         if(nPi0Count > 1) nMultPi0_Test++;
         
-      
         //----------------------------------------------------------------------
         // pID Studies
         //----------------------------------------------------------------------
         if( is_pID_Studies){
-            for(int i = 0; i < 10; i++){
-                if(CCProtonPi0_proton_score[i] == -1) break;
-                if(CCProtonPi0_trajProtonProngPDG[i] == 2212){
-                    pID_proton->Fill(CCProtonPi0_proton_score[i]);
-                }else if(CCProtonPi0_trajProtonProngPDG[i] == 211){
-                    pID_piplus->Fill(CCProtonPi0_proton_score[i]);
-                }else if(CCProtonPi0_trajProtonProngPDG[i] == -211){
-                    pID_piminus->Fill(CCProtonPi0_proton_score[i]);
-                }else{
-                    pID_other->Fill(CCProtonPi0_proton_score[i]);
-                }
+            if(CCProtonPi0_trajProtonProngPDG[indRecoProton] == 2212){
+                pID_proton->Fill(CCProtonPi0_proton_score[indRecoProton]);
+            }else if(CCProtonPi0_trajProtonProngPDG[indRecoProton] == 211){
+                pID_piplus->Fill(CCProtonPi0_proton_score[indRecoProton]);
+            }else if(CCProtonPi0_trajProtonProngPDG[indRecoProton] == -211){
+                pID_piminus->Fill(CCProtonPi0_proton_score[indRecoProton]);
+            }else{
+                pID_other->Fill(CCProtonPi0_proton_score[indRecoProton]);
             }
         }
         
@@ -279,14 +286,14 @@ void CCProtonPi0::run(string playlist)
             // Fill Particles
             //------------------------------------------------------------------
             if( isMC ){
-                fillInteractionTrue();
+                fillInteractionTrue(indRecoProton);
                 fillMuonTrue();
-                fillProtonTrue();
+                fillProtonTrue(indRecoProton);
                 fillPionTrue();
             }
             
             // Fill Reconstructed Information
-//             fillInteractionReco();
+            fillInteractionReco(indRecoProton);
             fillMuonReco();
             fillProtonReco(indRecoProton);
             fillPionReco();
@@ -303,7 +310,7 @@ void CCProtonPi0::run(string playlist)
 
     } // end for-loop
     
-    if(is_pID_Studies) get_pID_Stats();
+    
     
     failText<<"N(Muon Charge Diff) = "<<nMuonChargeDiff<<endl;
     failText<<"N(AntiMuon) = "<<nAntiMuon<<endl;
@@ -328,6 +335,7 @@ void CCProtonPi0::run(string playlist)
     cutText<<"Cut_PreFilter_Pi0             "<<nCut_PreFilter_Pi0<<endl;
     cutText<<"Cut_Reco_Muon_NoProblem       "<<nCut_Reco_Muon_NoProblem<<endl;
     cutText<<"Cut_Reco_Pi0_NoProblem       "<<nCut_Reco_Pi0_NoProblem<<endl;
+    cutText<<"Cut_PhotonDistanceLow      "<<nCut_PhotonDistanceLow<<endl;
     cutText<<endl;
     cutText<<"nSignal                          "<<nSignal<<endl;
     cutText<<"Signal_Vertex_None               "<<nSignal_Vertex_None<<endl;
@@ -344,7 +352,7 @@ void CCProtonPi0::run(string playlist)
     cutText<<"Signal_PreFilter_Pi0             "<<nSignal_PreFilter_Pi0<<endl;
     cutText<<"Signal_Reco_Muon_NoProblem       "<<nSignal_Reco_Muon_NoProblem<<endl;
     cutText<<"Signal_Reco_Pi0_NoProblem       "<<nSignal_Reco_Pi0_NoProblem<<endl;
-    
+    cutText<<"Signal_PhotonDistanceLow      "<<nSignal_PhotonDistanceLow<<endl;
     
     // Write the Root Files
     write_RootFile();           //CCProtonPi0
@@ -355,7 +363,7 @@ void CCProtonPi0::run(string playlist)
     
     closeFiles();
     
-    
+    if(is_pID_Studies) get_pID_Stats();
 }
 
 //<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
@@ -366,35 +374,113 @@ void CCProtonPi0::run(string playlist)
 
 void CCProtonPi0::get_pID_Stats()
 {
-    cout<<"Calculating pID Statististics"<<endl;
+    cout<<"=== Calculationg pID Statistics ==="<<endl;
+    
+    string rootDir = "Output/RootFiles/Interaction.root";
+    TFile* f_Root = new TFile(rootDir.c_str());
+    
+    TH1F* pID_proton  = (TH1F*)f_Root->Get("pID_proton");
+    TH1F* pID_piplus  = (TH1F*)f_Root->Get("pID_piplus");
+    TH1F* pID_piminus = (TH1F*)f_Root->Get("pID_piminus");
+    TH1F* pID_other   = (TH1F*)f_Root->Get("pID_other");
+    
     double nProton = 0;
     double nTotalProton = 0;
     double nCapturedEvents = 0;
+    double nEvents = 0;
     double purity;
     double efficiency;
+    int nBins = 20;
+    
+
     //Get Total Proton
-    for(int i = 39; i >= 0; i--){
+    for(int i = nBins; i >= 1; i--){
         nTotalProton = nTotalProton + pID_proton->GetBinContent(i);
     }
     cout<<"nTotalProton = "<<nTotalProton<<endl;
     
-    for(int i = 39; i >= 0; i--){
+    
+    for(int i = nBins; i >= 1; i--){
         nProton = nProton + pID_proton->GetBinContent(i);
-        nCapturedEvents =   nCapturedEvents +
+        nCapturedEvents =   nCapturedEvents+
                             pID_proton->GetBinContent(i) +
+                            pID_piplus->GetBinContent(i) +
+                            pID_piminus->GetBinContent(i) +
+                            pID_other->GetBinContent(i);
+        nEvents =           pID_proton->GetBinContent(i) +
                             pID_piplus->GetBinContent(i) +
                             pID_piminus->GetBinContent(i) +
                             pID_other->GetBinContent(i);
                             
         purity = nProton / nCapturedEvents;
         efficiency = nProton / nTotalProton;
-        cout<<"pID = "<<0.025*i<<" Purity = "<<purity<<" Efficiency "<<efficiency<<endl;
+//         cout<<"pID = "<<pID_proton->GetBinLowEdge(i)<<" Purity = "<<purity<<" Efficiency = "<<efficiency<<endl;
+        cout<<pID_proton->GetBinLowEdge(i)<<" "<<purity<<" "<<efficiency<<endl;
+    }
+    
+}
+
+bool CCProtonPi0::isPhotonDistanceLow()
+{
+    double dist_photon1;
+    double dist_photon2;
+    
+    dist_photon1 = HEP_Functions::calcDistance( RE_photon_vertex_1[0],
+                                                RE_photon_vertex_1[1], 
+                                                RE_photon_vertex_1[2],
+                                                CCProtonPi0_vtx[0],
+                                                CCProtonPi0_vtx[1],
+                                                CCProtonPi0_vtx[2] );
+                                                
+    dist_photon2 = HEP_Functions::calcDistance( RE_photon_vertex_2[0],
+                                                RE_photon_vertex_2[1], 
+                                                RE_photon_vertex_2[2],
+                                                CCProtonPi0_vtx[0],
+                                                CCProtonPi0_vtx[1],
+                                                CCProtonPi0_vtx[2] );
+                                                
+    if (dist_photon1 < minPhotonDistance && dist_photon2 < minPhotonDistance){
+        return true;
+    }else{
+        return false;
     }
 }
 
-void CCProtonPi0::fillInteractionTrue()
+void CCProtonPi0::fillInteractionTrue(int indProton)
 {
+    int indPion;
+    double invMass_true;
+    double invMass_reco;
+    
+    int_channel->Fill(mc_intType);
+    
+    if( truth_N_pi0 == 1 && CCProtonPi0_trajProtonProngPDG[indProton] == 2212){
+        indPion = getBestPi0();
+        invMass_true = calcDeltaInvariantMass(  mc_FSPartPx[indPion], 
+                                                mc_FSPartPy[indPion], 
+                                                mc_FSPartPz[indPion],
+                                                mc_FSPartE[indPion],
+                                                CCProtonPi0_trajProtonProngPx[indProton],
+                                                CCProtonPi0_trajProtonProngPy[indProton],
+                                                CCProtonPi0_trajProtonProngPz[indProton],
+                                                CCProtonPi0_trajProtonProngEnergy[indProton]);
+        
+        invMass_reco = calcDeltaInvariantMass(  pi0_px, 
+                                                pi0_py, 
+                                                pi0_pz,
+                                                pi0_E,
+                                                CCProtonPi0_proton_px[indProton],
+                                                CCProtonPi0_proton_py[indProton],
+                                                CCProtonPi0_proton_pz[indProton],
+                                                CCProtonPi0_proton_E[indProton]);
+        
+        deltaInvMass_mc->Fill(invMass_true);
+        deltaInvMass_reco_mc->Fill(invMass_reco,invMass_true);
+        deltaInvMass_error->Fill(Data_Functions::getError(invMass_true,invMass_reco));
+    }
+    
     beamEnergy_mc->Fill(mc_incomingE);
+    
 //     beamEnergy_reco->Fill(Erec);
 //     beamEnergy_error->Fill( Data_Functions::getError(mc_incomingE,Erec) );
 //     beamEnergy_reco_mc->Fill(Erec,mc_incomingE);
@@ -405,24 +491,87 @@ void CCProtonPi0::fillInteractionTrue()
 //     q2_reco_mc->Fill(Q2/mevSq_to_gevSq,mc_Q2 /mevSq_to_gevSq);
 
     vertex_z_true->Fill(mc_vtx[2]);
-    vertex_z_reco->Fill(CCProtonPi0_vtx[2]);
     vertex_z_error->Fill( Data_Functions::getError(mc_vtx[2],CCProtonPi0_vtx[2]) );
     vertex_z_reco_mc->Fill(CCProtonPi0_vtx[2],mc_vtx[2]);
     
     vertex_x_y_true->Fill(mc_vtx[0],mc_vtx[1]);
-    vertex_x_y_reco->Fill(CCProtonPi0_vtx[0],CCProtonPi0_vtx[1]);
     
-    int_channel->Fill(mc_intType);
-    
-    mgg_reco->Fill(mgg);
 
 }
 
-void CCProtonPi0::fillInteractionReco()
+void CCProtonPi0::fillInteractionReco(int indProton)
 {
-// Reserved for Future Version
+    double invMass_reco;
+    
+    invMass_reco = calcDeltaInvariantMass(  pi0_px, 
+                                            pi0_py, 
+                                            pi0_pz,
+                                            pi0_E,
+                                            CCProtonPi0_proton_px[indProton],
+                                            CCProtonPi0_proton_py[indProton],
+                                            CCProtonPi0_proton_pz[indProton],
+                                            CCProtonPi0_proton_E[indProton]);
+                                                
+    deltaInvMass_reco->Fill(invMass_reco);
+    mgg_reco->Fill(mgg);
+    
+    vertex_x_y_reco->Fill(CCProtonPi0_vtx[0],CCProtonPi0_vtx[1]);
+    vertex_z_reco->Fill(CCProtonPi0_vtx[2]);
 }
 
+// double CCProtonPi0::calcDeltaInvariantMass(int isMC, int indProton)
+// {
+//     double invMassSq;
+//     double pionMom;
+//     double E_pi0, px_pi0, py_pi0, pz_pi0;
+//     double E_p, px_p, py_p, pz_p;
+//     int indPion;
+//     
+//     indPion = getBestPi0();
+//     
+//     if(isMC){
+//         E_pi0   = mc_FSPartE[indPion];
+//         px_pi0  = mc_FSPartPx[indPion];
+//         py_pi0  = mc_FSPartPy[indPion];
+//         pz_pi0  = mc_FSPartPz[indPion];
+//         
+//         E_p     = CCProtonPi0_trajProtonProngEnergy[indProton];
+//         px_p    = CCProtonPi0_trajProtonProngPx[indProton];
+//         py_p    = CCProtonPi0_trajProtonProngPy[indProton];
+//         pz_p    = CCProtonPi0_trajProtonProngPz[indProton];
+//     }else{
+//         E_pi0   = pi0_E;
+//         px_pi0  = pi0_px;
+//         py_pi0  = pi0_py;
+//         pz_pi0  = pi0_pz;
+//         
+//         E_p     = CCProtonPi0_proton_E[indProton];
+//         px_p    = CCProtonPi0_proton_px[indProton];
+//         py_p    = CCProtonPi0_proton_py[indProton];
+//         pz_p    = CCProtonPi0_proton_pz[indProton];
+//     }
+//     
+//     invMassSq = (E_pi0 + E_p) * (E_pi0 + E_p) -
+//                 ((px_pi0 + px_p)*(px_pi0 + px_p) + 
+//                  (py_pi0 + py_p)*(py_pi0 + py_p) +
+//                  (pz_pi0 + pz_p)*(pz_pi0 + pz_p));
+//         
+//     return sqrt(invMassSq);
+// }
+
+
+double CCProtonPi0::calcDeltaInvariantMass(double px1, double py1, double pz1, double E1,
+                                           double px2, double py2, double pz2, double E2)
+{
+    double invMassSq;
+    
+    invMassSq = (E1 + E2) * (E1 + E2) -
+                ((px1 + px2)*(px1 + px2) + 
+                 (py1 + py2)*(py1 + py2) +
+                 (pz1 + pz2)*(pz1 + pz2));
+        
+    return sqrt(invMassSq);
+}
 
 void CCProtonPi0::initVariables()
 {
@@ -450,7 +599,6 @@ void CCProtonPi0::initVariables()
     beam_p3.SetTheta(0.059);
     
     max_nFSPart = 15;
-    maxBeamEnergy = 20000; //MeV
     
     cout<<"Done!"<<endl;
 }
@@ -523,21 +671,6 @@ void CCProtonPi0::writeReadme()
     readme<<"Test"<<endl;
 }
 
-/*
---------------------------------------------------------------------------------
- Beam Energy Cu: isBeamEnergyLow(double maxEnergy)
-    Incoming Beam Energy must be lower than a maximum Energy
---------------------------------------------------------------------------------
-*/
-bool CCProtonPi0::isBeamEnergyLow(double maxEnergy)
-{
-    if(mc_incomingE > maxEnergy){
-        return false;
-    }else{
-        return true;
-    }
-
-}
 
 /*
 --------------------------------------------------------------------------------
@@ -606,10 +739,8 @@ int CCProtonPi0::countParticles(int targetPDG, bool applyPCut)
 
 }
 
-void CCProtonPi0::fillProtonTrue()
-{
-    int ind = proton.ind;
-    
+void CCProtonPi0::fillProtonTrue(int ind)
+{    
     // Fill 4-Momentum
     proton.set_p4(  CCProtonPi0_trajProtonProngPx[ind],
                     CCProtonPi0_trajProtonProngPy[ind],
@@ -732,14 +863,32 @@ double CCProtonPi0::getBestPi0Momentum()
     return tempP;
 }
 
+int CCProtonPi0::getBestPi0()
+{
+    TVector3 p3;
+    double tempP = 0;
+    double ind = -1;
+    
+    for(int i = 0; i < mc_nFSPart && i < max_nFSPart; i++ ){
+        if( mc_FSPartPDG[i] == 111){
+            p3.SetXYZ(mc_FSPartPx[i],mc_FSPartPy[i],mc_FSPartPz[i]);
+            if(p3.Mag() > tempP){
+                tempP = p3.Mag();
+                ind = i;
+            }
+        }
+    }
+    return ind;
+}
+
 
 void CCProtonPi0::fillMuonTrue()
 {
 
     // Fill 4-Momentum
-    muon.set_p4(    CCProtonPi0_trajMuonProngPx,
-                    CCProtonPi0_trajMuonProngPy,
-                    CCProtonPi0_trajMuonProngPz,
+    muon.set_p4(    CCProtonPi0_trajMuonProngPx * HEP_Functions::MeV_to_GeV,
+                    CCProtonPi0_trajMuonProngPy * HEP_Functions::MeV_to_GeV,
+                    CCProtonPi0_trajMuonProngPz * HEP_Functions::MeV_to_GeV,
                     -1.0, 
                     true);
        
@@ -757,10 +906,10 @@ void CCProtonPi0::fillMuonReco()
     muon.particleScore = CCProtonPi0_muon_muScore;
     
     // Fill 4-Momentum
-    muon.set_p4(    CCProtonPi0_muon_px,
-                    CCProtonPi0_muon_py,
-                    CCProtonPi0_muon_pz,
-                    CCProtonPi0_muon_E,
+    muon.set_p4(    CCProtonPi0_muon_px * HEP_Functions::MeV_to_GeV,
+                    CCProtonPi0_muon_py * HEP_Functions::MeV_to_GeV,
+                    CCProtonPi0_muon_pz * HEP_Functions::MeV_to_GeV,
+                    CCProtonPi0_muon_E * HEP_Functions::MeV_to_GeV,
                     false);
     
     // set Angle wrt Beam
@@ -1549,67 +1698,67 @@ void CCProtonPi0::initHistograms()
     
     pID_purity = new TH1F( "pID_purity","Proton Purity",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_purity->GetXaxis()->SetTitle("Proton Purity = Captured Proton / Captured Total Events");
-    pID_purity->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.particleScore.get_width()));
+    pID_purity->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
     pID_efficiency = new TH1F( "pID_efficiency","Proton Efficiency",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_efficiency->GetXaxis()->SetTitle("Proton Efficiency = Captured Proton / Total Protons");
-    pID_efficiency->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.particleScore.get_width()));
+    pID_efficiency->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
     pID_piplus = new TH1F( "pID_piplus","Pi Plus",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_piplus->GetXaxis()->SetTitle("Pi Plus");
-    pID_piplus->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.particleScore.get_width()));
+    pID_piplus->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
     pID_piminus = new TH1F( "pID_piminus","Pi Minus",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_piminus->GetXaxis()->SetTitle("Pi Minus");
-    pID_piminus->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.particleScore.get_width()));
+    pID_piminus->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
     pID_proton = new TH1F( "pID_proton","Proton",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_proton->GetXaxis()->SetTitle("Proton");
-    pID_proton->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.particleScore.get_width()));
+    pID_proton->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
     pID_other = new TH1F( "pID_other","Other",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_other->GetXaxis()->SetTitle("Other");
-    pID_other->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.particleScore.get_width()));
+    pID_other->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
     beamEnergy_mc = new TH1F( "beamEnergy_mc","True Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    beamEnergy_mc->GetXaxis()->SetTitle("True Beam Energy MeV");
-    beamEnergy_mc->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.beamE.get_width()));
+    beamEnergy_mc->GetXaxis()->SetTitle("True Beam Energy [MeV]");
+    beamEnergy_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
     
     beamEnergy_reco = new TH1F( "beamEnergy_reco","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    beamEnergy_reco->GetXaxis()->SetTitle("Reconstructed Beam Energy MeV");
-    beamEnergy_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.beamE.get_width()));
+    beamEnergy_reco->GetXaxis()->SetTitle("Reconstructed Beam Energy [MeV]");
+    beamEnergy_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
     
     beamEnergy_error = new TH1F( "beamEnergy_error","Error on Beam Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     beamEnergy_error->GetXaxis()->SetTitle("(Reco- True) / True");
-    beamEnergy_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.error.get_width()));
+    beamEnergy_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
     
     beamEnergy_reco_mc = new TH2F( "beamEnergy_reco_mc","True vs Reconstructed Beam Energy",
                                 binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),
                                 binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
-    beamEnergy_reco_mc->GetXaxis()->SetTitle("Reconstructed Beam Energy MeV");
-    beamEnergy_reco_mc->GetYaxis()->SetTitle("True Beam Energy MeV");
+    beamEnergy_reco_mc->GetXaxis()->SetTitle("Reconstructed Beam Energy [MeV]");
+    beamEnergy_reco_mc->GetYaxis()->SetTitle("True Beam Energy [MeV]");
     
     q2_mc = new TH1F( "q2_mc","True Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
-    q2_mc->GetXaxis()->SetTitle("True Q^{2} MeV");
-    q2_mc->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.q2.get_width()));
+    q2_mc->GetXaxis()->SetTitle("True Q^{2} [MeV]");
+    q2_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.q2.get_width()));
     
     q2_reco = new TH1F( "q2_reco","Reconstructed Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
-    q2_reco->GetXaxis()->SetTitle("Reconstructed Q^{2} MeV");
-    q2_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.q2.get_width()));
+    q2_reco->GetXaxis()->SetTitle("Reconstructed Q^{2} [MeV]");
+    q2_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.q2.get_width()));
     
     q2_error = new TH1F( "q2_error","Error on Q^{2}",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     q2_error->GetXaxis()->SetTitle("(Reco- True) / True");
-    q2_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.error.get_width()));
+    q2_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
     
     q2_reco_mc = new TH2F( "q2_reco_mc","True vs Reconstructed Q^{2}",
                                 binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max(),
                                 binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max());
-    q2_reco_mc->GetXaxis()->SetTitle("Reconstructed Q^{2} MeV");
-    q2_reco_mc->GetYaxis()->SetTitle("True Q^{2} MeV");
+    q2_reco_mc->GetXaxis()->SetTitle("Reconstructed Q^{2} [MeV]");
+    q2_reco_mc->GetYaxis()->SetTitle("True Q^{2} [MeV]");
     
     int_channel = new TH1F( "int_channel","Interaction Channel",binList.int_channel.get_nBins(), binList.int_channel.get_min(), binList.int_channel.get_max() );
     int_channel->GetXaxis()->SetTitle("1 = QE, 2 = Resonant, 3 = DIS, 4 = Coh pi");
-    int_channel->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.int_channel.get_width()));
+    int_channel->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.int_channel.get_width()));
     
     vertex_x_y_true = new TH2F( "vertex_x_y_true","True Vertex X vs Y",   binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max(),
                                                                 binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max());
@@ -1623,25 +1772,45 @@ void CCProtonPi0::initHistograms()
     
     vertex_z_true = new TH1F( "vertex_z_true","True Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
     vertex_z_true->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
-    vertex_z_true->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.vertex_z.get_width()));
+    vertex_z_true->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.vertex_z.get_width()));
     
     vertex_z_reco = new TH1F( "vertex_z_reco","Reconstructed Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
     vertex_z_reco->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
-    vertex_z_reco->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.vertex_z.get_width()));
+    vertex_z_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.vertex_z.get_width()));
     
     vertex_z_error = new TH1F( "vertex_z_error","Error on Vertex Z",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     vertex_z_error->GetXaxis()->SetTitle("(Reco- True) / True");
-    vertex_z_error->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.error.get_width()));
-    
-    mgg_reco = new TH1F( "mgg_reco","Reconstructed Invariant Mass",binList.mgg_reco.get_nBins(), binList.mgg_reco.get_min(), binList.mgg_reco.get_max() );
-    mgg_reco ->GetXaxis()->SetTitle("Reconstructed Invariant Mass");
-    mgg_reco ->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",binList.mgg_reco.get_width()));
+    vertex_z_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
     
     vertex_z_reco_mc = new TH2F( "vertex_z_reco_mc","True vs Reconstructed Vertex Z",
                                 binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max(),
                                 binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max());
-    vertex_z_reco_mc->GetXaxis()->SetTitle("Reconstructed Vertex Z");
-    vertex_z_reco_mc->GetYaxis()->SetTitle("True Vertex Z");
+    vertex_z_reco_mc->GetXaxis()->SetTitle("Reconstructed Vertex Z [mm]");
+    vertex_z_reco_mc->GetYaxis()->SetTitle("True Vertex Z [mm]");
+    
+    mgg_reco = new TH1F( "mgg_reco","Reconstructed Invariant Mass",binList.mgg_reco.get_nBins(), binList.mgg_reco.get_min(), binList.mgg_reco.get_max() );
+    mgg_reco->GetXaxis()->SetTitle("Reconstructed Invariant Mass [MeV]");
+    mgg_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.mgg_reco.get_width()));
+    
+    deltaInvMass_reco = new TH1F( "deltaInvMass_reco","Reconstructed Delta+ Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
+    deltaInvMass_reco->GetXaxis()->SetTitle("Reconstructed Delta+ Invariant Mass [MeV]");
+    deltaInvMass_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV] ",binList.deltaInvMass.get_width()));
+    
+    deltaInvMass_mc= new TH1F( "deltaInvMass_mc","True Delta+ Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
+    deltaInvMass_mc->GetXaxis()->SetTitle("True Delta+ Invariant Mass [MeV]");
+    deltaInvMass_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV] ",binList.deltaInvMass.get_width()));
+    
+    deltaInvMass_error = new TH1F( "deltaInvMass_error","Delta+ Invariant Mass Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    deltaInvMass_error->GetXaxis()->SetTitle("(Reco- True) / True");
+    deltaInvMass_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
+    
+    deltaInvMass_reco_mc = new TH2F( "deltaInvMass_reco_mc","True vs Reconstructed Delta+ Invariant Mass",
+        binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max(),
+        binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
+    deltaInvMass_reco_mc->GetXaxis()->SetTitle("Reconstructed Delta+ Invariant Mass [MeV]");
+    deltaInvMass_reco_mc->GetYaxis()->SetTitle("True Delta+ Invariant Mass [MeV]");
+    
+
     
 }
 

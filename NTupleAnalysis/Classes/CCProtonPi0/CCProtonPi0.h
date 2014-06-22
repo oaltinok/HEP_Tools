@@ -19,7 +19,7 @@ Class: CCProtonPi0
     
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_06_18
+    Last Revision:  2014_06_21
 ================================================================================
 */
 
@@ -77,7 +77,6 @@ public :
     void fillHistograms();
     void write_RootFile();
     void writeReadme();
-    bool isBeamEnergyLow(double maxEnergy);
     int findTrueParticle(int targetPDG);
     int countParticles(int targetPDG, bool applyPCut);
     void get_pID_Stats();
@@ -85,8 +84,10 @@ public :
     //--------------------------------------------------------------------------
     //  Interaction Specific Functions
     //--------------------------------------------------------------------------
-    void fillInteractionTrue();
-    void fillInteractionReco();
+    void fillInteractionTrue(int indProton);
+    void fillInteractionReco(int indProton);
+    double calcDeltaInvariantMass(  double px1, double py1, double pz1, double E1,
+                                    double px2, double py2, double pz2, double E2);
     
     //--------------------------------------------------------------------------
     //  Muon Specific Functions
@@ -96,7 +97,7 @@ public :
     //--------------------------------------------------------------------------
     //  Proton Specific Functions
     //--------------------------------------------------------------------------
-    void fillProtonTrue();
+    void fillProtonTrue(int ind);
     void fillProtonReco(int ind);
     int findBestProton();
     bool isProtonShort(int ind);
@@ -106,6 +107,8 @@ public :
     void fillPionTrue();
     void fillPionReco();
     double getBestPi0Momentum();
+    int getBestPi0();
+    bool isPhotonDistanceLow();
     
     //--------------------------------------------------------------------------
     //     Default Functions
@@ -128,6 +131,11 @@ public :
     TH1F* beamEnergy_reco;
     TH1F* beamEnergy_error;
     TH2F* beamEnergy_reco_mc;
+    
+    TH1F* deltaInvMass_mc;
+    TH1F* deltaInvMass_reco;
+    TH1F* deltaInvMass_error;
+    TH2F* deltaInvMass_reco_mc;
     
     TH1F* mgg_reco;
     
@@ -157,11 +165,13 @@ public :
    //--------------------------------------------------------------------------
     bool isDataAnalysis;
     bool isMC;
-    bool applyProtonScore;
     bool is_pID_Studies;
-    double maxBeamEnergy;
+    bool applyProtonScore;
+    bool applyPhotonDistance;
+    
     int max_nFSPart;
     double minProtonScore;
+    double minPhotonDistance;
     TVector3 beam_p3;
     Proton proton;
     Muon muon;

@@ -22,8 +22,54 @@ void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
     
     plotSpecial();
     
+    plotPID();
+    
 }
 
+void Plotter::plotPID()
+{
+    string rootDir = "Output/RootFiles/Interaction.root";
+    string plotDir = "Output/Plots/Interaction/";
+    cout<<"Plottting pID for Proton"<<endl;
+    inform(rootDir, plotDir);
+    
+    TFile* f_Root = new TFile(rootDir.c_str());
+    
+    THStack *hs = new THStack("hs","Proton Score");
+    
+    TH1F* h_pID_other = (TH1F*)f_Root->Get("pID_other");
+    h_pID_other->SetFillColor(kRed);
+    h_pID_other->SetMarkerStyle(21);
+    h_pID_other->SetMarkerColor(kRed);
+    
+    TH1F* h_pID_piminus = (TH1F*)f_Root->Get("pID_piminus");
+    h_pID_piminus->SetFillColor(kYellow);
+    h_pID_piminus->SetMarkerStyle(21);
+    h_pID_piminus->SetMarkerColor(kYellow);
+    
+    TH1F* h_pID_piplus = (TH1F*)f_Root->Get("pID_piplus");
+    h_pID_piplus->SetFillColor(kBlue);
+    h_pID_piplus->SetMarkerStyle(21);
+    h_pID_piplus->SetMarkerColor(kBlue);
+    
+    TH1F* h_pID_proton = (TH1F*)f_Root->Get("pID_proton");
+    h_pID_proton->SetFillColor(kGreen);
+    h_pID_proton->SetMarkerStyle(21);
+    h_pID_proton->SetMarkerColor(kGreen);
+    
+    TCanvas* c1 = new TCanvas();
+
+    hs->Add(h_pID_other);
+    hs->Add(h_pID_piminus);
+    hs->Add(h_pID_piplus);
+    hs->Add(h_pID_proton);
+    hs->Draw();
+    hs->GetXaxis()->SetTitle("Proton Score");
+    hs->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",0.05));
+    
+    c1->Print(Form("%s%s",plotDir.c_str(),"stacked_pID.png"),"png");
+
+}
 
 void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
 {
@@ -36,6 +82,10 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
     
     // Plot Only MC Values
     if( isMC ){
+    
+        TH1F* h_deltaInvMass_mc = (TH1F*)f_Root->Get("deltaInvMass_mc");
+        plot1D_Hist(h_deltaInvMass_mc ,"deltaInvMass_mc.png",plotDir);
+        
         TH1F* h_beamEnergy_mc= (TH1F*)f_Root->Get("beamEnergy_mc");
         plot1D_Hist(h_beamEnergy_mc,"beamEnergy_mc.png",plotDir);
         
@@ -55,6 +105,9 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
     
     // Plot Only Reco Values
     if( isReco ){
+        TH1F* h_deltaInvMass_reco = (TH1F*)f_Root->Get("deltaInvMass_reco");
+        plot1D_Hist(h_deltaInvMass_reco,"deltaInvMass_reco.png",plotDir);
+        
         TH1F* h_mgg_reco = (TH1F*)f_Root->Get("mgg_reco");
         plot1D_Hist(h_mgg_reco,"mgg_reco.png",plotDir);
         
@@ -74,6 +127,13 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
 
     //  Plot 2D Comparison Plots and Error Plots
     if ( is2D ){
+        TH2F* h_deltaInvMass_reco_mc = (TH2F*)f_Root->Get("deltaInvMass_reco_mc");
+        plot2D_Hist(h_deltaInvMass_reco_mc,"deltaInvMass_reco_mc.png",plotDir);
+        
+        TH1F* h_deltaInvMass_error = (TH1F*)f_Root->Get("deltaInvMass_error");
+        plot1D_Hist(h_deltaInvMass_error,"deltaInvMass_error.png",plotDir);
+        
+        
 //         TH2F* h_beamEnergy_reco_mc= (TH2F*)f_Root->Get("beamEnergy_reco_mc");
 //         plot2D_Hist(h_beamEnergy_reco_mc,"beamEnergy_reco_mc.png",plotDir);
 // 
@@ -194,7 +254,6 @@ void Plotter::plotPion(bool isMC, bool isReco, bool is2D)
 
 void Plotter::plotSpecial()
 {
-
     string rootDir = "Output/RootFiles/Pion.root";
     string plotDir = "Output/Plots/Pion/";
     
@@ -228,14 +287,20 @@ void Plotter::plotSpecial()
     hs->GetXaxis()->SetTitle("Pi0 Momentum");
     hs->GetYaxis()->SetTitle(Form("Candidates / %3.1f ",100.0));
     
+    c1->Print(Form("%s%s",plotDir.c_str(),"stacked_Pi0_Momentum.png"),"png");
+    
+    // Plot Other Special Plots
     TH2F* h_P_reco_mc_1Pi0= (TH2F*)f_Root->Get("P_reco_mc_1Pi0");
     plot2D_Hist(h_P_reco_mc_1Pi0,"P_reco_mc_1Pi0.png",plotDir);
     
+    TH1F* h_P_error_1Pi0= (TH1F*)f_Root->Get("P_error_1Pi0");
+    plot1D_Hist(h_P_error_1Pi0,"P_error_1Pi0.png",plotDir);
+    
     TH2F* h_P_reco_mc_MultPi0= (TH2F*)f_Root->Get("P_reco_mc_MultPi0");
     plot2D_Hist(h_P_reco_mc_MultPi0,"P_reco_mc_MultPi0.png",plotDir);
-    
-    
-    c1->Print(Form("%s%s",plotDir.c_str(),"stacked_Pi0_Momentum.png"),"png");
+
+    TH1F* h_P_error_MultPi0= (TH1F*)f_Root->Get("P_error_MultPi0");
+    plot1D_Hist(h_P_error_MultPi0,"P_error_MultPi0.png",plotDir);
 }
 
 void Plotter::inform(string rootDir, string plotDir)
@@ -253,7 +318,13 @@ void Plotter::plot1D_Hist(TH1F* hist1D, string fileName, string plotDir)
     hist1D->SetLineWidth(3);
     hist1D->SetFillColor(kRed);
     hist1D->SetFillStyle(3010);
+    
     hist1D->Draw();
+    gPad->Update();
+    
+    // Statistics Box
+//     TPaveStats *st = (TPaveStats*)hist1D->FindObject("stats");
+    
     c1->Print(Form("%s%s",plotDir.c_str(),fileName.c_str()),"png");
     delete c1;
     
@@ -268,11 +339,21 @@ void Plotter::plot2D_Hist(TH2F* hist2D, string fileName, string plotDir)
     c1->SetWindowSize(w,h);
     
     // Pad
-    TPad *p = new TPad("p","p",0.02,0.02,0.98,0.98);
+    TPad *p = new TPad("p","p",0.05,0.05,0.95,0.95);
     p->Draw();
     
     p->cd();
+    hist2D->GetYaxis()->SetTitleOffset(1.8);
     hist2D->Draw("colz");
+    gPad->Update();
+    
+    // Statistics Box
+    TPaveStats *st = (TPaveStats*)hist2D->FindObject("stats");
+    st->SetOptStat(1000000110);
+    st->SetX1NDC(0.1); 
+    st->SetX2NDC(0.3); 
+    st->SetY1NDC(0.8); 
+    st->SetY2NDC(0.9); 
    
     c1->Print(Form("%s%s",plotDir.c_str(),fileName.c_str()),"png");
     

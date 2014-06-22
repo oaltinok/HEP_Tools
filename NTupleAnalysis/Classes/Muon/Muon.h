@@ -5,7 +5,7 @@ Class: Muon -> Derived Class from Particle Base Clas
                 extends base class with muon specific parameters
                 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_05_10
+    Last Revision: 2014_06_20
 ================================================================================
 */
 

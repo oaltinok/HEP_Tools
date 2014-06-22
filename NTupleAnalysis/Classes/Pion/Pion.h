@@ -5,7 +5,7 @@ Class: Pion -> Derived Class from Particle Base Clas
                 extends base class with pion specific parameters
 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_06_18
+    Last Revision: 2014_06_20
 ================================================================================
 */
 
@@ -26,6 +26,9 @@ class Pion : public Particle
         
         TH2F* P_reco_mc_1Pi0;
         TH2F* P_reco_mc_MultPi0;
+        
+        TH1F* P_error_1Pi0;
+        TH1F* P_error_MultPi0;
         
 
     private:

@@ -12,7 +12,7 @@ Namespace: HEP_Functions
         > HEP_Functions::calcEnergy(momentum,restMass);
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_06_18
+    Last Revision:  2014_06_19
 ================================================================================
 */
 
@@ -21,6 +21,8 @@ Namespace: HEP_Functions
 
 namespace HEP_Functions
 {
+
+const double MeV_to_GeV = 0.001; 
 
 inline double calcEnergy(double P, double restMass)
 {
@@ -36,6 +38,15 @@ inline double calcMomentum(double px, double py, double pz)
     return P;
 }
 
+inline double calcDistance( double x1, double y1, double z1,
+                            double x2, double y2, double z2)
+{
+    double d;
+    d = sqrt(   (x1-x2)*(x1-x2) + 
+                (y1-y2)*(y1-y2) + 
+                (z1-z2)*(z1-z2));
+    return d;
+}
     
 }
 

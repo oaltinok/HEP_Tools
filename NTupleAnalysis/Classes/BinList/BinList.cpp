@@ -24,6 +24,7 @@ BinList::BinList()
     vertex_z.setBin(470,4300.0,9000.0);
     vertex_x_y.setBin(200,-1000.0,1000.0);
     mgg_reco.setBin(50,0.0,500.0);
+    deltaInvMass.setBin(20,800.0,2800.0);
     
     // Neutrino Specific Bins
     beamE.setBin(20,0,20000.0);

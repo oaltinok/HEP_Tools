@@ -13,7 +13,7 @@ Class: Plotter
             
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_06_18
+    Last Revision: 2014_06_20
 ================================================================================
 */
 
@@ -28,6 +28,7 @@ Class: Plotter
 #include <TCanvas.h>
 #include <TFile.h>
 #include <THStack.h>
+#include <TPaveStats.h>
 
 using namespace std;
 
@@ -50,6 +51,7 @@ class Plotter
         void plotPion(bool isMC, bool isReco, bool is2D);
                             
         void plotSpecial();
+        void plotPID();
         void inform(string rootDir, string plotDir);
         
         // Plottting Macros

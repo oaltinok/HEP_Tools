@@ -17,7 +17,7 @@ main.cpp
             > main(true) for Generating Plots only
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_06_18
+    Last Revision: 2014_06_21
 ================================================================================
 */
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv[] )
 
     // Edit isTest Variable for running Test Samples or complete playlist
     bool isTest     = false;
-    bool isComplete = true;
+    bool isComplete = false;
     
     // Plot Selection
     bool plotsMC    = true;
