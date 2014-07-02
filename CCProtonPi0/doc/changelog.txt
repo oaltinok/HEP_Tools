@@ -1,4 +1,5 @@
-cvs commit -m "v1_00 - 2014_07_02
+================================================================================
+v1_00 - 2014_07_02
 
 * setPi0ParticleData() Function reorganized completely
     * Function Order: 
@@ -10,4 +11,8 @@ cvs commit -m "v1_00 - 2014_07_02
 
 * Version Tracking Started
     * CCProtonPi0 v1_00 is the stable version capable of reconstructing
-        All Final State Particles" .
+        All Final State Particles
+    
+================================================================================
+
+

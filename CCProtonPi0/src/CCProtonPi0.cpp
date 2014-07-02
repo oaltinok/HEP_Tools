@@ -568,18 +568,15 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch( "Cut_secEndPoint_Michel_Exist", -1 );
     declareIntEventBranch( "Cut_Proton_None", -1 );
     declareIntEventBranch( "Cut_PreFilter_Pi0", -1 );
+    declareIntEventBranch( "Cut_VtxBlob", -1 );
+    declareIntEventBranch( "Cut_ConeBlobs", -1 );
     
     //! Event - General reco
-    declareIntEventBranch( "n_startpoint_vertices", -1 );
     declareIntEventBranch( "n_long_tracks", -1);
     declareIntEventBranch( "n_short_tracks", -1);
     declareIntEventBranch( "n_anchored_long_trk_prongs", -1 );
     declareIntEventBranch( "n_anchored_short_trk_prongs", -1 );
-    declareIntEventBranch( "n_vtx_prongs", -1 );
     declareIntEventBranch( "n_iso_trk_prongs", -1);
-    declareIntEventBranch( "n_iso_blob_prongs", -1);  
-    declareIntEventBranch( "n_dsp_blob_prongs", -1);
-    declareIntEventBranch( "n_us_muon_clusters", 0);
     declareDoubleEventBranch( "time", -1.0 );
   
     //! Event - Michel 
@@ -601,69 +598,6 @@ StatusCode CCProtonPi0::initialize()
     declareBoolEventBranch( "well_fit_vertex");
     declareDoubleEventBranch( "well_fit_vertex_angle", -99.9 );
     declareBoolEventBranch( "isBrokenTrack");
-    
-    //! Event - Pi0 
-    // May convert to NuInt type variable
-    // Additional Branches CCProtonPi0 Styles
-    declareDoubleEventBranch("pi0_px",-1.0);
-    declareDoubleEventBranch("pi0_py",-1.0);
-    declareDoubleEventBranch("pi0_pz",-1.0);
-    declareDoubleEventBranch("pi0_E",-1.0);
-    
-    declareDoubleEventBranch("gamma1_px",-1.0);
-    declareDoubleEventBranch("gamma1_py",-1.0);
-    declareDoubleEventBranch("gamma1_pz",-1.0);
-    declareDoubleEventBranch("gamma1_E",-1.0);
-    
-    declareDoubleEventBranch("gamma2_px",-1.0);
-    declareDoubleEventBranch("gamma2_py",-1.0);
-    declareDoubleEventBranch("gamma2_pz",-1.0);
-    declareDoubleEventBranch("gamma2_E",-1.0);
-
-    // CCPi0 Default Branches
-    declareDoubleEventBranch("pienergy",1.e6);
-    declareDoubleEventBranch("pitheta", 1.e6);
-    declareDoubleEventBranch("piphi",   1.e6);
-    declareDoubleEventBranch("pithetax", 1.e6);
-    declareDoubleEventBranch("pithetay",   1.e6);
-    declareDoubleEventBranch("oangle",  1.e6);
-    
-    declareDoubleEventBranch("mgg", 1.e6);
-    
-    declareDoubleEventBranch("pithetab", 1.e6);
-    declareDoubleEventBranch("piphib",   1.e6);
-    declareDoubleEventBranch("pithetaxb", 1.e6);
-    declareDoubleEventBranch("pithetayb",   1.e6);
-    
-    declareDoubleEventBranch("g1e",     1.e6);
-    declareDoubleEventBranch("g1theta", 1.e6);
-    declareDoubleEventBranch("g1phi",   1.e6);
-    declareDoubleEventBranch("g2e",     1.e6);
-    declareDoubleEventBranch("g2theta", 1.e6);
-    declareDoubleEventBranch("g2phi",   1.e6);
-    
-    declareContainerDoubleEventBranch("pimom",4,-1);
-    declareContainerDoubleEventBranch("g1mom",3,-1);
-    declareContainerDoubleEventBranch("g2mom",3,-1);
-   
-    declareDoubleEventBranch( "RE_scalar", -9999);
-    declareDoubleEventBranch( "RE_photon_energy_1", -9999 );
-    declareDoubleEventBranch( "RE_photon_energy_2", -9999 );
-    declareDoubleEventBranch( "RE_photon_dEdx_1", -9999 );
-    declareDoubleEventBranch( "RE_photon_dEdx_2", -9999 );
-    declareDoubleEventBranch( "RE_photon_time_1", -9999 );
-    declareDoubleEventBranch( "RE_photon_time_2", -9999 );
-    declareBoolEventBranch("is_GoodDirection1");
-    declareBoolEventBranch("is_GoodPosition1");
-    declareBoolEventBranch("is_GoodDirection2");
-    declareBoolEventBranch("is_GoodPosition2");
-    
-    declareBoolEventBranch("is_GoodBlob1" );
-    declareBoolEventBranch("is_GoodBlob2" );
-    declareContainerDoubleEventBranch( "RE_photon_direction_1");
-    declareContainerDoubleEventBranch( "RE_photon_direction_2");
-    declareContainerDoubleEventBranch( "RE_photon_vertex_1");
-    declareContainerDoubleEventBranch( "RE_photon_vertex_2");
     
     //! Event - PreFilterPi0()
     declareDoubleEventBranch("evis_nearvtx_total", -1.0);
@@ -812,28 +746,14 @@ StatusCode CCProtonPi0::initialize()
     
     declareContainerDoubleEventBranch("blob_cluster_energy1");
     declareContainerDoubleEventBranch("blob_cluster_energy2");
-    
-    declareIntEventBranch("g1blob_ndigit",-1);
-    declareIntEventBranch("g1blob_ncluster",-1);
+
     declareDoubleEventBranch("g1blob_minsep", -1.0);
-    declareDoubleEventBranch("g1blob_vtx_distance",-1.0);
-    declareDoubleEventBranch("g1blob_edge_distance",-1.0);
+
     
-    declareIntEventBranch("g2blob_ndigit",-1);
-    declareIntEventBranch("g2blob_ncluster",-1);
+
     declareDoubleEventBranch("g2blob_minsep", -1.0);
-    declareDoubleEventBranch("g2blob_vtx_distance",-1.0);
-    declareDoubleEventBranch("g2blob_edge_distance",-1.0);
-    
-    declareDoubleEventBranch("g1recotrkrevis", -1.0);
-    declareDoubleEventBranch("g1recoecalevis", -1.0);
-    declareDoubleEventBranch("g1recohcalevis", -1.0);
-    declareDoubleEventBranch("g1recoscalevis", -1.0);
-    
-    declareDoubleEventBranch("g2recotrkrevis", -1.0);
-    declareDoubleEventBranch("g2recoecalevis", -1.0);
-    declareDoubleEventBranch("g2recohcalevis", -1.0);
-    declareDoubleEventBranch("g2recoscalevis", -1.0);
+
+
     
     //! Event - OD info
     declareDoubleEventBranch( "od_upstreamFrame", -9999 );
@@ -919,7 +839,65 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleBranch(m_hypMeths, "proton_p_visEnergy",     10, -1);
     declareContainerDoubleBranch(m_hypMeths, "proton_p_dEdXTool",      10, -1);
     
-   
+    //! Event - Pi0 -- Filles in setPi0ParticleData()
+    // May convert to NuInt type variable
+    
+    declareDoubleEventBranch("pi0_px",-9.0);
+    declareDoubleEventBranch("pi0_py",-9.0);
+    declareDoubleEventBranch("pi0_pz",-9.0);
+    declareDoubleEventBranch("pi0_E",-9.0);
+    declareDoubleEventBranch("pi0_invMass", -9.0);
+    declareDoubleEventBranch("pi0_theta", -9.0);
+    declareDoubleEventBranch("pi0_phi",   -9.0);
+    declareDoubleEventBranch("pi0_thetaX", -9.0);
+    declareDoubleEventBranch("pi0_thetaY",   -9.0);
+    declareDoubleEventBranch("pi0_openingAngle",  -9.0);
+    declareDoubleEventBranch( "pi0_cos_openingAngle", -9.0);
+    
+    declareDoubleEventBranch("gamma1_px",-9.9);
+    declareDoubleEventBranch("gamma1_py",-9.9);
+    declareDoubleEventBranch("gamma1_pz",-9.9);
+    declareDoubleEventBranch("gamma1_E",-9.9);
+    declareDoubleEventBranch("gamma1_theta",-9.9);
+    declareDoubleEventBranch("gamma1_phi",-9.9);
+    declareDoubleEventBranch("gamma1_dEdx",-9.9 );
+    declareDoubleEventBranch("gamma1_time",-9.9 );
+    declareDoubleEventBranch("gamma1_dist_vtx",-1.0);
+    declareDoubleEventBranch("gamma1_dist_exit",-1.0);
+    declareContainerDoubleEventBranch("gamma1_direction",3,-9.9);
+    declareContainerDoubleEventBranch("gamma1_vertex",3,-9.9);
+    declareIntEventBranch("gamma1_blob_ndigits",-1);
+    declareIntEventBranch("gamma1_blob_nclusters",-1);
+    declareDoubleEventBranch("gamma1_evis_trkr", -9.9);
+    declareDoubleEventBranch("gamma1_evis_ecal", -9.9);
+    declareDoubleEventBranch("gamma1_evis_hcal", -9.9);
+    declareDoubleEventBranch("gamma1_evis_scal", -9.9);
+    declareBoolEventBranch("gamma1_isGoodDirection");
+    declareBoolEventBranch("gamma1_isGoodPosition");
+    declareBoolEventBranch("gamma1_isGoodBlob");
+    
+    declareDoubleEventBranch("gamma2_px",-9.9);
+    declareDoubleEventBranch("gamma2_py",-9.9);
+    declareDoubleEventBranch("gamma2_pz",-9.9);
+    declareDoubleEventBranch("gamma2_E",-9.9);
+    declareDoubleEventBranch("gamma2_theta",-9.9);
+    declareDoubleEventBranch("gamma2_phi",-9.9);
+    declareDoubleEventBranch("gamma2_dEdx",-9.9 );
+    declareDoubleEventBranch("gamma2_time",-9.9 );
+    declareDoubleEventBranch("gamma2_dist_vtx",-1.0);
+    declareDoubleEventBranch("gamma2_dist_exit",-1.0);
+    declareContainerDoubleEventBranch("gamma2_direction",3,-9.9);
+    declareContainerDoubleEventBranch("gamma2_vertex",3,-9.9);
+    declareIntEventBranch("gamma2_blob_ndigits",-1);
+    declareIntEventBranch("gamma2_blob_nclusters",-1);
+    declareDoubleEventBranch("gamma2_evis_trkr", -9.9);
+    declareDoubleEventBranch("gamma2_evis_ecal", -9.9);
+    declareDoubleEventBranch("gamma2_evis_hcal", -9.9);
+    declareDoubleEventBranch("gamma2_evis_scal", -9.9);
+    declareBoolEventBranch("gamma2_isGoodDirection");
+    declareBoolEventBranch("gamma2_isGoodPosition");
+    declareBoolEventBranch("gamma2_isGoodBlob");
+    
     
     info() <<"Exit CCProtonPi0::initialize()" << endmsg;
     info() <<"--------------------------------------------------------------------------"<<endmsg;
@@ -1359,6 +1337,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     if ( VtxBlob(event, m_PrimaryVertex) ){
         debug()<<"Succesful VtxBlob Reconstruction!"<<endmsg;
     }else{
+        event->setIntData("Cut_VtxBlob",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS;  
     }
@@ -1372,6 +1351,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     if ( ConeBlobs(event, m_PrimaryVertex) ){
         debug()<<"Succesful ConeBlobs Reconstruction!"<<endmsg;
     }else{
+        event->setIntData("Cut_ConeBlobs",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS;  
     }
@@ -1446,28 +1426,19 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     event->setIntData( "ddead", ddead );
     event->setIntData( "tdead", tdead );
     
-//     event->setIntData("n_startpoint_vertices", n_startpoint_vertices);
     event->setIntData("n_long_tracks", n_long_tracks);
     event->setIntData("n_short_tracks", n_short_tracks);
     event->setIntData("n_anchored_long_trk_prongs", n_anchored_long_trk_prongs);
     event->setIntData("n_anchored_short_trk_prongs", n_anchored_short_trk_prongs);
-//     event->setIntData("n_vtx_blob_prongs", n_vtx_blob_prongs);
     event->setIntData("n_iso_trk_prongs", n_iso_trk_prongs);
-//     event->setIntData("n_iso_blob_prongs", n_iso_blob_prongs);
-//     event->setIntData("n_dsp_blob_prongs", n_dsp_blob_prongs);
-//     
+
+    
     event->setDoubleData("muonVisibleE", muon_visible_energy );
-//     event->setDoubleData("hadronVisibleE", hadron_visible_energy );
     
     event->setDoubleData( "totalVisibleE",   totalVisibleEnergy );
     event->setDoubleData( "totalIDVisibleE", idVisibleEnergy );
     event->setDoubleData( "totalODVisibleE", odVisibleEnergy );
-//     //event->setDoubleData( "vtxTrackExtraE",  vtx_track_extra_E);
-//     event->setDoubleData( "vtxBlobExtraE",   vtx_blob_energy );
-//     event->setDoubleData( "unattachedExtraE",unattached_extra_energy );
-//     event->setDoubleData( "dispersedExtraE", dispersed_energy );  
     
-
     fillCommonPhysicsAnaBranches( event );
 
     //--------------------------------------------------------------------------
@@ -1604,10 +1575,6 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
     nuInt->setDoubleData("vtx_z", vtx_position.z() );
     
 
-    
-
-    
-    
     //--------------------------------------------------------------------------
     //! Interaction Parameters
     //--------------------------------------------------------------------------
@@ -2273,7 +2240,7 @@ void CCProtonPi0::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::P
 //==============================================================================
 // Set Muon particle data
 //==============================================================================
-StatusCode CCProtonPi0::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, SmartRef<Minerva::Prong>& muonProng) const 
+bool CCProtonPi0::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, SmartRef<Minerva::Prong>& muonProng) const 
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::setMuonParticleData()" << endmsg;
@@ -2385,7 +2352,8 @@ StatusCode CCProtonPi0::setMuonParticleData(   Minerva::NeutrinoInt* nuInt, Smar
 
     debug() << "Exit CCProtonPi0::setMuonParticleData()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    return StatusCode::SUCCESS;
+    
+    return true;
 }
 
 //==============================================================================
@@ -2541,12 +2509,10 @@ bool CCProtonPi0::getProtonProng(    Minerva::ProngVect& hadronProngs,
         }
     }
    
-    
     debug() << "Found "<<nGoodProtons<<" Good Protons!"<<endmsg;
     debug() << "N(protonProngs) =  " << protonProngs.size() << endmsg;
     debug() << "N(protonParticles) =  " << protonParticles.size() << endmsg;
    
-    
     debug() << "Exit CCProtonPi0::getProtonProng()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
@@ -2556,7 +2522,7 @@ bool CCProtonPi0::getProtonProng(    Minerva::ProngVect& hadronProngs,
 //==============================================================================
 // Set proton particle data
 //==============================================================================
-void CCProtonPi0::setProtonParticleData(     Minerva::NeutrinoInt* nuInt, 
+bool CCProtonPi0::setProtonParticleData(     Minerva::NeutrinoInt* nuInt, 
                                                 Minerva::ProngVect& protonProngs,
                                                 Minerva::ParticleVect& protonParticles, 
                                                 double vertexZ ) const 
@@ -2715,7 +2681,7 @@ void CCProtonPi0::setProtonParticleData(     Minerva::NeutrinoInt* nuInt,
     debug() << "Exit CCProtonPi0::setProtonParticleData()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
-    return;
+    return true;
 }
 
 //==============================================================================
@@ -2803,29 +2769,40 @@ void CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonPro
 // setPi0ParticleData
 //==============================================================================
 
-StatusCode CCProtonPi0::setPi0ParticleData( Minerva::PhysicsEvent *event, 
-                                            Minerva::IDBlob* idblob1, 
-                                            Minerva::IDBlob* idblob2,
-                                            const SmartRef<Minerva::Vertex>& vertex ) const
+bool CCProtonPi0::setPi0ParticleData( Minerva::PhysicsEvent *event, 
+                                        Minerva::IDBlob* idblob1, 
+                                        Minerva::IDBlob* idblob2,
+                                        const SmartRef<Minerva::Vertex>& vertex ) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "CCProtonPi0::setPi0ParticleData()" << endmsg;
 
     const Gaudi::XYZPoint& pos = vertex->position();
-            
+    
+    // Check Gamma1 Quality
     bool goodPosition1  = m_idHoughBlob->GetStartPosition(idblob1, pos, true );
     bool goodDirection1 = m_idHoughBlob->GetDirection(idblob1, pos );
     bool isGoodBlob1 = false;
     if (goodPosition1 && goodDirection1) isGoodBlob1 = true;
     
+    // Check Gamma2 Quality
     bool goodPosition2  = m_idHoughBlob->GetStartPosition(idblob2, pos, true );
     bool goodDirection2 = m_idHoughBlob->GetDirection(idblob2, pos );
     bool isGoodBlob2 = false;
     if (goodPosition2 && goodDirection2) isGoodBlob2 = true;
-    // Process only if we have 2 Bood Blobs
+    
+    event->filtertaglist()->setOrAddFilterTag("gamma1_isGoodDirection", goodDirection1);
+    event->filtertaglist()->setOrAddFilterTag("gamma1_isGoodPosition",  goodPosition1);
+    event->filtertaglist()->setOrAddFilterTag("gamma1_isGoodBlob", isGoodBlob1);
+    
+    event->filtertaglist()->setOrAddFilterTag("gamma2_isGoodBlob", isGoodBlob2);
+    event->filtertaglist()->setOrAddFilterTag("gamma2_isGoodDirection", goodDirection2);
+    event->filtertaglist()->setOrAddFilterTag("gamma2_isGoodPosition",  goodPosition2);
+    
+    // Process only if we have 2 Good Blobs
     if (!isGoodBlob1 || !isGoodBlob2){
-        debug() << "Don't have 2 Good Blobs! -- CANNOT Set Pi0 Particle Data!" <<endmsg; 
-        return StatusCode::SUCCESS;
+        debug() << "Don't have 2 Good Blobs! -- CANNOT Set Pi0 Particle Data!" <<endmsg;
+        return false;
     }
 
     if (attenuation_correction_) {
@@ -2833,6 +2810,7 @@ StatusCode CCProtonPi0::setPi0ParticleData( Minerva::PhysicsEvent *event,
         ApplyAttenuationCorrection(idblob2);
     }
     
+    // Get Blob Energy and Time
     double g1energy   = 0.0;
     double g1trkrevis = 0.0;
     double g1ecalevis = 0.0;
@@ -2845,11 +2823,12 @@ StatusCode CCProtonPi0::setPi0ParticleData( Minerva::PhysicsEvent *event,
     double g2hcalevis = 0.0;
     double g2scalevis = 0.0;
 
-    
     m_idHoughBlob->getBlobEnergyTime( idblob1, g1energy, g1trkrevis, g1ecalevis, g1hcalevis, g1scalevis );
     m_idHoughBlob->getBlobEnergyTime( idblob2, g2energy, g2trkrevis, g2ecalevis, g2hcalevis, g2scalevis );
 
-    /* Make sure gamma1 is the more energetic one */
+    //--------------------------------------------------------------------------
+    //    Make sure Gamma1 is the more energetic one 
+    //--------------------------------------------------------------------------
     if (g2energy > g1energy) {
         std::swap(goodPosition1, goodPosition2);  /* Swap variables already assigned */
         std::swap(goodDirection1,goodDirection2);
@@ -2858,30 +2837,34 @@ StatusCode CCProtonPi0::setPi0ParticleData( Minerva::PhysicsEvent *event,
         std::swap(idblob1,idblob2);               /* And the blobs themselves */
     }
     
+    // Get Blob Time
     double time1 = idblob1->time();
     double time2 = idblob2->time();
 
+    // Get Blob dEdx
     double dEdx1 = 0.0;
     double dEdx2 = 0.0;
     m_idHoughBlob->idBlobdEdx( idblob1, dEdx1 );
     m_idHoughBlob->idBlobdEdx( idblob2, dEdx2 );
 
+    // Get Blob Directions
     Gaudi::XYZVector direction1 = idblob1->direction(); 
     Gaudi::XYZVector direction2	= idblob2->direction();
 
+    // Save Gamma1 and Gamma2 Starting Position (blob vertex)
     std::vector<double> position1;
     std::vector<double> position2;
     position1.push_back(idblob1->startPoint().x());
     position1.push_back(idblob1->startPoint().y());
     position1.push_back(idblob1->startPoint().z());
+    
     position2.push_back(idblob2->startPoint().x());
     position2.push_back(idblob2->startPoint().y());
     position2.push_back(idblob2->startPoint().z());
 
-    
-    double cos_oangle  = direction1.Dot(direction2);
-    
-    std::vector<double> direc_1, direc_2;
+    // Save Gamma1 and Gamma2 Direction
+    std::vector<double> direc_1;
+    std::vector<double> direc_2;
     direc_1.push_back(direction1.x());
     direc_1.push_back(direction1.y());
     direc_1.push_back(direction1.z());
@@ -2890,197 +2873,95 @@ StatusCode CCProtonPi0::setPi0ParticleData( Minerva::PhysicsEvent *event,
     direc_2.push_back(direction2.y());
     direc_2.push_back(direction2.z());
     
-    debug() << "Direction: " << direction1 << " " << direction2
-              << cos_oangle << endmsg;
-
-    event->setDoubleData( "RE_scalar", cos_oangle );
-    event->setDoubleData( "RE_photon_energy_1", g1energy );
-    event->setDoubleData( "RE_photon_energy_2", g2energy );
-    event->setDoubleData( "RE_photon_dEdx_1", dEdx1 );
-    event->setDoubleData( "RE_photon_dEdx_2", dEdx2 );
-    event->setDoubleData( "RE_photon_time_1", time1 );
-    event->setDoubleData( "RE_photon_time_2", time2 );
-    event->filtertaglist()->setOrAddFilterTag("is_GoodDirection1", goodDirection1);
-    event->filtertaglist()->setOrAddFilterTag("is_GoodPosition1",  goodPosition1);
-    event->filtertaglist()->setOrAddFilterTag("is_GoodDirection2", goodDirection2);
-    event->filtertaglist()->setOrAddFilterTag("is_GoodPosition2",  goodPosition2);
-    event->filtertaglist()->setOrAddFilterTag("is_GoodBlob1", isGoodBlob1);
-    event->filtertaglist()->setOrAddFilterTag("is_GoodBlob2", isGoodBlob2);
-    event->setContainerDoubleData( "RE_photon_direction_1", direc_1 );
-    event->setContainerDoubleData( "RE_photon_direction_2", direc_2 );
-    event->setContainerDoubleData( "RE_photon_vertex_1", position1 );
-    event->setContainerDoubleData( "RE_photon_vertex_2", position2 );
-
-    event->setIntData("g1blob_ndigit",  idblob1->getAllDigits().size());
-    event->setIntData("g2blob_ndigit",  idblob2->getAllDigits().size());
-    event->setIntData("g1blob_ncluster",idblob1->nclusters());
-    event->setIntData("g2blob_ncluster",idblob2->nclusters());
-  
-    
+    // Calculate Gamma1 and Gamma2 3-Momentums
     TVector3 g1mom(direction1.x(),direction1.y(),direction1.z());
     TVector3 g2mom(direction2.x(),direction2.y(),direction2.z());
     g1mom *= g1energy;
     g2mom *= g2energy;
-
+    
+    // Calculate Distance: Vertex - Blob
+    const double gamma1_dist_vtx = CalcDistanceFromBlobAxisToVertex(idblob1,vertex);
+    const double gamma2_dist_vtx = CalcDistanceFromBlobAxisToVertex(idblob2,vertex);
+    
+    // Calculate Distance: Blob - Exit
+    const double gamma1_dist_exit = CalcDistanceFromVertexToExiting(idblob1,vertex);
+    const double gamma2_dist_exit = CalcDistanceFromVertexToExiting(idblob2,vertex);
+    
+    // Calculate Pi0 3-Momentum
     TVector3 pimom = g1mom + g2mom;
     
-    const double oangle = g1mom.Angle(g2mom)*TMath::RadToDeg();
-    event->setDoubleData("oangle", oangle);
+    // Calculate Opening Angle
+    const double openingAngle       = (g1mom.Angle(g2mom))*TMath::RadToDeg();
+    const double cos_openingAngle   = direction1.Dot(direction2);
     
-    const double mgg = std::sqrt(2*g1energy*g2energy*(1-cos_oangle));
-    event->setDoubleData("mgg", mgg);
-
-    // CCProtonPi0 Style Branches
+    // Calculate invariant Mass of Pi0
+    const double invMass = std::sqrt(2*g1energy*g2energy*(1-cos_openingAngle));
+    
+    // Calculate dEdX for Blobs
+    CalculatedEdx(idblob1,event,1,vertex);
+    CalculatedEdx(idblob2,event,2,vertex);
+    
+    //--------------------------------------------------------------------------
+    //    Fill Branches
+    //--------------------------------------------------------------------------
+    
+    // Pi0 Information
+    event->setDoubleData("pi0_openingAngle", openingAngle);
+    event->setDoubleData("pi0_cos_openingAngle", cos_openingAngle );
+    event->setDoubleData("pi0_invMass", invMass);
     event->setDoubleData("pi0_px",pimom.x());
     event->setDoubleData("pi0_py",pimom.y());
     event->setDoubleData("pi0_pz",pimom.z());
     event->setDoubleData("pi0_E",g1energy+g2energy);
+    event->setDoubleData("pi0_theta",  pimom.Theta()*TMath::RadToDeg());
+    event->setDoubleData("pi0_phi",    pimom.Phi()*TMath::RadToDeg());
+    event->setDoubleData("pi0_thetaX", std::atan2(pimom.X(),pimom.Z())*TMath::RadToDeg());
+    event->setDoubleData("pi0_thetaY", std::atan2(pimom.Y(),pimom.Z())*TMath::RadToDeg());
     
+    // Gamma1 Information
     event->setDoubleData("gamma1_px",g1mom.x());
     event->setDoubleData("gamma1_py",g1mom.y());
     event->setDoubleData("gamma1_pz",g1mom.z());
     event->setDoubleData("gamma1_E",g1energy);
+    event->setDoubleData("gamma1_theta",g1mom.Theta()*TMath::RadToDeg());
+    event->setDoubleData("gamma1_phi",  g1mom.Phi()*TMath::RadToDeg());
+    event->setDoubleData("gamma1_dEdx", dEdx1 );
+    event->setDoubleData("gamma1_time", time1 );
+    event->setDoubleData("gamma1_dist_vtx",gamma1_dist_vtx);
+    event->setDoubleData("gamma1_dist_exit",gamma1_dist_exit);
+    event->setContainerDoubleData("gamma1_direction", direc_1 );
+    event->setContainerDoubleData("gamma1_vertex", position1 );
+    event->setIntData("gamma1_blob_ndigits",  idblob1->getAllDigits().size());
+    event->setIntData("gamma1_blob_nclusters",idblob1->nclusters());
+    event->setDoubleData("gamma1_evis_trkr", g1trkrevis);
+    event->setDoubleData("gamma1_evis_ecal", g1ecalevis);
+    event->setDoubleData("gamma1_evis_hcal", g1hcalevis);
+    event->setDoubleData("gamma1_evis_scal", g1scalevis);
     
+    // Gamma2 Information
     event->setDoubleData("gamma2_px",g2mom.x());
     event->setDoubleData("gamma2_py",g2mom.y());
     event->setDoubleData("gamma2_pz",g2mom.z());
     event->setDoubleData("gamma2_E",g2energy);
+    event->setDoubleData("gamma2_theta",g2mom.Theta()*TMath::RadToDeg());
+    event->setDoubleData("gamma2_phi",  g2mom.Phi()*TMath::RadToDeg());
+    event->setDoubleData("gamma2_dEdx", dEdx2 );
+    event->setDoubleData("gamma2_time", time2 );
+    event->setDoubleData("gamma2_dist_vtx",gamma2_dist_vtx);
+    event->setDoubleData("gamma2_dist_exit",gamma2_dist_exit);
+    event->setContainerDoubleData("gamma2_direction", direc_2 );
+    event->setContainerDoubleData("gamma2_vertex", position2 );
+    event->setIntData("gamma2_blob_nclusters",idblob2->nclusters());
+    event->setIntData("gamma2_blob_ndigits",  idblob2->getAllDigits().size());
+    event->setDoubleData("gamma2_evis_trkr", g2trkrevis);
+    event->setDoubleData("gamma2_evis_ecal", g2ecalevis);
+    event->setDoubleData("gamma2_evis_hcal", g2hcalevis);
+    event->setDoubleData("gamma2_evis_scal", g2scalevis);
 
-    // CCPi0 Default Branches
-    event->setDoubleData("pienergy", g1energy+g2energy);
-    event->setDoubleData("pitheta",  pimom.Theta()*TMath::RadToDeg());
-    event->setDoubleData("piphi",    pimom.Phi()*TMath::RadToDeg());
-    event->setDoubleData("pithetax", std::atan2(pimom.X(),pimom.Z())*TMath::RadToDeg());
-    event->setDoubleData("pithetay", std::atan2(pimom.Y(),pimom.Z())*TMath::RadToDeg());
-
-    event->setDoubleData("g1e",    g1energy);
-    event->setDoubleData("g1theta",g1mom.Theta()*TMath::RadToDeg());
-    event->setDoubleData("g1phi",  g1mom.Phi()*TMath::RadToDeg());
-    event->setDoubleData("g2e",    g2energy);
-    event->setDoubleData("g2theta",g2mom.Theta()*TMath::RadToDeg());
-    event->setDoubleData("g2phi",  g2mom.Phi()*TMath::RadToDeg());
-
-    event->setDoubleData("g1recotrkrevis", g1trkrevis);
-    event->setDoubleData("g1recoecalevis", g1ecalevis);
-    event->setDoubleData("g1recohcalevis", g1hcalevis);
-    event->setDoubleData("g1recoscalevis", g1scalevis);
-
-    event->setDoubleData("g2recotrkrevis", g2trkrevis);
-    event->setDoubleData("g2recoecalevis", g2ecalevis);
-    event->setDoubleData("g2recohcalevis", g2hcalevis);
-    event->setDoubleData("g2recoscalevis", g2scalevis);
-
-    
-    std::vector<double> pimomVec;
-    std::vector<double> g1momVec;
-    std::vector<double> g2momVec;
-
-    pimomVec.push_back(pimom.x());
-    pimomVec.push_back(pimom.y());
-    pimomVec.push_back(pimom.z());
-    pimomVec.push_back(pimom.Mag());
-
-    g1momVec.push_back(g1mom.x());
-    g1momVec.push_back(g1mom.y());
-    g1momVec.push_back(g1mom.z());
-    g2momVec.push_back(g2mom.x());
-    g2momVec.push_back(g2mom.y());
-    g2momVec.push_back(g2mom.z());
-    
-    event->setContainerDoubleData("pimom",pimomVec);
-    event->setContainerDoubleData("g1mom",g1momVec);
-    event->setContainerDoubleData("g2mom",g2momVec);
-
-    const double dvtx1 = CalcDistanceFromBlobAxisToVertex(idblob1,vertex);
-    const double dvtx2 = CalcDistanceFromBlobAxisToVertex(idblob2,vertex);
-    event->setDoubleData("g1blob_vtx_distance",dvtx1);
-    event->setDoubleData("g2blob_vtx_distance",dvtx2);
- 
-    const double dmax1 = CalcDistanceFromVertexToExiting(idblob1,vertex);
-    const double dmax2 = CalcDistanceFromVertexToExiting(idblob2,vertex);
-    event->setDoubleData("g1blob_edge_distance",dmax1);
-    event->setDoubleData("g2blob_edge_distance",dmax2);
-
-    CalculatedEdx(idblob1,event,1,vertex);
-    CalculatedEdx(idblob2,event,2,vertex);
-    
-//     CheckBlobDigitAssignment(event,idblob1,1);
-//     CheckBlobDigitAssignment(event,idblob2,2);
-
-//         // Convenient variables for analysis
-//         // 1) Muon and pi0 momentum in the detector coordinates
-//     const double pmu_x = m_MuonParticle->momentumVec().Px();
-//     const double pmu_y = m_MuonParticle->momentumVec().Py();
-//     const double pmu_z = m_MuonParticle->momentumVec().Pz();
-//     const double Emu    = m_MuonParticle->momentumVec().E();
-//     
-//     const double ppi_x = pimom.x();
-//     const double ppi_y = pimom.y();
-//     const double ppi_z = pimom.z();
-//     const double Epi    = g1energy + g2energy;
-//     
-//         // 2) transform into beam coordinates
-//     const double pmu_y2 =  costheta_b*pmu_y + sintheta_b*pmu_z;
-//     const double pmu_z2 = -sintheta_b*pmu_y + costheta_b*pmu_z;
-//     
-//     const double ppi_y2 =  costheta_b*ppi_y + sintheta_b*ppi_z;
-//     const double ppi_z2 = -sintheta_b*ppi_y + costheta_b*ppi_z;
-// 
-//         // 3) Calculate the neutrino energy
-//     const double pTx = pmu_x + ppi_x;
-//     const double pTy = pmu_y2 + ppi_y2;
-//     
-//     const double pmuL = Emu - pmu_z2;
-//     const double ppiL = Epi - ppi_z2;
-//     const double pL   = pmuL + ppiL;
-//     const double Tn   = 0.5*(pL*pL + pTx*pTx + pTy*pTy)/(mn - pL);
-//     const double Erec = Emu + Epi + Tn;
-// 
-//     const double Q2 = 2*Erec*(Emu-pmu_z2) - mmuon*mmuon;
-//     const double W2 = mp*mp + 2*mp*(Erec-Emu) - Q2;
-//     const double W  = std::sqrt(std::max(0.,W2));
-// 
-//         // Re-calculate these kinematic variables using 'better' pi0 energy
-//     const double m0 = 134.9764;
-//     const double Erec_es = Emu + m0/mgg*Epi + Tn;
-//     const double Q2_es = 2*Erec_es*(Emu-pmu_z2) - mmuon*mmuon;
-//     const double W2_es = mp*mp + 2*mp*(Erec_es-Emu) - Q2_es;
-//     const double W_es  = std::sqrt(std::max(0.,W2_es));
-
-    
-//     event->setDoubleData("Tn", Tn);
-//     event->setDoubleData("Erec", Erec);
-//     event->setDoubleData("Q2", Q2);
-//     event->setDoubleData("W2", W2);
-//     event->setDoubleData("W", W);
-//     
-//     event->setDoubleData("Erec_es", Erec_es);
-//     event->setDoubleData("Q2_es", Q2_es);
-//     event->setDoubleData("W2_es", W2_es);
-//     event->setDoubleData("W_es", W_es);
-
-
-    
-//     std::vector<double> mumom;
-//     mumom.push_back(pmu_x);
-//     mumom.push_back(pmu_y);
-//     mumom.push_back(pmu_z);
-//     mumom.push_back(m_MuonParticle->momentumVec().R());
-//     mumom.push_back(Emu);
-//     
-//     event->setContainerDoubleData("mumom", mumom);
-
-//     TVector3 pimom2(pimom.X(),ppi_y2,ppi_z2);
-//     event->setDoubleData("pithetab",  pimom2.Theta()*TMath::RadToDeg());
-//     event->setDoubleData("piphib",    pimom2.Phi()*TMath::RadToDeg());
-//     event->setDoubleData("pithetaxb", std::atan2(pimom2.X(),pimom2.Z())*TMath::RadToDeg());
-//     event->setDoubleData("pithetayb", std::atan2(pimom2.Y(),pimom2.Z())*TMath::RadToDeg());
-
-    
     debug() << "Exit CCProtonPi0::setPi0ParticleData()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
 
-    return StatusCode::SUCCESS;
+    return true;
 }
 
 //<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
@@ -3563,9 +3444,15 @@ StatusCode CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event,
     double minBlobSep1 = -1.;
     double minBlobSep2 = -1.;
     if (isAngleScan || isHough || additional) {
+        bool isPi0DataSet = false;
+        
         processBlobs(event,foundBlobs);
-        setPi0ParticleData(event,foundBlobs[0],foundBlobs[1],vertex);
+        isPi0DataSet = setPi0ParticleData(event,foundBlobs[0],foundBlobs[1],vertex);
 
+        if (!isPi0DataSet){
+            debug() << "Pi0 Data was not Set!"<<endmsg;
+        }
+        
         minBlobSep1 = CalcMinBlobSeparation(foundBlobs[0],vertex);
         minBlobSep2 = CalcMinBlobSeparation(foundBlobs[1],vertex);
 
@@ -3819,8 +3706,8 @@ StatusCode CCProtonPi0::processBlobs( Minerva::PhysicsEvent *event, std::vector<
 //     event->setIntData("blob_ndof_2",result2.first);
 //     event->setDoubleData("blob_fval_1", result1.second);
 //     event->setDoubleData("blob_fval_2", result2.second);
-//     event->setDoubleData("g1blob_vtx_distance", g1distance);
-//     event->setDoubleData("g2blob_vtx_distance", g2distance);
+//     event->setDoubleData("gamma1_dist_vtx", g1distance);
+//     event->setDoubleData("gamma2_dist_vtx", g2distance);
     
     
     debug() << "Exit CCProtonPi0::processBlobs()" << endmsg;
