@@ -127,9 +127,10 @@ MinervaAnalysisTool( type, name, parent )
     m_anaSignature = "CCProtonPi0";
     
     // Private Properties
-    declareProperty("StoreAllEvents",      m_store_all_events =    true);
-    declareProperty("DoPlausibilityCuts",  m_doPlausibilityCuts =  true);
-    declareProperty("MakeShortTracks",     m_makeShortTracks =     true);
+    declareProperty("WriteFSParticleTable", m_writeFSParticle_Table =   true);
+    declareProperty("StoreAllEvents",       m_store_all_events      =   true);
+    declareProperty("DoPlausibilityCuts",   m_doPlausibilityCuts    =   true);
+    declareProperty("MakeShortTracks",      m_makeShortTracks       =   true);
     
     declareProperty("BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian );
     
@@ -600,6 +601,9 @@ StatusCode CCProtonPi0::initialize()
     declareBoolEventBranch( "isBrokenTrack");
     
     //! Event - PreFilterPi0()
+    declareIntEventBranch("preFilter_Result", -1);
+    declareDoubleEventBranch("preFilter_rejectedEnergy", -1.0);
+    
     declareDoubleEventBranch("evis_nearvtx_total", -1.0);
     declareDoubleEventBranch("evis_nearvtx_x", -1.0);
     declareDoubleEventBranch("evis_nearvtx_u", -1.0);
@@ -1322,7 +1326,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //--------------------------------------------------------------------------
     //! MAKE CUT - if fails PreFilterPi0()
     //--------------------------------------------------------------------------
-    if ( PreFilterPi0(event) ){
+    if ( PreFilterPi0(event, m_PrimaryVertex) ){
         debug()<<"Passed PreFilterPi0()"<<endmsg;
     }else{
         event->setIntData("Cut_PreFilter_Pi0",1);
@@ -1626,13 +1630,11 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
         return sc;
     }
     
-    
     //--------------------------------------------------------------------------
     //! MC Plausibility
     //--------------------------------------------------------------------------
     bool isPlausible = truthIsPlausible(truthEvent);
     truthEvent->filtertaglist()->setOrAddFilterTag( "isPlausible", isPlausible); 
-    
     
     //--------------------------------------------------------------------------
     //! is Fiducial volume
@@ -1647,6 +1649,7 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     //--------------------------------------------------------------------------
     const SmartRefVector<Minerva::TG4Trajectory> pri_trajectories = truthEvent->trajectories();
     SmartRefVector<Minerva::TG4Trajectory>::const_iterator it_mcpart;
+    
     if (pri_trajectories.size() != truthEvent->fSpdg().size() && pri_trajectories.size() + 1 != truthEvent->fSpdg().size() ) {
         warning()<<"Number of GENIE FS particles "<<truthEvent->fSpdg().size()<<
                 " does not match number of Geant4 primary trajectories "<<pri_trajectories.size()<<"!"<<endmsg;
@@ -1657,15 +1660,6 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
         for ( std::vector<int>::const_iterator itGENIE = truthEvent->fSpdg().begin(); itGENIE != truthEvent->fSpdg().end(); ++itGENIE ) {
         warning()<<"    GENIE part:  "<<(*itGENIE)<<endmsg;
         }
-    }
-      
-    //--------------------------------------------------------------------------
-    //! Print the List of FS Particles
-    //--------------------------------------------------------------------------
-    debug()<<"Final State Particle List"<<endmsg;
-    debug()<<"Parent\t|\tParticle"<<endmsg;
-    for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart) {
-        debug()<<(*it_mcpart)->GetParentId()<<"\t|\t"<<(*it_mcpart)->GetPDGCode()<<endmsg;
     }
     
     //--------------------------------------------------------------------------
@@ -1683,7 +1677,6 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     int N_other     = 0;
 
     for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart) {
-    
         if ( ( (*it_mcpart)->GetPDGCode() ) == 2212 ) N_proton++;
         else if( ( (*it_mcpart)->GetPDGCode() ) == 2112 ) N_neutron++;
         else if( ( (*it_mcpart)->GetPDGCode() ) == 13 ) N_muminus++;
@@ -1694,7 +1687,6 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
         else if( ( (*it_mcpart)->GetPDGCode() ) == 2214 ) N_deltaplus++;
         else if( ( (*it_mcpart)->GetPDGCode() ) == 22 ) N_gamma++;
         else N_other++;
-        
     }
     
     //--------------------------------------------------------------------------
@@ -1706,13 +1698,41 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     int t_neutrinoPDG = truthEvent->incoming();
     
     // CC Neutrino Interaction
-    if ( t_current==1 && t_neutrinoPDG == 14 ) {
+    if ( t_current == 1 && t_neutrinoPDG == 14 ) {
         // Atleast 1 proton, 1 pi0, 0 pi+, 0 pi-
-        if(N_proton > 0 && N_pi0 == 1 && N_piplus == 0 && N_piminus == 0){
+        if(N_proton > 0 && N_pi0 == 1 && N_piplus == 0 && N_piminus == 0 && N_other == 0){
             isSignal = true;
         }
     }
     truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal", isSignal );
+    
+    
+    //--------------------------------------------------------------------------
+    //! Create Final State Particle Table
+    //--------------------------------------------------------------------------
+    if (m_writeFSParticle_Table){
+        // Using Reverse Iterator to have the table in correct order
+        SmartRefVector<Minerva::TG4Trajectory>::const_reverse_iterator rit_mcpart;
+        
+        info() <<"--------------------------------------------------------------"<<endmsg;
+        info() <<"Final State Particle Table"<<endmsg;
+        if(isSignal){
+            info() <<">> Marked as Signal! <<"<<endmsg;
+        }
+        info() <<"ID\tPDG\tParent\tPx\tPy\tPz\tE"<<endmsg;
+        for (rit_mcpart = pri_trajectories.rbegin(); rit_mcpart != pri_trajectories.rend(); ++rit_mcpart) {
+            Gaudi::LorentzVector temp_4p = (*rit_mcpart)->GetInitialMomentum();
+            info()  <<(*rit_mcpart)->GetTrackId()<<"\t"
+                    <<(*rit_mcpart)->GetPDGCode()<<"\t"
+                    <<(*rit_mcpart)->GetParentId()<<"\t"
+                    <<temp_4p.px()<<"\t"
+                    <<temp_4p.py()<<"\t"
+                    <<temp_4p.pz()<<"\t"
+                    <<temp_4p.E()<<"\t"
+                    <<endmsg;
+        }
+        info() <<"--------------------------------------------------------------"<<endmsg;
+    }
    
     
     //------------------------------------------------------------
@@ -4450,45 +4470,62 @@ bool CCProtonPi0::InsideHexagon(double x, double y, double w) const
 //==============================================================================
 //  PreFilterPi0
 //==============================================================================
-StatusCode CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event ) const
+bool CCProtonPi0::PreFilterPi0(   Minerva::PhysicsEvent *event, 
+                                        const SmartRef<Minerva::Vertex>& vertex ) const
 {
 
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::PreFilterPi0()" << endmsg;
-        //if ( event->processType() ==  Minerva::PhysicsEvent::RockParticle )  {
-        //info() << " Jumping rock Muon " << endmsg;
-        //return StatusCode::FAILURE;
-        //}
 
-    SmartRefVector<Minerva::IDCluster> unusedClusters
-        = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
-
-    const Gaudi::XYZPoint& vertex = event->interactionVertex()->position();
+    // Visible Energy Limits for the PreFilter [MeV]
+    // Other = Tracker + ECAL + HCAL
+    const double max_Evis_Target = 20;
+    const double min_Evis_Other = 80;   // energy smaller than 80*1.2 Mev must be ignored
+    const double max_Evis_Other = 2000; // energy bigger than 1.7*1.2 GeV must be ignored
+    
+    const Gaudi::XYZPoint& pos = vertex->position();
     const double inter_mod_z   = 45.0; // From geometry spreadsheet
     const double inter_plane_z = inter_mod_z/2.0;
-    const double z0 = vertex.Z();
+    const double z0 = pos.Z();
+    
+    // Use only UNUSED clusters
+    SmartRefVector<Minerva::IDCluster> unusedClusters;
+    unusedClusters = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
 
-    SmartRefVector<Minerva::IDCluster> nearVertexClusters;
-    for (SmartRefVector<Minerva::IDCluster>::iterator c = unusedClusters.begin();
-         c != unusedClusters.end(); c++ ){
-        const double c_z = (*c)->z();
-        if (std::abs(c_z-z0) < 5*inter_plane_z) nearVertexClusters.push_back(*c);
-    }
-
-    std::cout << "Total near-vertex cluster: " << nearVertexClusters.size() << std::endl;
-
-    double nearvtx_total  = 0.0;
+    //--------------------------------------------------------------------------
+    // Find Near-Vertex Clusters
+    //--------------------------------------------------------------------------
+    double nearvtx_total = 0.0;
     double nearvtx_evisX = 0.0;
     double nearvtx_evisU = 0.0;
     double nearvtx_evisV = 0.0;
     
-    for (SmartRefVector<Minerva::IDCluster>::iterator c = nearVertexClusters.begin();
-         c != nearVertexClusters.end(); c++ ){
-        const double energy = (*c)->energy();
+    // Save all near-vertex clusters
+    SmartRefVector<Minerva::IDCluster> nearVertexClusters;
+    for (   SmartRefVector<Minerva::IDCluster>::iterator iter_cluster = unusedClusters.begin();
+            iter_cluster != unusedClusters.end();
+            ++iter_cluster ){
+            
+        const double cluster_z = (*iter_cluster)->z();
+        if (std::abs(cluster_z-z0) < 5*inter_plane_z){ 
+            nearVertexClusters.push_back(*iter_cluster);
+        }
+    }
+
+    debug() << "Total Number of near-vertex clusters: " << nearVertexClusters.size() << endmsg;
+
+    // Save Visible Energy of near-vertex clusters for each view
+    for (   SmartRefVector<Minerva::IDCluster>::iterator iter_cluster = nearVertexClusters.begin();
+            iter_cluster != nearVertexClusters.end(); 
+            ++iter_cluster ){
+            
+        const double energy = (*iter_cluster)->energy();
+        Minerva::IDCluster::View view = (*iter_cluster)->view();
+        
         nearvtx_total += energy;
-        if ((*c)->view() == Minerva::IDCluster::X) nearvtx_evisX += energy;
-        if ((*c)->view() == Minerva::IDCluster::U) nearvtx_evisU += energy;
-        if ((*c)->view() == Minerva::IDCluster::V) nearvtx_evisV += energy;
+        if (view == Minerva::IDCluster::X) nearvtx_evisX += energy;
+        if (view == Minerva::IDCluster::U) nearvtx_evisU += energy;
+        if (view == Minerva::IDCluster::V) nearvtx_evisV += energy;
     }
 
     event->setDoubleData("evis_nearvtx_total", nearvtx_total);
@@ -4496,7 +4533,11 @@ StatusCode CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event ) const
     event->setDoubleData("evis_nearvtx_u", nearvtx_evisU);
     event->setDoubleData("evis_nearvtx_u", nearvtx_evisV);
 
-    
+
+    //--------------------------------------------------------------------------
+    // Save Visible Energy of all UNUSED Hits for each sub detector and view
+    // Target, Tracker, ECAL, HCAL, TOTAL
+    //--------------------------------------------------------------------------
     double ntgtEvis = 0.0;
     double trkrEvis = 0.0;
     double ecalEvis = 0.0;
@@ -4521,39 +4562,51 @@ StatusCode CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event ) const
     double hcalEvisV = 0.0;
     double totalV = 0.0;
 
-    for (SmartRefVector<Minerva::IDCluster>::iterator c = unusedClusters.begin();
-         c != unusedClusters.end(); c++ ){
-        const double energy = (*c)->energy();
-        Minerva::IDCluster::Subdet subdet = (*c)->subdet();
+    for (   SmartRefVector<Minerva::IDCluster>::iterator iter_cluster = unusedClusters.begin();
+            iter_cluster != unusedClusters.end(); 
+            ++iter_cluster ){
+            
+        const double energy = (*iter_cluster)->energy();
+        Minerva::IDCluster::Subdet subdet = (*iter_cluster)->subdet();
+        Minerva::IDCluster::View view = (*iter_cluster)->view();
+//         if ((*iter_cluster)->view() == Minerva::IDCluster::X) ntgtEvisX += energy;
+        
+        // Total Visible Energy
         total += energy;
-        if      (subdet == Minerva::IDCluster::NuclTargs) {
+        // Visible Energy in SubDetector = Target
+        if (subdet == Minerva::IDCluster::NuclTargs) {
             ntgtEvis += energy;
-            if ((*c)->view() == Minerva::IDCluster::X) ntgtEvisX += energy;
-            if ((*c)->view() == Minerva::IDCluster::U) ntgtEvisU += energy;
-            if ((*c)->view() == Minerva::IDCluster::V) ntgtEvisV += energy;
+            if (view == Minerva::IDCluster::X) ntgtEvisX += energy;
+            if (view == Minerva::IDCluster::U) ntgtEvisU += energy;
+            if (view == Minerva::IDCluster::V) ntgtEvisV += energy;
         }
+        // Visible Energy in SubDetector = Tracker
         else if (subdet == Minerva::IDCluster::Tracker) {
             trkrEvis += energy;
-            if ((*c)->view() == Minerva::IDCluster::X) trkrEvisX += energy;
-            if ((*c)->view() == Minerva::IDCluster::U) trkrEvisU += energy;
-            if ((*c)->view() == Minerva::IDCluster::V) trkrEvisV += energy;
+            if (view == Minerva::IDCluster::X) trkrEvisX += energy;
+            if (view == Minerva::IDCluster::U) trkrEvisU += energy;
+            if (view == Minerva::IDCluster::V) trkrEvisV += energy;
         }
+        // Visible Energy in SubDetector = ECAL
         else if (subdet == Minerva::IDCluster::ECAL) {
             ecalEvis += energy;
-            if ((*c)->view() == Minerva::IDCluster::X) ecalEvisX += energy;
-            if ((*c)->view() == Minerva::IDCluster::U) ecalEvisU += energy;
-            if ((*c)->view() == Minerva::IDCluster::V) ecalEvisV += energy;
+            if (view == Minerva::IDCluster::X) ecalEvisX += energy;
+            if (view == Minerva::IDCluster::U) ecalEvisU += energy;
+            if (view == Minerva::IDCluster::V) ecalEvisV += energy;
         }
+        // Visible Energy in SubDetector = HCAL
         else if (subdet == Minerva::IDCluster::HCAL) {
             hcalEvis += energy;
-            if ((*c)->view() == Minerva::IDCluster::X) hcalEvisX += energy;
-            if ((*c)->view() == Minerva::IDCluster::U) hcalEvisU += energy;
-            if ((*c)->view() == Minerva::IDCluster::V) hcalEvisV += energy;
+            if (view == Minerva::IDCluster::X) hcalEvisX += energy;
+            if (view == Minerva::IDCluster::U) hcalEvisU += energy;
+            if (view == Minerva::IDCluster::V) hcalEvisV += energy;
         }
-        
-        else {}
+        else{
+            debug() <<"Cluster SubDetector does not found!"<<endmsg;
+        }
     }
     
+    // Visible Energy except Target Region
     const double otherevis = trkrEvis + ecalEvis + hcalEvis;
     
     event->setDoubleData("evis_total_x", totalX);
@@ -4581,15 +4634,48 @@ StatusCode CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event ) const
     event->setDoubleData("evis_hcal",  hcalEvis);
     event->setDoubleData("evis_other", otherevis);
     
+
     debug() <<"Exit CCProtonPi0::PreFilterPi0()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
 
-    if      ( ntgtEvis > 20)    return StatusCode::FAILURE;
-    else if ( otherevis > 2000) return StatusCode::FAILURE; // energy bigger than 1.7*1.2 GeV must be ignored
-    else if ( otherevis < 80 )  return StatusCode::FAILURE; // energy smaller than 80*1.2 Mev must be ignored
-    else return StatusCode::SUCCESS;
+
     
-    return StatusCode::SUCCESS;
+    //--------------------------------------------------------------------------
+    // preFilter_Result
+    // 0 = Passes Filter
+    // 1 = Rejected by Target Filter
+    // 2 = Rejected by Max Other
+    // 3 = Rejected by Min Other
+    //--------------------------------------------------------------------------
+    
+    // Check Target Region
+    if ( ntgtEvis > max_Evis_Target){
+        debug() <<"Evis(target) bigger than max value!"<<endmsg;
+        debug() <<"Evis(target) = "<<ntgtEvis<<" max =  "<<max_Evis_Target<<endmsg;
+        event->setIntData("preFilter_Result",1);
+        return false;
+    }
+    // Check Other Regions (Tracker + ECAL + HCAL)
+    if ( otherevis > max_Evis_Other){
+        debug() <<"Evis(other) bigger than max value!"<<endmsg;
+        debug() <<"Evis(other) = "<<otherevis<<" max =  "<<max_Evis_Other<<endmsg;
+        event->setIntData("preFilter_Result",2);
+        event->setDoubleData("preFilter_rejectedEnergy",otherevis);
+        return false;
+    }else if( otherevis < min_Evis_Other ){
+        debug() <<"Evis(other) lower than min value!"<<endmsg;
+        debug() <<"Evis(other) = "<<otherevis<<" min =  "<<min_Evis_Other<<endmsg;
+        event->setIntData("preFilter_Result",3);
+        event->setDoubleData("preFilter_rejectedEnergy",otherevis);
+        return false;
+    }
+
+    // Passed all Tests
+    debug() <<"Evis(target) = "<<ntgtEvis<<" Evis(other) = "<<otherevis<<endmsg;
+    debug() <<"max_Target = "<<max_Evis_Target<<" min_Other =  "<<min_Evis_Other<<" max_Other =  "<<max_Evis_Other<<endmsg;
+    event->setIntData("preFilter_Result",0);
+    
+    return true;
     
 }
 

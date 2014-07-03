@@ -1,13 +1,17 @@
-cvs commit -m "v1_00 - 2014_07_02
+cvs commit -m "v1_01 - 2014_07_03
 
-* setPi0ParticleData() Function reorganized completely
-    * Function Order: 
-        1) Calculations
-        2) Branch Filling
-    * Additional Comments Added
-    
-* Unused Variables Removed and Variable Naming Style Improved
+* PreFilterPi0()
+    * Getting Vertex as input
+    * Return Value Changed: StatusCode -> bool
+    * Debug Messages and Comments 
+    * New Variables:
+        * Rejected Energy
+        * Status
 
-* Version Tracking Started
-    * CCProtonPi0 v1_00 is the stable version capable of reconstructing
-        All Final State Particles" .
+* tagTruth()
+    * Final State Particle Table as INFO
+        * m_writeFSParticle_Table controls execution
+        * Using reverse_iterator    
+        
+* setParticleData Functions
+    * Return Value Changed: StatusCode -> bool" .

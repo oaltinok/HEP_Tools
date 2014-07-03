@@ -21,7 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_07_02
+    Last Revision:  2014_07_03
+    Version:        v1_01
     
 ================================================================================
 */
@@ -29,6 +30,7 @@ CCProtonPi0
 #define CCPROTONPI0_H 1
 
 #include <utility>
+#include <fstream>
 
 // ineritance
 #include "AnaUtils/MinervaAnalysisTool.h"
@@ -118,6 +120,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         double m_minMuonScore;
         double m_minProtonScore;
         
+        // Algorihm Flow
+        bool m_writeFSParticle_Table;
         bool m_store_all_events;
         bool m_makeShortTracks;
         bool m_doPlausibilityCuts;
@@ -244,7 +248,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
                                                             const SmartRefVector<Minerva::IDCluster>& clusters,
                                                             const double sphereRadius,
                                                             std::vector<double>& radii) const;
-        StatusCode PreFilterPi0(Minerva::PhysicsEvent *event ) const;
+        bool PreFilterPi0(    Minerva::PhysicsEvent *event,
+                                    const SmartRef<Minerva::Vertex>& vertex ) const;
         StatusCode VtxBlob(Minerva::PhysicsEvent *event, 
                             const SmartRef<Minerva::Vertex>& vertex ) const;
         StatusCode ConeBlobs(   Minerva::PhysicsEvent *event,
