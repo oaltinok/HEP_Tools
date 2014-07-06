@@ -15,7 +15,7 @@ Class: BinList
         > binList->error.get_max();
             
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_06_20
+    Last Revision: 2014_07_06
 ================================================================================
 */
 #ifndef BinList_h
@@ -37,8 +37,10 @@ class BinList
         SingleBin int_channel;
         SingleBin vertex_z;
         SingleBin vertex_x_y;
-        SingleBin mgg_reco;
         SingleBin deltaInvMass;
+        SingleBin preFilter_Status;
+        SingleBin preFilter_RejectedEnergy;
+        
         
         // Analysis
         SingleBin beamE;

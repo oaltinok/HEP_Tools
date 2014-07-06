@@ -19,7 +19,7 @@ Class: CCProtonPi0
     
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_06_21
+    Last Revision:  2014_07_06
 ================================================================================
 */
 
@@ -137,7 +137,8 @@ public :
     TH1F* deltaInvMass_error;
     TH2F* deltaInvMass_reco_mc;
     
-    TH1F* mgg_reco;
+    TH1F* pFilter_Status;
+    TH1F* pFilter_RejectedEnergy;
     
     TH1F* q2_mc;
     TH1F* q2_reco;
@@ -212,7 +213,7 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
-    // Declaration of leaf types
+   // Declaration of leaf types
    Double_t        eventID;
    Int_t           physEvtNum;
    Int_t           n_hyps;
@@ -238,12 +239,13 @@ public :
    Bool_t          isMinosMatchStub;
    Bool_t          well_fit_vertex;
    Bool_t          isBrokenTrack;
-   Bool_t          is_GoodDirection1;
-   Bool_t          is_GoodPosition1;
-   Bool_t          is_GoodDirection2;
-   Bool_t          is_GoodPosition2;
-   Bool_t          is_GoodBlob1;
-   Bool_t          is_GoodBlob2;
+   Bool_t          gamma1_isGoodDirection;
+   Bool_t          gamma1_isGoodPosition;
+   Bool_t          gamma1_isGoodBlob;
+   Bool_t          gamma2_isGoodDirection;
+   Bool_t          gamma2_isGoodPosition;
+   Bool_t          gamma2_isGoodBlob;
+   Int_t           Cut_ConeBlobs;
    Int_t           Cut_EndPoint_Michel_Exist;
    Int_t           Cut_Muon_Charge;
    Int_t           Cut_Muon_None;
@@ -255,33 +257,29 @@ public :
    Int_t           Cut_Vertex_Not_Fiducial;
    Int_t           Cut_Vertex_Not_Reconstructable;
    Int_t           Cut_Vertex_Null;
+   Int_t           Cut_VtxBlob;
    Int_t           Cut_secEndPoint_Michel_Exist;
    Int_t           anglescan_ncand;
    Int_t           anglescan_ncandx;
    Int_t           broken_track_most_us_plane;
-   Int_t           g1blob_ncluster;
-   Int_t           g1blob_ndigit;
    Int_t           g1dedx_doublet;
    Int_t           g1dedx_empty_plane;
    Int_t           g1dedx_nplane;
    Int_t           g1mostevispdg;
-   Int_t           g2blob_ncluster;
-   Int_t           g2blob_ndigit;
    Int_t           g2dedx_doublet;
    Int_t           g2dedx_empty_plane;
    Int_t           g2dedx_nplane;
    Int_t           g2mostevispdg;
+   Int_t           gamma1_blob_nclusters;
+   Int_t           gamma1_blob_ndigits;
+   Int_t           gamma2_blob_nclusters;
+   Int_t           gamma2_blob_ndigits;
    Int_t           n_anchored_long_trk_prongs;
    Int_t           n_anchored_short_trk_prongs;
-   Int_t           n_dsp_blob_prongs;
-   Int_t           n_iso_blob_prongs;
    Int_t           n_iso_trk_prongs;
    Int_t           n_long_tracks;
    Int_t           n_short_tracks;
-   Int_t           n_startpoint_vertices;
-   Int_t           n_us_muon_clusters;
    Int_t           n_vtx_michel_views;
-   Int_t           n_vtx_prongs;
    Int_t           nblob_anglescan;
    Int_t           nblob_hough;
    Int_t           od_energeticTower;
@@ -293,6 +291,7 @@ public :
    Int_t           phys_n_dead_discr_pair_two_mod_upstream_prim_vtx;
    Int_t           phys_n_dead_discr_pair_upstream_prim_track_proj;
    Int_t           phys_vertex_is_fiducial;
+   Int_t           preFilter_Result;
    Int_t           vtx_primary_index;
    Int_t           vtx_primary_multiplicity;
    Int_t           vtx_secondary_count;
@@ -301,13 +300,6 @@ public :
    Double_t        RE_energy_ECAL;
    Double_t        RE_energy_HCAL;
    Double_t        RE_energy_Tracker;
-   Double_t        RE_photon_dEdx_1;
-   Double_t        RE_photon_dEdx_2;
-   Double_t        RE_photon_energy_1;
-   Double_t        RE_photon_energy_2;
-   Double_t        RE_photon_time_1;
-   Double_t        RE_photon_time_2;
-   Double_t        RE_scalar;
    Double_t        Sphere_Vertex_energy;
    Double_t        Vertex_blob_energy;
    Double_t        dispersedExtraE;
@@ -339,14 +331,11 @@ public :
    Double_t        evis_trkr_u;
    Double_t        evis_trkr_v;
    Double_t        evis_trkr_x;
-   Double_t        g1blob_edge_distance;
    Double_t        g1blob_minsep;
-   Double_t        g1blob_vtx_distance;
    Double_t        g1dedx;
    Double_t        g1dedx1;
    Double_t        g1dedx_total;
    Double_t        g1dedx_total1;
-   Double_t        g1e;
    Double_t        g1g1evis;
    Double_t        g1g2evis;
    Double_t        g1gmevis;
@@ -354,26 +343,17 @@ public :
    Double_t        g1muevis;
    Double_t        g1neutronevis;
    Double_t        g1otherevis;
-   Double_t        g1phi;
    Double_t        g1pi0evis;
    Double_t        g1pimevis;
    Double_t        g1pipevis;
    Double_t        g1protonevis;
-   Double_t        g1recoecalevis;
-   Double_t        g1recohcalevis;
-   Double_t        g1recoscalevis;
-   Double_t        g1recotrkrevis;
    Double_t        g1sharedevis;
-   Double_t        g1theta;
    Double_t        g1totalevis;
-   Double_t        g2blob_edge_distance;
    Double_t        g2blob_minsep;
-   Double_t        g2blob_vtx_distance;
    Double_t        g2dedx;
    Double_t        g2dedx1;
    Double_t        g2dedx_total;
    Double_t        g2dedx_total1;
-   Double_t        g2e;
    Double_t        g2g1evis;
    Double_t        g2g2evis;
    Double_t        g2gmevis;
@@ -381,34 +361,46 @@ public :
    Double_t        g2muevis;
    Double_t        g2neutronevis;
    Double_t        g2otherevis;
-   Double_t        g2phi;
    Double_t        g2pi0evis;
    Double_t        g2pimevis;
    Double_t        g2pipevis;
    Double_t        g2protonevis;
-   Double_t        g2recoecalevis;
-   Double_t        g2recohcalevis;
-   Double_t        g2recoscalevis;
-   Double_t        g2recotrkrevis;
    Double_t        g2sharedevis;
-   Double_t        g2theta;
    Double_t        g2totalevis;
    Double_t        gamma1_E;
+   Double_t        gamma1_dEdx;
+   Double_t        gamma1_dist_exit;
+   Double_t        gamma1_dist_vtx;
+   Double_t        gamma1_evis_ecal;
+   Double_t        gamma1_evis_hcal;
+   Double_t        gamma1_evis_scal;
+   Double_t        gamma1_evis_trkr;
+   Double_t        gamma1_phi;
    Double_t        gamma1_px;
    Double_t        gamma1_py;
    Double_t        gamma1_pz;
+   Double_t        gamma1_theta;
+   Double_t        gamma1_time;
    Double_t        gamma2_E;
+   Double_t        gamma2_dEdx;
+   Double_t        gamma2_dist_exit;
+   Double_t        gamma2_dist_vtx;
+   Double_t        gamma2_evis_ecal;
+   Double_t        gamma2_evis_hcal;
+   Double_t        gamma2_evis_scal;
+   Double_t        gamma2_evis_trkr;
+   Double_t        gamma2_phi;
    Double_t        gamma2_px;
    Double_t        gamma2_py;
    Double_t        gamma2_pz;
+   Double_t        gamma2_theta;
+   Double_t        gamma2_time;
    Double_t        hadronVisibleE;
-   Double_t        mgg;
    Double_t        muonVisibleE;
    Double_t        muon_phi;
    Double_t        muon_theta;
    Double_t        muon_thetaX;
    Double_t        muon_thetaY;
-   Double_t        oangle;
    Double_t        od_downstreamFrame;
    Double_t        od_downstreamFrame_z;
    Double_t        od_highStory;
@@ -423,18 +415,17 @@ public :
    Double_t        phys_energy_in_road_upstream;
    Double_t        phys_energy_unattached;
    Double_t        pi0_E;
+   Double_t        pi0_cos_openingAngle;
+   Double_t        pi0_invMass;
+   Double_t        pi0_openingAngle;
+   Double_t        pi0_phi;
    Double_t        pi0_px;
    Double_t        pi0_py;
    Double_t        pi0_pz;
-   Double_t        pienergy;
-   Double_t        piphi;
-   Double_t        piphib;
-   Double_t        pitheta;
-   Double_t        pithetab;
-   Double_t        pithetax;
-   Double_t        pithetaxb;
-   Double_t        pithetay;
-   Double_t        pithetayb;
+   Double_t        pi0_theta;
+   Double_t        pi0_thetaX;
+   Double_t        pi0_thetaY;
+   Double_t        preFilter_rejectedEnergy;
    Double_t        prim_vtx_smallest_opening_angle;
    Double_t        time;
    Double_t        totalIDVisibleE;
@@ -445,41 +436,41 @@ public :
    Double_t        vtx_michel_distance;
    Double_t        well_fit_vertex_angle;
    Int_t           anglescan_blob_nc_sz;
-   Int_t           anglescan_blob_nc[5];   //[anglescan_blob_nc_sz]
+   Int_t           anglescan_blob_nc[10];   //[anglescan_blob_nc_sz]
    Int_t           anglescan_blob_ncu_sz;
-   Int_t           anglescan_blob_ncu[5];   //[anglescan_blob_ncu_sz]
+   Int_t           anglescan_blob_ncu[10];   //[anglescan_blob_ncu_sz]
    Int_t           anglescan_blob_ncv_sz;
-   Int_t           anglescan_blob_ncv[5];   //[anglescan_blob_ncv_sz]
+   Int_t           anglescan_blob_ncv[10];   //[anglescan_blob_ncv_sz]
    Int_t           anglescan_blob_ncx_sz;
-   Int_t           anglescan_blob_ncx[5];   //[anglescan_blob_ncx_sz]
+   Int_t           anglescan_blob_ncx[10];   //[anglescan_blob_ncx_sz]
    Int_t           anglescan_blob_nd_sz;
-   Int_t           anglescan_blob_nd[5];   //[anglescan_blob_nd_sz]
+   Int_t           anglescan_blob_nd[10];   //[anglescan_blob_nd_sz]
    Int_t           anglescan_blob_ndu_sz;
-   Int_t           anglescan_blob_ndu[5];   //[anglescan_blob_ndu_sz]
+   Int_t           anglescan_blob_ndu[10];   //[anglescan_blob_ndu_sz]
    Int_t           anglescan_blob_ndv_sz;
-   Int_t           anglescan_blob_ndv[5];   //[anglescan_blob_ndv_sz]
+   Int_t           anglescan_blob_ndv[10];   //[anglescan_blob_ndv_sz]
    Int_t           anglescan_blob_ndx_sz;
-   Int_t           anglescan_blob_ndx[5];   //[anglescan_blob_ndx_sz]
+   Int_t           anglescan_blob_ndx[10];   //[anglescan_blob_ndx_sz]
    Int_t           anglescan_cand_nc_sz;
-   Int_t           anglescan_cand_nc[5];   //[anglescan_cand_nc_sz]
+   Int_t           anglescan_cand_nc[10];   //[anglescan_cand_nc_sz]
    Int_t           anglescan_cand_ncu_sz;
-   Int_t           anglescan_cand_ncu[5];   //[anglescan_cand_ncu_sz]
+   Int_t           anglescan_cand_ncu[10];   //[anglescan_cand_ncu_sz]
    Int_t           anglescan_cand_ncv_sz;
-   Int_t           anglescan_cand_ncv[5];   //[anglescan_cand_ncv_sz]
+   Int_t           anglescan_cand_ncv[10];   //[anglescan_cand_ncv_sz]
    Int_t           anglescan_cand_ncx_sz;
-   Int_t           anglescan_cand_ncx[5];   //[anglescan_cand_ncx_sz]
+   Int_t           anglescan_cand_ncx[10];   //[anglescan_cand_ncx_sz]
    Int_t           anglescan_cand_nd_sz;
-   Int_t           anglescan_cand_nd[5];   //[anglescan_cand_nd_sz]
+   Int_t           anglescan_cand_nd[10];   //[anglescan_cand_nd_sz]
    Int_t           anglescan_cand_ndu_sz;
-   Int_t           anglescan_cand_ndu[5];   //[anglescan_cand_ndu_sz]
+   Int_t           anglescan_cand_ndu[10];   //[anglescan_cand_ndu_sz]
    Int_t           anglescan_cand_ndv_sz;
-   Int_t           anglescan_cand_ndv[5];   //[anglescan_cand_ndv_sz]
+   Int_t           anglescan_cand_ndv[10];   //[anglescan_cand_ndv_sz]
    Int_t           anglescan_cand_ndx_sz;
-   Int_t           anglescan_cand_ndx[5];   //[anglescan_cand_ndx_sz]
+   Int_t           anglescan_cand_ndx[10];   //[anglescan_cand_ndx_sz]
    Int_t           anglescan_candx_nc_sz;
-   Int_t           anglescan_candx_nc[5];   //[anglescan_candx_nc_sz]
+   Int_t           anglescan_candx_nc[10];   //[anglescan_candx_nc_sz]
    Int_t           anglescan_candx_nd_sz;
-   Int_t           anglescan_candx_nd[5];   //[anglescan_candx_nd_sz]
+   Int_t           anglescan_candx_nd[10];   //[anglescan_candx_nd_sz]
    Int_t           final_blob_nc_sz;
    Int_t           final_blob_nc[2];   //[final_blob_nc_sz]
    Int_t           final_blob_ncu_sz;
@@ -516,14 +507,6 @@ public :
    Int_t           hough_blob_ndv[3];   //[hough_blob_ndv_sz]
    Int_t           hough_blob_ndx_sz;
    Int_t           hough_blob_ndx[3];   //[hough_blob_ndx_sz]
-   Int_t           RE_photon_direction_1_sz;
-   Double_t        RE_photon_direction_1[3];   //[RE_photon_direction_1_sz]
-   Int_t           RE_photon_direction_2_sz;
-   Double_t        RE_photon_direction_2[3];   //[RE_photon_direction_2_sz]
-   Int_t           RE_photon_vertex_1_sz;
-   Double_t        RE_photon_vertex_1[3];   //[RE_photon_vertex_1_sz]
-   Int_t           RE_photon_vertex_2_sz;
-   Double_t        RE_photon_vertex_2[3];   //[RE_photon_vertex_2_sz]
    Int_t           Vertex_energy_radii_sz;
    Double_t        Vertex_energy_radii[7];   //[Vertex_energy_radii_sz]
    Int_t           blob_cluster_energy1_sz;
@@ -533,13 +516,15 @@ public :
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[46];   //[g1dedx_rev_cluster_energy_sz]
-   Double_t        g1mom[3];
+   Double_t        g1dedx_rev_cluster_energy[74];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[46];   //[g2dedx_rev_cluster_energy_sz]
-   Double_t        g2mom[3];
+   Double_t        g2dedx_rev_cluster_energy[35];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        gamma1_direction[3];
+   Double_t        gamma1_vertex[3];
+   Double_t        gamma2_direction[3];
+   Double_t        gamma2_vertex[3];
    Int_t           good_mgg_vector_sz;
    Double_t        good_mgg_vector[1];   //[good_mgg_vector_sz]
    Int_t           mgg_vector_sz;
@@ -558,7 +543,6 @@ public :
    Double_t        od_towerTimeBlobMuon[2];   //[od_towerTimeBlobMuon_sz]
    Int_t           od_towerTimeBlobOD_sz;
    Double_t        od_towerTimeBlobOD[2];   //[od_towerTimeBlobOD_sz]
-   Double_t        pimom[4];
    Bool_t          truth_has_physics_event;
    Bool_t          truth_reco_hasGoodObjects;
    Bool_t          truth_reco_isGoodVertex;
@@ -852,20 +836,20 @@ public :
    Double_t        mc_FSPartE[24];   //[mc_nFSPart]
    Int_t           mc_FSPartPDG[24];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[51];   //[mc_er_nPart]
-   Int_t           mc_er_status[51];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[51];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[51];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[51];   //[mc_er_nPart]
-   Double_t        mc_er_Px[51];   //[mc_er_nPart]
-   Double_t        mc_er_Py[51];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[51];   //[mc_er_nPart]
-   Double_t        mc_er_E[51];   //[mc_er_nPart]
-   Int_t           mc_er_FD[51];   //[mc_er_nPart]
-   Int_t           mc_er_LD[51];   //[mc_er_nPart]
-   Int_t           mc_er_mother[51];   //[mc_er_nPart]
+   Int_t           mc_er_ID[53];   //[mc_er_nPart]
+   Int_t           mc_er_status[53];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[53];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[53];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[53];   //[mc_er_nPart]
+   Double_t        mc_er_Px[53];   //[mc_er_nPart]
+   Double_t        mc_er_Py[53];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[53];   //[mc_er_nPart]
+   Double_t        mc_er_E[53];   //[mc_er_nPart]
+   Int_t           mc_er_FD[53];   //[mc_er_nPart]
+   Int_t           mc_er_LD[53];   //[mc_er_nPart]
+   Int_t           mc_er_mother[53];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[7];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[8];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -921,12 +905,13 @@ public :
    TBranch        *b_isMinosMatchStub;   //!
    TBranch        *b_well_fit_vertex;   //!
    TBranch        *b_isBrokenTrack;   //!
-   TBranch        *b_is_GoodDirection1;   //!
-   TBranch        *b_is_GoodPosition1;   //!
-   TBranch        *b_is_GoodDirection2;   //!
-   TBranch        *b_is_GoodPosition2;   //!
-   TBranch        *b_is_GoodBlob1;   //!
-   TBranch        *b_is_GoodBlob2;   //!
+   TBranch        *b_gamma1_isGoodDirection;   //!
+   TBranch        *b_gamma1_isGoodPosition;   //!
+   TBranch        *b_gamma1_isGoodBlob;   //!
+   TBranch        *b_gamma2_isGoodDirection;   //!
+   TBranch        *b_gamma2_isGoodPosition;   //!
+   TBranch        *b_gamma2_isGoodBlob;   //!
+   TBranch        *b_Cut_ConeBlobs;   //!
    TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
    TBranch        *b_Cut_Muon_Charge;   //!
    TBranch        *b_Cut_Muon_None;   //!
@@ -938,33 +923,29 @@ public :
    TBranch        *b_Cut_Vertex_Not_Fiducial;   //!
    TBranch        *b_Cut_Vertex_Not_Reconstructable;   //!
    TBranch        *b_Cut_Vertex_Null;   //!
+   TBranch        *b_Cut_VtxBlob;   //!
    TBranch        *b_Cut_secEndPoint_Michel_Exist;   //!
    TBranch        *b_anglescan_ncand;   //!
    TBranch        *b_anglescan_ncandx;   //!
    TBranch        *b_broken_track_most_us_plane;   //!
-   TBranch        *b_g1blob_ncluster;   //!
-   TBranch        *b_g1blob_ndigit;   //!
    TBranch        *b_g1dedx_doublet;   //!
    TBranch        *b_g1dedx_empty_plane;   //!
    TBranch        *b_g1dedx_nplane;   //!
    TBranch        *b_g1mostevispdg;   //!
-   TBranch        *b_g2blob_ncluster;   //!
-   TBranch        *b_g2blob_ndigit;   //!
    TBranch        *b_g2dedx_doublet;   //!
    TBranch        *b_g2dedx_empty_plane;   //!
    TBranch        *b_g2dedx_nplane;   //!
    TBranch        *b_g2mostevispdg;   //!
+   TBranch        *b_gamma1_blob_nclusters;   //!
+   TBranch        *b_gamma1_blob_ndigits;   //!
+   TBranch        *b_gamma2_blob_nclusters;   //!
+   TBranch        *b_gamma2_blob_ndigits;   //!
    TBranch        *b_n_anchored_long_trk_prongs;   //!
    TBranch        *b_n_anchored_short_trk_prongs;   //!
-   TBranch        *b_n_dsp_blob_prongs;   //!
-   TBranch        *b_n_iso_blob_prongs;   //!
    TBranch        *b_n_iso_trk_prongs;   //!
    TBranch        *b_n_long_tracks;   //!
    TBranch        *b_n_short_tracks;   //!
-   TBranch        *b_n_startpoint_vertices;   //!
-   TBranch        *b_n_us_muon_clusters;   //!
    TBranch        *b_n_vtx_michel_views;   //!
-   TBranch        *b_n_vtx_prongs;   //!
    TBranch        *b_nblob_anglescan;   //!
    TBranch        *b_nblob_hough;   //!
    TBranch        *b_od_energeticTower;   //!
@@ -976,6 +957,7 @@ public :
    TBranch        *b_phys_n_dead_discr_pair_two_mod_upstream_prim_vtx;   //!
    TBranch        *b_phys_n_dead_discr_pair_upstream_prim_track_proj;   //!
    TBranch        *b_phys_vertex_is_fiducial;   //!
+   TBranch        *b_preFilter_Result;   //!
    TBranch        *b_vtx_primary_index;   //!
    TBranch        *b_vtx_primary_multiplicity;   //!
    TBranch        *b_vtx_secondary_count;   //!
@@ -984,13 +966,6 @@ public :
    TBranch        *b_RE_energy_ECAL;   //!
    TBranch        *b_RE_energy_HCAL;   //!
    TBranch        *b_RE_energy_Tracker;   //!
-   TBranch        *b_RE_photon_dEdx_1;   //!
-   TBranch        *b_RE_photon_dEdx_2;   //!
-   TBranch        *b_RE_photon_energy_1;   //!
-   TBranch        *b_RE_photon_energy_2;   //!
-   TBranch        *b_RE_photon_time_1;   //!
-   TBranch        *b_RE_photon_time_2;   //!
-   TBranch        *b_RE_scalar;   //!
    TBranch        *b_Sphere_Vertex_energy;   //!
    TBranch        *b_Vertex_blob_energy;   //!
    TBranch        *b_dispersedExtraE;   //!
@@ -1022,14 +997,11 @@ public :
    TBranch        *b_evis_trkr_u;   //!
    TBranch        *b_evis_trkr_v;   //!
    TBranch        *b_evis_trkr_x;   //!
-   TBranch        *b_g1blob_edge_distance;   //!
    TBranch        *b_g1blob_minsep;   //!
-   TBranch        *b_g1blob_vtx_distance;   //!
    TBranch        *b_g1dedx;   //!
    TBranch        *b_g1dedx1;   //!
    TBranch        *b_g1dedx_total;   //!
    TBranch        *b_g1dedx_total1;   //!
-   TBranch        *b_g1e;   //!
    TBranch        *b_g1g1evis;   //!
    TBranch        *b_g1g2evis;   //!
    TBranch        *b_g1gmevis;   //!
@@ -1037,26 +1009,17 @@ public :
    TBranch        *b_g1muevis;   //!
    TBranch        *b_g1neutronevis;   //!
    TBranch        *b_g1otherevis;   //!
-   TBranch        *b_g1phi;   //!
    TBranch        *b_g1pi0evis;   //!
    TBranch        *b_g1pimevis;   //!
    TBranch        *b_g1pipevis;   //!
    TBranch        *b_g1protonevis;   //!
-   TBranch        *b_g1recoecalevis;   //!
-   TBranch        *b_g1recohcalevis;   //!
-   TBranch        *b_g1recoscalevis;   //!
-   TBranch        *b_g1recotrkrevis;   //!
    TBranch        *b_g1sharedevis;   //!
-   TBranch        *b_g1theta;   //!
    TBranch        *b_g1totalevis;   //!
-   TBranch        *b_g2blob_edge_distance;   //!
    TBranch        *b_g2blob_minsep;   //!
-   TBranch        *b_g2blob_vtx_distance;   //!
    TBranch        *b_g2dedx;   //!
    TBranch        *b_g2dedx1;   //!
    TBranch        *b_g2dedx_total;   //!
    TBranch        *b_g2dedx_total1;   //!
-   TBranch        *b_g2e;   //!
    TBranch        *b_g2g1evis;   //!
    TBranch        *b_g2g2evis;   //!
    TBranch        *b_g2gmevis;   //!
@@ -1064,34 +1027,46 @@ public :
    TBranch        *b_g2muevis;   //!
    TBranch        *b_g2neutronevis;   //!
    TBranch        *b_g2otherevis;   //!
-   TBranch        *b_g2phi;   //!
    TBranch        *b_g2pi0evis;   //!
    TBranch        *b_g2pimevis;   //!
    TBranch        *b_g2pipevis;   //!
    TBranch        *b_g2protonevis;   //!
-   TBranch        *b_g2recoecalevis;   //!
-   TBranch        *b_g2recohcalevis;   //!
-   TBranch        *b_g2recoscalevis;   //!
-   TBranch        *b_g2recotrkrevis;   //!
    TBranch        *b_g2sharedevis;   //!
-   TBranch        *b_g2theta;   //!
    TBranch        *b_g2totalevis;   //!
    TBranch        *b_gamma1_E;   //!
+   TBranch        *b_gamma1_dEdx;   //!
+   TBranch        *b_gamma1_dist_exit;   //!
+   TBranch        *b_gamma1_dist_vtx;   //!
+   TBranch        *b_gamma1_evis_ecal;   //!
+   TBranch        *b_gamma1_evis_hcal;   //!
+   TBranch        *b_gamma1_evis_scal;   //!
+   TBranch        *b_gamma1_evis_trkr;   //!
+   TBranch        *b_gamma1_phi;   //!
    TBranch        *b_gamma1_px;   //!
    TBranch        *b_gamma1_py;   //!
    TBranch        *b_gamma1_pz;   //!
+   TBranch        *b_gamma1_theta;   //!
+   TBranch        *b_gamma1_time;   //!
    TBranch        *b_gamma2_E;   //!
+   TBranch        *b_gamma2_dEdx;   //!
+   TBranch        *b_gamma2_dist_exit;   //!
+   TBranch        *b_gamma2_dist_vtx;   //!
+   TBranch        *b_gamma2_evis_ecal;   //!
+   TBranch        *b_gamma2_evis_hcal;   //!
+   TBranch        *b_gamma2_evis_scal;   //!
+   TBranch        *b_gamma2_evis_trkr;   //!
+   TBranch        *b_gamma2_phi;   //!
    TBranch        *b_gamma2_px;   //!
    TBranch        *b_gamma2_py;   //!
    TBranch        *b_gamma2_pz;   //!
+   TBranch        *b_gamma2_theta;   //!
+   TBranch        *b_gamma2_time;   //!
    TBranch        *b_hadronVisibleE;   //!
-   TBranch        *b_mgg;   //!
    TBranch        *b_muonVisibleE;   //!
    TBranch        *b_muon_phi;   //!
    TBranch        *b_muon_theta;   //!
    TBranch        *b_muon_thetaX;   //!
    TBranch        *b_muon_thetaY;   //!
-   TBranch        *b_oangle;   //!
    TBranch        *b_od_downstreamFrame;   //!
    TBranch        *b_od_downstreamFrame_z;   //!
    TBranch        *b_od_highStory;   //!
@@ -1106,18 +1081,17 @@ public :
    TBranch        *b_phys_energy_in_road_upstream;   //!
    TBranch        *b_phys_energy_unattached;   //!
    TBranch        *b_pi0_E;   //!
+   TBranch        *b_pi0_cos_openingAngle;   //!
+   TBranch        *b_pi0_invMass;   //!
+   TBranch        *b_pi0_openingAngle;   //!
+   TBranch        *b_pi0_phi;   //!
    TBranch        *b_pi0_px;   //!
    TBranch        *b_pi0_py;   //!
    TBranch        *b_pi0_pz;   //!
-   TBranch        *b_pienergy;   //!
-   TBranch        *b_piphi;   //!
-   TBranch        *b_piphib;   //!
-   TBranch        *b_pitheta;   //!
-   TBranch        *b_pithetab;   //!
-   TBranch        *b_pithetax;   //!
-   TBranch        *b_pithetaxb;   //!
-   TBranch        *b_pithetay;   //!
-   TBranch        *b_pithetayb;   //!
+   TBranch        *b_pi0_theta;   //!
+   TBranch        *b_pi0_thetaX;   //!
+   TBranch        *b_pi0_thetaY;   //!
+   TBranch        *b_preFilter_rejectedEnergy;   //!
    TBranch        *b_prim_vtx_smallest_opening_angle;   //!
    TBranch        *b_time;   //!
    TBranch        *b_totalIDVisibleE;   //!
@@ -1199,14 +1173,6 @@ public :
    TBranch        *b_hough_blob_ndv;   //!
    TBranch        *b_hough_blob_ndx_sz;   //!
    TBranch        *b_hough_blob_ndx;   //!
-   TBranch        *b_RE_photon_direction_1_sz;   //!
-   TBranch        *b_RE_photon_direction_1;   //!
-   TBranch        *b_RE_photon_direction_2_sz;   //!
-   TBranch        *b_RE_photon_direction_2;   //!
-   TBranch        *b_RE_photon_vertex_1_sz;   //!
-   TBranch        *b_RE_photon_vertex_1;   //!
-   TBranch        *b_RE_photon_vertex_2_sz;   //!
-   TBranch        *b_RE_photon_vertex_2;   //!
    TBranch        *b_Vertex_energy_radii_sz;   //!
    TBranch        *b_Vertex_energy_radii;   //!
    TBranch        *b_blob_cluster_energy1_sz;   //!
@@ -1217,12 +1183,14 @@ public :
    TBranch        *b_g1dedx_cluster_energy;   //!
    TBranch        *b_g1dedx_rev_cluster_energy_sz;   //!
    TBranch        *b_g1dedx_rev_cluster_energy;   //!
-   TBranch        *b_g1mom;   //!
    TBranch        *b_g2dedx_cluster_energy_sz;   //!
    TBranch        *b_g2dedx_cluster_energy;   //!
    TBranch        *b_g2dedx_rev_cluster_energy_sz;   //!
    TBranch        *b_g2dedx_rev_cluster_energy;   //!
-   TBranch        *b_g2mom;   //!
+   TBranch        *b_gamma1_direction;   //!
+   TBranch        *b_gamma1_vertex;   //!
+   TBranch        *b_gamma2_direction;   //!
+   TBranch        *b_gamma2_vertex;   //!
    TBranch        *b_good_mgg_vector_sz;   //!
    TBranch        *b_good_mgg_vector;   //!
    TBranch        *b_mgg_vector_sz;   //!
@@ -1241,7 +1209,6 @@ public :
    TBranch        *b_od_towerTimeBlobMuon;   //!
    TBranch        *b_od_towerTimeBlobOD_sz;   //!
    TBranch        *b_od_towerTimeBlobOD;   //!
-   TBranch        *b_pimom;   //!
    TBranch        *b_truth_has_physics_event;   //!
    TBranch        *b_truth_reco_hasGoodObjects;   //!
    TBranch        *b_truth_reco_isGoodVertex;   //!

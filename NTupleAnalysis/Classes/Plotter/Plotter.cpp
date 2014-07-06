@@ -108,14 +108,17 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
         TH1F* h_deltaInvMass_reco = (TH1F*)f_Root->Get("deltaInvMass_reco");
         plot1D_Hist(h_deltaInvMass_reco,"deltaInvMass_reco.png",plotDir);
         
-        TH1F* h_mgg_reco = (TH1F*)f_Root->Get("mgg_reco");
-        plot1D_Hist(h_mgg_reco,"mgg_reco.png",plotDir);
-        
         TH1F* h_vertex_z_reco= (TH1F*)f_Root->Get("vertex_z_reco");
         plot1D_Hist(h_vertex_z_reco,"vertex_z_reco.png",plotDir);
         
         TH2F* h_vertex_x_y_reco= (TH2F*)f_Root->Get("vertex_x_y_reco");
         plot2D_Hist(h_vertex_x_y_reco,"vertex_x_y_reco.png",plotDir);
+        
+        TH1F* h_pFilter_Status = (TH1F*)f_Root->Get("pFilter_Status");
+        plot1D_Hist(h_pFilter_Status,"pFilter_Status.png",plotDir);
+        
+        TH1F* h_pFilter_RejectedEnergy = (TH1F*)f_Root->Get("pFilter_RejectedEnergy");
+        plot1D_Hist(h_pFilter_RejectedEnergy,"pFilter_RejectedEnergy.png",plotDir);
         
 //         TH1F* h_beamEnergy_reco= (TH1F*)f_Root->Get("beamEnergy_reco");
 //         plot1D_Hist(h_beamEnergy_reco,"beamEnergy_reco.png",plotDir);
@@ -167,62 +170,62 @@ void Plotter::plotParticleInfo(  string rootDir, string plotDir,
 
     // Plot Only MC Values
     if( isMC ){
-        TH1F* h_P_mc= (TH1F*)f_Root->Get("P_mc");
+        TH1F* h_P_mc = (TH1F*)f_Root->Get("P_mc");
         plot1D_Hist(h_P_mc,"P_mc.png",plotDir);
         
-        TH1F* h_KE_mc= (TH1F*)f_Root->Get("KE_mc");
+        TH1F* h_KE_mc = (TH1F*)f_Root->Get("KE_mc");
         plot1D_Hist(h_KE_mc,"KE_mc.png",plotDir);
         
-        TH1F* h_angleBeam_mc= (TH1F*)f_Root->Get("angleBeam_mc");
+        TH1F* h_angleBeam_mc = (TH1F*)f_Root->Get("angleBeam_mc");
         plot1D_Hist(h_angleBeam_mc,"angleBeam_mc.png",plotDir);
         
-        TH1F* h_angleMuon_mc= (TH1F*)f_Root->Get("angleMuon_mc");
+        TH1F* h_angleMuon_mc = (TH1F*)f_Root->Get("angleMuon_mc");
         plot1D_Hist(h_angleMuon_mc,"angleMuon_mc.png",plotDir);
     }
     
     // Plot Only Reco Values
     if( isReco ){
-        TH1F* h_partScore= (TH1F*)f_Root->Get("partScore");
+        TH1F* h_partScore = (TH1F*)f_Root->Get("partScore");
         plot1D_Hist(h_partScore,"partScore.png",plotDir);
         
-        TH1F* h_P_reco= (TH1F*)f_Root->Get("P_reco");
+        TH1F* h_P_reco = (TH1F*)f_Root->Get("P_reco");
         plot1D_Hist(h_P_reco,"P_reco.png",plotDir);
         
-        TH1F* h_KE_reco= (TH1F*)f_Root->Get("KE_reco");
+        TH1F* h_KE_reco = (TH1F*)f_Root->Get("KE_reco");
         plot1D_Hist(h_KE_reco,"KE_reco.png",plotDir);    
         
-        TH1F* h_angleBeam_reco= (TH1F*)f_Root->Get("angleBeam_reco");
+        TH1F* h_angleBeam_reco = (TH1F*)f_Root->Get("angleBeam_reco");
         plot1D_Hist(h_angleBeam_reco,"angleBeam_reco.png",plotDir);
         
-        TH1F* h_angleMuon_reco= (TH1F*)f_Root->Get("angleMuon_reco");
+        TH1F* h_angleMuon_reco = (TH1F*)f_Root->Get("angleMuon_reco");
         plot1D_Hist(h_angleMuon_reco,"angleMuon_reco.png",plotDir);
-
+        
     }
 
     //  Plot 2D Comparison Plots and Error Plots
     if ( is2D ){
-        TH2F* h_P_reco_mc= (TH2F*)f_Root->Get("P_reco_mc");
+        TH2F* h_P_reco_mc = (TH2F*)f_Root->Get("P_reco_mc");
         plot2D_Hist(h_P_reco_mc,"P_reco_mc.png",plotDir);
 
-        TH1F* h_P_error= (TH1F*)f_Root->Get("P_error");
+        TH1F* h_P_error = (TH1F*)f_Root->Get("P_error");
         plot1D_Hist(h_P_error,"P_error.png",plotDir);
         
-        TH2F* h_KE_reco_mc= (TH2F*)f_Root->Get("KE_reco_mc");
+        TH2F* h_KE_reco_mc = (TH2F*)f_Root->Get("KE_reco_mc");
         plot2D_Hist(h_KE_reco_mc,"KE_reco_mc.png",plotDir);
         
-        TH1F* h_KE_error= (TH1F*)f_Root->Get("KE_error");
+        TH1F* h_KE_error = (TH1F*)f_Root->Get("KE_error");
         plot1D_Hist(h_KE_error,"KE_error.png",plotDir);
         
-        TH2F* h_angleBeam_reco_mc= (TH2F*)f_Root->Get("angleBeam_reco_mc");
+        TH2F* h_angleBeam_reco_mc = (TH2F*)f_Root->Get("angleBeam_reco_mc");
         plot2D_Hist(h_angleBeam_reco_mc,"angleBeam_reco_mc.png",plotDir);
         
-        TH1F* h_angleBeam_error= (TH1F*)f_Root->Get("angleBeam_error");
+        TH1F* h_angleBeam_error = (TH1F*)f_Root->Get("angleBeam_error");
         plot1D_Hist(h_angleBeam_error,"angleBeam_error.png",plotDir);
         
-        TH2F* h_angleMuon_reco_mc= (TH2F*)f_Root->Get("angleMuon_reco_mc");
+        TH2F* h_angleMuon_reco_mc = (TH2F*)f_Root->Get("angleMuon_reco_mc");
         plot2D_Hist(h_angleMuon_reco_mc,"angleMuon_reco_mc.png",plotDir);
         
-        TH1F* h_angleMuon_error= (TH1F*)f_Root->Get("angleMuon_error");
+        TH1F* h_angleMuon_error = (TH1F*)f_Root->Get("angleMuon_error");
         plot1D_Hist(h_angleMuon_error,"angleMuon_error.png",plotDir);
     }
 
@@ -249,7 +252,15 @@ void Plotter::plotPion(bool isMC, bool isReco, bool is2D)
     string rootDir = "Output/RootFiles/Pion.root";
     string plotDir = "Output/Plots/Pion/";
     
+    // Standard Plots
     plotParticleInfo(rootDir, plotDir, isMC, isReco, is2D);
+    
+    // Unique Plots
+    TFile* f_Root = new TFile(rootDir.c_str());
+    
+    TH1F* h_invMass = (TH1F*)f_Root->Get("invMass");
+    plot1D_Hist(h_invMass,"invMass.png",plotDir);
+    
 }
 
 void Plotter::plotSpecial()

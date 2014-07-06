@@ -19,7 +19,7 @@ void CCProtonPi0::specifyRunTime()
     applyProtonScore = true;
     minProtonScore = 0.3;
     
-    applyPhotonDistance = true;
+    applyPhotonDistance = false;
     minPhotonDistance = 150; //mm
 
     //Select Branches to Activate
@@ -71,6 +71,7 @@ void CCProtonPi0::run(string playlist)
 
     if(m_ActivateInteraction){
         fChain->SetBranchStatus("CCProtonPi0_vtx*",1);
+        fChain->SetBranchStatus("preFilter_*",1);
     }
     
     if(m_ActivateMuon){
@@ -82,9 +83,8 @@ void CCProtonPi0::run(string playlist)
     }
     
     if(m_ActivatePi0){
-        fChain->SetBranchStatus("mgg",1);
         fChain->SetBranchStatus("pi0_*",1);
-        fChain->SetBranchStatus("RE_photon_vertex_*",1);
+        fChain->SetBranchStatus("gamma*",1);
     }
    
 
@@ -220,7 +220,7 @@ void CCProtonPi0::run(string playlist)
         
         // Find Best Proton in Reco
         indRecoProton = findBestProton();
-        
+            
         if ( applyProtonScore && (CCProtonPi0_proton_score[indRecoProton] < minProtonScore) ) continue;
         nCut_Proton_Score++;
         if(truth_isSignal) nSignal_Proton_Score++;
@@ -236,7 +236,7 @@ void CCProtonPi0::run(string playlist)
         nCut_Reco_Muon_NoProblem++;
         if(truth_isSignal) nSignal_Reco_Muon_NoProblem++;
         
-        if(pi0_E == -1) continue;
+        if(pi0_E == -9.0) continue;
         nCut_Reco_Pi0_NoProblem++;
         if(truth_isSignal) nSignal_Reco_Pi0_NoProblem++;
         
@@ -422,24 +422,8 @@ void CCProtonPi0::get_pID_Stats()
 
 bool CCProtonPi0::isPhotonDistanceLow()
 {
-    double dist_photon1;
-    double dist_photon2;
-    
-    dist_photon1 = HEP_Functions::calcDistance( RE_photon_vertex_1[0],
-                                                RE_photon_vertex_1[1], 
-                                                RE_photon_vertex_1[2],
-                                                CCProtonPi0_vtx[0],
-                                                CCProtonPi0_vtx[1],
-                                                CCProtonPi0_vtx[2] );
                                                 
-    dist_photon2 = HEP_Functions::calcDistance( RE_photon_vertex_2[0],
-                                                RE_photon_vertex_2[1], 
-                                                RE_photon_vertex_2[2],
-                                                CCProtonPi0_vtx[0],
-                                                CCProtonPi0_vtx[1],
-                                                CCProtonPi0_vtx[2] );
-                                                
-    if (dist_photon1 < minPhotonDistance && dist_photon2 < minPhotonDistance){
+    if (gamma1_dist_vtx < minPhotonDistance && gamma2_dist_vtx < minPhotonDistance){
         return true;
     }else{
         return false;
@@ -511,54 +495,16 @@ void CCProtonPi0::fillInteractionReco(int indProton)
                                             CCProtonPi0_proton_py[indProton],
                                             CCProtonPi0_proton_pz[indProton],
                                             CCProtonPi0_proton_E[indProton]);
+                                            
                                                 
     deltaInvMass_reco->Fill(invMass_reco);
-    mgg_reco->Fill(mgg);
+    
+    pFilter_Status->Fill(preFilter_Result);
+    pFilter_RejectedEnergy->Fill(preFilter_rejectedEnergy);
     
     vertex_x_y_reco->Fill(CCProtonPi0_vtx[0],CCProtonPi0_vtx[1]);
     vertex_z_reco->Fill(CCProtonPi0_vtx[2]);
 }
-
-// double CCProtonPi0::calcDeltaInvariantMass(int isMC, int indProton)
-// {
-//     double invMassSq;
-//     double pionMom;
-//     double E_pi0, px_pi0, py_pi0, pz_pi0;
-//     double E_p, px_p, py_p, pz_p;
-//     int indPion;
-//     
-//     indPion = getBestPi0();
-//     
-//     if(isMC){
-//         E_pi0   = mc_FSPartE[indPion];
-//         px_pi0  = mc_FSPartPx[indPion];
-//         py_pi0  = mc_FSPartPy[indPion];
-//         pz_pi0  = mc_FSPartPz[indPion];
-//         
-//         E_p     = CCProtonPi0_trajProtonProngEnergy[indProton];
-//         px_p    = CCProtonPi0_trajProtonProngPx[indProton];
-//         py_p    = CCProtonPi0_trajProtonProngPy[indProton];
-//         pz_p    = CCProtonPi0_trajProtonProngPz[indProton];
-//     }else{
-//         E_pi0   = pi0_E;
-//         px_pi0  = pi0_px;
-//         py_pi0  = pi0_py;
-//         pz_pi0  = pi0_pz;
-//         
-//         E_p     = CCProtonPi0_proton_E[indProton];
-//         px_p    = CCProtonPi0_proton_px[indProton];
-//         py_p    = CCProtonPi0_proton_py[indProton];
-//         pz_p    = CCProtonPi0_proton_pz[indProton];
-//     }
-//     
-//     invMassSq = (E_pi0 + E_p) * (E_pi0 + E_p) -
-//                 ((px_pi0 + px_p)*(px_pi0 + px_p) + 
-//                  (py_pi0 + py_p)*(py_pi0 + py_p) +
-//                  (pz_pi0 + pz_p)*(pz_pi0 + pz_p));
-//         
-//     return sqrt(invMassSq);
-// }
-
 
 double CCProtonPi0::calcDeltaInvariantMass(double px1, double py1, double pz1, double E1,
                                            double px2, double py2, double pz2, double E2)
@@ -780,7 +726,7 @@ int CCProtonPi0::findBestProton()
     double tempScore = CCProtonPi0_proton_score[0];
     int tempInd = 0;
     
-    for( int i = 1; i < 10; i++){
+    for( int i = 0; i < 10; i++){
         if( CCProtonPi0_proton_score[i] == -1 ) break;
         if( CCProtonPi0_proton_score[i] > tempScore){
             tempScore = CCProtonPi0_proton_score[i];
@@ -825,6 +771,9 @@ void CCProtonPi0::fillPionReco()
     
     // set Angle wrt Muon
     pion.set_angleMuon(muon, false);
+    
+    // Set Invariant Mass
+    pion.invMass->Fill(pi0_invMass);
 }
 
 void CCProtonPi0::fillPionTrue()
@@ -979,12 +928,13 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("isMinosMatchStub", &isMinosMatchStub, &b_isMinosMatchStub);
    fChain->SetBranchAddress("well_fit_vertex", &well_fit_vertex, &b_well_fit_vertex);
    fChain->SetBranchAddress("isBrokenTrack", &isBrokenTrack, &b_isBrokenTrack);
-   fChain->SetBranchAddress("is_GoodDirection1", &is_GoodDirection1, &b_is_GoodDirection1);
-   fChain->SetBranchAddress("is_GoodPosition1", &is_GoodPosition1, &b_is_GoodPosition1);
-   fChain->SetBranchAddress("is_GoodDirection2", &is_GoodDirection2, &b_is_GoodDirection2);
-   fChain->SetBranchAddress("is_GoodPosition2", &is_GoodPosition2, &b_is_GoodPosition2);
-   fChain->SetBranchAddress("is_GoodBlob1", &is_GoodBlob1, &b_is_GoodBlob1);
-   fChain->SetBranchAddress("is_GoodBlob2", &is_GoodBlob2, &b_is_GoodBlob2);
+   fChain->SetBranchAddress("gamma1_isGoodDirection", &gamma1_isGoodDirection, &b_gamma1_isGoodDirection);
+   fChain->SetBranchAddress("gamma1_isGoodPosition", &gamma1_isGoodPosition, &b_gamma1_isGoodPosition);
+   fChain->SetBranchAddress("gamma1_isGoodBlob", &gamma1_isGoodBlob, &b_gamma1_isGoodBlob);
+   fChain->SetBranchAddress("gamma2_isGoodDirection", &gamma2_isGoodDirection, &b_gamma2_isGoodDirection);
+   fChain->SetBranchAddress("gamma2_isGoodPosition", &gamma2_isGoodPosition, &b_gamma2_isGoodPosition);
+   fChain->SetBranchAddress("gamma2_isGoodBlob", &gamma2_isGoodBlob, &b_gamma2_isGoodBlob);
+   fChain->SetBranchAddress("Cut_ConeBlobs", &Cut_ConeBlobs, &b_Cut_ConeBlobs);
    fChain->SetBranchAddress("Cut_EndPoint_Michel_Exist", &Cut_EndPoint_Michel_Exist, &b_Cut_EndPoint_Michel_Exist);
    fChain->SetBranchAddress("Cut_Muon_Charge", &Cut_Muon_Charge, &b_Cut_Muon_Charge);
    fChain->SetBranchAddress("Cut_Muon_None", &Cut_Muon_None, &b_Cut_Muon_None);
@@ -996,33 +946,29 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("Cut_Vertex_Not_Fiducial", &Cut_Vertex_Not_Fiducial, &b_Cut_Vertex_Not_Fiducial);
    fChain->SetBranchAddress("Cut_Vertex_Not_Reconstructable", &Cut_Vertex_Not_Reconstructable, &b_Cut_Vertex_Not_Reconstructable);
    fChain->SetBranchAddress("Cut_Vertex_Null", &Cut_Vertex_Null, &b_Cut_Vertex_Null);
+   fChain->SetBranchAddress("Cut_VtxBlob", &Cut_VtxBlob, &b_Cut_VtxBlob);
    fChain->SetBranchAddress("Cut_secEndPoint_Michel_Exist", &Cut_secEndPoint_Michel_Exist, &b_Cut_secEndPoint_Michel_Exist);
    fChain->SetBranchAddress("anglescan_ncand", &anglescan_ncand, &b_anglescan_ncand);
    fChain->SetBranchAddress("anglescan_ncandx", &anglescan_ncandx, &b_anglescan_ncandx);
    fChain->SetBranchAddress("broken_track_most_us_plane", &broken_track_most_us_plane, &b_broken_track_most_us_plane);
-   fChain->SetBranchAddress("g1blob_ncluster", &g1blob_ncluster, &b_g1blob_ncluster);
-   fChain->SetBranchAddress("g1blob_ndigit", &g1blob_ndigit, &b_g1blob_ndigit);
    fChain->SetBranchAddress("g1dedx_doublet", &g1dedx_doublet, &b_g1dedx_doublet);
    fChain->SetBranchAddress("g1dedx_empty_plane", &g1dedx_empty_plane, &b_g1dedx_empty_plane);
    fChain->SetBranchAddress("g1dedx_nplane", &g1dedx_nplane, &b_g1dedx_nplane);
    fChain->SetBranchAddress("g1mostevispdg", &g1mostevispdg, &b_g1mostevispdg);
-   fChain->SetBranchAddress("g2blob_ncluster", &g2blob_ncluster, &b_g2blob_ncluster);
-   fChain->SetBranchAddress("g2blob_ndigit", &g2blob_ndigit, &b_g2blob_ndigit);
    fChain->SetBranchAddress("g2dedx_doublet", &g2dedx_doublet, &b_g2dedx_doublet);
    fChain->SetBranchAddress("g2dedx_empty_plane", &g2dedx_empty_plane, &b_g2dedx_empty_plane);
    fChain->SetBranchAddress("g2dedx_nplane", &g2dedx_nplane, &b_g2dedx_nplane);
    fChain->SetBranchAddress("g2mostevispdg", &g2mostevispdg, &b_g2mostevispdg);
+   fChain->SetBranchAddress("gamma1_blob_nclusters", &gamma1_blob_nclusters, &b_gamma1_blob_nclusters);
+   fChain->SetBranchAddress("gamma1_blob_ndigits", &gamma1_blob_ndigits, &b_gamma1_blob_ndigits);
+   fChain->SetBranchAddress("gamma2_blob_nclusters", &gamma2_blob_nclusters, &b_gamma2_blob_nclusters);
+   fChain->SetBranchAddress("gamma2_blob_ndigits", &gamma2_blob_ndigits, &b_gamma2_blob_ndigits);
    fChain->SetBranchAddress("n_anchored_long_trk_prongs", &n_anchored_long_trk_prongs, &b_n_anchored_long_trk_prongs);
    fChain->SetBranchAddress("n_anchored_short_trk_prongs", &n_anchored_short_trk_prongs, &b_n_anchored_short_trk_prongs);
-   fChain->SetBranchAddress("n_dsp_blob_prongs", &n_dsp_blob_prongs, &b_n_dsp_blob_prongs);
-   fChain->SetBranchAddress("n_iso_blob_prongs", &n_iso_blob_prongs, &b_n_iso_blob_prongs);
    fChain->SetBranchAddress("n_iso_trk_prongs", &n_iso_trk_prongs, &b_n_iso_trk_prongs);
    fChain->SetBranchAddress("n_long_tracks", &n_long_tracks, &b_n_long_tracks);
    fChain->SetBranchAddress("n_short_tracks", &n_short_tracks, &b_n_short_tracks);
-   fChain->SetBranchAddress("n_startpoint_vertices", &n_startpoint_vertices, &b_n_startpoint_vertices);
-   fChain->SetBranchAddress("n_us_muon_clusters", &n_us_muon_clusters, &b_n_us_muon_clusters);
    fChain->SetBranchAddress("n_vtx_michel_views", &n_vtx_michel_views, &b_n_vtx_michel_views);
-   fChain->SetBranchAddress("n_vtx_prongs", &n_vtx_prongs, &b_n_vtx_prongs);
    fChain->SetBranchAddress("nblob_anglescan", &nblob_anglescan, &b_nblob_anglescan);
    fChain->SetBranchAddress("nblob_hough", &nblob_hough, &b_nblob_hough);
    fChain->SetBranchAddress("od_energeticTower", &od_energeticTower, &b_od_energeticTower);
@@ -1034,6 +980,7 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("phys_n_dead_discr_pair_two_mod_upstream_prim_vtx", &phys_n_dead_discr_pair_two_mod_upstream_prim_vtx, &b_phys_n_dead_discr_pair_two_mod_upstream_prim_vtx);
    fChain->SetBranchAddress("phys_n_dead_discr_pair_upstream_prim_track_proj", &phys_n_dead_discr_pair_upstream_prim_track_proj, &b_phys_n_dead_discr_pair_upstream_prim_track_proj);
    fChain->SetBranchAddress("phys_vertex_is_fiducial", &phys_vertex_is_fiducial, &b_phys_vertex_is_fiducial);
+   fChain->SetBranchAddress("preFilter_Result", &preFilter_Result, &b_preFilter_Result);
    fChain->SetBranchAddress("vtx_primary_index", &vtx_primary_index, &b_vtx_primary_index);
    fChain->SetBranchAddress("vtx_primary_multiplicity", &vtx_primary_multiplicity, &b_vtx_primary_multiplicity);
    fChain->SetBranchAddress("vtx_secondary_count", &vtx_secondary_count, &b_vtx_secondary_count);
@@ -1042,13 +989,6 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("RE_energy_ECAL", &RE_energy_ECAL, &b_RE_energy_ECAL);
    fChain->SetBranchAddress("RE_energy_HCAL", &RE_energy_HCAL, &b_RE_energy_HCAL);
    fChain->SetBranchAddress("RE_energy_Tracker", &RE_energy_Tracker, &b_RE_energy_Tracker);
-   fChain->SetBranchAddress("RE_photon_dEdx_1", &RE_photon_dEdx_1, &b_RE_photon_dEdx_1);
-   fChain->SetBranchAddress("RE_photon_dEdx_2", &RE_photon_dEdx_2, &b_RE_photon_dEdx_2);
-   fChain->SetBranchAddress("RE_photon_energy_1", &RE_photon_energy_1, &b_RE_photon_energy_1);
-   fChain->SetBranchAddress("RE_photon_energy_2", &RE_photon_energy_2, &b_RE_photon_energy_2);
-   fChain->SetBranchAddress("RE_photon_time_1", &RE_photon_time_1, &b_RE_photon_time_1);
-   fChain->SetBranchAddress("RE_photon_time_2", &RE_photon_time_2, &b_RE_photon_time_2);
-   fChain->SetBranchAddress("RE_scalar", &RE_scalar, &b_RE_scalar);
    fChain->SetBranchAddress("Sphere_Vertex_energy", &Sphere_Vertex_energy, &b_Sphere_Vertex_energy);
    fChain->SetBranchAddress("Vertex_blob_energy", &Vertex_blob_energy, &b_Vertex_blob_energy);
    fChain->SetBranchAddress("dispersedExtraE", &dispersedExtraE, &b_dispersedExtraE);
@@ -1080,14 +1020,11 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("evis_trkr_u", &evis_trkr_u, &b_evis_trkr_u);
    fChain->SetBranchAddress("evis_trkr_v", &evis_trkr_v, &b_evis_trkr_v);
    fChain->SetBranchAddress("evis_trkr_x", &evis_trkr_x, &b_evis_trkr_x);
-   fChain->SetBranchAddress("g1blob_edge_distance", &g1blob_edge_distance, &b_g1blob_edge_distance);
    fChain->SetBranchAddress("g1blob_minsep", &g1blob_minsep, &b_g1blob_minsep);
-   fChain->SetBranchAddress("g1blob_vtx_distance", &g1blob_vtx_distance, &b_g1blob_vtx_distance);
    fChain->SetBranchAddress("g1dedx", &g1dedx, &b_g1dedx);
    fChain->SetBranchAddress("g1dedx1", &g1dedx1, &b_g1dedx1);
    fChain->SetBranchAddress("g1dedx_total", &g1dedx_total, &b_g1dedx_total);
    fChain->SetBranchAddress("g1dedx_total1", &g1dedx_total1, &b_g1dedx_total1);
-   fChain->SetBranchAddress("g1e", &g1e, &b_g1e);
    fChain->SetBranchAddress("g1g1evis", &g1g1evis, &b_g1g1evis);
    fChain->SetBranchAddress("g1g2evis", &g1g2evis, &b_g1g2evis);
    fChain->SetBranchAddress("g1gmevis", &g1gmevis, &b_g1gmevis);
@@ -1095,26 +1032,17 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("g1muevis", &g1muevis, &b_g1muevis);
    fChain->SetBranchAddress("g1neutronevis", &g1neutronevis, &b_g1neutronevis);
    fChain->SetBranchAddress("g1otherevis", &g1otherevis, &b_g1otherevis);
-   fChain->SetBranchAddress("g1phi", &g1phi, &b_g1phi);
    fChain->SetBranchAddress("g1pi0evis", &g1pi0evis, &b_g1pi0evis);
    fChain->SetBranchAddress("g1pimevis", &g1pimevis, &b_g1pimevis);
    fChain->SetBranchAddress("g1pipevis", &g1pipevis, &b_g1pipevis);
    fChain->SetBranchAddress("g1protonevis", &g1protonevis, &b_g1protonevis);
-   fChain->SetBranchAddress("g1recoecalevis", &g1recoecalevis, &b_g1recoecalevis);
-   fChain->SetBranchAddress("g1recohcalevis", &g1recohcalevis, &b_g1recohcalevis);
-   fChain->SetBranchAddress("g1recoscalevis", &g1recoscalevis, &b_g1recoscalevis);
-   fChain->SetBranchAddress("g1recotrkrevis", &g1recotrkrevis, &b_g1recotrkrevis);
    fChain->SetBranchAddress("g1sharedevis", &g1sharedevis, &b_g1sharedevis);
-   fChain->SetBranchAddress("g1theta", &g1theta, &b_g1theta);
    fChain->SetBranchAddress("g1totalevis", &g1totalevis, &b_g1totalevis);
-   fChain->SetBranchAddress("g2blob_edge_distance", &g2blob_edge_distance, &b_g2blob_edge_distance);
    fChain->SetBranchAddress("g2blob_minsep", &g2blob_minsep, &b_g2blob_minsep);
-   fChain->SetBranchAddress("g2blob_vtx_distance", &g2blob_vtx_distance, &b_g2blob_vtx_distance);
    fChain->SetBranchAddress("g2dedx", &g2dedx, &b_g2dedx);
    fChain->SetBranchAddress("g2dedx1", &g2dedx1, &b_g2dedx1);
    fChain->SetBranchAddress("g2dedx_total", &g2dedx_total, &b_g2dedx_total);
    fChain->SetBranchAddress("g2dedx_total1", &g2dedx_total1, &b_g2dedx_total1);
-   fChain->SetBranchAddress("g2e", &g2e, &b_g2e);
    fChain->SetBranchAddress("g2g1evis", &g2g1evis, &b_g2g1evis);
    fChain->SetBranchAddress("g2g2evis", &g2g2evis, &b_g2g2evis);
    fChain->SetBranchAddress("g2gmevis", &g2gmevis, &b_g2gmevis);
@@ -1122,34 +1050,46 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("g2muevis", &g2muevis, &b_g2muevis);
    fChain->SetBranchAddress("g2neutronevis", &g2neutronevis, &b_g2neutronevis);
    fChain->SetBranchAddress("g2otherevis", &g2otherevis, &b_g2otherevis);
-   fChain->SetBranchAddress("g2phi", &g2phi, &b_g2phi);
    fChain->SetBranchAddress("g2pi0evis", &g2pi0evis, &b_g2pi0evis);
    fChain->SetBranchAddress("g2pimevis", &g2pimevis, &b_g2pimevis);
    fChain->SetBranchAddress("g2pipevis", &g2pipevis, &b_g2pipevis);
    fChain->SetBranchAddress("g2protonevis", &g2protonevis, &b_g2protonevis);
-   fChain->SetBranchAddress("g2recoecalevis", &g2recoecalevis, &b_g2recoecalevis);
-   fChain->SetBranchAddress("g2recohcalevis", &g2recohcalevis, &b_g2recohcalevis);
-   fChain->SetBranchAddress("g2recoscalevis", &g2recoscalevis, &b_g2recoscalevis);
-   fChain->SetBranchAddress("g2recotrkrevis", &g2recotrkrevis, &b_g2recotrkrevis);
    fChain->SetBranchAddress("g2sharedevis", &g2sharedevis, &b_g2sharedevis);
-   fChain->SetBranchAddress("g2theta", &g2theta, &b_g2theta);
    fChain->SetBranchAddress("g2totalevis", &g2totalevis, &b_g2totalevis);
    fChain->SetBranchAddress("gamma1_E", &gamma1_E, &b_gamma1_E);
+   fChain->SetBranchAddress("gamma1_dEdx", &gamma1_dEdx, &b_gamma1_dEdx);
+   fChain->SetBranchAddress("gamma1_dist_exit", &gamma1_dist_exit, &b_gamma1_dist_exit);
+   fChain->SetBranchAddress("gamma1_dist_vtx", &gamma1_dist_vtx, &b_gamma1_dist_vtx);
+   fChain->SetBranchAddress("gamma1_evis_ecal", &gamma1_evis_ecal, &b_gamma1_evis_ecal);
+   fChain->SetBranchAddress("gamma1_evis_hcal", &gamma1_evis_hcal, &b_gamma1_evis_hcal);
+   fChain->SetBranchAddress("gamma1_evis_scal", &gamma1_evis_scal, &b_gamma1_evis_scal);
+   fChain->SetBranchAddress("gamma1_evis_trkr", &gamma1_evis_trkr, &b_gamma1_evis_trkr);
+   fChain->SetBranchAddress("gamma1_phi", &gamma1_phi, &b_gamma1_phi);
    fChain->SetBranchAddress("gamma1_px", &gamma1_px, &b_gamma1_px);
    fChain->SetBranchAddress("gamma1_py", &gamma1_py, &b_gamma1_py);
    fChain->SetBranchAddress("gamma1_pz", &gamma1_pz, &b_gamma1_pz);
+   fChain->SetBranchAddress("gamma1_theta", &gamma1_theta, &b_gamma1_theta);
+   fChain->SetBranchAddress("gamma1_time", &gamma1_time, &b_gamma1_time);
    fChain->SetBranchAddress("gamma2_E", &gamma2_E, &b_gamma2_E);
+   fChain->SetBranchAddress("gamma2_dEdx", &gamma2_dEdx, &b_gamma2_dEdx);
+   fChain->SetBranchAddress("gamma2_dist_exit", &gamma2_dist_exit, &b_gamma2_dist_exit);
+   fChain->SetBranchAddress("gamma2_dist_vtx", &gamma2_dist_vtx, &b_gamma2_dist_vtx);
+   fChain->SetBranchAddress("gamma2_evis_ecal", &gamma2_evis_ecal, &b_gamma2_evis_ecal);
+   fChain->SetBranchAddress("gamma2_evis_hcal", &gamma2_evis_hcal, &b_gamma2_evis_hcal);
+   fChain->SetBranchAddress("gamma2_evis_scal", &gamma2_evis_scal, &b_gamma2_evis_scal);
+   fChain->SetBranchAddress("gamma2_evis_trkr", &gamma2_evis_trkr, &b_gamma2_evis_trkr);
+   fChain->SetBranchAddress("gamma2_phi", &gamma2_phi, &b_gamma2_phi);
    fChain->SetBranchAddress("gamma2_px", &gamma2_px, &b_gamma2_px);
    fChain->SetBranchAddress("gamma2_py", &gamma2_py, &b_gamma2_py);
    fChain->SetBranchAddress("gamma2_pz", &gamma2_pz, &b_gamma2_pz);
+   fChain->SetBranchAddress("gamma2_theta", &gamma2_theta, &b_gamma2_theta);
+   fChain->SetBranchAddress("gamma2_time", &gamma2_time, &b_gamma2_time);
    fChain->SetBranchAddress("hadronVisibleE", &hadronVisibleE, &b_hadronVisibleE);
-   fChain->SetBranchAddress("mgg", &mgg, &b_mgg);
    fChain->SetBranchAddress("muonVisibleE", &muonVisibleE, &b_muonVisibleE);
    fChain->SetBranchAddress("muon_phi", &muon_phi, &b_muon_phi);
    fChain->SetBranchAddress("muon_theta", &muon_theta, &b_muon_theta);
    fChain->SetBranchAddress("muon_thetaX", &muon_thetaX, &b_muon_thetaX);
    fChain->SetBranchAddress("muon_thetaY", &muon_thetaY, &b_muon_thetaY);
-   fChain->SetBranchAddress("oangle", &oangle, &b_oangle);
    fChain->SetBranchAddress("od_downstreamFrame", &od_downstreamFrame, &b_od_downstreamFrame);
    fChain->SetBranchAddress("od_downstreamFrame_z", &od_downstreamFrame_z, &b_od_downstreamFrame_z);
    fChain->SetBranchAddress("od_highStory", &od_highStory, &b_od_highStory);
@@ -1164,18 +1104,17 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("phys_energy_in_road_upstream", &phys_energy_in_road_upstream, &b_phys_energy_in_road_upstream);
    fChain->SetBranchAddress("phys_energy_unattached", &phys_energy_unattached, &b_phys_energy_unattached);
    fChain->SetBranchAddress("pi0_E", &pi0_E, &b_pi0_E);
+   fChain->SetBranchAddress("pi0_cos_openingAngle", &pi0_cos_openingAngle, &b_pi0_cos_openingAngle);
+   fChain->SetBranchAddress("pi0_invMass", &pi0_invMass, &b_pi0_invMass);
+   fChain->SetBranchAddress("pi0_openingAngle", &pi0_openingAngle, &b_pi0_openingAngle);
+   fChain->SetBranchAddress("pi0_phi", &pi0_phi, &b_pi0_phi);
    fChain->SetBranchAddress("pi0_px", &pi0_px, &b_pi0_px);
    fChain->SetBranchAddress("pi0_py", &pi0_py, &b_pi0_py);
    fChain->SetBranchAddress("pi0_pz", &pi0_pz, &b_pi0_pz);
-   fChain->SetBranchAddress("pienergy", &pienergy, &b_pienergy);
-   fChain->SetBranchAddress("piphi", &piphi, &b_piphi);
-   fChain->SetBranchAddress("piphib", &piphib, &b_piphib);
-   fChain->SetBranchAddress("pitheta", &pitheta, &b_pitheta);
-   fChain->SetBranchAddress("pithetab", &pithetab, &b_pithetab);
-   fChain->SetBranchAddress("pithetax", &pithetax, &b_pithetax);
-   fChain->SetBranchAddress("pithetaxb", &pithetaxb, &b_pithetaxb);
-   fChain->SetBranchAddress("pithetay", &pithetay, &b_pithetay);
-   fChain->SetBranchAddress("pithetayb", &pithetayb, &b_pithetayb);
+   fChain->SetBranchAddress("pi0_theta", &pi0_theta, &b_pi0_theta);
+   fChain->SetBranchAddress("pi0_thetaX", &pi0_thetaX, &b_pi0_thetaX);
+   fChain->SetBranchAddress("pi0_thetaY", &pi0_thetaY, &b_pi0_thetaY);
+   fChain->SetBranchAddress("preFilter_rejectedEnergy", &preFilter_rejectedEnergy, &b_preFilter_rejectedEnergy);
    fChain->SetBranchAddress("prim_vtx_smallest_opening_angle", &prim_vtx_smallest_opening_angle, &b_prim_vtx_smallest_opening_angle);
    fChain->SetBranchAddress("time", &time, &b_time);
    fChain->SetBranchAddress("totalIDVisibleE", &totalIDVisibleE, &b_totalIDVisibleE);
@@ -1257,14 +1196,6 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("hough_blob_ndv", hough_blob_ndv, &b_hough_blob_ndv);
    fChain->SetBranchAddress("hough_blob_ndx_sz", &hough_blob_ndx_sz, &b_hough_blob_ndx_sz);
    fChain->SetBranchAddress("hough_blob_ndx", hough_blob_ndx, &b_hough_blob_ndx);
-   fChain->SetBranchAddress("RE_photon_direction_1_sz", &RE_photon_direction_1_sz, &b_RE_photon_direction_1_sz);
-   fChain->SetBranchAddress("RE_photon_direction_1", RE_photon_direction_1, &b_RE_photon_direction_1);
-   fChain->SetBranchAddress("RE_photon_direction_2_sz", &RE_photon_direction_2_sz, &b_RE_photon_direction_2_sz);
-   fChain->SetBranchAddress("RE_photon_direction_2", RE_photon_direction_2, &b_RE_photon_direction_2);
-   fChain->SetBranchAddress("RE_photon_vertex_1_sz", &RE_photon_vertex_1_sz, &b_RE_photon_vertex_1_sz);
-   fChain->SetBranchAddress("RE_photon_vertex_1", RE_photon_vertex_1, &b_RE_photon_vertex_1);
-   fChain->SetBranchAddress("RE_photon_vertex_2_sz", &RE_photon_vertex_2_sz, &b_RE_photon_vertex_2_sz);
-   fChain->SetBranchAddress("RE_photon_vertex_2", RE_photon_vertex_2, &b_RE_photon_vertex_2);
    fChain->SetBranchAddress("Vertex_energy_radii_sz", &Vertex_energy_radii_sz, &b_Vertex_energy_radii_sz);
    fChain->SetBranchAddress("Vertex_energy_radii", Vertex_energy_radii, &b_Vertex_energy_radii);
    fChain->SetBranchAddress("blob_cluster_energy1_sz", &blob_cluster_energy1_sz, &b_blob_cluster_energy1_sz);
@@ -1275,12 +1206,14 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("g1dedx_cluster_energy", g1dedx_cluster_energy, &b_g1dedx_cluster_energy);
    fChain->SetBranchAddress("g1dedx_rev_cluster_energy_sz", &g1dedx_rev_cluster_energy_sz, &b_g1dedx_rev_cluster_energy_sz);
    fChain->SetBranchAddress("g1dedx_rev_cluster_energy", g1dedx_rev_cluster_energy, &b_g1dedx_rev_cluster_energy);
-   fChain->SetBranchAddress("g1mom", g1mom, &b_g1mom);
    fChain->SetBranchAddress("g2dedx_cluster_energy_sz", &g2dedx_cluster_energy_sz, &b_g2dedx_cluster_energy_sz);
    fChain->SetBranchAddress("g2dedx_cluster_energy", g2dedx_cluster_energy, &b_g2dedx_cluster_energy);
    fChain->SetBranchAddress("g2dedx_rev_cluster_energy_sz", &g2dedx_rev_cluster_energy_sz, &b_g2dedx_rev_cluster_energy_sz);
    fChain->SetBranchAddress("g2dedx_rev_cluster_energy", g2dedx_rev_cluster_energy, &b_g2dedx_rev_cluster_energy);
-   fChain->SetBranchAddress("g2mom", g2mom, &b_g2mom);
+   fChain->SetBranchAddress("gamma1_direction", gamma1_direction, &b_gamma1_direction);
+   fChain->SetBranchAddress("gamma1_vertex", gamma1_vertex, &b_gamma1_vertex);
+   fChain->SetBranchAddress("gamma2_direction", gamma2_direction, &b_gamma2_direction);
+   fChain->SetBranchAddress("gamma2_vertex", gamma2_vertex, &b_gamma2_vertex);
    fChain->SetBranchAddress("good_mgg_vector_sz", &good_mgg_vector_sz, &b_good_mgg_vector_sz);
    fChain->SetBranchAddress("good_mgg_vector", &good_mgg_vector, &b_good_mgg_vector);
    fChain->SetBranchAddress("mgg_vector_sz", &mgg_vector_sz, &b_mgg_vector_sz);
@@ -1299,7 +1232,6 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("od_towerTimeBlobMuon", od_towerTimeBlobMuon, &b_od_towerTimeBlobMuon);
    fChain->SetBranchAddress("od_towerTimeBlobOD_sz", &od_towerTimeBlobOD_sz, &b_od_towerTimeBlobOD_sz);
    fChain->SetBranchAddress("od_towerTimeBlobOD", od_towerTimeBlobOD, &b_od_towerTimeBlobOD);
-   fChain->SetBranchAddress("pimom", pimom, &b_pimom);
    fChain->SetBranchAddress("truth_has_physics_event", &truth_has_physics_event, &b_truth_has_physics_event);
    fChain->SetBranchAddress("truth_reco_hasGoodObjects", &truth_reco_hasGoodObjects, &b_truth_reco_hasGoodObjects);
    fChain->SetBranchAddress("truth_reco_isGoodVertex", &truth_reco_isGoodVertex, &b_truth_reco_isGoodVertex);
@@ -1788,10 +1720,6 @@ void CCProtonPi0::initHistograms()
     vertex_z_reco_mc->GetXaxis()->SetTitle("Reconstructed Vertex Z [mm]");
     vertex_z_reco_mc->GetYaxis()->SetTitle("True Vertex Z [mm]");
     
-    mgg_reco = new TH1F( "mgg_reco","Reconstructed Invariant Mass",binList.mgg_reco.get_nBins(), binList.mgg_reco.get_min(), binList.mgg_reco.get_max() );
-    mgg_reco->GetXaxis()->SetTitle("Reconstructed Invariant Mass [MeV]");
-    mgg_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.mgg_reco.get_width()));
-    
     deltaInvMass_reco = new TH1F( "deltaInvMass_reco","Reconstructed Delta+ Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
     deltaInvMass_reco->GetXaxis()->SetTitle("Reconstructed Delta+ Invariant Mass [MeV]");
     deltaInvMass_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV] ",binList.deltaInvMass.get_width()));
@@ -1809,6 +1737,14 @@ void CCProtonPi0::initHistograms()
         binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
     deltaInvMass_reco_mc->GetXaxis()->SetTitle("Reconstructed Delta+ Invariant Mass [MeV]");
     deltaInvMass_reco_mc->GetYaxis()->SetTitle("True Delta+ Invariant Mass [MeV]");
+    
+    pFilter_Status = new TH1F( "pFilter_Status","Prefilter() Result",binList.preFilter_Status.get_nBins(), binList.preFilter_Status.get_min(), binList.preFilter_Status.get_max() );
+    pFilter_Status->GetXaxis()->SetTitle("0 = Passes Filter, 1 = Target Filter, 2 = Max Other, 3 = Min Other");
+    pFilter_Status->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.preFilter_Status.get_width()));
+    
+    pFilter_RejectedEnergy = new TH1F( "pFilter_RejectedEnergy","Rejected Energy by preFilter()",binList.preFilter_RejectedEnergy.get_nBins(), binList.preFilter_RejectedEnergy.get_min(), binList.preFilter_RejectedEnergy.get_max() );
+    pFilter_RejectedEnergy->GetXaxis()->SetTitle("Rejected Energy by preFilter()");
+    pFilter_RejectedEnergy->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.preFilter_RejectedEnergy.get_width()));
     
 
     

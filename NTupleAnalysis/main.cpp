@@ -17,7 +17,7 @@ main.cpp
             > main(true) for Generating Plots only
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_06_21
+    Last Revision: 2014_07_06
 ================================================================================
 */
 
@@ -70,8 +70,8 @@ int main(int argc, char *argv[] )
     
 
     // Edit isTest Variable for running Test Samples or complete playlist
-    bool isTest     = false;
-    bool isComplete = false;
+    bool isTest     = true;
+    bool isComplete = true;
     
     // Plot Selection
     bool plotsMC    = true;
@@ -84,8 +84,8 @@ int main(int argc, char *argv[] )
     }else{
         CCProtonPi0 t;
         if(isTest){
-//             t.run("Input/Playlists/MC_minerva1_CCProtonPi0.txt");
-            t.run("Input/Playlists/pl_MC_Test_Sample.dat");
+//             t.run("Input/Playlists/pl_MC_Test_Sample.dat");
+            t.run("Input/Playlists/pl_MC_Test.dat");
         }else if(isComplete){
             t.run("Input/Playlists/MC_minerva1_CCProtonPi0.dat");
         }else{

@@ -26,8 +26,14 @@ Pion::Pion()
     // Initialize Bins
     bin_P.setBin(30, 0.0, 3000.0);
     bin_KE.setBin(30, 0.0, 3000.0);
+    bin_invMass.setBin(50,0.0,500.0);
 
     cout<<"\tInitializing Histograms "<<endl;
+    invMass = new TH1F( "invMass","Reconstructed Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
+    invMass->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+    invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",bin_invMass.get_width()));
+    
+    
     partScore = new TH1F( "partScore","Pion Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");
     partScore->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f ",bin_P.get_width()));

@@ -1,9 +1,9 @@
 ##############################
 #==========================
-# N Good Files: 1545
-# POT Used: 7.709000E+20
+# N Good Files: 40
+# POT Used: 1.980000E+19
 #--------------------------
-# Time Created: 2014-06-18_15:02:50 
-# Command Used: FindAnaFilesWithoutMeta.py --dir /minerva/data/users/oaltinok/CCProtonPi0/MC/minerva1_new/grid/central_value/minerva/ana/v10r6p13/00/01/02 --test --batch --ana_tool CCProtonPi0 --output MC_minerva1_CCProtonPi0.dat
+# Time Created: 2014-07-06_11:19:14 
+# Command Used: /afs/fnal.gov/files/home/room2/oaltinok/cmtuser/Minerva_nightly/Tools/ProductionScripts/pot_scripts/FindAnaFilesWithoutMeta.py --dir /minerva/data/users/oaltinok/CCProtonPi0/MC/v1_01/test/grid/central_value/minerva/ana/v10r6p13/ --test --batch --ana_tool CCProtonPi0 --output MC_v1_01.dat
 #==========================
 ##############################
