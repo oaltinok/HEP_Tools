@@ -816,6 +816,7 @@ StatusCode CCProtonPi0::initialize()
     declareContainerIntBranch(m_hypMeths,    "proton_trk_pat_history", 10, -1);
     declareContainerIntBranch(m_hypMeths,    "proton_kinked",      10, -1);
     declareContainerIntBranch(m_hypMeths,    "proton_odMatch",     10, -1);
+    declareContainerIntBranch(m_hypMeths,    "proton_isRecoGood",     10, -1);
     declareContainerDoubleBranch(m_hypMeths, "proton_startPointX", 10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_startPointY", 10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_startPointZ", 10, SENTINEL);
@@ -1579,9 +1580,8 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
     debug() <<"m_ProtonProngs.size() = "<<m_ProtonProngs.size()
             <<" m_ProtonParticles.size() = "<<m_ProtonParticles.size()<<endmsg;
             
-    // VertexZ Required for setProtonParticleData()
-    double vertexZ = m_PrimaryVertex->position().z();
-    bool protonFilled = setProtonParticleData(nuInt,vertexZ);
+
+    bool protonFilled = setProtonParticleData(nuInt);
     
     debug() <<"After setProtonParticleData()"<<endmsg;
     debug() <<"m_ProtonProngs.size() = "<<m_ProtonProngs.size()
@@ -2543,7 +2543,7 @@ bool CCProtonPi0::getProtonProng(   Minerva::ProngVect& primaryProngs) const
             continue;
         }
     
-        // Temp Storage for ProngVect, Single Prong and Single Particle
+        // Temp Storage for ProngVect, Single Prong
         Minerva::ProngVect tmpProngs;
         SmartRef<Minerva::Prong> prong       = (Minerva::Prong*)NULL;
         SmartRef<Minerva::Particle> particle = (Minerva::Particle*)NULL;
@@ -2577,8 +2577,7 @@ bool CCProtonPi0::getProtonProng(   Minerva::ProngVect& primaryProngs) const
 //==============================================================================
 // Set proton particle data
 //==============================================================================
-bool CCProtonPi0::setProtonParticleData(    Minerva::NeutrinoInt* nuInt, 
-                                            double vertexZ ) const 
+bool CCProtonPi0::setProtonParticleData( Minerva::NeutrinoInt* nuInt ) const 
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::setProtonParticleData()" << endmsg;
@@ -2589,14 +2588,17 @@ bool CCProtonPi0::setProtonParticleData(    Minerva::NeutrinoInt* nuInt,
             
     // Sanity Check
     if ( m_ProtonProngs.size() == 0 ) {
-        fatal()<< "m_ProtonProngs is empty" <<endmsg;
+        warning()<< "m_ProtonProngs is empty" <<endmsg;
         return false;
     }else if ( m_ProtonParticles.size() == 0){
-        fatal()<< "m_ProtonParticles is empty" <<endmsg;
+        warning()<< "m_ProtonParticles is empty" <<endmsg;
+        return false;
+    }else if ( m_ProtonProngs.size() != m_ProtonParticles.size()){
+        warning()<< "m_ProtonProngs and m_ProtonParticles NOT SAME SIZE" <<endmsg;
         return false;
     }
     
-    
+    // Declare Variables
     double SENTINEL = -9.9;
     std::vector<double> p_calCorrection(10,SENTINEL);
     std::vector<double> p_visEnergyCorrection(10,SENTINEL);
@@ -2627,11 +2629,15 @@ bool CCProtonPi0::setProtonParticleData(    Minerva::NeutrinoInt* nuInt,
     
     std::vector<int> kinked(10,-1);
     std::vector<int> odMatch(10,-1);
+    std::vector<int> isRecoGood(10,-1);
     
     std::vector<double> score(10,SENTINEL);
     std::vector<double> score1(10,SENTINEL);
     std::vector<double> score2(10,SENTINEL);
     std::vector<double> chi2(10,SENTINEL);
+    
+    // Get Vertex Z Position
+    double vertexZ = m_PrimaryVertex->position().z();
     
     // Loop over all Proton Candidates
     for(unsigned int i = 0; i < m_ProtonProngs.size(); i++) {
@@ -2640,26 +2646,97 @@ bool CCProtonPi0::setProtonParticleData(    Minerva::NeutrinoInt* nuInt,
         
         double theta = prong->minervaTracks().front()->theta();
         double phi   = prong->minervaTracks().front()->phi();
+        
+        // Mark Prong if Particle Energy == 0
+        if ( particle->momentumVec().E() == 0.0 ){
+            debug()<<"particle energy from dEdX = 0";
+            isRecoGood[i] = -1;
+        }else{
+            isRecoGood[i] = 1;
+        }
     
         proton_theta[i]  = m_coordSysTool->thetaWRTBeam(particle->momentumVec());
         proton_thetaX[i] = m_coordSysTool->thetaXWRTBeam(particle->momentumVec());
         proton_thetaY[i] = m_coordSysTool->thetaYWRTBeam(particle->momentumVec());
         proton_phi[i]    = m_coordSysTool->phiWRTBeam(particle->momentumVec());
+        
+        //----------------------------------------------------------------------
+        // Debugging: Check values
+            debug()<<"Theta(Proton) = "<<theta
+            <<" Phi(Proton) = "<<phi
+            <<endmsg;
+        //----------------------------------------------------------------------
+        
+        //----------------------------------------------------------------------
+        // Debugging: Check values
+            debug()<<"Before m_energyCorrectionTool->getCorrectedEnergy"<<endmsg;
+            debug()<<"P4(Proton) = ( "
+            <<particle->momentumVec().Px()<<", "
+            <<particle->momentumVec().Py()<<", "
+            <<particle->momentumVec().Pz()<<", "
+            <<particle->momentumVec().E()<<" )"
+            <<endmsg;
+        //----------------------------------------------------------------------
     
+        debug()<<"Entering m_energyCorrectionTool->getCorrectedEnergy..."<<endmsg;
         Gaudi::LorentzVector dEdXprotonfourVec;
         StatusCode sc = m_energyCorrectionTool->getCorrectedEnergy(prong,particle,vertexZ,dEdXprotonfourVec);
         
-        if( !sc ) dEdXprotonfourVec = particle->momentumVec();
-        else particle->setMomentumVec(dEdXprotonfourVec);
-    
+        // if m_energyCorrectionTool->getCorrectedEnergy returns SUCCESS
+        if( sc ){
+            debug()<<"m_energyCorrectionTool->getCorrectedEnergy return SUCCESS"<<endmsg;
+            debug()<<"particle->setMomentumVec(dEdXprotonfourVec)"<<endmsg;
+            particle->setMomentumVec(dEdXprotonfourVec);
+        } else{
+            debug()<<"m_energyCorrectionTool->getCorrectedEnergy return FAILURE"<<endmsg;
+            debug()<<"dEdXprotonfourVec = particle->momentumVec()"<<endmsg;
+            dEdXprotonfourVec = particle->momentumVec();
+        }
+        
         p_dedx[i] = sqrt( dEdXprotonfourVec.E()*dEdXprotonfourVec.E() - MinervaUnits::M_proton*MinervaUnits::M_proton );
-        correctProtonProngEnergy(prong,p_calCorrection[i],p_visEnergyCorrection[i]);
-    
+        
+        //----------------------------------------------------------------------
+        // Debugging: Check values
+            debug()<<"Before correctProtonProngEnergy"<<endmsg;
+            debug()<<"P4(Proton) = ( "
+            <<particle->momentumVec().Px()<<", "
+            <<particle->momentumVec().Py()<<", "
+            <<particle->momentumVec().Pz()<<", "
+            <<particle->momentumVec().E()<<" )"
+            <<endmsg;
+        //----------------------------------------------------------------------
+        
+        bool isCorrected = correctProtonProngEnergy(prong,p_calCorrection[i],p_visEnergyCorrection[i]);
+        
+        // if correctProtonProngEnergy() returns false ==> use default particle 4-Momentum
+        if ( !isCorrected){
+            warning()<<"correctProtonProngEnergy() returned false!"<<endmsg;
+            p_calCorrection[i] = sqrt(  particle->momentumVec().Px() * particle->momentumVec().Px() +
+                                        particle->momentumVec().Py() * particle->momentumVec().Py() +
+                                        particle->momentumVec().Pz() * particle->momentumVec().Pz() );
+        }
+        //----------------------------------------------------------------------
+        // Debugging: Check values
+            debug()<<"p_calCorrection[i] = "<<p_calCorrection[i]<<endmsg;
+            debug()<<"p_visEnergyCorrection[i] = "<<p_visEnergyCorrection[i]<<endmsg;
+        //----------------------------------------------------------------------
+        
         E[i]  = sqrt( p_calCorrection[i]*p_calCorrection[i] + MinervaUnits::M_proton*MinervaUnits::M_proton );
         px[i] = p_calCorrection[i]*sin(theta)*cos(phi);
         py[i] = p_calCorrection[i]*sin(theta)*sin(phi);
         pz[i] = p_calCorrection[i]*cos(theta);
         p[i]  = sqrt( px[i]*px[i] + py[i]*py[i] + pz[i]*pz[i] );
+        
+        //----------------------------------------------------------------------
+        // Debugging: Check values
+            debug()<<"After correctProtonProngEnergy"<<endmsg;
+            debug()<<"P4(Proton) = ( "
+            <<px[i]<<", "
+            <<py[i]<<", "
+            <<pz[i]<<", "
+            <<E[i]<<" )"
+            <<endmsg;
+        //----------------------------------------------------------------------
     
         if( prong->minervaTracks().front()->direction() == Minerva::Track::Backward && pz[i] > 0. ) pz[i] *= -1.0;
         Gaudi::LorentzVector protonfourVec(px[i],py[i],pz[i],E[i]);
@@ -2692,6 +2769,14 @@ bool CCProtonPi0::setProtonParticleData(    Minerva::NeutrinoInt* nuInt,
             <<score[i]
             <<endmsg;
         //----------------------------------------------------------------------
+        
+        //----------------------------------------------------------------------
+        // Debugging: Check values
+            debug()<<"ekin[i] = "<<ekin[i]<<endmsg;
+            debug()<<"kinked[i] = "<<kinked[i]<<endmsg;
+            debug()<<"odMatch[i] = "<<odMatch[i]<<endmsg;
+            debug()<<"isRecoGood[i] = "<<isRecoGood[i]<<endmsg;
+        //----------------------------------------------------------------------
     }
 
     nuInt->setContainerDoubleData("proton_p_calCorrection",p_calCorrection);
@@ -2714,6 +2799,7 @@ bool CCProtonPi0::setProtonParticleData(    Minerva::NeutrinoInt* nuInt,
     
     nuInt->setContainerIntData("proton_kinked",kinked);
     nuInt->setContainerIntData("proton_odMatch",odMatch);
+    nuInt->setContainerIntData("proton_isRecoGood",isRecoGood);
     
     nuInt->setContainerDoubleData("proton_score",score);
     nuInt->setContainerDoubleData("proton_score1",score1);
@@ -2736,7 +2822,7 @@ bool CCProtonPi0::setProtonParticleData(    Minerva::NeutrinoInt* nuInt,
 //==============================================================================
 // Correct Proton Energy
 //==============================================================================
-void CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
+bool CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
                                                 double& p_calCorrection, 
                                                 double& p_visEnergyCorrection ) const
 {
@@ -2744,8 +2830,14 @@ void CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonPro
     debug() << "Enter CCProtonPi0::correctProtonProngEnergy()" << endmsg;
     
     //-- initialize
+    bool isCorrected = true;
+    double E_calCorrection = 0.0;
+    double E_visEnergyCorrection = 0.0;
     double calEnergy = 0.0;
     double visEnergy = 0.0;
+    p_calCorrection         = 0.0;
+    p_visEnergyCorrection   = 0.0;
+    
         
     //-- get the proton prong subprongs
     Minerva::ProngVect subProngs = protonProng->subProngs();
@@ -2786,32 +2878,57 @@ void CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonPro
     
         //-- get the total visible energy of the fuzz blobs
         Minerva::IDClusterVect clusters = fuzzBlobs[blob]->clusters();
-        for(unsigned int clus = 0; clus < clusters.size(); clus++) visEnergy += clusters[clus]->energy();
+        for(unsigned int clus = 0; clus < clusters.size(); clus++){
+            visEnergy += clusters[clus]->energy(); 
+        }
     }
+    //----------------------------------------------------------------------
+    // Debugging: Check values
+        debug() <<"The fuzz blobs energies!"<<endmsg;
+        debug() <<"calEnergy = "<<calEnergy<<endmsg;
+        debug() <<"visEnergy = "<<visEnergy<<endmsg;
+    //----------------------------------------------------------------------
     
     //-- get the prong first track
     SmartRef<Minerva::Track> track = (*protonProng->minervaTracks().begin());
     
     //-- update the particles four momentum
     Minerva::ParticleVect particles = protonProng->particles();
+    debug() <<"Prong N(Particles) = "<<particles.size()<<endmsg;
     for(unsigned int part = 0; part < particles.size(); part++) {
         if( particles[part]->idcode() != Minerva::Particle::Proton ) continue;
     
         Gaudi::XYZTVector fourMomentum = particles[part]->momentumVec();
         debug() << "particle idcode = " << particles[part]->idcode() << ", and four momentum = " << fourMomentum << endmsg;
     
-        double E_calCorrection = fourMomentum.E() + calEnergy;
-        p_calCorrection = sqrt( pow(E_calCorrection,2) - pow(particles[part]->mass(),2) );
+        E_calCorrection = fourMomentum.E() + calEnergy;
+        E_visEnergyCorrection = fourMomentum.E() + visEnergy;
+        
+        // Break if Energy is lower than particle rest mass
+        if( E_calCorrection < particles[part]->mass()){
+            warning() << "E_calCorrection < Particle Mass "<<E_calCorrection<<" < "<<particles[part]->mass()<<endmsg;
+            isCorrected = false;
+            break;
+        }else if( E_visEnergyCorrection < particles[part]->mass()){
+            warning() << " E_visEnergyCorrection < Particle Mass "<<E_visEnergyCorrection<<" < "<<particles[part]->mass()<<endmsg;
+            isCorrected = false;
+            break;
+        }
+        
+        p_calCorrection += sqrt( pow(E_calCorrection,2) - pow(particles[part]->mass(),2) );
         debug() << "update energy using calorimetric correction = " << E_calCorrection << endmsg;
-    
-        double E_visEnergyCorrection = fourMomentum.E() + visEnergy;
-        p_visEnergyCorrection = sqrt( pow(E_visEnergyCorrection,2) - pow(particles[part]->mass(),2) );     
+        debug() << "update momentum using calorimetric correction = " << p_calCorrection << endmsg;
+        
+        p_visEnergyCorrection += sqrt( pow(E_visEnergyCorrection,2) - pow(particles[part]->mass(),2) );     
         debug() << "update energy using visible energy correction = " << E_visEnergyCorrection << endmsg;
+        debug() << "update momentum using visible correction = " << p_visEnergyCorrection << endmsg;
     }     
-            
+    
     debug() << "Exit CCProtonPi0::correctProtonProngEnergy()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    return;
+    
+    // p_visEnergyCorrection == 0 leads to a 0 4-Momentum
+    return isCorrected;
 }
 
 //==============================================================================

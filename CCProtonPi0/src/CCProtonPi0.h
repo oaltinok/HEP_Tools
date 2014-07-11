@@ -21,8 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_07_09
-    Version:        v1_02
+    Last Revision:  2014_07_11
+    Version:        v1_03
     
 ================================================================================
 */
@@ -220,8 +220,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
                                     int & plane_return) const;
                                     
         bool setMuonParticleData(   Minerva::NeutrinoInt* nuInt ) const;
-        bool setProtonParticleData( Minerva::NeutrinoInt* nuInt, 
-                                    double vertexZ ) const;
+        bool setProtonParticleData( Minerva::NeutrinoInt* nuInt ) const;
         bool setPi0ParticleData(  Minerva::PhysicsEvent *event, 
                                         Minerva::IDBlob* idblob1, 
                                         Minerva::IDBlob* idblob2,
@@ -232,7 +231,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;
 
 
-        void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
+        bool correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
                                         double& p_calCorrection, 
                                         double& p_visEnergyCorrection ) const;
         void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
