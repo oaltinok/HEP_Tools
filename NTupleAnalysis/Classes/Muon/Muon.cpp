@@ -29,77 +29,77 @@ Muon::Muon()
     bin_AngleBeam.setBin(90,0.0,90.0);
 
     cout<<"\tInitializing Histograms "<<endl;
-    partScore = new TH1F( "partScore","Muon Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
+    partScore = new TH1D( "partScore","Muon Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");
     partScore->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f ",bin_partScore.get_width()));
     
-    P_mc = new TH1F( "P_mc","True Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    P_mc = new TH1D( "P_mc","True Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
     P_mc->GetXaxis()->SetTitle("True Muon Momentum [GeV]");
     P_mc->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [GeV] ",bin_P.get_width()));
     
-    P_reco = new TH1F( "P_reco","Reconstructed Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    P_reco = new TH1D( "P_reco","Reconstructed Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
     P_reco->GetXaxis()->SetTitle("Reconstructed Muon Momentum [GeV]");
     P_reco->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [GeV] ",bin_P.get_width()));
     
-    P_error = new TH1F( "P_error","Error on Muon Momentum",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
+    P_error = new TH1D( "P_error","Error on Muon Momentum",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
     P_error->GetXaxis()->SetTitle("(Reco- True) / True");
     P_error->GetYaxis()->SetTitle(Form("Candidates  / %3.2f",bin_error.get_width()));
     
-    P_reco_mc = new TH2F( "P_reco_mc","True vs Reconstructed Muon Momentum",
+    P_reco_mc = new TH2D( "P_reco_mc","True vs Reconstructed Muon Momentum",
                                 bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(),
                                 bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
     P_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Momentum [GeV]");
     P_reco_mc->GetYaxis()->SetTitle("True Muon Momentum [GeV]");
     
-    KE_mc = new TH1F( "KE_mc","True Muon Kinetic Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    KE_mc = new TH1D( "KE_mc","True Muon Kinetic Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
     KE_mc->GetXaxis()->SetTitle("True Muon Kinetic Energy [GeV]");
     KE_mc->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [GeV]",bin_P.get_width()));
     
-    KE_reco = new TH1F( "KE_reco","Reconstructed Muon Kinetic Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    KE_reco = new TH1D( "KE_reco","Reconstructed Muon Kinetic Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
     KE_reco->GetXaxis()->SetTitle("Reconstructed Muon Kinetic Energy [GeV]");
     KE_reco->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [GeV]",bin_P.get_width()));
     
-    KE_error = new TH1F( "KE_error","Error on Muon Kinetic Energy",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
+    KE_error = new TH1D( "KE_error","Error on Muon Kinetic Energy",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
     KE_error->GetXaxis()->SetTitle("(Reco- True) / True");
     KE_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",bin_error.get_width()));
     
-    KE_reco_mc = new TH2F( "KE_reco_mc","True vs Reconstructed Muon Kinetic Energy",
+    KE_reco_mc = new TH2D( "KE_reco_mc","True vs Reconstructed Muon Kinetic Energy",
                                 bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(),
                                 bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
     KE_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Kinetic Energy [GeV]");
     KE_reco_mc->GetYaxis()->SetTitle("True Muon Kinetic Energy [GeV]");
     
-    angleMuon_mc = new TH1F( "angleMuon_mc","True Muon Angle wrt. Muon",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
+    angleMuon_mc = new TH1D( "angleMuon_mc","True Muon Angle wrt. Muon",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
     angleMuon_mc->GetXaxis()->SetTitle("True Muon Angle wrt. Muon [Degree]");
     angleMuon_mc->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [Degree] ",bin_AngleBeam.get_width()));
     
-    angleMuon_reco = new TH1F( "angleMuon_reco","Reconstructed Muon Angle wrt. Muon",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
+    angleMuon_reco = new TH1D( "angleMuon_reco","Reconstructed Muon Angle wrt. Muon",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
     angleMuon_reco->GetXaxis()->SetTitle("Reconstructed Muon Angle wrt. Muon [Degree]");
     angleMuon_reco->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [Degree] ",bin_AngleBeam.get_width()));
     
-    angleMuon_error = new TH1F( "angleMuon_error","Error on Muon Angle wrt. Muon",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
+    angleMuon_error = new TH1D( "angleMuon_error","Error on Muon Angle wrt. Muon",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
     angleMuon_error->GetXaxis()->SetTitle("(Reco- True) / True");
     angleMuon_error->GetYaxis()->SetTitle(Form("Candidates  / %3.2f ",bin_error.get_width()));
     
-    angleMuon_reco_mc = new TH2F( "angleMuon_reco_mc","True vs Reconstructed Muon Angle wrt. Muon",
+    angleMuon_reco_mc = new TH2D( "angleMuon_reco_mc","True vs Reconstructed Muon Angle wrt. Muon",
                                 bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max(),
                                 bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max());
     angleMuon_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Angle wrt. Muon [Degree]");
     angleMuon_reco_mc->GetYaxis()->SetTitle("True Muon Angle wrt. Muon [Degree]");
     
-    angleBeam_mc = new TH1F( "angleBeam_mc","True Muon Angle wrt. Beam",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
+    angleBeam_mc = new TH1D( "angleBeam_mc","True Muon Angle wrt. Beam",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
     angleBeam_mc->GetXaxis()->SetTitle("True Muon Angle wrt. Beam [Degree]" );
     angleBeam_mc->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [Degree]",bin_AngleBeam.get_width()));
     
-    angleBeam_reco = new TH1F( "angleBeam_reco","Reconstructed Muon Angle wrt. Beam",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
+    angleBeam_reco = new TH1D( "angleBeam_reco","Reconstructed Muon Angle wrt. Beam",bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max() );
     angleBeam_reco->GetXaxis()->SetTitle("Reconstructed Muon Angle wrt. Beam [Degree]");
     angleBeam_reco->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [Degree]",bin_AngleBeam.get_width()));
     
-    angleBeam_error = new TH1F( "angleBeam_error","Error on Muon Angle wrt. Beam",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
+    angleBeam_error = new TH1D( "angleBeam_error","Error on Muon Angle wrt. Beam",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
     angleBeam_error->GetXaxis()->SetTitle("(Reco- True) / True");
     angleBeam_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",bin_AngleBeam.get_width()));
     
-    angleBeam_reco_mc = new TH2F( "angleBeam_reco_mc","True vs Reconstructed Muon Angle wrt. Beam",
+    angleBeam_reco_mc = new TH2D( "angleBeam_reco_mc","True vs Reconstructed Muon Angle wrt. Beam",
                                 bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max(),
                                 bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max());
     angleBeam_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Angle wrt. Beam [Degree]");

@@ -19,8 +19,10 @@ void CCProtonPi0::specifyRunTime()
     applyProtonScore = true;
     minProtonScore = 0.3;
     
-    applyPhotonDistance = false;
+    applyPhotonDistance = true;
     minPhotonDistance = 150; //mm
+    
+    SENTINEL = -9.9;
 
     //Select Branches to Activate
     m_ActivateMC            = true;
@@ -68,7 +70,6 @@ void CCProtonPi0::run(string playlist)
         fChain->SetBranchStatus("CCProtonPi0_traj*",1);
     }
     
-
     if(m_ActivateInteraction){
         fChain->SetBranchStatus("CCProtonPi0_vtx*",1);
         fChain->SetBranchStatus("preFilter_*",1);
@@ -98,14 +99,17 @@ void CCProtonPi0::run(string playlist)
     double nCut_Vertex_Michel_Exist = 0;           
     double nCut_Muon_None = 0;              
     double nCut_Muon_Score_Low = 0;
+    double nCut_Muon_Charge = 0;
     double nCut_EndPoint_Michel_Exist = 0;
     double nCut_secEndPoint_Michel_Exist = 0;
+    double nCut_Particle_None = 0;
     double nCut_Proton_None = 0;            
     double nCut_Proton_Score = 0;
     double nCut_PreFilter_Pi0 = 0;
-    double nCut_Reco_Muon_NoProblem = 0;
-    double nCut_Reco_Pi0_NoProblem = 0;
+    double nCut_VtxBlob = 0;
+    double nCut_ConeBlobs = 0;
     double nCut_PhotonDistanceLow = 0;
+    double nCut_Other = 0;
     
     double nSignal = 0;
     double nSignal_Vertex_None = 0;
@@ -115,14 +119,17 @@ void CCProtonPi0::run(string playlist)
     double nSignal_Vertex_Michel_Exist = 0;           
     double nSignal_Muon_None = 0;              
     double nSignal_Muon_Score_Low = 0;
+    double nSignal_Muon_Charge = 0;
     double nSignal_EndPoint_Michel_Exist = 0;
     double nSignal_secEndPoint_Michel_Exist = 0;
+    double nSignal_Particle_None = 0;
     double nSignal_Proton_None = 0;            
     double nSignal_Proton_Score = 0;
     double nSignal_PreFilter_Pi0 = 0;
-    double nSignal_Reco_Muon_NoProblem = 0;
-    double nSignal_Reco_Pi0_NoProblem = 0;
+    double nSignal_VtxBlob = 0;
+    double nSignal_ConeBlobs = 0;
     double nSignal_PhotonDistanceLow= 0;
+    double nSignal_Other = 0;
     
     int indRecoProton;
     int indTruePion;
@@ -141,7 +148,6 @@ void CCProtonPi0::run(string playlist)
         double nMultPi0_Test = 0;
         
     
-
     //------------------------------------------------------------------------
     // Loop over Chain
     //------------------------------------------------------------------------
@@ -165,11 +171,6 @@ void CCProtonPi0::run(string playlist)
             cout<<"\tEntry "<<jentry<<endl;
         }
         
-        //----------------------------------------------------------------------
-        // Plausibility Cuts
-        //----------------------------------------------------------------------
-        if (mc_nFSPart > max_nFSPart) continue;
-
         //----------------------------------------------------------------------
         // Count Events after each Reconstruction Cut
         //----------------------------------------------------------------------
@@ -202,6 +203,10 @@ void CCProtonPi0::run(string playlist)
         nCut_Muon_Score_Low++;
         if(truth_isSignal) nSignal_Muon_Score_Low++;
         
+        if( Cut_Muon_Charge == 1) continue;
+        nCut_Muon_Charge++;
+        if(truth_isSignal) nSignal_Muon_Charge++;
+        
         if( Cut_Vertex_Michel_Exist == 1) continue;
         nCut_Vertex_Michel_Exist++;
         if(truth_isSignal) nSignal_Vertex_Michel_Exist++;
@@ -214,7 +219,11 @@ void CCProtonPi0::run(string playlist)
         nCut_secEndPoint_Michel_Exist++;
         if(truth_isSignal) nSignal_secEndPoint_Michel_Exist++;
         
-        if( Cut_Proton_None == 1 || CCProtonPi0_proton_E[0] == -1) continue;
+        if( Cut_Particle_None == 1) continue;
+        nCut_Particle_None++;
+        if(truth_isSignal) nSignal_Particle_None++;
+
+        if( Cut_Proton_None == 1) continue;
         nCut_Proton_None++;
         if(truth_isSignal) nSignal_Proton_None++;
         
@@ -225,21 +234,25 @@ void CCProtonPi0::run(string playlist)
         nCut_Proton_Score++;
         if(truth_isSignal) nSignal_Proton_Score++;
         
+        pFilter_Status->Fill(preFilter_Result);
+        pFilter_RejectedEnergy->Fill(preFilter_rejectedEnergy);
+        
         if( Cut_PreFilter_Pi0 == 1) continue;
         nCut_PreFilter_Pi0++;
         if(truth_isSignal) nSignal_PreFilter_Pi0++;
         
-        if(CCProtonPi0_muon_pz == 0){
-            cout<<"Failed Reco Muon E = "<<CCProtonPi0_muon_E<<endl;
-            continue;
-        };
-        nCut_Reco_Muon_NoProblem++;
-        if(truth_isSignal) nSignal_Reco_Muon_NoProblem++;
+        if( Cut_VtxBlob == 1) continue;
+        nCut_VtxBlob++;
+        if(truth_isSignal) nSignal_VtxBlob++;
         
-        if(pi0_E == -9.0) continue;
-        nCut_Reco_Pi0_NoProblem++;
-        if(truth_isSignal) nSignal_Reco_Pi0_NoProblem++;
+        if( Cut_ConeBlobs == 1) continue;
+        nCut_ConeBlobs++;
+        if(truth_isSignal) nSignal_ConeBlobs++;
         
+        if( pi0_E == SENTINEL) continue;
+        nCut_Other++;
+        if(truth_isSignal) nSignal_Other++;
+
         if( applyPhotonDistance && isPhotonDistanceLow()) continue;
         nCut_PhotonDistanceLow++;
         if(truth_isSignal) nSignal_PhotonDistanceLow++;
@@ -265,6 +278,30 @@ void CCProtonPi0::run(string playlist)
         if(nPi0Count == 1) n1Pi0_Test++;
         if(nPi0Count > 1) nMultPi0_Test++;
         
+        // Particle NTuple Info after All Cuts
+        failText<<"----------------------------------------------------------------------"<<endl;
+        failText<<jentry<<endl;
+        failText<<"Muon 4-P = ( "
+                <<CCProtonPi0_muon_px<<", "
+                <<CCProtonPi0_muon_py<<", "
+                <<CCProtonPi0_muon_pz<<", "
+                <<CCProtonPi0_muon_E<<" )"
+                <<endl;
+        failText<<"Proton 4-P = ( "
+                <<CCProtonPi0_proton_px[indRecoProton]<<", "
+                <<CCProtonPi0_proton_py[indRecoProton]<<", "
+                <<CCProtonPi0_proton_pz[indRecoProton]<<", "
+                <<CCProtonPi0_proton_E[indRecoProton]<<" )"
+                <<" Score = "<<CCProtonPi0_proton_score[indRecoProton]
+                <<endl;
+        failText<<"Pi0 4-P = ( "
+                <<pi0_px<<", "
+                <<pi0_py<<", "
+                <<pi0_pz<<", "
+                <<pi0_E<<" )"
+                <<endl;
+
+        
         //----------------------------------------------------------------------
         // pID Studies
         //----------------------------------------------------------------------
@@ -279,7 +316,6 @@ void CCProtonPi0::run(string playlist)
                 pID_other->Fill(CCProtonPi0_proton_score[indRecoProton]);
             }
         }
-        
         
         if ( isDataAnalysis){
             //------------------------------------------------------------------
@@ -326,33 +362,39 @@ void CCProtonPi0::run(string playlist)
     cutText<<"Cut_Vertex_Not_Reconstructable     "<<nCut_Vertex_Not_Reconstructable<<endl;
     cutText<<"Cut_Vertex_Not_Fiducial       "<<nCut_Vertex_Not_Fiducial<<endl;
     cutText<<"Cut_Muon_None                 "<<nCut_Muon_None<<endl;
-    cutText<<"Cut_Muon_Score_Low            "<<nCut_Muon_Score_Low<<endl; 
+    cutText<<"Cut_Muon_Score_Low            "<<nCut_Muon_Score_Low<<endl;
+    cutText<<"Cut_Muon_Charge               "<<nCut_Muon_Charge<<endl; 
     cutText<<"Cut_Vertex_Michel_Exist       "<<nCut_Vertex_Michel_Exist<<endl;
     cutText<<"Cut_EndPoint_Michel_Exist     "<<nCut_EndPoint_Michel_Exist<<endl;
     cutText<<"Cut_secEndPoint_Michel_Exist  "<<nCut_secEndPoint_Michel_Exist<<endl;
+    cutText<<"Cut_Particle_None             "<<nCut_Particle_None<<endl;
     cutText<<"Cut_Proton_None               "<<nCut_Proton_None<<endl;
     cutText<<"Cut_Proton_Score              "<<nCut_Proton_Score<<endl;
     cutText<<"Cut_PreFilter_Pi0             "<<nCut_PreFilter_Pi0<<endl;
-    cutText<<"Cut_Reco_Muon_NoProblem       "<<nCut_Reco_Muon_NoProblem<<endl;
-    cutText<<"Cut_Reco_Pi0_NoProblem       "<<nCut_Reco_Pi0_NoProblem<<endl;
-    cutText<<"Cut_PhotonDistanceLow      "<<nCut_PhotonDistanceLow<<endl;
+    cutText<<"Cut_VtxBlob                   "<<nCut_VtxBlob<<endl;
+    cutText<<"Cut_ConeBlobs                 "<<nCut_ConeBlobs<<endl;
+    cutText<<"Cut_Other                     "<<nCut_Other<<endl;
+    cutText<<"Cut_PhotonDistanceLow         "<<nCut_PhotonDistanceLow<<endl;
     cutText<<endl;
-    cutText<<"nSignal                          "<<nSignal<<endl;
-    cutText<<"Signal_Vertex_None               "<<nSignal_Vertex_None<<endl;
-    cutText<<"Signal_Vertex_Null               "<<nSignal_Vertex_Null<<endl;
+    cutText<<"nSignal                           "<<nSignal<<endl;
+    cutText<<"Signal_Vertex_None                "<<nSignal_Vertex_None<<endl;
+    cutText<<"Signal_Vertex_Null                "<<nSignal_Vertex_Null<<endl;
     cutText<<"Signal_Vertex_Not_Reconstructable     "<<nSignal_Vertex_Not_Reconstructable<<endl;
-    cutText<<"Signal_Vertex_Not_Fiducial       "<<nSignal_Vertex_Not_Fiducial<<endl;
-    cutText<<"Signal_Muon_None                 "<<nSignal_Muon_None<<endl;
-    cutText<<"Signal_Muon_Score_Low            "<<nSignal_Muon_Score_Low<<endl; 
-    cutText<<"Signal_Vertex_Michel_Exist       "<<nSignal_Vertex_Michel_Exist<<endl;
-    cutText<<"Signal_EndPoint_Michel_Exist     "<<nSignal_EndPoint_Michel_Exist<<endl;
-    cutText<<"Signal_secEndPoint_Michel_Exist  "<<nSignal_secEndPoint_Michel_Exist<<endl;
-    cutText<<"Signal_Proton_None               "<<nSignal_Proton_None<<endl;
-    cutText<<"Signal_Proton_Score              "<<nSignal_Proton_Score<<endl;
-    cutText<<"Signal_PreFilter_Pi0             "<<nSignal_PreFilter_Pi0<<endl;
-    cutText<<"Signal_Reco_Muon_NoProblem       "<<nSignal_Reco_Muon_NoProblem<<endl;
-    cutText<<"Signal_Reco_Pi0_NoProblem       "<<nSignal_Reco_Pi0_NoProblem<<endl;
-    cutText<<"Signal_PhotonDistanceLow      "<<nSignal_PhotonDistanceLow<<endl;
+    cutText<<"Signal_Vertex_Not_Fiducial        "<<nSignal_Vertex_Not_Fiducial<<endl;
+    cutText<<"Signal_Muon_None                  "<<nSignal_Muon_None<<endl;
+    cutText<<"Signal_Muon_Score_Low             "<<nSignal_Muon_Score_Low<<endl;
+    cutText<<"Signal_Muon_Charge                "<<nSignal_Muon_Charge<<endl; 
+    cutText<<"Signal_Vertex_Michel_Exist        "<<nSignal_Vertex_Michel_Exist<<endl;
+    cutText<<"Signal_EndPoint_Michel_Exist      "<<nSignal_EndPoint_Michel_Exist<<endl;
+    cutText<<"Signal_secEndPoint_Michel_Exist   "<<nSignal_secEndPoint_Michel_Exist<<endl;
+    cutText<<"Signal_Particle_None              "<<nSignal_Particle_None<<endl;
+    cutText<<"Signal_Proton_None                "<<nSignal_Proton_None<<endl;
+    cutText<<"Signal_Proton_Score               "<<nSignal_Proton_Score<<endl;
+    cutText<<"Signal_PreFilter_Pi0              "<<nSignal_PreFilter_Pi0<<endl;
+    cutText<<"Signal_VtxBlob                    "<<nSignal_VtxBlob<<endl;
+    cutText<<"Signal_ConeBlobs                  "<<nSignal_ConeBlobs<<endl;
+    cutText<<"Signal_Other                      "<<nSignal_Other<<endl;
+    cutText<<"Signal_PhotonDistanceLow          "<<nSignal_PhotonDistanceLow<<endl;
     
     // Write the Root Files
     write_RootFile();           //CCProtonPi0
@@ -379,10 +421,10 @@ void CCProtonPi0::get_pID_Stats()
     string rootDir = "Output/RootFiles/Interaction.root";
     TFile* f_Root = new TFile(rootDir.c_str());
     
-    TH1F* pID_proton  = (TH1F*)f_Root->Get("pID_proton");
-    TH1F* pID_piplus  = (TH1F*)f_Root->Get("pID_piplus");
-    TH1F* pID_piminus = (TH1F*)f_Root->Get("pID_piminus");
-    TH1F* pID_other   = (TH1F*)f_Root->Get("pID_other");
+    TH1D* pID_proton  = (TH1D*)f_Root->Get("pID_proton");
+    TH1D* pID_piplus  = (TH1D*)f_Root->Get("pID_piplus");
+    TH1D* pID_piminus = (TH1D*)f_Root->Get("pID_piminus");
+    TH1D* pID_other   = (TH1D*)f_Root->Get("pID_other");
     
     double nProton = 0;
     double nTotalProton = 0;
@@ -499,9 +541,6 @@ void CCProtonPi0::fillInteractionReco(int indProton)
                                                 
     deltaInvMass_reco->Fill(invMass_reco);
     
-    pFilter_Status->Fill(preFilter_Result);
-    pFilter_RejectedEnergy->Fill(preFilter_rejectedEnergy);
-    
     vertex_x_y_reco->Fill(CCProtonPi0_vtx[0],CCProtonPi0_vtx[1]);
     vertex_z_reco->Fill(CCProtonPi0_vtx[2]);
 }
@@ -529,7 +568,7 @@ void CCProtonPi0::initVariables()
     rootDir =   "Output/RootFiles/Interaction.root";
     plotDir =   "Output/Plots/Interaction/";
     
-    
+    max_nFSPart = 10;
     cout<<"\tRoot File: "<<rootDir<<endl;
     cout<<"\tPlot Output Folder: "<<plotDir<<endl;
     
@@ -543,8 +582,6 @@ void CCProtonPi0::initVariables()
     beam_p3.SetXYZ(1.0,1.0,1.0);
     beam_p3.SetPhi(-1.554);
     beam_p3.SetTheta(0.059);
-    
-    max_nFSPart = 15;
     
     cout<<"Done!"<<endl;
 }
@@ -616,41 +653,6 @@ void CCProtonPi0::writeReadme()
 {
     readme<<"Test"<<endl;
 }
-
-
-/*
---------------------------------------------------------------------------------
- findParticle:
-    Returns the array indice of the Final State Particle for given PDG
---------------------------------------------------------------------------------
-*/
-int CCProtonPi0::findTrueParticle(int targetPDG)
-{
-    int current_ind = -1;
-    double current_P = 0;
-    
-    TVector3 p3;
-    
-    for(int i = 0; i < mc_nFSPart && i < max_nFSPart; i++ ){
-    
-        // Momentum of Particle (No Particle at rest)
-        // Update Particle Momentum until you find the fastest particle
-        if( mc_FSPartPDG[i] == targetPDG){
-            p3.SetXYZ(mc_FSPartPx[i],mc_FSPartPy[i],mc_FSPartPz[i]);
-            if (current_P < p3.Mag()){
-                current_P = p3.Mag();
-                current_ind = i;
-            }
-        }
-    }
-    
-    if (current_P > 0){
-        return current_ind;
-    }else{
-        return -1;
-    }
-}
-
 
 /*
 --------------------------------------------------------------------------------
@@ -738,24 +740,6 @@ int CCProtonPi0::findBestProton()
 
 }
 
-bool CCProtonPi0::isProtonShort(int ind)
-{
-    const double protonMass = 938; 
-    const double minProtonKE = 120;
-    double protonKE;
-    double protonE;
-    
-    protonE = mc_FSPartE[ind];
-    protonKE =  protonE - protonMass;
-    if( protonKE < minProtonKE){
-        return true;
-    }else{
-        return false;
-    }
-    
-}
-
-
 void CCProtonPi0::fillPionReco()
 {
     // Fill 4-Momentum
@@ -783,15 +767,18 @@ void CCProtonPi0::fillPionTrue()
     
     P_reco = HEP_Functions::calcMomentum(pi0_px,pi0_py,pi0_pz);
    
-    // Momentum Information with True Pi0 Count
+    // Momentum and Invariant Mass Information with True Pi0 Count
     if(truth_N_pi0 == 0){
         pion.P_reco_0Pi0->Fill(P_reco);
+        pion.invMass_0Pi0->Fill(pi0_invMass);
     }else if(truth_N_pi0 == 1){
         pion.P_reco_1Pi0->Fill(P_reco);
+        pion.invMass_1Pi0->Fill(pi0_invMass);
         P_true = getBestPi0Momentum();
         pion.P_reco_mc_1Pi0->Fill(P_reco,P_true);
     }else if(truth_N_pi0 > 1){
         pion.P_reco_MultPi0->Fill(P_reco);
+        pion.invMass_MultPi0->Fill(pi0_invMass);
         P_true = getBestPi0Momentum();
         pion.P_reco_mc_MultPi0->Fill(P_reco,P_true);
     }
@@ -939,6 +926,7 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("Cut_Muon_Charge", &Cut_Muon_Charge, &b_Cut_Muon_Charge);
    fChain->SetBranchAddress("Cut_Muon_None", &Cut_Muon_None, &b_Cut_Muon_None);
    fChain->SetBranchAddress("Cut_Muon_Score_Low", &Cut_Muon_Score_Low, &b_Cut_Muon_Score_Low);
+   fChain->SetBranchAddress("Cut_Particle_None", &Cut_Particle_None, &b_Cut_Particle_None);
    fChain->SetBranchAddress("Cut_PreFilter_Pi0", &Cut_PreFilter_Pi0, &b_Cut_PreFilter_Pi0);
    fChain->SetBranchAddress("Cut_Proton_None", &Cut_Proton_None, &b_Cut_Proton_None);
    fChain->SetBranchAddress("Cut_Vertex_Michel_Exist", &Cut_Vertex_Michel_Exist, &b_Cut_Vertex_Michel_Exist);
@@ -954,11 +942,9 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("g1dedx_doublet", &g1dedx_doublet, &b_g1dedx_doublet);
    fChain->SetBranchAddress("g1dedx_empty_plane", &g1dedx_empty_plane, &b_g1dedx_empty_plane);
    fChain->SetBranchAddress("g1dedx_nplane", &g1dedx_nplane, &b_g1dedx_nplane);
-   fChain->SetBranchAddress("g1mostevispdg", &g1mostevispdg, &b_g1mostevispdg);
    fChain->SetBranchAddress("g2dedx_doublet", &g2dedx_doublet, &b_g2dedx_doublet);
    fChain->SetBranchAddress("g2dedx_empty_plane", &g2dedx_empty_plane, &b_g2dedx_empty_plane);
    fChain->SetBranchAddress("g2dedx_nplane", &g2dedx_nplane, &b_g2dedx_nplane);
-   fChain->SetBranchAddress("g2mostevispdg", &g2mostevispdg, &b_g2mostevispdg);
    fChain->SetBranchAddress("gamma1_blob_nclusters", &gamma1_blob_nclusters, &b_gamma1_blob_nclusters);
    fChain->SetBranchAddress("gamma1_blob_ndigits", &gamma1_blob_ndigits, &b_gamma1_blob_ndigits);
    fChain->SetBranchAddress("gamma2_blob_nclusters", &gamma2_blob_nclusters, &b_gamma2_blob_nclusters);
@@ -1025,37 +1011,11 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("g1dedx1", &g1dedx1, &b_g1dedx1);
    fChain->SetBranchAddress("g1dedx_total", &g1dedx_total, &b_g1dedx_total);
    fChain->SetBranchAddress("g1dedx_total1", &g1dedx_total1, &b_g1dedx_total1);
-   fChain->SetBranchAddress("g1g1evis", &g1g1evis, &b_g1g1evis);
-   fChain->SetBranchAddress("g1g2evis", &g1g2evis, &b_g1g2evis);
-   fChain->SetBranchAddress("g1gmevis", &g1gmevis, &b_g1gmevis);
-   fChain->SetBranchAddress("g1mostevisfrac", &g1mostevisfrac, &b_g1mostevisfrac);
-   fChain->SetBranchAddress("g1muevis", &g1muevis, &b_g1muevis);
-   fChain->SetBranchAddress("g1neutronevis", &g1neutronevis, &b_g1neutronevis);
-   fChain->SetBranchAddress("g1otherevis", &g1otherevis, &b_g1otherevis);
-   fChain->SetBranchAddress("g1pi0evis", &g1pi0evis, &b_g1pi0evis);
-   fChain->SetBranchAddress("g1pimevis", &g1pimevis, &b_g1pimevis);
-   fChain->SetBranchAddress("g1pipevis", &g1pipevis, &b_g1pipevis);
-   fChain->SetBranchAddress("g1protonevis", &g1protonevis, &b_g1protonevis);
-   fChain->SetBranchAddress("g1sharedevis", &g1sharedevis, &b_g1sharedevis);
-   fChain->SetBranchAddress("g1totalevis", &g1totalevis, &b_g1totalevis);
    fChain->SetBranchAddress("g2blob_minsep", &g2blob_minsep, &b_g2blob_minsep);
    fChain->SetBranchAddress("g2dedx", &g2dedx, &b_g2dedx);
    fChain->SetBranchAddress("g2dedx1", &g2dedx1, &b_g2dedx1);
    fChain->SetBranchAddress("g2dedx_total", &g2dedx_total, &b_g2dedx_total);
    fChain->SetBranchAddress("g2dedx_total1", &g2dedx_total1, &b_g2dedx_total1);
-   fChain->SetBranchAddress("g2g1evis", &g2g1evis, &b_g2g1evis);
-   fChain->SetBranchAddress("g2g2evis", &g2g2evis, &b_g2g2evis);
-   fChain->SetBranchAddress("g2gmevis", &g2gmevis, &b_g2gmevis);
-   fChain->SetBranchAddress("g2mostevisfrac", &g2mostevisfrac, &b_g2mostevisfrac);
-   fChain->SetBranchAddress("g2muevis", &g2muevis, &b_g2muevis);
-   fChain->SetBranchAddress("g2neutronevis", &g2neutronevis, &b_g2neutronevis);
-   fChain->SetBranchAddress("g2otherevis", &g2otherevis, &b_g2otherevis);
-   fChain->SetBranchAddress("g2pi0evis", &g2pi0evis, &b_g2pi0evis);
-   fChain->SetBranchAddress("g2pimevis", &g2pimevis, &b_g2pimevis);
-   fChain->SetBranchAddress("g2pipevis", &g2pipevis, &b_g2pipevis);
-   fChain->SetBranchAddress("g2protonevis", &g2protonevis, &b_g2protonevis);
-   fChain->SetBranchAddress("g2sharedevis", &g2sharedevis, &b_g2sharedevis);
-   fChain->SetBranchAddress("g2totalevis", &g2totalevis, &b_g2totalevis);
    fChain->SetBranchAddress("gamma1_E", &gamma1_E, &b_gamma1_E);
    fChain->SetBranchAddress("gamma1_dEdx", &gamma1_dEdx, &b_gamma1_dEdx);
    fChain->SetBranchAddress("gamma1_dist_exit", &gamma1_dist_exit, &b_gamma1_dist_exit);
@@ -1435,6 +1395,7 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCProtonPi0_vtx_z", &CCProtonPi0_vtx_z, &b_CCProtonPi0_vtx_z);
    fChain->SetBranchAddress("CCProtonPi0_isProtonInsideOD", CCProtonPi0_isProtonInsideOD, &b_CCProtonPi0_isProtonInsideOD);
    fChain->SetBranchAddress("CCProtonPi0_ntrajProtonProng", CCProtonPi0_ntrajProtonProng, &b_CCProtonPi0_ntrajProtonProng);
+   fChain->SetBranchAddress("CCProtonPi0_proton_isRecoGood", CCProtonPi0_proton_isRecoGood, &b_CCProtonPi0_proton_isRecoGood);
    fChain->SetBranchAddress("CCProtonPi0_proton_kinked", CCProtonPi0_proton_kinked, &b_CCProtonPi0_proton_kinked);
    fChain->SetBranchAddress("CCProtonPi0_proton_odMatch", CCProtonPi0_proton_odMatch, &b_CCProtonPi0_proton_odMatch);
    fChain->SetBranchAddress("CCProtonPi0_proton_trk_pat_history", CCProtonPi0_proton_trk_pat_history, &b_CCProtonPi0_proton_trk_pat_history);
@@ -1628,121 +1589,121 @@ Int_t CCProtonPi0::Cut(Long64_t entry)
 void CCProtonPi0::initHistograms()
 {
     
-    pID_purity = new TH1F( "pID_purity","Proton Purity",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
+    pID_purity = new TH1D( "pID_purity","Proton Purity",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_purity->GetXaxis()->SetTitle("Proton Purity = Captured Proton / Captured Total Events");
     pID_purity->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
-    pID_efficiency = new TH1F( "pID_efficiency","Proton Efficiency",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
+    pID_efficiency = new TH1D( "pID_efficiency","Proton Efficiency",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_efficiency->GetXaxis()->SetTitle("Proton Efficiency = Captured Proton / Total Protons");
     pID_efficiency->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
-    pID_piplus = new TH1F( "pID_piplus","Pi Plus",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
+    pID_piplus = new TH1D( "pID_piplus","Pi Plus",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_piplus->GetXaxis()->SetTitle("Pi Plus");
     pID_piplus->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
-    pID_piminus = new TH1F( "pID_piminus","Pi Minus",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
+    pID_piminus = new TH1D( "pID_piminus","Pi Minus",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_piminus->GetXaxis()->SetTitle("Pi Minus");
     pID_piminus->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
-    pID_proton = new TH1F( "pID_proton","Proton",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
+    pID_proton = new TH1D( "pID_proton","Proton",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_proton->GetXaxis()->SetTitle("Proton");
     pID_proton->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
-    pID_other = new TH1F( "pID_other","Other",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
+    pID_other = new TH1D( "pID_other","Other",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_other->GetXaxis()->SetTitle("Other");
     pID_other->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
-    beamEnergy_mc = new TH1F( "beamEnergy_mc","True Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    beamEnergy_mc = new TH1D( "beamEnergy_mc","True Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
     beamEnergy_mc->GetXaxis()->SetTitle("True Beam Energy [MeV]");
     beamEnergy_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
     
-    beamEnergy_reco = new TH1F( "beamEnergy_reco","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    beamEnergy_reco = new TH1D( "beamEnergy_reco","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
     beamEnergy_reco->GetXaxis()->SetTitle("Reconstructed Beam Energy [MeV]");
     beamEnergy_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
     
-    beamEnergy_error = new TH1F( "beamEnergy_error","Error on Beam Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    beamEnergy_error = new TH1D( "beamEnergy_error","Error on Beam Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     beamEnergy_error->GetXaxis()->SetTitle("(Reco- True) / True");
     beamEnergy_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
     
-    beamEnergy_reco_mc = new TH2F( "beamEnergy_reco_mc","True vs Reconstructed Beam Energy",
+    beamEnergy_reco_mc = new TH2D( "beamEnergy_reco_mc","True vs Reconstructed Beam Energy",
                                 binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),
                                 binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
     beamEnergy_reco_mc->GetXaxis()->SetTitle("Reconstructed Beam Energy [MeV]");
     beamEnergy_reco_mc->GetYaxis()->SetTitle("True Beam Energy [MeV]");
     
-    q2_mc = new TH1F( "q2_mc","True Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
+    q2_mc = new TH1D( "q2_mc","True Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
     q2_mc->GetXaxis()->SetTitle("True Q^{2} [MeV]");
     q2_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.q2.get_width()));
     
-    q2_reco = new TH1F( "q2_reco","Reconstructed Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
+    q2_reco = new TH1D( "q2_reco","Reconstructed Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
     q2_reco->GetXaxis()->SetTitle("Reconstructed Q^{2} [MeV]");
     q2_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.q2.get_width()));
     
-    q2_error = new TH1F( "q2_error","Error on Q^{2}",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    q2_error = new TH1D( "q2_error","Error on Q^{2}",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     q2_error->GetXaxis()->SetTitle("(Reco- True) / True");
     q2_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
     
-    q2_reco_mc = new TH2F( "q2_reco_mc","True vs Reconstructed Q^{2}",
+    q2_reco_mc = new TH2D( "q2_reco_mc","True vs Reconstructed Q^{2}",
                                 binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max(),
                                 binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max());
     q2_reco_mc->GetXaxis()->SetTitle("Reconstructed Q^{2} [MeV]");
     q2_reco_mc->GetYaxis()->SetTitle("True Q^{2} [MeV]");
     
-    int_channel = new TH1F( "int_channel","Interaction Channel",binList.int_channel.get_nBins(), binList.int_channel.get_min(), binList.int_channel.get_max() );
+    int_channel = new TH1D( "int_channel","Interaction Channel",binList.int_channel.get_nBins(), binList.int_channel.get_min(), binList.int_channel.get_max() );
     int_channel->GetXaxis()->SetTitle("1 = QE, 2 = Resonant, 3 = DIS, 4 = Coh pi");
     int_channel->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.int_channel.get_width()));
     
-    vertex_x_y_true = new TH2F( "vertex_x_y_true","True Vertex X vs Y",   binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max(),
+    vertex_x_y_true = new TH2D( "vertex_x_y_true","True Vertex X vs Y",   binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max(),
                                                                 binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max());
     vertex_x_y_true->GetXaxis()->SetTitle("True Vertex X [mm]");
     vertex_x_y_true->GetYaxis()->SetTitle("True Vertex Y [mm]");
 
-    vertex_x_y_reco = new TH2F( "vertex_x_y_reco","Reconstructed Vertex X vs Y",   binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max(),
+    vertex_x_y_reco = new TH2D( "vertex_x_y_reco","Reconstructed Vertex X vs Y",   binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max(),
                                                                 binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max());
     vertex_x_y_reco->GetXaxis()->SetTitle("Reconstructed Vertex X [mm]");
     vertex_x_y_reco->GetYaxis()->SetTitle("Reconstructed Vertex Y [mm]");
     
-    vertex_z_true = new TH1F( "vertex_z_true","True Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+    vertex_z_true = new TH1D( "vertex_z_true","True Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
     vertex_z_true->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
     vertex_z_true->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.vertex_z.get_width()));
     
-    vertex_z_reco = new TH1F( "vertex_z_reco","Reconstructed Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+    vertex_z_reco = new TH1D( "vertex_z_reco","Reconstructed Vertex Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
     vertex_z_reco->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
     vertex_z_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.vertex_z.get_width()));
     
-    vertex_z_error = new TH1F( "vertex_z_error","Error on Vertex Z",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    vertex_z_error = new TH1D( "vertex_z_error","Error on Vertex Z",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     vertex_z_error->GetXaxis()->SetTitle("(Reco- True) / True");
     vertex_z_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
     
-    vertex_z_reco_mc = new TH2F( "vertex_z_reco_mc","True vs Reconstructed Vertex Z",
+    vertex_z_reco_mc = new TH2D( "vertex_z_reco_mc","True vs Reconstructed Vertex Z",
                                 binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max(),
                                 binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max());
     vertex_z_reco_mc->GetXaxis()->SetTitle("Reconstructed Vertex Z [mm]");
     vertex_z_reco_mc->GetYaxis()->SetTitle("True Vertex Z [mm]");
     
-    deltaInvMass_reco = new TH1F( "deltaInvMass_reco","Reconstructed Delta+ Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
+    deltaInvMass_reco = new TH1D( "deltaInvMass_reco","Reconstructed Delta+ Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
     deltaInvMass_reco->GetXaxis()->SetTitle("Reconstructed Delta+ Invariant Mass [MeV]");
     deltaInvMass_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV] ",binList.deltaInvMass.get_width()));
     
-    deltaInvMass_mc= new TH1F( "deltaInvMass_mc","True Delta+ Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
+    deltaInvMass_mc= new TH1D( "deltaInvMass_mc","True Delta+ Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
     deltaInvMass_mc->GetXaxis()->SetTitle("True Delta+ Invariant Mass [MeV]");
     deltaInvMass_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV] ",binList.deltaInvMass.get_width()));
     
-    deltaInvMass_error = new TH1F( "deltaInvMass_error","Delta+ Invariant Mass Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    deltaInvMass_error = new TH1D( "deltaInvMass_error","Delta+ Invariant Mass Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     deltaInvMass_error->GetXaxis()->SetTitle("(Reco- True) / True");
     deltaInvMass_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
     
-    deltaInvMass_reco_mc = new TH2F( "deltaInvMass_reco_mc","True vs Reconstructed Delta+ Invariant Mass",
+    deltaInvMass_reco_mc = new TH2D( "deltaInvMass_reco_mc","True vs Reconstructed Delta+ Invariant Mass",
         binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max(),
         binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
     deltaInvMass_reco_mc->GetXaxis()->SetTitle("Reconstructed Delta+ Invariant Mass [MeV]");
     deltaInvMass_reco_mc->GetYaxis()->SetTitle("True Delta+ Invariant Mass [MeV]");
     
-    pFilter_Status = new TH1F( "pFilter_Status","Prefilter() Result",binList.preFilter_Status.get_nBins(), binList.preFilter_Status.get_min(), binList.preFilter_Status.get_max() );
+    pFilter_Status = new TH1D( "pFilter_Status","Prefilter() Result",binList.preFilter_Status.get_nBins(), binList.preFilter_Status.get_min(), binList.preFilter_Status.get_max() );
     pFilter_Status->GetXaxis()->SetTitle("0 = Passes Filter, 1 = Target Filter, 2 = Max Other, 3 = Min Other");
     pFilter_Status->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.preFilter_Status.get_width()));
     
-    pFilter_RejectedEnergy = new TH1F( "pFilter_RejectedEnergy","Rejected Energy by preFilter()",binList.preFilter_RejectedEnergy.get_nBins(), binList.preFilter_RejectedEnergy.get_min(), binList.preFilter_RejectedEnergy.get_max() );
+    pFilter_RejectedEnergy = new TH1D( "pFilter_RejectedEnergy","Rejected Energy by preFilter()",binList.preFilter_RejectedEnergy.get_nBins(), binList.preFilter_RejectedEnergy.get_min(), binList.preFilter_RejectedEnergy.get_max() );
     pFilter_RejectedEnergy->GetXaxis()->SetTitle("Rejected Energy by preFilter()");
     pFilter_RejectedEnergy->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.preFilter_RejectedEnergy.get_width()));
     

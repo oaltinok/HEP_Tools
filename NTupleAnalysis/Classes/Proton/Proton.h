@@ -5,7 +5,7 @@ Class: Proton -> Derived Class from Particle Base Clas
                 extends base class with proton specific parameters
 
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_06_20
+    Last Revision: 2014_07_16
 ================================================================================
 */
 #ifndef Proton_h

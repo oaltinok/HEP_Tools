@@ -7,7 +7,7 @@ Class: Particle
     Uses ROOT Specific classes
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_05_10
+    Last Revision: 2014_07_16
 ================================================================================
 */
 
@@ -55,27 +55,27 @@ class Particle
         TFile* f;
         
         // Histograms
-        TH1F* partScore;
+        TH1D* partScore;
         
-        TH1F* P_mc;
-        TH1F* P_reco;
-        TH1F* P_error;
-        TH2F* P_reco_mc;
+        TH1D* P_mc;
+        TH1D* P_reco;
+        TH1D* P_error;
+        TH2D* P_reco_mc;
         
-        TH1F* KE_mc;
-        TH1F* KE_reco;
-        TH1F* KE_error;
-        TH2F* KE_reco_mc;
+        TH1D* KE_mc;
+        TH1D* KE_reco;
+        TH1D* KE_error;
+        TH2D* KE_reco_mc;
         
-        TH1F* angleBeam_mc;
-        TH1F* angleBeam_reco;
-        TH1F* angleBeam_error;
-        TH2F* angleBeam_reco_mc;
+        TH1D* angleBeam_mc;
+        TH1D* angleBeam_reco;
+        TH1D* angleBeam_error;
+        TH2D* angleBeam_reco_mc;
         
-        TH1F* angleMuon_mc;
-        TH1F* angleMuon_reco;
-        TH1F* angleMuon_error;
-        TH2F* angleMuon_reco_mc;
+        TH1D* angleMuon_mc;
+        TH1D* angleMuon_reco;
+        TH1D* angleMuon_error;
+        TH2D* angleMuon_reco_mc;
         
         // Bins for Histograms
         SingleBin bin_error;

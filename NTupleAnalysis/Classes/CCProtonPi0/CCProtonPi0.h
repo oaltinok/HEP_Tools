@@ -19,7 +19,8 @@ Class: CCProtonPi0
     
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_07_06
+    Version:        4_7
+    Last Revision:  2014_07_16
 ================================================================================
 */
 
@@ -77,7 +78,6 @@ public :
     void fillHistograms();
     void write_RootFile();
     void writeReadme();
-    int findTrueParticle(int targetPDG);
     int countParticles(int targetPDG, bool applyPCut);
     void get_pID_Stats();
     
@@ -100,7 +100,6 @@ public :
     void fillProtonTrue(int ind);
     void fillProtonReco(int ind);
     int findBestProton();
-    bool isProtonShort(int ind);
     //--------------------------------------------------------------------------
     //  Pion Specific Functions
     //--------------------------------------------------------------------------
@@ -127,39 +126,39 @@ public :
     TFile* f;
     
     // Analysis Variables
-    TH1F* beamEnergy_mc;
-    TH1F* beamEnergy_reco;
-    TH1F* beamEnergy_error;
-    TH2F* beamEnergy_reco_mc;
+    TH1D* beamEnergy_mc;
+    TH1D* beamEnergy_reco;
+    TH1D* beamEnergy_error;
+    TH2D* beamEnergy_reco_mc;
     
-    TH1F* deltaInvMass_mc;
-    TH1F* deltaInvMass_reco;
-    TH1F* deltaInvMass_error;
-    TH2F* deltaInvMass_reco_mc;
+    TH1D* deltaInvMass_mc;
+    TH1D* deltaInvMass_reco;
+    TH1D* deltaInvMass_error;
+    TH2D* deltaInvMass_reco_mc;
     
-    TH1F* pFilter_Status;
-    TH1F* pFilter_RejectedEnergy;
+    TH1D* pFilter_Status;
+    TH1D* pFilter_RejectedEnergy;
     
-    TH1F* q2_mc;
-    TH1F* q2_reco;
-    TH1F* q2_error;
-    TH2F* q2_reco_mc;
+    TH1D* q2_mc;
+    TH1D* q2_reco;
+    TH1D* q2_error;
+    TH2D* q2_reco_mc;
     
-    TH1F* vertex_z_true;
-    TH1F* vertex_z_reco;
-    TH1F* vertex_z_error;
-    TH2F* vertex_z_reco_mc;
+    TH1D* vertex_z_true;
+    TH1D* vertex_z_reco;
+    TH1D* vertex_z_error;
+    TH2D* vertex_z_reco_mc;
     
-    TH1F* int_channel;
-    TH2F* vertex_x_y_true;
-    TH2F* vertex_x_y_reco;
+    TH1D* int_channel;
+    TH2D* vertex_x_y_true;
+    TH2D* vertex_x_y_reco;
     
-    TH1F* pID_purity;
-    TH1F* pID_efficiency;
-    TH1F* pID_piplus;
-    TH1F* pID_piminus;
-    TH1F* pID_proton;
-    TH1F* pID_other;
+    TH1D* pID_purity;
+    TH1D* pID_efficiency;
+    TH1D* pID_piplus;
+    TH1D* pID_piminus;
+    TH1D* pID_proton;
+    TH1D* pID_other;
     
    // -------------------------------------------------------------------------
    //     Analysis Variables
@@ -173,6 +172,7 @@ public :
     int max_nFSPart;
     double minProtonScore;
     double minPhotonDistance;
+    double SENTINEL;
     TVector3 beam_p3;
     Proton proton;
     Muon muon;
@@ -250,6 +250,7 @@ public :
    Int_t           Cut_Muon_Charge;
    Int_t           Cut_Muon_None;
    Int_t           Cut_Muon_Score_Low;
+   Int_t           Cut_Particle_None;
    Int_t           Cut_PreFilter_Pi0;
    Int_t           Cut_Proton_None;
    Int_t           Cut_Vertex_Michel_Exist;
@@ -265,11 +266,9 @@ public :
    Int_t           g1dedx_doublet;
    Int_t           g1dedx_empty_plane;
    Int_t           g1dedx_nplane;
-   Int_t           g1mostevispdg;
    Int_t           g2dedx_doublet;
    Int_t           g2dedx_empty_plane;
    Int_t           g2dedx_nplane;
-   Int_t           g2mostevispdg;
    Int_t           gamma1_blob_nclusters;
    Int_t           gamma1_blob_ndigits;
    Int_t           gamma2_blob_nclusters;
@@ -336,37 +335,11 @@ public :
    Double_t        g1dedx1;
    Double_t        g1dedx_total;
    Double_t        g1dedx_total1;
-   Double_t        g1g1evis;
-   Double_t        g1g2evis;
-   Double_t        g1gmevis;
-   Double_t        g1mostevisfrac;
-   Double_t        g1muevis;
-   Double_t        g1neutronevis;
-   Double_t        g1otherevis;
-   Double_t        g1pi0evis;
-   Double_t        g1pimevis;
-   Double_t        g1pipevis;
-   Double_t        g1protonevis;
-   Double_t        g1sharedevis;
-   Double_t        g1totalevis;
    Double_t        g2blob_minsep;
    Double_t        g2dedx;
    Double_t        g2dedx1;
    Double_t        g2dedx_total;
    Double_t        g2dedx_total1;
-   Double_t        g2g1evis;
-   Double_t        g2g2evis;
-   Double_t        g2gmevis;
-   Double_t        g2mostevisfrac;
-   Double_t        g2muevis;
-   Double_t        g2neutronevis;
-   Double_t        g2otherevis;
-   Double_t        g2pi0evis;
-   Double_t        g2pimevis;
-   Double_t        g2pipevis;
-   Double_t        g2protonevis;
-   Double_t        g2sharedevis;
-   Double_t        g2totalevis;
    Double_t        gamma1_E;
    Double_t        gamma1_dEdx;
    Double_t        gamma1_dist_exit;
@@ -746,6 +719,7 @@ public :
    Double_t        CCProtonPi0_vtx_z;
    Int_t           CCProtonPi0_isProtonInsideOD[10];
    Int_t           CCProtonPi0_ntrajProtonProng[10];
+   Int_t           CCProtonPi0_proton_isRecoGood[10];
    Int_t           CCProtonPi0_proton_kinked[10];
    Int_t           CCProtonPi0_proton_odMatch[10];
    Int_t           CCProtonPi0_proton_trk_pat_history[10];
@@ -916,6 +890,7 @@ public :
    TBranch        *b_Cut_Muon_Charge;   //!
    TBranch        *b_Cut_Muon_None;   //!
    TBranch        *b_Cut_Muon_Score_Low;   //!
+   TBranch        *b_Cut_Particle_None;   //!
    TBranch        *b_Cut_PreFilter_Pi0;   //!
    TBranch        *b_Cut_Proton_None;   //!
    TBranch        *b_Cut_Vertex_Michel_Exist;   //!
@@ -931,11 +906,9 @@ public :
    TBranch        *b_g1dedx_doublet;   //!
    TBranch        *b_g1dedx_empty_plane;   //!
    TBranch        *b_g1dedx_nplane;   //!
-   TBranch        *b_g1mostevispdg;   //!
    TBranch        *b_g2dedx_doublet;   //!
    TBranch        *b_g2dedx_empty_plane;   //!
    TBranch        *b_g2dedx_nplane;   //!
-   TBranch        *b_g2mostevispdg;   //!
    TBranch        *b_gamma1_blob_nclusters;   //!
    TBranch        *b_gamma1_blob_ndigits;   //!
    TBranch        *b_gamma2_blob_nclusters;   //!
@@ -1002,37 +975,11 @@ public :
    TBranch        *b_g1dedx1;   //!
    TBranch        *b_g1dedx_total;   //!
    TBranch        *b_g1dedx_total1;   //!
-   TBranch        *b_g1g1evis;   //!
-   TBranch        *b_g1g2evis;   //!
-   TBranch        *b_g1gmevis;   //!
-   TBranch        *b_g1mostevisfrac;   //!
-   TBranch        *b_g1muevis;   //!
-   TBranch        *b_g1neutronevis;   //!
-   TBranch        *b_g1otherevis;   //!
-   TBranch        *b_g1pi0evis;   //!
-   TBranch        *b_g1pimevis;   //!
-   TBranch        *b_g1pipevis;   //!
-   TBranch        *b_g1protonevis;   //!
-   TBranch        *b_g1sharedevis;   //!
-   TBranch        *b_g1totalevis;   //!
    TBranch        *b_g2blob_minsep;   //!
    TBranch        *b_g2dedx;   //!
    TBranch        *b_g2dedx1;   //!
    TBranch        *b_g2dedx_total;   //!
    TBranch        *b_g2dedx_total1;   //!
-   TBranch        *b_g2g1evis;   //!
-   TBranch        *b_g2g2evis;   //!
-   TBranch        *b_g2gmevis;   //!
-   TBranch        *b_g2mostevisfrac;   //!
-   TBranch        *b_g2muevis;   //!
-   TBranch        *b_g2neutronevis;   //!
-   TBranch        *b_g2otherevis;   //!
-   TBranch        *b_g2pi0evis;   //!
-   TBranch        *b_g2pimevis;   //!
-   TBranch        *b_g2pipevis;   //!
-   TBranch        *b_g2protonevis;   //!
-   TBranch        *b_g2sharedevis;   //!
-   TBranch        *b_g2totalevis;   //!
    TBranch        *b_gamma1_E;   //!
    TBranch        *b_gamma1_dEdx;   //!
    TBranch        *b_gamma1_dist_exit;   //!
@@ -1412,6 +1359,7 @@ public :
    TBranch        *b_CCProtonPi0_vtx_z;   //!
    TBranch        *b_CCProtonPi0_isProtonInsideOD;   //!
    TBranch        *b_CCProtonPi0_ntrajProtonProng;   //!
+   TBranch        *b_CCProtonPi0_proton_isRecoGood;   //!
    TBranch        *b_CCProtonPi0_proton_kinked;   //!
    TBranch        *b_CCProtonPi0_proton_odMatch;   //!
    TBranch        *b_CCProtonPi0_proton_trk_pat_history;   //!

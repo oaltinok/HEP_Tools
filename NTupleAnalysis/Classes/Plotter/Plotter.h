@@ -13,7 +13,7 @@ Class: Plotter
             
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_07_06
+    Last Revision: 2014_07_16
 ================================================================================
 */
 
@@ -50,13 +50,14 @@ class Plotter
         void plotProton(bool isMC, bool isReco, bool is2D);
         void plotPion(bool isMC, bool isReco, bool is2D);
                             
-        void plotSpecial();
+        void plot_Pi0_P_Stacked();
+        void plot_Pi0_invMass_Stacked();
         void plotPID();
         void inform(string rootDir, string plotDir);
         
         // Plottting Macros
-        void plot1D_Hist(TH1F* hist1D, string fileName, string plotDir);
-        void plot2D_Hist(TH2F* hist2D, string fileName, string plotDir);
+        void plot1D_Hist(TH1D* hist1D, string fileName, string plotDir);
+        void plot2D_Hist(TH2D* hist2D, string fileName, string plotDir);
     
     private:
     

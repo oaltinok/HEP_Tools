@@ -5,7 +5,7 @@ Class: Muon -> Derived Class from Particle Base Clas
                 extends base class with muon specific parameters
                 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_06_20
+    Last Revision: 2014_07_16
 ================================================================================
 */
 
@@ -28,10 +28,6 @@ class Muon : public Particle
         static const double restMass = 105.66;
         bool isMinosMatched;
         SingleBin bin_AngleBeam;
-        
-
-         
-        
         
 };
 
