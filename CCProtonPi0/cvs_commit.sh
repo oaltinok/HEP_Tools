@@ -1,20 +1,20 @@
-cvs commit -m "v1_04 - 2014_07_15
-Revised Pi0 Reconstruction
-	Global Variables Used in all functions
-	Removed unused functions and variables
-	ConeBlobs()
-		Variable Naming Match
-		Return type changed: StatusCode to bool
-			Returns false if setPi0ParticleData() fails
-		ConeBlobs() main function that controls Pi0 Reconstruction. 
-			If it fails, the  reconstructEvent() for that event stops.
-	VtxBlob()
-		Return type changed: StatusCode to bool
-			Always returns true (return type reserved for future implementation)
-	processBlobs()
-		Removed unused variables
-		Return type changed: StatusCode to void
-		
-Options File Modifications
-	New Options files for DEBUG
-	Original options file set to INFO" .
+cvs commit -m "v1_05 - 2014_08_06
+Options file Ana_CCProtonPi0.opts Improved
+	More Control for CCProtonPi0 Flow
+
+Debugging Messages from older versions removed
+New NTuple Data Added to track all of the CUTs
+New Function: setVertexData()
+
+Class: AngleScan
+	Styling Modified to match Package Styling
+	Comments Added
+	
+Class: ClusterVectorInfo
+	Styling Modified to match Package Styling
+	Comments Added
+	
+Prong Colors Added for Scanning Sessions
+    http://ozgur.fresoft.com/ccprotonpi0.html
+	
+New Documentation: ProcessAna_Scripts.txt" .

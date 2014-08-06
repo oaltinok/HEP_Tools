@@ -21,8 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_07_15
-    Version:        v1_04
+    Last Revision:  2014_07_28
+    Version:        v1_05
     
 ================================================================================
 */
@@ -124,7 +124,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool m_writeFSParticle_Table;
         bool m_store_all_events;
         bool m_makeShortTracks;
-        bool m_doPlausibilityCuts;
+        bool m_DoPlausibilityCuts;
+        bool m_DoTruthMatch;
         
         // Tool Names
         std::string m_particleToolName;
@@ -133,7 +134,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         std::string m_michelTrkToolAlias;
         std::string m_michelVtxToolAlias;
         
-        // Prong Colors
+        // Prong and Cluster Colors
         int m_Color_muonProng;
         int m_Color_protonProng;
         int m_Color_primaryVertex;
@@ -142,6 +143,13 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int m_Color_unattachedProng;
         int m_Color_Gamma1Prong;
         int m_Color_Gamma2Prong;
+        int m_Color_clusterUnused;
+        int m_Color_clusterUsed;
+        int m_Color_VertexFila;
+        int m_Color_VertexSphere;
+        int m_Color_RejectedBlob;
+        
+       
         
         // VtxBlob
         bool 	 m_sphereVertex;
@@ -220,11 +228,13 @@ class CCProtonPi0 : public MinervaAnalysisTool
                                     int & module_return, 
                                     int & plane_return) const;
                                     
-        bool setMuonParticleData(   Minerva::NeutrinoInt* nuInt ) const;
-        bool setProtonParticleData( Minerva::NeutrinoInt* nuInt ) const;
-        bool setPi0ParticleData(  Minerva::PhysicsEvent *event, 
-                                        Minerva::IDBlob* idblob1, 
-                                        Minerva::IDBlob* idblob2) const;
+        void setVertexData( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent* event ) const;
+        bool setMuonData(   Minerva::NeutrinoInt* nuInt ) const;
+        bool setProtonData( Minerva::NeutrinoInt* nuInt ) const;
+        bool setPi0Data(    Minerva::PhysicsEvent *event, 
+                            Minerva::IDBlob* idblob1, 
+                            Minerva::IDBlob* idblob2) const;
+        
 
         
         bool createTrackedParticles( Minerva::ProngVect& prongs ) const;

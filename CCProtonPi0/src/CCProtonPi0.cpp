@@ -128,9 +128,10 @@ MinervaAnalysisTool( type, name, parent )
     m_anaSignature = "CCProtonPi0";
     
     // Private Properties
-    declareProperty("WriteFSParticleTable", m_writeFSParticle_Table =   true);
+    declareProperty("WriteFSParticleTable", m_writeFSParticle_Table =   false);
     declareProperty("StoreAllEvents",       m_store_all_events      =   true);
-    declareProperty("DoPlausibilityCuts",   m_doPlausibilityCuts    =   true);
+    declareProperty("DoPlausibilityCuts",   m_DoPlausibilityCuts    =   true);
+    declareProperty("DoTruthMatch",         m_DoTruthMatch          =   true);
     declareProperty("MakeShortTracks",      m_makeShortTracks       =   true);
     
     declareProperty("BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian );
@@ -138,14 +139,27 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("MinMuonScore",        m_minMuonScore = 0.9 );
     declareProperty("MinProtonScore",      m_minProtonScore = 0.0 );
     
-    declareProperty("MuonProngColor",               m_Color_muonProng       = 0x228B22); //-- green
-    declareProperty("ProtonProngColor",             m_Color_protonProng     = 0x9932CC); //-- purple
-    declareProperty("PrimaryVertexProngColor",      m_Color_primaryVertex   = 0xFF0000); //-- red
-    declareProperty("SecondaryVertexProngColor",    m_Color_secondaryVertex = 0xFFA500); //-- orange
-    declareProperty("TrackEndProngColor",           m_Color_endPointVertex  = 0xFF1493); //-- pink
-    declareProperty("UnattachedProngColor",         m_Color_unattachedProng = 0x0000CC); //-- dark blue
-    declareProperty("Gamma1ProngColor",             m_Color_Gamma1Prong     = 0x00FF00); //-- light green
-    declareProperty("Gamma2ProngColor",             m_Color_Gamma2Prong     = 0x00CCFF); //-- light blue
+    //--------------------------------------------------------------------------
+    // Arachne Colors
+    //--------------------------------------------------------------------------
+    // Prongs and Tracks
+    declareProperty("MuonProngColor",           m_Color_muonProng       = 0x228B22); //-- green
+    declareProperty("ProtonProngColor",         m_Color_protonProng     = 0x0000FF); //-- blue
+    declareProperty("TrackEndProngColor",       m_Color_endPointVertex  = 0xFFA500); //-- orange
+    declareProperty("UnattachedProngColor",     m_Color_unattachedProng = 0xFFFF00); //-- yellow
+    
+    // Blobs and Clusters
+    declareProperty("BlobRejectedColor",        m_Color_RejectedBlob    = 0xFF0000); //-- red
+    declareProperty("ClusterUnusedColor",       m_Color_clusterUnused   = 0xFF00FF); //-- magenta
+    declareProperty("ClusterUsedColor",         m_Color_clusterUsed     = 0x008080); //-- cyan
+    declareProperty("Gamma1ProngColor",         m_Color_Gamma1Prong     = 0x00FF00); //-- light green (lime)
+    declareProperty("Gamma2ProngColor",         m_Color_Gamma2Prong     = 0x00BFFF); //-- light blue 
+    
+    // Vertex
+    declareProperty("PrimaryVertexProngColor",  m_Color_primaryVertex   = 0x000000); //-- black
+    declareProperty("SecondaryVertexProngColor",m_Color_secondaryVertex = 0x000000); //-- black
+    declareProperty("VertexFilaColor",          m_Color_VertexFila      = 0x800080); //-- purple
+    declareProperty("VertexSphereColor",        m_Color_VertexSphere    = 0xFA8072); //-- salmon 
     
     declareProperty("MichelTrkToolAlias",   m_michelTrkToolAlias    = "CCProtonPi0_MichelTrackTool");
     declareProperty("MichelVtxToolAlias",   m_michelVtxToolAlias    = "CCProtonPi0_MichelVertexTool");
@@ -439,8 +453,6 @@ StatusCode CCProtonPi0::initialize()
     m_idDet = m_GeomUtilSvc->getIDDet();
     m_odDet = m_GeomUtilSvc->getODDet();
     
-    
-    
     //! declare common branches
     declareCommonPhysicsAnaBranches();
     declareMinosMuonBranches();
@@ -555,13 +567,15 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleBranch(m_hypMeths, "endProtonTrajYPosition",  10, -9999);
     declareContainerDoubleBranch(m_hypMeths, "endProtonTrajZPosition",  10, -9999);
     
-    
     //! Event - Cut Results
+    declareIntEventBranch( "Cut_Event_Not_Plausible", -1 );
+    declareIntEventBranch( "Cut_Event_Has_BadObject", -1 );
     declareIntEventBranch( "Cut_Vertex_None", -1 );
     declareIntEventBranch( "Cut_Vertex_Null", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Reconstructable", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Fiducial", -1 );
     declareIntEventBranch( "Cut_Muon_None",-1);
+    declareIntEventBranch( "Cut_Muon_Not_Plausible",-1);
     declareIntEventBranch( "Cut_Muon_Score_Low",-1);
     declareIntEventBranch( "Cut_Muon_Charge",-1);
     declareIntEventBranch( "Cut_Vertex_Michel_Exist", -1 );
@@ -759,7 +773,7 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch( m_hypMeths, "vtx_y",0.0);
     declareDoubleBranch( m_hypMeths, "vtx_z",0.0);
     
-    //! NeutrinoInt - Muon -- Filled in setMuonParticleData()
+    //! NeutrinoInt - Muon -- Filled in setMuonData()
     declareIntBranch( m_hypMeths, "muon_minervaTrack_types", -1);
     declareIntBranch( m_hypMeths, "muon_N_minosTracks", -1);
     declareIntBranch( m_hypMeths, "muon_minosTrackQuality", -1);
@@ -779,7 +793,7 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch( m_hypMeths, "muon_qpqpe", 99.0);
     declareDoubleBranch( m_hypMeths, "muon_E_shift", 0.0);
     
-    //! NeutrinoInt - Proton -- Filled in setProtonParticleData()
+    //! NeutrinoInt - Proton -- Filled in setProtonData()
     declareContainerIntBranch(m_hypMeths,    "proton_trk_pat_history", 10, -1);
     declareContainerIntBranch(m_hypMeths,    "proton_kinked",      10, -1);
     declareContainerIntBranch(m_hypMeths,    "proton_odMatch",     10, -1);
@@ -808,7 +822,7 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleBranch(m_hypMeths, "proton_p_visEnergy",     10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_p_dEdXTool",      10, SENTINEL);
     
-    //! Event - Pi0 -- Filles in setPi0ParticleData()
+    //! Event - Pi0 -- Filles in setPi0Data()
     // May convert to NuInt type variable
     
     declareDoubleEventBranch("pi0_px",SENTINEL);
@@ -922,24 +936,25 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     }
     
     //--------------------------------------------------------------------------
-    //! Check if this a plausible event ( MC only )
+    //! MAKE CUT - IF Event is NOT Plausible (MC Only)
     //--------------------------------------------------------------------------
     // default plausibility means that underlying truth is likely something to be rejected by standard Minos Match CC analysis
-    if( truthEvent && m_doPlausibilityCuts && !truthIsPlausible(truthEvent) ) {
+    if( truthEvent && m_DoPlausibilityCuts && !truthIsPlausible(truthEvent) ) {
         debug() << "This is not a plausible MC event! returning!" << endmsg;
-        return StatusCode::SUCCESS;
+        event->setIntData("Cut_Event_Not_Plausible",1);
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
     }
     
-    
     //--------------------------------------------------------------------------
-    //! Does this event carry a reco object with a BadObject flag?
+    //! MAKE CUT - IF Event has a Bad Object
     //--------------------------------------------------------------------------
     if( event->filtertaglist()->isFilterTagTrue( AnaFilterTags::BadObject() ) ) { 
         error() << "Found an event flagged with a BadObject! Refusing to analyze..." << endmsg;
-        counter("REFUSED_A_BADOBJECT") += 1;
-        return StatusCode::SUCCESS; // Things are bad, but we didn't crash.
+        event->setIntData("Cut_Event_Has_BadObject",1);
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
     }
-    counter("REFUSED_A_BADOBJECT") += 0;
     if (truthEvent){
         truthEvent->filtertaglist()->setOrAddFilterTag( "reco_hasGoodObjects", true); 
     }
@@ -1022,6 +1037,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     vtx_position = m_PrimaryVertex->position();
     if (vtx_position.z() != vtx_position.z()) {
         warning()<<"NaN vertex!"<<endmsg;
+        event->setIntData("Cut_Vertex_Null",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
@@ -1073,7 +1089,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     // Muon Reconstruction
     //
     //==========================================================================
-
+   
     debug() << "START: Muon Reconstruction..." << endmsg;
 
     bool is_minos_track = false, is_minos_stub = false;
@@ -1098,11 +1114,12 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     }
     
     //--------------------------------------------------------------------------
-    //! Check if this a plausible Muon ( MC only )
+    //! MAKE CUT - IF Muon is NOT Plausible (MC Only)
     //--------------------------------------------------------------------------
     double mc_frac = -1.0;
-    if ( m_doPlausibilityCuts && !muonIsPlausible( m_MuonProng, mc_frac) ) {
+    if ( m_DoPlausibilityCuts && !muonIsPlausible( m_MuonProng, mc_frac) ) {
         debug()<<"Muon is not plausible"<<endmsg;
+        event->setIntData("Cut_Muon_Not_Plausible",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
@@ -1156,7 +1173,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     double muon_visible_energy = m_MuonProng->minervaVisibleEnergySum();
     m_hitTagger->applyColorTag(m_MuonProng, m_Color_muonProng);
     event->setTime( m_recoTimeTool->prongBestTime(m_MuonProng) );
-    SmartRefVector<Track> muonTracks = m_MuonProng->minervaTracks(); 
     
     debug() << "FINISH: Muon Reconstruction" << endmsg;
     
@@ -1257,6 +1273,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     // Proton Reconstruction
     //
     //==========================================================================
+
     debug() << "START: Proton Reconstruction" << endmsg;
     
     //--------------------------------------------------------------------------
@@ -1268,9 +1285,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     // Create new particles with Proton and Pion hypotheses
     debug() << "Creating particles with Proton and Pion hypotheses" <<endmsg;
     bool makeParticles = createTrackedParticles(primaryProngs);
-    if (makeParticles){
-        debug() << "Creation of Particles are SUCCESFUL!"<< endmsg;
-    }else{
+    if (!makeParticles){
         debug() << "Creation of Particles are FAILED!"<< endmsg;
         event->setIntData("Cut_Particle_None",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
@@ -1280,17 +1295,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //--------------------------------------------------------------------------
     //! MAKE CUT - if NO Prong contains a Proton Particle
     //--------------------------------------------------------------------------
-    debug() <<"Before getProtonProng()"<<endmsg;
-    debug() <<"m_ProtonProngs.size() = "<<m_ProtonProngs.size()
-            <<" m_ProtonParticles.size() = "<<m_ProtonParticles.size()<<endmsg;
-            
-    // Call getProtonProng
     bool foundProton = getProtonProng(primaryProngs);
-    
-    debug() <<"After getProtonProng()"<<endmsg;
-    debug() <<"m_ProtonProngs.size() = "<<m_ProtonProngs.size()
-            <<" m_ProtonParticles.size() = "<<m_ProtonParticles.size()<<endmsg;
-
     if( foundProton ) {
         for(unsigned int i = 0; i < m_ProtonProngs.size(); i++) {
             debug() << "Tag the proton's prong with bit-field = " << m_ProtonProngs[i]->typeBitsToString() << endmsg;
@@ -1303,8 +1308,9 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         else return StatusCode::SUCCESS; 
     }
     
-    debug()<<"FINISH: Proton Reconstruction"<<endmsg;
     
+    
+    debug()<<"FINISH: Proton Reconstruction"<<endmsg;
     
     //==========================================================================
     //
@@ -1338,7 +1344,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     debug()<<"FINISH: Vertex Blob Reconstruction"<<endmsg;
     
     //--------------------------------------------------------------------------
-    //! MAKE CUT - if fails ConeBlobs()
+    //! MAKE CUT - if fails ConeBlobs() -- Main Function for Pi0 Reconstruction
     //--------------------------------------------------------------------------
     debug() << "START: Cone Blob Reconstruction" << endmsg;
     if ( ConeBlobs(event) ){
@@ -1350,7 +1356,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     }
     
     debug()<<"FINISH: Cone Blob Reconstruction"<<endmsg;
-    
     
     //--------------------------------------------------------------------------
     //! @todo Determine if vertex has broken track
@@ -1374,15 +1379,28 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     double totalVisibleEnergy = odVisibleEnergy + idVisibleEnergy;  
 
 
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    //! Color Inner Detector Unused Clusters
+    //--------------------------------------------------------------------------
+    for (   SmartRefVector<Minerva::IDCluster>::iterator iter_c = idClusters.begin();
+            iter_c != idClusters.end(); 
+            ++iter_c) 
+    {
+        if ( (int)(*iter_c)->history() == Minerva::IDCluster::Unused ){
+            m_hitTagger->applyColorTag((*iter_c), m_Color_clusterUnused);
+        }
+    }
+    //--------------------------------------------------------------------------
+
+    //--------------------------------------------------------------------------
     //! count other reconstructed quantities
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     int n_long_tracks = (event->select<Track>("Used:Unused","LongPatRec3View:LongPatRec2View")).size();
     int n_short_tracks = (event->select<Track>("Used:Unused","FourHitPatRec")).size();
     
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //! Calculate dead time
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------------
     m_getDeadTimeTool->setDeadTimeTool( getDeadTimeTable() );
     
     // get dead time data
@@ -1424,7 +1442,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     event->setIntData("n_anchored_long_trk_prongs", n_anchored_long_trk_prongs);
     event->setIntData("n_anchored_short_trk_prongs", n_anchored_short_trk_prongs);
     event->setIntData("n_iso_trk_prongs", n_iso_trk_prongs);
-
     
     event->setDoubleData("muonVisibleE", muon_visible_energy );
     
@@ -1535,47 +1552,25 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
     //--------------------------------------------------------------------------  
     //! Calculate and Set Muon Kinematics
     //--------------------------------------------------------------------------
-    bool muonFilled = setMuonParticleData( nuInt );
-    if( !muonFilled) {
+    bool muonFilled = setMuonData( nuInt );
+    if( !muonFilled ) {
+        warning()<<"Muon NTuple Branches did not filled!"<<endmsg;
         return StatusCode::FAILURE;
     }
 
     //--------------------------------------------------------------------------  
     //! Calculate and Set Proton Kinematics
     //--------------------------------------------------------------------------
-    debug() <<"Before setProtonParticleData()"<<endmsg;
-    debug() <<"m_ProtonProngs.size() = "<<m_ProtonProngs.size()
-            <<" m_ProtonParticles.size() = "<<m_ProtonParticles.size()<<endmsg;
-            
-
-    bool protonFilled = setProtonParticleData(nuInt);
-    
-    debug() <<"After setProtonParticleData()"<<endmsg;
-    debug() <<"m_ProtonProngs.size() = "<<m_ProtonProngs.size()
-            <<" m_ProtonParticles.size() = "<<m_ProtonParticles.size()<<endmsg;
-    if( !protonFilled) {
+    bool protonFilled = setProtonData(nuInt);
+    if( !protonFilled ) {
+        warning()<<"Proton NTuple Branches did not filled!"<<endmsg;
         return StatusCode::FAILURE;
     }
    
     //--------------------------------------------------------------------------
     //! Calculate and Set Vertex Parameters
     //--------------------------------------------------------------------------
-    Gaudi::XYZTVector vtx_position( m_PrimaryVertex->position().x(), 
-                                    m_PrimaryVertex->position().y(),
-                                    m_PrimaryVertex->position().z(),
-                                    event->time() );     
-    nuInt->setVertex( vtx_position );
-    nuInt->setScore( 1.0 );
-    
-    // Set primaryVertexData
-    int vtx_module, vtx_plane;
-    debug()<<"Calling getNearestPlane, vtx is "<<vtx_position.z()<<endmsg;
-    getNearestPlane(vtx_position.z(), vtx_module, vtx_plane); 
-    nuInt->setIntData("vtx_module", vtx_module);
-    nuInt->setIntData("vtx_plane", vtx_plane);
-    nuInt->setDoubleData("vtx_x", vtx_position.x() );
-    nuInt->setDoubleData("vtx_y", vtx_position.y() );
-    nuInt->setDoubleData("vtx_z", vtx_position.z() );
+    setVertexData(nuInt,event);
     
 
     //--------------------------------------------------------------------------
@@ -1588,7 +1583,7 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
     //--------------------------------------------------------------------------
     //! Truth Matching for Muon and Proton Prongs
     //--------------------------------------------------------------------------
-    if( haveNeutrinoMC() ) {
+    if( haveNeutrinoMC() && m_DoTruthMatch ) {
         Minerva::ProngVect muonProngs;
         muonProngs.push_back( muonProng );
         
@@ -2028,9 +2023,9 @@ StatusCode CCProtonPi0::finalize()
 //
 //<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
     
-//----------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // interpret Events which fails the reconstructor cuts
-//----------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 StatusCode CCProtonPi0::interpretFailEvent( Minerva::PhysicsEvent* event ) const
 {  
 
@@ -2083,21 +2078,22 @@ void CCProtonPi0::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::P
     std::vector<double> end_trajX(10,-1);
     std::vector<double> end_trajY(10,-1);
     std::vector<double> end_trajZ(10,-1);
-    
+    debug()<<"Debug Point = 0"<<endmsg;
     for(unsigned int p = 0; p < prongs.size(); p++) {
         SmartRef<Minerva::Prong> prong = prongs[p];
         Minerva::TrackVect tracks = prong->minervaTracks();
-    
+        debug()<<"Debug Point = 1 "<<prongs.size()<<endmsg;
         for(unsigned int trk = 0; trk < tracks.size(); trk++) {
             double other_energy = 0.0;
+            debug()<<"Debug Point = 2 "<<tracks.size()<<endmsg;
             std::map<const Minerva::TG4Trajectory*,double> trajMap = TruthMatcher->getTG4Trajectories(tracks[trk],other_energy);
             std::map<const Minerva::TG4Trajectory*,double>::iterator it;
-        
+            debug()<<"Debug Point = 3 "<<tracks.size()<<endmsg;
             if( trajMap.empty() ) continue;
         
             std::vector< std::pair<const Minerva::TG4Trajectory*,double> > parentVect;
             for(it = trajMap.begin(); it != trajMap.end(); it++) {
-        
+                debug()<<"Debug Point = 4 "<<endmsg;
                 const Minerva::TG4Trajectory* tmp = (*it).first;    
                 double fraction = (*it).second;
         
@@ -2131,7 +2127,7 @@ void CCProtonPi0::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::P
                     } //! end of while loop
                 } //! end of else
             } //! end loop over traj 
-    
+            debug()<<"Debug Point = 5 "<<endmsg;
             std::vector< std::pair<const Minerva::TG4Trajectory*,double> > updateParentVect;
             for(unsigned int i = 0; i < parent.size(); i++) {
                 double energy = 0.0;
@@ -2246,23 +2242,42 @@ void CCProtonPi0::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::P
         neutrino->setDoubleData("endMuonTrajZPosition",end_trajZ[0]);
     }
     
-    
     debug() << "Exit CCProtonPi0::setTrackProngTruth()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return;
 }
 
-
-
+//==============================================================================
+// Set Vertex Data 
+//==============================================================================
+void CCProtonPi0::setVertexData( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent* event ) const 
+{
+    Gaudi::XYZTVector vtx_position( m_PrimaryVertex->position().x(), 
+                                    m_PrimaryVertex->position().y(),
+                                    m_PrimaryVertex->position().z(),
+                                    event->time() );     
+    nuInt->setVertex( vtx_position );
+    nuInt->setScore( 1.0 );
+    nuInt->setDoubleData("vtx_x", vtx_position.x() );
+    nuInt->setDoubleData("vtx_y", vtx_position.y() );
+    nuInt->setDoubleData("vtx_z", vtx_position.z() );
+    
+    // Get Vertex Module and Planes
+    int vtx_module, vtx_plane;
+    debug()<<"Calling getNearestPlane, vtx is "<<vtx_position.z()<<endmsg;
+    getNearestPlane(vtx_position.z(), vtx_module, vtx_plane); 
+    nuInt->setIntData("vtx_module", vtx_module);
+    nuInt->setIntData("vtx_plane", vtx_plane);
+}
 
 //==============================================================================
 // Set Muon particle data
 //==============================================================================
-bool CCProtonPi0::setMuonParticleData( Minerva::NeutrinoInt* nuInt ) const 
+bool CCProtonPi0::setMuonData( Minerva::NeutrinoInt* nuInt ) const 
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0::setMuonParticleData()" << endmsg;
+    debug() << "Enter CCProtonPi0::setMuonData()" << endmsg;
     
     // Sanity Check
     if (!m_MuonProng || !m_MuonParticle) {
@@ -2391,7 +2406,7 @@ bool CCProtonPi0::setMuonParticleData( Minerva::NeutrinoInt* nuInt ) const
 
     fillMinosMuonBranches(nuInt, m_MuonProng);
 
-    debug() << "Exit CCProtonPi0::setMuonParticleData()" << endmsg;
+    debug() << "Exit CCProtonPi0::setMuonData()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return true;
@@ -2479,7 +2494,6 @@ bool CCProtonPi0::createTrackedParticles( Minerva::ProngVect& prongs ) const
         } else{
             debug() << "Did not make particles for the prong type = " << prongs[p]->typeBitsToString() << endmsg;
         }
-    
         hypotheses.clear();
     }
     
@@ -2490,6 +2504,7 @@ bool CCProtonPi0::createTrackedParticles( Minerva::ProngVect& prongs ) const
 
 //==============================================================================
 // Return the momentum analyzable contained ( proton candidate ) prong/particle
+// Uses Global Variables: m_ProtonProngs and m_ProtonParticles
 //==============================================================================
 bool CCProtonPi0::getProtonProng(   Minerva::ProngVect& primaryProngs) const
 {
@@ -2509,7 +2524,7 @@ bool CCProtonPi0::getProtonProng(   Minerva::ProngVect& primaryProngs) const
             debug() << "Muon Prong, skipping this prong! "<< endmsg;
             continue;
         }
-    
+        
         // Temp Storage for ProngVect, Single Prong
         Minerva::ProngVect tmpProngs;
         SmartRef<Minerva::Prong> prong       = (Minerva::Prong*)NULL;
@@ -2527,6 +2542,7 @@ bool CCProtonPi0::getProtonProng(   Minerva::ProngVect& primaryProngs) const
             prong->filtertaglist()->setOrAddFilterTag("PrimaryProton",true);
             particle->filtertaglist()->setOrAddFilterTag("PrimaryProton",true);
             prong->updateBestParticle(particle);
+            m_hitTagger->applyColorTag(prong, m_Color_protonProng);
             m_ProtonProngs.push_back( prong );
             m_ProtonParticles.push_back( particle );
             isProtonExist = true;
@@ -2544,12 +2560,12 @@ bool CCProtonPi0::getProtonProng(   Minerva::ProngVect& primaryProngs) const
 //==============================================================================
 // Set proton particle data
 //==============================================================================
-bool CCProtonPi0::setProtonParticleData( Minerva::NeutrinoInt* nuInt ) const 
+bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const 
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0::setProtonParticleData()" << endmsg;
+    debug() << "Enter CCProtonPi0::setProtonData()" << endmsg;
     
-    debug() <<"Inside setProtonParticleData()"<<endmsg;
+    debug() <<"Inside setProtonData()"<<endmsg;
     debug() <<"m_ProtonProngs.size() = "<<m_ProtonProngs.size()
             <<" m_ProtonParticles.size() = "<<m_ProtonParticles.size()<<endmsg;
             
@@ -2780,7 +2796,7 @@ bool CCProtonPi0::setProtonParticleData( Minerva::NeutrinoInt* nuInt ) const
     
     nuInt->setContainerDoubleData("proton_ekin",ekin);
     
-    debug() << "Exit CCProtonPi0::setProtonParticleData()" << endmsg;
+    debug() << "Exit CCProtonPi0::setProtonData()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return true;
@@ -2899,22 +2915,17 @@ bool CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonPro
 }
 
 //==============================================================================
-// setPi0ParticleData
+// setPi0Data
 //==============================================================================
 
-bool CCProtonPi0::setPi0ParticleData(   Minerva::PhysicsEvent *event, 
+bool CCProtonPi0::setPi0Data(   Minerva::PhysicsEvent *event, 
                                         Minerva::IDBlob* idblob1, 
                                         Minerva::IDBlob* idblob2) const
 {
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "CCProtonPi0::setPi0ParticleData()" << endmsg;
-
-    //--------------------------------------------------------------------------
-    // Debugging: Check values
+    debug() << "CCProtonPi0::setPi0Data()" << endmsg;
+    
     const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
-    debug() <<"m_PrimaryVertex->position() = "<<endmsg;
-    debug() <<"("<<vtx_position.x()<<","<<vtx_position.y()<<","<<vtx_position.z()<<")"<< endmsg;
-    //--------------------------------------------------------------------------
     
     // Check Gamma1 Quality
     bool goodPosition1  = m_idHoughBlob->GetStartPosition(idblob1, vtx_position, true );
@@ -3095,7 +3106,7 @@ bool CCProtonPi0::setPi0ParticleData(   Minerva::PhysicsEvent *event,
     event->setDoubleData("gamma2_evis_hcal", g2hcalevis);
     event->setDoubleData("gamma2_evis_scal", g2scalevis);
 
-    debug() << "Exit CCProtonPi0::setPi0ParticleData()" << endmsg;
+    debug() << "Exit CCProtonPi0::setPi0Data()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
 
     return true;
@@ -3117,13 +3128,8 @@ bool CCProtonPi0::VtxBlob(Minerva::PhysicsEvent *event) const
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::VtxBlob()" << endmsg;
     
-    //--------------------------------------------------------------------------
-    // Debugging: Check values
     const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
-    debug() <<"m_PrimaryVertex->position() = "<<endmsg;
-    debug() <<"("<<vtx_position.x()<<","<<vtx_position.y()<<","<<vtx_position.z()<<")"<< endmsg;
-    //--------------------------------------------------------------------------
-    
+
     //  --  Vertex blob
     double vertex_energy = 0;
     double vertex_energy_sphere = 0;
@@ -3152,7 +3158,7 @@ bool CCProtonPi0::VtxBlob(Minerva::PhysicsEvent *event) const
             debug() << " Adding Filament vertex " << vtxFilaBlob->nclusters()
                     << " clusters; energy = "  << vertex_energy_filament << endmsg;
             addObject( event, vtxFilaBlob );
-            m_hitTagger->applyColorTag( vtxFilaBlob, 0x9900FF );
+            m_hitTagger->applyColorTag( vtxFilaBlob, m_Color_VertexFila );
         }
     } // if (m_filamentVertex)
     
@@ -3190,7 +3196,7 @@ bool CCProtonPi0::VtxBlob(Minerva::PhysicsEvent *event) const
             debug() << " Adding Sphere vertex " << vtxSphereBlob->nclusters()
                     << " clusters; energy = "  <<  vertex_energy_sphere << endmsg;
             addObject( event, vtxSphereBlob );
-            m_hitTagger->applyColorTag( vtxSphereBlob, 0x9900FF );
+            m_hitTagger->applyColorTag( vtxSphereBlob, m_Color_VertexSphere );
         }
     } // if ( m_sphereVertex )
     
@@ -3289,33 +3295,55 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::ConeBlobs()" << endmsg;
     
-    //--------------------------------------------------------------------------
-    // Debugging: Check values
+    // Initialize Bool Variables
+    bool isAngleScan        = false;
+    bool isAngleScanApplied = false;
+    bool additional         = false;
+    bool isHough            = false;
+    bool isHoughApplied     = false;
+    bool isPi0DataSet       = false;
+    
+    // Get Vertex Position
     const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
-    debug() <<"m_PrimaryVertex->position() = "<<endmsg;
-    debug() <<"("<<vtx_position.x()<<","<<vtx_position.y()<<","<<vtx_position.z()<<")"<< endmsg;
-    //--------------------------------------------------------------------------
-
+    
     // variables to clean up the clusters
     SmartRefVector<Minerva::IDCluster> preidClusters 
             = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
     SmartRefVector<Minerva::IDCluster> usableClusters;
     SmartRefVector<Minerva::IDCluster> outTimeClusters;
     
+    // ---------------------------------------------------------------------
+    // Debugging
+    debug()<<"Cluster History in ConeBlobs()"<<endmsg;
+    // Check Cluster History
+    // Loop over Clusters
+    for (   SmartRefVector<Minerva::IDCluster>::iterator iter_c = preidClusters.begin();
+            iter_c != preidClusters.end(); 
+            ++iter_c) 
+    {
+        if( (int)(*iter_c)->history() == Minerva::IDCluster::Used ){
+            debug()<<"Used"<<endmsg;
+        }else if ( (int)(*iter_c)->history() == Minerva::IDCluster::Unused ){
+            debug()<<"Unused"<<endmsg;
+        }
+    }
+    // ---------------------------------------------------------------------    
+    
     // get origin of muon
     Gaudi::XYZTVector muon_position = m_MuonParticle->startPos();
     
-    double energyTracker = 0, energyECAL = 0, energyHCAL = 0;
-    bool isAngleScan = false;
-    bool isAngleScanApplied = false;
-    bool additional = false;
-    bool isHough = false;
-    bool isHoughApplied = false;
-    bool isPi0DataSet = false;
+    //--------------------------------------------------------------------------
+    // Get the Energy to Analyze on all Clusters: Tracker, ECAL, HCAL and
+    // Fill usableClusters
+    //--------------------------------------------------------------------------
+    double energyTracker    = 0.0;
+    double energyECAL       = 0.0;
+    double energyHCAL       = 0.0;
+    double EnergyToAnalyze  = 0.0;
     
-    // Get the Energy to analyze on all Clusters: Tracker, ECAL, HCAL
+    // Loop over all UNUSED Clusters
     SmartRefVector<Minerva::IDCluster>::iterator it_clus;
-    for ( it_clus = preidClusters.begin(); it_clus != preidClusters.end(); it_clus++){
+    for ( it_clus = preidClusters.begin(); it_clus != preidClusters.end(); ++it_clus){
         
         if ( (*it_clus)->pe()/(*it_clus)->iddigs() <= 3 ) continue;
         
@@ -3323,216 +3351,233 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
         if ( (*it_clus)->subdet() ==  Minerva::IDCluster::ECAL )    energyECAL += (*it_clus)->energy();
         if ( (*it_clus)->subdet() ==  Minerva::IDCluster::HCAL )    energyHCAL += (*it_clus)->energy();
         
-        // must include clusters close to MUON vertex time < 25 ns
+        // Fill usableClusters 
+        // Include clusters close to MUON vertex time < 25 ns
         if ( std::abs( (*it_clus)->time() -  muon_position.T() ) < m_rejectedClustersTime ) {
             usableClusters.push_back(*it_clus);
         } else {
             outTimeClusters.push_back(*it_clus);
         }
     }
-    // Save Energy Information
+    EnergyToAnalyze = energyTracker + energyECAL + energyHCAL;
+    debug() << "Energy to analyze = "<< EnergyToAnalyze << endmsg;
+    
+    // Return False if the Energy is Higher than Limit
+    if ( EnergyToAnalyze >= m_energyHoughlimit ){
+        debug() <<"Energy to analyze is higher than the limit! "
+                <<EnergyToAnalyze<<" >= "<<m_energyHoughlimit<<endmsg;
+        debug() <<"Exit CCProtonPi0::ConeBlobs()" << endmsg;
+        debug() <<"--------------------------------------------------------------------------"<<endmsg;
+        return false;
+    }
+    
+    // Save Energy Information to NTuples
     event->setDoubleData("RE_energy_Tracker", energyTracker );
     event->setDoubleData("RE_energy_ECAL", energyECAL );
     event->setDoubleData("RE_energy_HCAL", energyHCAL );
 
-    debug() << " Energy to analyze " << energyTracker + energyECAL + energyHCAL << endmsg;
 
+    //--------------------------------------------------------------------------
+    // Analyze usableClusters using AngleScan Class
+    //--------------------------------------------------------------------------
     std::vector<Minerva::IDBlob*> foundBlobs;
     unsigned int nblob_anglescan = 0;
     unsigned int nblob_hough     = 0;
-    if ( ( energyTracker + energyECAL + energyHCAL ) < m_energyHoughlimit ) {
     
-        AngleScan angleScanAlg(usableClusters,vtx_position);
-        angleScanAlg.AllowUVMatchWithMoreTolerance(m_AllowUVMatchWithMoreTolerance);
-        angleScanAlg.SetUVMatchTolerance(m_UVMatchTolerance);
-        angleScanAlg.DoReco();
+    // Create AngleScan Object
+    AngleScan angleScanAlg(usableClusters,vtx_position);
+    angleScanAlg.AllowUVMatchWithMoreTolerance(m_AllowUVMatchWithMoreTolerance);
+    angleScanAlg.SetUVMatchTolerance(m_UVMatchTolerance);
+    angleScanAlg.DoReco();
 
-        event->setIntData("anglescan_ncandx", angleScanAlg.GetNxCandidate());
-        event->setIntData("anglescan_ncand",  angleScanAlg.GetNCandidate());
+    event->setIntData("anglescan_ncandx", angleScanAlg.GetNxCandidate());   // Number of Shower Candidates in X
+    event->setIntData("anglescan_ncand",  angleScanAlg.GetNCandidate());    // Number of Shower Candidates
 
-        std::vector<int> candx_nc;
-        std::vector<int> candx_nd;
-        const std::vector<SmartRefVector<Minerva::IDCluster> >& xshowerCand = angleScanAlg.GetXShowerCandVector();
-        for (   std::vector<SmartRefVector<Minerva::IDCluster> >::const_iterator s = xshowerCand.begin();
-                s != xshowerCand.end(); 
-                ++s) 
-        {
-            ClusterVectorInfo clusterInfo(*s);
-            candx_nc.push_back(clusterInfo.GetN());
-            candx_nd.push_back(clusterInfo.GetDigitCount());
-        }
-        
-        event->setContainerIntData("anglescan_candx_nc", candx_nc);
-        event->setContainerIntData("anglescan_candx_nd", candx_nd);
-                    
-        std::vector<int> cand_nc;
-        std::vector<int> cand_ncx;
-        std::vector<int> cand_ncu;
-        std::vector<int> cand_ncv;
-
-        std::vector<int> cand_nd;
-        std::vector<int> cand_ndx;
-        std::vector<int> cand_ndu;
-        std::vector<int> cand_ndv;
-        const std::vector<SmartRefVector<Minerva::IDCluster> >& showerCand = angleScanAlg.GetShowerCandVector();
-        for (   std::vector<SmartRefVector<Minerva::IDCluster> >::const_iterator s = showerCand.begin();
-                s != showerCand.end(); 
-                ++s) 
-        {
-            ClusterVectorInfo clusterInfo(*s);
-            cand_nc.push_back(clusterInfo.GetN());
-            cand_ncx.push_back(clusterInfo.GetNx());
-            cand_ncu.push_back(clusterInfo.GetNu());
-            cand_ncv.push_back(clusterInfo.GetNv());
-
-            cand_nd.push_back(clusterInfo.GetDigitCount());
-            cand_ndx.push_back(clusterInfo.GetDigitCountX());
-            cand_ndu.push_back(clusterInfo.GetDigitCountU());
-            cand_ndv.push_back(clusterInfo.GetDigitCountV());
-        }
-
-        event->setContainerIntData("anglescan_cand_nc",   cand_nc);
-        event->setContainerIntData("anglescan_cand_ncx",  cand_ncx);
-        event->setContainerIntData("anglescan_cand_ncu",  cand_ncu);
-        event->setContainerIntData("anglescan_cand_ncv",  cand_ncv);
-        
-        event->setContainerIntData("anglescan_cand_nd",   cand_nd);
-        event->setContainerIntData("anglescan_cand_ndx",  cand_ndx);
-        event->setContainerIntData("anglescan_cand_ndu",  cand_ndu);
-        event->setContainerIntData("anglescan_cand_ndv",  cand_ndv);
-
-        std::vector<Minerva::IDBlob*> angleScanBlobs = angleScanAlg.GetShowers();
-        for (   std::vector<Minerva::IDBlob*>::const_iterator b = angleScanBlobs.begin();
-                b != angleScanBlobs.end(); 
-                ++b) 
-        {
-            if ( !m_idHoughBlob->isPhoton((*b)->clusters(),vtx_position)) continue;
-            foundBlobs.push_back(*b);
-        }
-
-        std::vector<int> blob_nc;
-        std::vector<int> blob_ncx;
-        std::vector<int> blob_ncu;
-        std::vector<int> blob_ncv;
-
-        std::vector<int> blob_nd;
-        std::vector<int> blob_ndx;
-        std::vector<int> blob_ndu;
-        std::vector<int> blob_ndv;        
-        for (   std::vector<Minerva::IDBlob*>::const_iterator b = foundBlobs.begin();
-                b != foundBlobs.end(); 
-                ++b) 
-        {
-            ClusterVectorInfo clusterInfo((*b)->clusters());
-            blob_nc.push_back(clusterInfo.GetN());
-            blob_ncx.push_back(clusterInfo.GetNx());
-            blob_ncu.push_back(clusterInfo.GetNu());
-            blob_ncv.push_back(clusterInfo.GetNv());
-
-            blob_nd.push_back(clusterInfo.GetDigitCount());
-            blob_ndx.push_back(clusterInfo.GetDigitCountX());
-            blob_ndu.push_back(clusterInfo.GetDigitCountU());
-            blob_ndv.push_back(clusterInfo.GetDigitCountV());
-        }
-
-        event->setContainerIntData("anglescan_blob_nc", blob_nc);
-        event->setContainerIntData("anglescan_blob_ncx",blob_ncx);
-        event->setContainerIntData("anglescan_blob_ncu",blob_ncu);
-        event->setContainerIntData("anglescan_blob_ncv",blob_ncv);
-
-        event->setContainerIntData("anglescan_blob_nd", blob_nd);
-        event->setContainerIntData("anglescan_blob_ndx",blob_ndx);
-        event->setContainerIntData("anglescan_blob_ndu",blob_ndu);
-        event->setContainerIntData("anglescan_blob_ndv",blob_ndv);
-            
-
-        nblob_anglescan = foundBlobs.size();
-        isAngleScan = foundBlobs.size() == 2;
-        isAngleScanApplied = true;
-
-
-        if (m_TrytoRecoverBlobReco && foundBlobs.size() > 2) {
-
-            debug() << "Finding best blob combination" << endmsg;
-            std::vector<double> masses;
-            std::vector<double> good_masses;
-            std::vector<Minerva::IDBlob*> bestBlobs;
-            double dM = 1.e6;
-            for (std::vector<Minerva::IDBlob*>::iterator b1 = foundBlobs.begin();
-                 b1 != foundBlobs.end(); ++b1) {
-                std::vector<Minerva::IDBlob*>::iterator b2 = b1+1;
-
-                if (b2 == foundBlobs.end()) break;
-
-                ClusterVectorInfo clusterInfo1((*b1)->clusters());
-                if (clusterInfo1.GetNx() < 2) continue;
-                
-                double e1 = 0.0;
-                double dummy1 = 0.0;
-                double dummy2 = 0.0;
-                double dummy3 = 0.0;
-                double dummy4 = 0.0;
-                m_idHoughBlob->getBlobEnergyTime((*b1),e1,dummy1,dummy2,dummy3,dummy4);
-                // double t1 = (*b1)->time();
-
-                bool goodPosition1  = m_idHoughBlob->GetStartPosition((*b1),vtx_position,true);
-                bool goodDirection1 = m_idHoughBlob->GetDirection((*b1),vtx_position);
-                Gaudi::XYZVector direction1 = (*b1)->direction();
-                
-                if (!goodPosition1 || !goodDirection1) break;
-                
-                for (; b2 != foundBlobs.end(); ++b2) {
-
-                    ClusterVectorInfo clusterInfo2((*b2)->clusters());
-                    if (clusterInfo2.GetNx() < 2) continue;
-                    
-                    double e2 = 0.0;
-                    m_idHoughBlob->getBlobEnergyTime((*b2),e2,dummy1,dummy2,dummy3,dummy4);
-                    // double t2 = (*b2)->time();
-
-                    bool goodPosition2  = m_idHoughBlob->GetStartPosition((*b2),vtx_position,true);
-                    bool goodDirection2 = m_idHoughBlob->GetDirection((*b2),vtx_position);
-
-                    if (!goodPosition2 || !goodDirection2) continue;
-                    
-                    Gaudi::XYZVector direction2 = (*b2)->direction();
-
-                    const double cos_oangle = direction1.Dot(direction2);
-                    const double mgg = std::sqrt(2*e1*e2*(1-cos_oangle));
-                    debug() << "\tCombination (" << std::distance(foundBlobs.begin(),b1) << ","
-                              << std::distance(foundBlobs.begin(),b2) << "): " << mgg
-                              << endmsg;
-
-                    masses.push_back(mgg);
-
-                    if (std::abs(mgg-134.9) < dM) {
-                        debug() << "\t replace dM: " << dM << " " << " with " << std::abs(mgg-134.9) << endmsg;
-                        dM = std::abs(mgg-134.9);
-                        bestBlobs.clear();
-                        bestBlobs.push_back(*b1);
-                        bestBlobs.push_back(*b2);
-                    }
-
-                        /*
-                    if (60.0 < mgg && mgg < 180) {
-                        good_masses.push_back(mgg);
-
-                        bestBlobs.push_back(*b1);
-                        bestBlobs.push_back(*b2);
-                    }
-                        */
-                }
-            } 
-                //additional = good_masses.size() == 1;
-                //if (good_masses.size() == 1) foundBlobs.swap(bestBlobs);
-            additional = ( bestBlobs.size() == 2 );
-            if (bestBlobs.size() == 2) foundBlobs.swap(bestBlobs);
-            
-            event->setContainerDoubleData("mgg_vector", masses);
-            event->setContainerDoubleData("good_mgg_vector", good_masses);
-        }
-        
+    std::vector<int> candx_nc;
+    std::vector<int> candx_nd;
+    // Get Shower Candidates in X View
+    const std::vector<SmartRefVector<Minerva::IDCluster> >& xshowerCand = angleScanAlg.GetXShowerCandVector();
+    // Loop over Shower Candidates in X View
+    for (   std::vector<SmartRefVector<Minerva::IDCluster> >::const_iterator s = xshowerCand.begin();
+            s != xshowerCand.end(); 
+            ++s) 
+    {
+        ClusterVectorInfo clusterInfo(*s);
+        candx_nc.push_back(clusterInfo.GetN());
+        candx_nd.push_back(clusterInfo.GetDigitCount());
     }
+    
+    event->setContainerIntData("anglescan_candx_nc", candx_nc);
+    event->setContainerIntData("anglescan_candx_nd", candx_nd);
+                
+    std::vector<int> cand_nc;
+    std::vector<int> cand_ncx;
+    std::vector<int> cand_ncu;
+    std::vector<int> cand_ncv;
+
+    std::vector<int> cand_nd;
+    std::vector<int> cand_ndx;
+    std::vector<int> cand_ndu;
+    std::vector<int> cand_ndv;
+    const std::vector<SmartRefVector<Minerva::IDCluster> >& showerCand = angleScanAlg.GetShowerCandVector();
+    for (   std::vector<SmartRefVector<Minerva::IDCluster> >::const_iterator s = showerCand.begin();
+            s != showerCand.end(); 
+            ++s) 
+    {
+        ClusterVectorInfo clusterInfo(*s);
+        cand_nc.push_back(clusterInfo.GetN());
+        cand_ncx.push_back(clusterInfo.GetNx());
+        cand_ncu.push_back(clusterInfo.GetNu());
+        cand_ncv.push_back(clusterInfo.GetNv());
+
+        cand_nd.push_back(clusterInfo.GetDigitCount());
+        cand_ndx.push_back(clusterInfo.GetDigitCountX());
+        cand_ndu.push_back(clusterInfo.GetDigitCountU());
+        cand_ndv.push_back(clusterInfo.GetDigitCountV());
+    }
+
+    event->setContainerIntData("anglescan_cand_nc",   cand_nc);
+    event->setContainerIntData("anglescan_cand_ncx",  cand_ncx);
+    event->setContainerIntData("anglescan_cand_ncu",  cand_ncu);
+    event->setContainerIntData("anglescan_cand_ncv",  cand_ncv);
+    
+    event->setContainerIntData("anglescan_cand_nd",   cand_nd);
+    event->setContainerIntData("anglescan_cand_ndx",  cand_ndx);
+    event->setContainerIntData("anglescan_cand_ndu",  cand_ndu);
+    event->setContainerIntData("anglescan_cand_ndv",  cand_ndv);
+
+    std::vector<Minerva::IDBlob*> angleScanBlobs = angleScanAlg.GetShowers();
+    for (   std::vector<Minerva::IDBlob*>::const_iterator b = angleScanBlobs.begin();
+            b != angleScanBlobs.end(); 
+            ++b) 
+    {
+        if ( !m_idHoughBlob->isPhoton((*b)->clusters(),vtx_position)) continue;
+        foundBlobs.push_back(*b);
+    }
+
+    std::vector<int> blob_nc;
+    std::vector<int> blob_ncx;
+    std::vector<int> blob_ncu;
+    std::vector<int> blob_ncv;
+
+    std::vector<int> blob_nd;
+    std::vector<int> blob_ndx;
+    std::vector<int> blob_ndu;
+    std::vector<int> blob_ndv;        
+    for (   std::vector<Minerva::IDBlob*>::const_iterator b = foundBlobs.begin();
+            b != foundBlobs.end(); 
+            ++b) 
+    {
+        ClusterVectorInfo clusterInfo((*b)->clusters());
+        blob_nc.push_back(clusterInfo.GetN());
+        blob_ncx.push_back(clusterInfo.GetNx());
+        blob_ncu.push_back(clusterInfo.GetNu());
+        blob_ncv.push_back(clusterInfo.GetNv());
+
+        blob_nd.push_back(clusterInfo.GetDigitCount());
+        blob_ndx.push_back(clusterInfo.GetDigitCountX());
+        blob_ndu.push_back(clusterInfo.GetDigitCountU());
+        blob_ndv.push_back(clusterInfo.GetDigitCountV());
+    }
+
+    event->setContainerIntData("anglescan_blob_nc", blob_nc);
+    event->setContainerIntData("anglescan_blob_ncx",blob_ncx);
+    event->setContainerIntData("anglescan_blob_ncu",blob_ncu);
+    event->setContainerIntData("anglescan_blob_ncv",blob_ncv);
+
+    event->setContainerIntData("anglescan_blob_nd", blob_nd);
+    event->setContainerIntData("anglescan_blob_ndx",blob_ndx);
+    event->setContainerIntData("anglescan_blob_ndu",blob_ndu);
+    event->setContainerIntData("anglescan_blob_ndv",blob_ndv);
+        
+
+    nblob_anglescan = foundBlobs.size();
+    isAngleScan = foundBlobs.size() == 2;
+    isAngleScanApplied = true;
+
+
+    if (m_TrytoRecoverBlobReco && foundBlobs.size() > 2) {
+
+        debug() << "Finding best blob combination" << endmsg;
+        std::vector<double> masses;
+        std::vector<double> good_masses;
+        std::vector<Minerva::IDBlob*> bestBlobs;
+        double dM = 1.e6;
+        for (std::vector<Minerva::IDBlob*>::iterator b1 = foundBlobs.begin();
+                b1 != foundBlobs.end(); ++b1) {
+            std::vector<Minerva::IDBlob*>::iterator b2 = b1+1;
+
+            if (b2 == foundBlobs.end()) break;
+
+            ClusterVectorInfo clusterInfo1((*b1)->clusters());
+            if (clusterInfo1.GetNx() < 2) continue;
+            
+            double e1 = 0.0;
+            double dummy1 = 0.0;
+            double dummy2 = 0.0;
+            double dummy3 = 0.0;
+            double dummy4 = 0.0;
+            m_idHoughBlob->getBlobEnergyTime((*b1),e1,dummy1,dummy2,dummy3,dummy4);
+            // double t1 = (*b1)->time();
+
+            bool goodPosition1  = m_idHoughBlob->GetStartPosition((*b1),vtx_position,true);
+            bool goodDirection1 = m_idHoughBlob->GetDirection((*b1),vtx_position);
+            Gaudi::XYZVector direction1 = (*b1)->direction();
+            
+            if (!goodPosition1 || !goodDirection1) break;
+            
+            for (; b2 != foundBlobs.end(); ++b2) {
+
+                ClusterVectorInfo clusterInfo2((*b2)->clusters());
+                if (clusterInfo2.GetNx() < 2) continue;
+                
+                double e2 = 0.0;
+                m_idHoughBlob->getBlobEnergyTime((*b2),e2,dummy1,dummy2,dummy3,dummy4);
+                // double t2 = (*b2)->time();
+
+                bool goodPosition2  = m_idHoughBlob->GetStartPosition((*b2),vtx_position,true);
+                bool goodDirection2 = m_idHoughBlob->GetDirection((*b2),vtx_position);
+
+                if (!goodPosition2 || !goodDirection2) continue;
+                
+                Gaudi::XYZVector direction2 = (*b2)->direction();
+
+                const double cos_oangle = direction1.Dot(direction2);
+                const double mgg = std::sqrt(2*e1*e2*(1-cos_oangle));
+                debug() << "\tCombination (" << std::distance(foundBlobs.begin(),b1) << ","
+                            << std::distance(foundBlobs.begin(),b2) << "): " << mgg
+                            << endmsg;
+
+                masses.push_back(mgg);
+
+                if (std::abs(mgg-134.9) < dM) {
+                    debug() << "\t replace dM: " << dM << " " << " with " << std::abs(mgg-134.9) << endmsg;
+                    dM = std::abs(mgg-134.9);
+                    bestBlobs.clear();
+                    bestBlobs.push_back(*b1);
+                    bestBlobs.push_back(*b2);
+                }
+
+                    /*
+                if (60.0 < mgg && mgg < 180) {
+                    good_masses.push_back(mgg);
+
+                    bestBlobs.push_back(*b1);
+                    bestBlobs.push_back(*b2);
+                }
+                    */
+            }
+        } 
+            //additional = good_masses.size() == 1;
+            //if (good_masses.size() == 1) foundBlobs.swap(bestBlobs);
+        additional = ( bestBlobs.size() == 2 );
+        if (bestBlobs.size() == 2) foundBlobs.swap(bestBlobs);
+        
+        event->setContainerDoubleData("mgg_vector", masses);
+        event->setContainerDoubleData("good_mgg_vector", good_masses);
+    }
+        
+    
 
     if ( !isAngleScan && !additional) { 
 
@@ -3596,10 +3641,10 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
     if (isAngleScan || isHough || additional) {
         
         processBlobs(event,foundBlobs);
-        isPi0DataSet = setPi0ParticleData(event,foundBlobs[0],foundBlobs[1]);
+        isPi0DataSet = setPi0Data(event,foundBlobs[0],foundBlobs[1]);
 
         //----------------------------------------------------------------------
-        // Return if setPi0ParticleData() Fails
+        // Return if setPi0Data() Fails
         // Returning false ensures no execution of interpretEvent()
         // ---------------------------------------------------------------------
         if (!isPi0DataSet){
@@ -3683,7 +3728,7 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
         m_blobUtils->insertIDClusters(outTimeClusters, rejectedBlob, Minerva::IDBlob::DispersedIDBlobPatRec );
         debug()<< "Adding rejected blob with vis energy = "  << rejectedBlob->energy() << endmsg;
         addObject( event, rejectedBlob );
-        m_hitTagger->applyColorTag( rejectedBlob, 0x000000 );
+        m_hitTagger->applyColorTag( rejectedBlob, m_Color_RejectedBlob ); // red
     }
 
     event->setDoubleData( "Rejected_blob_vis_energy", rejectedBlob->energy() );

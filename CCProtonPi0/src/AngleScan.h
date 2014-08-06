@@ -1,13 +1,13 @@
 /*
-    AngleScan.h Duplicated from CCPi0 Package on 2014-06-10
-        Purpose: Make CCProtonPi0 Package independent of CCPi0 Package
-        Future: Common Tools and Functions will be combined under AnaUtils or
-                PionUtils
-                
-    Original Author:    Trung Le
+================================================================================
+AngleScan
+
+    Original Author:    Trung Le - Duplicated from CCPi0 Package on 2014-06-10
     Author:             Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:               2014_06_10
-    Last Revision:      2014_06_10
+    Last Revision:      2014_07_17
+    Package Version:    v1_05
+================================================================================
 */
 
 #ifndef ANGLESCAN_H
@@ -27,8 +27,8 @@ class AngleScan {
     
     typedef SmartRefVector<Minerva::IDCluster> ShowerCand;
     
-    AngleScan(const SmartRefVector<Minerva::IDCluster>& clusters,
-              const Gaudi::XYZPoint& vertex);
+    // Overloaded Constructor
+    AngleScan(const SmartRefVector<Minerva::IDCluster>& clusters, const Gaudi::XYZPoint& vertex);
     
     void Initialize();
     void BuildThetaHistogram();
@@ -51,6 +51,7 @@ class AngleScan {
     const SmartRefVector<Minerva::IDCluster>& GetUnusedUClusters() const;
     const SmartRefVector<Minerva::IDCluster>& GetUnusedVClusters() const;        
 
+    // Set Functions for Data members controlling the algorithm behaviors
     void SetUVMatchTolerance(double epsilon);
     void SetUVMatchMoreTolerance(double big_epsilon);
     void AllowUVMatchWithMoreTolerance(bool b);
@@ -73,7 +74,7 @@ class AngleScan {
     
     void coneView(SmartRefVector<Minerva::IDCluster>& unusedViewClusters,
                   SmartRefVector<Minerva::IDCluster>& showerCand,
-                  double vtxT,
+                  double vtx_x,
                   double min_angle, double max_angle,
                   double zmin, double zmax);   
     
@@ -87,18 +88,18 @@ class AngleScan {
     SmartRefVector<Minerva::IDCluster> fRemainingUClusters;
     SmartRefVector<Minerva::IDCluster> fRemainingVClusters;
     
-    double fX;
-    double fY;
-    double fZ;
-    double fU;
-    double fV;
+    double vtx_pos_X;
+    double vtx_pos_Y;
+    double vtx_pos_Z;
+    double vtx_pos_U;
+    double vtx_pos_V;
     
     TH1F* fTheta;
     std::vector<TVector2> fPeaks;
     std::vector<ShowerCand> fShowerCandidates;
     std::vector<ShowerCand> fXShowerCandidates;
 
-        // Data member controlling the algorithm behaviors
+    // Data member controlling the algorithm behaviors
     double fUVMatchTolerance;
     double fUVMatchMoreTolerance;
     bool   fAllowUVMatchWithMoreTolerance;

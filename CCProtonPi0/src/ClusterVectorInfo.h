@@ -1,13 +1,15 @@
 /*
-    ClusterVectorInfo.h Duplicated from CCPi0 Package on 2014-06-10
-        Purpose: Make CCProtonPi0 Package independent of CCPi0 Package
-        Future: Common Tools and Functions will be combined under AnaUtils or
-                PionUtils
-                
-    Original Author:    Trung Le
+================================================================================
+ClusterVectorInfo
+    Class that controls Cluster Vectors
+    Useful get functions for Clusters and Digits in Each View (X,U,V)
+
+    Original Author:    Trung Le - Duplicated from CCPi0 Package on 2014-06-10
     Author:             Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:               2014_06_10
-    Last Revision:      2014_06_10
+    Last Revision:      2014_07_17
+    Package Version:    v1_05
+================================================================================
 */
 #ifndef ClusterVectorInfo_h
 #define ClusterVectorInfo_h
