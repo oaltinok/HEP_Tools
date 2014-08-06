@@ -17,7 +17,7 @@ main.cpp
             > main(true) for Generating Plots only
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_07_06
+    Last Revision: 2014_07_22
 ================================================================================
 */
 
@@ -84,8 +84,8 @@ int main(int argc, char *argv[] )
     }else{
         CCProtonPi0 t;
         if(isTest){
-//             t.run("Input/Playlists/pl_MC_Test_Sample.dat");
-            t.run("Input/Playlists/pl_MC_Test.dat");
+            t.run("Input/Playlists/pl_MC_Test_Sample.dat");
+//             t.run("Input/Playlists/pl_MC_Test.dat");
         }else if(isComplete){
             t.run("Input/Playlists/MC_minerva1_CCProtonPi0.dat");
         }else{

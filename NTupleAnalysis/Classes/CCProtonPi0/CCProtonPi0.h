@@ -19,8 +19,8 @@ Class: CCProtonPi0
     
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Version:        4_7
-    Last Revision:  2014_07_16
+    Version:        4_8
+    Last Revision:  2014_07_30
 ================================================================================
 */
 
@@ -80,6 +80,7 @@ public :
     void writeReadme();
     int countParticles(int targetPDG, bool applyPCut);
     void get_pID_Stats();
+    void writeScanList(Long64_t entryNo);
     
     //--------------------------------------------------------------------------
     //  Interaction Specific Functions
@@ -201,9 +202,11 @@ public :
     std::string cutFile;
     std::string channelTag;
     std::string failFile;
+    std::string roundupFile;
     ofstream readme;
     ofstream cutText;
     ofstream failText;
+    ofstream roundupText;
 
    // -------------------------------------------------------------------------
    //     Data
@@ -247,8 +250,11 @@ public :
    Bool_t          gamma2_isGoodBlob;
    Int_t           Cut_ConeBlobs;
    Int_t           Cut_EndPoint_Michel_Exist;
+   Int_t           Cut_Event_Has_BadObject;
+   Int_t           Cut_Event_Not_Plausible;
    Int_t           Cut_Muon_Charge;
    Int_t           Cut_Muon_None;
+   Int_t           Cut_Muon_Not_Plausible;
    Int_t           Cut_Muon_Score_Low;
    Int_t           Cut_Particle_None;
    Int_t           Cut_PreFilter_Pi0;
@@ -409,41 +415,41 @@ public :
    Double_t        vtx_michel_distance;
    Double_t        well_fit_vertex_angle;
    Int_t           anglescan_blob_nc_sz;
-   Int_t           anglescan_blob_nc[10];   //[anglescan_blob_nc_sz]
+   Int_t           anglescan_blob_nc[5];   //[anglescan_blob_nc_sz]
    Int_t           anglescan_blob_ncu_sz;
-   Int_t           anglescan_blob_ncu[10];   //[anglescan_blob_ncu_sz]
+   Int_t           anglescan_blob_ncu[5];   //[anglescan_blob_ncu_sz]
    Int_t           anglescan_blob_ncv_sz;
-   Int_t           anglescan_blob_ncv[10];   //[anglescan_blob_ncv_sz]
+   Int_t           anglescan_blob_ncv[5];   //[anglescan_blob_ncv_sz]
    Int_t           anglescan_blob_ncx_sz;
-   Int_t           anglescan_blob_ncx[10];   //[anglescan_blob_ncx_sz]
+   Int_t           anglescan_blob_ncx[5];   //[anglescan_blob_ncx_sz]
    Int_t           anglescan_blob_nd_sz;
-   Int_t           anglescan_blob_nd[10];   //[anglescan_blob_nd_sz]
+   Int_t           anglescan_blob_nd[5];   //[anglescan_blob_nd_sz]
    Int_t           anglescan_blob_ndu_sz;
-   Int_t           anglescan_blob_ndu[10];   //[anglescan_blob_ndu_sz]
+   Int_t           anglescan_blob_ndu[5];   //[anglescan_blob_ndu_sz]
    Int_t           anglescan_blob_ndv_sz;
-   Int_t           anglescan_blob_ndv[10];   //[anglescan_blob_ndv_sz]
+   Int_t           anglescan_blob_ndv[5];   //[anglescan_blob_ndv_sz]
    Int_t           anglescan_blob_ndx_sz;
-   Int_t           anglescan_blob_ndx[10];   //[anglescan_blob_ndx_sz]
+   Int_t           anglescan_blob_ndx[5];   //[anglescan_blob_ndx_sz]
    Int_t           anglescan_cand_nc_sz;
-   Int_t           anglescan_cand_nc[10];   //[anglescan_cand_nc_sz]
+   Int_t           anglescan_cand_nc[5];   //[anglescan_cand_nc_sz]
    Int_t           anglescan_cand_ncu_sz;
-   Int_t           anglescan_cand_ncu[10];   //[anglescan_cand_ncu_sz]
+   Int_t           anglescan_cand_ncu[5];   //[anglescan_cand_ncu_sz]
    Int_t           anglescan_cand_ncv_sz;
-   Int_t           anglescan_cand_ncv[10];   //[anglescan_cand_ncv_sz]
+   Int_t           anglescan_cand_ncv[5];   //[anglescan_cand_ncv_sz]
    Int_t           anglescan_cand_ncx_sz;
-   Int_t           anglescan_cand_ncx[10];   //[anglescan_cand_ncx_sz]
+   Int_t           anglescan_cand_ncx[5];   //[anglescan_cand_ncx_sz]
    Int_t           anglescan_cand_nd_sz;
-   Int_t           anglescan_cand_nd[10];   //[anglescan_cand_nd_sz]
+   Int_t           anglescan_cand_nd[5];   //[anglescan_cand_nd_sz]
    Int_t           anglescan_cand_ndu_sz;
-   Int_t           anglescan_cand_ndu[10];   //[anglescan_cand_ndu_sz]
+   Int_t           anglescan_cand_ndu[5];   //[anglescan_cand_ndu_sz]
    Int_t           anglescan_cand_ndv_sz;
-   Int_t           anglescan_cand_ndv[10];   //[anglescan_cand_ndv_sz]
+   Int_t           anglescan_cand_ndv[5];   //[anglescan_cand_ndv_sz]
    Int_t           anglescan_cand_ndx_sz;
-   Int_t           anglescan_cand_ndx[10];   //[anglescan_cand_ndx_sz]
+   Int_t           anglescan_cand_ndx[5];   //[anglescan_cand_ndx_sz]
    Int_t           anglescan_candx_nc_sz;
-   Int_t           anglescan_candx_nc[10];   //[anglescan_candx_nc_sz]
+   Int_t           anglescan_candx_nc[5];   //[anglescan_candx_nc_sz]
    Int_t           anglescan_candx_nd_sz;
-   Int_t           anglescan_candx_nd[10];   //[anglescan_candx_nd_sz]
+   Int_t           anglescan_candx_nd[5];   //[anglescan_candx_nd_sz]
    Int_t           final_blob_nc_sz;
    Int_t           final_blob_nc[2];   //[final_blob_nc_sz]
    Int_t           final_blob_ncu_sz;
@@ -489,11 +495,11 @@ public :
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[74];   //[g1dedx_rev_cluster_energy_sz]
+   Double_t        g1dedx_rev_cluster_energy[44];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[35];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[46];   //[g2dedx_rev_cluster_energy_sz]
    Double_t        gamma1_direction[3];
    Double_t        gamma1_vertex[3];
    Double_t        gamma2_direction[3];
@@ -810,20 +816,20 @@ public :
    Double_t        mc_FSPartE[24];   //[mc_nFSPart]
    Int_t           mc_FSPartPDG[24];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[53];   //[mc_er_nPart]
-   Int_t           mc_er_status[53];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[53];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[53];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[53];   //[mc_er_nPart]
-   Double_t        mc_er_Px[53];   //[mc_er_nPart]
-   Double_t        mc_er_Py[53];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[53];   //[mc_er_nPart]
-   Double_t        mc_er_E[53];   //[mc_er_nPart]
-   Int_t           mc_er_FD[53];   //[mc_er_nPart]
-   Int_t           mc_er_LD[53];   //[mc_er_nPart]
-   Int_t           mc_er_mother[53];   //[mc_er_nPart]
+   Int_t           mc_er_ID[51];   //[mc_er_nPart]
+   Int_t           mc_er_status[51];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[51];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[51];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[51];   //[mc_er_nPart]
+   Double_t        mc_er_Px[51];   //[mc_er_nPart]
+   Double_t        mc_er_Py[51];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[51];   //[mc_er_nPart]
+   Double_t        mc_er_E[51];   //[mc_er_nPart]
+   Int_t           mc_er_FD[51];   //[mc_er_nPart]
+   Int_t           mc_er_LD[51];   //[mc_er_nPart]
+   Int_t           mc_er_mother[51];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[8];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[7];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -887,8 +893,11 @@ public :
    TBranch        *b_gamma2_isGoodBlob;   //!
    TBranch        *b_Cut_ConeBlobs;   //!
    TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
+   TBranch        *b_Cut_Event_Has_BadObject;   //!
+   TBranch        *b_Cut_Event_Not_Plausible;   //!
    TBranch        *b_Cut_Muon_Charge;   //!
    TBranch        *b_Cut_Muon_None;   //!
+   TBranch        *b_Cut_Muon_Not_Plausible;   //!
    TBranch        *b_Cut_Muon_Score_Low;   //!
    TBranch        *b_Cut_Particle_None;   //!
    TBranch        *b_Cut_PreFilter_Pi0;   //!
