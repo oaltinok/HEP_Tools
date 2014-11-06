@@ -1,4 +1,20 @@
 ================================================================================
+v4_09
+Modular Design Improved
+    More Source Files for CCProtonPi0 Class
+    More Functions
+
+Makefile Improved
+    Compiles and Builds each source file separately
+    Compile Time Dramatically decreased
+
+New Class: Cut
+    Cut Object Manages the Event Selection(Cut) Statistics for 
+        CCProtonPi0 Analysis Package
+
+================================================================================
 v4_08 - 2014_07_30
 New Function: writeScanList()
     Creates an output text file containing event list ready for Arachne Roundup
+    
+    

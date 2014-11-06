@@ -103,6 +103,9 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
     
     // Plot Only Reco Values
     if( isReco ){
+        TH1D* h_nProngs_hist = (TH1D*)f_Root->Get("nProngs_hist");
+        plot1D_Hist(h_nProngs_hist,"nProngs_hist.png",plotDir);
+        
         TH1D* h_deltaInvMass_reco = (TH1D*)f_Root->Get("deltaInvMass_reco");
         plot1D_Hist(h_deltaInvMass_reco,"deltaInvMass_reco.png",plotDir);
         

@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jul 22 11:33:12 2014 by ROOT version 5.30/00
+// Thu Nov  6 10:30:41 2014 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -10,6 +10,11 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+
+// Header file for the classes stored in the TTree if any.
+#include "/grid/fermiapp/minerva/software_releases/lcgcmake/build/lcg_61/projects/ROOT-5.34.05/src/ROOT/5.34.05/cint/cint/lib/prec_stl/vector"
+
+// Fixed size dimensions of array or collections stored in the TTree if any.
 
 class MC_Sample {
 public :
@@ -65,6 +70,7 @@ public :
    Int_t           Cut_Vertex_Not_Reconstructable;
    Int_t           Cut_Vertex_Null;
    Int_t           Cut_VtxBlob;
+   Int_t           Cut_nProngs;
    Int_t           Cut_secEndPoint_Michel_Exist;
    Int_t           anglescan_ncand;
    Int_t           anglescan_ncandx;
@@ -79,6 +85,7 @@ public :
    Int_t           gamma1_blob_ndigits;
    Int_t           gamma2_blob_nclusters;
    Int_t           gamma2_blob_ndigits;
+   Int_t           nProngs;
    Int_t           n_anchored_long_trk_prongs;
    Int_t           n_anchored_short_trk_prongs;
    Int_t           n_iso_trk_prongs;
@@ -215,41 +222,41 @@ public :
    Double_t        vtx_michel_distance;
    Double_t        well_fit_vertex_angle;
    Int_t           anglescan_blob_nc_sz;
-   Int_t           anglescan_blob_nc[5];   //[anglescan_blob_nc_sz]
+   Int_t           anglescan_blob_nc[10];   //[anglescan_blob_nc_sz]
    Int_t           anglescan_blob_ncu_sz;
-   Int_t           anglescan_blob_ncu[5];   //[anglescan_blob_ncu_sz]
+   Int_t           anglescan_blob_ncu[10];   //[anglescan_blob_ncu_sz]
    Int_t           anglescan_blob_ncv_sz;
-   Int_t           anglescan_blob_ncv[5];   //[anglescan_blob_ncv_sz]
+   Int_t           anglescan_blob_ncv[10];   //[anglescan_blob_ncv_sz]
    Int_t           anglescan_blob_ncx_sz;
-   Int_t           anglescan_blob_ncx[5];   //[anglescan_blob_ncx_sz]
+   Int_t           anglescan_blob_ncx[10];   //[anglescan_blob_ncx_sz]
    Int_t           anglescan_blob_nd_sz;
-   Int_t           anglescan_blob_nd[5];   //[anglescan_blob_nd_sz]
+   Int_t           anglescan_blob_nd[10];   //[anglescan_blob_nd_sz]
    Int_t           anglescan_blob_ndu_sz;
-   Int_t           anglescan_blob_ndu[5];   //[anglescan_blob_ndu_sz]
+   Int_t           anglescan_blob_ndu[10];   //[anglescan_blob_ndu_sz]
    Int_t           anglescan_blob_ndv_sz;
-   Int_t           anglescan_blob_ndv[5];   //[anglescan_blob_ndv_sz]
+   Int_t           anglescan_blob_ndv[10];   //[anglescan_blob_ndv_sz]
    Int_t           anglescan_blob_ndx_sz;
-   Int_t           anglescan_blob_ndx[5];   //[anglescan_blob_ndx_sz]
+   Int_t           anglescan_blob_ndx[10];   //[anglescan_blob_ndx_sz]
    Int_t           anglescan_cand_nc_sz;
-   Int_t           anglescan_cand_nc[5];   //[anglescan_cand_nc_sz]
+   Int_t           anglescan_cand_nc[10];   //[anglescan_cand_nc_sz]
    Int_t           anglescan_cand_ncu_sz;
-   Int_t           anglescan_cand_ncu[5];   //[anglescan_cand_ncu_sz]
+   Int_t           anglescan_cand_ncu[10];   //[anglescan_cand_ncu_sz]
    Int_t           anglescan_cand_ncv_sz;
-   Int_t           anglescan_cand_ncv[5];   //[anglescan_cand_ncv_sz]
+   Int_t           anglescan_cand_ncv[10];   //[anglescan_cand_ncv_sz]
    Int_t           anglescan_cand_ncx_sz;
-   Int_t           anglescan_cand_ncx[5];   //[anglescan_cand_ncx_sz]
+   Int_t           anglescan_cand_ncx[10];   //[anglescan_cand_ncx_sz]
    Int_t           anglescan_cand_nd_sz;
-   Int_t           anglescan_cand_nd[5];   //[anglescan_cand_nd_sz]
+   Int_t           anglescan_cand_nd[10];   //[anglescan_cand_nd_sz]
    Int_t           anglescan_cand_ndu_sz;
-   Int_t           anglescan_cand_ndu[5];   //[anglescan_cand_ndu_sz]
+   Int_t           anglescan_cand_ndu[10];   //[anglescan_cand_ndu_sz]
    Int_t           anglescan_cand_ndv_sz;
-   Int_t           anglescan_cand_ndv[5];   //[anglescan_cand_ndv_sz]
+   Int_t           anglescan_cand_ndv[10];   //[anglescan_cand_ndv_sz]
    Int_t           anglescan_cand_ndx_sz;
-   Int_t           anglescan_cand_ndx[5];   //[anglescan_cand_ndx_sz]
+   Int_t           anglescan_cand_ndx[10];   //[anglescan_cand_ndx_sz]
    Int_t           anglescan_candx_nc_sz;
-   Int_t           anglescan_candx_nc[5];   //[anglescan_candx_nc_sz]
+   Int_t           anglescan_candx_nc[10];   //[anglescan_candx_nc_sz]
    Int_t           anglescan_candx_nd_sz;
-   Int_t           anglescan_candx_nd[5];   //[anglescan_candx_nd_sz]
+   Int_t           anglescan_candx_nd[10];   //[anglescan_candx_nd_sz]
    Int_t           final_blob_nc_sz;
    Int_t           final_blob_nc[2];   //[final_blob_nc_sz]
    Int_t           final_blob_ncu_sz;
@@ -295,11 +302,11 @@ public :
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[44];   //[g1dedx_rev_cluster_energy_sz]
+   Double_t        g1dedx_rev_cluster_energy[56];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[46];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[22];   //[g2dedx_rev_cluster_energy_sz]
    Double_t        gamma1_direction[3];
    Double_t        gamma1_vertex[3];
    Double_t        gamma2_direction[3];
@@ -331,18 +338,18 @@ public :
    Bool_t          truth_reco_isMinosMatch;
    Bool_t          truth_reco_isBrokenTrack;
    Bool_t          truth_isSignal;
+   Bool_t          truth_isSignalGold;
+   Bool_t          truth_isSignalSilver1;
+   Bool_t          truth_isSignal_1Pi0;
+   Bool_t          truth_isSignal_2Gamma;
    Bool_t          truth_isFidVol;
    Bool_t          truth_isPlausible;
-   Int_t           truth_N_deltaplus;
+   Int_t           truth_N_FSParticles;
    Int_t           truth_N_gamma;
-   Int_t           truth_N_muminus;
-   Int_t           truth_N_muplus;
-   Int_t           truth_N_neutron;
-   Int_t           truth_N_other;
    Int_t           truth_N_pi0;
-   Int_t           truth_N_piminus;
-   Int_t           truth_N_piplus;
    Int_t           truth_N_proton;
+   Int_t           truth_N_proton_Long;
+   Int_t           truth_N_proton_Short;
    Int_t           truth_muon_charge;
    Int_t           truth_reco_muonCharge;
    Int_t           truth_target_material;
@@ -616,20 +623,20 @@ public :
    Double_t        mc_FSPartE[24];   //[mc_nFSPart]
    Int_t           mc_FSPartPDG[24];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[51];   //[mc_er_nPart]
-   Int_t           mc_er_status[51];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[51];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[51];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[51];   //[mc_er_nPart]
-   Double_t        mc_er_Px[51];   //[mc_er_nPart]
-   Double_t        mc_er_Py[51];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[51];   //[mc_er_nPart]
-   Double_t        mc_er_E[51];   //[mc_er_nPart]
-   Int_t           mc_er_FD[51];   //[mc_er_nPart]
-   Int_t           mc_er_LD[51];   //[mc_er_nPart]
-   Int_t           mc_er_mother[51];   //[mc_er_nPart]
+   Int_t           mc_er_ID[53];   //[mc_er_nPart]
+   Int_t           mc_er_status[53];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[53];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[53];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[53];   //[mc_er_nPart]
+   Double_t        mc_er_Px[53];   //[mc_er_nPart]
+   Double_t        mc_er_Py[53];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[53];   //[mc_er_nPart]
+   Double_t        mc_er_E[53];   //[mc_er_nPart]
+   Int_t           mc_er_FD[53];   //[mc_er_nPart]
+   Int_t           mc_er_LD[53];   //[mc_er_nPart]
+   Int_t           mc_er_mother[53];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[7];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[8];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -708,6 +715,7 @@ public :
    TBranch        *b_Cut_Vertex_Not_Reconstructable;   //!
    TBranch        *b_Cut_Vertex_Null;   //!
    TBranch        *b_Cut_VtxBlob;   //!
+   TBranch        *b_Cut_nProngs;   //!
    TBranch        *b_Cut_secEndPoint_Michel_Exist;   //!
    TBranch        *b_anglescan_ncand;   //!
    TBranch        *b_anglescan_ncandx;   //!
@@ -722,6 +730,7 @@ public :
    TBranch        *b_gamma1_blob_ndigits;   //!
    TBranch        *b_gamma2_blob_nclusters;   //!
    TBranch        *b_gamma2_blob_ndigits;   //!
+   TBranch        *b_nProngs;   //!
    TBranch        *b_n_anchored_long_trk_prongs;   //!
    TBranch        *b_n_anchored_short_trk_prongs;   //!
    TBranch        *b_n_iso_trk_prongs;   //!
@@ -974,18 +983,18 @@ public :
    TBranch        *b_truth_reco_isMinosMatch;   //!
    TBranch        *b_truth_reco_isBrokenTrack;   //!
    TBranch        *b_truth_isSignal;   //!
+   TBranch        *b_truth_isSignalGold;   //!
+   TBranch        *b_truth_isSignalSilver1;   //!
+   TBranch        *b_truth_isSignal_1Pi0;   //!
+   TBranch        *b_truth_isSignal_2Gamma;   //!
    TBranch        *b_truth_isFidVol;   //!
    TBranch        *b_truth_isPlausible;   //!
-   TBranch        *b_truth_N_deltaplus;   //!
+   TBranch        *b_truth_N_FSParticles;   //!
    TBranch        *b_truth_N_gamma;   //!
-   TBranch        *b_truth_N_muminus;   //!
-   TBranch        *b_truth_N_muplus;   //!
-   TBranch        *b_truth_N_neutron;   //!
-   TBranch        *b_truth_N_other;   //!
    TBranch        *b_truth_N_pi0;   //!
-   TBranch        *b_truth_N_piminus;   //!
-   TBranch        *b_truth_N_piplus;   //!
    TBranch        *b_truth_N_proton;   //!
+   TBranch        *b_truth_N_proton_Long;   //!
+   TBranch        *b_truth_N_proton_Short;   //!
    TBranch        *b_truth_muon_charge;   //!
    TBranch        *b_truth_reco_muonCharge;   //!
    TBranch        *b_truth_target_material;   //!
@@ -1316,7 +1325,7 @@ public :
 #endif
 
 #ifdef MC_Sample_cxx
-MC_Sample::MC_Sample(TTree *tree)
+MC_Sample::MC_Sample(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -1336,7 +1345,7 @@ MC_Sample::MC_Sample(TTree *tree)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/CCProtonPi0/MC/v1_05/test/nogrid/central_value/minerva/ana/v10r6p13/00/01/32/00/SIM_minerva_00013200_Subruns_0005_CCProtonPi0_Ana_Tuple_v10r6p13.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/CCProtonPi0/MC/v1_06/test/grid/central_value/minerva/ana/v10r9p1/00/01/32/00/SIM_minerva_00013200_Subruns_0001-0002-0003-0004_CCProtonPi0_Ana_Tuple_v10r9p1.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1436,6 +1445,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("Cut_Vertex_Not_Reconstructable", &Cut_Vertex_Not_Reconstructable, &b_Cut_Vertex_Not_Reconstructable);
    fChain->SetBranchAddress("Cut_Vertex_Null", &Cut_Vertex_Null, &b_Cut_Vertex_Null);
    fChain->SetBranchAddress("Cut_VtxBlob", &Cut_VtxBlob, &b_Cut_VtxBlob);
+   fChain->SetBranchAddress("Cut_nProngs", &Cut_nProngs, &b_Cut_nProngs);
    fChain->SetBranchAddress("Cut_secEndPoint_Michel_Exist", &Cut_secEndPoint_Michel_Exist, &b_Cut_secEndPoint_Michel_Exist);
    fChain->SetBranchAddress("anglescan_ncand", &anglescan_ncand, &b_anglescan_ncand);
    fChain->SetBranchAddress("anglescan_ncandx", &anglescan_ncandx, &b_anglescan_ncandx);
@@ -1450,6 +1460,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("gamma1_blob_ndigits", &gamma1_blob_ndigits, &b_gamma1_blob_ndigits);
    fChain->SetBranchAddress("gamma2_blob_nclusters", &gamma2_blob_nclusters, &b_gamma2_blob_nclusters);
    fChain->SetBranchAddress("gamma2_blob_ndigits", &gamma2_blob_ndigits, &b_gamma2_blob_ndigits);
+   fChain->SetBranchAddress("nProngs", &nProngs, &b_nProngs);
    fChain->SetBranchAddress("n_anchored_long_trk_prongs", &n_anchored_long_trk_prongs, &b_n_anchored_long_trk_prongs);
    fChain->SetBranchAddress("n_anchored_short_trk_prongs", &n_anchored_short_trk_prongs, &b_n_anchored_short_trk_prongs);
    fChain->SetBranchAddress("n_iso_trk_prongs", &n_iso_trk_prongs, &b_n_iso_trk_prongs);
@@ -1702,18 +1713,18 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_reco_isMinosMatch", &truth_reco_isMinosMatch, &b_truth_reco_isMinosMatch);
    fChain->SetBranchAddress("truth_reco_isBrokenTrack", &truth_reco_isBrokenTrack, &b_truth_reco_isBrokenTrack);
    fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
+   fChain->SetBranchAddress("truth_isSignalGold", &truth_isSignalGold, &b_truth_isSignalGold);
+   fChain->SetBranchAddress("truth_isSignalSilver1", &truth_isSignalSilver1, &b_truth_isSignalSilver1);
+   fChain->SetBranchAddress("truth_isSignal_1Pi0", &truth_isSignal_1Pi0, &b_truth_isSignal_1Pi0);
+   fChain->SetBranchAddress("truth_isSignal_2Gamma", &truth_isSignal_2Gamma, &b_truth_isSignal_2Gamma);
    fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
    fChain->SetBranchAddress("truth_isPlausible", &truth_isPlausible, &b_truth_isPlausible);
-   fChain->SetBranchAddress("truth_N_deltaplus", &truth_N_deltaplus, &b_truth_N_deltaplus);
+   fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
    fChain->SetBranchAddress("truth_N_gamma", &truth_N_gamma, &b_truth_N_gamma);
-   fChain->SetBranchAddress("truth_N_muminus", &truth_N_muminus, &b_truth_N_muminus);
-   fChain->SetBranchAddress("truth_N_muplus", &truth_N_muplus, &b_truth_N_muplus);
-   fChain->SetBranchAddress("truth_N_neutron", &truth_N_neutron, &b_truth_N_neutron);
-   fChain->SetBranchAddress("truth_N_other", &truth_N_other, &b_truth_N_other);
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
-   fChain->SetBranchAddress("truth_N_piminus", &truth_N_piminus, &b_truth_N_piminus);
-   fChain->SetBranchAddress("truth_N_piplus", &truth_N_piplus, &b_truth_N_piplus);
    fChain->SetBranchAddress("truth_N_proton", &truth_N_proton, &b_truth_N_proton);
+   fChain->SetBranchAddress("truth_N_proton_Long", &truth_N_proton_Long, &b_truth_N_proton_Long);
+   fChain->SetBranchAddress("truth_N_proton_Short", &truth_N_proton_Short, &b_truth_N_proton_Short);
    fChain->SetBranchAddress("truth_muon_charge", &truth_muon_charge, &b_truth_muon_charge);
    fChain->SetBranchAddress("truth_reco_muonCharge", &truth_reco_muonCharge, &b_truth_reco_muonCharge);
    fChain->SetBranchAddress("truth_target_material", &truth_target_material, &b_truth_target_material);

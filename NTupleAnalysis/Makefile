@@ -1,54 +1,65 @@
-MAINEXE  = main.exe
+# ==============================================================================
+#
+# Makefile for NTupleAnalysis Package
+# 	Statistical Data Analysis Package for CCProtonPi0
+#	Author: Ozgur Altinok
+#	Last Revision: 2014_11_06
+#
+# ==============================================================================
+
+# Main File and its executable
 MAINCPP = main.cpp
-MAINO	  = main.o
+MAINEXE = main.exe
 
-BINLISTCPP = Classes/BinList/BinList.cpp
-BINLISTO = Classes/BinList/BinList.o
-
-SINGLEBINCPP = Classes/SingleBin/SingleBin.cpp
-SINGLEBINO = Classes/SingleBin/SingleBin.o
-
-CCDELTAPLUSCPP = Classes/CCProtonPi0/CCProtonPi0.cpp
-CCDELTAPLUSO = Classes/CCProtonPi0/CCProtonPi0.o
-
-PARTICLECPP = Classes/Particle/Particle.cpp 
-PARTICLEO = Classes/Particle/Particle.o
-
-MUONCPP = Classes/Muon/Muon.cpp
-MUONO = Classes/Muon/Muon.o
-
-PROTONCPP = Classes/Proton/Proton.cpp
-PROTONO = Classes/Proton/Proton.o
-
-PIONCPP = Classes/Pion/Pion.cpp
-PIONO = Classes/Pion/Pion.o
-
+# Class: Plotter
 PLOTTERCPP = Classes/Plotter/Plotter.cpp
-PLOTTERO = Classes/Plotter/Plotter.o 
+ALLPLOTTERCPP = $(PLOTTERCPP)
 
+# Class: CCProtonPi0
+CCPROTONPI0CPP = Classes/CCProtonPi0/CCProtonPi0.cpp
+INITHISTOGRAMSCPP = Classes/CCProtonPi0/initHistograms.cpp
+DEFAULTFUNCTIONSCPP = Classes/CCProtonPi0/DefaultFunctions.cpp
+MUONFUNCTIONSCPP = Classes/CCProtonPi0/MuonFunctions.cpp
+PROTONFUNCTIONSCPP = Classes/CCProtonPi0/ProtonFunctions.cpp
+PIONFUNCTIONSCPP = Classes/CCProtonPi0/PionFunctions.cpp
+ALLCCPROTONPI0CPP = $(CCPROTONPI0CPP) $(INITHISTOGRAMSCPP) $(DEFAULTFUNCTIONSCPP) $(MUONFUNCTIONSCPP) $(PROTONFUNCTIONSCPP) $(PIONFUNCTIONSCPP)
 
-#All header files and source files are expected in the current directory
+# Class: Particle and its Subclasses
+PARTICLECPP = Classes/Particle/Particle.cpp 
+MUONCPP = Classes/Muon/Muon.cpp
+PROTONCPP = Classes/Proton/Proton.cpp
+PIONCPP = Classes/Pion/Pion.cpp
+ALLPARTICLESCPP = $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP)
 
-#The first target defined is the default for the makefile
-CXX	= g++
-RM	= rm -f
-SHELL = sh
+# Other Helper Classes
+BINLISTCPP = Classes/BinList/BinList.cpp
+SINGLEBINCPP = Classes/SingleBin/SingleBin.cpp
+CUTCPP = Classes/Cut/Cut.cpp
+ALLOTHERCPP = $(CUTCPP) $(BINLISTCPP) $(SINGLEBINCPP)
 
-##### Library path and compiler / linker / rootcint options #####
-CXXFLAGS	= -o
-CXX		= g++
+# ALL Classes Required for the Package
+ALLCPP = $(MAINCPP) $(ALLPLOTTERCPP) $(ALLCCPROTONPI0CPP) $(ALLPARTICLESCPP) $(ALLOTHERCPP)
 
-#FLAGS for the root libraries and include paths
-ROOTFLAGS   = `root-config --libs --cflags`
+# ------------------------------------------------------------------------------
+# Commands and Flags
+# ------------------------------------------------------------------------------
+CC = g++
+CFLAGS = -c -Wall
+ROOTFLAGS = `root-config --libs --cflags`
+RM = rm -f
 
-ALLCPP = $(MAINCPP) $(BINLISTCPP) $(SINGLEBINCPP) $(CCDELTAPLUSCPP) $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP) $(PLOTTERCPP)
+SOURCES = $(ALLCPP)
+OBJECTS = $(SOURCES:.cpp=.o)
+EXECUTABLE = $(MAINEXE)
 
-ALLO = $(MAINO) $(BINLISTO) $(SINGLEBINO) $(CCDELTAPLUSO) $(PARTICLEO) $(MUONO) $(PROTONO) $(PIONCO) $(PLOTTERO)
+all: $(SOURCES) $(EXECUTABLE)
 
+$(EXECUTABLE): $(OBJECTS) 
+	$(CC) $(ROOTFLAGS) $(OBJECTS) -o $@
 
-all:
-	$(CXX) $(ROOTFLAGS) $(ALLCPP) $(CXXFLAGS) $(MAINEXE)
+.cpp.o:
+	$(CC) $(ROOTFLAGS) $(CFLAGS) $< -o $@
 	
 clean: 
-	$(RM) $(MAINEXE)
+	$(RM) $(MAINEXE) $(OBJECTS)
 
