@@ -1,17 +1,17 @@
-/HTBlob.cpp/1.2/Sat May 24 15:09:59 2014//
-/HTBlob.h/1.2/Sat May 24 15:09:21 2014//
-/HTtool.cpp/1.2/Sat May 24 15:10:04 2014//
-/HTtool.h/1.2/Sat May 24 15:09:18 2014//
-D/CVS////
-/DigitVectorTruthInfo.cpp/1.1/Tue Jun 10 22:28:20 2014//
-/DigitVectorTruthInfo.h/1.1/Tue Jun 10 22:26:18 2014//
-/OneParLineFit.h/1.1/Tue Jun 10 20:17:32 2014//
-/TraverseHistory.cpp/1.1/Tue Jun 10 22:29:32 2014//
-/TraverseHistory.h/1.1/Tue Jun 10 22:29:15 2014//
-/TwoParLineFit.h/1.1/Tue Jun 10 20:17:41 2014//
-/AngleScan.cpp/1.2/Thu Jul 17 19:08:02 2014//
-/AngleScan.h/1.2/Thu Jul 17 19:08:13 2014//
-/CCProtonPi0.cpp/1.12/Mon Jul 28 19:55:43 2014//
-/CCProtonPi0.h/1.12/Mon Jul 28 19:55:30 2014//
-/ClusterVectorInfo.cpp/1.2/Thu Jul 17 16:46:24 2014//
-/ClusterVectorInfo.h/1.2/Thu Jul 17 16:36:47 2014//
+/AngleScan.cpp/1.2/Wed Aug  6 17:30:14 2014//
+/AngleScan.h/1.2/Wed Aug  6 17:30:14 2014//
+/ClusterVectorInfo.cpp/1.2/Wed Aug  6 17:30:14 2014//
+/ClusterVectorInfo.h/1.2/Wed Aug  6 17:30:14 2014//
+/DigitVectorTruthInfo.cpp/1.1/Tue Jun 10 23:13:19 2014//
+/DigitVectorTruthInfo.h/1.1/Tue Jun 10 23:13:19 2014//
+/HTBlob.cpp/1.2/Sat May 24 17:19:39 2014//
+/HTBlob.h/1.2/Sat May 24 17:19:39 2014//
+/HTtool.cpp/1.2/Sat May 24 17:19:39 2014//
+/HTtool.h/1.2/Sat May 24 17:19:39 2014//
+/OneParLineFit.h/1.1/Tue Jun 10 23:13:19 2014//
+/TraverseHistory.cpp/1.1/Tue Jun 10 23:13:19 2014//
+/TraverseHistory.h/1.1/Tue Jun 10 23:13:19 2014//
+/TwoParLineFit.h/1.1/Tue Jun 10 23:13:19 2014//
+/CCProtonPi0.cpp/1.13/Wed Nov  5 15:45:48 2014//
+/CCProtonPi0.h/1.13/Wed Nov  5 15:41:39 2014//
+D

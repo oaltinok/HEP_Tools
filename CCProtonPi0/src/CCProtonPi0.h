@@ -21,8 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_07_28
-    Version:        v1_05
+    Last Revision:  2014_11_05
+    Version:        v1_06
     
 ================================================================================
 */
@@ -126,6 +126,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool m_makeShortTracks;
         bool m_DoPlausibilityCuts;
         bool m_DoTruthMatch;
+        bool m_Do_nProngCut;
+        int m_min_nProngs;
+        int m_max_nProngs;
         
         // Tool Names
         std::string m_particleToolName;
@@ -235,7 +238,10 @@ class CCProtonPi0 : public MinervaAnalysisTool
                             Minerva::IDBlob* idblob1, 
                             Minerva::IDBlob* idblob2) const;
         
-
+        void setSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
+        void setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const;
+        void writeFSParticleTable(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
+        bool isSinglePi0(Minerva::GenMinInteraction* truthEvent, int nPi0, int nGamma) const;
         
         bool createTrackedParticles( Minerva::ProngVect& prongs ) const;
         bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;

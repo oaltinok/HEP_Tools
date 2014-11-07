@@ -127,17 +127,23 @@ MinervaAnalysisTool( type, name, parent )
     //! mandatory declaration of analysis signature: CCProtonPi0
     m_anaSignature = "CCProtonPi0";
     
-    // Private Properties
-    declareProperty("WriteFSParticleTable", m_writeFSParticle_Table =   false);
+	 // Private Properties
+	 declareProperty("WriteFSParticleTable", m_writeFSParticle_Table =   false);
     declareProperty("StoreAllEvents",       m_store_all_events      =   true);
     declareProperty("DoPlausibilityCuts",   m_DoPlausibilityCuts    =   true);
     declareProperty("DoTruthMatch",         m_DoTruthMatch          =   true);
+    declareProperty("Do_nProngCut",         m_Do_nProngCut          =   false);  
     declareProperty("MakeShortTracks",      m_makeShortTracks       =   true);
+	 declareProperty("min_nProngs",      	  m_min_nProngs       =   2);
+	 declareProperty("max_nProngs",      	  m_max_nProngs       =   2);
     
     declareProperty("BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian );
     
     declareProperty("MinMuonScore",        m_minMuonScore = 0.9 );
     declareProperty("MinProtonScore",      m_minProtonScore = 0.0 );
+	 
+	 
+
     
     //--------------------------------------------------------------------------
     // Arachne Colors
@@ -474,6 +480,10 @@ StatusCode CCProtonPi0::initialize()
     declareIntTruthBranch(  "reco_muonCharge", 0);
     
     declareBoolTruthBranch( "isSignal");
+    declareBoolTruthBranch( "isSignalGold");
+    declareBoolTruthBranch( "isSignalSilver1");
+    declareBoolTruthBranch( "isSignal_1Pi0");
+    declareBoolTruthBranch( "isSignal_2Gamma");
     declareBoolTruthBranch( "isFidVol");
     declareBoolTruthBranch( "isPlausible");
     
@@ -481,16 +491,12 @@ StatusCode CCProtonPi0::initialize()
     declareIntTruthBranch( "vertex_plane", 0);
     declareIntTruthBranch( "target_material", -1);
     
+    declareIntTruthBranch("N_FSParticles", -1 );
     declareIntTruthBranch("N_proton", -1 );
-    declareIntTruthBranch("N_neutron", -1 );
-    declareIntTruthBranch("N_muminus", -1 );
-    declareIntTruthBranch("N_muplus", -1 );
+    declareIntTruthBranch("N_proton_Long", -1 );
+    declareIntTruthBranch("N_proton_Short", -1 );
     declareIntTruthBranch("N_pi0", -1 );
-    declareIntTruthBranch("N_piplus", -1 );
-    declareIntTruthBranch("N_piminus", -1 );
-    declareIntTruthBranch("N_deltaplus", -1 );
     declareIntTruthBranch("N_gamma", -1 );
-    declareIntTruthBranch("N_other", -1 );
 
     declareDoubleTruthBranch("muon_px", 0 );
     declareDoubleTruthBranch("muon_py", 0 );
@@ -574,6 +580,7 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch( "Cut_Vertex_Null", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Reconstructable", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Fiducial", -1 );
+	declareIntEventBranch( "Cut_nProngs", -1 );
     declareIntEventBranch( "Cut_Muon_None",-1);
     declareIntEventBranch( "Cut_Muon_Not_Plausible",-1);
     declareIntEventBranch( "Cut_Muon_Score_Low",-1);
@@ -588,6 +595,7 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch( "Cut_ConeBlobs", -1 );
     
     //! Event - General reco
+    declareIntEventBranch( "nProngs", -1);
     declareIntEventBranch( "n_long_tracks", -1);
     declareIntEventBranch( "n_short_tracks", -1);
     declareIntEventBranch( "n_anchored_long_trk_prongs", -1 );
@@ -1028,6 +1036,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         }
     }
     
+    
     //--------------------------------------------------------------------------
     //! MAKE CUT - if Interaction Vertex is NOT in Fiducial Volume
     //-------------------------------------------------------------------------- 
@@ -1083,6 +1092,27 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     event->setIntData("vtx_secondary_count", allVertices.size()); /* Number of secondary vertices */
     
     debug() << "FINISH: Vertex Reconstruction!" << endmsg;
+	 
+    //==========================================================================
+    //
+    // Prong Cuts
+    //
+    //==========================================================================
+	
+	event->setIntData("nProngs", event->primaryProngs().size());
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - if nProngs is not Valid
+    //-------------------------------------------------------------------------- 
+    if( m_Do_nProngCut ){
+        debug()<<"nProngs Cut with min_nProngs = "<<m_min_nProngs<<" max_nProngs = "<<m_max_nProngs<<endmsg;
+        int n_PrimaryProngs = event->primaryProngs().size();
+        if( n_PrimaryProngs < m_min_nProngs || n_PrimaryProngs > m_max_nProngs ){
+            debug()<<"Cut: N(Prongs) = "<<n_PrimaryProngs<<endmsg;
+            event->setIntData("Cut_nProngs",1);
+            if( m_store_all_events ) return interpretFailEvent(event); 
+            else return StatusCode::SUCCESS; 
+        }
+    }
 
     //==========================================================================
     //
@@ -1659,143 +1689,155 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     //--------------------------------------------------------------------------
     //! Count the Number of FS Particles
     //--------------------------------------------------------------------------
+    
+    Gaudi::LorentzVector proton_4p;
+    double proton_KE = 0.0;
+    double proton_restMass = 938.28;
+    double proton_KE_threshold = 120;
+    int particle_PDG;
+    int N_FSParticles = 0;
+    int N_proton_Long   = 0; // Proton is Long if KE >= 120
+    int N_proton_Short  = 0; // Proton is Short if KE < 120
     int N_proton    = 0;
     int N_neutron   = 0;
-    int N_muminus   = 0;
-    int N_muplus    = 0;
-    int N_pi0       = 0;
-    int N_piplus    = 0;
-    int N_piminus   = 0;
-    int N_deltaplus = 0;
     int N_gamma     = 0;
+    int N_pi0       = 0;
+    int N_muon      = 0;
     int N_other     = 0;
 
+    // Get Number of Final State Particles
+    N_FSParticles = pri_trajectories.size();
+    
     for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart) {
-        if ( ( (*it_mcpart)->GetPDGCode() ) == 2212 ) N_proton++;
-        else if( ( (*it_mcpart)->GetPDGCode() ) == 2112 ) N_neutron++;
-        else if( ( (*it_mcpart)->GetPDGCode() ) == 13 ) N_muminus++;
-        else if( ( (*it_mcpart)->GetPDGCode() ) == -13 ) N_muplus++;
-        else if( ( (*it_mcpart)->GetPDGCode() ) == 111 ) N_pi0++;
-        else if( ( (*it_mcpart)->GetPDGCode() ) == 211 ) N_piplus++;
-        else if( ( (*it_mcpart)->GetPDGCode() ) == -211 ) N_piminus++;
-        else if( ( (*it_mcpart)->GetPDGCode() ) == 2214 ) N_deltaplus++;
-        else if( ( (*it_mcpart)->GetPDGCode() ) == 22 ) N_gamma++;
+        particle_PDG =  (*it_mcpart)->GetPDGCode();
+        proton_KE = 0.0;
+        if (  particle_PDG == 2212 ){
+            N_proton++;
+            proton_4p = (*it_mcpart)->GetInitialMomentum();
+            proton_KE = proton_4p.E() - proton_restMass;
+            if(proton_KE >= proton_KE_threshold) N_proton_Long++;
+            else N_proton_Short++;
+                
+            debug()<<"Proton KE = "<<proton_KE<<" | "<<N_proton_Long<<" "<<N_proton_Short<<endmsg; 
+        }
+        else if ( particle_PDG == 2112 ) N_neutron++;
+        else if ( particle_PDG == 111 ) N_pi0++;
+        else if ( particle_PDG == 22 ) N_gamma++;
+        else if ( particle_PDG == 13 ) N_muon++;
         else N_other++;
     }
+    debug()<<"N(Final State Particles) = "<<N_FSParticles<<endmsg;
+    debug()<<"N(Proton) = "<<N_proton<<" N(Neutron) = "<<N_neutron<<" N(Pi0) = "<<N_pi0<<endmsg;
+    debug()<<"N(Gamma) = "<<N_gamma<<" N(Other) = "<<N_other<<endmsg;
+    debug()<<"N(Proton_Long) = "<<N_proton_Long<<" N(Proton_Short) = "<<N_proton_Short<<endmsg;
+    
+    truthEvent->setIntData("N_FSParticles",  N_FSParticles);
+    truthEvent->setIntData("N_proton",  N_proton);
+    truthEvent->setIntData("N_proton_Long",  N_proton_Long);
+    truthEvent->setIntData("N_proton_Short",  N_proton_Short);
+    truthEvent->setIntData("N_pi0",  N_pi0);
+    truthEvent->setIntData("N_gamma",  N_gamma);
     
     //--------------------------------------------------------------------------
-    //! Find Signal -- CC Neutrino Interaction with FS Particles: muon, proton, pi0
+    //! Find Signal --  CC Neutrino Interaction inside Fiducial Volume
+    //!                 FS Particles: muon, proton, pi0(2xGamma)
     //--------------------------------------------------------------------------
     bool isSignal = false;
+    bool isSignal_Gold = false;
+    bool isSignal_Silver1 = false;
+    bool is1Pi0 = false;
 
     int t_current = truthEvent->current();
     int t_neutrinoPDG = truthEvent->incoming();
     
-    // CC Neutrino Interaction
-    if ( t_current == 1 && t_neutrinoPDG == 14 ) {
-        // Atleast 1 proton, 1 pi0, 0 pi+, 0 pi-
-        if(N_proton > 0 && N_pi0 == 1 && N_piplus == 0 && N_piminus == 0 && N_other == 0){
-            isSignal = true;
+    // Signal Must be CC Neutrino Interaction in Fiducial Volume
+    if ( isFidVol && t_current == 1 && t_neutrinoPDG == 14){
+        is1Pi0 = isSinglePi0(truthEvent,N_pi0,N_gamma);
+        // Gold Signal: 1+ Long Protons, 1 Pi0 (2 Gamma), No Other
+        if( is1Pi0 && N_proton_Long >= 1 && N_other == 0){ 
+            isSignal_Gold = true;
+            debug()<<"Signal: Gold!"<<endmsg;
         }
+        // Silver 1 Signal: Short Proton + 1 Pi0
+        else if(is1Pi0 && N_proton_Short >= 1 && N_proton_Long == 0 && N_other == 0){
+            isSignal_Silver1 = true;
+            debug()<<"Signal: Silver1! --> Short Proton"<<endmsg;
+        }
+        
     }
+
+    // isSignal is TRUE for Gold OR Silver
+    isSignal = isSignal_Gold || isSignal_Silver1;
+    
     truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal", isSignal );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isSignalGold", isSignal_Gold );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isSignalSilver1", isSignal_Silver1 );
     
     
     //--------------------------------------------------------------------------
     //! Create Final State Particle Table
     //--------------------------------------------------------------------------
-    if (m_writeFSParticle_Table){
-        // Using Reverse Iterator to have the table in correct order
-        SmartRefVector<Minerva::TG4Trajectory>::const_reverse_iterator rit_mcpart;
-        
-        info() <<"--------------------------------------------------------------"<<endmsg;
-        info() <<"Final State Particle Table"<<endmsg;
-        if(isSignal){
-            info() <<">> Marked as Signal! <<"<<endmsg;
-        }
-        info() <<"ID\tPDG\tParent\tPx\tPy\tPz\tE"<<endmsg;
-        for (rit_mcpart = pri_trajectories.rbegin(); rit_mcpart != pri_trajectories.rend(); ++rit_mcpart) {
-            Gaudi::LorentzVector temp_4p = (*rit_mcpart)->GetInitialMomentum();
-            info()  <<(*rit_mcpart)->GetTrackId()<<"\t"
-                    <<(*rit_mcpart)->GetPDGCode()<<"\t"
-                    <<(*rit_mcpart)->GetParentId()<<"\t"
-                    <<temp_4p.px()<<"\t"
-                    <<temp_4p.py()<<"\t"
-                    <<temp_4p.pz()<<"\t"
-                    <<temp_4p.E()<<"\t"
-                    <<endmsg;
-        }
-        info() <<"--------------------------------------------------------------"<<endmsg;
-    }
+    if (m_writeFSParticle_Table) writeFSParticleTable(truthEvent,isSignal);
    
-    
     //------------------------------------------------------------
-    //! Target Material
+    //! Set Target Material 
     //------------------------------------------------------------
-    Gaudi::LorentzVector t_vtx = truthEvent->Vtx(); 
-    int t_targetMaterial = -1; 
-    
-    G4ThreeVector G4vtx(t_vtx.x(), t_vtx.y(), t_vtx.z());
-    G4ThreeVector G4vec(0, 0, 1); // The next function needs a direction vector as argument. Here's a dummy.
-    G4Navigator* geantNav = new G4Navigator;
-    geantNav->SetWorldVolume(m_gigaCnvSvc->world());
-    G4VPhysicalVolume* physVol=geantNav->LocateGlobalPointAndSetup(G4vtx, &G4vec, false, true);
-    G4Material* material=physVol->GetLogicalVolume()->GetMaterial(); 
-    delete geantNav;
-    
-    if ( material->GetName() == "/dd/Materials/Minerva/PlasticScint" ) {
-        t_targetMaterial = 0;
-    }
-    else if ( material->GetName() == "/dd/Materials/Minerva/PSTitaniumDioxide" ) {
-        t_targetMaterial = 1;
-    }
-    else if ( material->GetName() == "/dd/Materials/Minerva/GreyEpoxy" ) {
-        t_targetMaterial = 2;
-    }
-    else if ( material->GetName() == "/dd/Materials/Minerva/Lexan" ) {
-        t_targetMaterial = 3;
-    }
-    else if ( material->GetName() == "/dd/Materials/Minerva/GreenFiber" ) {
-        t_targetMaterial = 4;
-    }
-    else if ( material->GetName() == "/dd/Materials/Minerva/PureLead" ) {
-        t_targetMaterial = 5;
-    }
-    else if ( material->GetName() == "/dd/Materials/Minerva/PureCarbon" ) {
-        t_targetMaterial = 6;
-    }  
-    else if ( material->GetName() == "/dd/Materials/Minerva/PureAluminum" ) {
-        t_targetMaterial = 7;
-    }   
-    else if ( material->GetName() == "/dd/Materials/Minerva/StainlessSteel" ) {
-        t_targetMaterial = 8;
-    }   
-    else if ( material->GetName() == "/dd/Materials/Air" ) {
-        t_targetMaterial = 9;
-    }
-    else t_targetMaterial = 10; 
+    setTargetMaterial(truthEvent);
     
     //--------------------------------------------------------------
-    //! Vertex module and plane
+    //! Set Vertex module and plane
     //--------------------------------------------------------------   
-    debug()<<"Calling getNearestPlane, t_vtx is "<<t_vtx.z()<<endmsg;    
+    Gaudi::LorentzVector t_vtx = truthEvent->Vtx();    
     int vertex_module;
     int vertex_plane;
+    
+    debug()<<"Calling getNearestPlane, t_vtx is "<<t_vtx.z()<<endmsg;   
     getNearestPlane(t_vtx.z(), vertex_module, vertex_plane);  
-    plot1D(2*vertex_module + vertex_plane + 0.5,"nearest_plane","Nearest Plane to point in z",-40,260, 300);
-    plot2D(t_vtx.z(), 2*vertex_module + vertex_plane +0.5,"nearest_plane_v_z","",4000.0,10000.0, 120, -40, 260, 300);
-    
 
+    truthEvent->setIntData("vertex_module", vertex_module);
+    truthEvent->setIntData("vertex_plane", vertex_plane);  
     
-    //!Get all trajectories
-    Minerva::TG4Trajectories* all_trajectories = NULL;
-    if (exist<Minerva::TG4Trajectories>(Minerva::TG4TrajectoryLocation::Default)) {
-        all_trajectories = get<Minerva::TG4Trajectories>(Minerva::TG4TrajectoryLocation::Default);
-        debug() <<"There are "<<all_trajectories->size()<<" TG4Trajectories"<<endmsg; 
-    }
-    if (!all_trajectories) {
-        warning()<<"Could not find trajectories in TES"<<endmsg;
-    }
+    //--------------------------------------------------------------------------
+    //! Set Signal Kinematics 
+    //--------------------------------------------------------------------------
+    if (isSignal) setSignalKinematics(truthEvent);
+    
+  
+    debug() <<"Exit CCProtonPi0::tagTruth()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    return StatusCode::SUCCESS;
+    
+}
+
+//==============================================================================
+//  Finalize
+//==============================================================================
+StatusCode CCProtonPi0::finalize()
+{
+    info() <<"--------------------------------------------------------------------------"<<endmsg;
+    info() << "Enter: finalize()" << endmsg;
+    
+    
+    // finalize the base class.
+    StatusCode sc = this->MinervaAnalysisTool::finalize();
+    if( sc.isFailure() ) return Error( "Failed to finalize!", sc );
+    
+    
+    info() <<"Exit CCProtonPi0::CCProtonPi0::finalize()" << endmsg;
+    info() <<"--------------------------------------------------------------------------"<<endmsg;
+    return sc;
+}
+
+//<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+//
+//  Private Functions
+//
+//<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+void CCProtonPi0::setSignalKinematics(Minerva::GenMinInteraction* truthEvent) const
+{
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCProtonPi0::setSignalKinematics()" << endmsg;
     
     //--------------------------------------------------------------------------
     //! Get Muon Kinematics
@@ -1807,6 +1849,9 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     double t_muon_E = t_mu4p.E();
     double t_muon_theta=m_coordSysTool->thetaWRTBeam(t_mu4p);
     int t_muon_charge = 0;
+    
+    int t_current = truthEvent->current();
+    int t_neutrinoPDG = truthEvent->incoming();
     
     if (t_current==1 && t_neutrinoPDG==14) t_muon_charge = -1;
     else if ( t_current==1 && t_neutrinoPDG==-14) t_muon_charge = 1;
@@ -1889,6 +1934,9 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     int nProton = 0;
     int nGamma = 0;
     
+    const SmartRefVector<Minerva::TG4Trajectory> pri_trajectories = truthEvent->trajectories();
+    SmartRefVector<Minerva::TG4Trajectory>::const_iterator it_mcpart;
+    
     for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart) {
         
         Gaudi::LorentzVector temp_4p = (*it_mcpart)->GetInitialMomentum();
@@ -1933,13 +1981,9 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     }
     
     //--------------------------------------------------------------------------
-    //! fill the truthEvent info
+    //! fill the truthEvent info for Signal Kinematics
     //--------------------------------------------------------------------------
-    debug()<<"Filling ntuple for truth information!"<<endmsg;
-    
-    truthEvent->setIntData("vertex_module", vertex_module);
-    truthEvent->setIntData("vertex_plane", vertex_plane);  
-    truthEvent->setIntData("target_material", t_targetMaterial);
+    debug()<<"Filling ntuple for truth Signal Kinematics info!"<<endmsg;
     
     truthEvent->setDoubleData("muon_px", t_muon_px);
     truthEvent->setDoubleData("muon_py", t_muon_py);
@@ -1979,49 +2023,145 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     truthEvent->setContainerDoubleData("gamma_vtx_z", t_gamma_vtx_z);
     truthEvent->setContainerDoubleData("gamma_theta_wrtbeam",  t_gamma_theta);
     truthEvent->setContainerIntData("gamma_trackID", t_gamma_trackID);
-    truthEvent->setContainerIntData("gamma_parentID", t_gamma_parentID);
-    
-    truthEvent->setIntData("N_proton",  N_proton);
-    truthEvent->setIntData("N_neutron",  N_neutron);
-    truthEvent->setIntData("N_muminus",  N_muminus);
-    truthEvent->setIntData("N_muplus",  N_muplus);
-    truthEvent->setIntData("N_pi0",  N_pi0);
-    truthEvent->setIntData("N_piplus",  N_piplus);
-    truthEvent->setIntData("N_piminus",  N_piminus);
-    truthEvent->setIntData("N_deltaplus",N_deltaplus);
-    truthEvent->setIntData("N_gamma", N_gamma);
-    truthEvent->setIntData("N_other", N_other );
-    
-    debug() <<"Exit CCProtonPi0::tagTruth()" << endmsg;
+    truthEvent->setContainerIntData("gamma_parentID", t_gamma_parentID); 
+
+    debug() << "Exit CCProtonPi0::setSignalKinematics()" << endmsg;
     debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    return StatusCode::SUCCESS;
-    
 }
 
-//==============================================================================
-//  Finalize
-//==============================================================================
-StatusCode CCProtonPi0::finalize()
+
+//------------------------------------------------------------------------------
+// setTargetMaterial() Stores Target Material using Truth information
+//------------------------------------------------------------------------------
+void CCProtonPi0::setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const
 {
-    info() <<"--------------------------------------------------------------------------"<<endmsg;
-    info() << "Enter: finalize()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCProtonPi0::setTargetMaterial()" << endmsg;
     
+    Gaudi::LorentzVector t_vtx = truthEvent->Vtx(); 
+    int t_targetMaterial = -1; 
     
-    // finalize the base class.
-    StatusCode sc = this->MinervaAnalysisTool::finalize();
-    if( sc.isFailure() ) return Error( "Failed to finalize!", sc );
+    G4ThreeVector G4vtx(t_vtx.x(), t_vtx.y(), t_vtx.z());
+    G4ThreeVector G4vec(0, 0, 1); // The next function needs a direction vector as argument. Here's a dummy.
+    G4Navigator* geantNav = new G4Navigator;
+    geantNav->SetWorldVolume(m_gigaCnvSvc->world());
+    G4VPhysicalVolume* physVol=geantNav->LocateGlobalPointAndSetup(G4vtx, &G4vec, false, true);
+    G4Material* material=physVol->GetLogicalVolume()->GetMaterial(); 
+    delete geantNav;
     
+    if ( material->GetName() == "/dd/Materials/Minerva/PlasticScint" ) {
+        t_targetMaterial = 0;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/PSTitaniumDioxide" ) {
+        t_targetMaterial = 1;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/GreyEpoxy" ) {
+        t_targetMaterial = 2;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/Lexan" ) {
+        t_targetMaterial = 3;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/GreenFiber" ) {
+        t_targetMaterial = 4;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/PureLead" ) {
+        t_targetMaterial = 5;
+    }
+    else if ( material->GetName() == "/dd/Materials/Minerva/PureCarbon" ) {
+        t_targetMaterial = 6;
+    }  
+    else if ( material->GetName() == "/dd/Materials/Minerva/PureAluminum" ) {
+        t_targetMaterial = 7;
+    }   
+    else if ( material->GetName() == "/dd/Materials/Minerva/StainlessSteel" ) {
+        t_targetMaterial = 8;
+    }   
+    else if ( material->GetName() == "/dd/Materials/Air" ) {
+        t_targetMaterial = 9;
+    }
+    else t_targetMaterial = 10;    
     
-    info() <<"Exit CCProtonPi0::CCProtonPi0::finalize()" << endmsg;
-    info() <<"--------------------------------------------------------------------------"<<endmsg;
-    return sc;
+    truthEvent->setIntData("target_material", t_targetMaterial);
+    
+    debug() << "Exit CCProtonPi0::setTargetMaterial()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
 }
 
-//<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-//
-//  Private Functions
-//
-//<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+//------------------------------------------------------------------------------
+// writeFSParticleTable() writes Final State Particle Table using truth information
+//------------------------------------------------------------------------------
+void CCProtonPi0::writeFSParticleTable(Minerva::GenMinInteraction* truthEvent, bool isSignal) const
+{
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCProtonPi0::writeFSParticleTable()" << endmsg;
+    
+    const SmartRefVector<Minerva::TG4Trajectory> pri_trajectories = truthEvent->trajectories();
+    
+    // Using Reverse Iterator to have the table in correct order
+    SmartRefVector<Minerva::TG4Trajectory>::const_reverse_iterator rit_mcpart;
+    
+    std::cout <<"--------------------------------------------------------------"<<std::endl;
+    std::cout <<"Final State Particle Table"<<std::endl;
+    if(isSignal){
+        std::cout<<">> Marked as Signal! <<"<<std::endl;
+    }
+    std::cout<<std::left;
+    std::cout.width(8); std::cout<<"ID";
+    std::cout.width(8); std::cout<<"PDG";
+    std::cout.width(8); std::cout<<"Parent";
+    std::cout.width(12); std::cout<<"Px";
+    std::cout.width(12); std::cout<<"Py";
+    std::cout.width(12); std::cout<<"Pz";
+    std::cout.width(12); std::cout<<"Energy";
+    std::cout<<std::endl;
+
+    for (rit_mcpart = pri_trajectories.rbegin(); rit_mcpart != pri_trajectories.rend(); ++rit_mcpart) {
+        Gaudi::LorentzVector temp_4p = (*rit_mcpart)->GetInitialMomentum();
+        
+        std::cout.width(8); std::cout<<(*rit_mcpart)->GetTrackId();
+        std::cout.width(8); std::cout<<(*rit_mcpart)->GetPDGCode();
+        std::cout.width(8); std::cout<<(*rit_mcpart)->GetParentId();
+        std::cout.width(12); std::cout<<temp_4p.px();
+        std::cout.width(12); std::cout<<temp_4p.py();
+        std::cout.width(12); std::cout<<temp_4p.pz();
+        std::cout.width(12); std::cout<<temp_4p.E();
+        std::cout<<std::endl;
+        
+    }
+    std::cout<<"--------------------------------------------------------------"<<std::endl; 
+    
+    debug() << "Exit CCProtonPi0::writeFSParticleTable()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+}
+
+//------------------------------------------------------------------------------
+// isSinglePi0 Function Returns TRUE if there is Single Pi0 in FS or 2 Gamma's
+//------------------------------------------------------------------------------
+bool CCProtonPi0::isSinglePi0(Minerva::GenMinInteraction* truthEvent, int nPi0, int nGamma) const
+{
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    debug() << "Enter CCProtonPi0::isSinglePi0()" << endmsg;
+    
+    bool is1Pi0;
+    
+    if( nPi0 == 1 && nGamma == 0){
+        debug()<<"Single Pi0"<<endmsg;
+        truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal_1Pi0", true );
+        is1Pi0 = true;
+    }else if( nPi0 == 0 && nGamma == 2){
+        debug()<<"2 Gamma"<<endmsg;
+        truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal_2Gamma", true );
+        is1Pi0 = true;
+    }else{
+        debug()<<"No Single Pi0 "<<endmsg;
+        is1Pi0 = false;
+    }
+    
+    debug() << "Exit CCProtonPi0::isSinglePi0()" << endmsg;
+    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+    
+    return is1Pi0;
+}
     
 //------------------------------------------------------------------------------
 // interpret Events which fails the reconstructor cuts

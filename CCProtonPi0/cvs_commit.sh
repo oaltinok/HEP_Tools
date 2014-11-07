@@ -1,20 +1,20 @@
-cvs commit -m "v1_05 - 2014_08_06
-Options file Ana_CCProtonPi0.opts Improved
-	More Control for CCProtonPi0 Flow
+cvs commit -m "v1_06 - 2014_11_07
+Modularity Improved
 
-Debugging Messages from older versions removed
-New NTuple Data Added to track all of the CUTs
-New Function: setVertexData()
+New Analysis Parameter nProngs
+    min_nProngs = 2
+    max_nProngs = 2,3, etc... (Can be varied)
 
-Class: AngleScan
-	Styling Modified to match Package Styling
-	Comments Added
-	
-Class: ClusterVectorInfo
-	Styling Modified to match Package Styling
-	Comments Added
-	
-Prong Colors Added for Scanning Sessions
-    http://ozgur.fresoft.com/ccprotonpi0.html
-	
-New Documentation: ProcessAna_Scripts.txt" .
+Options File Modified for the nProngs Parameters
+
+Signal Definition is Changed!
+    Signal_Gold
+        Long Proton (KE > 120 MeV)
+        1 Pi0 or 2x Gamma
+        No Other
+    Signal_Silver1
+        Short Proton (KE < 120 MeV)
+        1 Pi0 or 2x Gamma
+        No Other
+
+Documentation Removed: ProcessAna_Scripts.txt" .
