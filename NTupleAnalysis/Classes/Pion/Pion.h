@@ -5,7 +5,7 @@ Class: Pion -> Derived Class from Particle Base Clas
                 extends base class with pion specific parameters
 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_07_16
+    Last Revision: 2014_12_01
 ================================================================================
 */
 
@@ -18,7 +18,13 @@ class Pion : public Particle
 {
     public:
         Pion();
+        ~Pion();
         void set_kineticEnergy(bool isMC);
+        void initialize(int nMode);
+        
+        SingleBin bin_photonConvLength;
+        
+        TH1D* photonConvLength;
         
         TH1D* invMass;
         TH1D* invMass_0Pi0;

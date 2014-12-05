@@ -3,7 +3,7 @@
 # Makefile for NTupleAnalysis Package
 # 	Statistical Data Analysis Package for CCProtonPi0
 #	Author: Ozgur Altinok
-#	Last Revision: 2014_11_06
+#	Last Revision: 2014_11_11
 #
 # ==============================================================================
 
@@ -13,7 +13,9 @@ MAINEXE = main.exe
 
 # Class: Plotter
 PLOTTERCPP = Classes/Plotter/Plotter.cpp
-ALLPLOTTERCPP = $(PLOTTERCPP)
+DEFAULTPLOTSCPP = Classes/Plotter/Default_Plots.cpp
+OTHERPLOTSCPP = Classes/Plotter/Other_Plots.cpp
+ALLPLOTTERCPP = $(PLOTTERCPP) $(DEFAULTPLOTSCPP) $(OTHERPLOTSCPP)
 
 # Class: CCProtonPi0
 CCPROTONPI0CPP = Classes/CCProtonPi0/CCProtonPi0.cpp
@@ -35,7 +37,8 @@ ALLPARTICLESCPP = $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP)
 BINLISTCPP = Classes/BinList/BinList.cpp
 SINGLEBINCPP = Classes/SingleBin/SingleBin.cpp
 CUTCPP = Classes/Cut/Cut.cpp
-ALLOTHERCPP = $(CUTCPP) $(BINLISTCPP) $(SINGLEBINCPP)
+CUTSTATCPP = Classes/Cut/CutStat.cpp
+ALLOTHERCPP = $(BINLISTCPP) $(SINGLEBINCPP) $(CUTCPP) $(CUTSTATCPP)
 
 # ALL Classes Required for the Package
 ALLCPP = $(MAINCPP) $(ALLPLOTTERCPP) $(ALLCCPROTONPI0CPP) $(ALLPARTICLESCPP) $(ALLOTHERCPP)

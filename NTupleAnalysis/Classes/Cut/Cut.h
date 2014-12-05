@@ -9,12 +9,13 @@ Class: Cut
     
     Usage:
         > #include "Classes/Cut/Cut.h" 
-        > Cut cutAll("All")
+        > Cut cutAll
+        > cutAll.set_Name("All");
         > cutAll.inc_nEvent()
         > cutAll.get_nEvent()
 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_11_05
+    Last Revision: 2014_11_10
 ================================================================================
 */
 
@@ -23,6 +24,7 @@ Class: Cut
 
 #include <iostream>
 #include <string>
+#include "CutStat.h"
 
 class Cut{
 	public:
@@ -34,25 +36,18 @@ class Cut{
         
 		// Get Functions
 		std::string get_Name();
-		double get_nEvent();
-		double get_nSignal();
-        double get_nSignal_Gold();
-        double get_nSignal_Silver1();
-		  
-		// Increment Functions
-		void inc_nEvent();
-		void inc_nSignal();
-        void inc_nSignal_Gold();
-        void inc_nSignal_Silver1();
         
-		  
+        void increment(bool isSignal, bool isGold, bool isSilver1, bool isDIS);
+        
+        CutStat nEvent;
+        CutStat nSignal;
+        CutStat nSignal_Gold;
+        CutStat nSignal_Silver1;
+        CutStat nDIS;
 		  
 	private:
 		std::string name;
-		double nEvent;
-		double nSignal;
-        double nSignal_Gold;
-        double nSignal_Silver1;
+
 };
 
 

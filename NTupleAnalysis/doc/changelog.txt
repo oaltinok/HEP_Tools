@@ -1,4 +1,19 @@
 ================================================================================
+v4_10
+main.cpp provides better interface
+    User defines run and analysis mode
+setup.sh and cleanup.sh Modified 
+    Output Folder Branches for Signal vs Background
+
+Destructors Improved for Better Memory Management
+
+Branching Enabled
+    Signal
+    Background
+    AllEvents
+
+Plotter Class with multiple implementation files
+================================================================================
 v4_09
 Modular Design Improved
     More Source Files for CCProtonPi0 Class

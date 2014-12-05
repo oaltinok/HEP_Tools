@@ -10,15 +10,20 @@ using namespace std;
 
 Pion::Pion()
 {
+    // Do Nothing!
+}
 
-    cout<<"Initializing Pion Particle"<<endl;
+
+void Pion::initialize(int nMode)
+{
+    cout<<"Initializing Pion Particle"<<endl;    
+    
+    setAnalysisMode(nMode);
     
     // File Locations
-    rootDir =   "Output/RootFiles/Pion.root";
-    plotDir =   "Output/Plots/Pion/";
+    rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "Pion.root";
     
     cout<<"\tRoot File: "<<rootDir<<endl;
-    cout<<"\tPlot Output Folder: "<<plotDir<<endl;
     
     // Create Root File 
     f = new TFile(rootDir.c_str(),"RECREATE");
@@ -27,8 +32,16 @@ Pion::Pion()
     bin_P.setBin(30, 0.0, 3000.0);
     bin_KE.setBin(30, 0.0, 3000.0);
     bin_invMass.setBin(50,0.0,500.0);
+    bin_photonConvLength.setBin(50,0.0,100.0);
 
     cout<<"\tInitializing Histograms "<<endl;
+    //--------------------------------------------------------------------------
+    // Photon conversion Length
+    //--------------------------------------------------------------------------
+    photonConvLength = new TH1D( "photonConvLength","Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
+    photonConvLength->GetXaxis()->SetTitle("Photon Distance from Vertex [cm]");
+    photonConvLength->GetYaxis()->SetTitle("N(Events)");
+    
     //--------------------------------------------------------------------------
     // Invariant Mass
     //--------------------------------------------------------------------------
@@ -48,9 +61,28 @@ Pion::Pion()
     invMass_MultPi0->GetXaxis()->SetTitle("Reconstructed Pion Invariant Mass [MeV]");
     invMass_MultPi0->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_invMass.get_width()));
     
+
     //--------------------------------------------------------------------------
-    // Momentum
+    // Momentum and Energy
     //--------------------------------------------------------------------------
+    E_mc = new TH1D( "E_mc","True Pion Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    E_mc->GetXaxis()->SetTitle("True Pion Energy [MeV]");
+    E_mc->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_P.get_width()));
+    
+    E_reco = new TH1D( "E_reco","Reconstructed Pion Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    E_reco->GetXaxis()->SetTitle("Reconstructed Pion Energy [MeV]");
+    E_reco->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_P.get_width()));
+    
+    E_error = new TH1D( "E_error","Error on Pion Energy",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
+    E_error->GetXaxis()->SetTitle("(Reco- True) / True");
+    E_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",bin_error.get_width()));
+    
+    E_reco_mc = new TH2D( "E_reco_mc","True vs Reconstructed Pion Energy",
+                          bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(),
+                          bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
+                          E_reco_mc->GetXaxis()->SetTitle("Reconstructed Pion Energy [MeV]");
+                          E_reco_mc->GetYaxis()->SetTitle("True Pion Energy [MeV]");
+    
     P_mc = new TH1D( "P_mc","True Pion Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
     P_mc->GetXaxis()->SetTitle("True Pion Momentum [MeV]");
     P_mc->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_P.get_width()));
@@ -169,7 +201,25 @@ Pion::Pion()
     partScore->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f ",bin_P.get_width()));
     
     
-    cout<<"Initialization Complete! "<<endl;
+    cout<<"Done!"<<endl;
+}
+
+Pion::~Pion()
+{    
+    delete invMass;
+    delete invMass_0Pi0;
+    delete invMass_1Pi0;
+    delete invMass_MultPi0;
+    
+    delete P_reco_0Pi0;
+    delete P_reco_1Pi0;
+    delete P_reco_MultPi0;
+    
+    delete P_reco_mc_1Pi0;
+    delete P_reco_mc_MultPi0;
+    
+    delete P_error_1Pi0;
+    delete P_error_MultPi0;   
 }
 
 void Pion::set_kineticEnergy(bool isMC)

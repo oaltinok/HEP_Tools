@@ -7,7 +7,7 @@ Class: Particle
     Uses ROOT Specific classes
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_07_16
+    Last Revision: 2014_11_12
 ================================================================================
 */
 
@@ -25,6 +25,7 @@ Class: Particle
 
 // Libraries
 #include "../../Libraries/Data_Functions.h"
+#include "../../Libraries/Folder_List.h"
 
 //Classes
 #include "../SingleBin/SingleBin.h"
@@ -41,6 +42,7 @@ class Particle
         // Monte Carlo(MC) and Reconstructed(Reco)
         TLorentzVector p4[N_DATA_TYPE];     // 4-Momentum of the Particle (Px,Py,Pz,E)
         double momentum[N_DATA_TYPE];       // 3 Momentum of the Particle (P)
+        double energy[N_DATA_TYPE];         // Total Energy
         double kineticEnergy[N_DATA_TYPE];  // Kinetic energy of the Particle
         double angleBeam[N_DATA_TYPE];      // Angle wrt Beam in rads
         double angleMuon[N_DATA_TYPE];      // Angle wrt Muon in rads
@@ -52,10 +54,17 @@ class Particle
         double particleScore;       // Particle Score from Reconstructed Values
         double trackLength;         // Track Length in [mm]
         
+        std::string branchDir;
+        
         TFile* f;
         
         // Histograms
         TH1D* partScore;
+        
+        TH1D* E_reco;
+        TH1D* E_mc;
+        TH1D* E_error;
+        TH2D* E_reco_mc;
         
         TH1D* P_mc;
         TH1D* P_reco;
@@ -79,27 +88,25 @@ class Particle
         
         // Bins for Histograms
         SingleBin bin_error;
+        SingleBin bin_E;
         SingleBin bin_P;
         SingleBin bin_KE;
         SingleBin bin_angle;
         SingleBin bin_partScore;
-        
-        
+          
         // File Locations
         std::string rootDir;
-        std::string plotDir;
-        
-        
+          
         // Functions
         Particle();
         ~Particle();
+        void setAnalysisMode(int nMode);
         int getDataType(bool isMC); // Returns the indice of arrays reco = 0, mc = 1
         virtual void set_angleMuon(Particle &mu, bool isMC);
         virtual void set_kineticEnergy(bool isMC);
         void set_angleBeam(TVector3 beamp3, bool isMC);
         void set_p4(double px, double py, double pz, double E, bool isMC);
         void set_errors();
-        void set_momentum(bool isMC);
         void fill_Histograms();
         void write_RootFile();
         void plot_data();

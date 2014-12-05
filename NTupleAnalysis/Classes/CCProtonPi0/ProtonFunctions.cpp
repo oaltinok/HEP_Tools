@@ -5,46 +5,14 @@
 
 using namespace std;
 
-/*
---------------------------------------------------------------------------------
- countParticles:
-    Returns the number of particles in the Final State
-        Input 
-            int targetPDG
-            bool applyPCut - Variable for selecting particles with momentum 
-                                (no particle at rest)
---------------------------------------------------------------------------------
-*/
-int CCProtonPi0::countParticles(int targetPDG, bool applyPCut)
-{
-    int count = 0;
-    TVector3 p3;
-    
-    for(int i = 0; i < mc_nFSPart && i < max_nFSPart; i++ ){
-        if( mc_FSPartPDG[i] == targetPDG){
-            if(applyPCut){
-                p3.SetXYZ(mc_FSPartPx[i],mc_FSPartPy[i],mc_FSPartPz[i]);
-                if(p3.Mag() > 0){
-                    count++;
-                }
-            }
-            else{
-                count++;
-            }
-        }
-    }
-    
-    return count;
 
-}
-
-void CCProtonPi0::fillProtonTrue(int ind)
+void CCProtonPi0::fillProtonTrue()
 {    
     // Fill 4-Momentum
-    proton.set_p4(  CCProtonPi0_trajProtonProngPx[ind],
-                    CCProtonPi0_trajProtonProngPy[ind],
-                    CCProtonPi0_trajProtonProngPz[ind],
-                    -1.0, 
+    proton.set_p4(  truth_proton_px[indTrueProton],
+                    truth_proton_py[indTrueProton],
+                    truth_proton_pz[indTrueProton],
+                    truth_proton_E[indTrueProton], 
                     true);
        
     // set Angle wrt Beam
@@ -55,16 +23,16 @@ void CCProtonPi0::fillProtonTrue(int ind)
     
 }
 
-void CCProtonPi0::fillProtonReco(int ind)
+void CCProtonPi0::fillProtonReco()
 {
     // Set Particle Score
-    proton.particleScore = CCProtonPi0_proton_score[ind];
+    proton.particleScore = CCProtonPi0_proton_score[indRecoProton];
     
     // Fill 4-Momentum
-    proton.set_p4(  CCProtonPi0_proton_px[ind],
-                    CCProtonPi0_proton_py[ind],
-                    CCProtonPi0_proton_pz[ind],
-                    CCProtonPi0_proton_E[ind],
+    proton.set_p4(  CCProtonPi0_proton_px[indRecoProton],
+                    CCProtonPi0_proton_py[indRecoProton],
+                    CCProtonPi0_proton_pz[indRecoProton],
+                    CCProtonPi0_proton_E[indRecoProton],
                     false);
                     
     // set Angle wrt Beam
@@ -72,9 +40,37 @@ void CCProtonPi0::fillProtonReco(int ind)
     
     // set Angle wrt Muon
     proton.set_angleMuon(muon, false);
+    
+    // Set Particle Score - proton and pion
+//     proton.protonScore->Fill(CCProtonPi0_protonScore[indRecoProton]);
+//     proton.pionScore->Fill(CCProtonPi0_pionScore[indRecoProton]);
 }
 
-int CCProtonPi0::findBestProton()
+//--------------------------------------------------------------------------
+//  findTrueProton()
+//      finds Truth Proton using Proton Energy - Highest Energy Proton
+//--------------------------------------------------------------------------
+void CCProtonPi0::findTrueProton()
+{
+    double tempInd = 0;
+    double tempE = truth_proton_E[0];
+    
+    for ( int i = 1; i < 20; i++){
+        if (truth_proton_E[i] == SENTINEL) break;
+        if (truth_proton_E[i] > tempE){
+            tempE = truth_proton_E[i];
+            tempInd = 0;
+        }
+    }
+    
+    indTrueProton = tempInd;
+}
+
+//--------------------------------------------------------------------------
+//  findRecoProton()
+//      finds Reco Proton using Proton Score
+//--------------------------------------------------------------------------
+void CCProtonPi0::findRecoProton()
 {
     double tempScore = CCProtonPi0_proton_score[0];
     int tempInd = 0;
@@ -87,7 +83,7 @@ int CCProtonPi0::findBestProton()
         }
     }
     
-    return tempInd;
+    indRecoProton = tempInd;
 
 }
 

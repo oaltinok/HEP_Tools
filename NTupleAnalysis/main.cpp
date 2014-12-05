@@ -17,7 +17,7 @@ main.cpp
             > main(true) for Generating Plots only
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_10_29
+    Last Revision: 2014_12_03
 ================================================================================
 */
 
@@ -28,70 +28,85 @@ main.cpp
 #include <string>
 #include <ctime>
 
-const    string option1 = "run";
-const    string option2 = "plot";
+const string runOption1 = "run";
+const string runOption2 = "plot";
+const string modeOption1 = "1";
+const string modeOption2 = "2";
+const string modeOption3 = "3";
 
 void showInputError(char *argv[]);
+bool get_runSelection(string runSelect, bool &onlyPlot);
+bool get_modeSelection(string modeSelect, int &nMode);
 
 using namespace std;
 
 int main(int argc, char *argv[] )
 {
+
     clock_t timeStart;
     timeStart = clock();
     clock_t timeEnd;
     double timeDiff;
     int timeDiff_m;
     int timeDiff_s;
+    int nMode;
     bool onlyPlot;
-    string input;
+    string runSelect;
+    string modeSelect;
+    bool isRunSelected;
+    bool isModeSelected;
     
-    if ( argc != 2 || argc > 2) /* argc should be 2 for correct execution */
-    {
-        /* We print argv[0] assuming it is the program name */
-        showInputError(argv);
-        return 0;
-    }else{
-        input = argv[1];
-    }
-    
-    if(input.compare(option1) == 0){
-        cout<<"Run Option Selected!"<<endl;
-        onlyPlot = false;
-    }
-    else if(input.compare(option2) == 0){
-        cout<<"Plot Option Selected!"<<endl;
-        onlyPlot = true;
-    }
-    else{ 
-        showInputError(argv);
-        return 0;
-    }
-    
-
     // Edit isTest Variable for running Test Samples or complete playlist
-    bool isTest     = true;
-    bool isComplete = true;
+    bool isTest     = false;
+    bool isPlaylist = false;
     
     // Plot Selection
     bool plotsMC    = true;
     bool plotsReco  = true;
     bool plots2D    = true;
+
+    // Check User Input
+    if ( argc != 3 || argc > 3) /* argc should be 3 for correct execution */
+    {
+        /* We print argv[0] assuming it is the program name */
+        showInputError(argv);
+        return 0;
+    }else{
+        runSelect = argv[1];
+        modeSelect = argv[2];
+    }
+    
+    
+    // Get Run Selection   
+    isRunSelected = get_runSelection(runSelect, onlyPlot);
+    if( !isRunSelected ){
+        showInputError(argv);
+        return 0;
+    }
+    
+    // Get Mode Selection   
+    isModeSelected = get_modeSelection(modeSelect, nMode);
+    if( !isModeSelected ){
+        showInputError(argv);
+        return 0;
+    }
     
     if(onlyPlot){
-        Plotter p;
+        Plotter p(nMode);
         p.plotHistograms(plotsMC,plotsReco,plots2D); 
     }else{
         CCProtonPi0 t;
+        t.setAnalysisMode(nMode);
         if(isTest){
-           t.run("Input/Playlists/pl_MC_Test_Sample.dat");
-//             t.run("Input/Playlists/pl_MC_Test.dat");
-//              t.run("Input/Playlists/pl_MC_nProngs3.dat");
-//             t.run("Input/Playlists/pl_MC_signal.dat");
-        }else if(isComplete){
-            t.run("Input/Playlists/MC_minerva1_CCProtonPi0.dat");
+            t.setChannelTag("test");
+            t.run("Input/Playlists/pl_MC_Test_Sample.dat");
+//             t.run("Input/Playlists/pl_MC_Test_Sample_nogrid.dat");
+        }else if(isPlaylist){
+            t.setChannelTag("minerva13C");
+            t.run("Input/Playlists/pl_MC_minerva13C.dat");
         }else{
-            t.run("Input/Playlists/pl_MC_Test.dat");
+            t.setChannelTag("runset");
+            t.run("Input/Playlists/pl_MC_Run.dat");
         }
     }
     
@@ -109,9 +124,61 @@ int main(int argc, char *argv[] )
 
 void showInputError(char *argv[])
 {
-    cout<<"Not a valid option!"<<endl;
-    cout<<"Run: "<<argv[0]<<" "<<option1<<endl;
-    cout<<"Plot: "<<argv[0]<<" "<<option2<<endl;
+    cout<<std::left;
+    cout<<"----------------------------------------------------------------------"<<endl;
+    cout<<"Not a valid syntax!"<<endl;
+    cout<<"----------------------------------------------------------------------"<<endl;
+    cout<<"Correct Syntax: "<<endl;
+    cout<<"\t"<<argv[0]<<" runOption modeOption"<<"\n"<<endl;
+
+    cout<<"runOptions:"<<endl;
+    cout.width(16);cout<<"\tRun:"<<runOption1<<endl;
+    cout.width(16);cout<<"\tPlot:"<<runOption2<<"\n"<<endl;
+    
+    cout<<"modeOptions:"<<endl;
+    cout.width(16); cout<<"\tSignal:"<<modeOption1<<endl;
+    cout.width(16); cout<<"\tBackground:"<<modeOption2<<endl;
+    cout.width(16); cout<<"\tEverything:"<<modeOption3<<endl;
+    cout<<"----------------------------------------------------------------------"<<endl;
+}
+
+bool get_runSelection(string runSelect, bool &onlyPlot)
+{
+    // Get Run Selection
+    if(runSelect.compare(runOption1) == 0){
+        cout<<"Run Option Selected!"<<endl;
+        onlyPlot = false;
+    }
+    else if(runSelect.compare(runOption2) == 0){
+        cout<<"Plot Option Selected!"<<endl;
+        onlyPlot = true;
+    }
+    else{ 
+        return false;
+    }
+    
+    return true;
+}
+
+bool get_modeSelection(string modeSelect, int &nMode)
+{
+    // Get Mode Selection
+    if(modeSelect.compare(modeOption1) == 0){
+        cout<<"Signal Mode Selected!"<<endl;
+        nMode = 1;
+    }
+    else if(modeSelect.compare(modeOption2) == 0){
+        cout<<"Background Mode Selected!"<<endl;
+        nMode = 2;
+    }
+    else if(modeSelect.compare(modeOption3) == 0){
+        cout<<"All Events Mode Selected!"<<endl;
+        nMode = 3;
+    }else{
+        return false;   
+    }
+    
+    return true;
 }
 
 

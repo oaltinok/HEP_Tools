@@ -67,6 +67,24 @@ const int pi_zero = 111;
 const int pi_plus = 211;
 const int pi_minus = -pi_plus;
 
+// -----------------------------------------------------------------------------
+//      Baryon Resonance
+//------------------------------------------------------------------------------
+const double Delta_p_1232 = 2214;
+const double Delta_pp_1232 = 2224;
+
+const double Delta_p_1620 = 2122;
+const double Delta_pp_1620 = 2222;
+
+const double Delta_p_1700 = 12214;
+const double Delta_pp_1700 = 12224;
+
+const double N_p_1440 = 12212;
+const double N_p_1520 = 2124;
+const double N_p_1535 = 22212;
+const double N_p_1650 = 32212;
+const double N_p_1675 = 2216;
+const double N_p_1680 = 12216;
 }
 
 #endif

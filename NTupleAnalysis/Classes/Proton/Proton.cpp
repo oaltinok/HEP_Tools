@@ -10,27 +10,62 @@ using namespace std;
 
 Proton::Proton()
 {
+    // Do Nothing
+}
+
+void Proton::initialize(int nMode)
+{
     cout<<"Initializing Proton Particle"<<endl;
     
+    setAnalysisMode(nMode);
+    
     // File Locations
-    rootDir =   "Output/RootFiles/Proton.root";
-    plotDir =   "Output/Plots/Proton/";
+    rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "Proton.root";
     
     cout<<"\tRoot File: "<<rootDir<<endl;
-    cout<<"\tPlot Output Folder: "<<plotDir<<endl;
     
     // Create Root File 
     f = new TFile(rootDir.c_str(),"RECREATE");
 
     // Initialize Bins
+    bin_E.setBin(30,0.0,3000.0);
     bin_P.setBin(20, 0.0, 2000.0);
     bin_KE.setBin(20, 0.0, 2000.0);
 
     cout<<"\tInitializing Histograms "<<endl;
+    
+    // Unique Histograms
+    protonScore = new TH1D( "protonScore","Proton Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
+    protonScore->GetXaxis()->SetTitle("Proton Score");
+    protonScore->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f ",bin_partScore.get_width()));
+    
+    pionScore = new TH1D( "pionScore","Pion Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
+    pionScore->GetXaxis()->SetTitle("Pion Score");
+    pionScore->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f ",bin_partScore.get_width()));
+    
+    // Default Histograms
     partScore = new TH1D( "partScore","Proton Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");
-    partScore->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f ",bin_P.get_width()));
+    partScore->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f ",bin_partScore.get_width()));
     
+    E_mc = new TH1D( "E_mc","True Proton Energy",bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max() );
+    E_mc->GetXaxis()->SetTitle("True Proton Energy [MeV]");
+    E_mc->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f [MeV] ",bin_E.get_width()));
+    
+    E_reco = new TH1D( "E_reco","Reconstructed Proton Energy",bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max() );
+    E_reco->GetXaxis()->SetTitle("Reconstructed Proton Energy [MeV]");
+    E_reco->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f [MeV] ",bin_E.get_width()));
+    
+    E_error = new TH1D( "E_error","Error on Proton Energy",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
+    E_error->GetXaxis()->SetTitle("(Reco- True) / True");
+    E_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",bin_error.get_width()));
+    
+    E_reco_mc = new TH2D( "E_reco_mc","True vs Reconstructed Proton Energy",
+                          bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max(),
+                          bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max());
+                          E_reco_mc->GetXaxis()->SetTitle("Reconstructed Proton Energy [MeV]");
+                          E_reco_mc->GetYaxis()->SetTitle("True Proton Energy [MeV]");
+       
     P_mc = new TH1D( "P_mc","True Proton Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
     P_mc->GetXaxis()->SetTitle("True Proton Momentum [MeV]");
     P_mc->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f [MeV] ",bin_P.get_width()));
@@ -103,7 +138,7 @@ Proton::Proton()
     angleBeam_reco_mc->GetXaxis()->SetTitle("Reconstructed Proton Angle wrt. Beam [Degree]");
     angleBeam_reco_mc->GetYaxis()->SetTitle("True Proton Angle wrt. Beam [Degree]");
     
-    cout<<"Initialization Complete! "<<endl;
+    cout<<"Done!"<<endl;
 }
 
 void Proton::set_kineticEnergy(bool isMC)

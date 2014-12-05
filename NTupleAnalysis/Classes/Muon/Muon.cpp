@@ -10,15 +10,19 @@ using namespace std;
 
 Muon::Muon()
 {
+   // Do Nothing 
+}
+
+void Muon::initialize(int nMode)
+{
     cout<<"Initializing Muon Particle"<<endl;
     
-    // File Locations
-    rootDir =   "Output/RootFiles/Muon.root";
-    plotDir =   "Output/Plots/Muon/";
-
+    setAnalysisMode(nMode);
     
+    // File Locations
+    rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "Muon.root";
+
     cout<<"\tRoot File: "<<rootDir<<endl;
-    cout<<"\tPlot Output Folder: "<<plotDir<<endl;
     
     // Create Root File 
     f = new TFile(rootDir.c_str(),"RECREATE");
@@ -29,9 +33,28 @@ Muon::Muon()
     bin_AngleBeam.setBin(90,0.0,90.0);
 
     cout<<"\tInitializing Histograms "<<endl;
+    
     partScore = new TH1D( "partScore","Muon Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");
     partScore->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f ",bin_partScore.get_width()));
+    
+    E_mc = new TH1D( "E_mc","True Muon Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    E_mc->GetXaxis()->SetTitle("True Muon Energy [GeV]");
+    E_mc->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [GeV] ",bin_P.get_width()));
+    
+    E_reco = new TH1D( "E_reco","Reconstructed Muon Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    E_reco->GetXaxis()->SetTitle("Reconstructed Muon Energy [GeV]");
+    E_reco->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [GeV] ",bin_P.get_width()));
+    
+    E_error = new TH1D( "E_error","Error on Muon Energy",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
+    E_error->GetXaxis()->SetTitle("(Reco- True) / True");
+    E_error->GetYaxis()->SetTitle(Form("Candidates  / %3.2f",bin_error.get_width()));
+    
+    E_reco_mc = new TH2D( "E_reco_mc","True vs Reconstructed Muon Energy",
+                          bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(),
+                          bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
+                          E_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Energy [GeV]");
+                          E_reco_mc->GetYaxis()->SetTitle("True Muon Energy [GeV]");
     
     P_mc = new TH1D( "P_mc","True Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
     P_mc->GetXaxis()->SetTitle("True Muon Momentum [GeV]");
@@ -105,7 +128,7 @@ Muon::Muon()
     angleBeam_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Angle wrt. Beam [Degree]");
     angleBeam_reco_mc->GetYaxis()->SetTitle("True Muon Angle wrt. Beam [Degree]");
     
-    cout<<"Initialization Complete! "<<endl;
+    cout<<"Done!"<<endl;
 }
 
 bool Muon::get_isMinosMatched()

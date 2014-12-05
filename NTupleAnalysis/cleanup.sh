@@ -1,26 +1,18 @@
 #===============================================================================
 # cleanup.sh
-# Removes all files inside Output/ Directory
+# Removes Output/ Directory
 # CAUTION: Removes ALL Files, if you want to keep some files, edit the function
 #               or change directory configuration
 # 
 #    Terminal Usage:
 #        > source cleanup.sh
 #    
-#    Last Revision: 2014_02_03
+#    Last Revision: 2014_11_06
 #===============================================================================
 
-echo "Cleanup Process for Output Directories Started!"
-echo "Cleaning Output Folder"
+echo "Removing Output Folder"
 
-Folder_List=(Output/Plots/*
-                Output/RootFiles/*
-                Output/TextFiles/*)
-
-for ilist1 in ${Folder_List[@]}; do
-    echo "Clean: ${ilist1}"
-    rm -frv ${ilist1}
-done
+rm -frv Output
 
 echo "Cleanup Finished!"
 

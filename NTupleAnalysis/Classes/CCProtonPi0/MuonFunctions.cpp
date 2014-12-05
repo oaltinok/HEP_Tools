@@ -9,10 +9,10 @@ void CCProtonPi0::fillMuonTrue()
 {
 
     // Fill 4-Momentum
-    muon.set_p4(    CCProtonPi0_trajMuonProngPx * HEP_Functions::MeV_to_GeV,
-                    CCProtonPi0_trajMuonProngPy * HEP_Functions::MeV_to_GeV,
-                    CCProtonPi0_trajMuonProngPz * HEP_Functions::MeV_to_GeV,
-                    -1.0, 
+    muon.set_p4(    truth_muon_px * HEP_Functions::MeV_to_GeV,
+                    truth_muon_py * HEP_Functions::MeV_to_GeV,
+                    truth_muon_pz * HEP_Functions::MeV_to_GeV,
+                    truth_muon_E, 
                     true);
        
     // set Angle wrt Beam

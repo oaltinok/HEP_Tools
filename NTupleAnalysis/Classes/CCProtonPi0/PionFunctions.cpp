@@ -23,12 +23,31 @@ void CCProtonPi0::fillPionReco()
     
     // Set Invariant Mass
     pion.invMass->Fill(pi0_invMass);
+    
+    // Set Photon Conversion Length in [cm]
+    pion.photonConvLength->Fill(gamma1_dist_vtx * 0.1);
+    pion.photonConvLength->Fill(gamma2_dist_vtx * 0.1);
 }
 
 void CCProtonPi0::fillPionTrue()
 {
     double P_true;
     double P_reco;
+    
+    // Fill 4-Momentum
+    if (truth_pi0_E != -1){
+        pion.set_p4(truth_pi0_px,
+                    truth_pi0_py,
+                    truth_pi0_pz,
+                    truth_pi0_E,
+                    true);
+    }else{
+        pion.set_p4(truth_gamma_px[0]+truth_gamma_px[1] ,
+                    truth_gamma_py[0]+truth_gamma_py[1],
+                    truth_gamma_pz[0]+truth_gamma_pz[1],
+                    truth_gamma_E[0]+truth_gamma_E[1],
+                    true);
+    }
     
     P_reco = HEP_Functions::calcMomentum(pi0_px,pi0_py,pi0_pz);
    

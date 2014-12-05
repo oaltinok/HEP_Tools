@@ -5,7 +5,7 @@ Class: Muon -> Derived Class from Particle Base Clas
                 extends base class with muon specific parameters
                 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_07_16
+    Last Revision: 2014_11_12
 ================================================================================
 */
 
@@ -18,6 +18,7 @@ class Muon : public Particle
 {
     public:
         Muon();
+        void initialize(int nMode);
         bool get_isMinosMatched();
         void set_isMinosMatched(bool input);
         void set_angleMuon(Particle &mu, bool isMC);
