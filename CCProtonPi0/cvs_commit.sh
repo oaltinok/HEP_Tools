@@ -1,20 +1,35 @@
-cvs commit -m "v1_06 - 2014_11_07
-Modularity Improved
+cvs commit -m "v1_07 - 2014_12_05
 
-New Analysis Parameter nProngs
-    min_nProngs = 2
-    max_nProngs = 2,3, etc... (Can be varied)
+General Updates:
+    truthIsPlausible() Updated
+        using muonIsPlausible()
+    Removed reco_* variables (unused variables)
+    Event Kinematics Calculations are Implemented
+    Event Kinematics Need Update: See @todo in function header
 
-Options File Modified for the nProngs Parameters
+New Functions:
+    findLeadingProton()
+    setLeadingProton_4P()
 
-Signal Definition is Changed!
-    Signal_Gold
-        Long Proton (KE > 120 MeV)
-        1 Pi0 or 2x Gamma
-        No Other
-    Signal_Silver1
-        Short Proton (KE < 120 MeV)
-        1 Pi0 or 2x Gamma
-        No Other
 
-Documentation Removed: ProcessAna_Scripts.txt" .
+tagTruth() Updated
+    Using GENIE:Event Record
+        Creating Tables for Final State Particles
+        Saving Information for Pi0, Pi0 Mother and Pi0 GrandMother
+    setSignalKinematics() Updated
+        Using FS Particle Trajectories
+        Saving only 4-Momentum and Theta wrt Beam
+        Removed all others
+
+Vertex Reconstruction Updates:
+    smear true vertex no longer used
+
+Muon Reconstruction Updates:
+    Muon MINOS Match Information now saved under CCProtonPi0_muon_ variables
+        muon_hasMinosMatchTrack
+        muon_hasMinosMatchStub
+
+Proton Reconstruction Updates:
+    Proton reconstruction is controlled with a new parameter: 
+        m_reconstruct_NoProtonEvents
+    When it is TRUE, Reconstruction Continues even there is no proton candidate" .

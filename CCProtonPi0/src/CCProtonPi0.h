@@ -21,8 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_11_05
-    Version:        v1_06
+    Last Revision:  2014_12_05
+    Version:        v1_07
     
 ================================================================================
 */
@@ -100,13 +100,15 @@ class CCProtonPi0 : public MinervaAnalysisTool
         
         StatusCode tagTruth( Minerva::GenMinInteraction* truthEvent ) const;
         
+        bool truthIsPlausible( const Minerva::PhysicsEvent*) const;
+        
     private:
         // Fiducial Volume
         double m_fidHexApothem;
         double m_fidUpStreamZ;
         double m_fidDownStreamZ;
         
-        // Analysable Volume
+        // Analyzable Volume
         double m_recoHexApothem;
         double m_recoUpStreamZ;
         double m_recoDownStreamZ;
@@ -127,6 +129,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool m_DoPlausibilityCuts;
         bool m_DoTruthMatch;
         bool m_Do_nProngCut;
+        bool m_reconstruct_NoProtonEvents;
         int m_min_nProngs;
         int m_max_nProngs;
         
@@ -152,8 +155,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int m_Color_VertexSphere;
         int m_Color_RejectedBlob;
         
-       
-        
+             
         // VtxBlob
         bool 	 m_sphereVertex;
         double  m_maxSearchD;
@@ -230,7 +232,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         StatusCode getNearestPlane( double z, 
                                     int & module_return, 
                                     int & plane_return) const;
-                                    
+        
+        void setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronVisibleEnergy) const;
         void setVertexData( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent* event ) const;
         bool setMuonData(   Minerva::NeutrinoInt* nuInt ) const;
         bool setProtonData( Minerva::NeutrinoInt* nuInt ) const;
@@ -238,20 +241,25 @@ class CCProtonPi0 : public MinervaAnalysisTool
                             Minerva::IDBlob* idblob1, 
                             Minerva::IDBlob* idblob2) const;
         
+        
         void setSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
         void setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const;
         void writeFSParticleTable(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
+        void writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
+        void setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) const;
         bool isSinglePi0(Minerva::GenMinInteraction* truthEvent, int nPi0, int nGamma) const;
         
         bool createTrackedParticles( Minerva::ProngVect& prongs ) const;
         bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;
+        bool findLeadingProton() const;
+        void setLeadingProton_4P(bool foundLeadingProton) const;
 
 
         bool correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
                                         double& p_calCorrection, 
                                         double& p_visEnergyCorrection ) const;
+                                        
         void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
-        
 
         //! CCPi0 Functions
         SmartRefVector<Minerva::IDCluster> FilterInSphereClusters(  const SmartRefVector<Minerva::IDCluster>& clusters,
