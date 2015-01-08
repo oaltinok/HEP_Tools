@@ -1,0 +1,49 @@
+================================================================================
+v2_00
+
+General Updates:
+    Included NTupleAnalysis Package under NTupleAnalysis/
+    Version Number Changed to Match with CCProtonPi0
+================================================================================
+v4_11
+    General Updates
+        Modified for CCProtonPi0 v1_08 Output
+        Background Analysis Included
+    Plotter Improvements
+        New Plot Mode: Signal vs Background
+        New Plots: Signal / Background
+================================================================================
+v4_10
+main.cpp provides better interface
+    User defines run and analysis mode
+setup.sh and cleanup.sh Modified 
+    Output Folder Branches for Signal vs Background
+
+Destructors Improved for Better Memory Management
+
+Branching Enabled
+    Signal
+    Background
+    AllEvents
+
+Plotter Class with multiple implementation files
+================================================================================
+v4_09
+Modular Design Improved
+    More Source Files for CCProtonPi0 Class
+    More Functions
+
+Makefile Improved
+    Compiles and Builds each source file separately
+    Compile Time Dramatically decreased
+
+New Class: Cut
+    Cut Object Manages the Event Selection(Cut) Statistics for 
+        CCProtonPi0 Analysis Package
+
+================================================================================
+v4_08 - 2014_07_30
+New Function: writeScanList()
+    Creates an output text file containing event list ready for Arachne Roundup
+    
+    
