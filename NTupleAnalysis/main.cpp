@@ -17,7 +17,7 @@ main.cpp
             > main(true) for Generating Plots only
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_12_03
+//     Last Revision: 2015_01_08
 ================================================================================
 */
 
@@ -33,6 +33,7 @@ const string runOption2 = "plot";
 const string modeOption1 = "1";
 const string modeOption2 = "2";
 const string modeOption3 = "3";
+const string modeOption4 = "4";
 
 void showInputError(char *argv[]);
 bool get_runSelection(string runSelect, bool &onlyPlot);
@@ -174,6 +175,9 @@ bool get_modeSelection(string modeSelect, int &nMode)
     else if(modeSelect.compare(modeOption3) == 0){
         cout<<"All Events Mode Selected!"<<endl;
         nMode = 3;
+    }else if (modeSelect.compare(modeOption4) == 0){
+        cout<<"Plot Only! Signal vs Background Mode"<<endl;
+        nMode = 4;  
     }else{
         return false;   
     }

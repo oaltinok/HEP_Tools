@@ -41,8 +41,8 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
         TH1D* h_q2_mc= (TH1D*)f_Root->Get("q2_mc");
         plot1D_Hist(h_q2_mc,"q2_mc.png",plotDir);
         
-        TH1D* h_w2_mc= (TH1D*)f_Root->Get("w2_mc");
-        plot1D_Hist(h_w2_mc,"w2_mc.png",plotDir);
+        TH1D* h_w_mc= (TH1D*)f_Root->Get("w_mc");
+        plot1D_Hist(h_w_mc,"w_mc.png",plotDir);
         
         TH1D* h_int_channel= (TH1D*)f_Root->Get("int_channel");
         plot1D_Hist(h_int_channel,"int_channel.png",plotDir);
@@ -57,11 +57,14 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
     
     // Plot Only Reco Values
     if( isReco ){
+        TH1D* h_E_Unused_postPi0 = (TH1D*)f_Root->Get("E_Unused_postPi0");
+        plot1D_Hist(h_E_Unused_postPi0,"E_Unused_postPi0.png",plotDir);
+        
+        TH1D* h_total_E = (TH1D*)f_Root->Get("total_E");
+        plot1D_Hist(h_total_E,"total_E.png",plotDir);
+        
         TH1D* h_nProngs_hist = (TH1D*)f_Root->Get("nProngs_hist");
         plot1D_Hist(h_nProngs_hist,"nProngs_hist.png",plotDir);
-        
-        TH1D* h_nProngs_hist_initial = (TH1D*)f_Root->Get("nProngs_hist_initial");
-        plot1D_Hist(h_nProngs_hist_initial,"nProngs_hist_initial.png",plotDir);
         
         TH1D* h_deltaInvMass_reco = (TH1D*)f_Root->Get("deltaInvMass_reco");
         plot1D_Hist(h_deltaInvMass_reco,"deltaInvMass_reco.png",plotDir);
@@ -87,13 +90,19 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
         TH1D* h_q2_reco= (TH1D*)f_Root->Get("q2_reco");
         plot1D_Hist(h_q2_reco,"q2_reco.png",plotDir);    
         
-        TH1D* h_w2_reco= (TH1D*)f_Root->Get("w2_reco");
-        plot1D_Hist(h_w2_reco,"w2_reco.png",plotDir); 
+        TH1D* h_w_reco= (TH1D*)f_Root->Get("w_reco");
+        plot1D_Hist(h_w_reco,"w_reco.png",plotDir); 
+        
+        TH1D* h_wSq_reco= (TH1D*)f_Root->Get("wSq_reco");
+        plot1D_Hist(h_wSq_reco,"wSq_reco.png",plotDir); 
 
     }
 
     //  Plot 2D Comparison Plots and Error Plots
     if ( is2D ){
+        TH2D* h_total_E_neutrinoE = (TH2D*)f_Root->Get("total_E_neutrinoE");
+        plot2D_Hist(h_total_E_neutrinoE,"total_E_neutrinoE.png",plotDir);
+        
         TH2D* h_deltaInvMass_reco_mc = (TH2D*)f_Root->Get("deltaInvMass_reco_mc");
         plot2D_Hist(h_deltaInvMass_reco_mc,"deltaInvMass_reco_mc.png",plotDir);
         
@@ -121,11 +130,11 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
         TH1D* h_q2_error= (TH1D*)f_Root->Get("q2_error");
         plot1D_Hist(h_q2_error,"q2_error.png",plotDir);
         
-        TH2D* h_w2_reco_mc= (TH2D*)f_Root->Get("w2_reco_mc");
-        plot2D_Hist(h_w2_reco_mc,"w2_reco_mc.png",plotDir);
+        TH2D* h_w_reco_mc= (TH2D*)f_Root->Get("w_reco_mc");
+        plot2D_Hist(h_w_reco_mc,"w_reco_mc.png",plotDir);
         
-        TH1D* h_w2_error= (TH1D*)f_Root->Get("w2_error");
-        plot1D_Hist(h_w2_error,"w2_error.png",plotDir);
+        TH1D* h_w_error= (TH1D*)f_Root->Get("w_error");
+        plot1D_Hist(h_w_error,"w_error.png",plotDir);
 
         TH2D* h_vertex_z_reco_mc= (TH2D*)f_Root->Get("vertex_z_reco_mc");
         plot2D_Hist(h_vertex_z_reco_mc,"vertex_z_reco_mc.png",plotDir);
@@ -172,9 +181,11 @@ void Plotter::plotParticleInfo(  string rootDir, string plotDir,
         
         TH1D* h_E_reco = (TH1D*)f_Root->Get("E_reco");
         plot1D_Hist(h_E_reco,"E_reco.png",plotDir);
+        plot1D_HistLogScale(h_E_reco,"E_reco_log.png",plotDir);
         
         TH1D* h_P_reco = (TH1D*)f_Root->Get("P_reco");
         plot1D_Hist(h_P_reco,"P_reco.png",plotDir);
+        plot1D_HistLogScale(h_P_reco,"P_reco_log.png",plotDir);
         
         TH1D* h_KE_reco = (TH1D*)f_Root->Get("KE_reco");
         plot1D_Hist(h_KE_reco,"KE_reco.png",plotDir);    
@@ -247,7 +258,25 @@ void Plotter::plotPion(bool isMC, bool isReco, bool is2D)
     TH1D* h_invMass = (TH1D*)f_Root->Get("invMass");
     plot1D_Hist(h_invMass,"invMass.png",plotDir);
     
-
+    TH1D* h_gamma1_ConvLength = (TH1D*)f_Root->Get("gamma1_ConvLength");
+    plot1D_Hist(h_gamma1_ConvLength,"gamma1_ConvLength.png",plotDir);
+    
+    TH1D* h_gamma2_ConvLength = (TH1D*)f_Root->Get("gamma2_ConvLength");
+    plot1D_Hist(h_gamma2_ConvLength,"gamma2_ConvLength.png",plotDir);
+    
+    TH2D* h_nClusters_All_gamma2_gamma1 = (TH2D*)f_Root->Get("nClusters_All_gamma2_gamma1");
+    plot2D_Hist(h_nClusters_All_gamma2_gamma1,"nClusters_All_gamma2_gamma1.png",plotDir);
+    
+    TH2D* h_nClusters_X_gamma2_gamma1 = (TH2D*)f_Root->Get("nClusters_X_gamma2_gamma1");
+    plot2D_Hist(h_nClusters_X_gamma2_gamma1,"nClusters_X_gamma2_gamma1.png",plotDir);
+    
+    TH2D* h_ConvLength_gamma2_gamma1 = (TH2D*)f_Root->Get("ConvLength_gamma2_gamma1");
+    plot2D_Hist(h_ConvLength_gamma2_gamma1,"ConvLength_gamma2_gamma1.png",plotDir);
+    
+    TH2D* h_Energy_gamma2_gamma1 = (TH2D*)f_Root->Get("Energy_gamma2_gamma1");
+    plot2D_Hist(h_Energy_gamma2_gamma1,"Energy_gamma2_gamma1.png",plotDir);
+    
+    
     
     delete f_Root;
 }

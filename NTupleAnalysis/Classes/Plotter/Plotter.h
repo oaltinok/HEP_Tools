@@ -26,10 +26,13 @@ Class: Plotter
 #include <TMath.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <TPad.h>
 #include <TFile.h>
 #include <THStack.h>
 #include <TPaveStats.h>
 #include <TLegend.h>
+#include <TGraph.h>
+#include <TVectorD.h>
 
 #include "../../Libraries/Folder_List.h"
 
@@ -54,7 +57,10 @@ class Plotter
         // Plottting Macros
         void plot1D_Hist(TH1D* hist1D, string fileName, string plotDir);
         void plot2D_Hist(TH2D* hist2D, string fileName, string plotDir);
+        void plot1D_HistLogScale(TH1D* hist1D, string fileName, string plotDir);
         void plotStacked(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
+        void plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
+        void plotSignalRatio(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
         
         // Default Plots - File: Default_Plots.cpp
         void plotInteraction(bool isMC, bool isReco, bool is2D);
@@ -65,18 +71,26 @@ class Plotter
                                 bool isMC, bool isReco, bool is2D);
                             
                
-        // Other Plots - File: Other_Plots.cpp
+                                
+        // pID Plots - File: pID_Plots.cpp
         void plotPID();
         void pID_proton();
         void pID_pion();
         void plot_2D_pID();
+        void pIDDiff();
+        void pIDSum();
+        
+        // Other Plots - File: Other_Plots.cpp
         void plot_mc_w_Stacked();
+        void plot_final_mc_w_Stacked();
         void plotSignalBackground();
+        void plotCutHistograms();
         void plotDebuggingPlots();
 
         
     
     private:
+        bool isSignalvsBackground;
         int branchInd;
         string branchDir;
         string otherDir;

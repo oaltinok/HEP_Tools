@@ -31,16 +31,68 @@ void Pion::initialize(int nMode)
     // Initialize Bins
     bin_P.setBin(30, 0.0, 3000.0);
     bin_KE.setBin(30, 0.0, 3000.0);
-    bin_invMass.setBin(50,0.0,500.0);
+    bin_invMass.setBin(60,0.0,600.0);
     bin_photonConvLength.setBin(50,0.0,100.0);
+    bin_gammaClusters.setBin(40,0.0,40.0);
+    bin_gammaEnergy.setBin(40,0.0,1.0);
 
     cout<<"\tInitializing Histograms "<<endl;
     //--------------------------------------------------------------------------
     // Photon conversion Length
     //--------------------------------------------------------------------------
-    photonConvLength = new TH1D( "photonConvLength","Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
-    photonConvLength->GetXaxis()->SetTitle("Photon Distance from Vertex [cm]");
-    photonConvLength->GetYaxis()->SetTitle("N(Events)");
+    gamma1_ConvLength = new TH1D( "gamma1_ConvLength","Leading Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
+    gamma1_ConvLength->GetXaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
+    gamma1_ConvLength->GetYaxis()->SetTitle("N(Events)");
+    
+    gamma2_ConvLength = new TH1D( "gamma2_ConvLength","Secondary Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
+    gamma2_ConvLength->GetXaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
+    gamma2_ConvLength->GetYaxis()->SetTitle("N(Events)");
+    
+    ConvLength_gamma2_gamma1= new TH2D( "ConvLength_gamma2_gamma1","Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
+    ConvLength_gamma2_gamma1->GetXaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
+    ConvLength_gamma2_gamma1->GetYaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
+    
+    gamma1_nClusters_All = new TH1D( "gamma1_nClusters_All","Leading Photon N(Clusters)",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
+    gamma1_nClusters_All->GetXaxis()->SetTitle("Leading Photon N(Clusters)");
+    gamma1_nClusters_All->GetYaxis()->SetTitle("N(Events)");
+    
+    gamma2_nClusters_All = new TH1D( "gamma2_nClusters_All","Second Photon N(Clusters)",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
+    gamma2_nClusters_All->GetXaxis()->SetTitle("Second Photon N(Clusters)");
+    gamma2_nClusters_All->GetYaxis()->SetTitle("N(Events)");
+    
+    nClusters_All_gamma2_gamma1 = new TH2D( "nClusters_All_gamma2_gamma1","Leading vs Second Photon N(Clusters)",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max(),bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
+    nClusters_All_gamma2_gamma1->GetXaxis()->SetTitle("Second Photon N(Clusters)");
+    nClusters_All_gamma2_gamma1->GetYaxis()->SetTitle("Leading Photon N(Clusters)");
+    
+    gamma1_nClusters_X = new TH1D( "gamma1_nClusters_X","Leading Photon N(Clusters) on X",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
+    gamma1_nClusters_X->GetXaxis()->SetTitle("Leading Photon N(Clusters) on X");
+    gamma1_nClusters_X->GetYaxis()->SetTitle("N(Events)");
+    
+    gamma2_nClusters_X = new TH1D( "gamma2_nClusters_X","Second Photon N(Clusters) on X",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
+    gamma2_nClusters_X->GetXaxis()->SetTitle("Second Photon N(Clusters) on X");
+    gamma2_nClusters_X->GetYaxis()->SetTitle("N(Events)");
+    
+    nClusters_X_gamma2_gamma1 = new TH2D( "nClusters_X_gamma2_gamma1","Leading vs Second Photon N(Clusters) on X",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max(), bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
+    nClusters_X_gamma2_gamma1->GetXaxis()->SetTitle("Second Photon N(Clusters) on X");
+    nClusters_X_gamma2_gamma1->GetYaxis()->SetTitle("Leading Photon N(Clusters) on X");
+    
+    gamma1_Energy = new TH1D( "gamma1_Energy","Leading Photon Energy",bin_gammaEnergy.get_nBins(), bin_gammaEnergy.get_min(), bin_gammaEnergy.get_max() );
+    gamma1_Energy->GetXaxis()->SetTitle("Leading Photon Energy [GeV]");
+    gamma1_Energy->GetYaxis()->SetTitle("N(Events)");
+    
+    gamma2_Energy = new TH1D( "gamma2_Energy","Second Photon Energy",bin_gammaEnergy.get_nBins(), bin_gammaEnergy.get_min(), bin_gammaEnergy.get_max() );
+    gamma2_Energy->GetXaxis()->SetTitle("Second Photon Energy [GeV]");
+    gamma2_Energy->GetYaxis()->SetTitle("N(Events)");
+    
+    Energy_gamma2_gamma1 = new TH2D( "Energy_gamma2_gamma1","Leading vs Second Photon Energy",bin_gammaEnergy.get_nBins(), bin_gammaEnergy.get_min(), bin_gammaEnergy.get_max(),bin_gammaEnergy.get_nBins(), bin_gammaEnergy.get_min(), bin_gammaEnergy.get_max() );
+    Energy_gamma2_gamma1->GetXaxis()->SetTitle("Second Photon Energy [GeV]");
+    Energy_gamma2_gamma1->GetYaxis()->SetTitle("Leading Photon Energy [GeV]");
+      
+    photonEnergy_Asymmetry = new TH1D( "photonEnergy_Asymmetry","Photon Energy Asymmetry",bin_gammaEnergy.get_nBins(), bin_gammaEnergy.get_min(), bin_gammaEnergy.get_max());
+    photonEnergy_Asymmetry->GetXaxis()->SetTitle("Photon Energy Asymmetry");
+    photonEnergy_Asymmetry->GetYaxis()->SetTitle("N(Events)");
+    
+    
     
     //--------------------------------------------------------------------------
     // Invariant Mass

@@ -15,7 +15,8 @@ MAINEXE = main.exe
 PLOTTERCPP = Classes/Plotter/Plotter.cpp
 DEFAULTPLOTSCPP = Classes/Plotter/Default_Plots.cpp
 OTHERPLOTSCPP = Classes/Plotter/Other_Plots.cpp
-ALLPLOTTERCPP = $(PLOTTERCPP) $(DEFAULTPLOTSCPP) $(OTHERPLOTSCPP)
+PIDPLOTSCPP = Classes/Plotter/pID_Plots.cpp
+ALLPLOTTERCPP = $(PLOTTERCPP) $(DEFAULTPLOTSCPP) $(OTHERPLOTSCPP) $(PIDPLOTSCPP)
 
 # Class: CCProtonPi0
 CCPROTONPI0CPP = Classes/CCProtonPi0/CCProtonPi0.cpp

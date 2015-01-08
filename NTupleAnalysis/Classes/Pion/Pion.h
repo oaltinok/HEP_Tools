@@ -5,7 +5,7 @@ Class: Pion -> Derived Class from Particle Base Clas
                 extends base class with pion specific parameters
 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_12_01
+    Last Revision: 2014_12_07
 ================================================================================
 */
 
@@ -23,9 +23,27 @@ class Pion : public Particle
         void initialize(int nMode);
         
         SingleBin bin_photonConvLength;
+        SingleBin bin_gammaClusters;
+        SingleBin bin_gammaEnergy;
         
-        TH1D* photonConvLength;
+        TH1D* gamma1_nClusters_All;
+        TH1D* gamma2_nClusters_All;
+        TH2D* nClusters_All_gamma2_gamma1;
         
+        TH1D* gamma1_nClusters_X;
+        TH1D* gamma2_nClusters_X;
+        TH2D* nClusters_X_gamma2_gamma1;
+        
+        TH1D* gamma1_ConvLength;
+        TH1D* gamma2_ConvLength;
+        TH2D* ConvLength_gamma2_gamma1;
+        
+        TH1D* gamma1_Energy;
+        TH1D* gamma2_Energy;
+        TH2D* Energy_gamma2_gamma1;
+           
+        TH1D* photonEnergy_Asymmetry;
+
         TH1D* invMass;
         TH1D* invMass_0Pi0;
         TH1D* invMass_1Pi0;

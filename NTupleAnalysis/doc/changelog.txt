@@ -1,4 +1,12 @@
 ================================================================================
+v4_11
+    General Updates
+        Modified for CCProtonPi0 v1_08 Output
+        Background Analysis Included
+    Plotter Improvements
+        New Plot Mode: Signal vs Background
+        New Plots: Signal / Background
+================================================================================
 v4_10
 main.cpp provides better interface
     User defines run and analysis mode

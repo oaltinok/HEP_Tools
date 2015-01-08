@@ -32,10 +32,6 @@ void CCProtonPi0::initHistograms()
     pID_proton_protonScore->GetXaxis()->SetTitle("proton_protonScore");
     pID_proton_protonScore->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
-    pID_other_protonScore = new TH1D( "pID_other_protonScore","other_protonScore",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
-    pID_other_protonScore->GetXaxis()->SetTitle("other_protonScore");
-    pID_other_protonScore->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
-    
     // Pion Score
     pID_piplus_pionScore = new TH1D( "pID_piplus_pionScore","piplus_pionScore",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_piplus_pionScore->GetXaxis()->SetTitle("piplus_pionScore");
@@ -49,9 +45,6 @@ void CCProtonPi0::initHistograms()
     pID_proton_pionScore->GetXaxis()->SetTitle("proton_pionScore");
     pID_proton_pionScore->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
-    pID_other_pionScore = new TH1D( "pID_other_pionScore","other_pionScore",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
-    pID_other_pionScore->GetXaxis()->SetTitle("other_pionScore");
-    pID_other_pionScore->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
     // 2D Particle Score
     pID_proton_pionScore_protonScore = new TH2D( "pID_proton_pionScore_protonScore","pID_proton_pionScore_protonScore",
@@ -71,6 +64,31 @@ void CCProtonPi0::initHistograms()
                                                  binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max());
     pID_piminus_pionScore_protonScore->GetXaxis()->SetTitle("Pion Score");
     pID_piminus_pionScore_protonScore->GetYaxis()->SetTitle("Proton Score");
+    
+    // Particle Score Sum and Difference
+    pID_proton_pIDSum = new TH1D( "pID_proton_pIDSum","Proton Score + Pion Score for TRUE Protons",binList.particleScoreSum.get_nBins(), binList.particleScoreSum.get_min(), binList.particleScoreSum.get_max() );
+    pID_proton_pIDSum->GetXaxis()->SetTitle("Proton Score + Pion Score");
+    pID_proton_pIDSum->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScoreSum.get_width()));
+    
+    pID_proton_pIDDiff = new TH1D( "pID_proton_pIDDiff","Proton Score - Pion Score for TRUE Protons",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
+    pID_proton_pIDDiff->GetXaxis()->SetTitle("Proton Score - Pion Score");
+    pID_proton_pIDDiff->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScoreDiff.get_width()));
+    
+    pID_piplus_pIDSum = new TH1D( "pID_piplus_pIDSum","Proton Score + Pion Score for TRUE Pi-Plus",binList.particleScoreSum.get_nBins(), binList.particleScoreSum.get_min(), binList.particleScoreSum.get_max() );
+    pID_piplus_pIDSum->GetXaxis()->SetTitle("Proton Score + Pion Score");
+    pID_piplus_pIDSum->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScoreSum.get_width()));
+    
+    pID_piplus_pIDDiff = new TH1D( "pID_piplus_pIDDiff","Proton Score - Pion Score for TRUE Pi-Plus",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
+    pID_piplus_pIDDiff->GetXaxis()->SetTitle("Proton Score - Pion Score");
+    pID_piplus_pIDDiff->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScoreDiff.get_width()));
+    
+    pID_piminus_pIDSum = new TH1D( "pID_piminus_pIDSum","Proton Score + Pion Score for TRUE Pi-Minus",binList.particleScoreSum.get_nBins(), binList.particleScoreSum.get_min(), binList.particleScoreSum.get_max() );
+    pID_piminus_pIDSum->GetXaxis()->SetTitle("Proton Score + Pion Score");
+    pID_piminus_pIDSum->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScoreSum.get_width()));
+    
+    pID_piminus_pIDDiff = new TH1D( "pID_piminus_pIDDiff","Proton Score - Pion Score for TRUE Pi-Minus",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
+    pID_piminus_pIDDiff->GetXaxis()->SetTitle("Proton Score - Pion Score");
+    pID_piminus_pIDDiff->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScoreDiff.get_width()));
     
     //--------------------------------------------------------------------------
     
@@ -146,39 +164,63 @@ void CCProtonPi0::initHistograms()
     q2_reco_mc->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
     q2_reco_mc->GetYaxis()->SetTitle("True Q^{2} [GeV^{2}]");
     
-    w2_mc = new TH1D( "w2_mc","True W",binList.w2.get_nBins(), binList.w2.get_min(), binList.w2.get_max() );
-    w2_mc->GetXaxis()->SetTitle("True W [GeV]");
-    w2_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w2.get_width()));
+    w_mc = new TH1D( "w_mc","True W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    w_mc->GetXaxis()->SetTitle("True W [GeV]");
+    w_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
     
-    w2_reco = new TH1D( "w2_reco","Reconstructed W",binList.w2.get_nBins(), binList.w2.get_min(), binList.w2.get_max() );
-    w2_reco->GetXaxis()->SetTitle("Reconstructed W [GeV]");
-    w2_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w2.get_width()));
+    w_reco = new TH1D( "w_reco","Reconstructed W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    w_reco->GetXaxis()->SetTitle("Reconstructed W [GeV]");
+    w_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
     
-    w2_error = new TH1D( "w2_error","Error on W",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
-    w2_error->GetXaxis()->SetTitle("(True-Reco) / True");
-    w2_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
+    wSq_reco = new TH1D( "wSq_reco","Reconstructed W^{2}",binList.wSq.get_nBins(), binList.wSq.get_min(), binList.wSq.get_max() );
+    wSq_reco->GetXaxis()->SetTitle("Reconstructed W^{2} [GeV^{2}]");
+    wSq_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.wSq.get_width()));
     
-    w2_reco_mc = new TH2D( "w2_reco_mc","True vs Reconstructed W",
-                           binList.w2.get_nBins(), binList.w2.get_min(), binList.w2.get_max(),
-                           binList.w2.get_nBins(), binList.w2.get_min(), binList.w2.get_max());
-                           w2_reco_mc->GetXaxis()->SetTitle("Reconstructed W [GeV]");
-                           w2_reco_mc->GetYaxis()->SetTitle("True W [GeV]");
+    w_error = new TH1D( "w_error","Error on W",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    w_error->GetXaxis()->SetTitle("(True-Reco) / True");
+    w_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
+    
+    w_reco_mc = new TH2D( "w_reco_mc","True vs Reconstructed W",
+                           binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max(),
+                           binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    w_reco_mc->GetXaxis()->SetTitle("Reconstructed W [GeV]");
+    w_reco_mc->GetYaxis()->SetTitle("True W [GeV]");
                            
-    mc_w_DIS = new TH1D( "mc_w_DIS","True W for DIS",binList.w2.get_nBins(), binList.w2.get_min(), binList.w2.get_max() );
+    mc_w_DIS = new TH1D( "mc_w_DIS","True W for DIS",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
     mc_w_DIS->GetXaxis()->SetTitle("True W for DIS [GeV]");
-    mc_w_DIS->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w2.get_width()));
+    mc_w_DIS->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
     
-    mc_w_RES = new TH1D( "mc_w_RES","True W for RES",binList.w2.get_nBins(), binList.w2.get_min(), binList.w2.get_max() );
+    mc_w_RES = new TH1D( "mc_w_RES","True W for RES",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
     mc_w_RES->GetXaxis()->SetTitle("True W for RES [GeV]");
-    mc_w_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w2.get_width()));
+    mc_w_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
     
-    mc_w_CCQE = new TH1D( "mc_w_CCQE","True W for CCQE",binList.w2.get_nBins(), binList.w2.get_min(), binList.w2.get_max() );
+    mc_w_CCQE = new TH1D( "mc_w_CCQE","True W for CCQE",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
     mc_w_CCQE->GetXaxis()->SetTitle("True W for CCQE [GeV]");
-    mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w2.get_width()));
+    mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
     
+    final_mc_w_DIS = new TH1D( "final_mc_w_DIS","True W for DIS",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    final_mc_w_DIS->GetXaxis()->SetTitle("True W for DIS [GeV]");
+    final_mc_w_DIS->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
+    
+    final_mc_w_RES = new TH1D( "final_mc_w_RES","True W for RES",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    final_mc_w_RES->GetXaxis()->SetTitle("True W for RES [GeV]");
+    final_mc_w_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
+    
+    final_mc_w_CCQE = new TH1D( "final_mc_w_CCQE","True W for CCQE",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    final_mc_w_CCQE->GetXaxis()->SetTitle("True W for CCQE [GeV]");
+    final_mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
+    
+       
+    // Interaction Type
     int_channel = new TH1D( "int_channel","Interaction Channel",binList.int_channel.get_nBins(), binList.int_channel.get_min(), binList.int_channel.get_max() );
     int_channel->GetXaxis()->SetTitle("1 = QE, 2 = Resonant, 3 = DIS, 4 = Coh pi");
     int_channel->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.int_channel.get_width()));
+    
+    
+    // Vertex
+    vertex_count = new TH1D( "vertex_count","Number of Vertices",binList.objectCount.get_nBins(), binList.objectCount.get_min(), binList.objectCount.get_max() );
+    vertex_count->GetXaxis()->SetTitle("Number of Vertices");
+    vertex_count->GetYaxis()->SetTitle("N(Events)");
     
     vertex_x_y_true = new TH2D( "vertex_x_y_true","True Vertex X vs Y",   binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max(),
     binList.vertex_x_y.get_nBins(), binList.vertex_x_y.get_min(), binList.vertex_x_y.get_max());
@@ -238,14 +280,12 @@ void CCProtonPi0::initHistograms()
     nProngs_hist->GetXaxis()->SetTitle("Number of Prongs");
     nProngs_hist->GetYaxis()->SetTitle("Candidates"); 
     
-    nProngs_hist_initial = new TH1D( "nProngs_hist_initial","Number of Prongs before CUTS",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
-    nProngs_hist_initial->GetXaxis()->SetTitle("Number of Prongs");
-    nProngs_hist_initial->GetYaxis()->SetTitle("Candidates"); 
+
     
     // Debugging Histograms
-    w2fail_w2 = new TH1D( "w2fail_w2","mN^{2}+2mN(Epi + Tp) - Q^{2}",binList.w2fail.get_nBins(), binList.w2fail.get_min(), binList.w2fail.get_max() );
+    w2fail_w2 = new TH1D( "w2fail_w2","mN^{2}+2mN(Epi + Tp) - Q^{2}",binList.wfail.get_nBins(), binList.wfail.get_min(), binList.wfail.get_max() );
     w2fail_w2->GetXaxis()->SetTitle("mN^{2}+2mN(Epi + Tp) - Q^{2} [GeV^{2}]");
-    w2fail_w2->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w2fail.get_width()));
+    w2fail_w2->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.wfail.get_width()));
     
     w2fail_q2 = new TH1D( "w2fail_q2","Reconstructed Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
     w2fail_q2->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
@@ -279,6 +319,89 @@ void CCProtonPi0::initHistograms()
     w2fail_proton_KE = new TH1D( "w2fail_proton_KE","Reconstructed Proton Kinetic Energy",binList.protonKE.get_nBins(), binList.protonKE.get_min(), binList.protonKE.get_max() );
     w2fail_proton_KE->GetXaxis()->SetTitle("Reconstructed Proton Kinetic Energy [GeV]");
     w2fail_proton_KE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.protonKE.get_width()));
+    
+    // Cluster Energy after Pi0 Reconstruction
+    E_Unused_postPi0 = new TH1D( "E_Unused_postPi0","Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
+    E_Unused_postPi0->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
+    E_Unused_postPi0->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
+    
+    E_Used_postPi0 = new TH1D( "E_Used_postPi0","Used Cluster Energy after Pi0 Reconstruction",binList.UsedE.get_nBins(), binList.UsedE.get_min(), binList.UsedE.get_max() );
+    E_Used_postPi0->GetXaxis()->SetTitle("Used Cluster Energy after Pi0 Reconstruction [MeV]");
+    E_Used_postPi0->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UsedE.get_width()));
+    
+    // Cluster Timing
+    time_AllClusters = new TH1D( "time_AllClusters","Cluster Time",binList.time.get_nBins(), binList.time.get_min(), binList.time.get_max() );
+    time_AllClusters->GetXaxis()->SetTitle("Cluster Time");
+    time_AllClusters->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.time.get_width()));
+    
+    // Total Final State Particle Energy
+    total_E = new TH1D( "total_E","Total FS Particle Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    total_E->GetXaxis()->SetTitle("Total FS Particle Energy [GeV]");
+    total_E->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
+    
+    total_E_neutrinoE = new TH2D( "total_E_neutrinoE","Neutrino Energy vs Total FS Particle Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    total_E_neutrinoE->GetXaxis()->SetTitle("Total FS Particle Energy [GeV]");
+    total_E_neutrinoE->GetYaxis()->SetTitle("Neutrino Energy [GeV]");
+    
+    //! ------------------------------------------------------------------------
+    //! Cut Histograms
+    //! ------------------------------------------------------------------------
+    hCut_vertexCount = new TH1D( "hCut_vertexCount","Number of Vertices",binList.objectCount.get_nBins(), binList.objectCount.get_min(), binList.objectCount.get_max() );
+    hCut_vertexCount->GetXaxis()->SetTitle("Number of Vertices");
+    hCut_vertexCount->GetYaxis()->SetTitle("N(Events)");
+    
+    hCut_nProngs = new TH1D( "hCut_nProngs","Number of Prongs before CUTS",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+    hCut_nProngs->GetXaxis()->SetTitle("Number of Prongs");
+    hCut_nProngs->GetYaxis()->SetTitle("N(Events)"); 
+    
+    hCut_Michel = new TH1D( "hCut_Michel","Event Has Michel?",binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
+    hCut_Michel->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
+    hCut_Michel->GetYaxis()->SetTitle("N(Events)");
+    
+    hCut_protonScore = new TH1D( "hCut_protonScore","Proton Score",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
+    hCut_protonScore->GetXaxis()->SetTitle("Proton Score");
+    hCut_protonScore->GetYaxis()->SetTitle("N(Events)");
+    
+    hCut_pionScore = new TH1D( "hCut_pionScore","Pion Score",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
+    hCut_pionScore->GetXaxis()->SetTitle("Pion Score");
+    hCut_pionScore->GetYaxis()->SetTitle("N(Events)");
+    
+    hCut_pIDDiff = new TH1D( "hCut_pIDDiff","Proton Score - Pion Score",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
+    hCut_pIDDiff->GetXaxis()->SetTitle("Proton Score - Pion Score");
+    hCut_pIDDiff->GetYaxis()->SetTitle("N(Events)");
+    
+    hCut_eVis_nuclearTarget = new TH1D( "hCut_eVis_nuclearTarget","Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
+    hCut_eVis_nuclearTarget->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
+    hCut_eVis_nuclearTarget->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
+    
+    hCut_eVis_other = new TH1D( "hCut_eVis_other","Visible Energy in Tracker + ECAL + HCAL",binList.eVis_other.get_nBins(), binList.eVis_other.get_min(), binList.eVis_other.get_max() );
+    hCut_eVis_other->GetXaxis()->SetTitle("Visible Energy in Tracker + ECAL + HCAL [MeV]");
+    hCut_eVis_other->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_other.get_width()));
+    
+    hCut_gamma1ConvDist = new TH1D( "hCut_gamma1ConvDist","Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+    hCut_gamma1ConvDist->GetXaxis()->SetTitle("Leading Photon Conversion Distance");
+    hCut_gamma1ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
+    
+    hCut_gamma2ConvDist = new TH1D( "hCut_gamma2ConvDist","Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+    hCut_gamma2ConvDist->GetXaxis()->SetTitle("Second Photon Conversion Distance");
+    hCut_gamma2ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
+    
+    hCut_pi0invMass = new TH1D( "hCut_pi0invMass","Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    hCut_pi0invMass->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+    hCut_pi0invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+    
+    hCut_neutrinoE = new TH1D( "hCut_neutrinoE","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    hCut_neutrinoE->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
+    hCut_neutrinoE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
+    
+    hCut_QSq = new TH1D( "hCut_QSq","Reconstructed Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
+    hCut_QSq->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
+    hCut_QSq->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.q2.get_width()));
+    
+    hCut_UnusedE = new TH1D( "hCut_UnusedE","Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
+    hCut_UnusedE->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
+    hCut_UnusedE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
+    
     
     
 }

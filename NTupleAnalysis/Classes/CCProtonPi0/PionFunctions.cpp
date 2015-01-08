@@ -7,6 +7,8 @@ using namespace std;
 
 void CCProtonPi0::fillPionReco()
 {
+    double photon_E_asym;
+    
     // Fill 4-Momentum
     pion.set_p4(    pi0_px,
                     pi0_py,
@@ -25,8 +27,36 @@ void CCProtonPi0::fillPionReco()
     pion.invMass->Fill(pi0_invMass);
     
     // Set Photon Conversion Length in [cm]
-    pion.photonConvLength->Fill(gamma1_dist_vtx * 0.1);
-    pion.photonConvLength->Fill(gamma2_dist_vtx * 0.1);
+    pion.gamma1_ConvLength->Fill(gamma1_dist_vtx);
+    pion.gamma2_ConvLength->Fill(gamma2_dist_vtx);
+    pion.ConvLength_gamma2_gamma1->Fill(gamma2_dist_vtx, gamma1_dist_vtx);
+    
+    // Set Photon N(Clusters)
+    pion.gamma1_nClusters_All->Fill(gamma1_blob_nclusters);
+    pion.gamma2_nClusters_All->Fill(gamma2_blob_nclusters);
+    pion.nClusters_All_gamma2_gamma1->Fill(gamma2_blob_nclusters,gamma1_blob_nclusters);
+    
+    int gamma1_xCLusters;
+    int gamma2_xCLusters;
+    if(final_blob_nc[0] >= final_blob_nc[1]){
+        gamma1_xCLusters = final_blob_nc[0];
+        gamma2_xCLusters = final_blob_nc[1];
+    }else{ 
+        gamma1_xCLusters = final_blob_nc[1];
+        gamma2_xCLusters = final_blob_nc[0];
+    }
+    pion.gamma1_nClusters_X->Fill(gamma1_xCLusters);
+    pion.gamma2_nClusters_X->Fill(gamma2_xCLusters);
+    pion.nClusters_X_gamma2_gamma1->Fill(gamma2_xCLusters,gamma1_xCLusters);
+    
+    // Set Photon Energy [GeV]
+    pion.gamma1_Energy->Fill(gamma1_E * HEP_Functions::MeV_to_GeV);
+    pion.gamma2_Energy->Fill(gamma2_E * HEP_Functions::MeV_to_GeV);
+    pion.Energy_gamma2_gamma1->Fill(gamma2_E * HEP_Functions::MeV_to_GeV,gamma1_E * HEP_Functions::MeV_to_GeV );
+    
+    // Set Photon Energy Assymmetry
+    photon_E_asym = abs((gamma1_E - gamma2_E) / (gamma1_E + gamma2_E));  
+    pion.photonEnergy_Asymmetry->Fill(photon_E_asym);
 }
 
 void CCProtonPi0::fillPionTrue()

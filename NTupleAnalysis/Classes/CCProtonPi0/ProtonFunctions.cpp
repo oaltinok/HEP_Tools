@@ -24,10 +24,10 @@ void CCProtonPi0::fillProtonTrue()
 }
 
 void CCProtonPi0::fillProtonReco()
-{
+{    
     // Set Particle Score
     proton.particleScore = CCProtonPi0_proton_score[indRecoProton];
-    
+
     // Fill 4-Momentum
     proton.set_p4(  CCProtonPi0_proton_px[indRecoProton],
                     CCProtonPi0_proton_py[indRecoProton],
@@ -42,8 +42,8 @@ void CCProtonPi0::fillProtonReco()
     proton.set_angleMuon(muon, false);
     
     // Set Particle Score - proton and pion
-//     proton.protonScore->Fill(CCProtonPi0_protonScore[indRecoProton]);
-//     proton.pionScore->Fill(CCProtonPi0_pionScore[indRecoProton]);
+    proton.protonScore->Fill(CCProtonPi0_protonScore[indRecoProton]);
+    proton.pionScore->Fill(CCProtonPi0_pionScore[indRecoProton]);
 }
 
 //--------------------------------------------------------------------------
