@@ -21,8 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2014_12_05
-    Version:        v1_07
+    Last Revision:  2015_01_06
+    Version:        v1_08
     
 ================================================================================
 */
@@ -241,18 +241,18 @@ class CCProtonPi0 : public MinervaAnalysisTool
                             Minerva::IDBlob* idblob1, 
                             Minerva::IDBlob* idblob2) const;
         
-        
+        bool tagSignal(Minerva::GenMinInteraction* truthEvent) const;
+        void tagBackground(Minerva::GenMinInteraction* truthEvent) const;
         void setSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
         void setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const;
-        void writeFSParticleTable(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
+        void writeFSParticleTable(bool isSignal) const;
         void writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
         void setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) const;
         bool isSinglePi0(Minerva::GenMinInteraction* truthEvent, int nPi0, int nGamma) const;
+        bool isMotherPrimary(std::vector<int>& motherList, int mother ) const;
         
         bool createTrackedParticles( Minerva::ProngVect& prongs ) const;
         bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;
-        bool findLeadingProton() const;
-        void setLeadingProton_4P(bool foundLeadingProton) const;
 
 
         bool correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
@@ -260,6 +260,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
                                         double& p_visEnergyCorrection ) const;
                                         
         void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
+        double getClusterEnergy(Minerva::PhysicsEvent* event, std::string input_clusterType) const;
+        void getClusterTime(Minerva::PhysicsEvent* event) const;
 
         //! CCPi0 Functions
         SmartRefVector<Minerva::IDCluster> FilterInSphereClusters(  const SmartRefVector<Minerva::IDCluster>& clusters,

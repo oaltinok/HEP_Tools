@@ -1,35 +1,33 @@
-cvs commit -m "v1_07 - 2014_12_05
+cvs commit -m "v1_08
 
 General Updates:
-    truthIsPlausible() Updated
-        using muonIsPlausible()
-    Removed reco_* variables (unused variables)
-    Event Kinematics Calculations are Implemented
-    Event Kinematics Need Update: See @todo in function header
+    PDG Namespace Introduced - PDG::proton for proton PDG Code
+    Saving Unused and Used Cluster energy in different stages:
+        preMuon
+        preProton
+        prePi0
+        postPi0
+    Time Distribution for  Clusters
 
-New Functions:
-    findLeadingProton()
-    setLeadingProton_4P()
+TagTruth()
+    tagSignal() Function Revised
+        No Longer Requiring Truth Vertex inside Fiducial Volume
+        No Longer using Gold and Silver1 Signal Categories
+    tagBackground() Function
+        Identifies Background Type as one of the following
+            QE, SinglePiPlus, SinglePiMinus, MultiPion, Other
+        Checks for Background Branching for each Type:
+            Background with Michel
+            Background with Pi0
 
-
-tagTruth() Updated
-    Using GENIE:Event Record
-        Creating Tables for Final State Particles
-        Saving Information for Pi0, Pi0 Mother and Pi0 GrandMother
-    setSignalKinematics() Updated
-        Using FS Particle Trajectories
-        Saving only 4-Momentum and Theta wrt Beam
-        Removed all others
 
 Vertex Reconstruction Updates:
-    smear true vertex no longer used
 
 Muon Reconstruction Updates:
-    Muon MINOS Match Information now saved under CCProtonPi0_muon_ variables
-        muon_hasMinosMatchTrack
-        muon_hasMinosMatchStub
 
 Proton Reconstruction Updates:
-    Proton reconstruction is controlled with a new parameter: 
-        m_reconstruct_NoProtonEvents
-    When it is TRUE, Reconstruction Continues even there is no proton candidate" .
+    Leading Proton Information saved after Proton Energy Correction
+    If there is no proton candidate, NTuples have proton at rest Information
+        No Proton or Pion Score - Just px,py,pz,E
+
+Pi0 Reconstruction Updates:" .
