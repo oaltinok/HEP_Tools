@@ -126,8 +126,7 @@ using namespace Minerva;
 CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const IInterface* parent ) :
 MinervaAnalysisTool( type, name, parent ) 
 {
-    info() <<"--------------------------------------------------------------------------"<<endmsg;
-    info() <<"Enter CCProtonPi0::CCProtonPi0() -- Default Constructor" << endmsg;
+    debug() <<"Enter CCProtonPi0::CCProtonPi0() -- Default Constructor" << endmsg;
     
     declareInterface<IInteractionHypothesis>(this);
     //! mandatory declaration of analysis signature: CCProtonPi0
@@ -142,8 +141,7 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("RecoNoProtonEvents",   m_reconstruct_NoProtonEvents = true);
    
     declareProperty("Do_nProngCut",         m_Do_nProngCut          =   false);  
-    declareProperty("min_nProngs",      	  m_min_nProngs       =   2);
-    declareProperty("max_nProngs",      	  m_max_nProngs       =   2);
+    declareProperty("max_nProngs",      	m_max_nProngs       =   2);
     
     declareProperty("BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian );
     
@@ -223,8 +221,6 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("HypothesisMethods", m_hypMeths);
     info() << " CCProtonPi0 Hypothesis added " << endmsg;
    
-    info() <<"Exit CCProtonPi0::CCProtonPi0() -- Default Constructor" << endmsg;
-    info() <<"--------------------------------------------------------------------------"<<endmsg;
 }
     
 //==============================================================================
@@ -232,8 +228,7 @@ MinervaAnalysisTool( type, name, parent )
 //==============================================================================
 StatusCode CCProtonPi0::initialize()
 {
-    info() <<"--------------------------------------------------------------------------"<<endmsg;
-    info() <<"Enter CCProtonPi0::initialize()" << endmsg;
+    debug() <<"Enter CCProtonPi0::initialize()" << endmsg;
     
     //! Initialize the base class.  This will fail if you did not define m_anaSignature.
     StatusCode sc = this->MinervaAnalysisTool::initialize();
@@ -411,6 +406,16 @@ StatusCode CCProtonPi0::initialize()
         return StatusCode::FAILURE;
     }
     
+    try {
+        m_LikelihoodPIDTool = tool<IParticleTool>( "LikelihoodPIDTool" );
+    }
+    catch( GaudiException& e ) {
+        error() << "Could not obtain tool: LikelihoodPIDTool!" << endmsg;
+        return StatusCode::FAILURE;
+    }
+    
+    
+    
     //! Blob Tools
     try{
         m_blobUtils = tool<IBlobCreatorUtils>("BlobCreatorUtils");
@@ -478,22 +483,24 @@ StatusCode CCProtonPi0::initialize()
     
     //! Truth Branches
     // Signal and Background
-    declareBoolTruthBranch( "isSignal");
-    declareBoolTruthBranch( "isSignal_1Pi0");
-    declareBoolTruthBranch( "isSignal_2Gamma");
-    declareBoolTruthBranch( "isFidVol");
+    declareBoolTruthBranch("isSignal");
+    declareBoolTruthBranch("isSignal_1Pi0");
+    declareBoolTruthBranch("isSignal_2Gamma");
+    declareBoolTruthBranch("isFidVol");
     
     // Background Types
-    declareBoolTruthBranch( "isBckg_QE");
-    declareBoolTruthBranch( "isBckg_SinglePiPlus");
-    declareBoolTruthBranch( "isBckg_SinglePiMinus");
-    declareBoolTruthBranch( "isBckg_MultiPion");
-    declareBoolTruthBranch( "isBckg_SecondaryPi0");
-    declareBoolTruthBranch( "isBckg_Other");
+    declareBoolTruthBranch("isBckg_QELike");
+    declareBoolTruthBranch("isBckg_SinglePiPlus");
+    declareBoolTruthBranch("isBckg_SinglePiMinus");
+    declareBoolTruthBranch("isBckg_MultiPion");
+    declareBoolTruthBranch("isBckg_MultiPiZero");
+    declareBoolTruthBranch("isBckg_Other");
     
     // Background Branching - For Each Background Type
-    declareBoolTruthBranch( "isBckg_withMichel");
-    declareBoolTruthBranch( "isBckg_withPi0");
+    declareBoolTruthBranch("isBckg_withAntiMuon");
+    declareBoolTruthBranch("isBckg_withMichel");
+    declareBoolTruthBranch("isBckg_withPrimaryPi0");
+    declareBoolTruthBranch("isBckg_withSecondaryPi0");
     
     declareIntTruthBranch("N_FSParticles", -1 );
     declareIntTruthBranch("N_proton", -1 );
@@ -570,7 +577,6 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleBranch(m_hypMeths, "endProtonTrajZPosition",  10, -9999);
     
     //! Event - Cut Results
-    declareIntEventBranch( "Cut_Event_Has_BadObject", -1 );
     declareIntEventBranch( "Cut_Vertex_None", -1 );
     declareIntEventBranch( "Cut_Vertex_Null", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Reconstructable", -1 );
@@ -591,8 +597,6 @@ StatusCode CCProtonPi0::initialize()
     
     //! Event - General reco
     declareIntEventBranch( "nProngs", -1);
-    declareIntEventBranch( "n_long_tracks", -1);
-    declareIntEventBranch( "n_short_tracks", -1);
     declareIntEventBranch( "n_anchored_long_trk_prongs", -1 );
     declareIntEventBranch( "n_anchored_short_trk_prongs", -1 );
     declareIntEventBranch( "n_iso_trk_prongs", -1);
@@ -608,17 +612,14 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch( "totalVisibleE", -1.0 );
     declareDoubleEventBranch( "totalIDVisibleE", -1.0 );
     declareDoubleEventBranch( "totalODVisibleE", -1.0 );
-    declareDoubleEventBranch( "vtxBlobExtraE",  -1.0 );
-    declareDoubleEventBranch( "unattachedExtraE", -1.0 );
-    declareDoubleEventBranch( "dispersedExtraE", -1.0 );
     declareDoubleEventBranch( "energyUnused_preMuon", -1.0 );
-    declareDoubleEventBranch( "energyUnused_preProton", -1.0 );
     declareDoubleEventBranch( "energyUnused_prePi0", -1.0 );
-    declareDoubleEventBranch( "energyUnused_postPi0", -1.0 );
+    declareDoubleEventBranch( "energyUnused_preProton", -1.0 );   
+    declareDoubleEventBranch( "energyUnused_postProton", -1.0 );
     declareDoubleEventBranch( "energyUsed_preMuon", -1.0 );
-    declareDoubleEventBranch( "energyUsed_preProton", -1.0 );
     declareDoubleEventBranch( "energyUsed_prePi0", -1.0 );
-    declareDoubleEventBranch( "energyUsed_postPi0", -1.0 );
+    declareDoubleEventBranch( "energyUsed_preProton", -1.0 );
+    declareDoubleEventBranch( "energyUsed_postProton", -1.0 );
      
     //! Event - Time
     declareDoubleEventBranch( "UsedClustersTime", -1.0 );
@@ -829,9 +830,8 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleBranch(m_hypMeths, "proton_endPointZ",   10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "protonScore",    10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "pionScore",    10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_score",    10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_score1",   10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_score2",   10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "protonScore_LLR",    10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "pionScore_LLR",    10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_chi2_ndf", 10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_theta",    10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_thetaX",   10, SENTINEL);
@@ -906,10 +906,6 @@ StatusCode CCProtonPi0::initialize()
     declareBoolEventBranch("gamma2_isGoodPosition");
     declareBoolEventBranch("gamma2_isGoodBlob");
     
-    
-    info() <<"Exit CCProtonPi0::initialize()" << endmsg;
-    info() <<"--------------------------------------------------------------------------"<<endmsg;
-    
     return sc;
 }
     
@@ -920,7 +916,6 @@ StatusCode CCProtonPi0::initialize()
 //==============================================================================
 StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::reconstructEvent()" << endmsg;
     
     //--------------------------------------------------------------------------
@@ -934,19 +929,24 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     // Vectors
     m_ProtonProngs.clear();
     m_ProtonParticles.clear();
-      
+    
+    //--------------------------------------------------------------------------
+    //! Do NOT Analyze the Event - if the TRUE Vertex is NOT Fiducial
+    //--------------------------------------------------------------------------    
     if( truthEvent ){
         info() << "This is a MC event." << endmsg;
+        if ( !(truthEvent->filtertaglist()->isFilterTagTrue("isFidVol")) ){
+            info() << "True Vertex is NOT Fiducial! Skipping Event! " <<endmsg;
+            return StatusCode::SUCCESS; 
+        }
     }
-        
+    
     //--------------------------------------------------------------------------
-    //! MAKE CUT - IF Event has a Bad Object
+    //! Do NOT Analyze the Event - if Event has a Bad Object
     //--------------------------------------------------------------------------
     if( event->filtertaglist()->isFilterTagTrue( AnaFilterTags::BadObject() ) ) { 
-        error() << "Found an event flagged with a BadObject! Refusing to analyze..." << endmsg;
-        event->setIntData("Cut_Event_Has_BadObject",1);
-        if( m_store_all_events ) return interpretFailEvent(event); 
-        else return StatusCode::SUCCESS; 
+        warning() << "Found an event flagged with a BadObject! Refusing to analyze..." << endmsg;
+        return StatusCode::SUCCESS; 
     }
 
     
@@ -1068,16 +1068,15 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     // Prong Cuts
     //
     //==========================================================================
-	
-	event->setIntData("nProngs", event->primaryProngs().size());
+	int nPrimaryProngs = event->primaryProngs().size();
+	event->setIntData("nProngs", nPrimaryProngs);
     //--------------------------------------------------------------------------
-    //! MAKE CUT - if nProngs is not Valid
+    //! MAKE CUT - if nPrimaryProngs is not Valid
     //-------------------------------------------------------------------------- 
     if( m_Do_nProngCut ){
-        debug()<<"nProngs Cut with min_nProngs = "<<m_min_nProngs<<" max_nProngs = "<<m_max_nProngs<<endmsg;
-        int n_PrimaryProngs = event->primaryProngs().size();
-        if( n_PrimaryProngs < m_min_nProngs || n_PrimaryProngs > m_max_nProngs ){
-            debug()<<"Cut: N(Prongs) = "<<n_PrimaryProngs<<endmsg;
+        debug()<<"nProngs Cut with "<<"max_nProngs = "<<m_max_nProngs<<endmsg;
+        if( nPrimaryProngs > m_max_nProngs ){
+            debug()<<"Cut: N(Prongs) = "<<nPrimaryProngs<<endmsg;
             event->setIntData("Cut_nProngs",1);
             if( m_store_all_events ) return interpretFailEvent(event); 
             else return StatusCode::SUCCESS; 
@@ -1263,64 +1262,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     
     //==========================================================================
     //
-    // Proton Reconstruction
-    //
-    //==========================================================================
-
-    debug() << "START: Proton Reconstruction" << endmsg;
-    
-    // Get Unused and Used Energy preProton
-    double totalUnusedEnergy_preProton = getClusterEnergy(event,"Unused");
-    double totalUsedEnergy_preProton = getClusterEnergy(event,"Used");
-    event->setDoubleData("energyUnused_preProton",totalUnusedEnergy_preProton);
-    event->setDoubleData("energyUsed_preProton",totalUsedEnergy_preProton);
-    
-    //--------------------------------------------------------------------------
-    //! MAKE CUT - if Particle Creation Fails (Proton and Pion Hypotheses)
-    //--------------------------------------------------------------------------
-    // Get all of the primary prongs in the event
-    primaryProngs = event->primaryProngs();
-    
-    // Create new particles with Proton and Pion hypotheses
-    debug() << "Creating particles with Proton and Pion hypotheses" <<endmsg;
-    bool makeParticles = createTrackedParticles(primaryProngs);
-    if (!makeParticles){
-        debug() << "Creation of Particles are FAILED!"<< endmsg;
-        event->setIntData("Cut_Particle_None",1);
-        if ( m_reconstruct_NoProtonEvents ){
-            debug() << "Reconstructing Event even there is no Proton Candidate!"<< endmsg;
-        }else{
-            if( m_store_all_events ) return interpretFailEvent(event); 
-            else return StatusCode::SUCCESS; 
-        }
-    }
-    
-    //--------------------------------------------------------------------------
-    //! MAKE CUT - if NO Prong contains a Proton Particle
-    //--------------------------------------------------------------------------
-    bool foundProton = getProtonProng(primaryProngs);
-    if( foundProton ) {
-        for(unsigned int i = 0; i < m_ProtonProngs.size(); i++) {
-            debug() << "Tag the proton's prong with bit-field = " << m_ProtonProngs[i]->typeBitsToString() << endmsg;
-        }
-    } 
-    else {
-        debug() << "Didn't find any contained in the tracker bit-positive prong with a proton particle!" << endmsg;
-        event->setIntData("Cut_Proton_None",1);
-        if ( m_reconstruct_NoProtonEvents ){
-            debug() << "Reconstructing Event even there is no Proton Candidate!"<< endmsg;
-        }else{
-            if( m_store_all_events ) return interpretFailEvent(event); 
-            else return StatusCode::SUCCESS; 
-        }
-    }
-   
-    
-    debug()<<"FINISH: Proton Reconstruction"<<endmsg;
-    
-    
-    //==========================================================================
-    //
     // Pi0 Reconstruction
     //
     //==========================================================================
@@ -1370,13 +1311,85 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     
     debug()<<"FINISH: Cone Blob Reconstruction"<<endmsg;
     
-    // Get Unused and Used Energy postPi0
-    double totalUnusedEnergy_postPi0 = getClusterEnergy(event,"Unused");
-    double totalUsedEnergy_postPi0 = getClusterEnergy(event,"Used");
-    event->setDoubleData("energyUnused_postPi0",totalUnusedEnergy_postPi0);
-    event->setDoubleData("energyUsed_postPi0",totalUsedEnergy_postPi0);
-        
+    //==========================================================================
+    //
+    // Proton Reconstruction
+    //
+    //==========================================================================
+
+    debug() << "START: Proton Reconstruction" << endmsg;
     
+    // Get Unused and Used Energy preProton
+    double totalUnusedEnergy_preProton = getClusterEnergy(event,"Unused");
+    double totalUsedEnergy_preProton = getClusterEnergy(event,"Used");
+    event->setDoubleData("energyUnused_preProton",totalUnusedEnergy_preProton);
+    event->setDoubleData("energyUsed_preProton",totalUsedEnergy_preProton);
+    
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - if Particle Creation Fails (Proton and Pion Hypotheses)
+    //--------------------------------------------------------------------------
+    // Get all of the primary prongs in the event
+    primaryProngs = event->primaryProngs();
+
+    // Create new particles with Proton and Pion hypotheses
+    debug() << "Creating particles with Proton and Pion hypotheses" <<endmsg;
+    bool makeParticles = createTrackedParticles(primaryProngs);
+    if (!makeParticles){
+        debug() << "Creation of Particles are FAILED!"<< endmsg;
+        event->setIntData("Cut_Particle_None",1);
+        if ( m_reconstruct_NoProtonEvents ){
+            debug() << "Reconstructing Event even there is no Proton Candidate!"<< endmsg;
+        }else{
+            if( m_store_all_events ) return interpretFailEvent(event); 
+            else return StatusCode::SUCCESS; 
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - if NO Prong contains a Proton Particle
+    //--------------------------------------------------------------------------
+    bool foundProton = getProtonProng(primaryProngs);
+    if( foundProton ) {
+        for(unsigned int i = 0; i < m_ProtonProngs.size(); i++) {
+            debug() << "Tag the proton's prong with bit-field = " << m_ProtonProngs[i]->typeBitsToString() << endmsg;
+        }
+    }else {
+        debug() << "Didn't find any contained in the tracker bit-positive prong with a proton particle!" << endmsg;
+        event->setIntData("Cut_Proton_None",1);
+        if ( m_reconstruct_NoProtonEvents ){
+            debug() << "Reconstructing Event even there is no Proton Candidate!"<< endmsg;
+        }else{
+            if( m_store_all_events ) return interpretFailEvent(event); 
+            else return StatusCode::SUCCESS; 
+        }
+    }
+    
+        
+    // Get Unused and Used Energy postProton
+    double totalUnusedEnergy_postProton = getClusterEnergy(event,"Unused");
+    double totalUsedEnergy_postProton = getClusterEnergy(event,"Used");
+    event->setDoubleData("energyUnused_postProton",totalUnusedEnergy_postProton);
+    event->setDoubleData("energyUsed_postProton",totalUsedEnergy_postProton);
+    
+    
+    debug()<<"FINISH: Proton Reconstruction"<<endmsg;
+    
+    //==========================================================================
+    //
+    // End of Reconstruction!
+    //
+    //==========================================================================
+    
+    //--------------------------------------------------------------------------
+    //! Write FS Particle Table and Event Record for Reconstructed Events
+    //--------------------------------------------------------------------------
+    bool isSignal = truthEvent->filtertaglist()->isFilterTagTrue("isSignal");
+    if (m_writeFSParticle_Table){
+        info()<<"FS Particle Table and Event Record for Reconstructed Event!"<<endmsg;
+        writeBackgroundType(truthEvent);
+        writeFSParticleTable(isSignal);
+        writeEventRecord(truthEvent,isSignal);
+    }
     
     //--------------------------------------------------------------------------
     //! Get Cluster Timing
@@ -1406,11 +1419,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     }
     //--------------------------------------------------------------------------
 
-    //--------------------------------------------------------------------------
-    //! count other reconstructed quantities
-    //--------------------------------------------------------------------------
-    int n_long_tracks = (event->select<Track>("Used:Unused","LongPatRec3View:LongPatRec2View")).size();
-    int n_short_tracks = (event->select<Track>("Used:Unused","FourHitPatRec")).size();
     
     //--------------------------------------------------------------------------
     //! Calculate dead time
@@ -1451,17 +1459,15 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     event->setIntData( "ddead", ddead );
     event->setIntData( "tdead", tdead );
     
-    event->setIntData("n_long_tracks", n_long_tracks);
-    event->setIntData("n_short_tracks", n_short_tracks);
     event->setIntData("n_anchored_long_trk_prongs", n_anchored_long_trk_prongs);
     event->setIntData("n_anchored_short_trk_prongs", n_anchored_short_trk_prongs);
     event->setIntData("n_iso_trk_prongs", n_iso_trk_prongs);
     
     event->setDoubleData("muonVisibleE", muon_visible_energy );
     event->setDoubleData("hadronVisibleE", totalVisibleEnergy - muon_visible_energy);
-    event->setDoubleData( "totalVisibleE",   totalVisibleEnergy );
-    event->setDoubleData( "totalIDVisibleE", idVisibleEnergy );
-    event->setDoubleData( "totalODVisibleE", odVisibleEnergy );
+    event->setDoubleData("totalVisibleE",   totalVisibleEnergy );
+    event->setDoubleData("totalIDVisibleE", idVisibleEnergy );
+    event->setDoubleData("totalODVisibleE", odVisibleEnergy );
     
     fillCommonPhysicsAnaBranches( event );
 
@@ -1483,9 +1489,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //! Add the interactions to the event. Use MinervaHistoTool::addInteractionHyp.
     StatusCode sc = addInteractionHyp( event, interactions );
     
-
-    debug() <<"Exit CCProtonPi0::reconstructEvent()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return sc;
     
 }
@@ -1497,7 +1500,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
 //==============================================================================
 StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, const Minerva::GenMinInteraction *truthEvent, NeutrinoVect& interaction_hyp ) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::interpretEvent()" << endmsg;
     
     if( truthEvent ){
@@ -1506,7 +1508,7 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
     
     if( !event ){
         debug() << "NULL Event" << endmsg;
-        return StatusCode::FAILURE;
+        return StatusCode::FAILURE; // we crashed!
     }
     
     //--------------------------------------------------------------------------
@@ -1632,11 +1634,8 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
             debug() << "       set the proton prong track truth information" << endmsg;
         }
     }
-
-    debug() <<"Exit CCProtonPi0::interpretEvent()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    return StatusCode::SUCCESS;
     
+    return StatusCode::SUCCESS;
 }
    
 
@@ -1645,7 +1644,6 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
 //==============================================================================
 StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const 
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter: CCProtonPi0::tagTruth()" << endmsg;
 
     if (!truthEvent) {
@@ -1654,7 +1652,7 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     }
     
     //--------------------------------------------------------------------------
-    //! is Fiducial volume
+    //! is Truth Vertex inside  Fiducial volume
     //--------------------------------------------------------------------------
     bool isFidVol = FiducialPointTool->isFiducial(truthEvent, m_fidHexApothem, m_fidUpStreamZ, m_fidDownStreamZ );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isFidVol", isFidVol );
@@ -1663,7 +1661,6 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     // Return immediately - if Event is not inside Fid Volume
     if (!isFidVol){ 
         debug() <<"Exit CCProtonPi0::tagTruth() - True vtx is not in Fiducial Volume!" << endmsg;
-        debug() <<"--------------------------------------------------------------------------"<<endmsg;
         return StatusCode::SUCCESS;
     }
     
@@ -1713,12 +1710,7 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     truthEvent->setIntData("vertex_module", vertex_module);
     truthEvent->setIntData("vertex_plane", vertex_plane);  
     
-    
-  
-    debug() <<"Exit CCProtonPi0::tagTruth()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
-    
 }
 
 //==============================================================================
@@ -1739,17 +1731,12 @@ bool CCProtonPi0::truthIsPlausible( const Minerva::PhysicsEvent*  ) const
 //==============================================================================
 StatusCode CCProtonPi0::finalize()
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter: CCProtonPi0::finalize()" << endmsg;
-    
     
     // finalize the base class.
     StatusCode sc = this->MinervaAnalysisTool::finalize();
     if( sc.isFailure() ) return Error( "Failed to finalize!", sc );
     
-    
-    debug() <<"Exit CCProtonPi0::finalize()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return sc;
 }
 
@@ -1763,12 +1750,11 @@ StatusCode CCProtonPi0::finalize()
 // tagSignal() 
 //      Tags Event as Signal or NOT
 //      Signal: CC-Neutrino Interaction inside Fiducial Volume, 
-//              FS Particles: Single Pi0, 1+ Proton, No Other
+//              FS Particles: Single Pi0, No Other (Proton and Neutrons are OK)
 //      returns TRUE if it is a Signal Event    
 //------------------------------------------------------------------------------
 bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::tagSignal()" << endmsg;
     
     bool isSignal = false;
@@ -1809,7 +1795,7 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart) {
         particle_PDG =  (*it_mcpart)->GetPDGCode();
         if (  particle_PDG == PDG::proton ) N_proton++;
-        else if ( particle_PDG == PDG::proton ) N_neutron++;
+        else if ( particle_PDG == PDG::neutron ) N_neutron++;
         else if ( particle_PDG == PDG::pi0 ) N_pi0++;
         else if ( particle_PDG == PDG::gamma ) N_gamma++;
         else if ( particle_PDG == PDG::muon ) N_muon++;
@@ -1858,7 +1844,6 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
 //------------------------------------------------------------------------------
 void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::tagBackground()" << endmsg;
     
     Minerva::TG4Trajectories::iterator it_mcpart;
@@ -1875,65 +1860,70 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
     
     int nPiPlus = 0;
     int nPiMinus = 0;
-    int particle_PDG;
-    int particle_ID;
+    int nPrimaryPiZero = 0;
+    int nSecondaryPiZero = 0;
+    int nAntiMuon = 0;
+    int particle_PDG = -1;
+    int particle_ID = -1;
     int mother_ID = -1;
     
-    bool isQE = false;
+    bool isQELike = false;
     bool isSinglePiPlus = false;
     bool isSinglePiMinus = false;
     bool isMultiPion = false;
+    bool isMultiPiZero = false;
     bool isOther = false;
+    
+    bool hasAntiMuon = false;
     bool hasMichel = false;
-    bool hasPi0 = false;
+    bool hasPrimaryPi0 = false;
+    bool hasSecondaryPi0 = false;
     
     std::vector<int> primary_traj_ID;
- 
-    
-    // -------------------------------------------------------------------------
-    // Identify Background Type
-    // -------------------------------------------------------------------------
-    // Background: QE
-//     const Minerva::InteractionTypes* intType = truthEvent->interactionType();
-   
-    debug() << "Interaction Type = "<<truthEvent->interactionType()<<endmsg;
-    if( truthEvent->interactionType() == 1){
-           isQE = true;
-       }
-//     debug() << "Interaction Type = "<<intType<<endmsg;
-//     if( *intType == 1){
-//         isQE = true;
-//     }
+    std::vector<int> primary_Pi0_ID;
     
     // Identify Primary Trajectories
     for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
         
         if ( (*it_mcpart)->GetProcessName() == "Primary"){
+            
             particle_PDG = (*it_mcpart)->GetPDGCode();
             particle_ID = (*it_mcpart)->GetTrackId();
             
             // Save Primary Trajectory IDs
             primary_traj_ID.push_back(particle_ID);
             
-            // Count PiPlus and PiMinus
+            // Count Particles
+            if (particle_PDG == -(PDG::muon)) nAntiMuon++;
             if (particle_PDG == PDG::pi) nPiPlus++;
-            if (particle_PDG == -(PDG::pi)) nPiMinus++; 
+            if (particle_PDG == -(PDG::pi)) nPiMinus++;
+            if (particle_PDG == PDG::pi0){ 
+                nPrimaryPiZero++;
+                primary_Pi0_ID.push_back(particle_ID);
+            } 
         }   
     }
     
-    // Background Types
-    if (nPiPlus == 1 && nPiMinus == 0 ) isSinglePiPlus = true;
-    if (nPiPlus == 0 && nPiMinus == 1 ) isSinglePiMinus = true;
-    if ((nPiPlus + nPiMinus) > 1 ) isMultiPion = true;
-    if (!isQE && (nPiPlus == 0 && nPiMinus == 0) ) isOther = true;
-        
+    // -------------------------------------------------------------------------
+    // Background Types 
+    // -------------------------------------------------------------------------
+    if( isBackgroundQELike(truthEvent) ) isQELike = true;    // Check for QE-Like Events
+    else if (nPiPlus == 1 && nPiMinus == 0 ) isSinglePiPlus = true;                
+    else if (nPiPlus == 0 && nPiMinus == 1 ) isSinglePiMinus = true;
+    else if ((nPiPlus + nPiMinus) > 1 ) isMultiPion = true; //MultiPion is Multiple Charged Pion
+    // If there is NO Charged Pion out of nucleus, check for Multiple Pi0
+    else if ( ((nPiPlus + nPiMinus) == 0) && nPrimaryPiZero > 1 )isMultiPiZero = true;
+    else isOther = true;
+    
     
     // -------------------------------------------------------------------------
-    // Check for Background Branching: hasMichel and hasPi0
+    // Check for Background Branching: hasMichel, hasPrimaryPi0, hasSecondaryPi0
     // -------------------------------------------------------------------------
+ 
+    if(nAntiMuon > 0) hasAntiMuon = true;
+    hasMichel = checkMichel();
     
-        
-    // Loop over Secondary Trajectories
+    // Loop over Secondary Trajectories to Check Secondary Pi0
     for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
         
         // Skip Primary Trajectories
@@ -1942,45 +1932,182 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
         particle_PDG =  (*it_mcpart)->GetPDGCode();
         mother_ID = (*it_mcpart)->GetParentId();
         
-        // Check Trajectory Mother is one of the Primary Particles
-        if ( isMotherPrimary(primary_traj_ID, mother_ID) ){
-            
-            // Check for Michel
-            if (particle_PDG == -(PDG::muon) ){
-                hasMichel = true;
-            }
-            // Check for Secondary Pi0
-            else if(particle_PDG == PDG::pi0){
-                hasPi0 = true;
-            }
-            
+        // Check Trajectory Mother is NOT a Primary Pi0 - Scattering
+        if ( particle_PDG == PDG::pi0 && !isMotherPrimary(primary_Pi0_ID, mother_ID) ){
+            nSecondaryPiZero++;
         }
-        
-        // Stop Search if Event hasMichel and Pi0
-        if ( hasMichel && hasPi0 ) break;
     }
     
+    if (nPrimaryPiZero > 0) hasPrimaryPi0 = true;
+    if (nSecondaryPiZero > 0) hasSecondaryPi0 = true;
+
+    
+    debug()<<"Interaction Type = "<<truthEvent->interactionType()<<endmsg;
     debug()<<"Background Type!"<<endmsg;
-    debug()<<"  QuasiElastic = "<<isQE<<endmsg;
+    debug()<<"  QuasiElastic Like = "<<isQELike<<endmsg;
     debug()<<"  SinglePiPlus = "<<isSinglePiPlus<<endmsg;
     debug()<<"  SinglePiMinus = "<<isSinglePiMinus<<endmsg;
     debug()<<"  MultiPion = "<<isMultiPion<<endmsg;
+    debug()<<"  MultiPiZero = "<<isMultiPiZero<<endmsg;
     debug()<<"  Other = "<<isOther<<endmsg;
     debug()<<"Background Branching!"<<endmsg;
+    debug()<<"  hasAntiMuon = "<<hasAntiMuon<<endmsg;
     debug()<<"  hasMichel = "<<hasMichel<<endmsg;
-    debug()<<"  hasPi0 = "<<hasPi0<<endmsg;
-    
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_QE", isQE );
+    debug()<<"  hasPrimaryPi0 = "<<hasPrimaryPi0<<endmsg;
+    debug()<<"  hasSecondaryPi0 = "<<hasSecondaryPi0<<endmsg;
+ 
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_QELike", isQELike );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_SinglePiPlus", isSinglePiPlus );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_SinglePiMinus", isSinglePiMinus );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_MultiPion", isMultiPion );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_MultiPiZero", isMultiPiZero );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_Other", isOther );
     
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_withAntiMuon", hasAntiMuon );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_withMichel", hasMichel );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_withPi0", hasPi0 );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_withPrimaryPi0", hasPrimaryPi0 );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_withSecondaryPi0", hasSecondaryPi0 );
     
-      
 }
+
+
+
+//------------------------------------------------------------------------------
+// isBackgoundQELike() 
+//      Check Primary Trajectories for a Background Event to decide whether it is a QE like or not
+//      Returns TRUE if event has only protons and neutrons outside of Nucleus (muon is OK)
+//------------------------------------------------------------------------------
+bool CCProtonPi0::isBackgroundQELike(Minerva::GenMinInteraction* truthEvent) const
+{
+    debug() << "Enter CCProtonPi0::isBackgoundQELike()" << endmsg;
+    
+    const SmartRefVector<Minerva::TG4Trajectory> pri_trajectories = truthEvent->trajectories();
+    SmartRefVector<Minerva::TG4Trajectory>::const_iterator it_mcpart;
+    int N_other = 0;
+    int particle_PDG;
+    
+    for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart){
+        particle_PDG =  (*it_mcpart)->GetPDGCode();
+        if (  particle_PDG == PDG::proton ) continue;
+        else if ( particle_PDG == PDG::neutron ) continue;
+        else if ( particle_PDG == PDG::muon ) continue;
+        else if ( particle_PDG == -(PDG::muon) ) continue;
+        else N_other++;
+    }
+    
+    // If there are Other Particles than proton, neutron, muon, or antimuon
+    if (N_other > 0) return false;
+    else return true;
+    
+}
+
+
+//------------------------------------------------------------------------------
+// checkPionAbsorption() 
+//      Checks for Pion Absorption inside Nucleus for Events Does not have a pion outside
+//      Returns TRUE if there is a pion inside (pi+,pi-,pi0)
+//------------------------------------------------------------------------------
+bool CCProtonPi0::checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const
+{
+    debug() <<"Enter: CCProtonPi0::checkPionAbsorption()" << endmsg;
+    
+    const Minerva::GenMinEventRecord* eventRecord = truthEvent->eventRecord();
+    const std::vector<int> eRecPartID = eventRecord->eRecPartID();
+
+    for(unsigned int g_part = 0; g_part < eRecPartID.size(); g_part++ ){
+        if (eRecPartID[g_part] == PDG::pi) return true;
+        if (eRecPartID[g_part] == -(PDG::pi)) return true;
+        if (eRecPartID[g_part] == PDG::pi0) return true;
+    }
+    
+    return false;
+    
+}
+//------------------------------------------------------------------------------
+// checkMichel() 
+//      Check MC Trajectories for a PiPlus to MuPlus Decay
+//      Returns TRUE if such a decay exists
+//------------------------------------------------------------------------------
+bool CCProtonPi0::checkMichel() const
+{
+    debug() <<"Enter: CCProtonPi0::checkMichel()" << endmsg;
+    
+    Minerva::TG4Trajectories::iterator it_mcpart;
+    Minerva::TG4Trajectories* trajects = NULL;
+    if( exist<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default ) ) {
+        trajects = get<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default );
+    } else {
+        warning() << "Could not get TG4Trajectories from " << Minerva::TG4TrajectoryLocation::Default << endmsg;
+        return false;
+    }
+    
+    // just to make sure
+    if( !trajects ) return false;
+    
+    int particle_PDG;
+    int particle_ID;
+    int mother_ID;
+    std::vector<int> PiPlus_traj_ID;
+    
+    // Save all Pi+ Info
+    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+        
+        particle_PDG =  (*it_mcpart)->GetPDGCode();
+        particle_ID = (*it_mcpart)->GetTrackId();
+        
+        // Save Pi+ Trajectory IDs
+        if (particle_PDG == PDG::pi ) PiPlus_traj_ID.push_back(particle_ID);
+        
+    }
+    
+    // Loop again to check Daughters of Pi+
+    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+        
+        particle_PDG =  (*it_mcpart)->GetPDGCode();
+        mother_ID = (*it_mcpart)->GetParentId();
+        
+        // Check Trajectory Mother is one of the Pi+
+        if ( isMotherPrimary(PiPlus_traj_ID, mother_ID) ){
+            if (particle_PDG == -(PDG::muon) ) return true;
+        } 
+    }
+    
+    return false;
+    
+}
+
+//------------------------------------------------------------------------------
+// writeBackgroundType() 
+//      Prints Background Type with its Branching Information
+//          Uses info()
+//------------------------------------------------------------------------------
+void CCProtonPi0::writeBackgroundType(Minerva::GenMinInteraction* truthEvent) const
+{
+    // RETURN if it is a Signal Event
+    if(truthEvent->filtertaglist()->isFilterTagTrue("isSignal")) return;
+     
+    // Print Background Type
+    if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_QELike")) info() <<"Background: QE Like"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_AntiMuon")) info() <<"Background: Anti-Muon"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_SinglePiPlus")) info() <<"Background: Single PiPlus"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_SinglePiMinus")) info() <<"Background: Single PiMinus"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_MultiPion")) info() <<"Background: Multiple Charged Pion"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_MultiPiZero")) info() <<"Background: Multiple PiZero"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_PionAbsorption")) info() <<"Background: Pion Absorption"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_Other")) info() <<"Background: Other"<<endmsg;
+    else warning()<< "No Background Type!"<<endmsg;
+    
+    // Print Branching Information
+    bool hasMichel = truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withMichel");
+    bool hasPi0 = truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withPi0");
+    bool hasGamma = truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withGamma");
+    
+    info()<<"Background Branching: "<<endmsg;
+    info()<<"   Michel = "<<hasMichel<<" hasPi0 = "<<hasPi0<<" hasGamma = "<<hasGamma<<endmsg;
+}
+
+
+
 
 
 //------------------------------------------------------------------------------
@@ -1989,7 +2116,6 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
 //------------------------------------------------------------------------------
 void CCProtonPi0::setSignalKinematics(Minerva::GenMinInteraction* truthEvent) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::setSignalKinematics()" << endmsg;
     
     //--------------------------------------------------------------------------
@@ -2115,8 +2241,6 @@ void CCProtonPi0::setSignalKinematics(Minerva::GenMinInteraction* truthEvent) co
     truthEvent->setContainerDoubleData("gamma_E",  t_gamma_E);
     truthEvent->setContainerDoubleData("gamma_theta_wrtbeam",  t_gamma_theta);
 
-    debug() << "Exit CCProtonPi0::setSignalKinematics()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
 }
 
 
@@ -2125,7 +2249,6 @@ void CCProtonPi0::setSignalKinematics(Minerva::GenMinInteraction* truthEvent) co
 //------------------------------------------------------------------------------
 void CCProtonPi0::setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::setTargetMaterial()" << endmsg;
     
     Gaudi::LorentzVector t_vtx = truthEvent->Vtx(); 
@@ -2172,11 +2295,11 @@ void CCProtonPi0::setTargetMaterial(Minerva::GenMinInteraction* truthEvent) cons
     else t_targetMaterial = 10;    
     
     truthEvent->setIntData("target_material", t_targetMaterial);
-    
-    debug() << "Exit CCProtonPi0::setTargetMaterial()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
 }
 
+//------------------------------------------------------------------------------
+// isMotherPrimary() returns True if the particle mother is a Primary Particle
+//------------------------------------------------------------------------------
 bool CCProtonPi0::isMotherPrimary(std::vector<int>& motherList, int mother ) const
 {
     for( unsigned int i = 0 ; i < motherList.size(); i++ ) {
@@ -2203,10 +2326,11 @@ void CCProtonPi0::writeFSParticleTable(bool isSignal) const
     if( !trajects ) return;
 
     Gaudi::LorentzVector temp_4p;
+    double gammaE_threshold = 20; //MeV
     int particle_PDG;
     int particle_ID;
     int mother_ID = -1;
-    std::vector<int> pri_pi0_ID;
+    std::vector<int> primary_traj_ID;
     std::vector<int> pri_piplus_ID;
     std::vector<int> pri_piminus_ID;
     
@@ -2236,6 +2360,8 @@ void CCProtonPi0::writeFSParticleTable(bool isSignal) const
             particle_PDG = (*rit_mcpart)->GetPDGCode();
             particle_ID = (*rit_mcpart)->GetTrackId();
             
+            primary_traj_ID.push_back(particle_ID);
+            
             std::cout.width(12); std::cout<<particle_ID;    // ID
             std::cout.width(24); std::cout<<(*rit_mcpart)->GetProcessName();// Process
             std::cout.width(12); std::cout<<particle_PDG;                   // PDG
@@ -2244,16 +2370,14 @@ void CCProtonPi0::writeFSParticleTable(bool isSignal) const
             std::cout.width(12); std::cout<<temp_4p.E();
             std::cout<<std::endl;
             
-            // Save Primary Pi0, PiPlus and PiMinus Information
-            if (particle_PDG == PDG::pi0) pri_pi0_ID.push_back(particle_ID);
-            else if (particle_PDG == PDG::pi) pri_piplus_ID.push_back(particle_ID);
-            else if (particle_PDG == -(PDG::pi)) pri_piminus_ID.push_back(particle_ID); 
+            // Save Primary Trajectory Information
+            primary_traj_ID.push_back(particle_ID);
         }
         
     }
     
     
-    // Print 2nd Particles only if their Mother is a PiPlus or  PiMinus
+    // Print Special 2nd Particles
     for (rit_mcpart = trajects->rbegin(); rit_mcpart != trajects->rend(); ++rit_mcpart) {
 
         // Skip Primary Trajectories
@@ -2263,10 +2387,10 @@ void CCProtonPi0::writeFSParticleTable(bool isSignal) const
         particle_PDG =  (*rit_mcpart)->GetPDGCode();
         mother_ID = (*rit_mcpart)->GetParentId();
         
-        // PiPlus Daughters - Michel, Charge Exchange or Other
-        if ( isMotherPrimary(pri_piplus_ID, mother_ID) ){
+        
+        if ( isMotherPrimary(primary_traj_ID, mother_ID) ){
             if (particle_PDG == -(PDG::muon) ){
-                std::cout<<"PiPlus with Michel!"<<std::endl;
+                std::cout<<"Michel!"<<std::endl;
                 std::cout.width(12); std::cout<<(*rit_mcpart)->GetTrackId();    // ID
                 std::cout.width(24); std::cout<<(*rit_mcpart)->GetProcessName();// Process
                 std::cout.width(12); std::cout<<particle_PDG;                   // PDG
@@ -2275,7 +2399,16 @@ void CCProtonPi0::writeFSParticleTable(bool isSignal) const
                 std::cout.width(12); std::cout<<temp_4p.E();
                 std::cout<<std::endl;
             }else if(particle_PDG == PDG::pi0){
-                std::cout<<"PiPlus Charge Exchanges!"<<std::endl;
+                std::cout<<"Secondary Pi0!"<<std::endl;
+                std::cout.width(12); std::cout<<(*rit_mcpart)->GetTrackId();    // ID
+                std::cout.width(24); std::cout<<(*rit_mcpart)->GetProcessName();// Process
+                std::cout.width(12); std::cout<<particle_PDG;                   // PDG
+                std::cout.width(12); std::cout<<(*rit_mcpart)->GetParentId();   // Mother PDG
+                std::cout.width(12); std::cout<<temp_4p.P();
+                std::cout.width(12); std::cout<<temp_4p.E();
+                std::cout<<std::endl;
+            }else if(particle_PDG == PDG::gamma && temp_4p.E() > gammaE_threshold  ){
+                std::cout<<"Secondary Gamma with Energy > 20 MeV!"<<std::endl;
                 std::cout.width(12); std::cout<<(*rit_mcpart)->GetTrackId();    // ID
                 std::cout.width(24); std::cout<<(*rit_mcpart)->GetProcessName();// Process
                 std::cout.width(12); std::cout<<particle_PDG;                   // PDG
@@ -2285,34 +2418,6 @@ void CCProtonPi0::writeFSParticleTable(bool isSignal) const
                 std::cout<<std::endl;
             }
         }
-        
-        // PiMinus Daughters - Charge Exchange or Other
-        else if ( isMotherPrimary(pri_piminus_ID, mother_ID) ){
-            if (particle_PDG == PDG::pi0 ){
-                std::cout<<"PiMinus Charge Exchanges"<<std::endl;
-                std::cout.width(12); std::cout<<(*rit_mcpart)->GetTrackId();    // ID
-                std::cout.width(24); std::cout<<(*rit_mcpart)->GetProcessName();// Process
-                std::cout.width(12); std::cout<<particle_PDG;                   // PDG
-                std::cout.width(12); std::cout<<mother_ID;                      // Mother PDG
-                std::cout.width(12); std::cout<<temp_4p.P();
-                std::cout.width(12); std::cout<<temp_4p.E();
-                std::cout<<std::endl;
-            }
-        }
-        
-        // Secondary Pi0
-        else if (particle_PDG == PDG::pi0){
-            std::cout<<"Secondary Pi0 - Not from Primary PiPlus or PiMinus"<<std::endl;
-            std::cout.width(12); std::cout<<(*rit_mcpart)->GetTrackId();    // ID
-            std::cout.width(24); std::cout<<(*rit_mcpart)->GetProcessName();// Process
-            std::cout.width(12); std::cout<<particle_PDG;                   // PDG
-            std::cout.width(12); std::cout<<mother_ID;                      // Mother PDG
-            std::cout.width(12); std::cout<<temp_4p.P();
-            std::cout.width(12); std::cout<<temp_4p.E();
-            std::cout<<std::endl;
-            continue;
-        }
-        
     }
     std::cout<<"--------------------------------------------------------------"<<std::endl;
   
@@ -2367,7 +2472,6 @@ void CCProtonPi0::writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool 
 
 void CCProtonPi0::setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::setPi0GenieRecord()" << endmsg;
     
     //--------------------------------------------------------------------------
@@ -2421,10 +2525,7 @@ void CCProtonPi0::setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) cons
     truthEvent->setIntData("pi0_MotherStatus", t_pi0_MotherStatus);
     truthEvent->setIntData("pi0_GrandMother", t_pi0_GrandMother);
     truthEvent->setIntData("pi0_GrandMotherStatus", t_pi0_GrandMotherStatus);
-    
-    debug() << "Exit CCProtonPi0::setPi0GenieRecord()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
+  
 }
 
 //------------------------------------------------------------------------------
@@ -2432,7 +2533,6 @@ void CCProtonPi0::setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) cons
 //------------------------------------------------------------------------------
 bool CCProtonPi0::isSinglePi0(Minerva::GenMinInteraction* truthEvent, int nPi0, int nGamma) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::isSinglePi0()" << endmsg;
     
     bool is1Pi0;
@@ -2449,10 +2549,7 @@ bool CCProtonPi0::isSinglePi0(Minerva::GenMinInteraction* truthEvent, int nPi0, 
         debug()<<"No Single Pi0 "<<endmsg;
         is1Pi0 = false;
     }
-    
-    debug() << "Exit CCProtonPi0::isSinglePi0()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
+   
     return is1Pi0;
 }
     
@@ -2461,10 +2558,6 @@ bool CCProtonPi0::isSinglePi0(Minerva::GenMinInteraction* truthEvent, int nPi0, 
 //------------------------------------------------------------------------------
 StatusCode CCProtonPi0::interpretFailEvent( Minerva::PhysicsEvent* event ) const
 {  
-
-    debug() <<"Exit CCProtonPi0::reconstructEvent() through interpretFailEvent()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::interpretFailEvent()" << endmsg;
     
     Minerva::NeutrinoInt* nuInt = new Minerva::NeutrinoInt(m_anaSignature);
@@ -2475,8 +2568,6 @@ StatusCode CCProtonPi0::interpretFailEvent( Minerva::PhysicsEvent* event ) const
     fillCommonPhysicsAnaBranches(event);
     fillNuMIBranches(event);
     
-    debug() << "Exit CCProtonPi0::interpretFailEvent()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
 }
 
@@ -2508,7 +2599,6 @@ void CCProtonPi0::setVertexData( Minerva::NeutrinoInt* nuInt, const Minerva::Phy
 //==============================================================================
 bool CCProtonPi0::setMuonData( Minerva::NeutrinoInt* nuInt ) const 
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::setMuonData()" << endmsg;
     
     // Sanity Check
@@ -2645,9 +2735,6 @@ bool CCProtonPi0::setMuonData( Minerva::NeutrinoInt* nuInt ) const
     nuInt->setDoubleData("muon_E_shift",muon_E_shift);
 
     fillMinosMuonBranches(nuInt, m_MuonProng);
-
-    debug() << "Exit CCProtonPi0::setMuonData()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return true;
 }
@@ -2660,7 +2747,6 @@ bool CCProtonPi0::setMuonData( Minerva::NeutrinoInt* nuInt ) const
 //! @todo Make sure the 4P info used for calculations are same as the ones written to NTuples
 void CCProtonPi0::setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronVisibleEnergy) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::setEventKinematics()" << endmsg;
       
     //--------------------------------------------------------------------------
@@ -2741,9 +2827,7 @@ void CCProtonPi0::setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronV
     nuInt->setDoubleData("total_py",total_py);
     nuInt->setDoubleData("total_pz",total_pz);
     nuInt->setDoubleData("total_E",total_E);
-    
-    debug() << "Exit CCProtonPi0::setEventKinematics()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
+
 }
 
 //==============================================================================
@@ -2751,7 +2835,6 @@ void CCProtonPi0::setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronV
 //==============================================================================
 StatusCode CCProtonPi0::getNearestPlane(double z, int & module_return, int & plane_return) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::getNearestPlane()" << endmsg;
     
     // Got From Brandon's CCNuPionInc - 2014_04_14
@@ -2769,8 +2852,6 @@ StatusCode CCProtonPi0::getNearestPlane(double z, int & module_return, int & pla
     module_return = planeid.module();
     plane_return = planeid.plane();
 
-    debug() << "Exit CCProtonPi0::getNearestPlane()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return StatusCode::SUCCESS;
   
 }
@@ -2780,7 +2861,6 @@ StatusCode CCProtonPi0::getNearestPlane(double z, int & module_return, int & pla
 //==============================================================================
 bool CCProtonPi0::createTrackedParticles( Minerva::ProngVect& prongs ) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::createTrackedParticles()" << endmsg;
     bool makeParticles = false;
     
@@ -2831,8 +2911,6 @@ bool CCProtonPi0::createTrackedParticles( Minerva::ProngVect& prongs ) const
         hypotheses.clear();
     }
     
-    debug() << "Exit CCProtonPi0::createTrackedParticles()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     return makeParticles;
 }
 
@@ -2842,7 +2920,6 @@ bool CCProtonPi0::createTrackedParticles( Minerva::ProngVect& prongs ) const
 //==============================================================================
 bool CCProtonPi0::getProtonProng(   Minerva::ProngVect& primaryProngs) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::getProtonProng()" << endmsg;
   
     debug() <<"N(primaryProngs) =  " << primaryProngs.size() << endmsg;
@@ -2880,15 +2957,16 @@ bool CCProtonPi0::getProtonProng(   Minerva::ProngVect& primaryProngs) const
             m_ProtonProngs.push_back( prong );
             m_ProtonParticles.push_back( particle );
             isProtonExist = true;
+            
+            
+
+            
+            
         }
     }
 
     debug() <<"Found "<<m_ProtonParticles.size()<<" Proton Candidates!"<<endmsg;
-
    
-    debug() <<"Exit CCProtonPi0::getProtonProng()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
     return isProtonExist;
 }
 
@@ -2898,8 +2976,15 @@ bool CCProtonPi0::getProtonProng(   Minerva::ProngVect& primaryProngs) const
 //==============================================================================
 bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const 
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::setProtonData()" << endmsg;
+    
+    // PID Score from Likelihood Parameters
+    Minerva::ParticleVect protonLikelihood;
+    Minerva::ParticleVect pionLikelihood;
+    std::vector<Minerva::Particle::ID> protonHypotheses;
+    std::vector<Minerva::Particle::ID> pionHypotheses;
+    protonHypotheses.push_back( Minerva::Particle::Proton );
+    pionHypotheses.push_back( Minerva::Particle::Pion );
     
     // Declare Variables
     double SENTINEL = -9.9;
@@ -2936,9 +3021,8 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
     
     std::vector<double> pionScore(10,SENTINEL);
     std::vector<double> protonScore(10,SENTINEL);
-    std::vector<double> score(10,SENTINEL);
-    std::vector<double> score1(10,SENTINEL);
-    std::vector<double> score2(10,SENTINEL);
+    std::vector<double> pionScoreLLR(10,SENTINEL);
+    std::vector<double> protonScoreLLR(10,SENTINEL);
     std::vector<double> chi2(10,SENTINEL);
     bool noProtons = false;
 
@@ -3099,25 +3183,31 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
     
         kinked[i]  = (int)prong->Kinked();
         odMatch[i] = (int)prong->OdMatch(); 
-        score[i]   = particle->score();
-        score1[i]  = particle->getDoubleData("score1");
-        score2[i]  = particle->getDoubleData("score2");
         chi2[i]    = particle->getDoubleData("chi2_ndf");
         m_protonUtils->getParticleScores(prong,protonScore[i],pionScore[i]);
         
+        m_LikelihoodPIDTool->makeParticles( prong, protonLikelihood, protonHypotheses );
+        m_LikelihoodPIDTool->makeParticles( prong, pionLikelihood, pionHypotheses );
+
+        // Phil's Likelihood Method for PID
+        if(!protonLikelihood.empty()){
+                protonScoreLLR[i] = protonLikelihood[i]->score();
+                pionScoreLLR[i] = pionLikelihood[i]->score();
+        }else{
+            debug()<<"particlesLikelihood is empty!"<<endmsg;
+        }
+        
         // Find Leading Proton
-        if (score[i]  > tempProtonScore){
-            tempProtonScore = score[i];
+        if (protonScore[i]  > tempProtonScore){
+            tempProtonScore = protonScore[i];
             leadingProtonIndice = i;
         }
         
         //----------------------------------------------------------------------
         // Debugging: Check values
             debug()<<"P4(Proton) = ( "<<px[i]<<", "<<py[i]<<", "<<pz[i]<<", "<<E[i]<<" )"<<endmsg;
-            debug()<<" score = "<<score[i]
-            <<" protonScore = "<<protonScore[i]
-            <<" pionScore = "<<pionScore[i]
-            <<endmsg;
+            debug()<<" protonScore = "<<protonScore[i]<<" pionScore = "<<pionScore[i]<<endmsg;
+            debug()<<" protonScoreLLR = "<<protonScoreLLR[i]<<" pionScoreLLR = "<<pionScoreLLR[i]<<endmsg;
         //----------------------------------------------------------------------
         
         //----------------------------------------------------------------------
@@ -3159,9 +3249,8 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
     
     nuInt->setContainerDoubleData("protonScore",protonScore);
     nuInt->setContainerDoubleData("pionScore",pionScore);
-    nuInt->setContainerDoubleData("proton_score",score);
-    nuInt->setContainerDoubleData("proton_score1",score1);
-    nuInt->setContainerDoubleData("proton_score2",score2);
+    nuInt->setContainerDoubleData("protonScore_LLR",protonScoreLLR);
+    nuInt->setContainerDoubleData("pionScore_LLR",pionScoreLLR);
     nuInt->setContainerDoubleData("proton_chi2_ndf",chi2);
     
     nuInt->setContainerDoubleData("proton_theta",proton_theta);
@@ -3170,9 +3259,6 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
     nuInt->setContainerDoubleData("proton_phi",proton_phi);
     
     nuInt->setContainerDoubleData("proton_ekin",ekin);
-    
-    debug() << "Exit CCProtonPi0::setProtonData()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     
     return true;
 }
@@ -3184,7 +3270,6 @@ bool CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonPro
                                                 double& p_calCorrection, 
                                                 double& p_visEnergyCorrection ) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::correctProtonProngEnergy()" << endmsg;
     
     //-- initialize
@@ -3282,9 +3367,6 @@ bool CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonPro
         debug() << "update momentum using visible correction = " << p_visEnergyCorrection << endmsg;
     }     
     
-    debug() << "Exit CCProtonPi0::correctProtonProngEnergy()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
     // p_visEnergyCorrection == 0 leads to a 0 4-Momentum
     return isCorrected;
 }
@@ -3297,7 +3379,6 @@ bool CCProtonPi0::setPi0Data(   Minerva::PhysicsEvent *event,
                                         Minerva::IDBlob* idblob1, 
                                         Minerva::IDBlob* idblob2) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "CCProtonPi0::setPi0Data()" << endmsg;
     
     const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
@@ -3494,9 +3575,6 @@ bool CCProtonPi0::setPi0Data(   Minerva::PhysicsEvent *event,
     event->setDoubleData("gamma2_evis_hcal", g2hcalevis);
     event->setDoubleData("gamma2_evis_scal", g2scalevis);
 
-    debug() << "Exit CCProtonPi0::setPi0Data()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-
     return true;
 }
 
@@ -3512,8 +3590,6 @@ bool CCProtonPi0::setPi0Data(   Minerva::PhysicsEvent *event,
 //==============================================================================
 bool CCProtonPi0::VtxBlob(Minerva::PhysicsEvent *event) const
 {
-    
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::VtxBlob()" << endmsg;
     
     const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
@@ -3592,11 +3668,8 @@ bool CCProtonPi0::VtxBlob(Minerva::PhysicsEvent *event) const
     event->setDoubleData( "Vertex_blob_energy", vertex_energy );
     event->setDoubleData( "Filament_Vertex_energy", vertex_energy_filament );
     event->setDoubleData( "Sphere_Vertex_energy", vertex_energy_sphere );
-  
-    debug() << "Exit CCProtonPi0::VtxBlob()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-
-  return true;
+    
+    return true;
 
 }
 
@@ -3607,7 +3680,6 @@ SmartRefVector<Minerva::IDCluster> CCProtonPi0::FilterInSphereClusters( const Sm
                                      const double sphereRadius,
                                      std::vector<double>& radii) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::FilterInSphereClusters()" << endmsg;
     
     //--------------------------------------------------------------------------
@@ -3667,10 +3739,7 @@ SmartRefVector<Minerva::IDCluster> CCProtonPi0::FilterInSphereClusters( const Sm
     }
 
     vertexEnergyVector.swap(radii);
-    
-    debug() << "Exit CCProtonPi0::FilterInSphereClusters()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
+  
     return sphereClusters;
     
 }
@@ -3680,7 +3749,6 @@ SmartRefVector<Minerva::IDCluster> CCProtonPi0::FilterInSphereClusters( const Sm
 //==============================================================================
 bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::ConeBlobs()" << endmsg;
     
     // Initialize Bool Variables
@@ -4020,8 +4088,6 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
         // ---------------------------------------------------------------------
         if (!isPi0DataSet){
             debug() << "Pi0 Data was not Set, Returning!..."<<endmsg;
-            debug() << "Exit CCProtonPi0::ConeBlobs()" << endmsg;
-            debug() <<"--------------------------------------------------------------------------"<<endmsg;
             return false;
         }
         
@@ -4104,9 +4170,6 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
 
     event->setDoubleData( "Rejected_blob_vis_energy", rejectedBlob->energy() );
     
-    debug() << "Exit CCProtonPi0::ConeBlobs()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
     return isPi0DataSet;
 
 }
@@ -4118,7 +4181,6 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
 StatusCode CCProtonPi0::HoughBlob(SmartRefVector<Minerva::IDCluster> idClusters,
                                    std::vector<Minerva::IDBlob*>& outBlobs) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::HoughBlob()" << endmsg;
 
     //--------------------------------------------------------------------------
@@ -4201,11 +4263,8 @@ StatusCode CCProtonPi0::HoughBlob(SmartRefVector<Minerva::IDCluster> idClusters,
             m_idHoughBlob->AddClusterInsideCone( *it_clus, outBlobs, vtx_position );
 
 
-    info() << " Hough Transform is done! " << endmsg;
-    
-    debug() << "Exit CCProtonPi0::HoughBlob()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-
+    debug() << " Hough Transform is done! " << endmsg;
+   
     return StatusCode::SUCCESS;
 }
 
@@ -4214,7 +4273,6 @@ StatusCode CCProtonPi0::HoughBlob(SmartRefVector<Minerva::IDCluster> idClusters,
 //==============================================================================
 void CCProtonPi0::processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::processBlobs()" << endmsg;
 
     int count = 0;
@@ -4245,8 +4303,6 @@ void CCProtonPi0::processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerv
     idBlobs[0]->setIntData("Photon1", true);
     idBlobs[1]->setIntData("Photon2", true);
 
-    debug() << "Exit CCProtonPi0::processBlobs()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
 }
 
 //==============================================================================
@@ -4254,7 +4310,6 @@ void CCProtonPi0::processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerv
 //==============================================================================
 void CCProtonPi0::ApplyAttenuationCorrection(Minerva::IDBlob* blob) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::ApplyAttenuationCorrection()" << endmsg;
 
     info() << "AttenuationCorrection (before): " << blob->energy() << endmsg;
@@ -4285,10 +4340,8 @@ void CCProtonPi0::ApplyAttenuationCorrection(Minerva::IDBlob* blob) const
 
     blob->updateEnergy();
     
-    info() << "AttenuationCorrection (after):  " << blob->energy() << endmsg;
+    debug() << "AttenuationCorrection (after):  " << blob->energy() << endmsg;
     
-    debug() << "Exit CCProtonPi0::ApplyAttenuationCorrection()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
 }
 
 //==============================================================================
@@ -4296,7 +4349,6 @@ void CCProtonPi0::ApplyAttenuationCorrection(Minerva::IDBlob* blob) const
 //==============================================================================
 double CCProtonPi0::CalcMinBlobSeparation(const Minerva::IDBlob* blob) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::CalcMinBlobSeparation()" << endmsg;
 
     //--------------------------------------------------------------------------
@@ -4347,9 +4399,6 @@ double CCProtonPi0::CalcMinBlobSeparation(const Minerva::IDBlob* blob) const
         double distance = sqrt(pow(z-z0,2) + pow(t-t0,2));
         dmin = std::min(dmin,distance);
     }
-    
-    debug() << "Exit CCProtonPi0::CalcMinBlobSeparation()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
 
     return dmin;
 }
@@ -4359,7 +4408,6 @@ double CCProtonPi0::CalcMinBlobSeparation(const Minerva::IDBlob* blob) const
 //==============================================================================
 std::vector<double> CCProtonPi0::GetBlobClusterEnergy(const Minerva::IDBlob* blob) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::GetBlobClusterEnergy()" << endmsg;
     
     //--------------------------------------------------------------------------
@@ -4382,10 +4430,7 @@ std::vector<double> CCProtonPi0::GetBlobClusterEnergy(const Minerva::IDBlob* blo
         clusterEnergies.push_back((*c)->energy());
         if (std::distance(clusters.begin(),c) > 4) break;
     }
-
-    debug() << "Exit CCProtonPi0::GetBlobClusterEnergy()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
+   
     return clusterEnergies;
 }
 
@@ -4394,7 +4439,6 @@ std::vector<double> CCProtonPi0::GetBlobClusterEnergy(const Minerva::IDBlob* blo
 //==============================================================================
 StatusCode CCProtonPi0::ODActivity( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs ) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::ODActivity()" << endmsg;
     
     debug() << " Starting ODActivity::EnergeticTower " << endmsg;
@@ -4542,10 +4586,7 @@ StatusCode CCProtonPi0::ODActivity( Minerva::PhysicsEvent *event, std::vector<Mi
     event->setContainerDoubleData( "od_towerTimeBlobMuon", timeBlobMuonVector );
     
     debug() << " Ending ODActivity::EnergeticTower " << endmsg;
-    
-    debug() <<"Exit CCProtonPi0::ODActivity()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
+     
     return StatusCode::SUCCESS;
 }
 
@@ -4554,7 +4595,6 @@ StatusCode CCProtonPi0::ODActivity( Minerva::PhysicsEvent *event, std::vector<Mi
 //==============================================================================
 double CCProtonPi0::CalcDistanceFromBlobAxisToVertex( const Minerva::IDBlob* blob ) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::CalcDistanceFromBlobAxisToVertex()" << endmsg;
     
     //--------------------------------------------------------------------------
@@ -4598,9 +4638,6 @@ double CCProtonPi0::CalcDistanceFromBlobAxisToVertex( const Minerva::IDBlob* blo
     const double dvtx2 = (x31.Cross(x32)).R()/(x2-x1).R();
     debug() << "\t Self-test distance: " << dvtx2 << endmsg;
     assert(dvtx2 < 1.e-6);
-    
-    debug() <<"Exit CCProtonPi0::CalcDistanceFromBlobAxisToVertex()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
 
     return dvtx;
 }
@@ -4610,7 +4647,6 @@ double CCProtonPi0::CalcDistanceFromBlobAxisToVertex( const Minerva::IDBlob* blo
 //==============================================================================
 double CCProtonPi0::CalcDistanceFromVertexToExiting(const Minerva::IDBlob* blob) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::CalcDistanceFromVertexToExiting()" << endmsg;
     
     //--------------------------------------------------------------------------
@@ -4641,9 +4677,6 @@ double CCProtonPi0::CalcDistanceFromVertexToExiting(const Minerva::IDBlob* blob)
     debug() << "\t nstep before exiting:    " << nstep << endmsg;
     debug() << "\t Distance before exiting: " << dmax << endmsg;
     
-    debug() <<"Exit CCProtonPi0::CalcDistanceFromVertexToExiting()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
     return dmax;
 }
 
@@ -4654,7 +4687,6 @@ void CCProtonPi0::CalculatedEdx(    const Minerva::IDBlob* blob,
                                     Minerva::PhysicsEvent* event, 
                                     unsigned int blob_number) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::CalculatedEdx()" << endmsg;
     
     //--------------------------------------------------------------------------
@@ -4758,10 +4790,6 @@ void CCProtonPi0::CalculatedEdx(    const Minerva::IDBlob* blob,
 
         event->setContainerDoubleData("g2dedx_rev_cluster_energy", blob_rev_cluster_energy);
     }
-    
-    debug() <<"Exit CCProtonPi0::CalculatedEdx()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-
 }
 
 //==============================================================================
@@ -4769,7 +4797,6 @@ void CCProtonPi0::CalculatedEdx(    const Minerva::IDBlob* blob,
 //==============================================================================
 bool CCProtonPi0::InsideHexagon(double x, double y, double w) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::InsideHexagon()" << endmsg;
     
     double max = w/2;
@@ -4783,10 +4810,7 @@ bool CCProtonPi0::InsideHexagon(double x, double y, double w) const
         
         if (xtmp < min || xtmp > max) return false;
     }
-    
-    debug() <<"Exit CCProtonPi0::InsideHexagon()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
+   
     return true;
     
 }
@@ -4796,8 +4820,6 @@ bool CCProtonPi0::InsideHexagon(double x, double y, double w) const
 //==============================================================================
 bool CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event) const
 {
-
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() <<"Enter CCProtonPi0::PreFilterPi0()" << endmsg;
     
     //--------------------------------------------------------------------------
@@ -5010,9 +5032,6 @@ bool CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event) const
     debug() <<"max_Target = "<<max_Evis_Target<<" min_Other =  "<<min_Evis_Other<<" max_Other =  "<<max_Evis_Other<<endmsg;
     event->setIntData("preFilter_Result",0);
     
-    debug() <<"Exit CCProtonPi0::PreFilterPi0()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
     return true;
     
 }
@@ -5022,7 +5041,6 @@ bool CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event) const
 //---------------------------------------------------------------------------------
 void CCProtonPi0::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
     debug() << "Enter CCProtonPi0::setTrackProngTruth()" << endmsg;
     
     std::vector<const Minerva::TG4Trajectory*> parent;
@@ -5211,10 +5229,7 @@ void CCProtonPi0::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::P
         neutrino->setDoubleData("endMuonTrajYPosition",end_trajY[0]);
         neutrino->setDoubleData("endMuonTrajZPosition",end_trajZ[0]);
     }
-    
-    debug() << "Exit CCProtonPi0::setTrackProngTruth()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
+   
     return;
 }
 
@@ -5223,12 +5238,12 @@ void CCProtonPi0::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::P
 //------------------------------------------------------------------------------
 double CCProtonPi0::getClusterEnergy(Minerva::PhysicsEvent* event, std::string input_clusterType) const
 {
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    debug() << "Enter CCProtonPi0::getClusterEnergy()" << endmsg;
+    debug() <<"Enter: CCProtonPi0::getClusterEnergy()" << endmsg;
     
     const std::string clusterType1 = "Unused";
     const std::string clusterType2 = "Used";
     const std::string clusterType3 = "Used:Unused";
+    const std::string energyType = "!XTalkCandidate"; // energy from hits that are NOT a Cross-Talk Candidate
     std::string clusterType;
     
     if(input_clusterType.compare(clusterType1) == 0 || input_clusterType.compare(clusterType2) == 0 || input_clusterType.compare(clusterType3) == 0 ){
@@ -5239,21 +5254,20 @@ double CCProtonPi0::getClusterEnergy(Minerva::PhysicsEvent* event, std::string i
         return -1.0;
     }
     
-    SmartRefVector<IDCluster> idClusters = event->select<IDCluster>(clusterType,"All");
-    SmartRefVector<ODCluster> odClusters = event->select<ODCluster>(clusterType,"All");  
+    SmartRefVector<IDCluster> idClusters = event->select<IDCluster>(clusterType,energyType);
+    SmartRefVector<ODCluster> odClusters = event->select<ODCluster>(clusterType,energyType);  
     double idEnergy = m_extraEnergyTool->getIDEnergy(idClusters, -1.0);
     double odEnergy = m_extraEnergyTool->getODEnergy(odClusters, -1.0);
     double totalEnergy = idEnergy  + odEnergy;
-    
-    debug() <<"Exit CCProtonPi0::getClusterEnergy()" << endmsg;
-    debug() <<"--------------------------------------------------------------------------"<<endmsg;
-    
+   
     return totalEnergy;
 }
 
 
 void CCProtonPi0::getClusterTime(Minerva::PhysicsEvent* event) const
 {
+    debug() <<"Enter: CCProtonPi0::getClusterTime()" << endmsg;
+    
     SmartRefVector<Minerva::IDCluster> unusedClusters = event->select<Minerva::IDCluster>("Unused","All");
     SmartRefVector<Minerva::IDCluster> usedClusters = event->select<Minerva::IDCluster>("Used","All");
     SmartRefVector<Minerva::IDCluster> allClusters = event->select<Minerva::IDCluster>("Used:Unused","All");

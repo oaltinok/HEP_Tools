@@ -66,7 +66,6 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("gamma2_isGoodBlob", &gamma2_isGoodBlob, &b_gamma2_isGoodBlob);
    fChain->SetBranchAddress("Cut_ConeBlobs", &Cut_ConeBlobs, &b_Cut_ConeBlobs);
    fChain->SetBranchAddress("Cut_EndPoint_Michel_Exist", &Cut_EndPoint_Michel_Exist, &b_Cut_EndPoint_Michel_Exist);
-   fChain->SetBranchAddress("Cut_Event_Has_BadObject", &Cut_Event_Has_BadObject, &b_Cut_Event_Has_BadObject);
    fChain->SetBranchAddress("Cut_Muon_Charge", &Cut_Muon_Charge, &b_Cut_Muon_Charge);
    fChain->SetBranchAddress("Cut_Muon_None", &Cut_Muon_None, &b_Cut_Muon_None);
    fChain->SetBranchAddress("Cut_Muon_Not_Plausible", &Cut_Muon_Not_Plausible, &b_Cut_Muon_Not_Plausible);
@@ -99,8 +98,6 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("n_anchored_long_trk_prongs", &n_anchored_long_trk_prongs, &b_n_anchored_long_trk_prongs);
    fChain->SetBranchAddress("n_anchored_short_trk_prongs", &n_anchored_short_trk_prongs, &b_n_anchored_short_trk_prongs);
    fChain->SetBranchAddress("n_iso_trk_prongs", &n_iso_trk_prongs, &b_n_iso_trk_prongs);
-   fChain->SetBranchAddress("n_long_tracks", &n_long_tracks, &b_n_long_tracks);
-   fChain->SetBranchAddress("n_short_tracks", &n_short_tracks, &b_n_short_tracks);
    fChain->SetBranchAddress("n_vtx_michel_views", &n_vtx_michel_views, &b_n_vtx_michel_views);
    fChain->SetBranchAddress("nblob_anglescan", &nblob_anglescan, &b_nblob_anglescan);
    fChain->SetBranchAddress("nblob_hough", &nblob_hough, &b_nblob_hough);
@@ -127,12 +124,11 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("UnusedClustersTime", &UnusedClustersTime, &b_UnusedClustersTime);
    fChain->SetBranchAddress("UsedClustersTime", &UsedClustersTime, &b_UsedClustersTime);
    fChain->SetBranchAddress("Vertex_blob_energy", &Vertex_blob_energy, &b_Vertex_blob_energy);
-   fChain->SetBranchAddress("dispersedExtraE", &dispersedExtraE, &b_dispersedExtraE);
-   fChain->SetBranchAddress("energyUnused_postPi0", &energyUnused_postPi0, &b_energyUnused_postPi0);
+   fChain->SetBranchAddress("energyUnused_postProton", &energyUnused_postProton, &b_energyUnused_postProton);
    fChain->SetBranchAddress("energyUnused_preMuon", &energyUnused_preMuon, &b_energyUnused_preMuon);
    fChain->SetBranchAddress("energyUnused_prePi0", &energyUnused_prePi0, &b_energyUnused_prePi0);
    fChain->SetBranchAddress("energyUnused_preProton", &energyUnused_preProton, &b_energyUnused_preProton);
-   fChain->SetBranchAddress("energyUsed_postPi0", &energyUsed_postPi0, &b_energyUsed_postPi0);
+   fChain->SetBranchAddress("energyUsed_postProton", &energyUsed_postProton, &b_energyUsed_postProton);
    fChain->SetBranchAddress("energyUsed_preMuon", &energyUsed_preMuon, &b_energyUsed_preMuon);
    fChain->SetBranchAddress("energyUsed_prePi0", &energyUsed_prePi0, &b_energyUsed_prePi0);
    fChain->SetBranchAddress("energyUsed_preProton", &energyUsed_preProton, &b_energyUsed_preProton);
@@ -238,8 +234,6 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("totalIDVisibleE", &totalIDVisibleE, &b_totalIDVisibleE);
    fChain->SetBranchAddress("totalODVisibleE", &totalODVisibleE, &b_totalODVisibleE);
    fChain->SetBranchAddress("totalVisibleE", &totalVisibleE, &b_totalVisibleE);
-   fChain->SetBranchAddress("unattachedExtraE", &unattachedExtraE, &b_unattachedExtraE);
-   fChain->SetBranchAddress("vtxBlobExtraE", &vtxBlobExtraE, &b_vtxBlobExtraE);
    fChain->SetBranchAddress("vtx_michel_distance", &vtx_michel_distance, &b_vtx_michel_distance);
    fChain->SetBranchAddress("anglescan_blob_nc_sz", &anglescan_blob_nc_sz, &b_anglescan_blob_nc_sz);
    fChain->SetBranchAddress("anglescan_blob_nc", anglescan_blob_nc, &b_anglescan_blob_nc);
@@ -354,14 +348,16 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("truth_isSignal_1Pi0", &truth_isSignal_1Pi0, &b_truth_isSignal_1Pi0);
    fChain->SetBranchAddress("truth_isSignal_2Gamma", &truth_isSignal_2Gamma, &b_truth_isSignal_2Gamma);
    fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
-   fChain->SetBranchAddress("truth_isBckg_QE", &truth_isBckg_QE, &b_truth_isBckg_QE);
+   fChain->SetBranchAddress("truth_isBckg_QELike", &truth_isBckg_QELike, &b_truth_isBckg_QELike);
    fChain->SetBranchAddress("truth_isBckg_SinglePiPlus", &truth_isBckg_SinglePiPlus, &b_truth_isBckg_SinglePiPlus);
    fChain->SetBranchAddress("truth_isBckg_SinglePiMinus", &truth_isBckg_SinglePiMinus, &b_truth_isBckg_SinglePiMinus);
    fChain->SetBranchAddress("truth_isBckg_MultiPion", &truth_isBckg_MultiPion, &b_truth_isBckg_MultiPion);
-   fChain->SetBranchAddress("truth_isBckg_SecondaryPi0", &truth_isBckg_SecondaryPi0, &b_truth_isBckg_SecondaryPi0);
+   fChain->SetBranchAddress("truth_isBckg_MultiPiZero", &truth_isBckg_MultiPiZero, &b_truth_isBckg_MultiPiZero);
    fChain->SetBranchAddress("truth_isBckg_Other", &truth_isBckg_Other, &b_truth_isBckg_Other);
+   fChain->SetBranchAddress("truth_isBckg_withAntiMuon", &truth_isBckg_withAntiMuon, &b_truth_isBckg_withAntiMuon);
    fChain->SetBranchAddress("truth_isBckg_withMichel", &truth_isBckg_withMichel, &b_truth_isBckg_withMichel);
-   fChain->SetBranchAddress("truth_isBckg_withPi0", &truth_isBckg_withPi0, &b_truth_isBckg_withPi0);
+   fChain->SetBranchAddress("truth_isBckg_withPrimaryPi0", &truth_isBckg_withPrimaryPi0, &b_truth_isBckg_withPrimaryPi0);
+   fChain->SetBranchAddress("truth_isBckg_withSecondaryPi0", &truth_isBckg_withSecondaryPi0, &b_truth_isBckg_withSecondaryPi0);
    fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
    fChain->SetBranchAddress("truth_N_gamma", &truth_N_gamma, &b_truth_N_gamma);
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
@@ -558,7 +554,9 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCProtonPi0_endProtonTrajYPosition", CCProtonPi0_endProtonTrajYPosition, &b_CCProtonPi0_endProtonTrajYPosition);
    fChain->SetBranchAddress("CCProtonPi0_endProtonTrajZPosition", CCProtonPi0_endProtonTrajZPosition, &b_CCProtonPi0_endProtonTrajZPosition);
    fChain->SetBranchAddress("CCProtonPi0_pionScore", CCProtonPi0_pionScore, &b_CCProtonPi0_pionScore);
+   fChain->SetBranchAddress("CCProtonPi0_pionScore_LLR", CCProtonPi0_pionScore_LLR, &b_CCProtonPi0_pionScore_LLR);
    fChain->SetBranchAddress("CCProtonPi0_protonScore", CCProtonPi0_protonScore, &b_CCProtonPi0_protonScore);
+   fChain->SetBranchAddress("CCProtonPi0_protonScore_LLR", CCProtonPi0_protonScore_LLR, &b_CCProtonPi0_protonScore_LLR);
    fChain->SetBranchAddress("CCProtonPi0_proton_E", CCProtonPi0_proton_E, &b_CCProtonPi0_proton_E);
    fChain->SetBranchAddress("CCProtonPi0_proton_chi2_ndf", CCProtonPi0_proton_chi2_ndf, &b_CCProtonPi0_proton_chi2_ndf);
    fChain->SetBranchAddress("CCProtonPi0_proton_ekin", CCProtonPi0_proton_ekin, &b_CCProtonPi0_proton_ekin);
@@ -573,9 +571,6 @@ void CCProtonPi0::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCProtonPi0_proton_px", CCProtonPi0_proton_px, &b_CCProtonPi0_proton_px);
    fChain->SetBranchAddress("CCProtonPi0_proton_py", CCProtonPi0_proton_py, &b_CCProtonPi0_proton_py);
    fChain->SetBranchAddress("CCProtonPi0_proton_pz", CCProtonPi0_proton_pz, &b_CCProtonPi0_proton_pz);
-   fChain->SetBranchAddress("CCProtonPi0_proton_score", CCProtonPi0_proton_score, &b_CCProtonPi0_proton_score);
-   fChain->SetBranchAddress("CCProtonPi0_proton_score1", CCProtonPi0_proton_score1, &b_CCProtonPi0_proton_score1);
-   fChain->SetBranchAddress("CCProtonPi0_proton_score2", CCProtonPi0_proton_score2, &b_CCProtonPi0_proton_score2);
    fChain->SetBranchAddress("CCProtonPi0_proton_startPointX", CCProtonPi0_proton_startPointX, &b_CCProtonPi0_proton_startPointX);
    fChain->SetBranchAddress("CCProtonPi0_proton_startPointY", CCProtonPi0_proton_startPointY, &b_CCProtonPi0_proton_startPointY);
    fChain->SetBranchAddress("CCProtonPi0_proton_startPointZ", CCProtonPi0_proton_startPointZ, &b_CCProtonPi0_proton_startPointZ);
@@ -770,17 +765,17 @@ delete status_Pi0_GrandMother;
 //     delete E_Unused_preMuon;
 //     delete E_Unused_preProton;
 //     delete E_Unused_prePi0;
-delete E_Unused_postPi0;
+delete E_Unused_postProton;
 
 //     delete E_Used_preMuon;
 //     delete E_Used_preProton;
 //     delete E_Used_prePi0;
-delete E_Used_postPi0;
+delete E_Used_postProton;
 
 //     delete E_All_preMuon;
 //     delete E_All_preProton;
 //     delete E_All_prePi0;
-//     delete E_All_postPi0;
+//     delete E_All_postProton;
 
 //     delete time_UnusedClusters;
 //     delete time_UsedClusters;

@@ -10,61 +10,65 @@ void Plotter::plotCutHistograms()
     TFile* f_Root_Signal_Interaction = new TFile(rootDir_Interaction[0].c_str());
     TFile* f_Root_Background_Interaction = new TFile(rootDir_Interaction[1].c_str());
     
-    TH1D* h_signal_hCut_vertexCount= (TH1D*)f_Root_Signal_Interaction->Get("hCut_vertexCount");
-    TH1D* h_background_hCut_vertexCount = (TH1D*)f_Root_Background_Interaction->Get("hCut_vertexCount");
-    plotStacked(h_signal_hCut_vertexCount, h_background_hCut_vertexCount,"Number of Vertices", "hCut_vertexCount.png", otherDir);
+//     TH1D* h_signal_hCut_vertexCount= (TH1D*)f_Root_Signal_Interaction->Get("hCut_vertexCount");
+//     TH1D* h_background_hCut_vertexCount = (TH1D*)f_Root_Background_Interaction->Get("hCut_vertexCount");
+//     plotStacked(h_signal_hCut_vertexCount, h_background_hCut_vertexCount,"Number of Vertices", "hCut_vertexCount.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_nProngs= (TH1D*)f_Root_Signal_Interaction->Get("hCut_nProngs");
+//     TH1D* h_background_hCut_nProngs = (TH1D*)f_Root_Background_Interaction->Get("hCut_nProngs");
+//     plotStacked(h_signal_hCut_nProngs, h_background_hCut_nProngs,"Number of Prongs at Primary Vertex", "hCut_nProngs.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_Michel = (TH1D*)f_Root_Signal_Interaction->Get("hCut_Michel");
+//     TH1D* h_background_hCut_Michel = (TH1D*)f_Root_Background_Interaction->Get("hCut_Michel");
+//     plotStacked(h_signal_hCut_Michel, h_background_hCut_Michel,"Does Event has Michel? (0 = No, 1 = Yes)", "hCut_Michel.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_protonScore = (TH1D*)f_Root_Signal_Interaction->Get("hCut_protonScore");
+//     TH1D* h_background_hCut_protonScore = (TH1D*)f_Root_Background_Interaction->Get("hCut_protonScore");
+//     plotStacked(h_signal_hCut_protonScore, h_background_hCut_protonScore,"Proton Score", "hCut_protonScore.png", otherDir);
     
-    TH1D* h_signal_hCut_nProngs= (TH1D*)f_Root_Signal_Interaction->Get("hCut_nProngs");
-    TH1D* h_background_hCut_nProngs = (TH1D*)f_Root_Background_Interaction->Get("hCut_nProngs");
-    plotStacked(h_signal_hCut_nProngs, h_background_hCut_nProngs,"Number of Prongs at Primary Vertex", "hCut_nProngs.png", otherDir);
+    TH1D* h_signal_hCut_protonScore_LLR = (TH1D*)f_Root_Signal_Interaction->Get("hCut_protonScore_LLR");
+    TH1D* h_background_hCut_protonScore_LLR = (TH1D*)f_Root_Background_Interaction->Get("hCut_protonScore_LLR");
+    plotStacked(h_signal_hCut_protonScore_LLR, h_background_hCut_protonScore_LLR,"Proton Score_LLR", "hCut_protonScore_LLR.png", otherDir);
     
-    TH1D* h_signal_hCut_Michel = (TH1D*)f_Root_Signal_Interaction->Get("hCut_Michel");
-    TH1D* h_background_hCut_Michel = (TH1D*)f_Root_Background_Interaction->Get("hCut_Michel");
-    plotStacked(h_signal_hCut_Michel, h_background_hCut_Michel,"Does Event has Michel? (0 = No, 1 = Yes)", "hCut_Michel.png", otherDir);
-    
-    TH1D* h_signal_hCut_protonScore = (TH1D*)f_Root_Signal_Interaction->Get("hCut_protonScore");
-    TH1D* h_background_hCut_protonScore = (TH1D*)f_Root_Background_Interaction->Get("hCut_protonScore");
-    plotStacked(h_signal_hCut_protonScore, h_background_hCut_protonScore,"Proton Score", "hCut_protonScore.png", otherDir);
-    
-    TH1D* h_signal_hCut_pionScore = (TH1D*)f_Root_Signal_Interaction->Get("hCut_pionScore");
-    TH1D* h_background_hCut_pionScore = (TH1D*)f_Root_Background_Interaction->Get("hCut_pionScore");
-    plotStacked(h_signal_hCut_pionScore, h_background_hCut_pionScore,"Pion Score", "hCut_pionScore.png", otherDir);
-    
+//     TH1D* h_signal_hCut_pionScore = (TH1D*)f_Root_Signal_Interaction->Get("hCut_pionScore");
+//     TH1D* h_background_hCut_pionScore = (TH1D*)f_Root_Background_Interaction->Get("hCut_pionScore");
+//     plotStacked(h_signal_hCut_pionScore, h_background_hCut_pionScore,"Pion Score", "hCut_pionScore.png", otherDir);
+//     
     TH1D* h_signal_hCut_pIDDiff = (TH1D*)f_Root_Signal_Interaction->Get("hCut_pIDDiff");
     TH1D* h_background_hCut_pIDDiff = (TH1D*)f_Root_Background_Interaction->Get("hCut_pIDDiff");
     plotStacked(h_signal_hCut_pIDDiff, h_background_hCut_pIDDiff,"Proton Score - Pion Score", "hCut_pIDDiff.png", otherDir);
-    
-    TH1D* h_signal_hCut_eVis_nuclearTarget = (TH1D*)f_Root_Signal_Interaction->Get("hCut_eVis_nuclearTarget");
-    TH1D* h_background_hCut_eVis_nuclearTarget = (TH1D*)f_Root_Background_Interaction->Get("hCut_eVis_nuclearTarget");
-    plotStacked(h_signal_hCut_eVis_nuclearTarget, h_background_hCut_eVis_nuclearTarget,"Visible Energy inside Nuclear Target", "hCut_eVis_nuclearTarget.png", otherDir);
-    
-    TH1D* h_signal_hCut_eVis_other = (TH1D*)f_Root_Signal_Interaction->Get("hCut_eVis_other");
-    TH1D* h_background_hCut_eVis_other = (TH1D*)f_Root_Background_Interaction->Get("hCut_eVis_other");
-    plotStacked(h_signal_hCut_eVis_other, h_background_hCut_eVis_other,"Visible Energy at Target + ECAL + HCAL", "hCut_eVis_other.png", otherDir);
-    
-    TH1D* h_signal_hCut_gamma1ConvDist = (TH1D*)f_Root_Signal_Interaction->Get("hCut_gamma1ConvDist");
-    TH1D* h_background_hCut_gamma1ConvDist = (TH1D*)f_Root_Background_Interaction->Get("hCut_gamma1ConvDist");
-    plotStacked(h_signal_hCut_gamma1ConvDist, h_background_hCut_gamma1ConvDist,"Leading Photon Conversion Distance [cm]", "hCut_gamma1ConvDist.png", otherDir);
-    
-    TH1D* h_signal_hCut_gamma2ConvDist = (TH1D*)f_Root_Signal_Interaction->Get("hCut_gamma2ConvDist");
-    TH1D* h_background_hCut_gamma2ConvDist = (TH1D*)f_Root_Background_Interaction->Get("hCut_gamma2ConvDist");
-    plotStacked(h_signal_hCut_gamma2ConvDist, h_background_hCut_gamma2ConvDist,"Second Photon Conversion Distance [cm]", "hCut_gamma2ConvDist.png", otherDir);
-    
-    TH1D* h_signal_hCut_pi0invMass = (TH1D*)f_Root_Signal_Interaction->Get("hCut_pi0invMass");
-    TH1D* h_background_hCut_pi0invMass = (TH1D*)f_Root_Background_Interaction->Get("hCut_pi0invMass");
-    plotStacked(h_signal_hCut_pi0invMass, h_background_hCut_pi0invMass,"Pi0 Invariant Mass", "hCut_pi0invMass.png", otherDir);
-    
-    TH1D* h_signal_hCut_neutrinoE = (TH1D*)f_Root_Signal_Interaction->Get("hCut_neutrinoE");
-    TH1D* h_background_hCut_neutrinoE = (TH1D*)f_Root_Background_Interaction->Get("hCut_neutrinoE");
-    plotStacked(h_signal_hCut_neutrinoE, h_background_hCut_neutrinoE,"Neutrino Energy [GeV]", "hCut_neutrinoE.png", otherDir);
-    
-    TH1D* h_signal_hCut_QSq = (TH1D*)f_Root_Signal_Interaction->Get("hCut_QSq");
-    TH1D* h_background_hCut_QSq = (TH1D*)f_Root_Background_Interaction->Get("hCut_QSq");
-    plotStacked(h_signal_hCut_QSq, h_background_hCut_QSq,"Q^{2} [GeV^{2}]", "hCut_QSq.png", otherDir);
-    
-    TH1D* h_signal_hCut_UnusedE = (TH1D*)f_Root_Signal_Interaction->Get("hCut_UnusedE");
-    TH1D* h_background_hCut_UnusedE = (TH1D*)f_Root_Background_Interaction->Get("hCut_UnusedE");
-    plotStacked(h_signal_hCut_UnusedE, h_background_hCut_UnusedE,"Unused Cluster Energy at the end of Reconstruction", "hCut_UnusedE.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_eVis_nuclearTarget = (TH1D*)f_Root_Signal_Interaction->Get("hCut_eVis_nuclearTarget");
+//     TH1D* h_background_hCut_eVis_nuclearTarget = (TH1D*)f_Root_Background_Interaction->Get("hCut_eVis_nuclearTarget");
+//     plotStacked(h_signal_hCut_eVis_nuclearTarget, h_background_hCut_eVis_nuclearTarget,"Visible Energy inside Nuclear Target", "hCut_eVis_nuclearTarget.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_eVis_other = (TH1D*)f_Root_Signal_Interaction->Get("hCut_eVis_other");
+//     TH1D* h_background_hCut_eVis_other = (TH1D*)f_Root_Background_Interaction->Get("hCut_eVis_other");
+//     plotStacked(h_signal_hCut_eVis_other, h_background_hCut_eVis_other,"Visible Energy at Target + ECAL + HCAL", "hCut_eVis_other.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_gamma1ConvDist = (TH1D*)f_Root_Signal_Interaction->Get("hCut_gamma1ConvDist");
+//     TH1D* h_background_hCut_gamma1ConvDist = (TH1D*)f_Root_Background_Interaction->Get("hCut_gamma1ConvDist");
+//     plotStacked(h_signal_hCut_gamma1ConvDist, h_background_hCut_gamma1ConvDist,"Leading Photon Conversion Distance [cm]", "hCut_gamma1ConvDist.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_gamma2ConvDist = (TH1D*)f_Root_Signal_Interaction->Get("hCut_gamma2ConvDist");
+//     TH1D* h_background_hCut_gamma2ConvDist = (TH1D*)f_Root_Background_Interaction->Get("hCut_gamma2ConvDist");
+//     plotStacked(h_signal_hCut_gamma2ConvDist, h_background_hCut_gamma2ConvDist,"Second Photon Conversion Distance [cm]", "hCut_gamma2ConvDist.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_pi0invMass = (TH1D*)f_Root_Signal_Interaction->Get("hCut_pi0invMass");
+//     TH1D* h_background_hCut_pi0invMass = (TH1D*)f_Root_Background_Interaction->Get("hCut_pi0invMass");
+//     plotStacked(h_signal_hCut_pi0invMass, h_background_hCut_pi0invMass,"Pi0 Invariant Mass", "hCut_pi0invMass.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_neutrinoE = (TH1D*)f_Root_Signal_Interaction->Get("hCut_neutrinoE");
+//     TH1D* h_background_hCut_neutrinoE = (TH1D*)f_Root_Background_Interaction->Get("hCut_neutrinoE");
+//     plotStacked(h_signal_hCut_neutrinoE, h_background_hCut_neutrinoE,"Neutrino Energy [GeV]", "hCut_neutrinoE.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_QSq = (TH1D*)f_Root_Signal_Interaction->Get("hCut_QSq");
+//     TH1D* h_background_hCut_QSq = (TH1D*)f_Root_Background_Interaction->Get("hCut_QSq");
+//     plotStacked(h_signal_hCut_QSq, h_background_hCut_QSq,"Q^{2} [GeV^{2}]", "hCut_QSq.png", otherDir);
+//     
+//     TH1D* h_signal_hCut_UnusedE = (TH1D*)f_Root_Signal_Interaction->Get("hCut_UnusedE");
+//     TH1D* h_background_hCut_UnusedE = (TH1D*)f_Root_Background_Interaction->Get("hCut_UnusedE");
+//     plotStacked(h_signal_hCut_UnusedE, h_background_hCut_UnusedE,"Unused Cluster Energy at the end of Reconstruction", "hCut_UnusedE.png", otherDir);
     
     
 }

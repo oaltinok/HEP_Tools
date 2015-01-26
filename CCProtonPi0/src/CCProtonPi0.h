@@ -21,8 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2015_01_06
-    Version:        v1_08
+    Last Revision:  2015_01_21
+    Version:        v2_01
     
 ================================================================================
 */
@@ -218,7 +218,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IMCTrackTool*               m_MCTrackTool;
         IGiGaGeomCnvSvc*            m_gigaCnvSvc;
         IParticleTool*              m_particleTool;
+        IParticleTool*              m_LikelihoodPIDTool;
         IMinervaMathTool*           m_mathTool;
+        
         
         IBlobCreatorUtils*          m_blobUtils;
         IHoughBlob*                 m_idHoughBlob;
@@ -243,13 +245,17 @@ class CCProtonPi0 : public MinervaAnalysisTool
         
         bool tagSignal(Minerva::GenMinInteraction* truthEvent) const;
         void tagBackground(Minerva::GenMinInteraction* truthEvent) const;
+        bool isBackgroundQELike(Minerva::GenMinInteraction* truthEvent) const;
         void setSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
         void setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const;
+        void writeBackgroundType(Minerva::GenMinInteraction* truthEvent) const;
         void writeFSParticleTable(bool isSignal) const;
         void writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
         void setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) const;
         bool isSinglePi0(Minerva::GenMinInteraction* truthEvent, int nPi0, int nGamma) const;
         bool isMotherPrimary(std::vector<int>& motherList, int mother ) const;
+        bool checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const;
+        bool checkMichel() const;
         
         bool createTrackedParticles( Minerva::ProngVect& prongs ) const;
         bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;

@@ -15,7 +15,7 @@ Class: Cut
         > cutAll.get_nEvent()
 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_11_10
+    Last Revision: 2015_01_13
 ================================================================================
 */
 
@@ -37,13 +37,10 @@ class Cut{
 		// Get Functions
 		std::string get_Name();
         
-        void increment(bool isSignal, bool isGold, bool isSilver1, bool isDIS);
+        void increment(bool isSignal);
         
         CutStat nEvent;
         CutStat nSignal;
-        CutStat nSignal_Gold;
-        CutStat nSignal_Silver1;
-        CutStat nDIS;
 		  
 	private:
 		std::string name;

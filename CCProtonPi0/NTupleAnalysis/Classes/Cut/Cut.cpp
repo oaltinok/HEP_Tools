@@ -23,13 +23,10 @@ string Cut::get_Name()
 	return name;
 }
 
-void Cut::increment(bool isSignal, bool isGold, bool isSilver1, bool isDIS)
+void Cut::increment(bool isSignal)
 {
     nEvent.increment();
     if (isSignal) nSignal.increment();
-    if (isGold) nSignal_Gold.increment();
-    if (isSilver1) nSignal_Silver1.increment();
-    if (isDIS) nDIS.increment();    
 }
 
 

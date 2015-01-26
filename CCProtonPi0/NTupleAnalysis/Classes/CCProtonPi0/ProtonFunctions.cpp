@@ -26,7 +26,7 @@ void CCProtonPi0::fillProtonTrue()
 void CCProtonPi0::fillProtonReco()
 {    
     // Set Particle Score
-    proton.particleScore = CCProtonPi0_proton_score[indRecoProton];
+    proton.particleScore = CCProtonPi0_protonScore[indRecoProton];
 
     // Fill 4-Momentum
     proton.set_p4(  CCProtonPi0_proton_px[indRecoProton],
@@ -72,13 +72,13 @@ void CCProtonPi0::findTrueProton()
 //--------------------------------------------------------------------------
 void CCProtonPi0::findRecoProton()
 {
-    double tempScore = CCProtonPi0_proton_score[0];
+    double tempScore = CCProtonPi0_protonScore[0];
     int tempInd = 0;
     
     for( int i = 0; i < 10; i++){
-        if( CCProtonPi0_proton_score[i] == -1 ) break;
-        if( CCProtonPi0_proton_score[i] > tempScore){
-            tempScore = CCProtonPi0_proton_score[i];
+        if( CCProtonPi0_protonScore[i] == -1 ) break;
+        if( CCProtonPi0_protonScore[i] > tempScore){
+            tempScore = CCProtonPi0_protonScore[i];
             tempInd = i;
         }
     }

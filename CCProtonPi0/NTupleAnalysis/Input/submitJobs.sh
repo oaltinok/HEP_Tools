@@ -1,26 +1,15 @@
-CCPROTONPI0_V="v4_08"
+CCPROTONPI0_V="v2_01"
 OUTPUTFOLDER="run"
 
 echo "Submitting Jobs ..."
 echo "... CCProtonPi0 Version: ${CCPROTONPI0_V}" 
 echo "... Output Folder: ${OUTPUTFOLDER}"
 
-RunNumberList=(13205
-    13206
-    13207
-    13208
-    13209
-    13210
-    13211
-    13212
-    13213
-    13214
-    13215
-    13216
-    13217
-    13218
-    13219
-    13220)
+RunNumberList=(13200
+    13201
+    13202
+    13203
+    13204)
 
 for runNumber in ${RunNumberList[@]}; do
         echo "Submitting Run = ${runNumber}"
@@ -28,4 +17,26 @@ for runNumber in ${RunNumberList[@]}; do
 done
 
 echo "All Runs Submitted!"
+
+# 13200
+# 13201
+# 13202
+# 13203
+# 13204
+# 13205
+# 13206
+# 13207
+# 13208
+# 13209
+# 13210
+# 13211
+# 13212
+# 13213
+# 13214
+# 13215
+# 13216
+# 13217
+# 13218
+# 13219
+# 13220
 

@@ -19,6 +19,19 @@ void CCProtonPi0::initHistograms()
     pID_efficiency->GetXaxis()->SetTitle("Proton Efficiency = Captured Proton / Total Protons");
     pID_efficiency->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
     
+    // Proton Score LLR
+    pID_piplus_protonScore_LLR = new TH1D( "pID_piplus_protonScore_LLR","piplus_protonScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
+    pID_piplus_protonScore_LLR->GetXaxis()->SetTitle("piplus_protonScore_LLR");
+    pID_piplus_protonScore_LLR->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
+    
+    pID_piminus_protonScore_LLR = new TH1D( "pID_piminus_protonScore_LLR","piminus_protonScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
+    pID_piminus_protonScore_LLR->GetXaxis()->SetTitle("piminus_protonScore_LLR");
+    pID_piminus_protonScore_LLR->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
+    
+    pID_proton_protonScore_LLR = new TH1D( "pID_proton_protonScore_LLR","proton_protonScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
+    pID_proton_protonScore_LLR->GetXaxis()->SetTitle("proton_protonScore_LLR");
+    pID_proton_protonScore_LLR->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
+    
     // Proton Score 
     pID_piplus_protonScore = new TH1D( "pID_piplus_protonScore","piplus_protonScore",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_piplus_protonScore->GetXaxis()->SetTitle("piplus_protonScore");
@@ -31,6 +44,19 @@ void CCProtonPi0::initHistograms()
     pID_proton_protonScore = new TH1D( "pID_proton_protonScore","proton_protonScore",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_proton_protonScore->GetXaxis()->SetTitle("proton_protonScore");
     pID_proton_protonScore->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
+    
+    // Pion Score LLR
+    pID_piplus_pionScore_LLR = new TH1D( "pID_piplus_pionScore_LLR","piplus_pionScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
+    pID_piplus_pionScore_LLR->GetXaxis()->SetTitle("piplus_pionScore_LLR");
+    pID_piplus_pionScore_LLR->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
+    
+    pID_piminus_pionScore_LLR = new TH1D( "pID_piminus_pionScore_LLR","piminus_pionScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
+    pID_piminus_pionScore_LLR->GetXaxis()->SetTitle("piminus_pionScore_LLR");
+    pID_piminus_pionScore_LLR->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
+    
+    pID_proton_pionScore_LLR = new TH1D( "pID_proton_pionScore_LLR","proton_pionScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
+    pID_proton_pionScore_LLR->GetXaxis()->SetTitle("proton_pionScore_LLR");
+    pID_proton_pionScore_LLR->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
     
     // Pion Score
     pID_piplus_pionScore = new TH1D( "pID_piplus_pionScore","piplus_pionScore",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
@@ -64,6 +90,44 @@ void CCProtonPi0::initHistograms()
                                                  binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max());
     pID_piminus_pionScore_protonScore->GetXaxis()->SetTitle("Pion Score");
     pID_piminus_pionScore_protonScore->GetYaxis()->SetTitle("Proton Score");
+    
+    // 2D Proton Score vs ProtonScore_LLR
+    pID_proton_protonScore_protonScore_LLR = new TH2D( "pID_proton_protonScore_protonScore_LLR","pID_proton_protonScore_protonScore_LLR",
+                                                 binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max(),
+                                                 binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max());
+    pID_proton_protonScore_protonScore_LLR->GetXaxis()->SetTitle("Proton Score");
+    pID_proton_protonScore_protonScore_LLR->GetYaxis()->SetTitle("Proton Score LLR");
+    
+    pID_piplus_protonScore_protonScore_LLR = new TH2D( "pID_piplus_protonScore_protonScore_LLR","pID_piplus_protonScore_protonScore_LLR",
+                                                 binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max(),
+                                                 binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max());
+    pID_piplus_protonScore_protonScore_LLR->GetXaxis()->SetTitle("Proton Score");
+    pID_piplus_protonScore_protonScore_LLR->GetYaxis()->SetTitle("Proton Score LLR");
+                                                 
+    pID_piminus_protonScore_protonScore_LLR = new TH2D( "pID_piminus_protonScore_protonScore_LLR","pID_piminus_protonScore_protonScore_LLR",
+                                                 binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max(),
+                                                 binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max());
+    pID_piminus_protonScore_protonScore_LLR->GetXaxis()->SetTitle("Proton Score");
+    pID_piminus_protonScore_protonScore_LLR->GetYaxis()->SetTitle("Proton Score LLR");
+    
+    // 2d Pion Score vs PionScore_LLR
+    pID_proton_pionScore_pionScore_LLR = new TH2D( "pID_proton_pionScore_pionScore_LLR","pID_proton_pionScore_pionScore_LLR",
+                                                 binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max(),
+                                                 binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max());
+    pID_proton_pionScore_pionScore_LLR->GetXaxis()->SetTitle("Pion Score");
+    pID_proton_pionScore_pionScore_LLR->GetYaxis()->SetTitle("Pion Score LLR");
+    
+    pID_piplus_pionScore_pionScore_LLR = new TH2D( "pID_piplus_pionScore_pionScore_LLR","pID_piplus_pionScore_pionScore_LLR",
+                                                 binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max(),
+                                                 binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max());
+    pID_piplus_pionScore_pionScore_LLR->GetXaxis()->SetTitle("Pion Score");
+    pID_piplus_pionScore_pionScore_LLR->GetYaxis()->SetTitle("Pion Score LLR");
+                                                 
+    pID_piminus_pionScore_pionScore_LLR = new TH2D( "pID_piminus_pionScore_pionScore_LLR","pID_piminus_pionScore_pionScore_LLR",
+                                                 binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max(),
+                                                 binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max());
+    pID_piminus_pionScore_pionScore_LLR->GetXaxis()->SetTitle("Pion Score");
+    pID_piminus_pionScore_pionScore_LLR->GetYaxis()->SetTitle("Pion Score LLR");
     
     // Particle Score Sum and Difference
     pID_proton_pIDSum = new TH1D( "pID_proton_pIDSum","Proton Score + Pion Score for TRUE Protons",binList.particleScoreSum.get_nBins(), binList.particleScoreSum.get_min(), binList.particleScoreSum.get_max() );
@@ -321,13 +385,13 @@ void CCProtonPi0::initHistograms()
     w2fail_proton_KE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.protonKE.get_width()));
     
     // Cluster Energy after Pi0 Reconstruction
-    E_Unused_postPi0 = new TH1D( "E_Unused_postPi0","Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
-    E_Unused_postPi0->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
-    E_Unused_postPi0->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
+    E_Unused_postProton = new TH1D( "E_Unused_postProton","Unused Cluster Energy after Proton Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
+    E_Unused_postProton->GetXaxis()->SetTitle("Unused Cluster Energy after Proton Reconstruction [MeV]");
+    E_Unused_postProton->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
     
-    E_Used_postPi0 = new TH1D( "E_Used_postPi0","Used Cluster Energy after Pi0 Reconstruction",binList.UsedE.get_nBins(), binList.UsedE.get_min(), binList.UsedE.get_max() );
-    E_Used_postPi0->GetXaxis()->SetTitle("Used Cluster Energy after Pi0 Reconstruction [MeV]");
-    E_Used_postPi0->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UsedE.get_width()));
+    E_Used_postProton = new TH1D( "E_Used_postProton","Used Cluster Energy after Proton Reconstruction",binList.UsedE.get_nBins(), binList.UsedE.get_min(), binList.UsedE.get_max() );
+    E_Used_postProton->GetXaxis()->SetTitle("Used Cluster Energy after Proton Reconstruction [MeV]");
+    E_Used_postProton->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UsedE.get_width()));
     
     // Cluster Timing
     time_AllClusters = new TH1D( "time_AllClusters","Cluster Time",binList.time.get_nBins(), binList.time.get_min(), binList.time.get_max() );
@@ -369,6 +433,10 @@ void CCProtonPi0::initHistograms()
     hCut_pIDDiff = new TH1D( "hCut_pIDDiff","Proton Score - Pion Score",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
     hCut_pIDDiff->GetXaxis()->SetTitle("Proton Score - Pion Score");
     hCut_pIDDiff->GetYaxis()->SetTitle("N(Events)");
+    
+    hCut_protonScore_LLR = new TH1D( "hCut_protonScore_LLR","proton_protonScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
+    hCut_protonScore_LLR->GetXaxis()->SetTitle("proton_protonScore_LLR");
+    hCut_protonScore_LLR->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
     
     hCut_eVis_nuclearTarget = new TH1D( "hCut_eVis_nuclearTarget","Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
     hCut_eVis_nuclearTarget->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");

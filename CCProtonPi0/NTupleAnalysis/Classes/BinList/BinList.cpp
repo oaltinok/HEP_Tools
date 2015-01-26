@@ -20,6 +20,7 @@ BinList::BinList()
     angle.setBin(180, 0.0, 180.0);
     trackLength.setBin(200, 0.0, 2000.0 );
     particleScore.setBin(100,0.0,1.0);
+    particleScore_LLR.setBin(100,-100.0,100.0);
     particleScoreSum.setBin(200,0.0,2.0);
     particleScoreDiff.setBin(100,-1.0,1.0);
     particleStatus.setBin(17,-1,16);

@@ -13,7 +13,7 @@ Class: Plotter
             
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_12_03
+    Last Revision: 2015_01_21
 ================================================================================
 */
 
@@ -76,6 +76,8 @@ class Plotter
         void plotPID();
         void pID_proton();
         void pID_pion();
+        void pID_proton_LLR();
+        void pID_pion_LLR();
         void plot_2D_pID();
         void pIDDiff();
         void pIDSum();

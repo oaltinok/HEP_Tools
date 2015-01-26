@@ -34,6 +34,7 @@ class BinList
         SingleBin angle;
         SingleBin trackLength;
         SingleBin particleScore;
+        SingleBin particleScore_LLR;
         SingleBin particleScoreSum;
         SingleBin particleScoreDiff;
         SingleBin particleStatus;
