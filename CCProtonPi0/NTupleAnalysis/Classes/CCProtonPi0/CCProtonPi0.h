@@ -19,8 +19,8 @@ Class: CCProtonPi0
     
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Version:        v2_01
-    Last Revision:  2015_01_23
+    Version:        v2_02
+    Last Revision:  2015_02_13
 ================================================================================
 */
 
@@ -94,12 +94,12 @@ public :
     void writeBackgroundTableRows(vector< vector<double> > bckgVector, int nProngs);
     double getCutEfficiency(double nSig, double effBase);
     double getCutPurity(double nSig, double nEvents);
-    int countParticles(int targetPDG, bool applyPCut);
     void get_pID_Stats();
     void writeScanList(Long64_t entryNo);
     void setChannelTag(std::string input);
     void fillBackgroundBranches();
     void setBackgroundBranch(vector<double>& background, bool hasAntiMuon, bool hasMichel, bool hasPrimaryPi0, bool hasSecondaryPi0 );
+    void fill_mc_w();
     
     //--------------------------------------------------------------------------
     //  Interaction Specific Functions
@@ -109,8 +109,7 @@ public :
     void writeFSParticle4P(Long64_t nEntry);
     void fillInteractionTrue();
     void fillInteractionReco();
-    double calcDeltaInvariantMass(  double px1, double py1, double pz1, double E1,
-                                    double px2, double py2, double pz2, double E2);
+    double calcDeltaInvariantMass();
     
     //--------------------------------------------------------------------------
     //  Muon Specific Functions
@@ -134,9 +133,6 @@ public :
     //--------------------------------------------------------------------------
     void fillPionTrue();
     void fillPionReco();
-    double getBestPi0Momentum();
-    int getBestPi0();
-    bool isPhotonDistanceLow();
     
     //--------------------------------------------------------------------------
     //  Default Functions
@@ -197,7 +193,6 @@ public :
     TH1D* vertex_z_error;
     TH2D* vertex_z_reco_mc;
    
-    
     TH1D* int_channel;
     TH2D* vertex_x_y_true;
     TH2D* vertex_x_y_reco;
@@ -247,57 +242,48 @@ public :
     TH1D* status_Pi0_Mother;
     TH1D* status_Pi0_GrandMother;
     
-//     TH1D* E_Unused_preMuon;
-//     TH1D* E_Unused_preProton;
-//     TH1D* E_Unused_prePi0;
-    TH1D* E_Unused_postProton;
-    
-//     TH1D* E_Used_preMuon;
-//     TH1D* E_Used_preProton;
-//     TH1D* E_Used_prePi0;
-    TH1D* E_Used_postProton;
-    
-//     TH1D* E_All_preMuon;
-//     TH1D* E_All_preProton;
-//     TH1D* E_All_prePi0;
-//     TH1D* E_All_postProton;
-    
-//     TH1D* time_UnusedClusters;
-//     TH1D* time_UsedClusters;
+    TH1D* E_Unused_afterReco;
+    TH1D* E_Used_afterReco;
     TH1D* time_AllClusters;
     
     TH1D* total_E;
     TH2D* total_E_neutrinoE;
     
+    TH1D* prongShowerScore;
     
-    // Debugging Histograms
-    TH1D* w2fail_q2;
-    TH1D* w2fail_Enu;
-    TH1D* w2fail_muon_E;
-    TH1D* w2fail_muon_Pz;
-    TH1D* w2fail_pion_E;
-    TH1D* w2fail_proton_KE;
-    TH1D* w2fail_term1;
-    TH2D* w2fail_term1_q2;
-    TH1D* w2fail_w2;
-    
+    // -------------------------------------------------------------------------
     // Cut Histograms
+    // -------------------------------------------------------------------------
+    // Common
     TH1D* hCut_vertexCount;
     TH1D* hCut_nProngs;
-    TH1D* hCut_Michel;
+    
+    // Topology Dependent
+    TH1D* hCut_1Prong_Michel;
+    TH1D* hCut_2Prong_Michel;
+    TH1D* hCut_1Prong_eVis_nuclearTarget;
+    TH1D* hCut_2Prong_eVis_nuclearTarget;
+    TH1D* hCut_1Prong_eVis_other;
+    TH1D* hCut_2Prong_eVis_other;
+    TH1D* hCut_1Prong_pi0invMass;
+    TH1D* hCut_2Prong_pi0invMass;
+    TH1D* hCut_1Prong_gamma1ConvDist;
+    TH1D* hCut_2Prong_gamma1ConvDist;
+    TH1D* hCut_1Prong_gamma2ConvDist;
+    TH1D* hCut_2Prong_gamma2ConvDist;
+    TH1D* hCut_1Prong_neutrinoE;
+    TH1D* hCut_2Prong_neutrinoE;
+    TH1D* hCut_1Prong_UnusedE;
+    TH1D* hCut_2Prong_UnusedE;
+
+    
+    // 2 Prong Specific
     TH1D* hCut_protonScore;
     TH1D* hCut_pionScore;
     TH1D* hCut_pIDDiff;
     TH1D* hCut_protonScore_LLR;
-    TH1D* hCut_eVis_nuclearTarget;
-    TH1D* hCut_eVis_other;
-    TH1D* hCut_gamma1ConvDist;
-    TH1D* hCut_gamma2ConvDist;
-    TH1D* hCut_pi0invMass;
-    TH1D* hCut_neutrinoE;
-    TH1D* hCut_QSq;
-    TH1D* hCut_UnusedE;
-    
+    TH1D* hCut_deltaInvMass;
+
     // -------------------------------------------------------------------------
     //     Cut Numbers
     //--------------------------------------------------------------------------
@@ -309,7 +295,6 @@ public :
     // Common Cut Numbers
     Cut nCut_All;
     Cut nCut_Vertex_None;
-    Cut nCut_Vertex_Null;
     Cut nCut_Vertex_Not_Reconstructable; 
     Cut nCut_Vertex_Not_Fiducial;
     Cut nCut_Vertex_Count;
@@ -327,7 +312,8 @@ public :
     Cut nCut_1Prong_VtxBlob;
     Cut nCut_1Prong_ConeBlobs;
     Cut nCut_1Prong_Pi0_invMass;
-    Cut nCut_1Prong_PhotonDistanceLow;
+    Cut nCut_1Prong_Photon1DistanceLow;
+    Cut nCut_1Prong_Photon2DistanceLow;
     Cut nCut_1Prong_beamEnergy;
     Cut nCut_1Prong_UnusedE;
     
@@ -343,7 +329,8 @@ public :
     Cut nCut_2Prong_VtxBlob;
     Cut nCut_2Prong_ConeBlobs;
     Cut nCut_2Prong_Pi0_invMass;
-    Cut nCut_2Prong_PhotonDistanceLow;
+    Cut nCut_2Prong_Photon1DistanceLow;
+    Cut nCut_2Prong_Photon2DistanceLow;
     Cut nCut_2Prong_beamEnergy;
     Cut nCut_2Prong_UnusedE;
     Cut nCut_2Prong_Particle_None;
@@ -352,6 +339,7 @@ public :
     Cut nCut_2Prong_Pion_Score;
     Cut nCut_2Prong_pIDDiff;
     Cut nCut_2Prong_Proton_Score_LLR;
+    Cut nCut_2Prong_DeltaInvMass;
 
    
     // -------------------------------------------------------------------------
@@ -393,6 +381,7 @@ public :
     bool writeFSParticleMomentum;
     bool isPassedAllCuts;
     bool applyMaxEvents;
+    bool applyDeltaInvMass;
     
     int anaMode;
     bool isAnalysisModeSelected;
@@ -406,6 +395,8 @@ public :
     double minPhotonDistance;
     double min_Pi0_invMass;
     double max_Pi0_invMass;
+    double min_Delta_invMass;
+    double max_Delta_invMass;
     double max_QSq;
     double max_beamEnergy;
     double maxUnusedE;
@@ -499,12 +490,13 @@ public :
    Int_t           Cut_Vertex_None;
    Int_t           Cut_Vertex_Not_Fiducial;
    Int_t           Cut_Vertex_Not_Reconstructable;
-   Int_t           Cut_Vertex_Null;
    Int_t           Cut_VtxBlob;
    Int_t           Cut_nProngs;
    Int_t           Cut_secEndPoint_Michel_Exist;
    Int_t           anglescan_ncand;
    Int_t           anglescan_ncandx;
+   Int_t           blob_ndof_1;
+   Int_t           blob_ndof_2;
    Int_t           broken_track_most_us_plane;
    Int_t           g1dedx_doublet;
    Int_t           g1dedx_empty_plane;
@@ -521,8 +513,6 @@ public :
    Int_t           n_anchored_short_trk_prongs;
    Int_t           n_iso_trk_prongs;
    Int_t           n_vtx_michel_views;
-   Int_t           nblob_anglescan;
-   Int_t           nblob_hough;
    Int_t           od_energeticTower;
    Int_t           phys_energy_in_road_downstream_nplanes;
    Int_t           phys_energy_in_road_upstream_nplanes;
@@ -537,51 +527,26 @@ public :
    Int_t           vtx_primary_multiplicity;
    Int_t           vtx_secondary_count;
    Int_t           vtx_total_count;
-   Double_t        AllClustersTime;
    Double_t        Filament_Vertex_energy;
    Double_t        RE_energy_ECAL;
    Double_t        RE_energy_HCAL;
    Double_t        RE_energy_Tracker;
    Double_t        Sphere_Vertex_energy;
-   Double_t        UnusedClustersTime;
-   Double_t        UsedClustersTime;
    Double_t        Vertex_blob_energy;
-   Double_t        energyUnused_postProton;
-   Double_t        energyUnused_preMuon;
-   Double_t        energyUnused_prePi0;
-   Double_t        energyUnused_preProton;
-   Double_t        energyUsed_postProton;
-   Double_t        energyUsed_preMuon;
-   Double_t        energyUsed_prePi0;
-   Double_t        energyUsed_preProton;
+   Double_t        blob_fval_1;
+   Double_t        blob_fval_2;
+   Double_t        energyUnused_afterReco;
+   Double_t        energyUsed_afterReco;
    Double_t        energy_from_mc;
    Double_t        energy_from_mc_fraction;
    Double_t        energy_from_mc_fraction_of_highest;
-   Double_t        evis_ecal;
-   Double_t        evis_ecal_u;
-   Double_t        evis_ecal_v;
-   Double_t        evis_ecal_x;
-   Double_t        evis_hcal;
-   Double_t        evis_hcal_u;
-   Double_t        evis_hcal_v;
-   Double_t        evis_hcal_x;
-   Double_t        evis_nearvtx_total;
-   Double_t        evis_nearvtx_u;
-   Double_t        evis_nearvtx_v;
-   Double_t        evis_nearvtx_x;
-   Double_t        evis_ntgt;
-   Double_t        evis_ntgt_u;
-   Double_t        evis_ntgt_v;
-   Double_t        evis_ntgt_x;
-   Double_t        evis_other;
+   Double_t        evis_ECAL;
+   Double_t        evis_HCAL;
+   Double_t        evis_NuclearTarget;
+   Double_t        evis_TotalExceptNuclearTarget;
+   Double_t        evis_Tracker;
+   Double_t        evis_nearvtx;
    Double_t        evis_total;
-   Double_t        evis_total_u;
-   Double_t        evis_total_v;
-   Double_t        evis_total_x;
-   Double_t        evis_trkr;
-   Double_t        evis_trkr_u;
-   Double_t        evis_trkr_v;
-   Double_t        evis_trkr_x;
    Double_t        g1blob_minsep;
    Double_t        g1dedx;
    Double_t        g1dedx1;
@@ -594,7 +559,6 @@ public :
    Double_t        g2dedx_total1;
    Double_t        gamma1_E;
    Double_t        gamma1_dEdx;
-   Double_t        gamma1_dist_exit;
    Double_t        gamma1_dist_vtx;
    Double_t        gamma1_evis_ecal;
    Double_t        gamma1_evis_hcal;
@@ -604,11 +568,11 @@ public :
    Double_t        gamma1_px;
    Double_t        gamma1_py;
    Double_t        gamma1_pz;
+   Double_t        gamma1_score;
    Double_t        gamma1_theta;
    Double_t        gamma1_time;
    Double_t        gamma2_E;
    Double_t        gamma2_dEdx;
-   Double_t        gamma2_dist_exit;
    Double_t        gamma2_dist_vtx;
    Double_t        gamma2_evis_ecal;
    Double_t        gamma2_evis_hcal;
@@ -618,6 +582,7 @@ public :
    Double_t        gamma2_px;
    Double_t        gamma2_py;
    Double_t        gamma2_pz;
+   Double_t        gamma2_score;
    Double_t        gamma2_theta;
    Double_t        gamma2_time;
    Double_t        hadronVisibleE;
@@ -652,83 +617,16 @@ public :
    Double_t        pi0_thetaY;
    Double_t        preFilter_rejectedEnergy;
    Double_t        prim_vtx_smallest_opening_angle;
+   Double_t        prong_showerScore;
    Double_t        time;
    Double_t        totalIDVisibleE;
    Double_t        totalODVisibleE;
    Double_t        totalVisibleE;
    Double_t        vtx_michel_distance;
-   Int_t           anglescan_blob_nc_sz;
-   Int_t           anglescan_blob_nc[6];   //[anglescan_blob_nc_sz]
-   Int_t           anglescan_blob_ncu_sz;
-   Int_t           anglescan_blob_ncu[6];   //[anglescan_blob_ncu_sz]
-   Int_t           anglescan_blob_ncv_sz;
-   Int_t           anglescan_blob_ncv[6];   //[anglescan_blob_ncv_sz]
-   Int_t           anglescan_blob_ncx_sz;
-   Int_t           anglescan_blob_ncx[6];   //[anglescan_blob_ncx_sz]
-   Int_t           anglescan_blob_nd_sz;
-   Int_t           anglescan_blob_nd[6];   //[anglescan_blob_nd_sz]
-   Int_t           anglescan_blob_ndu_sz;
-   Int_t           anglescan_blob_ndu[6];   //[anglescan_blob_ndu_sz]
-   Int_t           anglescan_blob_ndv_sz;
-   Int_t           anglescan_blob_ndv[6];   //[anglescan_blob_ndv_sz]
-   Int_t           anglescan_blob_ndx_sz;
-   Int_t           anglescan_blob_ndx[6];   //[anglescan_blob_ndx_sz]
-   Int_t           anglescan_cand_nc_sz;
-   Int_t           anglescan_cand_nc[6];   //[anglescan_cand_nc_sz]
-   Int_t           anglescan_cand_ncu_sz;
-   Int_t           anglescan_cand_ncu[6];   //[anglescan_cand_ncu_sz]
-   Int_t           anglescan_cand_ncv_sz;
-   Int_t           anglescan_cand_ncv[6];   //[anglescan_cand_ncv_sz]
-   Int_t           anglescan_cand_ncx_sz;
-   Int_t           anglescan_cand_ncx[6];   //[anglescan_cand_ncx_sz]
-   Int_t           anglescan_cand_nd_sz;
-   Int_t           anglescan_cand_nd[6];   //[anglescan_cand_nd_sz]
-   Int_t           anglescan_cand_ndu_sz;
-   Int_t           anglescan_cand_ndu[6];   //[anglescan_cand_ndu_sz]
-   Int_t           anglescan_cand_ndv_sz;
-   Int_t           anglescan_cand_ndv[6];   //[anglescan_cand_ndv_sz]
-   Int_t           anglescan_cand_ndx_sz;
-   Int_t           anglescan_cand_ndx[6];   //[anglescan_cand_ndx_sz]
-   Int_t           anglescan_candx_nc_sz;
-   Int_t           anglescan_candx_nc[6];   //[anglescan_candx_nc_sz]
-   Int_t           anglescan_candx_nd_sz;
-   Int_t           anglescan_candx_nd[6];   //[anglescan_candx_nd_sz]
-   Int_t           final_blob_nc_sz;
-   Int_t           final_blob_nc[2];   //[final_blob_nc_sz]
-   Int_t           final_blob_ncu_sz;
-   Int_t           final_blob_ncu[2];   //[final_blob_ncu_sz]
-   Int_t           final_blob_ncv_sz;
-   Int_t           final_blob_ncv[2];   //[final_blob_ncv_sz]
-   Int_t           final_blob_ncx_sz;
-   Int_t           final_blob_ncx[2];   //[final_blob_ncx_sz]
-   Int_t           final_blob_nd_sz;
-   Int_t           final_blob_nd[2];   //[final_blob_nd_sz]
-   Int_t           final_blob_ndu_sz;
-   Int_t           final_blob_ndu[2];   //[final_blob_ndu_sz]
-   Int_t           final_blob_ndv_sz;
-   Int_t           final_blob_ndv[2];   //[final_blob_ndv_sz]
-   Int_t           final_blob_ndx_sz;
-   Int_t           final_blob_ndx[2];   //[final_blob_ndx_sz]
    Int_t           g1dedx_cluster_occupancy_sz;
    Int_t           g1dedx_cluster_occupancy[6];   //[g1dedx_cluster_occupancy_sz]
    Int_t           g2dedx_cluster_occupancy_sz;
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
-   Int_t           hough_blob_nc_sz;
-   Int_t           hough_blob_nc[3];   //[hough_blob_nc_sz]
-   Int_t           hough_blob_ncu_sz;
-   Int_t           hough_blob_ncu[3];   //[hough_blob_ncu_sz]
-   Int_t           hough_blob_ncv_sz;
-   Int_t           hough_blob_ncv[3];   //[hough_blob_ncv_sz]
-   Int_t           hough_blob_ncx_sz;
-   Int_t           hough_blob_ncx[3];   //[hough_blob_ncx_sz]
-   Int_t           hough_blob_nd_sz;
-   Int_t           hough_blob_nd[3];   //[hough_blob_nd_sz]
-   Int_t           hough_blob_ndu_sz;
-   Int_t           hough_blob_ndu[3];   //[hough_blob_ndu_sz]
-   Int_t           hough_blob_ndv_sz;
-   Int_t           hough_blob_ndv[3];   //[hough_blob_ndv_sz]
-   Int_t           hough_blob_ndx_sz;
-   Int_t           hough_blob_ndx[3];   //[hough_blob_ndx_sz]
    Int_t           Vertex_energy_radii_sz;
    Double_t        Vertex_energy_radii[7];   //[Vertex_energy_radii_sz]
    Int_t           blob_cluster_energy1_sz;
@@ -738,19 +636,15 @@ public :
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[44];   //[g1dedx_rev_cluster_energy_sz]
+   Double_t        g1dedx_rev_cluster_energy[56];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[46];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[22];   //[g2dedx_rev_cluster_energy_sz]
    Double_t        gamma1_direction[3];
    Double_t        gamma1_vertex[3];
    Double_t        gamma2_direction[3];
    Double_t        gamma2_vertex[3];
-   Int_t           good_mgg_vector_sz;
-   Double_t        good_mgg_vector[1];   //[good_mgg_vector_sz]
-   Int_t           mgg_vector_sz;
-   Double_t        mgg_vector[1];   //[mgg_vector_sz]
    Int_t           od_distanceBlobTower_sz;
    Double_t        od_distanceBlobTower[2];   //[od_distanceBlobTower_sz]
    Int_t           od_idBlobTime_sz;
@@ -968,7 +862,6 @@ public :
    Int_t           CCProtonPi0_proton_isRecoGood[10];
    Int_t           CCProtonPi0_proton_kinked[10];
    Int_t           CCProtonPi0_proton_odMatch[10];
-   Int_t           CCProtonPi0_proton_trk_pat_history[10];
    Int_t           CCProtonPi0_trajProtonProngPDG[10];
    Int_t           CCProtonPi0_trajProtonProngPrimary[10];
    Double_t        CCProtonPi0_endProtonTrajMomentum[10];
@@ -1051,26 +944,26 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[18];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[18];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[18];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[18];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[18];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[23];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[23];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[23];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[23];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[23];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[42];   //[mc_er_nPart]
-   Int_t           mc_er_status[42];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[42];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[42];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[42];   //[mc_er_nPart]
-   Double_t        mc_er_Px[42];   //[mc_er_nPart]
-   Double_t        mc_er_Py[42];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[42];   //[mc_er_nPart]
-   Double_t        mc_er_E[42];   //[mc_er_nPart]
-   Int_t           mc_er_FD[42];   //[mc_er_nPart]
-   Int_t           mc_er_LD[42];   //[mc_er_nPart]
-   Int_t           mc_er_mother[42];   //[mc_er_nPart]
+   Int_t           mc_er_ID[52];   //[mc_er_nPart]
+   Int_t           mc_er_status[52];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[52];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[52];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[52];   //[mc_er_nPart]
+   Double_t        mc_er_Px[52];   //[mc_er_nPart]
+   Double_t        mc_er_Py[52];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[52];   //[mc_er_nPart]
+   Double_t        mc_er_E[52];   //[mc_er_nPart]
+   Int_t           mc_er_FD[52];   //[mc_er_nPart]
+   Int_t           mc_er_LD[52];   //[mc_er_nPart]
+   Int_t           mc_er_mother[52];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[6];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[8];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -1141,12 +1034,13 @@ public :
    TBranch        *b_Cut_Vertex_None;   //!
    TBranch        *b_Cut_Vertex_Not_Fiducial;   //!
    TBranch        *b_Cut_Vertex_Not_Reconstructable;   //!
-   TBranch        *b_Cut_Vertex_Null;   //!
    TBranch        *b_Cut_VtxBlob;   //!
    TBranch        *b_Cut_nProngs;   //!
    TBranch        *b_Cut_secEndPoint_Michel_Exist;   //!
    TBranch        *b_anglescan_ncand;   //!
    TBranch        *b_anglescan_ncandx;   //!
+   TBranch        *b_blob_ndof_1;   //!
+   TBranch        *b_blob_ndof_2;   //!
    TBranch        *b_broken_track_most_us_plane;   //!
    TBranch        *b_g1dedx_doublet;   //!
    TBranch        *b_g1dedx_empty_plane;   //!
@@ -1163,8 +1057,6 @@ public :
    TBranch        *b_n_anchored_short_trk_prongs;   //!
    TBranch        *b_n_iso_trk_prongs;   //!
    TBranch        *b_n_vtx_michel_views;   //!
-   TBranch        *b_nblob_anglescan;   //!
-   TBranch        *b_nblob_hough;   //!
    TBranch        *b_od_energeticTower;   //!
    TBranch        *b_phys_energy_in_road_downstream_nplanes;   //!
    TBranch        *b_phys_energy_in_road_upstream_nplanes;   //!
@@ -1179,51 +1071,26 @@ public :
    TBranch        *b_vtx_primary_multiplicity;   //!
    TBranch        *b_vtx_secondary_count;   //!
    TBranch        *b_vtx_total_count;   //!
-   TBranch        *b_AllClustersTime;   //!
    TBranch        *b_Filament_Vertex_energy;   //!
    TBranch        *b_RE_energy_ECAL;   //!
    TBranch        *b_RE_energy_HCAL;   //!
    TBranch        *b_RE_energy_Tracker;   //!
    TBranch        *b_Sphere_Vertex_energy;   //!
-   TBranch        *b_UnusedClustersTime;   //!
-   TBranch        *b_UsedClustersTime;   //!
    TBranch        *b_Vertex_blob_energy;   //!
-   TBranch        *b_energyUnused_postProton;   //!
-   TBranch        *b_energyUnused_preMuon;   //!
-   TBranch        *b_energyUnused_prePi0;   //!
-   TBranch        *b_energyUnused_preProton;   //!
-   TBranch        *b_energyUsed_postProton;   //!
-   TBranch        *b_energyUsed_preMuon;   //!
-   TBranch        *b_energyUsed_prePi0;   //!
-   TBranch        *b_energyUsed_preProton;   //!
+   TBranch        *b_blob_fval_1;   //!
+   TBranch        *b_blob_fval_2;   //!
+   TBranch        *b_energyUnused_afterReco;   //!
+   TBranch        *b_energyUsed_afterReco;   //!
    TBranch        *b_energy_from_mc;   //!
    TBranch        *b_energy_from_mc_fraction;   //!
    TBranch        *b_energy_from_mc_fraction_of_highest;   //!
-   TBranch        *b_evis_ecal;   //!
-   TBranch        *b_evis_ecal_u;   //!
-   TBranch        *b_evis_ecal_v;   //!
-   TBranch        *b_evis_ecal_x;   //!
-   TBranch        *b_evis_hcal;   //!
-   TBranch        *b_evis_hcal_u;   //!
-   TBranch        *b_evis_hcal_v;   //!
-   TBranch        *b_evis_hcal_x;   //!
-   TBranch        *b_evis_nearvtx_total;   //!
-   TBranch        *b_evis_nearvtx_u;   //!
-   TBranch        *b_evis_nearvtx_v;   //!
-   TBranch        *b_evis_nearvtx_x;   //!
-   TBranch        *b_evis_ntgt;   //!
-   TBranch        *b_evis_ntgt_u;   //!
-   TBranch        *b_evis_ntgt_v;   //!
-   TBranch        *b_evis_ntgt_x;   //!
-   TBranch        *b_evis_other;   //!
+   TBranch        *b_evis_ECAL;   //!
+   TBranch        *b_evis_HCAL;   //!
+   TBranch        *b_evis_NuclearTarget;   //!
+   TBranch        *b_evis_TotalExceptNuclearTarget;   //!
+   TBranch        *b_evis_Tracker;   //!
+   TBranch        *b_evis_nearvtx;   //!
    TBranch        *b_evis_total;   //!
-   TBranch        *b_evis_total_u;   //!
-   TBranch        *b_evis_total_v;   //!
-   TBranch        *b_evis_total_x;   //!
-   TBranch        *b_evis_trkr;   //!
-   TBranch        *b_evis_trkr_u;   //!
-   TBranch        *b_evis_trkr_v;   //!
-   TBranch        *b_evis_trkr_x;   //!
    TBranch        *b_g1blob_minsep;   //!
    TBranch        *b_g1dedx;   //!
    TBranch        *b_g1dedx1;   //!
@@ -1236,7 +1103,6 @@ public :
    TBranch        *b_g2dedx_total1;   //!
    TBranch        *b_gamma1_E;   //!
    TBranch        *b_gamma1_dEdx;   //!
-   TBranch        *b_gamma1_dist_exit;   //!
    TBranch        *b_gamma1_dist_vtx;   //!
    TBranch        *b_gamma1_evis_ecal;   //!
    TBranch        *b_gamma1_evis_hcal;   //!
@@ -1246,11 +1112,11 @@ public :
    TBranch        *b_gamma1_px;   //!
    TBranch        *b_gamma1_py;   //!
    TBranch        *b_gamma1_pz;   //!
+   TBranch        *b_gamma1_score;   //!
    TBranch        *b_gamma1_theta;   //!
    TBranch        *b_gamma1_time;   //!
    TBranch        *b_gamma2_E;   //!
    TBranch        *b_gamma2_dEdx;   //!
-   TBranch        *b_gamma2_dist_exit;   //!
    TBranch        *b_gamma2_dist_vtx;   //!
    TBranch        *b_gamma2_evis_ecal;   //!
    TBranch        *b_gamma2_evis_hcal;   //!
@@ -1260,6 +1126,7 @@ public :
    TBranch        *b_gamma2_px;   //!
    TBranch        *b_gamma2_py;   //!
    TBranch        *b_gamma2_pz;   //!
+   TBranch        *b_gamma2_score;   //!
    TBranch        *b_gamma2_theta;   //!
    TBranch        *b_gamma2_time;   //!
    TBranch        *b_hadronVisibleE;   //!
@@ -1294,83 +1161,16 @@ public :
    TBranch        *b_pi0_thetaY;   //!
    TBranch        *b_preFilter_rejectedEnergy;   //!
    TBranch        *b_prim_vtx_smallest_opening_angle;   //!
+   TBranch        *b_prong_showerScore;   //!
    TBranch        *b_time;   //!
    TBranch        *b_totalIDVisibleE;   //!
    TBranch        *b_totalODVisibleE;   //!
    TBranch        *b_totalVisibleE;   //!
    TBranch        *b_vtx_michel_distance;   //!
-   TBranch        *b_anglescan_blob_nc_sz;   //!
-   TBranch        *b_anglescan_blob_nc;   //!
-   TBranch        *b_anglescan_blob_ncu_sz;   //!
-   TBranch        *b_anglescan_blob_ncu;   //!
-   TBranch        *b_anglescan_blob_ncv_sz;   //!
-   TBranch        *b_anglescan_blob_ncv;   //!
-   TBranch        *b_anglescan_blob_ncx_sz;   //!
-   TBranch        *b_anglescan_blob_ncx;   //!
-   TBranch        *b_anglescan_blob_nd_sz;   //!
-   TBranch        *b_anglescan_blob_nd;   //!
-   TBranch        *b_anglescan_blob_ndu_sz;   //!
-   TBranch        *b_anglescan_blob_ndu;   //!
-   TBranch        *b_anglescan_blob_ndv_sz;   //!
-   TBranch        *b_anglescan_blob_ndv;   //!
-   TBranch        *b_anglescan_blob_ndx_sz;   //!
-   TBranch        *b_anglescan_blob_ndx;   //!
-   TBranch        *b_anglescan_cand_nc_sz;   //!
-   TBranch        *b_anglescan_cand_nc;   //!
-   TBranch        *b_anglescan_cand_ncu_sz;   //!
-   TBranch        *b_anglescan_cand_ncu;   //!
-   TBranch        *b_anglescan_cand_ncv_sz;   //!
-   TBranch        *b_anglescan_cand_ncv;   //!
-   TBranch        *b_anglescan_cand_ncx_sz;   //!
-   TBranch        *b_anglescan_cand_ncx;   //!
-   TBranch        *b_anglescan_cand_nd_sz;   //!
-   TBranch        *b_anglescan_cand_nd;   //!
-   TBranch        *b_anglescan_cand_ndu_sz;   //!
-   TBranch        *b_anglescan_cand_ndu;   //!
-   TBranch        *b_anglescan_cand_ndv_sz;   //!
-   TBranch        *b_anglescan_cand_ndv;   //!
-   TBranch        *b_anglescan_cand_ndx_sz;   //!
-   TBranch        *b_anglescan_cand_ndx;   //!
-   TBranch        *b_anglescan_candx_nc_sz;   //!
-   TBranch        *b_anglescan_candx_nc;   //!
-   TBranch        *b_anglescan_candx_nd_sz;   //!
-   TBranch        *b_anglescan_candx_nd;   //!
-   TBranch        *b_final_blob_nc_sz;   //!
-   TBranch        *b_final_blob_nc;   //!
-   TBranch        *b_final_blob_ncu_sz;   //!
-   TBranch        *b_final_blob_ncu;   //!
-   TBranch        *b_final_blob_ncv_sz;   //!
-   TBranch        *b_final_blob_ncv;   //!
-   TBranch        *b_final_blob_ncx_sz;   //!
-   TBranch        *b_final_blob_ncx;   //!
-   TBranch        *b_final_blob_nd_sz;   //!
-   TBranch        *b_final_blob_nd;   //!
-   TBranch        *b_final_blob_ndu_sz;   //!
-   TBranch        *b_final_blob_ndu;   //!
-   TBranch        *b_final_blob_ndv_sz;   //!
-   TBranch        *b_final_blob_ndv;   //!
-   TBranch        *b_final_blob_ndx_sz;   //!
-   TBranch        *b_final_blob_ndx;   //!
    TBranch        *b_g1dedx_cluster_occupancy_sz;   //!
    TBranch        *b_g1dedx_cluster_occupancy;   //!
    TBranch        *b_g2dedx_cluster_occupancy_sz;   //!
    TBranch        *b_g2dedx_cluster_occupancy;   //!
-   TBranch        *b_hough_blob_nc_sz;   //!
-   TBranch        *b_hough_blob_nc;   //!
-   TBranch        *b_hough_blob_ncu_sz;   //!
-   TBranch        *b_hough_blob_ncu;   //!
-   TBranch        *b_hough_blob_ncv_sz;   //!
-   TBranch        *b_hough_blob_ncv;   //!
-   TBranch        *b_hough_blob_ncx_sz;   //!
-   TBranch        *b_hough_blob_ncx;   //!
-   TBranch        *b_hough_blob_nd_sz;   //!
-   TBranch        *b_hough_blob_nd;   //!
-   TBranch        *b_hough_blob_ndu_sz;   //!
-   TBranch        *b_hough_blob_ndu;   //!
-   TBranch        *b_hough_blob_ndv_sz;   //!
-   TBranch        *b_hough_blob_ndv;   //!
-   TBranch        *b_hough_blob_ndx_sz;   //!
-   TBranch        *b_hough_blob_ndx;   //!
    TBranch        *b_Vertex_energy_radii_sz;   //!
    TBranch        *b_Vertex_energy_radii;   //!
    TBranch        *b_blob_cluster_energy1_sz;   //!
@@ -1389,10 +1189,6 @@ public :
    TBranch        *b_gamma1_vertex;   //!
    TBranch        *b_gamma2_direction;   //!
    TBranch        *b_gamma2_vertex;   //!
-   TBranch        *b_good_mgg_vector_sz;   //!
-   TBranch        *b_good_mgg_vector;   //!
-   TBranch        *b_mgg_vector_sz;   //!
-   TBranch        *b_mgg_vector;   //!
    TBranch        *b_od_distanceBlobTower_sz;   //!
    TBranch        *b_od_distanceBlobTower;   //!
    TBranch        *b_od_idBlobTime_sz;   //!
@@ -1610,7 +1406,6 @@ public :
    TBranch        *b_CCProtonPi0_proton_isRecoGood;   //!
    TBranch        *b_CCProtonPi0_proton_kinked;   //!
    TBranch        *b_CCProtonPi0_proton_odMatch;   //!
-   TBranch        *b_CCProtonPi0_proton_trk_pat_history;   //!
    TBranch        *b_CCProtonPi0_trajProtonProngPDG;   //!
    TBranch        *b_CCProtonPi0_trajProtonProngPrimary;   //!
    TBranch        *b_CCProtonPi0_endProtonTrajMomentum;   //!
@@ -1741,7 +1536,7 @@ public :
    TBranch        *b_prong_part_pid;   //!
    TBranch        *b_prong_part_E;   //!
    TBranch        *b_prong_part_pos;   //!
-  
+
 };
 
 #endif

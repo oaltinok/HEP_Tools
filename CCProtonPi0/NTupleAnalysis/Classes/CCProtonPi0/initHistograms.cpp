@@ -32,6 +32,11 @@ void CCProtonPi0::initHistograms()
     pID_proton_protonScore_LLR->GetXaxis()->SetTitle("proton_protonScore_LLR");
     pID_proton_protonScore_LLR->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
     
+    // Shower Score
+    prongShowerScore = new TH1D( "prongShowerScore","",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
+    prongShowerScore->GetXaxis()->SetTitle("prong EMPID Shower Score");
+    prongShowerScore->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore.get_width()));
+    
     // Proton Score 
     pID_piplus_protonScore = new TH1D( "pID_piplus_protonScore","piplus_protonScore",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     pID_piplus_protonScore->GetXaxis()->SetTitle("piplus_protonScore");
@@ -346,52 +351,15 @@ void CCProtonPi0::initHistograms()
     
 
     
-    // Debugging Histograms
-    w2fail_w2 = new TH1D( "w2fail_w2","mN^{2}+2mN(Epi + Tp) - Q^{2}",binList.wfail.get_nBins(), binList.wfail.get_min(), binList.wfail.get_max() );
-    w2fail_w2->GetXaxis()->SetTitle("mN^{2}+2mN(Epi + Tp) - Q^{2} [GeV^{2}]");
-    w2fail_w2->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.wfail.get_width()));
-    
-    w2fail_q2 = new TH1D( "w2fail_q2","Reconstructed Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
-    w2fail_q2->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
-    w2fail_q2->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.q2.get_width()));
-    
-    w2fail_term1 = new TH1D( "w2fail_term1","mN^{2}+2mN(Epi + Tp)",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
-    w2fail_term1->GetXaxis()->SetTitle("mN^{2}+2mN(Epi + Tp) [GeV^{2}]");
-    w2fail_term1->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.q2.get_width()));
-    
-    w2fail_term1_q2 = new TH2D( "w2fail_term1_q2","Q^{2} vs (mN^{2}+2mN(Epi + Tp))",  binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max(),
-                                                                        binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
-    w2fail_term1_q2->GetXaxis()->SetTitle("mN^{2}+2mN(Epi + Tp) [GeV^{2}]");
-    w2fail_term1_q2->GetYaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
-    
-    w2fail_Enu = new TH1D( "w2fail_Enu","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    w2fail_Enu->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
-    w2fail_Enu->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
-    
-    w2fail_muon_E = new TH1D( "w2fail_muon_E","Reconstructed Muon Energy",binList.muonE.get_nBins(), binList.muonE.get_min(), binList.muonE.get_max() );
-    w2fail_muon_E->GetXaxis()->SetTitle("Reconstructed Muon Energy [GeV]");
-    w2fail_muon_E->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.muonE.get_width()));
-    
-    w2fail_muon_Pz = new TH1D( "w2fail_muon_Pz","Reconstructed Muon Momentum(z)",binList.muonE.get_nBins(), binList.muonE.get_min(), binList.muonE.get_max() );
-    w2fail_muon_Pz->GetXaxis()->SetTitle("Reconstructed Muon Momentum(z) [GeV]");
-    w2fail_muon_Pz->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.muonE.get_width()));
-    
-    w2fail_pion_E = new TH1D( "w2fail_pion_E","Reconstructed Pion Energy",binList.pionE.get_nBins(), binList.pionE.get_min(), binList.pionE.get_max() );
-    w2fail_pion_E->GetXaxis()->SetTitle("Reconstructed Pion Energy [GeV]");
-    w2fail_pion_E->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.pionE.get_width()));
-    
-    w2fail_proton_KE = new TH1D( "w2fail_proton_KE","Reconstructed Proton Kinetic Energy",binList.protonKE.get_nBins(), binList.protonKE.get_min(), binList.protonKE.get_max() );
-    w2fail_proton_KE->GetXaxis()->SetTitle("Reconstructed Proton Kinetic Energy [GeV]");
-    w2fail_proton_KE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.protonKE.get_width()));
-    
+   
     // Cluster Energy after Pi0 Reconstruction
-    E_Unused_postProton = new TH1D( "E_Unused_postProton","Unused Cluster Energy after Proton Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
-    E_Unused_postProton->GetXaxis()->SetTitle("Unused Cluster Energy after Proton Reconstruction [MeV]");
-    E_Unused_postProton->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
+    E_Unused_afterReco = new TH1D( "E_Unused_afterReco","Unused Cluster Energy after Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
+    E_Unused_afterReco->GetXaxis()->SetTitle("Unused Cluster Energy after Reconstruction [MeV]");
+    E_Unused_afterReco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
     
-    E_Used_postProton = new TH1D( "E_Used_postProton","Used Cluster Energy after Proton Reconstruction",binList.UsedE.get_nBins(), binList.UsedE.get_min(), binList.UsedE.get_max() );
-    E_Used_postProton->GetXaxis()->SetTitle("Used Cluster Energy after Proton Reconstruction [MeV]");
-    E_Used_postProton->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UsedE.get_width()));
+    E_Used_afterReco = new TH1D( "E_Used_afterReco","Used Cluster Energy after Reconstruction",binList.UsedE.get_nBins(), binList.UsedE.get_min(), binList.UsedE.get_max() );
+    E_Used_afterReco->GetXaxis()->SetTitle("Used Cluster Energy after Reconstruction [MeV]");
+    E_Used_afterReco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UsedE.get_width()));
     
     // Cluster Timing
     time_AllClusters = new TH1D( "time_AllClusters","Cluster Time",binList.time.get_nBins(), binList.time.get_min(), binList.time.get_max() );
@@ -416,11 +384,71 @@ void CCProtonPi0::initHistograms()
     
     hCut_nProngs = new TH1D( "hCut_nProngs","Number of Prongs before CUTS",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
     hCut_nProngs->GetXaxis()->SetTitle("Number of Prongs");
-    hCut_nProngs->GetYaxis()->SetTitle("N(Events)"); 
+    hCut_nProngs->GetYaxis()->SetTitle("N(Events)");
     
-    hCut_Michel = new TH1D( "hCut_Michel","Event Has Michel?",binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
-    hCut_Michel->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
-    hCut_Michel->GetYaxis()->SetTitle("N(Events)");
+    hCut_1Prong_Michel = new TH1D( "hCut_1Prong_Michel","Event Has Michel?",binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
+    hCut_1Prong_Michel->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
+    hCut_1Prong_Michel->GetYaxis()->SetTitle("N(Events)");
+
+    hCut_1Prong_eVis_nuclearTarget = new TH1D( "hCut_1Prong_eVis_nuclearTarget","Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
+    hCut_1Prong_eVis_nuclearTarget->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
+    hCut_1Prong_eVis_nuclearTarget->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
+    
+    hCut_1Prong_eVis_other = new TH1D( "hCut_1Prong_eVis_other","Visible Energy in Tracker + ECAL + HCAL",binList.eVis_other.get_nBins(), binList.eVis_other.get_min(), binList.eVis_other.get_max() );
+    hCut_1Prong_eVis_other->GetXaxis()->SetTitle("Visible Energy in Tracker + ECAL + HCAL [MeV]");
+    hCut_1Prong_eVis_other->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_other.get_width()));
+    
+    hCut_1Prong_gamma1ConvDist = new TH1D( "hCut_1Prong_gamma1ConvDist","Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+    hCut_1Prong_gamma1ConvDist->GetXaxis()->SetTitle("Leading Photon Conversion Distance");
+    hCut_1Prong_gamma1ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
+    
+    hCut_1Prong_gamma2ConvDist = new TH1D( "hCut_1Prong_gamma2ConvDist","Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+    hCut_1Prong_gamma2ConvDist->GetXaxis()->SetTitle("Second Photon Conversion Distance");
+    hCut_1Prong_gamma2ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
+    
+    hCut_1Prong_pi0invMass = new TH1D( "hCut_1Prong_pi0invMass","Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    hCut_1Prong_pi0invMass->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+    hCut_1Prong_pi0invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+    
+    hCut_1Prong_neutrinoE = new TH1D( "hCut_1Prong_neutrinoE","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    hCut_1Prong_neutrinoE->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
+    hCut_1Prong_neutrinoE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
+    
+    hCut_1Prong_UnusedE = new TH1D( "hCut_1Prong_UnusedE","Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
+    hCut_1Prong_UnusedE->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
+    hCut_1Prong_UnusedE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
+    
+    hCut_2Prong_Michel = new TH1D( "hCut_2Prong_Michel","Event Has Michel?",binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
+    hCut_2Prong_Michel->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
+    hCut_2Prong_Michel->GetYaxis()->SetTitle("N(Events)");
+
+    hCut_2Prong_eVis_nuclearTarget = new TH1D( "hCut_2Prong_eVis_nuclearTarget","Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
+    hCut_2Prong_eVis_nuclearTarget->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
+    hCut_2Prong_eVis_nuclearTarget->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
+    
+    hCut_2Prong_eVis_other = new TH1D( "hCut_2Prong_eVis_other","Visible Energy in Tracker + ECAL + HCAL",binList.eVis_other.get_nBins(), binList.eVis_other.get_min(), binList.eVis_other.get_max() );
+    hCut_2Prong_eVis_other->GetXaxis()->SetTitle("Visible Energy in Tracker + ECAL + HCAL [MeV]");
+    hCut_2Prong_eVis_other->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_other.get_width()));
+    
+    hCut_2Prong_gamma1ConvDist = new TH1D( "hCut_2Prong_gamma1ConvDist","Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+    hCut_2Prong_gamma1ConvDist->GetXaxis()->SetTitle("Leading Photon Conversion Distance");
+    hCut_2Prong_gamma1ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
+    
+    hCut_2Prong_gamma2ConvDist = new TH1D( "hCut_2Prong_gamma2ConvDist","Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+    hCut_2Prong_gamma2ConvDist->GetXaxis()->SetTitle("Second Photon Conversion Distance");
+    hCut_2Prong_gamma2ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
+    
+    hCut_2Prong_pi0invMass = new TH1D( "hCut_2Prong_pi0invMass","Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    hCut_2Prong_pi0invMass->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+    hCut_2Prong_pi0invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+    
+    hCut_2Prong_neutrinoE = new TH1D( "hCut_2Prong_neutrinoE","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    hCut_2Prong_neutrinoE->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
+    hCut_2Prong_neutrinoE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
+    
+    hCut_2Prong_UnusedE = new TH1D( "hCut_2Prong_UnusedE","Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
+    hCut_2Prong_UnusedE->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
+    hCut_2Prong_UnusedE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
     
     hCut_protonScore = new TH1D( "hCut_protonScore","Proton Score",binList.particleScore.get_nBins(), binList.particleScore.get_min(), binList.particleScore.get_max() );
     hCut_protonScore->GetXaxis()->SetTitle("Proton Score");
@@ -438,37 +466,9 @@ void CCProtonPi0::initHistograms()
     hCut_protonScore_LLR->GetXaxis()->SetTitle("proton_protonScore_LLR");
     hCut_protonScore_LLR->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
     
-    hCut_eVis_nuclearTarget = new TH1D( "hCut_eVis_nuclearTarget","Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
-    hCut_eVis_nuclearTarget->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
-    hCut_eVis_nuclearTarget->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
-    
-    hCut_eVis_other = new TH1D( "hCut_eVis_other","Visible Energy in Tracker + ECAL + HCAL",binList.eVis_other.get_nBins(), binList.eVis_other.get_min(), binList.eVis_other.get_max() );
-    hCut_eVis_other->GetXaxis()->SetTitle("Visible Energy in Tracker + ECAL + HCAL [MeV]");
-    hCut_eVis_other->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_other.get_width()));
-    
-    hCut_gamma1ConvDist = new TH1D( "hCut_gamma1ConvDist","Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
-    hCut_gamma1ConvDist->GetXaxis()->SetTitle("Leading Photon Conversion Distance");
-    hCut_gamma1ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
-    
-    hCut_gamma2ConvDist = new TH1D( "hCut_gamma2ConvDist","Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
-    hCut_gamma2ConvDist->GetXaxis()->SetTitle("Second Photon Conversion Distance");
-    hCut_gamma2ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
-    
-    hCut_pi0invMass = new TH1D( "hCut_pi0invMass","Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-    hCut_pi0invMass->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-    hCut_pi0invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
-    
-    hCut_neutrinoE = new TH1D( "hCut_neutrinoE","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    hCut_neutrinoE->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
-    hCut_neutrinoE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
-    
-    hCut_QSq = new TH1D( "hCut_QSq","Reconstructed Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
-    hCut_QSq->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
-    hCut_QSq->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.q2.get_width()));
-    
-    hCut_UnusedE = new TH1D( "hCut_UnusedE","Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
-    hCut_UnusedE->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
-    hCut_UnusedE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
+    hCut_deltaInvMass = new TH1D( "hCut_deltaInvMass","deltaInvMass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
+    hCut_deltaInvMass->GetXaxis()->SetTitle("hCut_deltaInvMass");
+    hCut_deltaInvMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.deltaInvMass.get_width()));
     
     
     

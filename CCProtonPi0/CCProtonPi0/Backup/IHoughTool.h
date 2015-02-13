@@ -1,3 +1,14 @@
+/*
+    IHoughTool.h Duplicated from CCPi0 Package on 2014-05-24
+        Purpose: Make CCProtonPi0 Package independent of CCPi0 Package
+        Future: Common Tools and Functions will be combined under AnaUtils or
+                PionUtils
+                
+    Original Author:    Trung Le
+    Author:             Ozgur Altinok  - ozgur.altinok@tufts.edu
+    Date:               2014_05_24
+    Last Revision:      2014_05_24
+*/
 #ifndef IHOUGHTOOL_H 
 #define IHOUGHTOOL_H 1
 

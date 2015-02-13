@@ -14,9 +14,7 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());
-    
-    plotDebuggingPlots();
-    
+
     // Signal only Plots
     if( branchInd == 0){
         TH1D* h_status_Pi0 = (TH1D*)f_Root->Get("status_Pi0");
@@ -31,10 +29,7 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
     
     // Plot Only MC Values
     if( isMC ){
-    
-        TH1D* h_deltaInvMass_mc = (TH1D*)f_Root->Get("deltaInvMass_mc");
-        plot1D_Hist(h_deltaInvMass_mc ,"deltaInvMass_mc.png",plotDir);
-        
+            
         TH1D* h_beamEnergy_mc= (TH1D*)f_Root->Get("beamEnergy_mc");
         plot1D_Hist(h_beamEnergy_mc,"beamEnergy_mc.png",plotDir);
         
@@ -57,9 +52,6 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
     
     // Plot Only Reco Values
     if( isReco ){
-        TH1D* h_E_Unused_postPi0 = (TH1D*)f_Root->Get("E_Unused_postPi0");
-        plot1D_Hist(h_E_Unused_postPi0,"E_Unused_postPi0.png",plotDir);
-        
         TH1D* h_total_E = (TH1D*)f_Root->Get("total_E");
         plot1D_Hist(h_total_E,"total_E.png",plotDir);
         
@@ -258,21 +250,21 @@ void Plotter::plotPion(bool isMC, bool isReco, bool is2D)
     TH1D* h_invMass = (TH1D*)f_Root->Get("invMass");
     plot1D_Hist(h_invMass,"invMass.png",plotDir);
     
+    // Photon Conversion Length
     TH1D* h_gamma1_ConvLength = (TH1D*)f_Root->Get("gamma1_ConvLength");
     plot1D_Hist(h_gamma1_ConvLength,"gamma1_ConvLength.png",plotDir);
     
     TH1D* h_gamma2_ConvLength = (TH1D*)f_Root->Get("gamma2_ConvLength");
     plot1D_Hist(h_gamma2_ConvLength,"gamma2_ConvLength.png",plotDir);
     
-    TH2D* h_nClusters_All_gamma2_gamma1 = (TH2D*)f_Root->Get("nClusters_All_gamma2_gamma1");
-    plot2D_Hist(h_nClusters_All_gamma2_gamma1,"nClusters_All_gamma2_gamma1.png",plotDir);
-    
-    TH2D* h_nClusters_X_gamma2_gamma1 = (TH2D*)f_Root->Get("nClusters_X_gamma2_gamma1");
-    plot2D_Hist(h_nClusters_X_gamma2_gamma1,"nClusters_X_gamma2_gamma1.png",plotDir);
-    
     TH2D* h_ConvLength_gamma2_gamma1 = (TH2D*)f_Root->Get("ConvLength_gamma2_gamma1");
     plot2D_Hist(h_ConvLength_gamma2_gamma1,"ConvLength_gamma2_gamma1.png",plotDir);
     
+    // nClusters
+    TH2D* h_nClusters_All_gamma2_gamma1 = (TH2D*)f_Root->Get("nClusters_All_gamma2_gamma1");
+    plot2D_Hist(h_nClusters_All_gamma2_gamma1,"nClusters_All_gamma2_gamma1.png",plotDir);
+    
+    // Gamma Energy
     TH2D* h_Energy_gamma2_gamma1 = (TH2D*)f_Root->Get("Energy_gamma2_gamma1");
     plot2D_Hist(h_Energy_gamma2_gamma1,"Energy_gamma2_gamma1.png",plotDir);
     

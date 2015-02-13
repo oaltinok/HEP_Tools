@@ -51,7 +51,7 @@ void Pion::initialize(int nMode)
     ConvLength_gamma2_gamma1= new TH2D( "ConvLength_gamma2_gamma1","Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
     ConvLength_gamma2_gamma1->GetXaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
     ConvLength_gamma2_gamma1->GetYaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
-    
+        
     gamma1_nClusters_All = new TH1D( "gamma1_nClusters_All","Leading Photon N(Clusters)",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
     gamma1_nClusters_All->GetXaxis()->SetTitle("Leading Photon N(Clusters)");
     gamma1_nClusters_All->GetYaxis()->SetTitle("N(Events)");
@@ -63,18 +63,6 @@ void Pion::initialize(int nMode)
     nClusters_All_gamma2_gamma1 = new TH2D( "nClusters_All_gamma2_gamma1","Leading vs Second Photon N(Clusters)",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max(),bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
     nClusters_All_gamma2_gamma1->GetXaxis()->SetTitle("Second Photon N(Clusters)");
     nClusters_All_gamma2_gamma1->GetYaxis()->SetTitle("Leading Photon N(Clusters)");
-    
-    gamma1_nClusters_X = new TH1D( "gamma1_nClusters_X","Leading Photon N(Clusters) on X",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
-    gamma1_nClusters_X->GetXaxis()->SetTitle("Leading Photon N(Clusters) on X");
-    gamma1_nClusters_X->GetYaxis()->SetTitle("N(Events)");
-    
-    gamma2_nClusters_X = new TH1D( "gamma2_nClusters_X","Second Photon N(Clusters) on X",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
-    gamma2_nClusters_X->GetXaxis()->SetTitle("Second Photon N(Clusters) on X");
-    gamma2_nClusters_X->GetYaxis()->SetTitle("N(Events)");
-    
-    nClusters_X_gamma2_gamma1 = new TH2D( "nClusters_X_gamma2_gamma1","Leading vs Second Photon N(Clusters) on X",bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max(), bin_gammaClusters.get_nBins(), bin_gammaClusters.get_min(), bin_gammaClusters.get_max() );
-    nClusters_X_gamma2_gamma1->GetXaxis()->SetTitle("Second Photon N(Clusters) on X");
-    nClusters_X_gamma2_gamma1->GetYaxis()->SetTitle("Leading Photon N(Clusters) on X");
     
     gamma1_Energy = new TH1D( "gamma1_Energy","Leading Photon Energy",bin_gammaEnergy.get_nBins(), bin_gammaEnergy.get_min(), bin_gammaEnergy.get_max() );
     gamma1_Energy->GetXaxis()->SetTitle("Leading Photon Energy [GeV]");
@@ -99,20 +87,7 @@ void Pion::initialize(int nMode)
     //--------------------------------------------------------------------------
     invMass = new TH1D( "invMass","Reconstructed Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
     invMass->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-    invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",bin_invMass.get_width()));
-
-    invMass_0Pi0 = new TH1D( "invMass_0Pi0","True N(Pi0) = 0",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
-    invMass_0Pi0->GetXaxis()->SetTitle("Reconstructed Pion Invariant Mass [MeV]");
-    invMass_0Pi0->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_invMass.get_width()));
-    
-    invMass_1Pi0 = new TH1D( "invMass_1Pi0","True N(Pi0) = 1",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
-    invMass_1Pi0->GetXaxis()->SetTitle("Reconstructed Pion Invariant Mass [MeV]");
-    invMass_1Pi0->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_invMass.get_width()));
-    
-    invMass_MultPi0 = new TH1D( "invMass_MultPi0","True N(Pi0) = 2+",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
-    invMass_MultPi0->GetXaxis()->SetTitle("Reconstructed Pion Invariant Mass [MeV]");
-    invMass_MultPi0->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_invMass.get_width()));
-    
+    invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",bin_invMass.get_width()));   
 
     //--------------------------------------------------------------------------
     // Momentum and Energy
@@ -153,34 +128,6 @@ void Pion::initialize(int nMode)
     P_reco_mc->GetXaxis()->SetTitle("Reconstructed Pion Momentum [MeV]");
     P_reco_mc->GetYaxis()->SetTitle("True Pion Momentum [MeV]");
     
-    // Momentum Studies
-    P_reco_0Pi0 = new TH1D( "P_reco_0Pi0","True N(Pi0) = 0",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    P_reco_0Pi0->GetXaxis()->SetTitle("Reconstructed Pion Momentum [MeV]");
-    P_reco_0Pi0->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_P.get_width()));
-    
-    P_reco_1Pi0 = new TH1D( "P_reco_1Pi0","True N(Pi0) = 1",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    P_reco_1Pi0->GetXaxis()->SetTitle("Reconstructed Pion Momentum [MeV]");
-    P_reco_1Pi0->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_P.get_width()));
-    
-    P_reco_MultPi0 = new TH1D( "P_reco_MultPi0","True N(Pi0) = 2+",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    P_reco_MultPi0->GetXaxis()->SetTitle("Reconstructed Pion Momentum [MeV]");
-    P_reco_MultPi0->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_P.get_width()));
-    
-    P_reco_mc_1Pi0 = new TH2D( "P_reco_mc_1Pi0","True N(Pi0) = 1",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(),bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    P_reco_mc_1Pi0->GetXaxis()->SetTitle("Reconstructed Pion Momentum [MeV]");
-    P_reco_mc_1Pi0->GetYaxis()->SetTitle("True Pion Momentum [MeV]");
-    
-    P_error_1Pi0 = new TH1D( "P_error_1Pi0","Error on Pion Momentum True N(Pi0) = 1",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
-    P_error_1Pi0->GetXaxis()->SetTitle("(Reco- True) / True");
-    P_error_1Pi0->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",bin_error.get_width()));
-    
-    P_reco_mc_MultPi0 = new TH2D( "P_reco_mc_MultPi0","True N(Pi0) = 2+",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(),bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    P_reco_mc_MultPi0->GetXaxis()->SetTitle("Reconstructed Pion Momentum [MeV]");
-    P_reco_mc_MultPi0->GetYaxis()->SetTitle("True Pion Momentum [MeV]");
-    
-    P_error_MultPi0 = new TH1D( "P_error_MultPi0","Error on Pion Momentum True N(Pi0) = 2+",bin_error.get_nBins(), bin_error.get_min(), bin_error.get_max() );
-    P_error_MultPi0->GetXaxis()->SetTitle("(Reco- True) / True");
-    P_error_MultPi0->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",bin_error.get_width()));
     
     //--------------------------------------------------------------------------
     // Kinetic Energy
@@ -258,20 +205,7 @@ void Pion::initialize(int nMode)
 
 Pion::~Pion()
 {    
-    delete invMass;
-    delete invMass_0Pi0;
-    delete invMass_1Pi0;
-    delete invMass_MultPi0;
     
-    delete P_reco_0Pi0;
-    delete P_reco_1Pi0;
-    delete P_reco_MultPi0;
-    
-    delete P_reco_mc_1Pi0;
-    delete P_reco_mc_MultPi0;
-    
-    delete P_error_1Pi0;
-    delete P_error_MultPi0;   
 }
 
 void Pion::set_kineticEnergy(bool isMC)

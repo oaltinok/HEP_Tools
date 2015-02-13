@@ -27,27 +27,14 @@ void CCProtonPi0::fillPionReco()
     pion.invMass->Fill(pi0_invMass);
     
     // Set Photon Conversion Length in [cm]
-    pion.gamma1_ConvLength->Fill(gamma1_dist_vtx);
-    pion.gamma2_ConvLength->Fill(gamma2_dist_vtx);
+    pion.gamma1_ConvLength->Fill(gamma1_dist_vtx * 0.1);
+    pion.gamma2_ConvLength->Fill(gamma2_dist_vtx * 0.1);
     pion.ConvLength_gamma2_gamma1->Fill(gamma2_dist_vtx, gamma1_dist_vtx);
-    
+        
     // Set Photon N(Clusters)
     pion.gamma1_nClusters_All->Fill(gamma1_blob_nclusters);
     pion.gamma2_nClusters_All->Fill(gamma2_blob_nclusters);
     pion.nClusters_All_gamma2_gamma1->Fill(gamma2_blob_nclusters,gamma1_blob_nclusters);
-    
-    int gamma1_xCLusters;
-    int gamma2_xCLusters;
-    if(final_blob_nc[0] >= final_blob_nc[1]){
-        gamma1_xCLusters = final_blob_nc[0];
-        gamma2_xCLusters = final_blob_nc[1];
-    }else{ 
-        gamma1_xCLusters = final_blob_nc[1];
-        gamma2_xCLusters = final_blob_nc[0];
-    }
-    pion.gamma1_nClusters_X->Fill(gamma1_xCLusters);
-    pion.gamma2_nClusters_X->Fill(gamma2_xCLusters);
-    pion.nClusters_X_gamma2_gamma1->Fill(gamma2_xCLusters,gamma1_xCLusters);
     
     // Set Photon Energy [GeV]
     pion.gamma1_Energy->Fill(gamma1_E * HEP_Functions::MeV_to_GeV);
@@ -61,9 +48,6 @@ void CCProtonPi0::fillPionReco()
 
 void CCProtonPi0::fillPionTrue()
 {
-    double P_true;
-    double P_reco;
-    
     // Fill 4-Momentum
     if (truth_pi0_E != -1){
         pion.set_p4(truth_pi0_px,
@@ -79,66 +63,11 @@ void CCProtonPi0::fillPionTrue()
                     true);
     }
     
-    P_reco = HEP_Functions::calcMomentum(pi0_px,pi0_py,pi0_pz);
-   
-    // Momentum and Invariant Mass Information with True Pi0 Count
-    if(truth_N_pi0 == 0){
-        pion.P_reco_0Pi0->Fill(P_reco);
-        pion.invMass_0Pi0->Fill(pi0_invMass);
-    }else if(truth_N_pi0 == 1){
-        pion.P_reco_1Pi0->Fill(P_reco);
-        pion.invMass_1Pi0->Fill(pi0_invMass);
-        P_true = getBestPi0Momentum();
-        pion.P_reco_mc_1Pi0->Fill(P_reco,P_true);
-    }else if(truth_N_pi0 > 1){
-        pion.P_reco_MultPi0->Fill(P_reco);
-        pion.invMass_MultPi0->Fill(pi0_invMass);
-        P_true = getBestPi0Momentum();
-        pion.P_reco_mc_MultPi0->Fill(P_reco,P_true);
-    }
-}
-
-// Loops over all FS Particles and returns the most energetic pi0
-double CCProtonPi0::getBestPi0Momentum()
-{
-    TVector3 p3;
-    double tempP = 0;
+    // set Angle wrt Beam
+    pion.set_angleBeam(beam_p3, true);
     
-    for(int i = 0; i < mc_nFSPart && i < max_nFSPart; i++ ){
-        if( mc_FSPartPDG[i] == 111){
-            p3.SetXYZ(mc_FSPartPx[i],mc_FSPartPy[i],mc_FSPartPz[i]);
-            if(p3.Mag() > tempP) tempP = p3.Mag();
-        }
-    }
-    return tempP;
-}
-
-int CCProtonPi0::getBestPi0()
-{
-    TVector3 p3;
-    double tempP = 0;
-    double ind = -1;
-    
-    for(int i = 0; i < mc_nFSPart && i < max_nFSPart; i++ ){
-        if( mc_FSPartPDG[i] == 111){
-            p3.SetXYZ(mc_FSPartPx[i],mc_FSPartPy[i],mc_FSPartPz[i]);
-            if(p3.Mag() > tempP){
-                tempP = p3.Mag();
-                ind = i;
-            }
-        }
-    }
-    return ind;
-}
-
-bool CCProtonPi0::isPhotonDistanceLow()
-{
-    
-    if (gamma1_dist_vtx < minPhotonDistance && gamma2_dist_vtx < minPhotonDistance){
-        return true;
-    }else{
-        return false;
-    }
+    // set Angle wrt Muon
+    pion.set_angleMuon(muon, true);
 }
 
 #endif

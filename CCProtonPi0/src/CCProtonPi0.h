@@ -21,8 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2015_01_21
-    Version:        v2_01
+    Last Revision:  2015_02_12
+    Version:        v2_02
     
 ================================================================================
 */
@@ -154,7 +154,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int m_Color_VertexFila;
         int m_Color_VertexSphere;
         int m_Color_RejectedBlob;
-        
              
         // VtxBlob
         bool 	 m_sphereVertex;
@@ -187,6 +186,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         double m_extraEnergyLowerTimeWindow;          ///< Cylinder Cut (ns) 
         double m_extraEnergyUpperTimeWindow;          ///< Cylinder Cut (ns) 
         double m_extraEnergyPECut;                    ///< Cylinder Cut (MeV)?
+        
+        double m_maxSeedLongTrackChi2;
+        double m_maxSeedShortTrackChi2;
         
         TRandom3*                 m_randomGen;
         unsigned long int         m_randomSeed;
@@ -257,7 +259,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const;
         bool checkMichel() const;
         
-        bool createTrackedParticles( Minerva::ProngVect& prongs ) const;
+        bool createTrackedParticles( Minerva::PhysicsEvent* event, Minerva::ProngVect& prongs ) const;
         bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;
 
 
@@ -267,7 +269,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
                                         
         void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
         double getClusterEnergy(Minerva::PhysicsEvent* event, std::string input_clusterType) const;
-        void getClusterTime(Minerva::PhysicsEvent* event) const;
+        double getProngShowerScore(SmartRef<Minerva::Prong> prong) const;
+        StatusCode FindProngAxis(Minerva::Prong * prong) const;
+        bool TrackChi2Pass(const Minerva::Track * track) const;
 
         //! CCPi0 Functions
         SmartRefVector<Minerva::IDCluster> FilterInSphereClusters(  const SmartRefVector<Minerva::IDCluster>& clusters,
@@ -283,8 +287,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         StatusCode ODActivity( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs ) const;
       
         double CalcMinBlobSeparation( const Minerva::IDBlob* blob) const;
-        double CalcDistanceFromBlobAxisToVertex(    const Minerva::IDBlob* blob ) const;
-        double CalcDistanceFromVertexToExiting(     const Minerva::IDBlob* blob ) const;
 
         void CalculatedEdx( const Minerva::IDBlob* blob,
                             Minerva::PhysicsEvent* event, 
@@ -293,7 +295,10 @@ class CCProtonPi0 : public MinervaAnalysisTool
 
         std::vector<double> GetBlobClusterEnergy(   const Minerva::IDBlob* blob ) const;
         
-        bool InsideHexagon(double x, double y, double w) const;
+        std::pair<int,double> OneParLineFitBlob(const Minerva::IDBlob* blob) const;
+        double calcDistance(  double x1, double y1, double z1,
+                              double x2, double y2, double z2) const;
+       
 
 };
 

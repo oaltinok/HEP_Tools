@@ -24,7 +24,7 @@ void CCProtonPi0::fillProtonTrue()
 }
 
 void CCProtonPi0::fillProtonReco()
-{    
+{   
     // Set Particle Score
     proton.particleScore = CCProtonPi0_protonScore[indRecoProton];
 

@@ -13,7 +13,7 @@ Class: Plotter
             
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_01_21
+    Last Revision: 2015_02_13
 ================================================================================
 */
 
@@ -87,8 +87,6 @@ class Plotter
         void plot_final_mc_w_Stacked();
         void plotSignalBackground();
         void plotCutHistograms();
-        void plotDebuggingPlots();
-
         
     
     private:

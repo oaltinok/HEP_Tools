@@ -15,7 +15,7 @@ void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
 //         plotSignalBackground();
         plotCutHistograms();
     }else{
-//         plotInteraction(isMC,isReco, is2D);
+        plotInteraction(isMC,isReco, is2D);
         
 //         plotMuon(isMC,isReco, is2D);
         
@@ -23,10 +23,10 @@ void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
         
 //         plotPion(isMC,isReco, is2D);
         
-        plotPID();
+//        plotPID();
         
-//         plot_mc_w_Stacked();
-//         plot_final_mc_w_Stacked();
+        plot_mc_w_Stacked();
+        plot_final_mc_w_Stacked();
     }
    
     

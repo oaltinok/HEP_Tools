@@ -1,4 +1,4 @@
-CCPROTONPI0_V="v2_01"
+CCPROTONPI0_V="v2_02"
 OUTPUTFOLDER="run"
 
 echo "Submitting Jobs ..."
@@ -9,7 +9,13 @@ RunNumberList=(13200
     13201
     13202
     13203
-    13204)
+    13204
+    13205
+    13206
+    13207
+    13208
+    13209
+    13210)
 
 for runNumber in ${RunNumberList[@]}; do
         echo "Submitting Run = ${runNumber}"

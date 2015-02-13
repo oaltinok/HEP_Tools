@@ -1,14 +1,3 @@
-/*
-    OneParLineFit.h Duplicated from CCPi0 Package on 2014-06-10
-        Purpose: Make CCProtonPi0 Package independent of CCPi0 Package
-        Future: Common Tools and Functions will be combined under AnaUtils or
-                PionUtils
-                
-    Original Author:    Trung Le
-    Author:             Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Date:               2014_06_10
-    Last Revision:      2014_06_10
-*/
 #ifndef OneParLineFit_h
 #define OneParLineFit_h
 

@@ -1,11 +1,3 @@
-/*
-    HTBlob.cpp Duplicated from CCPi0 Package on 2014-05-24
-        Purpose: Make CCProtonPi0 Package independent of CCPi0 Package
-        Future: Common Tools and Functions will be combined under AnaUtils or
-                PionUtils
-                
-    See HTBlob.h for Class Information
-*/
 #include "HTBlob.h"
 #include <cmath>
 #include <limits>

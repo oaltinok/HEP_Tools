@@ -1,14 +1,3 @@
-/*
-    DigitVectorTruthInfo.h Duplicated from CCPi0 Package on 2014-06-10
-        Purpose: Make CCProtonPi0 Package independent of CCPi0 Package
-        Future: Common Tools and Functions will be combined under AnaUtils or
-                PionUtils
-                
-    Original Author:    Trung Le
-    Author:             Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Date:               2014_06_10
-    Last Revision:      2014_06_10
-*/
 #ifndef DigitVectorTruthInfo_h
 #define DigitVectorTruthInfo_h
 
@@ -19,6 +8,7 @@
 namespace Minerva {
     class TG4Trajectory;
     class IDDigit;
+    class IDCluster;
 }
 
 class DigitVectorTruthInfo {
@@ -26,9 +16,9 @@ class DigitVectorTruthInfo {
     DigitVectorTruthInfo();
     ~DigitVectorTruthInfo() {}
 
-    void ParseTruth(const SmartRefVector<Minerva::IDDigit>& digits,
+    void ParseTruth(const SmartRefVector<Minerva::IDCluster>& clusters,
                     const std::map<int,Minerva::TG4Trajectory*>& trajectories);
-
+    
     double GetTotalNormEnergy() const;
     double GetDataNormEnergy() const;
     double GetMCNormEnergy() const;

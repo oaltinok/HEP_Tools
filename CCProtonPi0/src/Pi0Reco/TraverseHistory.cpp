@@ -1,11 +1,3 @@
-/*
-    TraverseHistory:.cpp Duplicated from CCPi0 Package on 2014-06-10
-        Purpose: Make CCProtonPi0 Package independent of CCPi0 Package
-        Future: Common Tools and Functions will be combined under AnaUtils or
-                PionUtils
-                
-    See TraverseHistory:.h for Class Information
-*/
 #undef NDEBUG
 #include <cassert>
 #include <iostream>

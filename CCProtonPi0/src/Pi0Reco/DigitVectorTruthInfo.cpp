@@ -1,11 +1,3 @@
-/*
-    DigitVectorTruthInfo.cpp Duplicated from CCPi0 Package on 2014-06-10
-        Purpose: Make CCProtonPi0 Package independent of CCPi0 Package
-        Future: Common Tools and Functions will be combined under AnaUtils or
-                PionUtils
-                
-    See DigitVectorTruthInfo.h for Class Information
-*/
 #undef NDEBUG
 #include <cassert>
 #include <set>
@@ -13,6 +5,7 @@
 #include <iostream>
 
 
+#include <Event/IDCluster.h>
 #include <Event/IDDigit.h>
 #include <Event/MCIDDigit.h>
 #include <Event/MCHit.h>
@@ -102,59 +95,74 @@ const std::map<int,double>& DigitVectorTruthInfo::GetNextToPrimaryIdEdepMap() co
     return fNextToPrimaryIdEdepMap;
 }
 
-void DigitVectorTruthInfo::ParseTruth(const SmartRefVector<Minerva::IDDigit>& digits,
+
+// Modified version to work with clusters instead of digits
+void DigitVectorTruthInfo::ParseTruth(const SmartRefVector<Minerva::IDCluster>& clusters,
                                       const std::map<int, TG4Trajectory*>& trajectories)
 {
 
-    for (SmartRefVector<Minerva::IDDigit>::const_iterator d = digits.begin();
-         d != digits.end(); ++d) {
-        const double energy = (*d)->normEnergy();
-        fTotalNormEnergy += energy;
+    for (SmartRefVector<Minerva::IDCluster>::const_iterator c = clusters.begin();
+         c != clusters.end(); ++c) {
+        SmartRefVector<Minerva::IDDigit> digits = (*c)->digits();
         
-        const Minerva::IDDigit* digit = *d;
-        const Minerva::MCIDDigit* mcdigit
-            = dynamic_cast<const Minerva::MCIDDigit*>(digit);
-        if (!mcdigit) {
-            fDataNormEnergy += energy;
-            continue;
-        }
-
-            /* This is an MC digit, including MC x-talk digit */
-        fMCNormEnergy += energy;
+    
+        for (SmartRefVector<Minerva::IDDigit>::const_iterator d = digits.begin();
+             d != digits.end(); ++d) {
+            const double norm_energy = (*d)->normEnergy();                    // norm energy of this digit
+            const double fraction    = (*c)->getDigitOwnershipFraction(*d);   // fraction of the digit in the cluster
+                                                                              // use correct fraction to avoid double counting
+            const double digit_energy = norm_energy * fraction;
+            fTotalNormEnergy += digit_energy;
+            
+            const Minerva::IDDigit* digit = *d;
+            const Minerva::MCIDDigit* mcdigit
+                = dynamic_cast<const Minerva::MCIDDigit*>(digit);
+            if (!mcdigit) {
+                fDataNormEnergy += digit_energy;
+                continue;
+            }
+            
+                /* This is an MC digit, including MC x-talk digit */
+            fMCNormEnergy += digit_energy;
+            
+            const SmartRefVector<Minerva::MCHit>& hits = mcdigit->hits();
+            
+            if (hits.empty()) {
+                fMCXtalkNormEnergy += digit_energy;
+                continue;
+            }
+            
+                /* Handle non x-talk, MC digits */
+                /* Implementation note: This part could be replaced by HitVectorTruthInfo */
+            double total = 0.0;
+            std::set<int> primaryContributors;
+            for (SmartRefVector<Minerva::MCHit>::const_iterator h = hits.begin();
+                 h != hits.end(); ++h) {
+                double hit_energy = (*h)->energy();
+                hit_energy *= fraction;                // all MC hits inside the digit must share the same
+                                                       // fraction
+                total += hit_energy;
+                
+                TraverseHistory history((*h)->GetTrackId());
+                history.DoTraverse(trajectories);
+                int primaryPdg = history.GetPrimaryPdg();
+                int nextToPrimaryId = history.GetNextToPrimaryId();
+                
+                fPdgEdepMap[primaryPdg] += hit_energy;
+                fNextToPrimaryIdEdepMap[nextToPrimaryId] += hit_energy;
+                
+                primaryContributors.insert(primaryPdg);
+            
+            }
+            
+            fTotalTruthEnergy += total;
         
-        const SmartRefVector<Minerva::MCHit>& hits = mcdigit->hits();
-        
-        if (hits.empty()) {
-            fMCXtalkNormEnergy += energy;
-            continue;
-        }
-        
-            /* Handle non x-talk, MC digits */
-            /* Implementation note: This part could be replaced by HitVectorTruthInfo */
-        double total = 0.0;
-        std::set<int> primaryContributors;
-        for (SmartRefVector<Minerva::MCHit>::const_iterator h = hits.begin();
-             h != hits.end(); ++h) {
-            total += (*h)->energy();
+            if (primaryContributors.size() > 1) fSharedTruthEnergy += total;
             
-            TraverseHistory history((*h)->GetTrackId());
-            history.DoTraverse(trajectories);
-            int primaryPdg = history.GetPrimaryPdg();
-            int nextToPrimaryId = history.GetNextToPrimaryId();
-            
-            fPdgEdepMap[primaryPdg] += (*h)->energy();
-            fNextToPrimaryIdEdepMap[nextToPrimaryId] += (*h)->energy();
-            
-            primaryContributors.insert(primaryPdg);
-            
-        }
-
-        fTotalTruthEnergy += total;
-        
-        if (primaryContributors.size() > 1) fSharedTruthEnergy += total;
-            
-    }
+        } // loop over cluster's digits
  
+    }
+
 }
 
 void DigitVectorTruthInfo::PrintMap() const

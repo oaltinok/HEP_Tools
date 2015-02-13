@@ -1,17 +1,5 @@
-/*
-================================================================================
-AngleScan
-
-    Original Author:    Trung Le - Duplicated from CCPi0 Package on 2014-06-10
-    Author:             Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Date:               2014_06_10
-    Last Revision:      2014_07_17
-    Package Version:    v1_05
-================================================================================
-*/
-
-#ifndef ANGLESCAN_H
-#define ANGLESCAN_H
+#ifndef cc1pi0_AngleScan_h
+#define cc1pi0_AngleScan_h
 
 #include <functional>
 
@@ -27,14 +15,20 @@ class AngleScan {
     
     typedef SmartRefVector<Minerva::IDCluster> ShowerCand;
     
-    // Overloaded Constructor
-    AngleScan(const SmartRefVector<Minerva::IDCluster>& clusters, const Gaudi::XYZPoint& vertex);
+    AngleScan(const SmartRefVector<Minerva::IDCluster>& clusters,
+              const Gaudi::XYZPoint& vertex);
     
     void Initialize();
     void BuildThetaHistogram();
     void FindPeaks();
     void DoReco();
 
+    const std::vector<TVector2>& GetPeaks() const;
+    const std::vector<TVector2>& GetGoodPeaks() const;
+
+    const std::vector<double>& GetXShowerClosestDistances() const;
+    const std::vector<double>& GetXShowerWeightedDistances() const;
+    
     unsigned int GetNxCandidate() const;
     unsigned int GetNCandidate() const;
 
@@ -51,7 +45,6 @@ class AngleScan {
     const SmartRefVector<Minerva::IDCluster>& GetUnusedUClusters() const;
     const SmartRefVector<Minerva::IDCluster>& GetUnusedVClusters() const;        
 
-    // Set Functions for Data members controlling the algorithm behaviors
     void SetUVMatchTolerance(double epsilon);
     void SetUVMatchMoreTolerance(double big_epsilon);
     void AllowUVMatchWithMoreTolerance(bool b);
@@ -74,7 +67,7 @@ class AngleScan {
     
     void coneView(SmartRefVector<Minerva::IDCluster>& unusedViewClusters,
                   SmartRefVector<Minerva::IDCluster>& showerCand,
-                  double vtx_x,
+                  double vtxT,
                   double min_angle, double max_angle,
                   double zmin, double zmax);   
     
@@ -88,18 +81,24 @@ class AngleScan {
     SmartRefVector<Minerva::IDCluster> fRemainingUClusters;
     SmartRefVector<Minerva::IDCluster> fRemainingVClusters;
     
-    double vtx_pos_X;
-    double vtx_pos_Y;
-    double vtx_pos_Z;
-    double vtx_pos_U;
-    double vtx_pos_V;
+    double fX;
+    double fY;
+    double fZ;
+    double fU;
+    double fV;
     
     TH1F* fTheta;
     std::vector<TVector2> fPeaks;
+    std::vector<TVector2> fGoodPeaks; /// peaks in the angular distributon that
+                                      /// produce shower candidates in the X view
+
+    std::vector<double> fXShowerClosestDistances;
+    std::vector<double> fXShowerWeightedDistances;
+    
     std::vector<ShowerCand> fShowerCandidates;
     std::vector<ShowerCand> fXShowerCandidates;
 
-    // Data member controlling the algorithm behaviors
+        // Data member controlling the algorithm behaviors
     double fUVMatchTolerance;
     double fUVMatchMoreTolerance;
     bool   fAllowUVMatchWithMoreTolerance;
