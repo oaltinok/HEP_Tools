@@ -1,8 +1,8 @@
 # Packages for Minerva Neutrino Experiment
 
-|Statistical Data Analysis | Other Algorithms	|
-|-------------- |------------------	|
-|CCProtonPi0	| dEdX Improvement	|
+|Statistical Data Analysis |MINERvA Operations| Other Algorithms	|
+|----|-----|-----|
+|CCProtonPi0	|CAMAC_DataReader|dEdX Improvement	|
 
 
 * These packages are specialized for MINERvA Experiment data format.
@@ -23,6 +23,14 @@
 	* Charged Current Neutrino Interaction inside Fiducial Volume
 	* Final State Particles: muon, proton, and pi0
 
+## MINERvA Operations:
+### CAMAC_DataReader
+* Package responsible for processing CAMAC Readout File
+	* CAMAC Provides electronic signal output from the Test Beam Detector
+	* Package reads the output data and converts scalars to real values
+	* Updates the NearlineCurrentHistos.root File interactively
+	* NearlineCurrentHistos.root file read by GMBrowser to show the plots to the Shifter
+	
 ## Other Algorithms:
 
 ### dEdX_pID
