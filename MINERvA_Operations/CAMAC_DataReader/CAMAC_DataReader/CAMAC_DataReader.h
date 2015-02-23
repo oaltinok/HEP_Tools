@@ -30,7 +30,7 @@ class CAMAC_DataReader
 
     private:
         CAMAC_Data TOF;
-        CAMAC_Data Veto;
+//         CAMAC_Data Veto;
         
         // I/O Files
         std::string rootDir;

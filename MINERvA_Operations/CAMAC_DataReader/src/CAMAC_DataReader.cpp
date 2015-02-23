@@ -10,10 +10,10 @@ using namespace std;
 
 CAMAC_DataReader::CAMAC_DataReader()
 {
-    //     rootDir = "DataFiles/Test.root";
-    rootDir = "DataFiles/NearlineCurrentHistos.root";
-    dataDir_TOF = "DataFiles/testreadoutcamacv6_camac.dat";
-    dataDir_Veto = "DataFiles/testreadoutcamacv6_camac.dat";
+    rootDir = "DataFiles/Test.root";
+//     rootDir = "DataFiles/NearlineCurrentHistos.root";
+    dataDir_TOF = "DataFiles/TB_00001014_0001_cosmc_v09_1502231219_camac.dat";
+    dataDir_Veto = "DataFiles/TB_00001014_0001_cosmc_v09_1502231219_camac.dat";
     branchName_TOF = "TOF_Data";
     branchName_Veto = "Veto_Data"; 
     
@@ -21,9 +21,9 @@ CAMAC_DataReader::CAMAC_DataReader()
     TOF.SetDataFileDir(dataDir_TOF);
     TOF.SetBranchName(branchName_TOF);
     
-    Veto.SetRootFileDir(rootDir);
-    Veto.SetDataFileDir(dataDir_Veto);
-    Veto.SetBranchName(branchName_Veto);
+//     Veto.SetRootFileDir(rootDir);
+//     Veto.SetDataFileDir(dataDir_Veto);
+//     Veto.SetBranchName(branchName_Veto);
         
 }
 
@@ -33,8 +33,8 @@ void CAMAC_DataReader::ReadData()
     cout<<"Reading CAMAC TOF Data"<<endl;
     TOF.ProcessData();
     
-    cout<<"Reading CAMAC Veto Data"<<endl;
-    Veto.ProcessData();
+//     cout<<"Reading CAMAC Veto Data"<<endl;
+//     Veto.ProcessData();
 }
 
 

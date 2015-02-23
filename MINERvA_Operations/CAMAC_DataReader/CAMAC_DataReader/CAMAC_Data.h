@@ -7,7 +7,7 @@ Class: CAMAC_Data
     NearlineCurrentHistos.root is used by GMBrowser to generate plots
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2015_02_20
+    Last Revision:  2015_02_23
 ================================================================================
 */
 #ifndef CAMAC_Data_h
@@ -15,6 +15,7 @@ Class: CAMAC_Data
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -24,6 +25,11 @@ Class: CAMAC_Data
 #include <TFile.h>
 #include <TH1.h>
 #include <TString.h>
+#include <TVectorD.h>
+#include <TGraph.h>
+
+// Local Libraries
+#include "PlotFormats.h"
 
 using namespace std;
 
@@ -40,14 +46,26 @@ class CAMAC_Data
     private:
         // Functions
         void OpenFiles();
-            void ReadDataFile();
+        void ReadDataFile();
         void WriteRootFile();
-        void ReadHeader(string header);
-        void ReadScalar(string line, int varInd);
+        void ReadInfoLine(string line, vector<string> &v);
+        void ReadHistogramFormat(string line);
+        void ReadGraphFormat(string line);
+        void ReadFrequencyFormat(string line);
+        void ReadDataLine(string line);
+        void ProcessDataLine(string var_name, double value);
+        void ProcessConvFactors();
         void OpenDataFileError();
-        void PrintVariables();
+        void PrintVector(vector<string> &v);
         void initHistograms();
+        void initGraphVectors();
+        void FillHistograms(string var_name, double value);
+        void FillGraphVectors(string var_name, double value);
+        int GetVariableInd(string var_name);
         
+        
+        bool isDebugging; 
+       
         // I/O Files
         string rootDir;
         string dataDir;
@@ -56,17 +74,27 @@ class CAMAC_Data
         ifstream dataFile;
         TFile* f_Root;
         
-        // Variable Name Vector
-        vector< string > vars;
+        // Vectors for Information Section
+        vector<string> version;
+        vector<string> vars;
+        vector<string> convFactors_str;
+        vector<double> convFactors;
+        vector<string> units;
+        
+        // Vectors for Plot Formats
+        vector<format_hist> f_hists;
+        vector<format_graph> f_graphs;
+        vector<format_frequency> f_frequencies;
+        
         
         // Histogram Vector
         vector < TH1D* > hists;
         
-        // Bins for the Histograms
-        int TOF_nBins;
-        double TOF_min;
-        double TOF_max;
-
+        // Vectors for Graphs
+        vector < TGraph* > graphs;
+        vector < vector<double> > x_axis_vectors;
+        vector < vector<double> > y_axis_vectors;
+        
 };
 
 #endif
