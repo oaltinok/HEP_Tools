@@ -1,8 +1,8 @@
 # ==============================================================================
 #
-# Makefile for Test Beam TOF and Veto Scalars
+# Makefile for CAMAC_DataReader
 #	Author: Ozgur Altinok
-#	Last Revision: 2015_02_16
+#	Last Revision: 2015_03_02
 #
 # ==============================================================================
 
@@ -13,12 +13,8 @@ MAINEXE = CAMACDataReader
 # CAMAC_Data
 CAMACDATACPP = src/CAMAC_Data.cpp
 
-# CAMAC_DataReader
-CAMACDATAREADERCPP = src/CAMAC_DataReader.cpp
-
-
 # ALL Classes Required for the Package
-ALLCPP = $(MAINCPP) $(CAMACDATACPP) $(CAMACDATAREADERCPP)
+ALLCPP = $(MAINCPP) $(CAMACDATACPP) 
 
 # ------------------------------------------------------------------------------
 # Commands and Flags
