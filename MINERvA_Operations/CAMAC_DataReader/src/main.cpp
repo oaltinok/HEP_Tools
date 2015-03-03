@@ -13,7 +13,7 @@ main.cpp
         > ./CAMACDataReader <CAMAC_readout_file>
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_03_02
+    Last Revision: 2015_03_03
 ================================================================================
 */
 
@@ -30,7 +30,6 @@ using namespace std;
 void ErrorUsage();
 string GetLatestDataFile();
 
-
 int main(int argc, char* argv[])
 {
     CAMAC_Data Data;
@@ -42,12 +41,8 @@ int main(int argc, char* argv[])
     Data.SetDataFileDir(latestDataDir);
     Data.ProcessData();
    
-//     while(true){
-//         
-//     }
-
     // Check for new data file and re-run again if needed
-    for (int i = 0; i < 3; i++){
+    while(true){
         // Get Latest Data Dir
         latestDataDir = GetLatestDataFile();
         
@@ -63,14 +58,17 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+/*
+	GetLatestDataFile()
+		Gets latest camac readout file from /work/data
+*/
 string GetLatestDataFile()
 {
     ifstream commandFile;
-    string dir = "DataFiles/";
     string fileName;
     
     // Use system command and write output to command.dat
-    system("ls -t DataFiles/ >> command.dat");
+    system("ls -t /work/data/TB*camac.dat >> command.dat");
     
     // Open Command.dat File
     commandFile.open("command.dat");
@@ -82,10 +80,7 @@ string GetLatestDataFile()
     // Remove command.dat
     system("rm -f command.dat");
     
-    // Append fileName to the Dir
-    dir.append(fileName);
-    
-    return dir;
+    return fileName;
 }
 
 

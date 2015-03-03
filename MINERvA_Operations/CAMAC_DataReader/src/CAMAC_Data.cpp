@@ -24,7 +24,7 @@ CAMAC_Data::CAMAC_Data()
     isDebugging = false;
     isNewSubrun = true;
     SetBranchName("CAMAC_Data");
-    SetRootFileDir("NearlineCurrentHistos.root");
+    SetRootFileDir("/minerva/data/testbeam2/nearonline/NearlineCurrentHistos.root");
     
     cout<<"\n\n";
 }
@@ -635,6 +635,7 @@ void CAMAC_Data::WriteRootFile()
     dataFile.close();
     
     cout<<"Succesfully updated ROOT File = "<<rootDir<<endl;
+    cout<<"	...Press CTRL+C to stop CAMAC_DataReader Execution"<<endl;
     cout<<endl;
 }
 
@@ -706,7 +707,7 @@ void CAMAC_Data::SetDataFileDir(string input)
 {
     dataDir = input;
     ProcessFileName(input);
-    
+    cout<<"Input Data File = "<<dataDir<<endl;
     // Update Variables
     latest_runNumber = runNumber;
     latest_subrunNumber = subrunNumber;
@@ -740,7 +741,7 @@ bool CAMAC_Data::ChangeDataFileDir(string input)
         // Return True
         return true;
     }else{
-        cout<<"No New CAMAC Readout File"<<endl;
+        // cout<<"No New CAMAC Readout File"<<endl;
         return false;
     }
 }

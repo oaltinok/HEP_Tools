@@ -7,7 +7,7 @@ Class: CAMAC_Data
     NearlineCurrentHistos.root is used by GMBrowser to generate plots
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2015_03_02
+    Last Revision:  2015_03_03
 ================================================================================
 */
 #ifndef CAMAC_Data_h
