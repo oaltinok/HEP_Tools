@@ -24,7 +24,7 @@ CAMAC_Data::CAMAC_Data()
     isDebugging = false;
     isNewSubrun = true;
     SetBranchName("CAMAC_Data");
-    SetRootFileDir("/minerva/data/testbeam2/nearonline/NearlineCurrentHistos.root");
+    SetRootFileDir("/minerva/data/testbeam2/nearonline/CAMACDataHistos.root");
     
     cout<<"\n\n";
 }
@@ -254,12 +254,12 @@ void CAMAC_Data::FillFrequencyPlots(int ind)
         exit(EXIT_FAILURE);
     }
     
-    for (unsigned int i = 0; i < f_frequencies.size(); i++){
-        if ( f_frequencies[i].vars.size() == 0 ){
-            cout<<"ERROR: Frequency Vector = "<<i<<" is NOT Initialized.. Did you initilize correctly!"<<endl;
-            exit(EXIT_FAILURE);
-        }
-    }
+  //  for (unsigned int i = 0; i < f_frequencies.size(); i++){
+   //     if ( f_frequencies[i].vars.size() == 0 ){
+   //         cout<<"ERROR: Frequency Vector = "<<i<<" is NOT Initialized.. Did you initilize correctly!"<<endl;
+   //         exit(EXIT_FAILURE);
+   //     }
+  //  }
     
        
     // Check Frequency Format's vars array - Which Holds the information
@@ -488,6 +488,7 @@ void CAMAC_Data::ReadHistogramFormat(string line)
                 >> tempHist.title >> tempHist.var_name
                 >> tempHist.nbins >> tempHist.low >> tempHist.high;
       
+
     if(isDebugging){
         cout<<"Title = "<<tempHist.title<<endl;
         cout<<"Variable = "<<tempHist.var_name<<endl;
@@ -635,6 +636,7 @@ void CAMAC_Data::WriteRootFile()
     dataFile.close();
     
     cout<<"Succesfully updated ROOT File = "<<rootDir<<endl;
+    cout<<" ...Waiting for NEW CAMAC Readout File..."<<endl;
     cout<<"	...Press CTRL+C to stop CAMAC_DataReader Execution"<<endl;
     cout<<endl;
 }
