@@ -8,7 +8,7 @@ There is an INFINITE loop which does the following:
 		If there is a NEW file :
 			Read File	
 			Process Data	
-			Update /minerva/data/testbeam2/nearonline/NearlineCurrentHistos.root
+			Update /minerva/data/testbeam2/nearonline/CAMACDataHistos.root
 
 ========================================================================
 Usage:
@@ -33,9 +33,9 @@ The GMBrowser Config File:
 /home/nfs/minerva/cmtuser/Minerva_v10r9p1/Tools/ControlRoomTools/gmbrowser/nearline.cfg
 
 ------------------------------------------------------------------------
-NearlineCurrentHistos.root File:
+CAMACDataHistos.root File:
 ------------------------------------------------------------------------
-/minerva/data/testbeam2/nearonline/NearlineCurrentHistos.root
+/minerva/data/testbeam2/nearonline/CAMACDataHistos.root
 
 Data is written to either mnvtb04 or mnvtb03 depending on what system it is. Every 12 hours it's backed up to somewhere inside /minerva/data/testbeam2.
 

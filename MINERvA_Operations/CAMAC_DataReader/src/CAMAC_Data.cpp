@@ -67,7 +67,6 @@ void CAMAC_Data::ReadInfoLine(string line, vector<string> &v)
 }
 
 
-
 /*
     Main Function that controls the reading the Data File
         Read Information Lines
