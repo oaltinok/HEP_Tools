@@ -8,10 +8,22 @@
 
 using namespace std;
 
+
 /*
-    Default Constructor
+	Default Constructor
 */
 CAMAC_Data::CAMAC_Data()
+{
+	cout<<"No Mode Specified... Correct Declaration as follows:"<<endl;
+	cout<<"\tCAMAC_Data Data(\"Auto\")"<<endl;
+	cout<<"\tCAMAC_Data Data(\"Manual\")"<<endl;
+	exit(EXIT_FAILURE);
+}
+
+/*
+    Overloaded Constructor
+*/
+CAMAC_Data::CAMAC_Data(string mode)
 {
     cout<<"\n\n";
     cout<<"#####################################################################"<<endl;
@@ -23,10 +35,9 @@ CAMAC_Data::CAMAC_Data()
     
     isDebugging = false;
     isNewSubrun = true;
+    SetMode(mode);
     SetBranchName("CAMAC_Data");
-    SetRootFileDir("/minerva/data/testbeam2/nearonline/CAMACDataHistos.root");
     
-    cout<<"\n\n";
 }
 
 /*
@@ -634,9 +645,12 @@ void CAMAC_Data::WriteRootFile()
     f_Root->Close();
     dataFile.close();
     
+    cout<<endl;
     cout<<"Succesfully updated ROOT File = "<<rootDir<<endl;
-    cout<<" ...Waiting for NEW CAMAC Readout File..."<<endl;
-    cout<<"	...Press CTRL+C to stop CAMAC_DataReader Execution"<<endl;
+    if(isModeAuto){
+    	cout<<" ...Waiting for NEW CAMAC Readout File..."<<endl;
+    	cout<<"	...Press CTRL+C to stop CAMAC_DataReader Execution"<<endl;
+    }
     cout<<endl;
 }
 
@@ -698,9 +712,61 @@ void CAMAC_Data::FillSubrunFrequencyPlotVectors()
     
 }
 
-void CAMAC_Data::SetRootFileDir(string input)
+void CAMAC_Data::ExitFail(string msg)
 {
-    rootDir = input;
+	cout<<msg<<endl;
+	exit(EXIT_FAILURE);
+}
+
+void CAMAC_Data::SetRootFileDir()
+{
+	string genericFile = "TB_00000000_0000_0000000000_camac.root";
+	if( isModeAuto){
+    	rootDir = "/minerva/data/testbeam2/nearonline/CAMACDataHistos.root";
+    }else{
+		string tempRun;
+		string tempSubrun;
+    	int nZeros_inRun = 8 - latest_runNumber.size();
+    	int nZeros_inSubrun = 4 - latest_subrunNumber.size();
+    	
+    	// Check Run Number Format
+    	if(nZeros_inRun < 0 || nZeros_inRun == 8 ){
+    		ExitFail("ERROR: Did you set run number correctly?");
+    	}
+    	
+    	// Check Subrun Number Format
+    	if(nZeros_inSubrun < 0 || nZeros_inSubrun == 4 ){
+    		ExitFail("ERROR: Did you set subrun number correctly?");
+    	}
+    	
+    	// Fill tempRun for File Name
+    	for(int i = 0; i < nZeros_inRun; i++){	
+    		tempRun.push_back('0');
+    	}
+    	for( unsigned int i = 0; i < latest_runNumber.size(); i++){
+    		tempRun.push_back(runNumber[i]);
+    	}
+    	
+    	// Fill tempSubrun for File Name
+    	for(int i = 0; i < nZeros_inSubrun; i++){	
+    		tempSubrun.push_back('0');
+    	}
+    	for( unsigned int i = 0; i < latest_subrunNumber.size(); i++){
+    		tempSubrun.push_back(subrunNumber[i]);
+    	}
+    	
+    	// Check Run/Subrun Number Formats
+    	if(tempRun.size() != 8 || tempSubrun.size() != 4){
+    		ExitFail("ERROR: Did you set run/subrun numbers correctly?");
+    	}
+    	
+    	// Form Root File Dir    	
+    	rootDir = 	"/minerva/data/testbeam2/camacdata/TB_" + 
+    				tempRun + "_" +
+    				tempSubrun + "_" +
+    				timeStamp + "_camac.root"; 
+    }
+    
     cout<<"Output ROOT File = "<<rootDir<<endl;
 }
 
@@ -885,6 +951,17 @@ void CAMAC_Data::ProcessFileName(string input)
 //     for(unsigned int i = 0; i < v_input.size(); i++) {
 //         cout<<v_input[i]<<endl;
 //     }
+}
+
+void CAMAC_Data::SetMode(string input)
+{
+	if(input.compare("Auto") == 0){
+		cout<<"Mode = Auto"<<endl;
+		isModeAuto = true;
+	}else if(input.compare("Manual") == 0){
+		cout<<"Mode = Manual"<<endl;
+		isModeAuto = false;
+	}
 }
 
 CAMAC_Data::~CAMAC_Data()

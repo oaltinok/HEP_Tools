@@ -63,13 +63,14 @@ void CheckUsage(int argc, char* argv[])
 
 void ManualMode(char* argv[])
 {
-	CAMAC_Data Data;
+	CAMAC_Data Data("Manual");
 	string dataDir;
 	
 	dataDir = GetSingleDataFile(argv[2],argv[4]);
 	
 	if( dataDir != ""){ 
 		Data.SetDataFileDir(dataDir);
+		Data.SetRootFileDir();
 		Data.ProcessData();
 	}else{
 		cout<<"ERROR: No File for run = "<<argv[2]<<" subrun = "<<argv[4]<<endl;
@@ -79,13 +80,14 @@ void ManualMode(char* argv[])
 
 void AutoMode()
 {
-    CAMAC_Data Data;
+    CAMAC_Data Data("Auto");
     string latestDataDir;
     bool isNewDataFile = false;
     
 	// Run First Time
     latestDataDir = GetLatestDataFile();
     Data.SetDataFileDir(latestDataDir);
+    Data.SetRootFileDir();
     Data.ProcessData();
    
     // Check for new data file and re-run again if needed

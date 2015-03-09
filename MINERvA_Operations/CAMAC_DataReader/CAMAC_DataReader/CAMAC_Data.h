@@ -38,10 +38,12 @@ class CAMAC_Data
 {
     public:
         CAMAC_Data();
+        CAMAC_Data(string mode);
         ~CAMAC_Data();
         void ProcessData();
-        void SetRootFileDir(string input);
+        void SetMode(string input);
         void SetDataFileDir(string input);
+        void SetRootFileDir();
         void SetBranchName(string input);
         bool ChangeDataFileDir(string input);
         string GetRunNumber();
@@ -89,6 +91,7 @@ class CAMAC_Data
         void FillSubrunGraphVectors();
      
         // Debugging
+        void ExitFail(string msg);
         void PrintVector(vector<string> &v);
         
         // ---------------------------------------------------------------------
@@ -96,6 +99,7 @@ class CAMAC_Data
         // ---------------------------------------------------------------------
         bool isDebugging; // Make true for debugging
         bool isNewSubrun;
+        bool isModeAuto;
        
         string runNumber;
         string subrunNumber;

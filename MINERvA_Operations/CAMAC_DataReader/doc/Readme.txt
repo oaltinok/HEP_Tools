@@ -1,60 +1,111 @@
-========================================================================
-Working Principal:
-========================================================================
-There is an INFINITE loop which does the following:
-	Check /work/data area for new CAMAC readout file
-		If no NEW files:
-			Check Again
-		If there is a NEW file :
-			Read File	
-			Process Data	
-			Update /minerva/data/testbeam2/nearonline/CAMACDataHistos.root
+########################################################################
+#																	   #
+#					Working Principal and Usage						   #
+#																	   #
+########################################################################
 
+There are two modes that you can run the CAMAC_DataReader
 ========================================================================
+Mode: Auto
+========================================================================
+Automatically reads the camac readout spill by spill and updates a single
+	ROOT file which is read by GMBrowser to show Plots
+See Data File Locations for input/output files.
+
 Usage:
+	1) Open a NEW Terminal
+	2) Navigate to package folder:
+		cd /home/nfs/minerva/CAMAC_DataReader
+	3) Run the package without any arguments
+		./CAMACDataReader
+	4) Stop Execution
+		CTRL + C or Close Terminal
+
+Algorithm Flow:
+	Infinite Loop that does the following:
+		Check lastspill_camac.dat file
+			If it is the latest
+				Read File	
+				Process Data	
+				Update CAMACDataHistos.root
+			else 
+				Check again
+			
+
 ========================================================================
-1) Open a NEW Terminal
-2) Navigate to package folder:
-	cd /home/nfs/minerva/CAMAC_DataReader
-3) Run the package
-	./CAMACDataReader
-4) Stop Execution
-	CTRL + C  or Close Terminal
+Mode: Manual
+========================================================================
+Reads the camac output file for specified run and subrun numbers
+	Creates a unique .ROOT file for that run/subrun
+See Data File Locations for input/output files.
 
+Usage:
+	1) Open a NEW Terminal
+	2) Navigate to package folder:
+		cd /home/nfs/minerva/CAMAC_DataReader
+	3) Run the package with the following arguments
+		./CAMACDataReader -r <run_number> -s <subrun_number>
+
+Algorithm Flow:
+	Process run/subrun numbers locate the input file
+	Read camac output file
+	Process Data
+	Create/Update .root file specific to the provided rub/subrun
+
+
+########################################################################
+#																	   #
+#						Data File Locations							   #
+#																	   #
+########################################################################
+
+The files are on the testbeam computers, mnvtb01-05. 
+Logon with "shh minerva@mnvtb04" on a minerva machine for example.
 
 ========================================================================
-Data File Locations - provided by Jeffrey and Dan
+INPUT Data Files:
 ========================================================================
-The files are on the testbeam computers, mnvtb01-05. Logon with "shh minerva@mnvtb04" on a minerva machine for example.
-
-------------------------------------------------------------------------
-The GMBrowser Config File:
-------------------------------------------------------------------------
-/home/nfs/minerva/cmtuser/Minerva_v10r9p1/Tools/ControlRoomTools/gmbrowser/nearline.cfg
-
-------------------------------------------------------------------------
-CAMACDataHistos.root File:
-------------------------------------------------------------------------
-/minerva/data/testbeam2/nearonline/CAMACDataHistos.root
-
-Data is written to either mnvtb04 or mnvtb03 depending on what system it is. Every 12 hours it's backed up to somewhere inside /minerva/data/testbeam2.
-
-------------------------------------------------------------------------
-Subrun by Subrun CAMAC Readout: (Input for CAMAC_DataReader)
-------------------------------------------------------------------------
-/work/data/TB_XXXXXXXX_YYYY_cosmc_v09_ZZZZZZZZZZ_camac.dat
-                Where XXXXXXXXXXX is typcal run number
+Mode: Auto - Spill by Spill camac output
+	/home/nfs/minerva/daq/daqdata/lastspill_camac.dat
+	
+Mode: Manual - Single file for a specific Subrun
+	/work/data/TB_XXXXXXXX_YYYY_cosmc_v09_ZZZZZZZZZZ_camac.dat
+                Where XXXXXXXXXXX is typical run number
                 Where YYYY is typical subrun
                 Where ZZZZZZZZZZZZZ is the timestamp
 
-------------------------------------------------------------------------
-Spill by Spill CAMAC Readout:
-------------------------------------------------------------------------
-/home/nfs/minerva/daq/daqdata/lastspill_camac.dat
+========================================================================
+OUTPUT Data Files:
+========================================================================
+Mode: Auto - Single .ROOT file which is read by GMBrowser
+	/minerva/data/testbeam2/nearonline/CAMACDataHistos.root
+
+Mode: Manual - Each Subrun has its unique .ROOT File
+	/minerva/data/testbeam2/camacdata/TB_XXXXXXXX_YYYY_ZZZZZZZZZZ_camac.root
+                Where XXXXXXXXXXX is typical run number
+                Where YYYY is typical subrun
+                Where ZZZZZZZZZZZZZ is the timestamp
+
 
 ========================================================================
-Data File Format - provided by Dan
+GMBrowser Files:
 ========================================================================
+Config File:
+	/home/nfs/minerva/cmtuser/Minerva_v10r9p1/Tools/ControlRoomTools/gmbrowser/nearline.cfg
+	
+Plot Macro File:
+	/home/nfs/minerva/cmtuser/Minerva_v10r9p1/Tools/ControlRoomTools/gmbrowser/macros/TestBeam_CAMACData.C
+
+
+
+########################################################################
+#																	   #
+#						Input Data File Format						   #
+#																	   #
+########################################################################
+
+Thanks to Dan for this information...
+
 The file format is as follows:
  
 Line1 : version
