@@ -13,6 +13,8 @@ Config::Config()
 void Config::ReadFile()
 {
     bool isLine_Version = true;
+    bool isLine_Run = true;
+    bool isLine_Subrun = true;
     bool isLine_VariableNames = true;
     bool isLine_ConvFactors = true;
     bool isLine_Units = true;
@@ -27,13 +29,23 @@ void Config::ReadFile()
         if (line.size() == 0) continue;
         
         // Break if you read SENTINEL for End of File
-        if (line.compare(SENTINEL_EOF) == 0) break;
+        if (line.compare(SENTINEL_CONFIG_END) == 0) break;
         
         if (isLine_Version){
             ReadConfigLine(line,version);
             isLine_Version = false;
             continue;
         }
+	else if (isLine_Run){
+	  ReadConfigLine(line,run);
+	  isLine_Run = false;
+	  continue;
+	}
+	else if (isLine_Subrun){
+	  ReadConfigLine(line,subrun);
+	  isLine_Subrun = false;
+	  continue;
+	}
         else if (isLine_VariableNames){
             ReadConfigLine(line,vars);
             isLine_VariableNames = false;
@@ -65,7 +77,7 @@ void Config::ReadFile()
             continue;
         }
     }
-
+    dataFile.close();
 }
         
 
@@ -109,7 +121,7 @@ void Config::ProcessConvFactors()
         TString s((*convFactors_str)[i]);
         convFactors->push_back(s.Atof());
     }
-    
+
     if ( convFactors_str->size() != convFactors->size() ){
         cout<<"ERROR: Conversion Factor Process!"<<endl;
         exit(EXIT_FAILURE);

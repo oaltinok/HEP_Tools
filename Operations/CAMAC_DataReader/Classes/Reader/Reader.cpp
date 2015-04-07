@@ -40,12 +40,16 @@ bool Reader::OpenFile(string input)
 }
 
 void Reader::SetVectors(    vector<string>* p_version,
+                            vector<string>* p_run,
+                            vector<string>* p_subrun,
                             vector<string>* p_vars,
                             vector<string>* p_convFactors_str,
                             vector<double>* p_convFactors, // convFactor read as string then converted to double  
                             vector<string>* p_units)
 {
         version = p_version;
+	run = p_run;
+	subrun = p_subrun;
         vars = p_vars;
         convFactors_str = p_convFactors_str;
         convFactors = p_convFactors; // convFactor read as string then converted to double  

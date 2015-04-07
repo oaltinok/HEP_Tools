@@ -11,6 +11,7 @@ class Hist : public Plotter{
         void AddFormat(   string in_title, string in_var_name,
                         int in_nbins, double in_low, double in_high);
         void Init();
+	void Reset();
         void Fill(string var_name, double value);
         void WriteRootFile();
 

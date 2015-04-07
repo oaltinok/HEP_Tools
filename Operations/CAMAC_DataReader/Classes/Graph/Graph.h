@@ -8,6 +8,7 @@ class Graph : public Plotter{
     public:
         void AddFormat(string in_title, string in_x_axis, string in_y_axis);
         void Init();
+	void Reset();
         void Fill(string var_name, double value);
         void WriteRootFile();
 

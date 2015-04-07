@@ -8,6 +8,7 @@ class Data : public Reader{
     public:
         Data();
         void ReadFile();
+	string GetFirstTime(string var_name);
 
     private:
         void ReadRunSubrun(string line);
@@ -16,6 +17,7 @@ class Data : public Reader{
         int GetVariableInd(string var_name);
         void CheckRunSubrun();
         void InitPlots();
+
         
         bool isDebugging;
         bool newFile;

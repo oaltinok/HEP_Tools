@@ -18,7 +18,8 @@
 
 using namespace std;
 
-const string SENTINEL_EOF = "CAMAC_Readout_End";
+const string SENTINEL_EOF = "gCAMAC_Readout_End";
+const string SENTINEL_CONFIG_END = "gCAMAC_Header_End";
 
 class Reader{
     
@@ -33,6 +34,8 @@ class Reader{
         void OpenDataFileError(); 
         
         void SetVectors(    vector<string>* p_version,
+			    vector<string>* p_run,
+			    vector<string>* p_subrun,
                             vector<string>* p_vars,
                             vector<string>* p_convFactors_str,
                             vector<double>* p_convFactors, // convFactor read as string then converted to double  
@@ -44,6 +47,8 @@ class Reader{
         // Pointers to Configuration Vectors
         vector<string>* version;
         vector<string>* vars;
+	vector<string>* run;
+	vector<string>* subrun;
         vector<string>* convFactors_str;
         vector<double>* convFactors; // convFactor read as string then converted to double  
         vector<string>* units;

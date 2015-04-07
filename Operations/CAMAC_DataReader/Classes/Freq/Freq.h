@@ -8,6 +8,7 @@ class Freq : public Plotter{
         public:
         void AddFormat(string in_title, vector<int> in_vars);
         void Init();
+	void Reset();
         void Fill(int ind);
         void WriteRootFile();
 

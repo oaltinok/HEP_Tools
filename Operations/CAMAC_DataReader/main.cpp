@@ -24,6 +24,7 @@ main.cpp
 #include <cstdlib>
 #include <string>
 
+
 // Include All Classes
 #include "Classes/CAMAC_DataReader/CAMAC_DataReader.h"
 
@@ -34,10 +35,12 @@ void ManualMode(char* argv[]);
 void ErrorUsage(char* argv[]);
 void CheckUsage(int argc, char* argv[]);
 
+
 int main(int argc, char* argv[])
 {
+
     CheckUsage(argc,argv);
-    
+
     if (argc == 1) AutoMode();
     else ManualMode(argv);
 
@@ -57,8 +60,8 @@ void ManualMode(char* argv[])
 
 void AutoMode()
 {
-	cout<<" Auto Mode is not working yet!"<<endl;
-	exit(EXIT_FAILURE);
+  //	cout<<" Auto Mode is not working yet!"<<endl;
+  //	exit(EXIT_FAILURE);
     CAMAC_DataReader CDR("Auto");
 
     while(true){

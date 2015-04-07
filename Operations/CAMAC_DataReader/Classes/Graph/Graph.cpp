@@ -40,6 +40,16 @@ void Graph::Init()
     
 }
 
+void Graph::Reset()
+{
+  vector<double> temp_vector;
+
+  for (unsigned int i = 0; i < formats.size(); i++){
+    graph_x_axis_vectors[i].clear();
+    graph_y_axis_vectors[i].clear();
+  }
+}
+
 
 void Graph::WriteRootFile()
 {
@@ -69,9 +79,10 @@ void Graph::Fill(string var_name, double value)
         cout<<"ERROR: No Graph Vectors Initialized... Did you initilize correctly!"<<endl;
         exit(EXIT_FAILURE);
     }
-
+    cout << var_name << "\t" << value << endl;
     // Search Graph Format Vector for the given var_name
     //      Fill Corresponding Histogram if that variable has a histogram
+
     for ( unsigned int i = 0; i < formats.size(); i++){
         if (var_name.compare(formats[i].x_axis) == 0) {
             graph_x_axis_vectors[i].push_back(value);

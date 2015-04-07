@@ -84,6 +84,14 @@ void Freq::Init()
     
 }
 
+void Freq::Reset()
+{
+  for (unsigned int i = 0; i < formats.size(); i++){
+    freq_x_axis_vectors.clear();
+    freq_y_axis_vectors.clear();
+  }
+}
+
 void Freq::AddFormat(string in_title, vector<int> in_vars)
 {
     Format tempFormat;

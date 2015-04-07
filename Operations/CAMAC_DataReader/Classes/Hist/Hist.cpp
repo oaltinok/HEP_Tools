@@ -93,6 +93,17 @@ void Hist::Fill(string var_name, double value)
     }
 }
 
+void Hist::Reset()
+{
+  TH1D* tempHist;
+  string var_name;
+   for (unsigned int i = 0; i < formats.size(); i++){
+     var_name = formats[i].var_name;
+     tempHist = (TH1D*)gDirectory->Get(var_name.c_str());
+     if(tempHist)tempHist->Reset();
+   }
+}
+
 void Hist::WriteRootFile()
 {
     for(unsigned int i = 0; i < hists.size(); i++){

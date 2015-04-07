@@ -63,6 +63,8 @@ class CAMAC_DataReader{
 
         // Configuration Vectors
         vector<string> version;
+        vector<string> vectrun;
+        vector<string> vectsubrun;
         vector<string> vars;
         vector<string> convFactors_str;
         vector<double> convFactors; // convFactor read as string then converted to double  
@@ -74,8 +76,10 @@ class CAMAC_DataReader{
         void InitParamaters();
         void InitReaders();
         void InitPlotters();
+        void ResetPlots();
         void InitPlots();
         void SetConfigDir();
+        void SetConfigDir_Manual();
         void SetDataDir();
         void SetRootDir();
         void OpenRootFile();
@@ -87,13 +91,15 @@ class CAMAC_DataReader{
         void CheckRunSubrun();
         
         // Run Functions
+	void ReadFirstTime();
+	void ReadRunSubrun();
         void ReadConfigFile();
         void ReadDataFile();
         void WriteRootFile();
         
         // Other 
         void ErrorMode();
-
+	void ResetVectors();
         
         // Readers
         Config ConfigReader;
