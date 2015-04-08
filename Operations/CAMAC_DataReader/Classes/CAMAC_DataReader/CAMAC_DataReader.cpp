@@ -67,7 +67,6 @@ CAMAC_DataReader::CAMAC_DataReader(string mode, string run_number, string subrun
     cout<<"#####################################################################"<<endl;
     cout<<"\n\n";
 
-    cout << mode << endl;
     if( mode.compare("Manual") == 0){
         cout<<"Mode = Manual"<<endl;
         isModeAuto = false;
@@ -116,49 +115,38 @@ void CAMAC_DataReader::InitParamaters()
 */
 void CAMAC_DataReader::RunManual()
 {
-
     InitPlots();
     DataReader.OpenFile(dataDir);
     DataReader.ReadFile();
     WriteRootFile();
-
 }
 
 void CAMAC_DataReader::RunAuto()
 {
-  cout << "Starting Autoreadout" << endl;
+  	cout << "Starting Autoreadout" << endl;
     InitPlots();
     cout << "About to enter the loop" << endl;
-    while(1)
-      {
-	cout << "In loop" << endl;
-	cout << "Open Data" << endl;
-	CheckDataFile();
-	cout << "Closed" << endl;
-	if(newFile)
-	  {
-	    // Open Root File - Required for Plotter Initialization
-	    
-	    cout << "In newfile" << endl;
-	    //OpenRootFile();	    
-	    if(resetPlots)
-	      {
-	     	ResetPlots();
-		//	     	InitPlots();
-	      }
-	    cout << "setdata" << endl;
-	    ReadDataFile();
-	    cout << "readata" << endl;
-	    WriteRootFile();
-	    cout << "write" << endl;
-	    f_Root->Write("",TObject::kOverwrite);
-	  }
-	else
-	  {
-	    gDirectory->ls();
-	    sleep(10);
-	  }
-      }
+    while(true){
+		//cout << "In loop" << endl;
+		cout <<"\tChecking File..."<< endl;
+		CheckDataFile();
+		if(newFile){
+	    	cout <<"\tNewFile!" << endl;
+	    		    
+	    	if(resetPlots){
+	     		ResetPlots();
+	      	}
+	    	
+	    	ReadDataFile();
+	    	WriteRootFile();
+	    	f_Root->Write("",TObject::kOverwrite);
+	  	}
+	  	else{
+	    	// gDirectory->ls();
+	    	cout<<"\tNo NewFile, Waiting 10s...\n"<<endl;
+	    	sleep(10);
+	  	}
+    }
     /*
     // Do Nothing!
     cout<<"Auto Mode did not implemented yet!"<<endl;
@@ -168,7 +156,6 @@ void CAMAC_DataReader::RunAuto()
 
 void CAMAC_DataReader::InitPlots()
 {
-
     HistPlotter.Init();
     GraphPlotter.Init();
     FreqPlotter.Init();
@@ -176,9 +163,10 @@ void CAMAC_DataReader::InitPlots()
 
 void CAMAC_DataReader::ResetPlots()
 {
-  HistPlotter.Reset();
-  //  GraphPlotter.Reset();
-  //FreqPlotter.Reset();
+	cout<<"\t\tRun/Subrun Changed! Resetting Plots..."<<endl;
+  	HistPlotter.Reset();
+  	GraphPlotter.Reset();
+  	FreqPlotter.Reset();
 }
 
 void CAMAC_DataReader::SetDataDir()
@@ -298,8 +286,6 @@ void CAMAC_DataReader::CheckDataFile()
     dataFile.close();
     ReadFirstTime();
     CheckRunSubrun();
-    cout << newFile << "\t" << resetPlots << endl;
-
 }
 
 void CAMAC_DataReader::CheckRunSubrun()
@@ -336,24 +322,20 @@ void CAMAC_DataReader::CheckRunSubrun()
 
 void CAMAC_DataReader::ReadFirstTime()
 {
-  cout << "Reading Time" << endl;
-  DataReader.OpenFile(dataDir);
-  time = DataReader.GetFirstTime("Time");
-  cout << "Checked time= " <<time << endl;
-
+  	DataReader.OpenFile(dataDir);
+  	time = DataReader.GetFirstTime("Time");
+  	cout <<"\t\tTime = "<<time<<endl;
 }
 
 void CAMAC_DataReader::ReadRunSubrun()
 {
-  cout << "Reading RunSubrun" << endl;
-  string line;
-  getline(dataFile,line);
-  getline(dataFile,line);
-  run = line;
-  getline(dataFile,line);
-  subrun = line;
-  cout << "Checked run,subrun= " <<run<<","<<subrun << endl;
-
+  	string line;
+  	getline(dataFile,line);
+  	getline(dataFile,line);
+  	run = line;
+  	getline(dataFile,line);
+  	subrun = line;
+  	cout << "\t\tRun/Subrun = " <<run<<"/"<<subrun<<endl;
 }
 
 
@@ -364,6 +346,7 @@ void CAMAC_DataReader::ReadConfigFile()
 
 void CAMAC_DataReader::ReadDataFile()
 {
+	cout <<"\t\tReading Data..." << endl;
     DataReader.OpenFile(dataDir);
     DataReader.ReadFile();   
 }
@@ -371,13 +354,11 @@ void CAMAC_DataReader::ReadDataFile()
 void CAMAC_DataReader::SetConfigDir_Manual()
 {
     ConfigReader.OpenFile(CAMAC_DataReader::Get_dataDir_Manual());
-    cout<<"Config File = "<<CAMAC_DataReader::Get_dataDir_Manual()<<endl;
 }
 
 void CAMAC_DataReader::SetConfigDir()
 {
     ConfigReader.OpenFile(dataDir_Auto);
-    cout<<"Config File = "<<dataDir_Auto<<endl;
 }
 
 void CAMAC_DataReader::OpenRootFile()
@@ -427,7 +408,8 @@ void CAMAC_DataReader::WriteRootFile()
     HistPlotter.WriteRootFile();
     GraphPlotter.WriteRootFile();
     FreqPlotter.WriteRootFile();
-    cout<<"Sucessfully Updated "<<rootDir<<endl;
+    cout<<"\t\tSucessfully Updated "<<rootDir<<endl;
+    cout<<endl;
 }
 
 

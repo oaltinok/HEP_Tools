@@ -5,15 +5,12 @@
 
 using namespace std;
 
-
 Data::Data()
 {
     isDebugging = false;
     
     newFile = true;
     resetPlots = true;
-    
-
 }
 
 void Data::ReadFile()
@@ -28,21 +25,17 @@ void Data::ReadFile()
         // Skip Empty Lines
         if (line.size() == 0) continue;
         
-	if (line.compare(SENTINEL_CONFIG_END) == 0){
-	  configBlockEnd = true;
-	  continue;
-	}
+		if (line.compare(SENTINEL_CONFIG_END) == 0){
+	  		configBlockEnd = true;
+	  		continue;
+		}
 
         // Break if you read SENTINEL for End of File
         if (line.compare(SENTINEL_EOF) == 0) break;
 	  
-        
-        if(configBlockEnd)
-	  { 
-
-	    ReadDataLine(line);
-
-	  }
+        if(configBlockEnd){ 
+			ReadDataLine(line);
+	  	}
     }
     
     // Close File after finishing
@@ -98,7 +91,6 @@ void Data::ProcessDataLine(string var_name, double value)
     // Convert Scalar Value to REAL Value using Conversion Factor
     value = value * var_convFactor;
     
-
     // Fill Histograms - Search Histograms for the Variable and fill if necessary
     hist->Fill(var_name,value);
 
@@ -136,41 +128,39 @@ int Data::GetVariableInd(string var_name)
 string Data::GetFirstTime(string var_name)
 {
   
-  bool configBlockEnd = false;
-  string line;
-  string ret_time;
+	bool configBlockEnd = false;
+  	string line;
+  	string ret_time;
 
-    while (!dataFile.eof())
-    {
+    while (!dataFile.eof()){
         getline (dataFile,line);
         
         // Skip Empty Lines
         if (line.size() == 0) continue;
         
-	if (line.compare(SENTINEL_CONFIG_END) == 0){
-	  configBlockEnd = true;
-	  continue;
-	}
+		if (line.compare(SENTINEL_CONFIG_END) == 0){
+	  		configBlockEnd = true;
+	  		continue;
+		}
 
         if(configBlockEnd){
-	  stringstream line_stream(line);
-	  string temp_var_name;
-	  string temp_value;    
-	  line_stream >> temp_var_name >> temp_value;	  
-	  if(var_name==var_name){
-	    ret_time = temp_value;
-	    break;
-	  }
-	}
+	  		stringstream line_stream(line);
+	  		string temp_var_name;
+	  		string temp_value;    
+	  		line_stream >> temp_var_name >> temp_value;	  
+	  		if(var_name==var_name){
+	    		ret_time = temp_value;
+	    	break;
+	  		}
+		}
     }
     
     dataFile.close();
+    
     return ret_time;
-
 }
 
 
-
-
-
 #endif
+
+

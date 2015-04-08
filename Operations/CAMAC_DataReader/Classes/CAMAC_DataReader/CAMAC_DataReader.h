@@ -13,7 +13,7 @@ Class: CAMAC_DataReader
         Freq    - Frequency Plots
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2015_03_10
+    Last Revision:  2015_04_08
 ================================================================================
 */
 #ifndef CAMAC_DataReader_h
@@ -91,15 +91,15 @@ class CAMAC_DataReader{
         void CheckRunSubrun();
         
         // Run Functions
-	void ReadFirstTime();
-	void ReadRunSubrun();
+		void ReadFirstTime();
+		void ReadRunSubrun();
         void ReadConfigFile();
         void ReadDataFile();
         void WriteRootFile();
         
         // Other 
         void ErrorMode();
-	void ResetVectors();
+		void ResetVectors();
         
         // Readers
         Config ConfigReader;

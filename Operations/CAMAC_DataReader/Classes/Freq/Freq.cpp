@@ -84,13 +84,29 @@ void Freq::Init()
     
 }
 
+/*
+	There are 2 containers for storing vectors
+		freq_x_axis_vectors
+		freq_y_axis_vectors
+	First, clear the each vector in containers
+	Second, clear the container
+*/
 void Freq::Reset()
 {
-  for (unsigned int i = 0; i < formats.size(); i++){
-    freq_x_axis_vectors.clear();
-    freq_y_axis_vectors.clear();
-  }
+	// Clear Each Vector in the Containers
+  	for (unsigned int i = 0; i < formats.size(); i++){
+		freq_x_axis_vectors[i].clear();
+    	freq_y_axis_vectors[i].clear();
+  	}
+  	
+  	// Clear container for Vectors
+  	freq_x_axis_vectors.clear();
+  	freq_y_axis_vectors.clear();
+  	
+  	// Init Vectors using formats vector
+  	Init();
 }
+
 
 void Freq::AddFormat(string in_title, vector<int> in_vars)
 {
