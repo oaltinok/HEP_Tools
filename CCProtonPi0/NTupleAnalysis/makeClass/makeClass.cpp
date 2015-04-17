@@ -40,7 +40,6 @@ void makeClass(){
      cout<<" Added "<<filename.c_str()<<endl;
    }
 
-
     fChain.MakeClass("MC_Sample");
 
 }

@@ -26,7 +26,7 @@ BinList::BinList()
     particleStatus.setBin(17,-1,16);
     multiplicity.setBin(10,0.0,10.0);
     int_channel.setBin(9,0.0,9.0);
-    vertex_z.setBin(470,4300.0,9000.0);
+    vertex_z.setBin(94,4300.0,9000.0);
     vertex_x_y.setBin(200,-1000.0,1000.0);
     deltaInvMass.setBin(20,800.0,2800.0);
     preFilter_Status.setBin(4,0,4);
@@ -54,6 +54,15 @@ BinList::BinList()
     michelID.setBin(2,0.0,2.0);
     pi0_invMass.setBin(60,0.0,600.0);
     bin_photonConvLength.setBin(50,0.0,100.0);
+    
+    // Michel Tool
+    michelMuon_P.setBin(50,0.0,250.0);
+    michelMuon_end_dist_vtx.setBin(40,0.0,2000.0);
+    michelMuon_length.setBin(25,0.0,50.0);
+    michelMuon_Z_vtx.setBin(80,-2000.0,2000.0);
+    michelPion_P.setBin(100,0.0,2000.0);
+    michelPion_begin_dist_vtx.setBin(40,0.0,2000.0);
+    michelPion_length.setBin(40,0.0,2000.0);
 
 }
 

@@ -33,16 +33,7 @@ void Proton::initialize(int nMode)
     bin_KE.setBin(20, 0.0, 2000.0);
 
     cout<<"\tInitializing Histograms "<<endl;
-    
-    // Unique Histograms
-    protonScore = new TH1D( "protonScore","Proton Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
-    protonScore->GetXaxis()->SetTitle("Proton Score");
-    protonScore->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f ",bin_partScore.get_width()));
-    
-    pionScore = new TH1D( "pionScore","Pion Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
-    pionScore->GetXaxis()->SetTitle("Pion Score");
-    pionScore->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f ",bin_partScore.get_width()));
-    
+       
     // Default Histograms
     partScore = new TH1D( "partScore","Proton Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");

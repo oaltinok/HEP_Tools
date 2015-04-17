@@ -3,7 +3,7 @@
 # Makefile for NTupleAnalysis Package
 # 	Statistical Data Analysis Package for CCProtonPi0
 #	Author: Ozgur Altinok
-#	Last Revision: 2014_11_11
+#	Last Revision: 2015_02_18
 #
 # ==============================================================================
 
@@ -18,14 +18,14 @@ OTHERPLOTSCPP = Classes/Plotter/Other_Plots.cpp
 PIDPLOTSCPP = Classes/Plotter/pID_Plots.cpp
 ALLPLOTTERCPP = $(PLOTTERCPP) $(DEFAULTPLOTSCPP) $(OTHERPLOTSCPP) $(PIDPLOTSCPP)
 
-# Class: CCProtonPi0
-CCPROTONPI0CPP = Classes/CCProtonPi0/CCProtonPi0.cpp
-INITHISTOGRAMSCPP = Classes/CCProtonPi0/initHistograms.cpp
-DEFAULTFUNCTIONSCPP = Classes/CCProtonPi0/DefaultFunctions.cpp
-MUONFUNCTIONSCPP = Classes/CCProtonPi0/MuonFunctions.cpp
-PROTONFUNCTIONSCPP = Classes/CCProtonPi0/ProtonFunctions.cpp
-PIONFUNCTIONSCPP = Classes/CCProtonPi0/PionFunctions.cpp
-ALLCCPROTONPI0CPP = $(CCPROTONPI0CPP) $(INITHISTOGRAMSCPP) $(DEFAULTFUNCTIONSCPP) $(MUONFUNCTIONSCPP) $(PROTONFUNCTIONSCPP) $(PIONFUNCTIONSCPP)
+# Class: Analyzer
+ANALYZERCPP = Classes/Analyzer/Analyzer.cpp
+INITHISTOGRAMSCPP = Classes/Analyzer/initHistograms.cpp
+DEFAULTFUNCTIONSCPP = Classes/Analyzer/DefaultFunctions.cpp
+MUONFUNCTIONSCPP = Classes/Analyzer/MuonFunctions.cpp
+PROTONFUNCTIONSCPP = Classes/Analyzer/ProtonFunctions.cpp
+PIONFUNCTIONSCPP = Classes/Analyzer/PionFunctions.cpp
+ALLANALYZERCPP = $(ANALYZERCPP) $(INITHISTOGRAMSCPP) $(DEFAULTFUNCTIONSCPP) $(MUONFUNCTIONSCPP) $(PROTONFUNCTIONSCPP) $(PIONFUNCTIONSCPP)
 
 # Class: Particle and its Subclasses
 PARTICLECPP = Classes/Particle/Particle.cpp 
@@ -35,14 +35,15 @@ PIONCPP = Classes/Pion/Pion.cpp
 ALLPARTICLESCPP = $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP)
 
 # Other Helper Classes
+PIDTOOLCPP = Classes/PIDTool/PIDTool.cpp
 BINLISTCPP = Classes/BinList/BinList.cpp
 SINGLEBINCPP = Classes/SingleBin/SingleBin.cpp
 CUTCPP = Classes/Cut/Cut.cpp
 CUTSTATCPP = Classes/Cut/CutStat.cpp
-ALLOTHERCPP = $(BINLISTCPP) $(SINGLEBINCPP) $(CUTCPP) $(CUTSTATCPP)
+ALLOTHERCPP = $(PIDTOOLCPP) $(BINLISTCPP) $(SINGLEBINCPP) $(CUTCPP) $(CUTSTATCPP)
 
 # ALL Classes Required for the Package
-ALLCPP = $(MAINCPP) $(ALLPLOTTERCPP) $(ALLCCPROTONPI0CPP) $(ALLPARTICLESCPP) $(ALLOTHERCPP)
+ALLCPP = $(MAINCPP) $(ALLPLOTTERCPP) $(ALLANALYZERCPP) $(ALLPARTICLESCPP) $(ALLOTHERCPP)
 
 # ------------------------------------------------------------------------------
 # Commands and Flags

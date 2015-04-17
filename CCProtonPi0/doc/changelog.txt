@@ -1,4 +1,64 @@
 ================================================================================
+v2_05
+
+General Updates:
+    For each event saving the truth_eventID and reco_eventID
+    truth_eventID corresponds to the eventID in the DST File
+        used in Arachne Scan
+
+Michel Study:
+    Saving true information for michelElectron, michelMuon and michelPion
+
+        
+--------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+    Modified for Michel Study
+        New Histograms and Variables for Michel Study
+        
+    Removed ArachneScan Functionality
+        Integrated this Functionality to the main class: Analyzer
+    
+    Improved Table Output Format
+        They are ready to be imported into Excel
+================================================================================
+v2_04
+
+General Updates:
+    New Variable to Control flow of DataAnalysis
+        AnalyzeEvent is marked inside tagTruth()
+    Added new parameters for MICHEL Tool
+        Truth and Reco distance to vertex 
+    
+Vertex Reconstruction Updates:
+
+Muon Reconstruction Updates:
+    
+Proton Reconstruction Updates:
+    
+Pi0 Reconstruction Updates:
+
+        
+--------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+    Main pID Tool is the Proton Score LLR - Phil's new Tool
+    Removed other pID Selections
+    Removed Object Files from Analyzer Class
+        It was a mistake to commit them on CVS
+    New Functionality
+        ArachneScan:
+            Creates Roundup List which can be used with Arachne to scan events
+================================================================================
+v2_03
+
+No Updates to CCProtonPi0 Package
+
+--------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+    Changed Class Name CCProtonPi0 to Analyzer
+        CCProtonPi0 is the Package name which creates confusions
+    New Class PIDTool
+        Class designed for PID Optimization
+================================================================================
 v2_02
 
 General Updates:

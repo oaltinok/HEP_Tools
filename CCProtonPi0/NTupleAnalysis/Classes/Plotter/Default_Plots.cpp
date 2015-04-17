@@ -25,6 +25,7 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
         
         TH1D* h_status_Pi0_GrandMother = (TH1D*)f_Root->Get("status_Pi0_GrandMother");
         plot1D_Hist(h_status_Pi0_GrandMother,"status_Pi0_GrandMother.png",plotDir);
+        
     }
     
     // Plot Only MC Values
@@ -47,7 +48,6 @@ void Plotter::plotInteraction(bool isMC, bool isReco, bool is2D)
         
         TH2D* h_vertex_x_y_true= (TH2D*)f_Root->Get("vertex_x_y_true");
         plot2D_Hist(h_vertex_x_y_true,"vertex_x_y_true.png",plotDir);
-    
     }
     
     // Plot Only Reco Values

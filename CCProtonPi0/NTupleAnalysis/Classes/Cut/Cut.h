@@ -15,7 +15,7 @@ Class: Cut
         > cutAll.get_nEvent()
 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_01_13
+    Last Revision: 2015_04_16
 ================================================================================
 */
 
@@ -37,10 +37,12 @@ class Cut{
 		// Get Functions
 		std::string get_Name();
         
-        void increment(bool isSignal);
+        void increment(bool isSignal, bool isStudy1_true = true, bool isStudy2_true = true);
         
         CutStat nEvent;
         CutStat nSignal;
+        CutStat nStudy1; // Number of the Events which is studied
+        CutStat nStudy2; // Number of the Events which is studied
 		  
 	private:
 		std::string name;

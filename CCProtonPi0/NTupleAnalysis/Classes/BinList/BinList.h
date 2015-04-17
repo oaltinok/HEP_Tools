@@ -70,6 +70,15 @@ class BinList
         SingleBin pi0_invMass;
         SingleBin bin_photonConvLength;
         
+        // Michel Tool
+        SingleBin michelMuon_P;
+        SingleBin michelMuon_end_dist_vtx;
+        SingleBin michelMuon_length;
+        SingleBin michelMuon_Z_vtx;
+        SingleBin michelPion_P;
+        SingleBin michelPion_begin_dist_vtx;
+        SingleBin michelPion_length;
+        
     
     private:
         

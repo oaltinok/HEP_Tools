@@ -21,8 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2015_02_12
-    Version:        v2_02
+    Last Revision:  2015_04_15
+    Version:        v2_05
     
 ================================================================================
 */
@@ -257,7 +257,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool isSinglePi0(Minerva::GenMinInteraction* truthEvent, int nPi0, int nGamma) const;
         bool isMotherPrimary(std::vector<int>& motherList, int mother ) const;
         bool checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const;
-        bool checkMichel() const;
+        bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
+        int getMichelPion(std::vector<int>& piList, int ID ) const;
+        void saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int muon_ID) const;
         
         bool createTrackedParticles( Minerva::PhysicsEvent* event, Minerva::ProngVect& prongs ) const;
         bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;

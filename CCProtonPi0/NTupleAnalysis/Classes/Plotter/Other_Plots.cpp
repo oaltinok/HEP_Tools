@@ -82,17 +82,9 @@ void Plotter::plotCutHistograms()
     TH1D* h_background_hCut_2Prong_UnusedE = (TH1D*)f_Root_Background_Interaction->Get("hCut_2Prong_UnusedE");
     plotStacked(h_signal_hCut_2Prong_UnusedE, h_background_hCut_2Prong_UnusedE,"Unused Cluster Energy at the end of Reconstruction (2Prong)", "hCut_2Prong_UnusedE.png", otherDir);
     
-    TH1D* h_signal_hCut_protonScore = (TH1D*)f_Root_Signal_Interaction->Get("hCut_protonScore");
-    TH1D* h_background_hCut_protonScore = (TH1D*)f_Root_Background_Interaction->Get("hCut_protonScore");
-    plotStacked(h_signal_hCut_protonScore, h_background_hCut_protonScore,"Proton Score", "hCut_protonScore.png", otherDir);
-    
     TH1D* h_signal_hCut_protonScore_LLR = (TH1D*)f_Root_Signal_Interaction->Get("hCut_protonScore_LLR");
     TH1D* h_background_hCut_protonScore_LLR = (TH1D*)f_Root_Background_Interaction->Get("hCut_protonScore_LLR");
     plotStacked(h_signal_hCut_protonScore_LLR, h_background_hCut_protonScore_LLR,"Proton Score_LLR", "hCut_protonScore_LLR.png", otherDir);
-    
-    TH1D* h_signal_hCut_pionScore = (TH1D*)f_Root_Signal_Interaction->Get("hCut_pionScore");
-    TH1D* h_background_hCut_pionScore = (TH1D*)f_Root_Background_Interaction->Get("hCut_pionScore");
-    plotStacked(h_signal_hCut_pionScore, h_background_hCut_pionScore,"Pion Score", "hCut_pionScore.png", otherDir);
     
     TH1D* h_signal_hCut_pIDDiff = (TH1D*)f_Root_Signal_Interaction->Get("hCut_pIDDiff");
     TH1D* h_background_hCut_pIDDiff = (TH1D*)f_Root_Background_Interaction->Get("hCut_pIDDiff");
@@ -102,7 +94,161 @@ void Plotter::plotCutHistograms()
     TH1D* h_background_hCut_deltaInvMass = (TH1D*)f_Root_Background_Interaction->Get("hCut_deltaInvMass");
     plotStacked(h_signal_hCut_deltaInvMass, h_background_hCut_deltaInvMass,"Delta+ Invariant Mass", "hCut_deltaInvMass.png", otherDir);
     
+}
+
+
+void Plotter::plotMichel()
+{
+    string rootDir = rootDir_Interaction[branchInd];
     
+    inform(rootDir, otherDir);
+    
+    TFile* f_Root = new TFile(rootDir.c_str());
+    
+    TH1D* h_N_michelElectrons = (TH1D*)f_Root->Get("N_michelElectrons");
+    plot1D_Hist(h_N_michelElectrons,"N_michelElectrons.png",otherDir);
+    
+    TH1D* h_vertex_michelElectron_E = (TH1D*)f_Root->Get("vertex_michelElectron_E");
+    TH1D* h_track_michelElectron_E = (TH1D*)f_Root->Get("track_michelElectron_E");
+    TH1D* h_track2_michelElectron_E = (TH1D*)f_Root->Get("track2_michelElectron_E");
+    TH1D* h_missed_michelElectron_E = (TH1D*)f_Root->Get("missed_michelElectron_E");
+    TH1D* h_found_michelElectron_E = (TH1D*)f_Root->Get("found_michelElectron_E");
+    MichelTool(h_vertex_michelElectron_E, h_track_michelElectron_E, h_track2_michelElectron_E, h_missed_michelElectron_E,
+                "Michel Electron Energy [MeV]", "michelElectron_E.png", otherDir);
+    plotStacked(h_found_michelElectron_E, h_missed_michelElectron_E, 
+                            "Michel Electron Energy [MeV]", "michelElectron_E.png", otherDir, 
+                            "Detected", "Missed");
+                
+    TH1D* h_vertex_michelMuon_P = (TH1D*)f_Root->Get("vertex_michelMuon_P");
+    TH1D* h_track_michelMuon_P = (TH1D*)f_Root->Get("track_michelMuon_P");
+    TH1D* h_track2_michelMuon_P = (TH1D*)f_Root->Get("track2_michelMuon_P");
+    TH1D* h_missed_michelMuon_P = (TH1D*)f_Root->Get("missed_michelMuon_P");
+    MichelTool(h_vertex_michelMuon_P, h_track_michelMuon_P, h_track2_michelMuon_P, h_missed_michelMuon_P,
+                "Michel Muon Momentum [MeV]", "michelMuon_P.png", otherDir);
+
+    TH1D* h_vertex_michelMuon_end_dist_vtx = (TH1D*)f_Root->Get("vertex_michelMuon_end_dist_vtx");
+    TH1D* h_track_michelMuon_end_dist_vtx = (TH1D*)f_Root->Get("track_michelMuon_end_dist_vtx");
+    TH1D* h_track2_michelMuon_end_dist_vtx = (TH1D*)f_Root->Get("track2_michelMuon_end_dist_vtx");
+    TH1D* h_missed_michelMuon_end_dist_vtx = (TH1D*)f_Root->Get("missed_michelMuon_end_dist_vtx");
+    MichelTool(h_vertex_michelMuon_end_dist_vtx, h_track_michelMuon_end_dist_vtx, h_track2_michelMuon_end_dist_vtx, h_missed_michelMuon_end_dist_vtx,
+                "Michel Distance to Vertex [mm]", "michelMuon_end_dist_vtx.png", otherDir);
+      
+    TH1D* h_vertex_michelMuon_length = (TH1D*)f_Root->Get("vertex_michelMuon_length");
+    TH1D* h_track_michelMuon_length = (TH1D*)f_Root->Get("track_michelMuon_length");
+    TH1D* h_track2_michelMuon_length = (TH1D*)f_Root->Get("track2_michelMuon_length");
+    TH1D* h_missed_michelMuon_length = (TH1D*)f_Root->Get("missed_michelMuon_length");
+    MichelTool(h_vertex_michelMuon_length, h_track_michelMuon_length, h_track2_michelMuon_length, h_missed_michelMuon_length,
+                "Michel Muon Length [mm]", "michelMuon_length.png", otherDir);
+    
+    TH1D* h_vertex_michelMuon_Z = (TH1D*)f_Root->Get("vertex_michelMuon_Z");
+    TH1D* h_track_michelMuon_Z = (TH1D*)f_Root->Get("track_michelMuon_Z");
+    TH1D* h_track2_michelMuon_Z = (TH1D*)f_Root->Get("track2_michelMuon_Z");
+    TH1D* h_missed_michelMuon_Z = (TH1D*)f_Root->Get("missed_michelMuon_Z");
+    MichelTool(h_vertex_michelMuon_Z, h_track_michelMuon_Z, h_track2_michelMuon_Z, h_missed_michelMuon_Z,
+                "Michel Muon End Point Z [mm]", "michelMuon_Z.png", otherDir);
+    
+    TH1D* h_vertex_michelMuon_Z_vtx = (TH1D*)f_Root->Get("vertex_michelMuon_Z_vtx");
+    TH1D* h_track_michelMuon_Z_vtx = (TH1D*)f_Root->Get("track_michelMuon_Z_vtx");
+    TH1D* h_track2_michelMuon_Z_vtx = (TH1D*)f_Root->Get("track2_michelMuon_Z_vtx");
+    TH1D* h_missed_michelMuon_Z_vtx = (TH1D*)f_Root->Get("missed_michelMuon_Z_vtx");
+    MichelTool(h_vertex_michelMuon_Z_vtx, h_track_michelMuon_Z_vtx, h_track2_michelMuon_Z_vtx, h_missed_michelMuon_Z_vtx,
+                "Michel Muon End Point Z - Vertex Z [mm]", "michelMuon_Z_vtx.png", otherDir);
+
+    TH1D* h_vertex_michelPion_P = (TH1D*)f_Root->Get("vertex_michelPion_P");
+    TH1D* h_track_michelPion_P = (TH1D*)f_Root->Get("track_michelPion_P");
+    TH1D* h_track2_michelPion_P = (TH1D*)f_Root->Get("track2_michelPion_P");
+    TH1D* h_missed_michelPion_P = (TH1D*)f_Root->Get("missed_michelPion_P");
+    MichelTool(h_vertex_michelPion_P, h_track_michelPion_P, h_track2_michelPion_P, h_missed_michelPion_P,
+                "Michel Pion Momentum [MeV]", "michelPion_P.png", otherDir);
+    
+    TH1D* h_vertex_michelPion_begin_dist_vtx = (TH1D*)f_Root->Get("vertex_michelPion_begin_dist_vtx");
+    TH1D* h_track_michelPion_begin_dist_vtx = (TH1D*)f_Root->Get("track_michelPion_begin_dist_vtx");
+    TH1D* h_track2_michelPion_begin_dist_vtx = (TH1D*)f_Root->Get("track2_michelPion_begin_dist_vtx");
+    TH1D* h_missed_michelPion_begin_dist_vtx = (TH1D*)f_Root->Get("missed_michelPion_begin_dist_vtx");
+    MichelTool(h_vertex_michelPion_begin_dist_vtx, h_track_michelPion_begin_dist_vtx, h_track2_michelPion_begin_dist_vtx, h_missed_michelPion_begin_dist_vtx,
+                "Michel Pion Initial Point Distance to Vertex [mm]", "michelPion_begin_dist_vtx.png", otherDir);
+                
+    TH1D* h_vertex_michelPion_length = (TH1D*)f_Root->Get("vertex_michelPion_length");
+    TH1D* h_track_michelPion_length = (TH1D*)f_Root->Get("track_michelPion_length");
+    TH1D* h_track2_michelPion_length = (TH1D*)f_Root->Get("track2_michelPion_length");
+    TH1D* h_missed_michelPion_length = (TH1D*)f_Root->Get("missed_michelPion_length");
+    MichelTool(h_vertex_michelPion_length, h_track_michelPion_length, h_track2_michelPion_length, h_missed_michelPion_length,
+                "Michel Pion Length [mm]", "michelPion_length.png", otherDir);
+                
+//     TH2D* h_vertex_michelMuon_dist_michelPion_length = (TH2D*)f_Root->Get("vertex_michelMuon_dist_michelPion_length");
+//     plot2D_Hist(h_vertex_michelMuon_dist_michelPion_length,"vertex_michelMuon_dist_michelPion_length.png",plotDir);
+//     
+//     TH2D* h_missed_michelMuon_dist_michelPion_length = (TH2D*)f_Root->Get("missed_michelMuon_dist_michelPion_length");
+//     plot2D_Hist(h_missed_michelMuon_dist_michelPion_length,"missed_michelMuon_dist_michelPion_length.png",plotDir);
+//     
+//     TH2D* h_vertex_michelMuon_X_Y = (TH2D*)f_Root->Get("vertex_michelMuon_X_Y");
+//     plot2D_Hist(h_vertex_michelMuon_X_Y,"vertex_michelMuon_X_Y.png",plotDir);
+//     
+//     TH2D* h_missed_michelMuon_X_Y = (TH2D*)f_Root->Get("missed_michelMuon_X_Y");
+//     plot2D_Hist(h_missed_michelMuon_X_Y,"missed_michelMuon_X_Y.png",plotDir);
+}
+
+
+void Plotter::MichelTool(TH1D* h_vertex, TH1D* h_track, TH1D* h_track2, TH1D* h_missed,
+                         string plotName, string fileName, string plotDir)
+{    
+    
+//     TH1D* h_vertex = new TH1D;
+//     TH1D* h_track  = new TH1D;
+//     TH1D* h_track2  = new TH1D;
+//     TH1D* h_missed  = new TH1D;
+//     
+//     h_vertex->Copy(*vertex);
+//     h_track->Copy(*track);
+//     h_track2->Copy(*track2);
+//     h_missed->Copy(*missed);
+    
+    TCanvas* c1 = new TCanvas();
+    THStack *hs = new THStack("hs",plotName.c_str());
+    TLegend *legend = new TLegend(0.7,0.8,0.9,0.9);  
+    
+    h_vertex->SetFillColor(kGreen);
+    h_vertex->SetMarkerStyle(21);
+    h_vertex->SetMarkerColor(kGreen);
+    
+    h_track->SetFillColor(kBlue);
+    h_track->SetMarkerStyle(21);
+    h_track->SetMarkerColor(kBlue);
+    
+    h_track2->SetFillColor(kMagenta);
+    h_track2->SetMarkerStyle(21);
+    h_track2->SetMarkerColor(kMagenta);
+    
+    h_missed->SetFillColor(kRed);
+    h_missed->SetMarkerStyle(21);
+    h_missed->SetMarkerColor(kRed);
+      
+    legend->AddEntry(h_vertex, "Vertex", "f");
+    legend->AddEntry(h_track, "Track", "f");
+    legend->AddEntry(h_track2, "2nd Track", "f");
+    legend->AddEntry(h_missed, "Missed", "f");
+    
+    hs->Add(h_missed);
+    hs->Add(h_track2);
+    hs->Add(h_track);
+    hs->Add(h_vertex);
+    hs->Draw();
+    
+    hs->GetXaxis()->SetTitle(plotName.c_str());
+    hs->GetYaxis()->SetTitle("N(Events)");
+    
+    legend->Draw();
+    
+    c1->Print(Form("%s%s",plotDir.c_str(),fileName.c_str()),"png");
+    
+    delete hs;
+    delete legend;
+    delete c1; 
+    
+//     delete h_vertex;
+//     delete h_track;
+//     delete h_track2;
+//     delete h_missed;
 }
 
 void Plotter::plotSignalBackground()
@@ -118,13 +264,13 @@ void Plotter::plotSignalBackground()
     TFile* f_Root_Background_Pion = new TFile(rootDir_Pion[1].c_str());
     
     // Proton Plots
-    TH1D* h_signal_protonScore = (TH1D*)f_Root_Signal_Proton->Get("protonScore");
-    TH1D* h_background_protonScore = (TH1D*)f_Root_Background_Proton->Get("protonScore");
-    plotStacked(h_signal_protonScore, h_background_protonScore,"Proton Score", "protonScore.png", otherDir);
-    
-    TH1D* h_signal_pionScore = (TH1D*)f_Root_Signal_Proton->Get("pionScore");
-    TH1D* h_background_pionScore = (TH1D*)f_Root_Background_Proton->Get("pionScore");
-    plotStacked(h_signal_pionScore, h_background_pionScore,"PionScore", "pionScore.png", otherDir);
+//     TH1D* h_signal_protonScore = (TH1D*)f_Root_Signal_Proton->Get("protonScore");
+//     TH1D* h_background_protonScore = (TH1D*)f_Root_Background_Proton->Get("protonScore");
+//     plotStacked(h_signal_protonScore, h_background_protonScore,"Proton Score", "protonScore.png", otherDir);
+//     
+//     TH1D* h_signal_pionScore = (TH1D*)f_Root_Signal_Proton->Get("pionScore");
+//     TH1D* h_background_pionScore = (TH1D*)f_Root_Background_Proton->Get("pionScore");
+//     plotStacked(h_signal_pionScore, h_background_pionScore,"PionScore", "pionScore.png", otherDir);
         
     TH1D* h_signal_E_Proton = (TH1D*)f_Root_Signal_Proton->Get("E_reco");
     TH1D* h_background_E_Proton = (TH1D*)f_Root_Background_Proton->Get("E_reco");
@@ -142,13 +288,13 @@ void Plotter::plotSignalBackground()
     plotStackedLogScale(h_signal_angleBeam_reco_Proton, h_background_angleBeam_reco_Proton,"Proton Angle wrt Beam", "angleBeam_reco_Proton_Log.png", otherDir);
     
     // Pion Plots
-    TH1D* h_signal_gamma1_ConvLength = (TH1D*)f_Root_Signal_Pion->Get("gamma1_ConvLength");
-    TH1D* h_background_gamma1_ConvLength = (TH1D*)f_Root_Background_Pion->Get("gamma1_ConvLength");
-    plotStacked(h_signal_gamma1_ConvLength, h_background_gamma1_ConvLength,"Leading Photon Conversion Length [cm]", "gamma1_ConvLength.png", otherDir);
-    
-    TH1D* h_signal_gamma2_ConvLength = (TH1D*)f_Root_Signal_Pion->Get("gamma2_ConvLength");
-    TH1D* h_background_gamma2_ConvLength = (TH1D*)f_Root_Background_Pion->Get("gamma2_ConvLength");
-    plotStacked(h_signal_gamma2_ConvLength, h_background_gamma2_ConvLength,"Second Photon Conversion Length [cm]", "gamma2_ConvLength.png", otherDir);
+//     TH1D* h_signal_gamma1_ConvLength = (TH1D*)f_Root_Signal_Pion->Get("gamma1_ConvLength");
+//     TH1D* h_background_gamma1_ConvLength = (TH1D*)f_Root_Background_Pion->Get("gamma1_ConvLength");
+//     plotStacked(h_signal_gamma1_ConvLength, h_background_gamma1_ConvLength,"Leading Photon Conversion Length [cm]", "gamma1_ConvLength.png", otherDir);
+//     
+//     TH1D* h_signal_gamma2_ConvLength = (TH1D*)f_Root_Signal_Pion->Get("gamma2_ConvLength");
+//     TH1D* h_background_gamma2_ConvLength = (TH1D*)f_Root_Background_Pion->Get("gamma2_ConvLength");
+//     plotStacked(h_signal_gamma2_ConvLength, h_background_gamma2_ConvLength,"Second Photon Conversion Length [cm]", "gamma2_ConvLength.png", otherDir);
     
     TH1D* h_signal_gamma1_nClusters_All = (TH1D*)f_Root_Signal_Pion->Get("gamma1_nClusters_All");
     TH1D* h_background_gamma1_nClusters_All = (TH1D*)f_Root_Background_Pion->Get("gamma1_nClusters_All");
@@ -158,13 +304,13 @@ void Plotter::plotSignalBackground()
     TH1D* h_background_gamma2_nClusters_All = (TH1D*)f_Root_Background_Pion->Get("gamma2_nClusters_All");
     plotStacked(h_signal_gamma2_nClusters_All, h_background_gamma2_nClusters_All,"Second Photon N(Clusters)", "gamma2_nClusters_All.png", otherDir);
     
-    TH1D* h_signal_gamma1_nClusters_X = (TH1D*)f_Root_Signal_Pion->Get("gamma1_nClusters_X");
-    TH1D* h_background_gamma1_nClusters_X = (TH1D*)f_Root_Background_Pion->Get("gamma1_nClusters_X");
-    plotStacked(h_signal_gamma1_nClusters_X, h_background_gamma1_nClusters_X,"Number of X Clusters in the Leading Photon", "gamma1_nClusters_X.png", otherDir);
-    
-    TH1D* h_signal_gamma2_nClusters_X = (TH1D*)f_Root_Signal_Pion->Get("gamma2_nClusters_X");
-    TH1D* h_background_gamma2_nClusters_X = (TH1D*)f_Root_Background_Pion->Get("gamma2_nClusters_X");
-    plotStacked(h_signal_gamma2_nClusters_X, h_background_gamma2_nClusters_X,"Number of X Clusters in the Second Photon", "gamma2_nClusters_X.png", otherDir);
+//     TH1D* h_signal_gamma1_nClusters_X = (TH1D*)f_Root_Signal_Pion->Get("gamma1_nClusters_X");
+//     TH1D* h_background_gamma1_nClusters_X = (TH1D*)f_Root_Background_Pion->Get("gamma1_nClusters_X");
+//     plotStacked(h_signal_gamma1_nClusters_X, h_background_gamma1_nClusters_X,"Number of X Clusters in the Leading Photon", "gamma1_nClusters_X.png", otherDir);
+//     
+//     TH1D* h_signal_gamma2_nClusters_X = (TH1D*)f_Root_Signal_Pion->Get("gamma2_nClusters_X");
+//     TH1D* h_background_gamma2_nClusters_X = (TH1D*)f_Root_Background_Pion->Get("gamma2_nClusters_X");
+//     plotStacked(h_signal_gamma2_nClusters_X, h_background_gamma2_nClusters_X,"Number of X Clusters in the Second Photon", "gamma2_nClusters_X.png", otherDir);
     
     TH1D* h_signal_gamma1_Energy= (TH1D*)f_Root_Signal_Pion->Get("gamma1_Energy");
     TH1D* h_background_gamma1_Energy= (TH1D*)f_Root_Background_Pion->Get("gamma1_Energy");

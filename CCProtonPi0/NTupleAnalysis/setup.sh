@@ -6,7 +6,7 @@
 #    Terminal Usage:
 #        > source setup.sh
 #    
-#    Last Revision: 2014_11_12
+#    Last Revision: 2015_02_18
 #===============================================================================
 
 echo "Setting Up Package"
@@ -27,6 +27,7 @@ PlotFolder_List=(Muon
 		Proton
 		Pion
 		Interaction
+		PIDStatistics
 		Other)
 
 # Create Main Folder

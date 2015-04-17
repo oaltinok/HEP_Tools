@@ -93,6 +93,10 @@ SmartRef<Minerva::Particle>     m_MuonParticle;
 Minerva::ProngVect    m_ProtonProngs;
 Minerva::ParticleVect m_ProtonParticles;
 
+// Counters for Functions - Debugging Purposes
+double N_tagTruth;
+double N_reconstructEvent;
+
 
 namespace
 {
@@ -250,6 +254,11 @@ StatusCode CCProtonPi0::initialize()
     if ( m_randomGen == NULL ) return StatusCode::FAILURE;
     
     
+    // Reset Counters for Functions - Debugging Purposes
+    // They can be used to track events in DST and Ana
+    N_tagTruth = 0;
+    N_reconstructEvent = 0;
+    
     m_detectableGammaE      = 0;        // MeV
     m_detectablePi0KE       = 0;        // MeV
     m_detectableProtonKE    = 120;      // MeV
@@ -261,8 +270,10 @@ StatusCode CCProtonPi0::initialize()
     
     // Reconstructable Volume
     m_recoHexApothem  = 1000.0*CLHEP::mm; 
-    m_recoUpStreamZ   = 5750.0*CLHEP::mm;
-    m_recoDownStreamZ = 8700.0*CLHEP::mm;
+    m_recoUpStreamZ   = 5810.0*CLHEP::mm;
+    m_recoDownStreamZ = 8600.0*CLHEP::mm;
+//     m_recoUpStreamZ   = 5750.0*CLHEP::mm;
+//     m_recoDownStreamZ = 8700.0*CLHEP::mm;
     
     
     //! Initializing Analysis Tools
@@ -492,11 +503,14 @@ StatusCode CCProtonPi0::initialize()
     double SENTINEL = -9.9;
     
     //! Truth Branches
+    declareDoubleTruthBranch("eventID",0.0);
+    
     // Signal and Background
     declareBoolTruthBranch("isSignal");
     declareBoolTruthBranch("isSignal_1Pi0");
     declareBoolTruthBranch("isSignal_2Gamma");
     declareBoolTruthBranch("isFidVol");
+    declareBoolTruthBranch("AnalyzeEvent");
     
     // Background Types
     declareBoolTruthBranch("isBckg_QELike");
@@ -520,6 +534,18 @@ StatusCode CCProtonPi0::initialize()
     declareIntTruthBranch( "vertex_module", 500);
     declareIntTruthBranch( "vertex_plane", 0);
     declareIntTruthBranch( "target_material", -1); 
+    
+    // Truth Michel Information
+    declareIntTruthBranch("N_trueMichelElectrons", -1 );
+    declareDoubleTruthBranch("michelElectron_P", SENTINEL );
+    declareDoubleTruthBranch("michelElectron_E", SENTINEL );
+    declareContainerDoubleTruthBranch("michelMuon_endPoint", 3, SENTINEL ); 
+    declareDoubleTruthBranch("michelMuon_P", SENTINEL );
+    declareDoubleTruthBranch("michelMuon_length", SENTINEL );
+    declareDoubleTruthBranch("michelMuon_end_dist_vtx", SENTINEL );
+    declareDoubleTruthBranch("michelPion_P", SENTINEL );
+    declareDoubleTruthBranch("michelPion_length", SENTINEL );
+    declareDoubleTruthBranch("michelPion_begin_dist_vtx", SENTINEL );
 
     declareDoubleTruthBranch("muon_px", SENTINEL );
     declareDoubleTruthBranch("muon_py", SENTINEL );
@@ -610,10 +636,12 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch( "n_anchored_short_trk_prongs", -1 );
     declareIntEventBranch( "n_iso_trk_prongs", -1);
     declareDoubleEventBranch( "time", -1.0 );
-  
+    declareDoubleEventBranch( "reco_eventID", -1.0 );
+    
     //! Event - Michel 
     declareIntEventBranch( "n_vtx_michel_views", 0 );
     declareDoubleEventBranch( "vtx_michel_distance", -1.0);
+    declareDoubleEventBranch( "endpoint_michel_distance", -1.0);
     
     //! Event - Energy
     declareDoubleEventBranch( "muonVisibleE", -1.0 );
@@ -759,7 +787,6 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleBranch(m_hypMeths, "protonScore",    10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "pionScore",    10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "protonScore_LLR",    10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "pionScore_LLR",    10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_chi2_ndf", 10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_theta",    10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_thetaX",   10, SENTINEL);
@@ -848,7 +875,15 @@ StatusCode CCProtonPi0::initialize()
 //==============================================================================
 StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const
 {
-    debug() <<"Enter CCProtonPi0::reconstructEvent()" << endmsg;
+    debug()<<"Enter CCProtonPi0::reconstructEvent()" << endmsg;
+    
+    //--------------------------------------------------------------------------
+    //! Count Events Enters reconstructEvent()
+    //      N_reconstructEvent is used as the reco_eventID
+    //--------------------------------------------------------------------------
+    debug()<<"reconstructEvent() Count = "<<N_reconstructEvent<<" tagTruth() Count = "<<N_tagTruth-1<<endmsg;
+    event->setDoubleData("reco_eventID", N_reconstructEvent);
+    N_reconstructEvent++;
     
     //--------------------------------------------------------------------------
     //! Initialize Global Variables
@@ -863,7 +898,9 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     m_ProtonParticles.clear();
     
     //--------------------------------------------------------------------------
-    //! Do NOT Analyze the Event - if the TRUE Vertex is NOT Fiducial
+    //! Do NOT Analyze the Event - 
+    //      if the TRUE Vertex is NOT Fiducial
+    //      if the AnalyzeEvent is False
     //--------------------------------------------------------------------------    
     if( truthEvent ){
         info() << "This is a MC event." << endmsg;
@@ -871,16 +908,22 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
             info() << "True Vertex is NOT Fiducial! Skipping Event! " <<endmsg;
             return StatusCode::SUCCESS; 
         }
+        
+//         if ( !(truthEvent->filtertaglist()->isFilterTagTrue("AnalyzeEvent")) ){
+//             info() << "TagTruth() Marked Event as Do NOT Analyze! Skipping Event! " <<endmsg;
+//             return StatusCode::SUCCESS; 
+//         }
     }
-    
+ 
     //--------------------------------------------------------------------------
     //! Do NOT Analyze the Event - if Event has a Bad Object
     //--------------------------------------------------------------------------
     if( event->filtertaglist()->isFilterTagTrue( AnaFilterTags::BadObject() ) ) { 
         warning() << "Found an event flagged with a BadObject! Refusing to analyze..." << endmsg;
-        return StatusCode::SUCCESS; 
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
     }
-
+    
     
     //==========================================================================
     //
@@ -1155,6 +1198,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         if (foundMichel){
             debug()<<"Found an End Point Michel Electron!"<<endmsg;
             event->setIntData("Cut_EndPoint_Michel_Exist",1);
+            event->setDoubleData("endpoint_michel_distance",michelProng.getDoubleData("distance"));
             if( m_store_all_events ) return interpretFailEvent(event); 
             else return StatusCode::SUCCESS; 
         }
@@ -1391,8 +1435,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //! Add the interactions to the event. Use MinervaHistoTool::addInteractionHyp.
     StatusCode sc = addInteractionHyp( event, interactions );
     
-    return sc;
-    
+    return sc;    
 }
     
 //==============================================================================
@@ -1547,6 +1590,15 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
 StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const 
 {
     debug() << "Enter: CCProtonPi0::tagTruth()" << endmsg;
+    
+    //--------------------------------------------------------------------------
+    //! Count Events Enters tagTruth()
+    //      N_tagTruth is used as the eventID to locate event in DST
+    //      Required for Arachne Scannings
+    //--------------------------------------------------------------------------
+    debug()<<"tagTruth() Count = "<<N_tagTruth<<endmsg;
+    truthEvent->setDoubleData("eventID", N_tagTruth);
+    N_tagTruth++;
 
     if (!truthEvent) {
         warning()<<"Passed a null truthEvent to tagTruth()!"<<endmsg;
@@ -1609,8 +1661,24 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     debug()<<"Calling getNearestPlane, t_vtx is "<<t_vtx.z()<<endmsg;   
     getNearestPlane(t_vtx.z(), vertex_module, vertex_plane);  
 
+    debug()<<"vertex_module = "<<vertex_module<<" vertex_plane = "<<vertex_plane<<endmsg;
+    
     truthEvent->setIntData("vertex_module", vertex_module);
-    truthEvent->setIntData("vertex_plane", vertex_plane);  
+    truthEvent->setIntData("vertex_plane", vertex_plane);
+    
+    //--------------------------------------------------------------------------
+    //! Decide whether to Analyze the Event or NOT
+    //    Set AnalyzeEvent true to Analyze All Events
+    //--------------------------------------------------------------------------
+    // Analyze Events only with True Michels
+    if ( truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withMichel") ){
+        debug()<<"Event with True Michel - Will Analyze the Event..."<<endmsg;
+        truthEvent->filtertaglist()->setOrAddFilterTag( "AnalyzeEvent", true );
+    }else{
+        truthEvent->filtertaglist()->setOrAddFilterTag( "AnalyzeEvent", false );    
+    }
+    
+    debug()<<"tagTruth Reached End"<<endmsg;
     
     return StatusCode::SUCCESS;
 }
@@ -1823,7 +1891,7 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
     // -------------------------------------------------------------------------
  
     if(nAntiMuon > 0) hasAntiMuon = true;
-    hasMichel = checkMichel();
+    hasMichel = checkMichel(truthEvent);
     
     // Loop over Secondary Trajectories to Check Secondary Pi0
     for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
@@ -1928,11 +1996,14 @@ bool CCProtonPi0::checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) co
 //------------------------------------------------------------------------------
 // checkMichel() 
 //      Check MC Trajectories for a PiPlus to MuPlus Decay
-//      Returns TRUE if such a decay exists
+//      Returns TRUE if such a decay exists and fills Michel Truth Branches
 //------------------------------------------------------------------------------
-bool CCProtonPi0::checkMichel() const
+bool CCProtonPi0::checkMichel(Minerva::GenMinInteraction* truthEvent) const
 {
     debug() <<"Enter: CCProtonPi0::checkMichel()" << endmsg;
+    
+    bool hasMichel = false;
+    int N_trueMichels = 0;
     
     Minerva::TG4Trajectories::iterator it_mcpart;
     Minerva::TG4Trajectories* trajects = NULL;
@@ -1946,10 +2017,16 @@ bool CCProtonPi0::checkMichel() const
     // just to make sure
     if( !trajects ) return false;
     
+    // Save Vertex Information
+    Gaudi::LorentzVector vtx = truthEvent->Vtx();
+    
     int particle_PDG;
     int particle_ID;
     int mother_ID;
     std::vector<int> PiPlus_traj_ID;
+    std::vector<double> PiPlus_traj_length;
+    std::vector<double> PiPlus_dist_vtx;
+    std::vector<double> PiPlus_momentum;
     
     // Save all Pi+ Info
     for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
@@ -1957,25 +2034,106 @@ bool CCProtonPi0::checkMichel() const
         particle_PDG =  (*it_mcpart)->GetPDGCode();
         particle_ID = (*it_mcpart)->GetTrackId();
         
-        // Save Pi+ Trajectory IDs
-        if (particle_PDG == PDG::pi ) PiPlus_traj_ID.push_back(particle_ID);
-        
+        // Save Pi+ Information
+        if (particle_PDG == PDG::pi ){
+            PiPlus_traj_ID.push_back(particle_ID);
+            Gaudi::LorentzVector piplus_momentum = (*it_mcpart)->GetInitialMomentum();
+            Gaudi::LorentzVector piplus_start = (*it_mcpart)->GetInitialPosition();
+            Gaudi::LorentzVector piplus_end = (*it_mcpart)->GetFinalPosition();
+            
+            double piplus_length = calcDistance(piplus_start.X(), piplus_start.Y(), piplus_start.Z(),
+                                                piplus_end.X(), piplus_end.Y(), piplus_end.Z());
+            
+            // PiPlus Initial Point Distance to Vertex
+            double piplus_dist_vtx = calcDistance(  vtx.X(), vtx.Y(), vtx.Z(),
+                                                    piplus_start.X(), piplus_start.Y(), piplus_start.Z());                                                
+                                                
+            PiPlus_traj_length.push_back(piplus_length);
+            PiPlus_momentum.push_back(piplus_momentum.P());
+            PiPlus_dist_vtx.push_back(piplus_dist_vtx);
+        }
     }
     
-    // Loop again to check Daughters of Pi+
+    // Loop again to locate Mu-Plus as a daughter of Pi-Plus
     for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
         
         particle_PDG =  (*it_mcpart)->GetPDGCode();
         mother_ID = (*it_mcpart)->GetParentId();
         
-        // Check Trajectory Mother is one of the Pi+
-        if ( isMotherPrimary(PiPlus_traj_ID, mother_ID) ){
-            if (particle_PDG == -(PDG::muon) ) return true;
+        
+        // Check particle is a Mu-Plus
+        if (particle_PDG == -(PDG::muon) ){
+            
+            // Check Mu-Plus Mother is one of the Pi-Plus
+            int michelPion_ind = getMichelPion(PiPlus_traj_ID, mother_ID);
+            if ( michelPion_ind != -1 ){
+                
+                Gaudi::LorentzVector michelMuon_end = (*it_mcpart)->GetFinalPosition();
+                
+                // Skip if the michel Muon end point is NOT in Reconstructable Volume
+                if ( !FiducialPointTool->isFiducial(michelMuon_end.X(),michelMuon_end.Y(),michelMuon_end.Z(), m_recoHexApothem, m_recoUpStreamZ, m_recoDownStreamZ ) ) {
+                    debug() <<"Michel Muon is Not in Reconstructable Volume = ("<<michelMuon_end.X()<<","<<michelMuon_end.Y()<<","<<michelMuon_end.Z()<<")"<< endmsg;
+                    continue;
+                }
+                
+                hasMichel = true;
+                
+                // Save Michel Information Only for the 1st Michel
+                N_trueMichels++;
+                if (N_trueMichels > 1) continue;
+                
+                // -------------------------------------------------------------
+                // Save Michel Electron Information
+                // -------------------------------------------------------------
+                int muon_ID = (*it_mcpart)->GetTrackId();
+                saveMichelElectron(truthEvent, muon_ID);
+                
+                // -------------------------------------------------------------
+                // Get Michel Muon Information
+                // -------------------------------------------------------------
+                std::vector<double> michelMuonPoint;
+                Gaudi::LorentzVector michelMuon_momentum = (*it_mcpart)->GetInitialMomentum();
+                Gaudi::LorentzVector michelMuon_start = (*it_mcpart)->GetInitialPosition();
+
+                // Anti-Muon End Point
+                michelMuonPoint.push_back(michelMuon_end.X());
+                michelMuonPoint.push_back(michelMuon_end.Y());
+                michelMuonPoint.push_back(michelMuon_end.Z());
+                
+                // Anti-Muon Length
+                double michel_length = calcDistance(michelMuon_start.X(), michelMuon_start.Y(), michelMuon_start.Z(),
+                                                    michelMuon_end.X(), michelMuon_end.Y(), michelMuon_end.Z());
+                                                    
+                // Distance AntiMuon End point to Vertex
+                double vtx_michel_end = calcDistance(   vtx.X(), vtx.Y(), vtx.Z(),
+                                                        michelMuon_end.X(), michelMuon_end.Y(), michelMuon_end.Z());
+                                                        
+                debug()<<"michelMuon_momentum = "<<michelMuon_momentum.P()<<endmsg;
+                debug()<<"michelMuon_length = "<<michel_length<<" michelMuon_end_dist_vtx = "<<vtx_michel_end<<endmsg;
+
+                // -------------------------------------------------------------
+                // Get Michel Pion Information - Use michelPion_ind
+                // -------------------------------------------------------------
+                debug()<<"michelPion_momentum = "<<PiPlus_momentum[michelPion_ind]<<endmsg;
+                debug()<<"michelPion_length = "<<PiPlus_traj_length[michelPion_ind]<<endmsg;
+                debug()<<"michelPion_begin_dist_vtx = "<<PiPlus_dist_vtx[michelPion_ind]<<endmsg;
+                
+                // Fill NTuple
+                truthEvent->setContainerDoubleData("michelMuon_endPoint",michelMuonPoint);
+                truthEvent->setDoubleData("michelMuon_P", michelMuon_momentum.P());
+                truthEvent->setDoubleData("michelMuon_length", michel_length);
+                truthEvent->setDoubleData("michelMuon_end_dist_vtx", vtx_michel_end);
+                truthEvent->setDoubleData("michelPion_P", PiPlus_momentum[michelPion_ind]);
+                truthEvent->setDoubleData("michelPion_length", PiPlus_traj_length[michelPion_ind]);
+                truthEvent->setDoubleData("michelPion_begin_dist_vtx", PiPlus_dist_vtx[michelPion_ind]);
+                
+            }
         } 
     }
     
-    return false;
-    
+    debug()<<"N_trueMichels = "<<N_trueMichels<<endmsg;
+    truthEvent->setIntData("N_trueMichelElectrons", N_trueMichels);
+    return hasMichel;
 }
 
 //------------------------------------------------------------------------------
@@ -2007,9 +2165,6 @@ void CCProtonPi0::writeBackgroundType(Minerva::GenMinInteraction* truthEvent) co
     info()<<"Background Branching: "<<endmsg;
     info()<<"   Michel = "<<hasMichel<<" hasPi0 = "<<hasPi0<<" hasGamma = "<<hasGamma<<endmsg;
 }
-
-
-
 
 
 //------------------------------------------------------------------------------
@@ -2209,6 +2364,56 @@ bool CCProtonPi0::isMotherPrimary(std::vector<int>& motherList, int mother ) con
     }
     
     return false;
+}
+
+//------------------------------------------------------------------------------
+// getMichelPion() returns the indice of Michel Pion or -1
+//------------------------------------------------------------------------------
+int CCProtonPi0::getMichelPion(std::vector<int>& piList, int ID ) const
+{
+    for( unsigned int i = 0 ; i < piList.size(); i++ ) {
+        if( ID == piList[i]) return i;
+    }
+    
+    return -1;
+}
+
+//------------------------------------------------------------------------------
+// saveMichelElectron() - Saves Michel Electron Information
+//------------------------------------------------------------------------------
+void CCProtonPi0::saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int muon_ID) const
+{
+    debug() <<"Enter: CCProtonPi0::saveMichelElectron()" << endmsg;
+    
+    Minerva::TG4Trajectories::iterator it_mcpart;
+    Minerva::TG4Trajectories* trajects = NULL;
+    if( exist<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default ) ) {
+        trajects = get<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default );
+    } else {
+        warning() << "Could not get TG4Trajectories from " << Minerva::TG4TrajectoryLocation::Default << endmsg;
+        return;
+    }
+    
+    // just to make sure
+    if( !trajects ) return;
+    
+    // Loop Over all Trajectories to Find Michel Electrons
+    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+        
+        int particle_PDG =  (*it_mcpart)->GetPDGCode();
+        int mother_ID = (*it_mcpart)->GetParentId();
+        
+        if (particle_PDG == -(PDG::electron) && mother_ID == muon_ID ){
+            
+            Gaudi::LorentzVector michelElectron_4P = (*it_mcpart)->GetInitialMomentum();
+            truthEvent->setDoubleData("michelElectron_P", michelElectron_4P.P());
+            truthEvent->setDoubleData("michelElectron_E", michelElectron_4P.E());
+            
+            debug()<<"Found Michel Electron with PDG = "<<particle_PDG<<" E = "<<michelElectron_4P.E()<<endmsg;
+            
+            break;
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -2933,7 +3138,6 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
     
     std::vector<double> pionScore(10,SENTINEL);
     std::vector<double> protonScore(10,SENTINEL);
-    std::vector<double> pionScoreLLR(10,SENTINEL);
     std::vector<double> protonScoreLLR(10,SENTINEL);
     std::vector<double> chi2(10,SENTINEL);
     bool noProtons = false;
@@ -3104,7 +3308,6 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
         // Phil's Likelihood Method for PID
         if(!protonLikelihood.empty()){
                 protonScoreLLR[i] = protonLikelihood[i]->score();
-                pionScoreLLR[i] = pionLikelihood[i]->score();
         }else{
             debug()<<"particlesLikelihood is empty!"<<endmsg;
         }
@@ -3119,7 +3322,7 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
         // Debugging: Check values
             debug()<<"P4(Proton) = ( "<<px[i]<<", "<<py[i]<<", "<<pz[i]<<", "<<E[i]<<" )"<<endmsg;
             debug()<<" protonScore = "<<protonScore[i]<<" pionScore = "<<pionScore[i]<<endmsg;
-            debug()<<" protonScoreLLR = "<<protonScoreLLR[i]<<" pionScoreLLR = "<<pionScoreLLR[i]<<endmsg;
+            debug()<<" protonScoreLLR = "<<protonScoreLLR[i]<<endmsg;
         //----------------------------------------------------------------------
         
         //----------------------------------------------------------------------
@@ -3162,7 +3365,6 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
     nuInt->setContainerDoubleData("protonScore",protonScore);
     nuInt->setContainerDoubleData("pionScore",pionScore);
     nuInt->setContainerDoubleData("protonScore_LLR",protonScoreLLR);
-    nuInt->setContainerDoubleData("pionScore_LLR",pionScoreLLR);
     nuInt->setContainerDoubleData("proton_chi2_ndf",chi2);
     
     nuInt->setContainerDoubleData("proton_theta",proton_theta);

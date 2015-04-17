@@ -13,9 +13,9 @@ void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
 {
     if (isSignalvsBackground){
 //         plotSignalBackground();
-        plotCutHistograms();
+//         plotCutHistograms();
     }else{
-        plotInteraction(isMC,isReco, is2D);
+//         plotInteraction(isMC,isReco, is2D);
         
 //         plotMuon(isMC,isReco, is2D);
         
@@ -25,8 +25,9 @@ void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
         
 //        plotPID();
         
-        plot_mc_w_Stacked();
-        plot_final_mc_w_Stacked();
+//         plot_mc_w_Stacked();
+//         plot_final_mc_w_Stacked();
+            plotMichel();
     }
    
     
@@ -116,7 +117,9 @@ void Plotter::plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plo
     
 }
 
-void Plotter::plotStacked(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir)
+void Plotter::plotStacked(TH1D* h_signal, TH1D* h_background, 
+                            string plotName, string fileName, string plotDir, 
+                            string signal_label, string background_label)
 {
     TH1D* h_signalRatio = new TH1D;
     TH1D* h_backgroundRatio = new TH1D;
@@ -139,8 +142,8 @@ void Plotter::plotStacked(TH1D* h_signal, TH1D* h_background, string plotName, s
     h_background->SetMarkerStyle(21);
     h_background->SetMarkerColor(kRed);
     
-    legend->AddEntry(h_signal, "Signal", "f");
-    legend->AddEntry(h_background, "Background", "f");
+    legend->AddEntry(h_signal, signal_label.c_str(), "f");
+    legend->AddEntry(h_background, background_label.c_str(), "f");
  
     
     hs->Add(h_background);
@@ -282,6 +285,9 @@ void Plotter::setFolders()
         
         rootDir_Interaction[i] = Folder_List::output + Folder_List::rootOut + branchDir + "Interaction.root";
         plotDir_Interaction[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Interaction/";
+        
+        rootDir_PID[i] = Folder_List::output + Folder_List::rootOut + branchDir + "PIDStatistics.root";
+        plotDir_PID[i] = Folder_List::output + Folder_List::plotOut + branchDir + "PIDStatistics/";
 
         rootDir_Muon[i] = Folder_List::output + Folder_List::rootOut + branchDir + "Muon.root";
         plotDir_Muon[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Muon/";

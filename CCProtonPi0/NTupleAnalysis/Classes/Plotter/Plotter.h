@@ -58,7 +58,9 @@ class Plotter
         void plot1D_Hist(TH1D* hist1D, string fileName, string plotDir);
         void plot2D_Hist(TH2D* hist2D, string fileName, string plotDir);
         void plot1D_HistLogScale(TH1D* hist1D, string fileName, string plotDir);
-        void plotStacked(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
+        void plotStacked(TH1D* h_signal, TH1D* h_background, 
+                            string plotName, string fileName, string plotDir, 
+                            string signal_label = "Signal", string background_label = "Background");
         void plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
         void plotSignalRatio(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
         
@@ -75,18 +77,20 @@ class Plotter
         // pID Plots - File: pID_Plots.cpp
         void plotPID();
         void pID_proton();
-        void pID_pion();
         void pID_proton_LLR();
-        void pID_pion_LLR();
         void plot_2D_pID();
         void pIDDiff();
-        void pIDSum();
+        void pIDStats();
+        void KE();
         
         // Other Plots - File: Other_Plots.cpp
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
         void plotSignalBackground();
         void plotCutHistograms();
+        void plotMichel();
+        void MichelTool(TH1D* vertex, TH1D* track, TH1D* track2, TH1D* missed,
+                         string plotName, string fileName, string plotDir);
         
     
     private:
@@ -97,6 +101,9 @@ class Plotter
         
         string rootDir_Interaction[nBranches];
         string plotDir_Interaction[nBranches];
+        
+        string rootDir_PID[nBranches];
+        string plotDir_PID[nBranches];
         
         string rootDir_Muon[nBranches];
         string plotDir_Muon[nBranches];

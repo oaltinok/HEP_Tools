@@ -4,25 +4,34 @@ main.cpp
     Main Function that controls the Analysis Package
     
     Classes Used:
-        CDeltaPlus core class for the package
+        Analyzer core class for the package
         Plotter class includes functions specific to generate Plots
     
     Input and Output folders assigned in this function
     Edit isTest variable to run a Test job or all playlist
     
-    Terminal Usage:
-        > root -l
-        > .L main.cpp
-            > main(false) for Running the Analysis
-            > main(true) for Generating Plots only
+    Build Package using "make"
     
+    Usage:
+        Signal Events
+            > ./main.exe run 1
+            > ./main.exe plot 1
+        Background Events
+            > ./main.exe run 2
+            > ./main.exe plot 2
+        All Events
+            > ./main.exe run 3
+            > ./main.exe plot 3
+        Plot Only: Signal vs Background - Requires both signal and background
+            > ./main.exe plot 4
+        
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-//     Last Revision: 2015_01_08
+    Last Revision: 2015_02_17
 ================================================================================
 */
 
 // Include Required Classes
-#include "Classes/CCProtonPi0/CCProtonPi0.h"
+#include "Classes/Analyzer/Analyzer.h"
 #include "Classes/Plotter/Plotter.h"
 
 #include <string>
@@ -96,18 +105,18 @@ int main(int argc, char *argv[] )
         Plotter p(nMode);
         p.plotHistograms(plotsMC,plotsReco,plots2D); 
     }else{
-        CCProtonPi0 t;
+        Analyzer t;
         t.setAnalysisMode(nMode);
         if(isTest){
             t.setChannelTag("test");
             t.run("Input/Playlists/pl_MC_Test_Sample.dat");
-//             t.run("Input/Playlists/pl_MC_Test_Sample_nogrid.dat");
         }else if(isPlaylist){
             t.setChannelTag("minerva13C");
             t.run("Input/Playlists/pl_MC_minerva13C.dat");
         }else{
             t.setChannelTag("runset");
-            t.run("Input/Playlists/pl_MC_Run.dat");
+            t.run("Input/Playlists/pl_MC_Scan.dat");
+//             t.run("Input/Playlists/pl_MC_Run3.dat");
         }
     }
     

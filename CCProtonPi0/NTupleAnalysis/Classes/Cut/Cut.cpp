@@ -23,10 +23,12 @@ string Cut::get_Name()
 	return name;
 }
 
-void Cut::increment(bool isSignal)
+void Cut::increment(bool isSignal, bool isStudy1_true, bool isStudy2_true)
 {
     nEvent.increment();
-    if (isSignal) nSignal.increment();
+    if(isSignal) nSignal.increment();
+    if(isStudy1_true) nStudy1.increment();
+    if(isStudy2_true) nStudy2.increment();
 }
 
 
