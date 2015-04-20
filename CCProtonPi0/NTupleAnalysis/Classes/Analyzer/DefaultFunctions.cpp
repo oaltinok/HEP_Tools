@@ -604,7 +604,8 @@ Analyzer::~Analyzer()
 
 Analyzer::Analyzer()
 {
-    // Do Nothing
+    cout<<"Error usage! Must include Analysis Mode"<<endl;
+    exit(EXIT_FAILURE);
 }
 
 Int_t Analyzer::GetEntry(Long64_t entry)

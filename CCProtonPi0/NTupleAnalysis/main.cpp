@@ -26,7 +26,7 @@ main.cpp
             > ./main.exe plot 4
         
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_02_17
+    Last Revision: 2015_04_20
 ================================================================================
 */
 
@@ -65,6 +65,7 @@ int main(int argc, char *argv[] )
     string modeSelect;
     bool isRunSelected;
     bool isModeSelected;
+    string channelTag;
     
     // Edit isTest Variable for running Test Samples or complete playlist
     bool isTest     = false;
@@ -105,17 +106,13 @@ int main(int argc, char *argv[] )
         Plotter p(nMode);
         p.plotHistograms(plotsMC,plotsReco,plots2D); 
     }else{
-        Analyzer t;
-        t.setAnalysisMode(nMode);
+        Analyzer t(nMode);    
         if(isTest){
-            t.setChannelTag("test");
             t.run("Input/Playlists/pl_MC_Test_Sample.dat");
         }else if(isPlaylist){
-            t.setChannelTag("minerva13C");
             t.run("Input/Playlists/pl_MC_minerva13C.dat");
         }else{
-            t.setChannelTag("runset");
-            t.run("Input/Playlists/pl_MC_Scan.dat");
+            t.run("Input/Playlists/pl_MC_Run_v2_5e.dat");
 //             t.run("Input/Playlists/pl_MC_Run3.dat");
         }
     }

@@ -10,11 +10,12 @@ using namespace std;
 
 Pion::Pion()
 {
-    // Do Nothing!
+    cout<<"Wrong usage of Pion! Must include Analysis Mode"<<endl;
+    exit(EXIT_FAILURE);
 }
 
 
-void Pion::initialize(int nMode)
+Pion::Pion(int nMode)
 {
     cout<<"Initializing Pion Particle"<<endl;    
     

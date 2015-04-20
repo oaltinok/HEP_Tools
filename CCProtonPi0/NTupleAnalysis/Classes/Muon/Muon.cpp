@@ -10,10 +10,11 @@ using namespace std;
 
 Muon::Muon()
 {
-   // Do Nothing 
+    cout<<"Wrong usage of Muon! Must include Analysis Mode"<<endl;
+    exit(EXIT_FAILURE);
 }
 
-void Muon::initialize(int nMode)
+Muon::Muon(int nMode)
 {
     cout<<"Initializing Muon Particle"<<endl;
     

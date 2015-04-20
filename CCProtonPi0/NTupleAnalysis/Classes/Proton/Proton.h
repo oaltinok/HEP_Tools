@@ -5,7 +5,7 @@ Class: Proton -> Derived Class from Particle Base Clas
                 extends base class with proton specific parameters
 
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_02_19
+    Last Revision: 2015_04_17
 ================================================================================
 */
 #ifndef Proton_h
@@ -17,8 +17,9 @@ class Proton : public Particle
 {
     public:
         Proton();
+        Proton(int nMode);
         void set_kineticEnergy(bool isMC);
-        void initialize(int nMode);
+        
                 
     private:
         static const double restMass = 938.27;

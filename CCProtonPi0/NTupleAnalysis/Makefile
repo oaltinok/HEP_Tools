@@ -3,7 +3,7 @@
 # Makefile for NTupleAnalysis Package
 # 	Statistical Data Analysis Package for CCProtonPi0
 #	Author: Ozgur Altinok
-#	Last Revision: 2015_02_18
+#	Last Revision: 2015_04_20
 #
 # ==============================================================================
 
@@ -20,12 +20,12 @@ ALLPLOTTERCPP = $(PLOTTERCPP) $(DEFAULTPLOTSCPP) $(OTHERPLOTSCPP) $(PIDPLOTSCPP)
 
 # Class: Analyzer
 ANALYZERCPP = Classes/Analyzer/Analyzer.cpp
-INITHISTOGRAMSCPP = Classes/Analyzer/initHistograms.cpp
+INITFUNCTIONSCPP = Classes/Analyzer/initFunctions.cpp
 DEFAULTFUNCTIONSCPP = Classes/Analyzer/DefaultFunctions.cpp
 MUONFUNCTIONSCPP = Classes/Analyzer/MuonFunctions.cpp
 PROTONFUNCTIONSCPP = Classes/Analyzer/ProtonFunctions.cpp
 PIONFUNCTIONSCPP = Classes/Analyzer/PionFunctions.cpp
-ALLANALYZERCPP = $(ANALYZERCPP) $(INITHISTOGRAMSCPP) $(DEFAULTFUNCTIONSCPP) $(MUONFUNCTIONSCPP) $(PROTONFUNCTIONSCPP) $(PIONFUNCTIONSCPP)
+ALLANALYZERCPP = $(ANALYZERCPP) $(INITFUNCTIONSCPP) $(DEFAULTFUNCTIONSCPP) $(MUONFUNCTIONSCPP) $(PROTONFUNCTIONSCPP) $(PIONFUNCTIONSCPP)
 
 # Class: Particle and its Subclasses
 PARTICLECPP = Classes/Particle/Particle.cpp 
@@ -37,10 +37,11 @@ ALLPARTICLESCPP = $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP)
 # Other Helper Classes
 PIDTOOLCPP = Classes/PIDTool/PIDTool.cpp
 BINLISTCPP = Classes/BinList/BinList.cpp
+CUTLISTCPP = Classes/CutList/CutList.cpp
 SINGLEBINCPP = Classes/SingleBin/SingleBin.cpp
 CUTCPP = Classes/Cut/Cut.cpp
 CUTSTATCPP = Classes/Cut/CutStat.cpp
-ALLOTHERCPP = $(PIDTOOLCPP) $(BINLISTCPP) $(SINGLEBINCPP) $(CUTCPP) $(CUTSTATCPP)
+ALLOTHERCPP = $(PIDTOOLCPP) $(BINLISTCPP) $(SINGLEBINCPP) $(CUTLISTCPP) $(CUTCPP) $(CUTSTATCPP)
 
 # ALL Classes Required for the Package
 ALLCPP = $(MAINCPP) $(ALLPLOTTERCPP) $(ALLANALYZERCPP) $(ALLPARTICLESCPP) $(ALLOTHERCPP)

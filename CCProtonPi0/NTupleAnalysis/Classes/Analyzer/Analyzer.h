@@ -19,7 +19,7 @@ Class: Analyzer
     
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2015_04_17
+    Last Revision:  2015_04_20
 ================================================================================
 */
 
@@ -37,6 +37,7 @@ Class: Analyzer
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdlib>
 
 // Libraries
 #include "../../Libraries/PDG_List.h"
@@ -46,16 +47,20 @@ Class: Analyzer
 
 // Classes
 #include "../BinList/BinList.h"
+#include "../CutList/CutList.h"
 #include "../PIDTool/PIDTool.h"
 #include "../Muon/Muon.h"
 #include "../Proton/Proton.h"
 #include "../Pion/Pion.h"
-#include "../Cut/Cut.h"
+
 
 const int nTopologies = 2;
 
 class Analyzer {
+    
 public :
+  
+    Analyzer(int nMode);
    // -------------------------------------------------------------------------
    //     Specific Functions
    //--------------------------------------------------------------------------
@@ -67,6 +72,15 @@ public :
    //---------------------------------------------------------------------------
     void run(std::string playlist);
     
+    
+    //--------------------------------------------------------------------------
+    //  Initialization Functions
+    //      File: initFunctions.cpp
+    //--------------------------------------------------------------------------
+    void initInteraction();
+    void initBackgroundStudy();
+    void initHistograms(); 
+    
     //--------------------------------------------------------------------------
     //  Runtime and Analyzer Functions
     //      File: Analyzer.cpp
@@ -75,29 +89,24 @@ public :
     void setAnalysisMode(int nMode);
     void fillData();
     void specifyRunTime();
-    void initVariables();
-    void initCutNumbers();
-    void initHistograms(); // File: initHistograms.cpp
     void closeTextFiles();
     void openTextFiles();
     void fillHistograms();
     void write_RootFile();
     void writeReadme();
-    void formCutVectors();
-    void writeCutTable();
-    void writeCutTableHeader();
-    void writeCutTableRows(std::vector<Cut> nCutVector, int nProngs, bool isShortList);
     void formBackgroundVectors();
     void writeBackgroundTable();
     void writeBackgroundTableHeader();
     void writeBackgroundTableRows(vector< vector<double> > bckgVector, int nProngs);
     double getCutEfficiency(double nSig, double effBase);
     double getCutPurity(double nSig, double nEvents);
-    void setChannelTag(std::string input);
     void fillBackgroundBranches();
     void setBackgroundBranch(vector<double>& background, bool hasAntiMuon, bool hasMichel, bool hasPrimaryPi0, bool hasSecondaryPi0 );
     void fill_mc_w();
     void writeScanFile();
+    
+    
+    
     
     //--------------------------------------------------------------------------
     //  Interaction Specific Functions
@@ -268,59 +277,7 @@ public :
     TH1D* hCut_protonScore_LLR;
     TH1D* hCut_deltaInvMass;
 
-    // -------------------------------------------------------------------------
-    //     Cut Numbers
-    //--------------------------------------------------------------------------
-    std::vector<Cut> nCutVector_1Prong;
-    std::vector<Cut> nCutVector_2Prong;
-    std::vector<Cut> nCutVector_1Prong_ShortList;
-    std::vector<Cut> nCutVector_2Prong_ShortList;
     
-    // Common Cut Numbers
-    Cut nCut_All;
-    Cut nCut_Vertex_None;
-    Cut nCut_Vertex_Not_Reconstructable; 
-    Cut nCut_Vertex_Not_Fiducial;
-    Cut nCut_Vertex_Count;
-    Cut nCut_nProngs;
-    
-    // nProngs == 1 Cut Numbers
-    Cut nCut_1Prong_Muon_None;              
-    Cut nCut_1Prong_Muon_Not_Plausible;
-    Cut nCut_1Prong_Muon_Score_Low;
-    Cut nCut_1Prong_Muon_Charge;
-    Cut nCut_1Prong_Vertex_Michel_Exist; 
-    Cut nCut_1Prong_EndPoint_Michel_Exist;
-    Cut nCut_1Prong_secEndPoint_Michel_Exist;
-    Cut nCut_1Prong_PreFilter_Pi0;
-    Cut nCut_1Prong_VtxBlob;
-    Cut nCut_1Prong_ConeBlobs;
-    Cut nCut_1Prong_Pi0_invMass;
-    Cut nCut_1Prong_Photon1DistanceLow;
-    Cut nCut_1Prong_Photon2DistanceLow;
-    Cut nCut_1Prong_beamEnergy;
-    Cut nCut_1Prong_UnusedE;
-    
-    // nProngs == 2 Cut Numbers
-    Cut nCut_2Prong_Muon_None;              
-    Cut nCut_2Prong_Muon_Not_Plausible;
-    Cut nCut_2Prong_Muon_Score_Low;
-    Cut nCut_2Prong_Muon_Charge;
-    Cut nCut_2Prong_Vertex_Michel_Exist; 
-    Cut nCut_2Prong_EndPoint_Michel_Exist;
-    Cut nCut_2Prong_secEndPoint_Michel_Exist;
-    Cut nCut_2Prong_PreFilter_Pi0;
-    Cut nCut_2Prong_VtxBlob;
-    Cut nCut_2Prong_ConeBlobs;
-    Cut nCut_2Prong_Pi0_invMass;
-    Cut nCut_2Prong_Photon1DistanceLow;
-    Cut nCut_2Prong_Photon2DistanceLow;
-    Cut nCut_2Prong_beamEnergy;
-    Cut nCut_2Prong_UnusedE;
-    Cut nCut_2Prong_Particle_None;
-    Cut nCut_2Prong_Proton_None;            
-    Cut nCut_2Prong_ProtonScore;
-    Cut nCut_2Prong_DeltaInvMass;
 
    
     // -------------------------------------------------------------------------
@@ -347,6 +304,10 @@ public :
    // -------------------------------------------------------------------------
    //     Analysis Variables
    //--------------------------------------------------------------------------
+    Muon muon;
+    Proton proton;
+    Pion pion;
+    PIDTool pIDTool;
     bool isDataAnalysis;
     bool analyze_NoProtonEvents;
     bool hasParticleTruthInfo;
@@ -382,11 +343,8 @@ public :
     double nMaxEvents;
     double SENTINEL;
     TVector3 beam_p3;
-    Muon muon;
-    Proton proton;
-    Pion pion;
-    PIDTool pIDTool;
-    
+
+   
     string scanFileName;
     std::vector<double> PDG_pi0_Mother;
     std::vector<double> PDG_pi0_GrandMother;
@@ -402,6 +360,7 @@ public :
    //   List of Bins
    //--------------------------------------------------------------------------
     BinList binList;
+    CutList cutList;
     
    // -------------------------------------------------------------------------
    //     Files
@@ -411,13 +370,13 @@ public :
     string readmeFile;
     string channelTag;
     string failFile[nTopologies];
-    string cutFile[nTopologies];
+    
     string backgroundFile[nTopologies];
     
     
     ofstream readme;
     ofstream failText[nTopologies];
-    ofstream cutText[nTopologies];
+    
     ofstream backgroundText[nTopologies];
     ofstream roundupText;
     ifstream DSTFileList;

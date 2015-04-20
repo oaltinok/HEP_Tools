@@ -10,10 +10,11 @@ using namespace std;
 
 Proton::Proton()
 {
-    // Do Nothing
+    cout<<"Wrong usage of Proton! Must include Analysis Mode"<<endl;
+    exit(EXIT_FAILURE);
 }
 
-void Proton::initialize(int nMode)
+Proton::Proton(int nMode)
 {
     cout<<"Initializing Proton Particle"<<endl;
     

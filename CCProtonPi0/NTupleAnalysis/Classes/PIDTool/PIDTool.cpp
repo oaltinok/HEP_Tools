@@ -54,7 +54,7 @@ void PIDTool::get_pID_Stats_LLR()
         purity_LLR->SetBinContent(i,purity);
         efficiency_LLR->SetBinContent(i,efficiency);
         purityXefficiency_LLR->SetBinContent(i,purity*efficiency);
-        cout<<"pID = "<<proton_protonScore_LLR->GetBinLowEdge(i)<<" Purity = "<<purity<<" Efficiency = "<<efficiency<<endl;
+//         cout<<"pID = "<<proton_protonScore_LLR->GetBinLowEdge(i)<<" Purity = "<<purity<<" Efficiency = "<<efficiency<<endl;
     }
     
     double maxPurityXEfficiency = purityXefficiency_LLR->GetMaximum();
@@ -103,7 +103,7 @@ void PIDTool::get_pID_Stats_pIDDiff()
         purity_pIDDiff->SetBinContent(i,purity);
         efficiency_pIDDiff->SetBinContent(i,efficiency);
         purityXefficiency_pIDDiff->SetBinContent(i,purity*efficiency);
-        cout<<"pID Diff = "<<proton_pIDDiff->GetBinLowEdge(i)<<" Purity = "<<purity<<" Efficiency = "<<efficiency<<endl;
+//         cout<<"pID Diff = "<<proton_pIDDiff->GetBinLowEdge(i)<<" Purity = "<<purity<<" Efficiency = "<<efficiency<<endl;
     }
     
     double maxPurityXEfficiency = purityXefficiency_pIDDiff->GetMaximum();
@@ -154,12 +154,12 @@ void PIDTool::FillHistograms(   double protonScore_LLR, double protonScore, doub
 
 PIDTool::PIDTool()
 {
-    // Do Nothing
+    cout<<"Wrong usage of PIDTool! Must include Analysis Mode"<<endl;
+    exit(EXIT_FAILURE);
 }
 
-void PIDTool::initialize(int nMode)
+PIDTool::PIDTool(int nMode)
 {
-
     cout<<"Initializing PIDTool"<<endl;
     
     SetAnalysisMode(nMode);

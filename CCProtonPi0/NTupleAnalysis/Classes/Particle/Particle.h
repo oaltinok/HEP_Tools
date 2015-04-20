@@ -16,6 +16,7 @@ Class: Particle
 
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 #include <TMath.h>
 #include <TH1.h>

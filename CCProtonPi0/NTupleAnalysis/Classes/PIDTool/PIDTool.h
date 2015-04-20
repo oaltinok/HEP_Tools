@@ -5,13 +5,14 @@ Class: PIDTool
     Generates pID specific Histograms and Statistics
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_02_26
+    Last Revision: 2015_04_17
 ================================================================================
 */
 #ifndef PIDTool_h
 #define PIDTool_h
 
 #include <iostream>
+#include <cstdlib>
 
 // ROOT Libraries
 #include <TFile.h>
@@ -30,7 +31,7 @@ class PIDTool
     public:
         // Functions
         PIDTool();
-        void initialize(int nMode);
+        PIDTool(int nMode);
         void SetAnalysisMode(int nMode);
         void FillHistograms(double protonScore_LLR, double protonScore, double pionScore,
                             int truthPDG, double prongE);

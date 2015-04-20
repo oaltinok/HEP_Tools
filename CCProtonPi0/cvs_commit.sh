@@ -1,21 +1,22 @@
-cvs commit -m "v2_05
+cvs commit -m "v2_06
 
 General Updates:
-    For each event saving the truth_eventID and reco_eventID
-    truth_eventID corresponds to the eventID in the DST File
-        used in Arachne Scan
-
-Michel Study:
-    Saving true information for michelElectron, michelMuon and michelPion
-
-        
+    No Updates to CCProtonPi0 Package 
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-    Modified for Michel Study
-        New Histograms and Variables for Michel Study
+    Revised Constructors for all Classes
+        Old Style = Empty Constructor + initialize()
+        New Style = Overloaded Constructor
+        Analyzer Uses Member Initialization List to Init other Objects
+        Collected other initialization functions under initFunctions.cpp
         
-    Removed ArachneScan Functionality
-        Integrated this Functionality to the main class: Analyzer
+    Added Class PIDTool to the CVS (forgot to add on previous release)
     
-    Improved Table Output Format
-        They are ready to be imported into Excel" .
+    Created a New Class: CutList
+        Moved all Cut Number related functions under this Class
+        Removed Channel Tag from the Package
+            Only Cut Tables had that tag and no needed for future
+    New Class: CutList
+        Member Variables are the Cut Numbers which represent each Selection 
+            in the Analysis
+        Creates the Cut Table for all topologies in the Analysis" .
