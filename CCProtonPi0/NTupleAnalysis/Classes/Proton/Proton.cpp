@@ -8,18 +8,10 @@
 
 using namespace std;
 
-Proton::Proton()
-{
-    cout<<"Wrong usage of Proton! Must include Analysis Mode"<<endl;
-    exit(EXIT_FAILURE);
-}
-
-Proton::Proton(int nMode)
+Proton::Proton(int nMode) : Particle(nMode)
 {
     cout<<"Initializing Proton Particle"<<endl;
-    
-    setAnalysisMode(nMode);
-    
+        
     // File Locations
     rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "Proton.root";
     
@@ -33,8 +25,6 @@ Proton::Proton(int nMode)
     bin_P.setBin(20, 0.0, 2000.0);
     bin_KE.setBin(20, 0.0, 2000.0);
 
-    cout<<"\tInitializing Histograms "<<endl;
-       
     // Default Histograms
     partScore = new TH1D( "partScore","Proton Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");

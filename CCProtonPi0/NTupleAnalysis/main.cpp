@@ -112,8 +112,7 @@ int main(int argc, char *argv[] )
         }else if(isPlaylist){
             t.run("Input/Playlists/pl_MC_minerva13C.dat");
         }else{
-            t.run("Input/Playlists/pl_MC_Run_v2_5e.dat");
-//             t.run("Input/Playlists/pl_MC_Run3.dat");
+            t.run("Input/Playlists/pl_MC_Run_Test.dat");
         }
     }
     

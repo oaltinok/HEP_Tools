@@ -12,7 +12,7 @@ Class: CutList
         Classes/CutList
         
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2015_04_20
+    Last Revision:  2015_04_21
 ================================================================================
 */
 #ifndef CutList_h
@@ -24,15 +24,14 @@ Class: CutList
 #include <cstdlib>
 #include <string>
 
+#include "../NTupleAnalysis/NTupleAnalysis.h"
 #include "../Cut/Cut.h"
-#include "../../Libraries/Folder_List.h"
 
 using namespace std;
 
-class CutList
+class CutList : public NTupleAnalysis
 {
     public:
-        CutList();
         CutList(int nMode);
         ~CutList();
         
@@ -88,7 +87,6 @@ class CutList
         Cut nCut_2Prong_DeltaInvMass;
         
     private:
-        void SetAnalysisMode(int nMode);
         void SetCutNames();
         void OpenTextFiles();
         void formCutVectors();
@@ -97,8 +95,6 @@ class CutList
         double getCutEfficiency(double nSig, double effBase);
         double getCutPurity(double nSig, double nEvents);
         
-        static const int nTopologies = 2;
-        
         vector<Cut> nCutVector_1Prong;
         vector<Cut> nCutVector_2Prong;
         vector<Cut> nCutVector_1Prong_ShortList;
@@ -106,7 +102,6 @@ class CutList
         
         ofstream cutText[nTopologies];
         string cutFile[nTopologies];
-        string branchDir;
         
 };
 

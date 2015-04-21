@@ -1,7 +1,6 @@
 /*
     See Analyzer.h header or Class Information
 */
-
 #ifndef Analyzer_cpp
 #define Analyzer_cpp
 
@@ -201,9 +200,21 @@ void Analyzer::run(string playlist)
         */
 
         //----------------------------------------------------------------------
-        // Fill Background Branches
+        // Fill Background Branches for Background Events
         //----------------------------------------------------------------------
-        fillBackgroundBranches();
+        if(!truth_isSignal) {
+            bckgTool.fillBackgroundBranches(    nProngs,
+                                                truth_isBckg_QELike, 
+                                                truth_isBckg_SinglePiPlus, 
+                                                truth_isBckg_SinglePiMinus, 
+                                                truth_isBckg_MultiPion, 
+                                                truth_isBckg_MultiPiZero, 
+                                                truth_isBckg_Other,
+                                                truth_isBckg_withAntiMuon,
+                                                truth_isBckg_withMichel,
+                                                truth_isBckg_withPrimaryPi0,
+                                                truth_isBckg_withSecondaryPi0);
+        }
 
         //----------------------------------------------------------------------
         // Data Analysis and Other Studies
@@ -234,7 +245,7 @@ void Analyzer::run(string playlist)
     // Write Text Files
     //--------------------------------------------------------------------------
     cutList.writeCutTable();
-    writeBackgroundTable();
+    bckgTool.writeBackgroundTable();
     getPi0Family(); // Pi0 Family Information written inside FailFile
     
     //--------------------------------------------------------------------------
@@ -247,28 +258,24 @@ void Analyzer::run(string playlist)
     if(is_pID_Studies) pIDTool.write_RootFile();
     
     
-    closeTextFiles();
-    
 }
 
 //------------------------------------------------------------------------------
 //  Constructor
 //------------------------------------------------------------------------------
 Analyzer::Analyzer(int nMode) : 
+    NTupleAnalysis(nMode),
     muon(nMode),
     proton(nMode),
     pion(nMode),
     pIDTool(nMode),
+    bckgTool(nMode),
     cutList(nMode)
 {
-    setAnalysisMode(nMode);
-    
     initInteraction();
     
     openTextFiles();
     
-    initBackgroundStudy();
-
     specifyRunTime();
     
     cout<<"Initialization Finished!\n"<<endl;
@@ -280,120 +287,7 @@ Analyzer::Analyzer(int nMode) :
 //
 //<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
-void Analyzer::fillBackgroundBranches()
-{
-    if (!truth_isSignal){
-        if (nProngs == 1){
-            if(truth_isBckg_QELike){ 
-                setBackgroundBranch(    bckg_1Prong_QELike,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-            
-            if(truth_isBckg_SinglePiPlus){ 
-                setBackgroundBranch(    bckg_1Prong_SinglePiPlus,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-            
-            if(truth_isBckg_SinglePiMinus){ 
-                setBackgroundBranch(    bckg_1Prong_SinglePiMinus,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-            
-            if(truth_isBckg_MultiPion){ 
-                setBackgroundBranch(    bckg_1Prong_MultiPion,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-            
-            if(truth_isBckg_MultiPiZero){ 
-                setBackgroundBranch(    bckg_1Prong_MultiPiZero,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-            
-            if(truth_isBckg_Other){ 
-                setBackgroundBranch(    bckg_1Prong_Other,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-        }
-        }else if (nProngs == 2){
-                if(truth_isBckg_QELike){ 
-                setBackgroundBranch(    bckg_2Prong_QELike,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-            
-            if(truth_isBckg_SinglePiPlus){ 
-                setBackgroundBranch(    bckg_2Prong_SinglePiPlus,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-            
-            if(truth_isBckg_SinglePiMinus){ 
-                setBackgroundBranch(    bckg_2Prong_SinglePiMinus,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-            
-            if(truth_isBckg_MultiPion){ 
-                setBackgroundBranch(    bckg_2Prong_MultiPion,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-            
-            if(truth_isBckg_MultiPiZero){ 
-                setBackgroundBranch(    bckg_2Prong_MultiPiZero,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-            
-            if(truth_isBckg_Other){ 
-                setBackgroundBranch(    bckg_2Prong_Other,
-                                        truth_isBckg_withAntiMuon,
-                                        truth_isBckg_withMichel,
-                                        truth_isBckg_withPrimaryPi0,
-                                        truth_isBckg_withSecondaryPi0);
-            }
-        }
-    } 
-}
 
-void Analyzer::setBackgroundBranch(vector<double>& background, bool hasAntiMuon, bool hasMichel, bool hasPrimaryPi0, bool hasSecondaryPi0 )
-{
-    bool hasPi0Candidate = hasPrimaryPi0 || hasSecondaryPi0;
-    background[0]++;                        // Total
-    if(hasAntiMuon) background[1]++;        // AntiMuon
-    if(hasMichel) background[2]++;          // Michel
-    if(hasPrimaryPi0) background[3]++;      // Primary Pi0
-    if(hasSecondaryPi0) background[4]++;    // Secondary Pi0
-    if(hasPi0Candidate) background[5]++;    // Pi0 Candidate
-    
-}
 
 void Analyzer::getPi0Family()
 {         
@@ -541,34 +435,6 @@ bool Analyzer::analyzeEvent()
     
     return isAnalyzable;
     
-}
-
-//------------------------------------------------------------------------------
-// Analysis Mode
-//      1) Signal Events
-//      2) Background Events
-//      Other) All Events
-//------------------------------------------------------------------------------
-void Analyzer::setAnalysisMode(int nMode)
-{  
-    if ( nMode == 1) {
-        cout<<"----------------------------------------------------------------------"<<endl;
-        cout<<"Analysis Mode: Signal - Only Signal Events will be Analyzed"<<endl;
-        branchDir = Folder_List::signal;
-    }else if ( nMode == 2){
-        cout<<"----------------------------------------------------------------------"<<endl;
-        cout<<"Analysis Mode: Background - Only Background Events will be Analyzed"<<endl;
-        branchDir = Folder_List::background;
-    }else{
-        cout<<"----------------------------------------------------------------------"<<endl;
-        cout<<"Analysis Mode: All - All Events will be Analyzed"<<endl;
-        branchDir = Folder_List::allEvents;
-    }
-    
-    cout<<"----------------------------------------------------------------------"<<endl;
-    
-    anaMode = nMode;
-    isAnalysisModeSelected = true;
 }
 
 void Analyzer::writeFSParticle4P(Long64_t nEntry)
@@ -851,98 +717,6 @@ void Analyzer::fill_mc_w()
     if(mc_intType == 3) mc_w_DIS->Fill(mc_w * HEP_Functions::MeV_to_GeV);
 }
 
-void Analyzer::formBackgroundVectors()
-{
-    bckgVector_1Prong.push_back(bckg_1Prong_QELike);
-    bckgVector_1Prong.push_back(bckg_1Prong_SinglePiPlus); 
-    bckgVector_1Prong.push_back(bckg_1Prong_SinglePiMinus); 
-    bckgVector_1Prong.push_back(bckg_1Prong_MultiPion); 
-    bckgVector_1Prong.push_back(bckg_1Prong_MultiPiZero);
-    bckgVector_1Prong.push_back(bckg_1Prong_Other);
-    
-    bckgVector_2Prong.push_back(bckg_2Prong_QELike);
-    bckgVector_2Prong.push_back(bckg_2Prong_SinglePiPlus); 
-    bckgVector_2Prong.push_back(bckg_2Prong_SinglePiMinus); 
-    bckgVector_2Prong.push_back(bckg_2Prong_MultiPion); 
-    bckgVector_2Prong.push_back(bckg_2Prong_MultiPiZero);
-    bckgVector_2Prong.push_back(bckg_2Prong_Other);
-}
-
-void Analyzer::writeBackgroundTableHeader()
-{
-        for (int t = 0; t < nTopologies; t++){ 
-            backgroundText[t]<<std::left;
-            // Table Header
-            backgroundText[t].width(20); backgroundText[t]<< "Background Type"; backgroundText[t]<<"|";
-            backgroundText[t].width(16); backgroundText[t]<< "Total"; backgroundText[t]<<"|";
-            backgroundText[t].width(16); backgroundText[t]<< "AntiMuon"; backgroundText[t]<<"|";
-            backgroundText[t].width(16); backgroundText[t]<< "Michel"; backgroundText[t]<<"|";
-            backgroundText[t].width(16); backgroundText[t]<< "Primary Pi0"; backgroundText[t]<<"|";
-            backgroundText[t].width(16); backgroundText[t]<< "Secondary Pi0"; backgroundText[t]<<"|";
-            backgroundText[t].width(16); backgroundText[t]<< "Pi0 Candidate"; backgroundText[t]<<"|";
-            backgroundText[t]<<endl;
-        }
-}
-
-
-void Analyzer::writeBackgroundTableRows(vector< vector<double> > bckgVector, int nProngs)
-{
-    int t;
-    if( nProngs == 1 ) t = 0;
-    if( nProngs == 2 ) t = 1;
-    
-    vector<double> bckg_QELike = bckgVector[0];
-    vector<double> bckg_SinglePiPlus = bckgVector[1];
-    vector<double> bckg_SinglePiMinus = bckgVector[2];
-    vector<double> bckg_MultiPion = bckgVector[3];
-    vector<double> bckg_MultiPiZero = bckgVector[4];
-    vector<double> bckg_Other = bckgVector[5];
-    
-    backgroundText[t].width(20); backgroundText[t]<<"QE Like"; backgroundText[t]<<"|"; 
-    for(int i = 0; i < nBckgBranch; i++){
-        backgroundText[t].width(16); backgroundText[t]<<bckg_QELike[i]; backgroundText[t]<<"|";   
-    }
-    backgroundText[t]<<endl;
-    
-    backgroundText[t].width(20); backgroundText[t]<<"SinglePiPlus"; backgroundText[t]<<"|"; 
-    for(int i = 0; i < nBckgBranch; i++){
-        backgroundText[t].width(16); backgroundText[t]<<bckg_SinglePiPlus[i]; backgroundText[t]<<"|";    
-    }
-    backgroundText[t]<<endl;
-    
-    backgroundText[t].width(20); backgroundText[t]<<"SinglePiMinus"; backgroundText[t]<<"|"; 
-    for(int i = 0; i < nBckgBranch; i++){
-        backgroundText[t].width(16); backgroundText[t]<<bckg_SinglePiMinus[i]; backgroundText[t]<<"|";    
-    }
-    backgroundText[t]<<endl;
-
-    backgroundText[t].width(20); backgroundText[t]<<"MultiChargedPion"; backgroundText[t]<<"|"; 
-    for(int i = 0; i < nBckgBranch; i++){
-        backgroundText[t].width(16); backgroundText[t]<<bckg_MultiPion[i]; backgroundText[t]<<"|";    
-    }
-    backgroundText[t]<<endl;
-    
-    backgroundText[t].width(20); backgroundText[t]<<"MultiPiZero"; backgroundText[t]<<"|"; 
-    for(int i = 0; i < nBckgBranch; i++){
-        backgroundText[t].width(16); backgroundText[t]<<bckg_MultiPiZero[i]; backgroundText[t]<<"|";    
-    }
-    backgroundText[t]<<endl;
-    
-    backgroundText[t].width(20); backgroundText[t]<<"Other"; backgroundText[t]<<"|"; 
-    for(int i = 0; i < nBckgBranch; i++){
-        backgroundText[t].width(16); backgroundText[t]<<bckg_Other[i]; backgroundText[t]<<"|";  
-    }
-    backgroundText[t]<<endl;
-    
-}
-
-void Analyzer::writeBackgroundTable()
-{
-    formBackgroundVectors();
-    writeBackgroundTableHeader();
-    writeBackgroundTableRows(bckgVector_1Prong, 1);
-    writeBackgroundTableRows(bckgVector_2Prong, 2);
-}
 
 void Analyzer::fillInteractionTrue()
 {
@@ -1033,7 +807,7 @@ void Analyzer::writeScanFile()
     const string other        = "&slice=-1&filetype=dst";
     
     roundupText<<arachne_html<<scanFileName<<entryString<<truth_eventID<<other<<" ";
-    roundupText<<truth_eventID<<"^"<<truth_michelMuon_end_dist_vtx<<"^s"<<mc_incomingE<<endl;
+    roundupText<<truth_eventID<<"^"<<truth_michelMuon_end_dist_vtx<<"^"<<mc_incomingE<<endl;
 }
 
 
@@ -1053,17 +827,18 @@ void Analyzer::write_RootFile()
 void Analyzer::closeTextFiles()
 {
     readme.close(); 
+    roundupText.close();
+    DSTFileList.close();
     
     for (int i = 0; i < nTopologies; i++){
-        backgroundText[i].close();
         failText[i].close();
     }
 }
 
 void Analyzer::openTextFiles()
 {
+    cout<<"Opening Text Files:"<<endl;
     
-    cout<<"\tText Files for Output:"<<endl;
     // Open Readme File
     readmeFile = Folder_List::output + Folder_List::textOut + branchDir + "readme.txt";
     readme.open( readmeFile.c_str() );
@@ -1074,23 +849,7 @@ void Analyzer::openTextFiles()
         cout<<"\t"<<readmeFile<<endl;
     }
     writeReadme();
-    
-
-    
-    // Open Background Files
-    backgroundFile[0] = Folder_List::output + Folder_List::textOut + branchDir + "BackgroundTable_1Prong.txt";
-    backgroundFile[1] = Folder_List::output + Folder_List::textOut + branchDir + "BackgroundTable_2Prong.txt";
-    
-    for (int i = 0; i < nTopologies; i++){
-        backgroundText[i].open( backgroundFile[i].c_str() );
-        if( !backgroundText[i].is_open() ){
-            cerr<<"Cannot open output text file: "<<backgroundFile[i]<<endl;
-            exit(1);
-        }else{
-            cout<<"\t"<<backgroundFile[i]<<endl;
-        }
-    }
-    
+   
     // Open Fail-Check Files
     failFile[0] = Folder_List::output + Folder_List::textOut + branchDir + "FailChecks_1Prong.txt";
     failFile[1] = Folder_List::output + Folder_List::textOut + branchDir + "FailChecks_2Prong.txt";
@@ -1111,6 +870,8 @@ void Analyzer::openTextFiles()
     if( !roundupText.is_open() ){
         cerr<<"Cannot open output text file: "<<roundupFile<<endl;
         exit(1);
+    }else{
+        cout<<"\t"<<roundupFile<<endl; 
     }
     
     string playlistDST = "Input/Playlists/pl_Scan.dat";
@@ -1118,7 +879,11 @@ void Analyzer::openTextFiles()
     if( !DSTFileList.is_open() ){
         cerr<<"Cannot open input text file: "<<playlistDST<<endl;
         exit(1);
+    }else{
+        cout<<"\t"<<playlistDST<<endl;
     }
+    
+    cout<<"Done!"<<endl;
 }
 
 void Analyzer::writeReadme()

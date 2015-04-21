@@ -8,18 +8,10 @@
 
 using namespace std;
 
-Muon::Muon()
-{
-    cout<<"Wrong usage of Muon! Must include Analysis Mode"<<endl;
-    exit(EXIT_FAILURE);
-}
-
-Muon::Muon(int nMode)
+Muon::Muon(int nMode) : Particle(nMode)
 {
     cout<<"Initializing Muon Particle"<<endl;
-    
-    setAnalysisMode(nMode);
-    
+        
     // File Locations
     rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "Muon.root";
 
@@ -32,8 +24,6 @@ Muon::Muon(int nMode)
     bin_P.setBin(100,0.0,10.0);
     bin_KE.setBin(100,0.0,10.0);
     bin_AngleBeam.setBin(90,0.0,90.0);
-
-    cout<<"\tInitializing Histograms "<<endl;
     
     partScore = new TH1D( "partScore","Muon Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");

@@ -14,13 +14,12 @@ void Analyzer::Init(string playlist, TChain* fChain)
 
     ifstream input_pl(playlist.c_str());
     string filename;
-    cout<<"Initializing Playlist"<<endl;
     
     if( !input_pl.is_open() ){
         cerr<<"Cannot open Playlist File!"<<endl;
         exit(1);
     }else{
-        cout<<"\tPlaylist: "<<playlist.c_str()<<endl;
+        cout<<"Reading Playlist: "<<playlist.c_str()<<endl;
     }
     
     
@@ -596,16 +595,9 @@ void Analyzer::Init(string playlist, TChain* fChain)
    Notify();
 }
 
-
 Analyzer::~Analyzer()
 {
-    // Do Nothing
-}
-
-Analyzer::Analyzer()
-{
-    cout<<"Error usage! Must include Analysis Mode"<<endl;
-    exit(EXIT_FAILURE);
+    closeTextFiles();
 }
 
 Int_t Analyzer::GetEntry(Long64_t entry)
@@ -636,7 +628,6 @@ Bool_t Analyzer::Notify()
    // to the generated code, but the routine can be extended by the
    // user if needed. The return value is currently not used.
 
-    cout<<"Done!"<<endl;
    return kTRUE;
 }
 

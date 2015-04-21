@@ -3,13 +3,16 @@
 # Makefile for NTupleAnalysis Package
 # 	Statistical Data Analysis Package for CCProtonPi0
 #	Author: Ozgur Altinok
-#	Last Revision: 2015_04_20
+#	Last Revision: 2015_04_21
 #
 # ==============================================================================
 
 # Main File and its executable
 MAINCPP = main.cpp
 MAINEXE = main.exe
+
+# Class: Base Class
+NTUPLEANALYSISCPP = Classes/NTupleAnalysis/NTupleAnalysis.cpp
 
 # Class: Plotter
 PLOTTERCPP = Classes/Plotter/Plotter.cpp
@@ -36,15 +39,16 @@ ALLPARTICLESCPP = $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP)
 
 # Other Helper Classes
 PIDTOOLCPP = Classes/PIDTool/PIDTool.cpp
+BACKGROUNDTOOLCPP = Classes/BackgroundTool/BackgroundTool.cpp
 BINLISTCPP = Classes/BinList/BinList.cpp
 CUTLISTCPP = Classes/CutList/CutList.cpp
 SINGLEBINCPP = Classes/SingleBin/SingleBin.cpp
 CUTCPP = Classes/Cut/Cut.cpp
 CUTSTATCPP = Classes/Cut/CutStat.cpp
-ALLOTHERCPP = $(PIDTOOLCPP) $(BINLISTCPP) $(SINGLEBINCPP) $(CUTLISTCPP) $(CUTCPP) $(CUTSTATCPP)
+ALLOTHERCPP = $(PIDTOOLCPP) $(BACKGROUNDTOOLCPP) $(BINLISTCPP) $(SINGLEBINCPP) $(CUTLISTCPP) $(CUTCPP) $(CUTSTATCPP)
 
 # ALL Classes Required for the Package
-ALLCPP = $(MAINCPP) $(ALLPLOTTERCPP) $(ALLANALYZERCPP) $(ALLPARTICLESCPP) $(ALLOTHERCPP)
+ALLCPP = $(MAINCPP) $(NTUPLEANALYSISCPP) $(ALLPLOTTERCPP) $(ALLANALYZERCPP) $(ALLPARTICLESCPP) $(ALLOTHERCPP)
 
 # ------------------------------------------------------------------------------
 # Commands and Flags

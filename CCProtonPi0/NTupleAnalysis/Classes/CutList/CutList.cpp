@@ -8,11 +8,14 @@
 
 using namespace std;
 
-CutList::CutList(int nMode)
+CutList::CutList(int nMode) : NTupleAnalysis(nMode)
 {
-    SetAnalysisMode(nMode);
+    cout<<"Initializing CutList"<<endl;
+    
     SetCutNames();
     OpenTextFiles();
+
+    cout<<"Done!"<<endl;
 }
 
 void CutList::SetCutNames()
@@ -277,34 +280,14 @@ void CutList::writeCutTableRows(vector<Cut> nCutVector, int nProngs, bool isShor
             
             cutText[t]<<endl;
     }
-     
-}
-
-void CutList::SetAnalysisMode(int nMode)
-{
-    if ( nMode == 1) {
-        cout<<"\tAnalysis Mode: Signal - Only Signal Events will be Analysed"<<endl;
-        branchDir = Folder_List::signal;
-    }else if ( nMode == 2){
-        cout<<"\tAnalysis Mode: Background - Only Background Events will be Analysed"<<endl;
-        branchDir = Folder_List::background;
-    }else{
-        cout<<"\tAnalysis Mode: All - All Events will be Analysed"<<endl;
-        branchDir = Folder_List::allEvents;
-    }
-}
-
-CutList::CutList()
-{
-    cout<<"Wrong usage of PIDTool! Must include Analysis Mode"<<endl;
-    exit(EXIT_FAILURE);    
 }
 
 CutList::~CutList()
 {
-    // Do Nothing    
+    for (int i = 0; i < nTopologies; i++){
+        cutText[i].close(); 
+    }
 }
-
 
 
 #endif

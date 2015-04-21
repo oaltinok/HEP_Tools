@@ -152,18 +152,10 @@ void PIDTool::FillHistograms(   double protonScore_LLR, double protonScore, doub
 }
 
 
-PIDTool::PIDTool()
-{
-    cout<<"Wrong usage of PIDTool! Must include Analysis Mode"<<endl;
-    exit(EXIT_FAILURE);
-}
-
-PIDTool::PIDTool(int nMode)
+PIDTool::PIDTool(int nMode) : NTupleAnalysis(nMode)
 {
     cout<<"Initializing PIDTool"<<endl;
-    
-    SetAnalysisMode(nMode);
-    
+        
     // File Locations
     rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "PIDStatistics.root";
 
@@ -312,20 +304,6 @@ PIDTool::PIDTool(int nMode)
     
     cout<<"Done!"<<endl;
 
-}
-
-void PIDTool::SetAnalysisMode(int nMode)
-{
-    if ( nMode == 1) {
-        cout<<"\tAnalysis Mode: Signal - Only Signal Events will be Analysed"<<endl;
-        branchDir = Folder_List::signal;
-    }else if ( nMode == 2){
-        cout<<"\tAnalysis Mode: Background - Only Background Events will be Analysed"<<endl;
-        branchDir = Folder_List::background;
-    }else{
-        cout<<"\tAnalysis Mode: All - All Events will be Analysed"<<endl;
-        branchDir = Folder_List::allEvents;
-    }
 }
 
 void PIDTool::write_RootFile()

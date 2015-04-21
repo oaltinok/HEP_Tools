@@ -46,39 +46,33 @@ Class: Analyzer
 #include "../../Libraries/HEP_Functions.h"
 
 // Classes
+#include "../NTupleAnalysis/NTupleAnalysis.h"
 #include "../BinList/BinList.h"
 #include "../CutList/CutList.h"
 #include "../PIDTool/PIDTool.h"
 #include "../Muon/Muon.h"
 #include "../Proton/Proton.h"
 #include "../Pion/Pion.h"
+#include "../BackgroundTool/BackgroundTool.h"
 
-
-const int nTopologies = 2;
-
-class Analyzer {
+class Analyzer : public NTupleAnalysis{
     
 public :
   
     Analyzer(int nMode);
-   // -------------------------------------------------------------------------
-   //     Specific Functions
-   //--------------------------------------------------------------------------
+    ~Analyzer();
 
    // -------------------------------------------------------------------------
    //     void run(): Generates a .root file with selected histograms
    //         playlist -> address of the playlist
-   //         filename -> file name for the output .root file
    //---------------------------------------------------------------------------
     void run(std::string playlist);
-    
     
     //--------------------------------------------------------------------------
     //  Initialization Functions
     //      File: initFunctions.cpp
     //--------------------------------------------------------------------------
     void initInteraction();
-    void initBackgroundStudy();
     void initHistograms(); 
     
     //--------------------------------------------------------------------------
@@ -86,7 +80,6 @@ public :
     //      File: Analyzer.cpp
     //--------------------------------------------------------------------------
     bool analyzeEvent();
-    void setAnalysisMode(int nMode);
     void fillData();
     void specifyRunTime();
     void closeTextFiles();
@@ -94,19 +87,10 @@ public :
     void fillHistograms();
     void write_RootFile();
     void writeReadme();
-    void formBackgroundVectors();
-    void writeBackgroundTable();
-    void writeBackgroundTableHeader();
-    void writeBackgroundTableRows(vector< vector<double> > bckgVector, int nProngs);
     double getCutEfficiency(double nSig, double effBase);
     double getCutPurity(double nSig, double nEvents);
-    void fillBackgroundBranches();
-    void setBackgroundBranch(vector<double>& background, bool hasAntiMuon, bool hasMichel, bool hasPrimaryPi0, bool hasSecondaryPi0 );
     void fill_mc_w();
     void writeScanFile();
-    
-    
-    
     
     //--------------------------------------------------------------------------
     //  Interaction Specific Functions
@@ -145,8 +129,6 @@ public :
     //  Default Functions
     //      File: DefaultFunctions.cpp
     //--------------------------------------------------------------------------
-    Analyzer();
-    ~Analyzer();
     void Init(string playlist, TChain* fChain);
     Int_t GetEntry(Long64_t entry);
     Long64_t LoadTree(Long64_t entry);
@@ -243,9 +225,7 @@ public :
     TH1D* michelElectron_E[5];
     TH2D* michelPion_length_dist_vtx[4];
     TH2D* michelMuon_dist_michelPion_length[4];
-    
-   
-        
+  
     // -------------------------------------------------------------------------
     // Cut Histograms
     // -------------------------------------------------------------------------
@@ -278,29 +258,6 @@ public :
     TH1D* hCut_deltaInvMass;
 
     
-
-   
-    // -------------------------------------------------------------------------
-    //     Background Study
-    //--------------------------------------------------------------------------
-    int nBckgBranch;
-    vector< vector<double> > bckgVector_1Prong;
-    vector< vector<double> > bckgVector_2Prong;
-    
-    vector<double> bckg_1Prong_QELike;
-    vector<double> bckg_1Prong_SinglePiPlus;
-    vector<double> bckg_1Prong_SinglePiMinus;
-    vector<double> bckg_1Prong_MultiPion;
-    vector<double> bckg_1Prong_MultiPiZero;
-    vector<double> bckg_1Prong_Other;
-    
-    vector<double> bckg_2Prong_QELike;
-    vector<double> bckg_2Prong_SinglePiPlus;
-    vector<double> bckg_2Prong_SinglePiMinus;
-    vector<double> bckg_2Prong_MultiPion;
-    vector<double> bckg_2Prong_MultiPiZero;
-    vector<double> bckg_2Prong_Other;
-    
    // -------------------------------------------------------------------------
    //     Analysis Variables
    //--------------------------------------------------------------------------
@@ -308,6 +265,8 @@ public :
     Proton proton;
     Pion pion;
     PIDTool pIDTool;
+    BackgroundTool bckgTool;
+    CutList cutList;
     bool isDataAnalysis;
     bool analyze_NoProtonEvents;
     bool hasParticleTruthInfo;
@@ -323,8 +282,6 @@ public :
     bool applyDeltaInvMass;
     
     double latest_ScanID;
-    int anaMode;
-    bool isAnalysisModeSelected;
     int max_nFSPart;
     int indRecoProton;
     int indTrueProton;
@@ -360,24 +317,19 @@ public :
    //   List of Bins
    //--------------------------------------------------------------------------
     BinList binList;
-    CutList cutList;
+    
     
    // -------------------------------------------------------------------------
    //     Files
    //--------------------------------------------------------------------------
-    string branchDir;
     string rootDir;
     string readmeFile;
     string channelTag;
     string failFile[nTopologies];
-    
-    string backgroundFile[nTopologies];
-    
-    
+       
     ofstream readme;
     ofstream failText[nTopologies];
-    
-    ofstream backgroundText[nTopologies];
+
     ofstream roundupText;
     ifstream DSTFileList;
 

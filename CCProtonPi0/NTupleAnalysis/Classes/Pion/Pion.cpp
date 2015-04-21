@@ -8,18 +8,9 @@
 
 using namespace std;
 
-Pion::Pion()
-{
-    cout<<"Wrong usage of Pion! Must include Analysis Mode"<<endl;
-    exit(EXIT_FAILURE);
-}
-
-
-Pion::Pion(int nMode)
+Pion::Pion(int nMode) : Particle(nMode)
 {
     cout<<"Initializing Pion Particle"<<endl;    
-    
-    setAnalysisMode(nMode);
     
     // File Locations
     rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "Pion.root";
@@ -37,7 +28,6 @@ Pion::Pion(int nMode)
     bin_gammaClusters.setBin(40,0.0,40.0);
     bin_gammaEnergy.setBin(40,0.0,1.0);
 
-    cout<<"\tInitializing Histograms "<<endl;
     //--------------------------------------------------------------------------
     // Photon conversion Length
     //--------------------------------------------------------------------------

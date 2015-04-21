@@ -9,27 +9,12 @@
 
 using namespace std;
 
-Particle::Particle()
+
+Particle::Particle(int nMode) : NTupleAnalysis(nMode)
 {
     bin_partScore.setBin(100,0.0,1.0);
     bin_error.setBin(400, -2.0, 2.0);
     bin_angle.setBin(180, 0.0, 180.0);
-}
-
-void Particle::setAnalysisMode(int nMode)
-{
-    
-    if ( nMode == 1) {
-        cout<<"\tAnalysis Mode: Signal - Only Signal Events will be Analysed"<<endl;
-        branchDir = Folder_List::signal;
-    }else if ( nMode == 2){
-        cout<<"\tAnalysis Mode: Background - Only Background Events will be Analysed"<<endl;
-        branchDir = Folder_List::background;
-    }else{
-        cout<<"\tAnalysis Mode: All - All Events will be Analysed"<<endl;
-        branchDir = Folder_List::allEvents;
-    }
-   
 }
 
 void Particle::fill_Histograms()

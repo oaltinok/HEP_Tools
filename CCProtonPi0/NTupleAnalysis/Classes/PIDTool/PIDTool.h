@@ -5,7 +5,7 @@ Class: PIDTool
     Generates pID specific Histograms and Statistics
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_04_17
+    Last Revision: 2015_04_21
 ================================================================================
 */
 #ifndef PIDTool_h
@@ -20,19 +20,17 @@ Class: PIDTool
 #include <TH2.h>
 
 // Classes
+#include "../NTupleAnalysis/NTupleAnalysis.h"
 #include "../BinList/BinList.h"
 
 // Libraries
 #include "../../Libraries/PDG_List.h"
-#include "../../Libraries/Folder_List.h"
 
-class PIDTool
+class PIDTool : public NTupleAnalysis
 {
     public:
         // Functions
-        PIDTool();
         PIDTool(int nMode);
-        void SetAnalysisMode(int nMode);
         void FillHistograms(double protonScore_LLR, double protonScore, double pionScore,
                             int truthPDG, double prongE);
         void get_pID_Stats();
@@ -79,7 +77,6 @@ class PIDTool
 
         
     private:
-        std::string branchDir;
         std::string rootDir;
         
         BinList binList;

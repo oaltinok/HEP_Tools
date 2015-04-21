@@ -6,9 +6,7 @@
 using namespace std;
 
 void Analyzer::initHistograms()
-{
-    cout<<"\tInitializing CCProtonPi0 Histograms"<<endl;
-      
+{      
     status_Pi0 = new TH1D( "status_Pi0","Pi0 Status",binList.particleStatus.get_nBins(), binList.particleStatus.get_min(), binList.particleStatus.get_max() );
     status_Pi0->GetXaxis()->SetTitle("GENIE Status Codes");
     status_Pi0->GetYaxis()->SetTitle("N(Events)");
@@ -518,28 +516,6 @@ void Analyzer::initInteraction()
     initHistograms();
   
     cout<<"Done!"<<endl;
-}
-
-void Analyzer::initBackgroundStudy()
-{
-    nBckgBranch = 6;
-        
-    // Background Types
-    for(int i = 0; i < nBckgBranch; i++){
-            bckg_1Prong_QELike.push_back(0.0);
-            bckg_1Prong_SinglePiPlus.push_back(0.0);
-            bckg_1Prong_SinglePiMinus.push_back(0.0);
-            bckg_1Prong_MultiPion.push_back(0.0);
-            bckg_1Prong_MultiPiZero.push_back(0.0);
-            bckg_1Prong_Other.push_back(0.0);
-            bckg_2Prong_QELike.push_back(0.0);
-            bckg_2Prong_SinglePiPlus.push_back(0.0);
-            bckg_2Prong_SinglePiMinus.push_back(0.0);
-            bckg_2Prong_MultiPion.push_back(0.0);
-            bckg_2Prong_MultiPiZero.push_back(0.0);
-            bckg_2Prong_Other.push_back(0.0);
-    }
-    
 }
 
 

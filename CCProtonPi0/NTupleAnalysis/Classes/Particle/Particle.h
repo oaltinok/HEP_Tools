@@ -7,7 +7,7 @@ Class: Particle
     Uses ROOT Specific classes
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2014_11_12
+    Last Revision: 2015_04_21
 ================================================================================
 */
 
@@ -26,12 +26,14 @@ Class: Particle
 
 // Libraries
 #include "../../Libraries/Data_Functions.h"
-#include "../../Libraries/Folder_List.h"
 
 //Classes
+#include "../NTupleAnalysis/NTupleAnalysis.h"
 #include "../SingleBin/SingleBin.h"
 
-class Particle
+using namespace std;
+
+class Particle : public NTupleAnalysis
 {
     public:
         // Two Data Data Types
@@ -54,8 +56,6 @@ class Particle
         // Reco Only
         double particleScore;       // Particle Score from Reconstructed Values
         double trackLength;         // Track Length in [mm]
-        
-        std::string branchDir;
         
         TFile* f;
         
@@ -99,9 +99,8 @@ class Particle
         std::string rootDir;
           
         // Functions
-        Particle();
+        Particle(int nMode);
         ~Particle();
-        void setAnalysisMode(int nMode);
         int getDataType(bool isMC); // Returns the indice of arrays reco = 0, mc = 1
         virtual void set_angleMuon(Particle &mu, bool isMC);
         virtual void set_kineticEnergy(bool isMC);
