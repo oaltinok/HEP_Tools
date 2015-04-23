@@ -9,19 +9,19 @@
 using namespace std;
 
 
-void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
+void Plotter::plotHistograms()
 {
     if (isSignalvsBackground){
 //         plotSignalBackground();
 //         plotCutHistograms();
     }else{
-//         plotInteraction(isMC,isReco, is2D);
+//         plotInteraction();
         
-//         plotMuon(isMC,isReco, is2D);
+//         plotMuon();
         
-//         plotProton(isMC,isReco, is2D);
+//         plotProton();
         
-//         plotPion(isMC,isReco, is2D);
+//         plotPion();
         
 //        plotPID();
         
@@ -33,7 +33,7 @@ void Plotter::plotHistograms(bool isMC, bool isReco, bool is2D)
     
 }
 
-void Plotter::plotSignalRatio(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir) 
+void Plotter::plotSignalRatio(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir) 
 {
     TH1D* h_ratio = new TH1D;
     
@@ -56,14 +56,11 @@ void Plotter::plotSignalRatio(TH1D* h_signal, TH1D* h_background, string plotNam
 }
 
 
-
-
 void Plotter::inform(string rootDir, string plotDir)
 {
     cout<<"------------ Plotting ------------"<<endl;
     cout<<"Input File: "<<rootDir<<endl;
     cout<<"Output Folder: "<<plotDir<<endl;
-
 }
 
 void Plotter::plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir)
@@ -93,7 +90,6 @@ void Plotter::plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plo
     legend->AddEntry(h_signal, "Signal", "f");
     legend->AddEntry(h_background, "Background", "f");
     
-    
     hs->Add(h_background);
     hs->Add(h_signal);
     hs->Draw();
@@ -109,7 +105,7 @@ void Plotter::plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plo
     delete c1;
     
     // Plot Signal Ratio
-    plotSignalRatio(h_signalRatio,h_backgroundRatio, plotName, fileName, plotDir);
+    plotSignalRatio(h_signalRatio,h_backgroundRatio, fileName, plotDir);
     
     
     delete h_signalRatio;
@@ -161,12 +157,10 @@ void Plotter::plotStacked(TH1D* h_signal, TH1D* h_background,
     delete c1;
     
     // Plot Signal Ratio
-    plotSignalRatio(h_signalRatio,h_backgroundRatio, plotName, fileName, plotDir);
+    plotSignalRatio(h_signalRatio,h_backgroundRatio,fileName, plotDir);
 
-    
     delete h_signalRatio;
     delete h_backgroundRatio;
-    
 }
 
 void Plotter::plot1D_HistLogScale(TH1D* hist1D, string fileName, string plotDir)

@@ -51,7 +51,7 @@ class Plotter
         //--------------------------------------------------------------------------
         Plotter(int nMode);
         void setFolders();
-        void plotHistograms(bool isMC, bool isReco, bool is2D);
+        void plotHistograms();
         void inform(string rootDir, string plotDir);
         
         // Plottting Macros
@@ -62,17 +62,14 @@ class Plotter
                             string plotName, string fileName, string plotDir, 
                             string signal_label = "Signal", string background_label = "Background");
         void plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
-        void plotSignalRatio(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
+        void plotSignalRatio(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir);
         
         // Default Plots - File: Default_Plots.cpp
-        void plotInteraction(bool isMC, bool isReco, bool is2D);
-        void plotMuon(bool isMC, bool isReco, bool is2D);
-        void plotProton(bool isMC, bool isReco, bool is2D);
-        void plotPion(bool isMC, bool isReco, bool is2D);
-        void plotParticleInfo(  string rootDir, string plotDir, 
-                                bool isMC, bool isReco, bool is2D);
-                            
-               
+        void plotInteraction();
+        void plotMuon();
+        void plotProton();
+        void plotPion();
+        void plotParticleInfo(  string rootDir, string plotDir);
                                 
         // pID Plots - File: pID_Plots.cpp
         void plotPID();

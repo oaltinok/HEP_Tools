@@ -63,7 +63,7 @@ BinList::BinList()
     michelPion_P.setBin(100,0.0,2000.0);
     michelPion_begin_dist_vtx.setBin(40,0.0,2000.0);
     michelPion_length.setBin(40,0.0,2000.0);
-
+    michel_time_diff.setBin(100,0.0,10000.0);
 }
 
 #endif

@@ -23,19 +23,14 @@ ALLPLOTTERCPP = $(PLOTTERCPP) $(DEFAULTPLOTSCPP) $(OTHERPLOTSCPP) $(PIDPLOTSCPP)
 
 # Class: Analyzer
 ANALYZERCPP = Classes/Analyzer/Analyzer.cpp
-INITFUNCTIONSCPP = Classes/Analyzer/initFunctions.cpp
-DEFAULTFUNCTIONSCPP = Classes/Analyzer/DefaultFunctions.cpp
-MUONFUNCTIONSCPP = Classes/Analyzer/MuonFunctions.cpp
-PROTONFUNCTIONSCPP = Classes/Analyzer/ProtonFunctions.cpp
-PIONFUNCTIONSCPP = Classes/Analyzer/PionFunctions.cpp
-ALLANALYZERCPP = $(ANALYZERCPP) $(INITFUNCTIONSCPP) $(DEFAULTFUNCTIONSCPP) $(MUONFUNCTIONSCPP) $(PROTONFUNCTIONSCPP) $(PIONFUNCTIONSCPP)
 
-# Class: Particle and its Subclasses
+# Class: Interaction, Particle and Particle SubClasses
+INTERACTIONCPP = Classes/Interaction/Interaction.cpp
 PARTICLECPP = Classes/Particle/Particle.cpp 
 MUONCPP = Classes/Muon/Muon.cpp
 PROTONCPP = Classes/Proton/Proton.cpp
 PIONCPP = Classes/Pion/Pion.cpp
-ALLPARTICLESCPP = $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP)
+ALLPARTICLESCPP = $(INTERACTIONCPP) $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP)
 
 # Other Helper Classes
 PIDTOOLCPP = Classes/PIDTool/PIDTool.cpp
@@ -48,13 +43,13 @@ CUTSTATCPP = Classes/Cut/CutStat.cpp
 ALLOTHERCPP = $(PIDTOOLCPP) $(BACKGROUNDTOOLCPP) $(BINLISTCPP) $(SINGLEBINCPP) $(CUTLISTCPP) $(CUTCPP) $(CUTSTATCPP)
 
 # ALL Classes Required for the Package
-ALLCPP = $(MAINCPP) $(NTUPLEANALYSISCPP) $(ALLPLOTTERCPP) $(ALLANALYZERCPP) $(ALLPARTICLESCPP) $(ALLOTHERCPP)
+ALLCPP = $(MAINCPP) $(NTUPLEANALYSISCPP) $(ALLPLOTTERCPP) $(ANALYZERCPP) $(ALLPARTICLESCPP) $(ALLOTHERCPP)
 
 # ------------------------------------------------------------------------------
 # Commands and Flags
 # ------------------------------------------------------------------------------
 CC = g++
-CFLAGS = -c -Wall
+CFLAGS = -c -Wall -Wextra
 ROOTFLAGS = `root-config --libs --cflags`
 RM = rm -f
 

@@ -8,7 +8,7 @@ Class: NTupleAnalysis
         anaMode - Signal Only, Background Only or All
         
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_04_21
+    Last Revision: 2015_04_22
 ================================================================================
 */
 
@@ -28,7 +28,10 @@ class NTupleAnalysis
     public:
         NTupleAnalysis(int nMode);
         
+        // Constants
         static const int nTopologies = 2;
+        static const double SENTINEL = -9.9;
+        
         string branchDir;
         bool isAnalysisModeSelected;
         int anaMode;

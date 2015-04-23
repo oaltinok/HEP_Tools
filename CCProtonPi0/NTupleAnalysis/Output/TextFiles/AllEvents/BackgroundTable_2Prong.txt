@@ -1,7 +1,0 @@
-Background Type     |Total           |AntiMuon        |Michel          |Primary Pi0     |Secondary Pi0   |Pi0 Candidate   |
-QE Like             |8               |0               |0               |0               |1               |1               |
-SinglePiPlus        |15              |0               |3               |6               |4               |10              |
-SinglePiMinus       |0               |0               |0               |0               |0               |0               |
-MultiChargedPion    |4               |0               |3               |1               |2               |3               |
-MultiPiZero         |2               |0               |0               |2               |0               |2               |
-Other               |2               |0               |0               |1               |1               |1               |

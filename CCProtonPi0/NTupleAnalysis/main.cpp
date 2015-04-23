@@ -26,7 +26,7 @@ main.cpp
             > ./main.exe plot 4
         
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_04_20
+    Last Revision: 2015_04_21
 ================================================================================
 */
 
@@ -71,11 +71,6 @@ int main(int argc, char *argv[] )
     bool isTest     = false;
     bool isPlaylist = false;
     
-    // Plot Selection
-    bool plotsMC    = true;
-    bool plotsReco  = true;
-    bool plots2D    = true;
-
     // Check User Input
     if ( argc != 3 || argc > 3) /* argc should be 3 for correct execution */
     {
@@ -86,7 +81,6 @@ int main(int argc, char *argv[] )
         runSelect = argv[1];
         modeSelect = argv[2];
     }
-    
     
     // Get Run Selection   
     isRunSelected = get_runSelection(runSelect, onlyPlot);
@@ -104,7 +98,7 @@ int main(int argc, char *argv[] )
     
     if(onlyPlot){
         Plotter p(nMode);
-        p.plotHistograms(plotsMC,plotsReco,plots2D); 
+        p.plotHistograms(); 
     }else{
         Analyzer t(nMode);    
         if(isTest){
@@ -112,7 +106,7 @@ int main(int argc, char *argv[] )
         }else if(isPlaylist){
             t.run("Input/Playlists/pl_MC_minerva13C.dat");
         }else{
-            t.run("Input/Playlists/pl_MC_Run_Test.dat");
+            t.run("Input/Playlists/pl_MC_Run2.dat");
         }
     }
     

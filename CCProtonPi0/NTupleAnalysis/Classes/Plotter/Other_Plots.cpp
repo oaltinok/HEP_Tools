@@ -108,6 +108,38 @@ void Plotter::plotMichel()
     TH1D* h_N_michelElectrons = (TH1D*)f_Root->Get("N_michelElectrons");
     plot1D_Hist(h_N_michelElectrons,"N_michelElectrons.png",otherDir);
     
+    TH1D* h_trueMichel_dist_reco = (TH1D*)f_Root->Get("trueMichel_dist_reco");
+    TH1D* h_fakeMichel_dist_reco = (TH1D*)f_Root->Get("fakeMichel_dist_reco");
+//     plot1D_Hist(h_trueMichel_dist_reco,"trueMichel_dist_reco.png",otherDir);  
+//     plot1D_Hist(h_fakeMichel_dist_reco,"fakeMichel_dist_reco.png",otherDir);
+    plotStacked(h_trueMichel_dist_reco, h_fakeMichel_dist_reco,"Michel Distance to Vertex", "Michel_dist_reco.png", otherDir);
+
+    TH1D* h_trueMichel_end_Z = (TH1D*)f_Root->Get("trueMichel_end_Z");
+    TH1D* h_fakeMichel_end_Z = (TH1D*)f_Root->Get("fakeMichel_end_Z");
+//     plot1D_Hist(h_trueMichel_end_Z,"trueMichel_end_Z.png",otherDir);  
+//     plot1D_Hist(h_fakeMichel_end_Z,"fakeMichel_end_Z.png",otherDir);
+    plotStacked(h_trueMichel_end_Z, h_fakeMichel_end_Z,"Michel Prong End Z [mm]", "Michel_end_Z.png", otherDir);
+    
+    TH1D* h_trueMichel_energy = (TH1D*)f_Root->Get("trueMichel_energy");
+    TH1D* h_fakeMichel_energy = (TH1D*)f_Root->Get("fakeMichel_energy");
+//     plot1D_Hist(h_trueMichel_energy,"trueMichel_energy.png",otherDir);  
+//     plot1D_Hist(h_fakeMichel_energy,"fakeMichel_energy.png",otherDir);
+    plotStacked(h_trueMichel_energy, h_fakeMichel_energy,"Michel Prong Energy", "Michel_energy.png", otherDir);
+    
+    TH1D* h_trueMichel_time_diff = (TH1D*)f_Root->Get("trueMichel_time_diff");
+    TH1D* h_fakeMichel_time_diff = (TH1D*)f_Root->Get("fakeMichel_time_diff");
+//     plot1D_Hist(h_trueMichel_time_diff,"trueMichel_time_diff.png",otherDir);  
+//     plot1D_Hist(h_fakeMichel_time_diff,"fakeMichel_time_diff.png",otherDir);
+    plotStacked(h_trueMichel_time_diff, h_fakeMichel_time_diff,"Michel Time Difference", "Michel_time_diff.png", otherDir);    
+
+    TH1D* h_trueMichel_end_Z_vtx_Z = (TH1D*)f_Root->Get("trueMichel_end_Z_vtx_Z");
+    TH1D* h_fakeMichel_end_Z_vtx_Z = (TH1D*)f_Root->Get("fakeMichel_end_Z_vtx_Z");
+//     plot1D_Hist(h_trueMichel_end_Z_vtx_Z,"trueMichel_end_Z_vtx_Z.png",otherDir);  
+//     plot1D_Hist(h_fakeMichel_end_Z_vtx_Z,"fakeMichel_end_Z_vtx_Z.png",otherDir);
+    plotStacked(h_trueMichel_end_Z_vtx_Z, h_fakeMichel_end_Z_vtx_Z,"Michel Z - Vertex Z", "Michel_end_Z_vtx_Z.png", otherDir); 
+
+    
+ /*   
     TH1D* h_vertex_michelElectron_E = (TH1D*)f_Root->Get("vertex_michelElectron_E");
     TH1D* h_track_michelElectron_E = (TH1D*)f_Root->Get("track_michelElectron_E");
     TH1D* h_track2_michelElectron_E = (TH1D*)f_Root->Get("track2_michelElectron_E");
@@ -173,7 +205,7 @@ void Plotter::plotMichel()
     TH1D* h_track2_michelPion_length = (TH1D*)f_Root->Get("track2_michelPion_length");
     TH1D* h_missed_michelPion_length = (TH1D*)f_Root->Get("missed_michelPion_length");
     MichelTool(h_vertex_michelPion_length, h_track_michelPion_length, h_track2_michelPion_length, h_missed_michelPion_length,
-                "Michel Pion Length [mm]", "michelPion_length.png", otherDir);
+                "Michel Pion Length [mm]", "michelPion_length.png", otherDir);*/
                 
 //     TH2D* h_vertex_michelMuon_dist_michelPion_length = (TH2D*)f_Root->Get("vertex_michelMuon_dist_michelPion_length");
 //     plot2D_Hist(h_vertex_michelMuon_dist_michelPion_length,"vertex_michelMuon_dist_michelPion_length.png",plotDir);

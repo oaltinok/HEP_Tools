@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Apr 16 08:31:56 2015 by ROOT version 5.34/05
+// Wed Apr 22 19:14:16 2015 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -159,6 +159,10 @@ public :
    Double_t        gamma2_theta;
    Double_t        gamma2_time;
    Double_t        hadronVisibleE;
+   Double_t        michelProng_begin_Z;
+   Double_t        michelProng_end_Z;
+   Double_t        michelProng_energy;
+   Double_t        michelProng_time_diff;
    Double_t        muonVisibleE;
    Double_t        muon_phi;
    Double_t        muon_theta;
@@ -214,7 +218,7 @@ public :
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[22];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[11];   //[g2dedx_rev_cluster_energy_sz]
    Double_t        gamma1_direction[3];
    Double_t        gamma1_vertex[3];
    Double_t        gamma2_direction[3];
@@ -529,26 +533,26 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[23];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[23];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[23];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[23];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[23];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[16];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[16];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[16];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[16];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[16];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[52];   //[mc_er_nPart]
-   Int_t           mc_er_status[52];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[52];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[52];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[52];   //[mc_er_nPart]
-   Double_t        mc_er_Px[52];   //[mc_er_nPart]
-   Double_t        mc_er_Py[52];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[52];   //[mc_er_nPart]
-   Double_t        mc_er_E[52];   //[mc_er_nPart]
-   Int_t           mc_er_FD[52];   //[mc_er_nPart]
-   Int_t           mc_er_LD[52];   //[mc_er_nPart]
-   Int_t           mc_er_mother[52];   //[mc_er_nPart]
+   Int_t           mc_er_ID[40];   //[mc_er_nPart]
+   Int_t           mc_er_status[40];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[40];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[40];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[40];   //[mc_er_nPart]
+   Double_t        mc_er_Px[40];   //[mc_er_nPart]
+   Double_t        mc_er_Py[40];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[40];   //[mc_er_nPart]
+   Double_t        mc_er_E[40];   //[mc_er_nPart]
+   Int_t           mc_er_FD[40];   //[mc_er_nPart]
+   Int_t           mc_er_LD[40];   //[mc_er_nPart]
+   Int_t           mc_er_mother[40];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[8];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[6];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -570,11 +574,11 @@ public :
    Int_t           mc_wgt_Flux_NA49_sz;
    Double_t        mc_wgt_Flux_NA49[100];   //[mc_wgt_Flux_NA49_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[5];   //[n_prongs]
-   Double_t        prong_part_score[5];   //[n_prongs]
-   Double_t        prong_part_mass[5];   //[n_prongs]
-   Int_t           prong_part_charge[5];   //[n_prongs]
-   Int_t           prong_part_pid[5];   //[n_prongs]
+   Int_t           prong_nParticles[4];   //[n_prongs]
+   Double_t        prong_part_score[4];   //[n_prongs]
+   Double_t        prong_part_mass[4];   //[n_prongs]
+   Int_t           prong_part_charge[4];   //[n_prongs]
+   Int_t           prong_part_pid[4];   //[n_prongs]
    vector<vector<double> > *prong_part_E;
    vector<vector<double> > *prong_part_pos;
 
@@ -716,6 +720,10 @@ public :
    TBranch        *b_gamma2_theta;   //!
    TBranch        *b_gamma2_time;   //!
    TBranch        *b_hadronVisibleE;   //!
+   TBranch        *b_michelProng_begin_Z;   //!
+   TBranch        *b_michelProng_end_Z;   //!
+   TBranch        *b_michelProng_energy;   //!
+   TBranch        *b_michelProng_time_diff;   //!
    TBranch        *b_muonVisibleE;   //!
    TBranch        *b_muon_phi;   //!
    TBranch        *b_muon_theta;   //!
@@ -1169,7 +1177,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/CCProtonPi0/MC/v2_05d/run/grid/central_value/minerva/ana/v10r8/00/01/32/00/SIM_minerva_00013200_Subruns_0001-0002-0003-0004_CCProtonPi0_Ana_Tuple_v10r8.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/CCProtonPi0/MC/v2_08/run/grid/central_value/minerva/ana/v10r8/00/01/32/00/SIM_minerva_00013200_Subruns_0001-0002-0003-0004_CCProtonPi0_Ana_Tuple_v10r8.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1358,6 +1366,10 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("gamma2_theta", &gamma2_theta, &b_gamma2_theta);
    fChain->SetBranchAddress("gamma2_time", &gamma2_time, &b_gamma2_time);
    fChain->SetBranchAddress("hadronVisibleE", &hadronVisibleE, &b_hadronVisibleE);
+   fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);
+   fChain->SetBranchAddress("michelProng_end_Z", &michelProng_end_Z, &b_michelProng_end_Z);
+   fChain->SetBranchAddress("michelProng_energy", &michelProng_energy, &b_michelProng_energy);
+   fChain->SetBranchAddress("michelProng_time_diff", &michelProng_time_diff, &b_michelProng_time_diff);
    fChain->SetBranchAddress("muonVisibleE", &muonVisibleE, &b_muonVisibleE);
    fChain->SetBranchAddress("muon_phi", &muon_phi, &b_muon_phi);
    fChain->SetBranchAddress("muon_theta", &muon_theta, &b_muon_theta);

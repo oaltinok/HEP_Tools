@@ -141,6 +141,9 @@ void Muon::set_angleMuon(Particle &mu, bool isMC)
         angleMuon[i] = 0.0;
     }
     
+    // Silence Compiler Warning
+    (void)mu;
+    (void)isMC;   
 }
 
 void Muon::set_kineticEnergy(bool isMC)

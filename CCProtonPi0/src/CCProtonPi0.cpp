@@ -642,6 +642,10 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch( "n_vtx_michel_views", 0 );
     declareDoubleEventBranch( "vtx_michel_distance", -1.0);
     declareDoubleEventBranch( "endpoint_michel_distance", -1.0);
+    declareDoubleEventBranch( "michelProng_energy", -1.0);
+    declareDoubleEventBranch( "michelProng_time_diff", -1.0);
+    declareDoubleEventBranch( "michelProng_end_Z", -1.0);
+    declareDoubleEventBranch( "michelProng_begin_Z", -1.0);
     
     //! Event - Energy
     declareDoubleEventBranch( "muonVisibleE", -1.0 );
@@ -1146,8 +1150,12 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         event->setIntData("Cut_Vertex_Michel_Exist",1);
         event->setIntData("n_vtx_michel_views",vtx_michel_prong.getIntData("category"));
         event->setDoubleData("vtx_michel_distance",vtx_michel_prong.getDoubleData("distance"));
-        if( m_store_all_events ) return interpretFailEvent(event); 
-        else return StatusCode::SUCCESS; 
+        event->setDoubleData("michelProng_energy",vtx_michel_prong.getDoubleData("energy"));
+        event->setDoubleData("michelProng_time_diff",vtx_michel_prong.getDoubleData("time_diff"));
+        event->setDoubleData("michelProng_end_Z",vtx_michel_prong.getDoubleData("edz"));
+        event->setDoubleData("michelProng_begin_Z",vtx_michel_prong.getDoubleData("bgz"));
+//         if( m_store_all_events ) return interpretFailEvent(event); 
+//         else return StatusCode::SUCCESS; 
     }else{
         debug()<<"There are NO Vertex Michel Electrons in the event!"<<endmsg;
     }
@@ -1199,8 +1207,13 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
             debug()<<"Found an End Point Michel Electron!"<<endmsg;
             event->setIntData("Cut_EndPoint_Michel_Exist",1);
             event->setDoubleData("endpoint_michel_distance",michelProng.getDoubleData("distance"));
-            if( m_store_all_events ) return interpretFailEvent(event); 
-            else return StatusCode::SUCCESS; 
+            event->setDoubleData("michelProng_energy",michelProng.getDoubleData("energy"));
+            event->setDoubleData("michelProng_time_diff",michelProng.getDoubleData("time_diff"));
+            event->setDoubleData("michelProng_end_Z",michelProng.getDoubleData("edz"));
+            event->setDoubleData("michelProng_begin_Z",michelProng.getDoubleData("bgz"));
+
+//             if( m_store_all_events ) return interpretFailEvent(event); 
+//             else return StatusCode::SUCCESS; 
         }
         
         // Search for secondary Michels
@@ -1213,8 +1226,12 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
                 if (foundMichel) {
                     debug()<<"Found a Secondary End Point Michel Electron!"<<endmsg;
                     event->setIntData("Cut_secEndPoint_Michel_Exist",1);
-                    if( m_store_all_events ) return interpretFailEvent(event); 
-                    else return StatusCode::SUCCESS; 
+                    event->setDoubleData("michelProng_energy",michelProng.getDoubleData("energy"));
+                    event->setDoubleData("michelProng_time_diff",michelProng.getDoubleData("time_diff"));
+                    event->setDoubleData("michelProng_end_Z",michelProng.getDoubleData("edz"));
+                    event->setDoubleData("michelProng_begin_Z",michelProng.getDoubleData("bgz"));
+//                     if( m_store_all_events ) return interpretFailEvent(event); 
+//                     else return StatusCode::SUCCESS; 
                 }
             }
         }

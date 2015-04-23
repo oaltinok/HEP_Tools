@@ -1,12 +1,31 @@
-#ifndef initFunctions_cpp
-#define initFunctions_cpp
+/*
+    See Interaction.h header for Class Information
+*/
+#ifndef Interaction_cpp
+#define Interaction_cpp
 
-#include "Analyzer.h"
+#include "Interaction.h"
 
 using namespace std;
 
-void Analyzer::initHistograms()
-{      
+Interaction::Interaction(int nMode) : NTupleAnalysis(nMode)
+{
+    cout<<"Initializing Interaction"<<endl;
+    
+    rootDir = Folder_List::output + Folder_List::rootOut + branchDir + "Interaction.root";
+    
+    cout<<"\tRoot File: "<<rootDir<<endl;
+ 
+    // Create Root File 
+    f = new TFile(rootDir.c_str(),"RECREATE");
+    
+    initHistograms();
+  
+    cout<<"Done!"<<endl;
+}
+
+void Interaction::initHistograms()
+{
     status_Pi0 = new TH1D( "status_Pi0","Pi0 Status",binList.particleStatus.get_nBins(), binList.particleStatus.get_min(), binList.particleStatus.get_max() );
     status_Pi0->GetXaxis()->SetTitle("GENIE Status Codes");
     status_Pi0->GetYaxis()->SetTitle("N(Events)");
@@ -220,6 +239,50 @@ void Analyzer::initHistograms()
     total_E_neutrinoE->GetYaxis()->SetTitle("Neutrino Energy [GeV]");
     
     // Michel Study - Found Events by Vertex Michel Tool
+    michel_dist_reco_true = new TH2D( "michel_dist_reco_true","Michel Vertex Distance true vs reco",binList.michelMuon_end_dist_vtx.get_nBins(), binList.michelMuon_end_dist_vtx.get_min(), binList.michelMuon_end_dist_vtx.get_max(),binList.michelMuon_end_dist_vtx.get_nBins(), binList.michelMuon_end_dist_vtx.get_min(), binList.michelMuon_end_dist_vtx.get_max() );
+    michel_dist_reco_true->GetXaxis()->SetTitle("Reconstructed [mm]");
+    michel_dist_reco_true->GetYaxis()->SetTitle("True[mm]");
+    
+    trueMichel_dist_reco = new TH1D( "trueMichel_dist_reco","TRUE Michel Distance to Vertex (Reconstructed)",binList.michelMuon_end_dist_vtx.get_nBins(), binList.michelMuon_end_dist_vtx.get_min(), binList.michelMuon_end_dist_vtx.get_max() );
+    trueMichel_dist_reco->GetXaxis()->SetTitle("TRUE Michel Distance to Vertex (Reconstructed) [mm]");
+    trueMichel_dist_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.michelMuon_end_dist_vtx.get_width()));
+    
+    fakeMichel_dist_reco = new TH1D( "fakeMichel_dist_reco","FAKE Michel Distance to Vertex (Reconstructed)",binList.michelMuon_end_dist_vtx.get_nBins(), binList.michelMuon_end_dist_vtx.get_min(), binList.michelMuon_end_dist_vtx.get_max() );
+    fakeMichel_dist_reco->GetXaxis()->SetTitle("FAKE Michel Distance to Vertex (Reconstructed) [mm]");
+    fakeMichel_dist_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.michelMuon_end_dist_vtx.get_width()));
+    
+    trueMichel_energy = new TH1D( "trueMichel_energy","TRUE Michel Electron Energy",binList.michelMuon_P.get_nBins(), binList.michelMuon_P.get_min(), binList.michelMuon_P.get_max() );
+    trueMichel_energy->GetXaxis()->SetTitle("TRUE Michel Electron Energy [MeV]");
+    trueMichel_energy->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.michelMuon_P.get_width()));
+    
+    fakeMichel_energy = new TH1D( "fakeMichel_energy","FAKE Michel Electron Energy",binList.michelMuon_P.get_nBins(), binList.michelMuon_P.get_min(), binList.michelMuon_P.get_max() );
+    fakeMichel_energy->GetXaxis()->SetTitle("FAKE Michel Electron Energy [MeV]");
+    fakeMichel_energy->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.michelMuon_P.get_width()));
+    
+    trueMichel_end_Z = new TH1D( "trueMichel_end_Z","TRUE Michel Prong end Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+    trueMichel_end_Z->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
+    trueMichel_end_Z->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.vertex_z.get_width()));
+    
+    fakeMichel_end_Z = new TH1D( "fakeMichel_end_Z","FAKE Michel Prong end Z",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+    fakeMichel_end_Z->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
+    fakeMichel_end_Z->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.vertex_z.get_width()));
+    
+    trueMichel_time_diff = new TH1D( "trueMichel_time_diff","TRUE Michel Time Difference",binList.michel_time_diff.get_nBins(), binList.michel_time_diff.get_min(), binList.michel_time_diff.get_max() );
+    trueMichel_time_diff->GetXaxis()->SetTitle("TRUE Michel Time Difference");
+    trueMichel_time_diff->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.michel_time_diff.get_width()));    
+
+    fakeMichel_time_diff = new TH1D( "fakeMichel_time_diff","FAKE Michel Time Difference",binList.michel_time_diff.get_nBins(), binList.michel_time_diff.get_min(), binList.michel_time_diff.get_max() );
+    fakeMichel_time_diff->GetXaxis()->SetTitle("TRUE Michel Time Difference");
+    fakeMichel_time_diff->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.michel_time_diff.get_width()));
+   
+    trueMichel_end_Z_vtx_Z = new TH1D( "trueMichel_end_Z_vtx_Z","TRUE Michel Muon End Point Z - Vertex Z",binList.michelMuon_Z_vtx.get_nBins(), binList.michelMuon_Z_vtx.get_min(), binList.michelMuon_Z_vtx.get_max() );
+    trueMichel_end_Z_vtx_Z->GetXaxis()->SetTitle("Michel Muon End Point Z - Vertex Z");
+    trueMichel_end_Z_vtx_Z->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.michelMuon_Z_vtx.get_width()));
+    
+    fakeMichel_end_Z_vtx_Z = new TH1D( "fakeMichel_end_Z_vtx_Z","FAKE Michel Muon End Point Z - Vertex Z",binList.michelMuon_Z_vtx.get_nBins(), binList.michelMuon_Z_vtx.get_min(), binList.michelMuon_Z_vtx.get_max() );
+    fakeMichel_end_Z_vtx_Z->GetXaxis()->SetTitle("Michel Muon End Point Z - Vertex Z");
+    fakeMichel_end_Z_vtx_Z->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.michelMuon_Z_vtx.get_width()));    
+    
     N_michelElectrons = new TH1D( "N_michelElectrons","Number of Michel Electrons in an Event",binList.objectCount.get_nBins(), binList.objectCount.get_min(), binList.objectCount.get_max() );
     N_michelElectrons->GetXaxis()->SetTitle("Number of Michel Electrons");
     N_michelElectrons->GetYaxis()->SetTitle("N(Events)");
@@ -498,24 +561,13 @@ void Analyzer::initHistograms()
     hCut_deltaInvMass = new TH1D( "hCut_deltaInvMass","deltaInvMass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
     hCut_deltaInvMass->GetXaxis()->SetTitle("hCut_deltaInvMass");
     hCut_deltaInvMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.deltaInvMass.get_width()));
-     
+    
 }
 
-
-void Analyzer::initInteraction()
+void Interaction::write_RootFile()
 {
-    cout<<"Initializing Interaction"<<endl;
-    
-    rootDir = Folder_List::output + Folder_List::rootOut + branchDir + "Interaction.root";
-    
-    cout<<"\tRoot File: "<<rootDir<<endl;
- 
-    // Create Root File 
-    f = new TFile(rootDir.c_str(),"RECREATE");
-    
-    initHistograms();
-  
-    cout<<"Done!"<<endl;
+    cout<<">> Writing "<<rootDir<<endl;
+    f->Write();
 }
 
 
