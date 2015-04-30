@@ -21,8 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2015_04_15
-    Version:        v2_08
+    Last Revision:  2015_04_28
+    Version:        v2_09
     
 ================================================================================
 */
@@ -114,6 +114,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         double m_recoDownStreamZ;
         
         double m_beamAngleBias;
+        
+        double m_michelProngMinTimeDiff;
+        double m_michelProngMaxEnergy;  
         
         double m_detectableGammaE;
         double m_detectablePi0KE;

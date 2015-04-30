@@ -33,14 +33,21 @@ void Plotter::plotHistograms()
     
 }
 
-void Plotter::plotSignalRatio(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir) 
+void Plotter::plotSignalRatio(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir, bool isReversed) 
 {
     TH1D* h_ratio = new TH1D;
     
-    h_signal->Copy(*h_ratio);
-    
-    h_ratio->Divide(h_background);
-    h_ratio->GetYaxis()->SetTitle("Signal / Background");
+    if (isReversed){
+        h_background->Copy(*h_ratio);
+        
+        h_ratio->Divide(h_signal);
+        h_ratio->GetYaxis()->SetTitle("Background / Signal");
+    }else{
+        h_signal->Copy(*h_ratio);
+        
+        h_ratio->Divide(h_background);
+        h_ratio->GetYaxis()->SetTitle("Signal / Background");
+    }
     
     TCanvas* c1 = new TCanvas();
     h_ratio->SetLineColor(kBlack);
@@ -115,7 +122,8 @@ void Plotter::plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plo
 
 void Plotter::plotStacked(TH1D* h_signal, TH1D* h_background, 
                             string plotName, string fileName, string plotDir, 
-                            string signal_label, string background_label)
+                            string signal_label, string background_label,
+                            bool isRatioReversed)
 {
     TH1D* h_signalRatio = new TH1D;
     TH1D* h_backgroundRatio = new TH1D;
@@ -157,7 +165,7 @@ void Plotter::plotStacked(TH1D* h_signal, TH1D* h_background,
     delete c1;
     
     // Plot Signal Ratio
-    plotSignalRatio(h_signalRatio,h_backgroundRatio,fileName, plotDir);
+    plotSignalRatio(h_signalRatio,h_backgroundRatio,fileName, plotDir, isRatioReversed);
 
     delete h_signalRatio;
     delete h_backgroundRatio;

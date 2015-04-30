@@ -32,18 +32,22 @@ PROTONCPP = Classes/Proton/Proton.cpp
 PIONCPP = Classes/Pion/Pion.cpp
 ALLPARTICLESCPP = $(INTERACTIONCPP) $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP)
 
-# Other Helper Classes
+# Tools for Detailed Studies
 PIDTOOLCPP = Classes/PIDTool/PIDTool.cpp
 BACKGROUNDTOOLCPP = Classes/BackgroundTool/BackgroundTool.cpp
+MICHELTOOLCPP = Classes/MichelTool/MichelTool.cpp
+ALLTOOLCPP = $(PIDTOOLCPP) $(BACKGROUNDTOOLCPP) $(MICHELTOOLCPP)
+
+# Other Helper Classes
 BINLISTCPP = Classes/BinList/BinList.cpp
 CUTLISTCPP = Classes/CutList/CutList.cpp
 SINGLEBINCPP = Classes/SingleBin/SingleBin.cpp
 CUTCPP = Classes/Cut/Cut.cpp
 CUTSTATCPP = Classes/Cut/CutStat.cpp
-ALLOTHERCPP = $(PIDTOOLCPP) $(BACKGROUNDTOOLCPP) $(BINLISTCPP) $(SINGLEBINCPP) $(CUTLISTCPP) $(CUTCPP) $(CUTSTATCPP)
+ALLOTHERCPP = $(BINLISTCPP) $(SINGLEBINCPP) $(CUTLISTCPP) $(CUTCPP) $(CUTSTATCPP)
 
 # ALL Classes Required for the Package
-ALLCPP = $(MAINCPP) $(NTUPLEANALYSISCPP) $(ALLPLOTTERCPP) $(ANALYZERCPP) $(ALLPARTICLESCPP) $(ALLOTHERCPP)
+ALLCPP = $(MAINCPP) $(NTUPLEANALYSISCPP) $(ANALYZERCPP) $(ALLPARTICLESCPP) $(ALLTOOLCPP) $(ALLOTHERCPP) $(ALLPLOTTERCPP)
 
 # ------------------------------------------------------------------------------
 # Commands and Flags

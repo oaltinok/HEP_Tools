@@ -60,9 +60,10 @@ class Plotter
         void plot1D_HistLogScale(TH1D* hist1D, string fileName, string plotDir);
         void plotStacked(TH1D* h_signal, TH1D* h_background, 
                             string plotName, string fileName, string plotDir, 
-                            string signal_label = "Signal", string background_label = "Background");
+                            string signal_label = "Signal", string background_label = "Background",
+                            bool isRatioReversed = false);
         void plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
-        void plotSignalRatio(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir);
+        void plotSignalRatio(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir, bool isReversed = false);
         
         // Default Plots - File: Default_Plots.cpp
         void plotInteraction();

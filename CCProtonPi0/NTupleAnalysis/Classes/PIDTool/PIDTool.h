@@ -39,8 +39,6 @@ class PIDTool : public NTupleAnalysis
         void write_RootFile();
         
         // Histograms
-        TFile* f;
-        
         TH1D* purity_LLR;
         TH1D* efficiency_LLR;
         TH1D* purityXefficiency_LLR;
@@ -77,6 +75,7 @@ class PIDTool : public NTupleAnalysis
 
         
     private:
+        TFile* f;
         std::string rootDir;
         
         BinList binList;

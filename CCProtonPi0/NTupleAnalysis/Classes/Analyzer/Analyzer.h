@@ -13,7 +13,7 @@ Class: Analyzer
         > See run function Comments
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2015_04_22
+    Last Revision:  2015_04_29
 ================================================================================
 */
 
@@ -40,6 +40,7 @@ Class: Analyzer
 #include "../NTupleAnalysis/NTupleAnalysis.h"
 #include "../CutList/CutList.h"
 #include "../PIDTool/PIDTool.h"
+#include "../MichelTool/MichelTool.h"
 #include "../Interaction/Interaction.h"
 #include "../Muon/Muon.h"
 #include "../Proton/Proton.h"
@@ -63,6 +64,7 @@ class Analyzer : public NTupleAnalysis{
         //  Runtime and Analyzer Functions
         bool analyzeEvent();
         bool getCutStatistics();
+        bool KeepMichelEvent();
         void fillData();
         void specifyRunTime();
         void openTextFiles();
@@ -105,24 +107,13 @@ class Analyzer : public NTupleAnalysis{
         Pion pion;
         PIDTool pIDTool;
         BackgroundTool bckgTool;
+        MichelTool michelTool;
         CutList cutList;
         TVector3 beam_p3;
         
         // Michel Study
         bool isMichelStudy;
-        double N_trueMichel_before;
-        double N_trueMichel_after;
-        double N_trueMichel_afterAll;
-        double N_noMichel_before;
-        double N_noMichel_after;
-        double N_detectedMichel_true;
-        double N_detectedMichel_fake;
-        double N_missedMichel_true;
-        double N_missedMichel_fake;
-        double N_contained_detectedMichel_true;
-        double N_contained_detectedMichel_fake;
-        double N_contained_missedMichel_true;
-        double N_contained_missedMichel_fake;
+
         
         // Other Variables
         bool isScanRun;
@@ -131,6 +122,7 @@ class Analyzer : public NTupleAnalysis{
         bool is_pID_Studies;
         bool applyProtonScore;
         bool applyPhotonDistance;
+        bool applyOtherMichelCuts;
         bool applyBeamEnergy;
         bool applyUnusedE;
         bool writeFSParticleMomentum;
@@ -156,10 +148,12 @@ class Analyzer : public NTupleAnalysis{
         vector<double> PDG_pi0_GrandMother;
 
         // Files
+        string logFileName;
         string scanFileName;
         string failFile[nTopologies];
         ofstream failText[nTopologies];  
         ofstream roundupText;
+        ofstream logFile;
         ifstream DSTFileList;
 
         // -------------------------------------------------------------------------

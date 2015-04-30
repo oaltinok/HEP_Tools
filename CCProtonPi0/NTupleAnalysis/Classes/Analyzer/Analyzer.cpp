@@ -17,7 +17,8 @@ void Analyzer::specifyRunTime()
     isDataAnalysis  = false;
     isScanRun = false;
     is_pID_Studies  = false;
-    isMichelStudy = true;
+    isMichelStudy = false;
+    applyOtherMichelCuts = false;
     writeFSParticleMomentum = false;
     
     applyProtonScore = true;
@@ -42,20 +43,6 @@ void Analyzer::specifyRunTime()
     max_Delta_invMass = 200.0;
         
     latest_ScanID = 0.0;
-    
-    N_trueMichel_before = 0.0;
-    N_trueMichel_after = 0.0;
-    N_trueMichel_afterAll = 0.0;
-    N_noMichel_before = 0.0;
-    N_noMichel_after = 0.0;
-    N_detectedMichel_true = 0.0;
-    N_detectedMichel_fake = 0.0;
-    N_missedMichel_true = 0.0;
-    N_missedMichel_fake = 0.0;
-    N_contained_detectedMichel_true = 0.0;
-    N_contained_detectedMichel_fake = 0.0;
-    N_contained_missedMichel_true = 0.0;
-    N_contained_missedMichel_fake = 0.0;
     
     hasParticleTruthInfo = false;
     
@@ -104,6 +91,9 @@ void Analyzer::run(string playlist)
     fChain->SetBranchStatus("g1blob*",1);
     fChain->SetBranchStatus("g2blob*",1);
     fChain->SetBranchStatus("michel*",1);
+    fChain->SetBranchStatus("endpoint_michel_distance",1);
+    
+    
     
     //------------------------------------------------------------------------
     // Loop over Chain
@@ -174,21 +164,6 @@ void Analyzer::run(string playlist)
 
     } // end for-loop
     
-    cout<<"N_trueMichel_before = "<<N_trueMichel_before<<endl;
-    cout<<"N_trueMichel_after  = "<<N_trueMichel_after <<endl;
-    cout<<"N_trueMichel_afterAll = "<<N_trueMichel_afterAll<<endl;
-    cout<<"N_noMichel_before = "<<N_noMichel_before<<endl;
-    cout<<"N_noMichel_after  = "<<N_noMichel_after <<endl;
-    cout<<endl;
-    cout<<"N_detectedMichel_true = "<<N_detectedMichel_true<<endl;
-    cout<<"N_detectedMichel_fake = "<<N_detectedMichel_fake<<endl;
-    cout<<"N_missedMichel_true = "<<N_missedMichel_true<<endl;
-    cout<<"N_missedMichel_fake = "<<N_missedMichel_fake<<endl;
-    cout<<endl;
-    cout<<"N_contained_detectedMichel_true = "<<N_contained_detectedMichel_true<<endl;
-    cout<<"N_contained_detectedMichel_fake = "<<N_contained_detectedMichel_fake<<endl;
-    cout<<"N_contained_missedMichel_true = "<<N_contained_missedMichel_true<<endl;
-    cout<<"N_contained_missedMichel_fake = "<<N_contained_missedMichel_fake<<endl;
     
     //--------------------------------------------------------------------------
     // Studies
@@ -210,6 +185,7 @@ void Analyzer::run(string playlist)
     proton.write_RootFile();
     pion.write_RootFile();
     if(is_pID_Studies) pIDTool.write_RootFile();
+    if(isMichelStudy) michelTool.write_RootFile();
     
     
 }
@@ -225,6 +201,7 @@ Analyzer::Analyzer(int nMode) :
     pion(nMode),
     pIDTool(nMode),
     bckgTool(nMode),
+    michelTool(nMode),
     cutList(nMode)
 {    
     openTextFiles();
@@ -435,9 +412,8 @@ bool Analyzer::getCutStatistics()
         Assign the selection to parameters study1 and study2
         Cut Objects will count them and print them in the Cut Table
     */
-    bool michelFound_Vertex = false;
-    bool michelFound_Track = false;
-    bool michelFound_Track2 = false;
+
+    
     // Study 1 - Detected Michels
     // Study 2 - Missed Michels
     
@@ -493,10 +469,6 @@ bool Analyzer::getCutStatistics()
     if (nProngs == 1) cutList.nCut_1Prong_Muon_Charge.increment(truth_isSignal, study1, study2);
     if (nProngs == 2) cutList.nCut_2Prong_Muon_Charge.increment(truth_isSignal, study1, study2);
     
-    // Cout Events before Michel Selections
-    if(truth_isBckg_withMichel) N_trueMichel_before++;
-    else N_noMichel_before++;
-    
     // Fill  hCut_Michel
     if (nProngs == 1){
         if( Cut_Vertex_Michel_Exist == 1 || Cut_EndPoint_Michel_Exist == 1 || Cut_secEndPoint_Michel_Exist == 1 ){
@@ -513,79 +485,59 @@ bool Analyzer::getCutStatistics()
     }
     
     if( Cut_Vertex_Michel_Exist == 1){
-        if(isMichelStudy) michelFound_Vertex = true;
-        else return false;
+        if( !isMichelStudy ) return false;
     }
     if (nProngs == 1) cutList.nCut_1Prong_Vertex_Michel_Exist.increment(truth_isSignal, study1, study2);
     if (nProngs == 2) cutList.nCut_2Prong_Vertex_Michel_Exist.increment(truth_isSignal, study1, study2);
     
     if( Cut_EndPoint_Michel_Exist == 1){
-        if(isMichelStudy) michelFound_Track = true;
-        else return false;
+        if( !isMichelStudy ) return false;
     }
     if (nProngs == 1) cutList.nCut_1Prong_EndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
     if (nProngs == 2) cutList.nCut_2Prong_EndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
     
     if( Cut_secEndPoint_Michel_Exist == 1){
-        if(isMichelStudy) michelFound_Track2 = true;
-        else return false;
+        if( !isMichelStudy ) return false;
     }  
     if (nProngs == 1) cutList.nCut_1Prong_secEndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
     if (nProngs == 2) cutList.nCut_2Prong_secEndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
     
-    bool isMichelFound = michelFound_Vertex || michelFound_Track || michelFound_Track2;
     
+    bool isMichelFound =    (Cut_Vertex_Michel_Exist == 1) || 
+                            (Cut_EndPoint_Michel_Exist == 1) ||
+                            (Cut_secEndPoint_Michel_Exist == 1);
     
-    if(isMichelFound){
-        if(truth_isBckg_withMichel) N_detectedMichel_true++;
-        else N_detectedMichel_fake++;  
-    }else{
-        if(truth_isBckg_withMichel) N_missedMichel_true++;
-        else N_missedMichel_fake++; 
+    // Apply Other Michel Cuts if michelFound
+    // If KeepMichelEvent() Returns False --> Cut the Event
+    if(isMichelStudy && (applyOtherMichelCuts && isMichelFound) ){ 
+        if( !KeepMichelEvent() ) return false;
     }
     
-    if(isMichelFound && michelProng_end_Z != -1){
+    // Save Found Michel Information
+    if(isMichelStudy && isMichelFound){
         if (truth_isBckg_withMichel){ 
-            interaction.trueMichel_dist_reco->Fill(vtx_michel_distance);
-            interaction.trueMichel_end_Z->Fill(michelProng_end_Z);
-            interaction.trueMichel_end_Z_vtx_Z->Fill(michelProng_end_Z-CCProtonPi0_vtx_z);
-            interaction.trueMichel_energy->Fill(michelProng_energy);
-            interaction.trueMichel_time_diff->Fill(michelProng_time_diff);
+            if (Cut_Vertex_Michel_Exist == 1 ) michelTool.trueMichel_dist_vtx->Fill(vtx_michel_distance);
+            if (Cut_Vertex_Michel_Exist == 1 ) michelTool.trueMichel_end_Z_vtx_Z->Fill(michelProng_end_Z-CCProtonPi0_vtx_z);
+            if (Cut_EndPoint_Michel_Exist == 1) michelTool.trueMichel_dist_end_point->Fill(endpoint_michel_distance);
+            
+            michelTool.trueMichel_end_Z->Fill(michelProng_end_Z);
+            michelTool.trueMichel_energy->Fill(michelProng_energy);
+            michelTool.trueMichel_time_diff->Fill(michelProng_time_diff);
         }
         else{
-            interaction.fakeMichel_dist_reco->Fill(vtx_michel_distance);
-            interaction.fakeMichel_end_Z->Fill(michelProng_end_Z);
-            interaction.fakeMichel_end_Z_vtx_Z->Fill(michelProng_end_Z-CCProtonPi0_vtx_z);
-            interaction.fakeMichel_energy->Fill(michelProng_energy);
-            interaction.fakeMichel_time_diff->Fill(michelProng_time_diff);
+            if (Cut_Vertex_Michel_Exist == 1 ) michelTool.fakeMichel_dist_vtx->Fill(vtx_michel_distance);
+            if (Cut_Vertex_Michel_Exist == 1 ) michelTool.fakeMichel_end_Z_vtx_Z->Fill(michelProng_end_Z-CCProtonPi0_vtx_z);
+            if (Cut_EndPoint_Michel_Exist == 1) michelTool.fakeMichel_dist_end_point->Fill(endpoint_michel_distance);
+            
+            michelTool.fakeMichel_end_Z->Fill(michelProng_end_Z);
+            michelTool.fakeMichel_energy->Fill(michelProng_energy);
+            michelTool.fakeMichel_time_diff->Fill(michelProng_time_diff);
         }
     }
     
-//     if(truth_isBckg_withMichel && isMichelFound){
-//         double minZDist = -200.0;
-//         double maxZDist = 200.0;
-//         double michelMuon_Zdist = truth_michelMuon_endPoint[2]-CCProtonPi0_vtx_z;
-//         if(vtx_michel_distance != -1){
-//             michel_dist_reco_true->Fill(vtx_michel_distance,truth_michelMuon_end_dist_vtx);
-//             
-// //         cout<<"vtx_michel_distance = "<<vtx_michel_distance<<" truth_michelMuon_end_dist_vtx = "<<truth_michelMuon_end_dist_vtx<<endl;
-//         }
-//         if(michelMuon_Zdist > minZDist && michelMuon_Zdist < maxZDist){
-//             return false;
-//         }
-//     }
+    // Cut Events with Michel after the Study
+    if (isMichelStudy && isMichelFound) return false;
     
-    if (isMichelFound){
-            if(truth_isBckg_withMichel) N_contained_detectedMichel_true++;
-            else N_contained_detectedMichel_fake++;  
-        }else{
-            if(truth_isBckg_withMichel) N_contained_missedMichel_true++;
-            else N_contained_missedMichel_fake++; 
-    }
-    
-    
-    if(truth_isBckg_withMichel) N_trueMichel_after++;
-    else N_noMichel_after++;
        
     // Fill PreFilter Plots
     if (nProngs == 1){
@@ -664,12 +616,6 @@ bool Analyzer::getCutStatistics()
         cutList.nCut_2Prong_DeltaInvMass.increment(truth_isSignal, study1, study2);
     }
     
-    //==========================================================================
-    //
-    // Analysis Cuts - Improves Purity Dramatically
-    //
-    //==========================================================================
-    
     if(nProngs == 1) interaction.hCut_1Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E * HEP_Functions::MeV_to_GeV);
     if(nProngs == 2) interaction.hCut_2Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E * HEP_Functions::MeV_to_GeV);
     if( applyBeamEnergy && ((CCProtonPi0_neutrino_E * HEP_Functions::MeV_to_GeV) > max_beamEnergy)) return false;
@@ -688,38 +634,33 @@ bool Analyzer::getCutStatistics()
     //      Save information for events have true michel which are failed 
     //          to be found with Michel Tool
     // -------------------------------------------------------------------------
-    if(truth_isBckg_withMichel){ 
-        if(truth_michelMuon_end_dist_vtx > 200){
-            if(isScanRun) writeScanFile();
-        }
-        
+    if(isMichelStudy && truth_isBckg_withMichel){         
         int ind;
         
-        if(michelFound_Vertex) ind = 0;
-        else if(michelFound_Track) ind = 1;
-        else if(michelFound_Track2) ind = 2;
+        if(Cut_Vertex_Michel_Exist == 1) ind = 0;
+        else if(Cut_EndPoint_Michel_Exist == 1) ind = 1;
+        else if(Cut_secEndPoint_Michel_Exist == 1) ind = 2;
         else ind = 3;
 
-        interaction.N_michelElectrons->Fill(truth_N_trueMichelElectrons);
+        michelTool.N_michelElectrons->Fill(truth_N_trueMichelElectrons);
         // All Found Events
-        if(michelFound_Vertex || michelFound_Track || michelFound_Track2 ){
-            interaction.michelElectron_E[4]->Fill(truth_michelElectron_E);  
+        if(Cut_Vertex_Michel_Exist == 1 || Cut_EndPoint_Michel_Exist == 1 || Cut_secEndPoint_Michel_Exist == 1 ){
+            michelTool.michelElectron_E[4]->Fill(truth_michelElectron_E);  
         }
-        interaction.michelElectron_E[ind]->Fill(truth_michelElectron_E);
-        interaction.michelMuon_X_Y[ind]->Fill(truth_michelMuon_endPoint[0],truth_michelMuon_endPoint[1]);
-        interaction.michelMuon_Z[ind]->Fill(truth_michelMuon_endPoint[2]);
-        interaction.michelMuon_Z_vtx[ind]->Fill(truth_michelMuon_endPoint[2]-mc_vtx[2]);
-        interaction.michelMuon_P[ind]->Fill(truth_michelMuon_P);
-        interaction.michelMuon_end_dist_vtx[ind]->Fill(truth_michelMuon_end_dist_vtx);
-        interaction.michelMuon_length[ind]->Fill(truth_michelMuon_length);
-        interaction.michelPion_P[ind]->Fill(truth_michelPion_P);
-        interaction.michelPion_begin_dist_vtx[ind]->Fill(truth_michelPion_begin_dist_vtx);
-        interaction.michelPion_length[ind]->Fill(truth_michelPion_length); 
-        interaction.michelMuon_dist_michelPion_length[ind]->Fill(truth_michelMuon_end_dist_vtx,truth_michelPion_length);
+        michelTool.michelElectron_E[ind]->Fill(truth_michelElectron_E);
+        michelTool.michelMuon_X_Y[ind]->Fill(truth_michelMuon_endPoint[0],truth_michelMuon_endPoint[1]);
+        michelTool.michelMuon_Z[ind]->Fill(truth_michelMuon_endPoint[2]);
+        michelTool.michelMuon_Z_vtx[ind]->Fill(truth_michelMuon_endPoint[2]-mc_vtx[2]);
+        michelTool.michelMuon_P[ind]->Fill(truth_michelMuon_P);
+        michelTool.michelMuon_end_dist_vtx[ind]->Fill(truth_michelMuon_end_dist_vtx);
+        michelTool.michelMuon_length[ind]->Fill(truth_michelMuon_length);
+        michelTool.michelPion_P[ind]->Fill(truth_michelPion_P);
+        michelTool.michelPion_begin_dist_vtx[ind]->Fill(truth_michelPion_begin_dist_vtx);
+        michelTool.michelPion_length[ind]->Fill(truth_michelPion_length); 
+        michelTool.michelMuon_dist_michelPion_length[ind]->Fill(truth_michelMuon_end_dist_vtx,truth_michelPion_length);
 
     } 
     
-    if(truth_isBckg_withMichel) N_trueMichel_afterAll++;
     return true;
     
 }
@@ -731,6 +672,25 @@ void Analyzer::fill_mc_w()
     if(mc_intType == 3) interaction.mc_w_DIS->Fill(mc_w * HEP_Functions::MeV_to_GeV);
 }
 
+/*
+    pre:
+        Event with detected Michel by the Tool
+    
+    Applies series of other selections to save some Events
+*/
+bool Analyzer::KeepMichelEvent()
+{
+    // Apply Time Difference Cut - Save Events with Short time Difference
+     double maxTimeDiff = 300.0;
+     if(michelProng_time_diff < maxTimeDiff){ 
+        // Apply Energy Cut
+        if(michelProng_energy > 100) return true;  
+     }
+    
+    // Event did not satisfied any of the conditions - will not Keep the Event
+    return false;
+    
+}
 
 void Analyzer::fillInteractionTrue()
 {
@@ -838,6 +798,8 @@ void Analyzer::fillHistograms()
 
 void Analyzer::closeTextFiles()
 {
+    logFile.close();
+    
     if(isScanRun){
         roundupText.close();
         DSTFileList.close();
@@ -851,6 +813,15 @@ void Analyzer::closeTextFiles()
 void Analyzer::openTextFiles()
 {
     cout<<"Opening Text Files:"<<endl;
+    
+    logFileName = Folder_List::output + Folder_List::textOut + branchDir + "LogFile.txt";
+    logFile.open(logFileName.c_str());
+    if( !logFile.is_open() ){
+        cerr<<"Cannot open output text file: "<<logFileName<<endl;
+        exit(EXIT_FAILURE);    
+    }else{
+        cout<<"\t"<<logFileName<<endl;
+    }
     
     // Open Fail-Check Files
     failFile[0] = Folder_List::output + Folder_List::textOut + branchDir + "FailChecks_1Prong.txt";

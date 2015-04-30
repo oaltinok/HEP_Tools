@@ -52,10 +52,8 @@ using namespace std;
 
 int main(int argc, char *argv[] )
 {
-
-    clock_t timeStart;
-    timeStart = clock();
-    clock_t timeEnd;
+    time_t timeStart; time(&timeStart);
+    time_t timeEnd;
     double timeDiff;
     int timeDiff_m;
     int timeDiff_s;
@@ -106,15 +104,14 @@ int main(int argc, char *argv[] )
         }else if(isPlaylist){
             t.run("Input/Playlists/pl_MC_minerva13C.dat");
         }else{
-            t.run("Input/Playlists/pl_MC_Run2.dat");
+            t.run("Input/Playlists/pl_MC_Run_v2_09_AdvancedTracker.dat");
         }
     }
     
     
-    timeEnd = clock();
-    timeDiff = ( timeEnd - timeStart ) / (double)CLOCKS_PER_SEC;
+    time(&timeEnd);
+    timeDiff = ( timeEnd - timeStart );
     
-
     timeDiff_m = (int)timeDiff / 60;
     timeDiff_s = (int)timeDiff % 60;
     

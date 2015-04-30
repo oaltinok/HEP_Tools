@@ -108,36 +108,42 @@ void Plotter::plotMichel()
     TH1D* h_N_michelElectrons = (TH1D*)f_Root->Get("N_michelElectrons");
     plot1D_Hist(h_N_michelElectrons,"N_michelElectrons.png",otherDir);
     
-    TH1D* h_trueMichel_dist_reco = (TH1D*)f_Root->Get("trueMichel_dist_reco");
-    TH1D* h_fakeMichel_dist_reco = (TH1D*)f_Root->Get("fakeMichel_dist_reco");
-//     plot1D_Hist(h_trueMichel_dist_reco,"trueMichel_dist_reco.png",otherDir);  
-//     plot1D_Hist(h_fakeMichel_dist_reco,"fakeMichel_dist_reco.png",otherDir);
-    plotStacked(h_trueMichel_dist_reco, h_fakeMichel_dist_reco,"Michel Distance to Vertex", "Michel_dist_reco.png", otherDir);
-
+    TH1D* h_trueMichel_dist_vtx = (TH1D*)f_Root->Get("trueMichel_dist_vtx");
+    TH1D* h_fakeMichel_dist_vtx = (TH1D*)f_Root->Get("fakeMichel_dist_vtx");
+    plotStacked(h_fakeMichel_dist_vtx, h_trueMichel_dist_vtx,"Michel Distance to Vertex", "Michel_dist_vtx.png", otherDir,"NO Michel", "TRUE Michel");
+//     plot1D_Hist(h_trueMichel_dist_vtx,"trueMichel_dist_vtx.png",otherDir); 
+//     plot1D_Hist(h_fakeMichel_dist_vtx,"fakeMichel_dist_vtx.png",otherDir);
+    
+    TH1D* h_trueMichel_dist_end_point = (TH1D*)f_Root->Get("trueMichel_dist_end_point");
+    TH1D* h_fakeMichel_dist_end_point = (TH1D*)f_Root->Get("fakeMichel_dist_end_point");
+    plotStacked(h_fakeMichel_dist_end_point, h_trueMichel_dist_end_point,"Michel Distance to End Point", "Michel_dist_end_point.png", otherDir,"NO Michel", "TRUE Michel");
+//     plot1D_Hist(h_trueMichel_dist_end_point,"trueMichel_dist_end_pointo.png",otherDir);  
+//     plot1D_Hist(h_fakeMichel_dist_end_point,"fakeMichel_dist_end_point.png",otherDir);
+    
     TH1D* h_trueMichel_end_Z = (TH1D*)f_Root->Get("trueMichel_end_Z");
     TH1D* h_fakeMichel_end_Z = (TH1D*)f_Root->Get("fakeMichel_end_Z");
+    plotStacked(h_fakeMichel_end_Z, h_trueMichel_end_Z,"Michel Prong End Z [mm]", "Michel_end_Z.png", otherDir,"NO Michel", "TRUE Michel");
 //     plot1D_Hist(h_trueMichel_end_Z,"trueMichel_end_Z.png",otherDir);  
 //     plot1D_Hist(h_fakeMichel_end_Z,"fakeMichel_end_Z.png",otherDir);
-    plotStacked(h_trueMichel_end_Z, h_fakeMichel_end_Z,"Michel Prong End Z [mm]", "Michel_end_Z.png", otherDir);
     
     TH1D* h_trueMichel_energy = (TH1D*)f_Root->Get("trueMichel_energy");
     TH1D* h_fakeMichel_energy = (TH1D*)f_Root->Get("fakeMichel_energy");
+    plotStacked(h_fakeMichel_energy, h_trueMichel_energy,"Michel Prong Energy", "Michel_energy.png", otherDir,"NO Michel", "TRUE Michel");
 //     plot1D_Hist(h_trueMichel_energy,"trueMichel_energy.png",otherDir);  
 //     plot1D_Hist(h_fakeMichel_energy,"fakeMichel_energy.png",otherDir);
-    plotStacked(h_trueMichel_energy, h_fakeMichel_energy,"Michel Prong Energy", "Michel_energy.png", otherDir);
-    
+     
     TH1D* h_trueMichel_time_diff = (TH1D*)f_Root->Get("trueMichel_time_diff");
     TH1D* h_fakeMichel_time_diff = (TH1D*)f_Root->Get("fakeMichel_time_diff");
+    plotStacked(h_fakeMichel_time_diff, h_trueMichel_time_diff,"Michel Time Difference", "Michel_time_diff.png", otherDir,"NO Michel", "TRUE Michel");  
 //     plot1D_Hist(h_trueMichel_time_diff,"trueMichel_time_diff.png",otherDir);  
 //     plot1D_Hist(h_fakeMichel_time_diff,"fakeMichel_time_diff.png",otherDir);
-    plotStacked(h_trueMichel_time_diff, h_fakeMichel_time_diff,"Michel Time Difference", "Michel_time_diff.png", otherDir);    
 
+    
     TH1D* h_trueMichel_end_Z_vtx_Z = (TH1D*)f_Root->Get("trueMichel_end_Z_vtx_Z");
     TH1D* h_fakeMichel_end_Z_vtx_Z = (TH1D*)f_Root->Get("fakeMichel_end_Z_vtx_Z");
+    plotStacked(h_fakeMichel_end_Z_vtx_Z, h_trueMichel_end_Z_vtx_Z,"Michel Z - Vertex Z", "Michel_end_Z_vtx_Z.png", otherDir,"NO Michel", "TRUE Michel");
 //     plot1D_Hist(h_trueMichel_end_Z_vtx_Z,"trueMichel_end_Z_vtx_Z.png",otherDir);  
 //     plot1D_Hist(h_fakeMichel_end_Z_vtx_Z,"fakeMichel_end_Z_vtx_Z.png",otherDir);
-    plotStacked(h_trueMichel_end_Z_vtx_Z, h_fakeMichel_end_Z_vtx_Z,"Michel Z - Vertex Z", "Michel_end_Z_vtx_Z.png", otherDir); 
-
     
  /*   
     TH1D* h_vertex_michelElectron_E = (TH1D*)f_Root->Get("vertex_michelElectron_E");

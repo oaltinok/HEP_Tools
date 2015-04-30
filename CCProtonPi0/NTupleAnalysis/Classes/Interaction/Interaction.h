@@ -9,7 +9,7 @@ Class: Interaction
             Study Histograms - Temporary (after the study will be removed)
                 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_04_22
+    Last Revision: 2015_04_29
 ================================================================================
 */
 #ifndef Interaction_h
@@ -104,34 +104,7 @@ class Interaction : public NTupleAnalysis
         TH1D* total_E;
         TH2D* total_E_neutrinoE;
         
-        // Michel Study
-        TH1D* N_michelElectrons;
-        TH1D* michelMuon_P[4];
-        TH1D* michelMuon_end_dist_vtx[4];
-        TH1D* michelMuon_length[4];
-        TH1D* michelMuon_Z[4];
-        TH2D* michelMuon_X_Y[4];
-        TH1D* michelMuon_Z_vtx[4];
-        TH1D* michelPion_P[4];
-        TH1D* michelPion_begin_dist_vtx[4];
-        TH1D* michelPion_length[4];
-        TH1D* michelElectron_E[5];
-        TH2D* michelPion_length_dist_vtx[4];
-        TH2D* michelMuon_dist_michelPion_length[4];
-        TH2D* michel_dist_reco_true;
-        
-        TH1D* trueMichel_dist_reco;
-        TH1D* fakeMichel_dist_reco;
-        TH1D* trueMichel_end_Z;
-        TH1D* fakeMichel_end_Z;
-        TH1D* trueMichel_end_Z_vtx_Z;
-        TH1D* fakeMichel_end_Z_vtx_Z;
-        TH1D* trueMichel_energy;
-        TH1D* fakeMichel_energy;
-        TH1D* trueMichel_time_diff;
-        TH1D* fakeMichel_time_diff;
 
-        
         // -------------------------------------------------------------------------
         // Cut Histograms
         // -------------------------------------------------------------------------

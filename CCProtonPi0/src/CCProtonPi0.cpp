@@ -259,6 +259,9 @@ StatusCode CCProtonPi0::initialize()
     N_tagTruth = 0;
     N_reconstructEvent = 0;
     
+    m_michelProngMinTimeDiff    = 300;  // ns
+    m_michelProngMaxEnergy      = 100;  // MeV
+    
     m_detectableGammaE      = 0;        // MeV
     m_detectablePi0KE       = 0;        // MeV
     m_detectableProtonKE    = 120;      // MeV
@@ -1147,15 +1150,27 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     bool foundMichel = m_michelVtxTool->findMichel( m_PrimaryVertex, vtx_michel_prong );
     if (foundMichel) {
         debug()<<"Found a Michel Electron!"<<endmsg;
-        event->setIntData("Cut_Vertex_Michel_Exist",1);
+        
+        // Fill Michel Prong Info
+        double michelEnergy = vtx_michel_prong.getDoubleData("energy");
+        double michelTimeDiff = vtx_michel_prong.getDoubleData("time_diff");
+        
         event->setIntData("n_vtx_michel_views",vtx_michel_prong.getIntData("category"));
         event->setDoubleData("vtx_michel_distance",vtx_michel_prong.getDoubleData("distance"));
-        event->setDoubleData("michelProng_energy",vtx_michel_prong.getDoubleData("energy"));
-        event->setDoubleData("michelProng_time_diff",vtx_michel_prong.getDoubleData("time_diff"));
+        event->setDoubleData("michelProng_energy",michelEnergy);
+        event->setDoubleData("michelProng_time_diff",michelTimeDiff);
         event->setDoubleData("michelProng_end_Z",vtx_michel_prong.getDoubleData("edz"));
         event->setDoubleData("michelProng_begin_Z",vtx_michel_prong.getDoubleData("bgz"));
-//         if( m_store_all_events ) return interpretFailEvent(event); 
-//         else return StatusCode::SUCCESS; 
+        
+        // Apply Michel Selections - Save Some Events
+        // Saving Events with Short Time Diff AND High Energy
+        if ( michelTimeDiff < m_michelProngMinTimeDiff && michelEnergy > m_michelProngMaxEnergy  ){
+            debug()<<"Saved Event with Time Diff = "<<michelTimeDiff<<" Energy = "<<michelEnergy<<endmsg;
+        }else{
+            event->setIntData("Cut_Vertex_Michel_Exist",1);
+            if( m_store_all_events ) return interpretFailEvent(event); 
+            else return StatusCode::SUCCESS; 
+        }
     }else{
         debug()<<"There are NO Vertex Michel Electrons in the event!"<<endmsg;
     }
@@ -1205,15 +1220,26 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
 
         if (foundMichel){
             debug()<<"Found an End Point Michel Electron!"<<endmsg;
-            event->setIntData("Cut_EndPoint_Michel_Exist",1);
+                
+            // Fill Michel Prong Info
+            double michelEnergy = michelProng.getDoubleData("energy");
+            double michelTimeDiff = michelProng.getDoubleData("time_diff");
+            
             event->setDoubleData("endpoint_michel_distance",michelProng.getDoubleData("distance"));
-            event->setDoubleData("michelProng_energy",michelProng.getDoubleData("energy"));
-            event->setDoubleData("michelProng_time_diff",michelProng.getDoubleData("time_diff"));
+            event->setDoubleData("michelProng_energy",michelEnergy);
+            event->setDoubleData("michelProng_time_diff",michelTimeDiff);
             event->setDoubleData("michelProng_end_Z",michelProng.getDoubleData("edz"));
             event->setDoubleData("michelProng_begin_Z",michelProng.getDoubleData("bgz"));
 
-//             if( m_store_all_events ) return interpretFailEvent(event); 
-//             else return StatusCode::SUCCESS; 
+            // Apply Michel Selections - Save Some Events
+            // Saving Events with Short Time Diff AND High Energy
+            if ( michelTimeDiff < m_michelProngMinTimeDiff && michelEnergy > m_michelProngMaxEnergy  ){
+                debug()<<"Saved Event with Time Diff = "<<michelTimeDiff<<" Energy = "<<michelEnergy<<endmsg;
+            }else{
+                event->setIntData("Cut_EndPoint_Michel_Exist",1);
+                if( m_store_all_events ) return interpretFailEvent(event); 
+                else return StatusCode::SUCCESS; 
+            }
         }
         
         // Search for secondary Michels
@@ -1225,13 +1251,26 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
                 foundMichel = m_michelTrkTool->findMichel( current_end_vtx, michelProng);
                 if (foundMichel) {
                     debug()<<"Found a Secondary End Point Michel Electron!"<<endmsg;
-                    event->setIntData("Cut_secEndPoint_Michel_Exist",1);
-                    event->setDoubleData("michelProng_energy",michelProng.getDoubleData("energy"));
-                    event->setDoubleData("michelProng_time_diff",michelProng.getDoubleData("time_diff"));
+                    
+                    // Fill Michel Prong Info
+                    double michelEnergy = michelProng.getDoubleData("energy");
+                    double michelTimeDiff = michelProng.getDoubleData("time_diff");
+                    
+                    event->setDoubleData("endpoint_michel_distance",michelProng.getDoubleData("distance"));
+                    event->setDoubleData("michelProng_energy",michelEnergy);
+                    event->setDoubleData("michelProng_time_diff",michelTimeDiff);
                     event->setDoubleData("michelProng_end_Z",michelProng.getDoubleData("edz"));
                     event->setDoubleData("michelProng_begin_Z",michelProng.getDoubleData("bgz"));
-//                     if( m_store_all_events ) return interpretFailEvent(event); 
-//                     else return StatusCode::SUCCESS; 
+                    
+                    // Apply Michel Selections - Save Some Events
+                    // Saving Events with Short Time Diff AND High Energy
+                    if ( michelTimeDiff < m_michelProngMinTimeDiff && michelEnergy > m_michelProngMaxEnergy  ){
+                        debug()<<"Saved Event with Time Diff = "<<michelTimeDiff<<" Energy = "<<michelEnergy<<endmsg;
+                    }else{
+                        event->setIntData("Cut_secEndPoint_Michel_Exist",1);
+                        if( m_store_all_events ) return interpretFailEvent(event); 
+                        else return StatusCode::SUCCESS; 
+                    }
                 }
             }
         }
@@ -4930,8 +4969,8 @@ bool CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event) const
     // Visible Energy Limits for the PreFilter [MeV]
     // Other = Tracker + ECAL + HCAL
     const double max_Evis_Target = 20;
-    const double min_Evis_Other = 80;   // energy smaller than 80*1.2 Mev must be ignored
-    const double max_Evis_Other = 2000; // energy bigger than 1.7*1.2 GeV must be ignored
+    const double min_Evis_Other = 50; // energy smaller than  50 Mev must be ignored - Can't be a Pi0
+    const double max_Evis_Other = 2500; // energy bigger than 2500 MeV must be ignored - DIS Events
     
     const double inter_mod_z   = 45.0; // From geometry spreadsheet
     const double inter_plane_z = inter_mod_z/2.0;

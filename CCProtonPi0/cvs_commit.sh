@@ -1,19 +1,21 @@
-cvs commit -m "v2_08
+cvs commit -m "v2_09
 
 CCProtonPi0 Updates:
-    Michel Tool
-        New Parameters for Detected Michel Prongs
-    Removed readme file from doc/
+    Improved Job Submission Script Located: /CCProtonPi0/NTupleAnalysis/Input/
+        Job Submission  for Odd and Even Run Numbers 
+        
+    Implemented selection mechanism for Found Michel Prongs
+        Save Events with Short time difference AND High michel prong energy
+        
+    Updated PreFilter() Function Parameters
+        Unused Energy in Tracker + ECAL + HCAL = [80,2000] --- > [50,2000]
+
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-    Wextra Added to the MakeFile
-        Fixed all warnings due to Wextra
-    New Class: Interaction
-        Removed Interaction specific variables and functions from Analyzer 
-            and created Interaction Class
-    Major Revision of Analyzer Class
-        Combined All implementations files under single file Analyzer.cpp
-        Removed Unused functions and variables
-    Revised Plotter Class
-        Modified Function Calls
-        Removed Unused parameters" .
+    Added Log File Functionality
+        Instead of cout, using Log File for debugging purposes
+    Fixed Timing of the Package
+        Was using clock(), replaced it with time()
+    New Class: MichelTool - For Michel Studies
+        Collected all Histograms and Counters under MichelTool Class
+        Analyzer fills MichelTool Histograms" .
