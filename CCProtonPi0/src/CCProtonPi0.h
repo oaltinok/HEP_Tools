@@ -21,8 +21,8 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2015_04_28
-    Version:        v2_09
+    Last Revision:  2015_05_01
+    Version:        v2_10
     
 ================================================================================
 */
@@ -152,6 +152,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int m_Color_unattachedProng;
         int m_Color_Gamma1Prong;
         int m_Color_Gamma2Prong;
+        int m_Color_GammaOtherProng;
         int m_Color_clusterUnused;
         int m_Color_clusterUsed;
         int m_Color_VertexFila;
@@ -251,7 +252,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool tagSignal(Minerva::GenMinInteraction* truthEvent) const;
         void tagBackground(Minerva::GenMinInteraction* truthEvent) const;
         bool isBackgroundQELike(Minerva::GenMinInteraction* truthEvent) const;
-        void setSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
+        void SetSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
         void setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const;
         void writeBackgroundType(Minerva::GenMinInteraction* truthEvent) const;
         void writeFSParticleTable(bool isSignal) const;

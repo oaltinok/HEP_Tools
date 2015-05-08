@@ -4,8 +4,8 @@ main.cpp
     Main Function that controls the Analysis Package
     
     Classes Used:
-        Analyzer core class for the package
-        Plotter class includes functions specific to generate Plots
+        CCProtonPi0_Analyzer core class for the package
+        CCProtonPi0_Plotter class includes functions specific to generate Plots
     
     Input and Output folders assigned in this function
     Edit isTest variable to run a Test job or all playlist
@@ -31,8 +31,8 @@ main.cpp
 */
 
 // Include Required Classes
-#include "Classes/Analyzer/Analyzer.h"
-#include "Classes/Plotter/Plotter.h"
+#include "Classes/Analyzer/CCProtonPi0_Analyzer.h"
+#include "Classes/Plotter/CCProtonPi0_Plotter.h"
 
 #include <string>
 #include <ctime>
@@ -95,16 +95,16 @@ int main(int argc, char *argv[] )
     }
     
     if(onlyPlot){
-        Plotter p(nMode);
+        CCProtonPi0_Plotter p(nMode);
         p.plotHistograms(); 
     }else{
-        Analyzer t(nMode);    
+        CCProtonPi0_Analyzer t(nMode);    
         if(isTest){
             t.run("Input/Playlists/pl_MC_Test_Sample.dat");
         }else if(isPlaylist){
             t.run("Input/Playlists/pl_MC_minerva13C.dat");
         }else{
-            t.run("Input/Playlists/pl_MC_Run_v2_09_AdvancedTracker.dat");
+            t.run("Input/Playlists/pl_MC_Run_2_10c.dat");
         }
     }
     

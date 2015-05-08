@@ -162,7 +162,6 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("MaxSeedShortTrackChi2", m_maxSeedShortTrackChi2 = 50 );  // short tracks can be constructed from > 1 cluster per plane, so chi^2s are usually bigger
 	 
 
-    
     //--------------------------------------------------------------------------
     // Arachne Colors
     //--------------------------------------------------------------------------
@@ -178,6 +177,7 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("ClusterUsedColor",         m_Color_clusterUsed     = 0x008080); //-- cyan
     declareProperty("Gamma1ProngColor",         m_Color_Gamma1Prong     = 0x00FF00); //-- light green (lime)
     declareProperty("Gamma2ProngColor",         m_Color_Gamma2Prong     = 0x00BFFF); //-- light blue 
+    declareProperty("GammaOtherProngColor",     m_Color_GammaOtherProng = 0xFFA500); //-- orange
     
     // Vertex
     declareProperty("PrimaryVertexProngColor",  m_Color_primaryVertex   = 0x000000); //-- black
@@ -435,11 +435,7 @@ StatusCode CCProtonPi0::initialize()
         error() << "Could not obtain tool: MinervaMathTool!" << endmsg;
         return StatusCode::FAILURE;
     }
-    
 
-    
-    
-    
     //! Blob Tools
     try{
         m_blobUtils = tool<IBlobCreatorUtils>("BlobCreatorUtils");
@@ -550,35 +546,17 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleTruthBranch("michelPion_length", SENTINEL );
     declareDoubleTruthBranch("michelPion_begin_dist_vtx", SENTINEL );
 
-    declareDoubleTruthBranch("muon_px", SENTINEL );
-    declareDoubleTruthBranch("muon_py", SENTINEL );
-    declareDoubleTruthBranch("muon_pz", SENTINEL );
-    declareDoubleTruthBranch("muon_E", SENTINEL );
-    declareDoubleTruthBranch("muon_theta_wrtbeam", SENTINEL );
-    declareIntTruthBranch("muon_charge", 0 );
-    
-    declareContainerDoubleTruthBranch("proton_px", 10, SENTINEL );
-    declareContainerDoubleTruthBranch("proton_py", 10, SENTINEL );
-    declareContainerDoubleTruthBranch("proton_pz", 10, SENTINEL );
-    declareContainerDoubleTruthBranch("proton_E",  10, SENTINEL );
-    declareContainerDoubleTruthBranch("proton_theta_wrtbeam",  10, SENTINEL );
+    declareContainerDoubleTruthBranch("muon_4P", 4, SENTINEL );
+    declareContainerDoubleTruthBranch("proton_4P", 4, SENTINEL );
+    declareContainerDoubleTruthBranch("pi0_4P", 4, SENTINEL );
+    declareContainerDoubleTruthBranch("gamma1_4P", 4, SENTINEL );
+    declareContainerDoubleTruthBranch("gamma2_4P", 4, SENTINEL );
     
     declareIntTruthBranch("pi0_status", -9 );
     declareIntTruthBranch("pi0_Mother", -9 );
     declareIntTruthBranch("pi0_MotherStatus", -9 );   
     declareIntTruthBranch("pi0_GrandMother", -9 );
     declareIntTruthBranch("pi0_GrandMotherStatus", -9 );
-    declareDoubleTruthBranch("pi0_px",SENTINEL);
-    declareDoubleTruthBranch("pi0_py",SENTINEL);
-    declareDoubleTruthBranch("pi0_pz",SENTINEL);
-    declareDoubleTruthBranch("pi0_E",SENTINEL);   
-    declareDoubleTruthBranch("pi0_theta_wrtbeam",SENTINEL);
-    
-    declareContainerDoubleTruthBranch("gamma_px", 2, SENTINEL );
-    declareContainerDoubleTruthBranch("gamma_py", 2, SENTINEL );
-    declareContainerDoubleTruthBranch("gamma_pz", 2, SENTINEL );
-    declareContainerDoubleTruthBranch("gamma_E",  2, SENTINEL );  
-    declareContainerDoubleTruthBranch("gamma_theta_wrtbeam",  2, SENTINEL );
     
     //! Truth Match for Prongs
     declareIntBranch(m_hypMeths,    "isMuonInsideOD",        -1);
@@ -782,32 +760,33 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch( m_hypMeths, "muon_E_shift", 0.0);
     
     //! NeutrinoInt - Proton -- Filled in setProtonData()
-    declareContainerIntBranch(m_hypMeths,    "proton_kinked",      10, -1);
-    declareContainerIntBranch(m_hypMeths,    "proton_odMatch",     10, -1);
-    declareContainerIntBranch(m_hypMeths,    "proton_isRecoGood",     10, -1);
-    declareContainerDoubleBranch(m_hypMeths, "proton_startPointX", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_startPointY", 10, SENTINEL);
+    declareContainerIntBranch(m_hypMeths,    "proton_kinked", 10,    -1);
+    declareContainerIntBranch(m_hypMeths,    "proton_odMatch", 10,  -1);
+    declareContainerIntBranch(m_hypMeths,    "proton_isRecoGood",10,-1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_length",10,  SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_startPointX",10,  SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_startPointY",10,  SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_startPointZ", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_endPointX",   10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_endPointY",   10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_endPointZ",   10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "protonScore",    10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "pionScore",    10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "protonScore_LLR",    10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_endPointX", 10,   SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_endPointY", 10,   SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_endPointZ", 10,   SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "protonScore",   10,  SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "pionScore",   10,  SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "protonScore_LLR",  10,   SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_chi2_ndf", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_theta",    10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_theta",   10,  SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_thetaX",   10, SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_thetaY",   10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_phi",      10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_ekin",     10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_E",        10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_p",        10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_px",       10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_py",       10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_pz",       10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_phi",       10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_ekin",      10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_E",         10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p",         10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_px",        10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_py",        10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_pz",        10,SENTINEL);
     declareContainerDoubleBranch(m_hypMeths, "proton_p_calCorrection", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_p_visEnergy",     10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_p_dEdXTool",      10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p_visEnergy",      10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p_dEdXTool",       10,SENTINEL);
     
     //! Event - Pi0 -- Filles in processBlobs()
     declareIntEventBranch("blob_ndof_1");
@@ -905,9 +884,9 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     m_ProtonParticles.clear();
     
     //--------------------------------------------------------------------------
-    //! Do NOT Analyze the Event - 
+    //! Do NOT Analyze the Event -
     //      if the TRUE Vertex is NOT Fiducial
-    //      if the AnalyzeEvent is False
+    //      if the AnalyzeEvent is False - TagTruth() Decides This
     //--------------------------------------------------------------------------    
     if( truthEvent ){
         info() << "This is a MC event." << endmsg;
@@ -916,10 +895,10 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
             return StatusCode::SUCCESS; 
         }
         
-//         if ( !(truthEvent->filtertaglist()->isFilterTagTrue("AnalyzeEvent")) ){
-//             info() << "TagTruth() Marked Event as Do NOT Analyze! Skipping Event! " <<endmsg;
-//             return StatusCode::SUCCESS; 
-//         }
+        if ( !(truthEvent->filtertaglist()->isFilterTagTrue("AnalyzeEvent")) ){
+            info() << "TagTruth() Marked Event as Do NOT Analyze! Skipping Event! " <<endmsg;
+            return StatusCode::SUCCESS; 
+        }
     }
  
     //--------------------------------------------------------------------------
@@ -927,14 +906,13 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //--------------------------------------------------------------------------
     if( event->filtertaglist()->isFilterTagTrue( AnaFilterTags::BadObject() ) ) { 
         warning() << "Found an event flagged with a BadObject! Refusing to analyze..." << endmsg;
-        if( m_store_all_events ) return interpretFailEvent(event); 
-        else return StatusCode::SUCCESS; 
+        return StatusCode::SUCCESS; 
     }
     
     
     //==========================================================================
     //
-    // Vertex Reconstruction
+    //! Vertex Reconstruction
     //
     //==========================================================================
     debug() << "START: Vertex Reconstruction..." << endmsg;
@@ -942,17 +920,14 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //--------------------------------------------------------------------------
     //! MAKE CUT - if NO or NULL Interaction Vertex
     //--------------------------------------------------------------------------
-    if( !(event->hasInteractionVertex()) ){
-        debug() << "The event does not have an interaction vertex!" << endmsg;
-        event->setIntData("Cut_Vertex_None",1);
-        if( m_store_all_events ) return interpretFailEvent(event); 
-        else return StatusCode::SUCCESS; 
-    }else if ( event->interactionVertex() == NULL ){
-        debug() << "The event has a NULL vertex!" << endmsg;
+    if( !(event->hasInteractionVertex()) || event->interactionVertex() == NULL ){
+        debug() << "The event has NO or NULL vertex!" << endmsg;
         event->setIntData("Cut_Vertex_None",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
+    
+    // Save Primary Vertex
     m_PrimaryVertex = event->interactionVertex();
     
     //--------------------------------------------------------------------------
@@ -1689,7 +1664,7 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     bool isSignal = tagSignal(truthEvent);
     if (isSignal){
         setPi0GenieRecord(truthEvent);  
-        setSignalKinematics(truthEvent);
+        SetSignalKinematics(truthEvent);
     }else{
         tagBackground(truthEvent);
     }
@@ -1726,13 +1701,13 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     //! Decide whether to Analyze the Event or NOT
     //    Set AnalyzeEvent true to Analyze All Events
     //--------------------------------------------------------------------------
-    // Analyze Events only with True Michels
-    if ( truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withMichel") ){
-        debug()<<"Event with True Michel - Will Analyze the Event..."<<endmsg;
-        truthEvent->filtertaglist()->setOrAddFilterTag( "AnalyzeEvent", true );
-    }else{
-        truthEvent->filtertaglist()->setOrAddFilterTag( "AnalyzeEvent", false );    
-    }
+    truthEvent->filtertaglist()->setOrAddFilterTag( "AnalyzeEvent", true );
+//     if ( truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withMichel") ){
+//         debug()<<"Event with True Michel - Will Analyze the Event..."<<endmsg;
+//         truthEvent->filtertaglist()->setOrAddFilterTag( "AnalyzeEvent", true );
+//     }else{
+//         truthEvent->filtertaglist()->setOrAddFilterTag( "AnalyzeEvent", false );    
+//     }
     
     debug()<<"tagTruth Reached End"<<endmsg;
     
@@ -2222,141 +2197,6 @@ void CCProtonPi0::writeBackgroundType(Minerva::GenMinInteraction* truthEvent) co
     info()<<"   Michel = "<<hasMichel<<" hasPi0 = "<<hasPi0<<" hasGamma = "<<hasGamma<<endmsg;
 }
 
-
-//------------------------------------------------------------------------------
-// setSignalKinematics() 
-//      Saves FS Particle 4-Momentums
-//------------------------------------------------------------------------------
-void CCProtonPi0::setSignalKinematics(Minerva::GenMinInteraction* truthEvent) const
-{
-    debug() << "Enter CCProtonPi0::setSignalKinematics()" << endmsg;
-    
-    //--------------------------------------------------------------------------
-    //! Get Muon Kinematics
-    //--------------------------------------------------------------------------
-    Gaudi::LorentzVector t_mu4p = truthEvent->PrimFSLepton();
-    double t_muon_px = t_mu4p.px();
-    double t_muon_py = t_mu4p.py();
-    double t_muon_pz = t_mu4p.pz();
-    double t_muon_E = t_mu4p.E();
-    double t_muon_theta=m_coordSysTool->thetaWRTBeam(t_mu4p);
-    int t_muon_charge = 0;
-    
-    int t_current = truthEvent->current();
-    int t_neutrinoPDG = truthEvent->incoming();
-    
-    if (t_current==1 && t_neutrinoPDG==14) t_muon_charge = -1;
-    else if ( t_current==1 && t_neutrinoPDG==-14) t_muon_charge = 1;
-        
-    //--------------------------------------------------------------------------
-    //! Get Proton, Pi0 and Gamma Kinematics
-    //--------------------------------------------------------------------------
-    const double SENTINEL = -9.9;
-    int nMaxProtons = 10;
-    int nMaxGammas = 2;
-    
-    std::vector<double> t_proton_px;
-    std::vector<double> t_proton_py;
-    std::vector<double> t_proton_pz;
-    std::vector<double> t_proton_E;
-    std::vector<double> t_proton_theta;
-    
-    std::vector<double> t_gamma_px;
-    std::vector<double> t_gamma_py;
-    std::vector<double> t_gamma_pz;
-    std::vector<double> t_gamma_E;
-    std::vector<double> t_gamma_theta;
-    
-    double t_pi0_px;
-    double t_pi0_py;
-    double t_pi0_pz;
-    double t_pi0_E;
-    double t_pi0_theta;
-    
-
-    // Initialize Protons
-    for (int i = 0; i < nMaxProtons; i++){
-        t_proton_px.push_back(SENTINEL);
-        t_proton_py.push_back(SENTINEL);
-        t_proton_pz.push_back(SENTINEL);
-        t_proton_E.push_back(SENTINEL);
-        t_proton_theta.push_back(SENTINEL);
-    }
-    
-    // Initialize Gammas
-    for (int i = 0; i < nMaxGammas; i++){ 
-        t_gamma_px.push_back(SENTINEL);
-        t_gamma_py.push_back(SENTINEL);
-        t_gamma_pz.push_back(SENTINEL);
-        t_gamma_E.push_back(SENTINEL);
-        t_gamma_theta.push_back(SENTINEL);
-    }
-    
-    int nProton = 0;
-    int nGamma = 0;
-    const SmartRefVector<Minerva::TG4Trajectory> pri_trajectories = truthEvent->trajectories();
-    SmartRefVector<Minerva::TG4Trajectory>::const_iterator it_mcpart;
-    
-    for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart) {       
-        Gaudi::LorentzVector temp_4p = (*it_mcpart)->GetInitialMomentum();
-        Gaudi::LorentzVector temp_vtx = (*it_mcpart)->GetFinalPosition();
-        int partPDG = (*it_mcpart)->GetPDGCode();
-        
-        if ( (partPDG == 2212) && nProton < nMaxProtons){
-            t_proton_px[nProton] = temp_4p.px();
-            t_proton_py[nProton] = temp_4p.py();
-            t_proton_pz[nProton] = temp_4p.pz();
-            t_proton_E[nProton]  = temp_4p.E();
-            t_proton_theta[nProton] = m_coordSysTool->thetaWRTBeam(temp_4p); 
-            nProton++;
-        }else if ( partPDG == 111){
-            t_pi0_px = temp_4p.px();
-            t_pi0_py = temp_4p.py();
-            t_pi0_pz = temp_4p.pz();
-            t_pi0_E  = temp_4p.E();
-            t_pi0_theta = m_coordSysTool->thetaWRTBeam(temp_4p); 
-        }else if ( (partPDG == 22) && nGamma < nMaxGammas){
-            t_gamma_px[nGamma] = temp_4p.px();
-            t_gamma_py[nGamma] = temp_4p.py();
-            t_gamma_pz[nGamma] = temp_4p.pz();
-            t_gamma_E[nGamma]  = temp_4p.E();
-            t_gamma_theta[nGamma] = m_coordSysTool->thetaWRTBeam(temp_4p); 
-            nGamma++;
-        }
-    }
-    
-    //--------------------------------------------------------------------------
-    //! fill the truthEvent info for Signal Kinematics
-    //--------------------------------------------------------------------------
-    debug()<<"Filling ntuple for truth Signal Kinematics info!"<<endmsg;
-    
-    truthEvent->setDoubleData("muon_px", t_muon_px);
-    truthEvent->setDoubleData("muon_py", t_muon_py);
-    truthEvent->setDoubleData("muon_pz", t_muon_pz);
-    truthEvent->setDoubleData("muon_E",  t_muon_E);
-    truthEvent->setDoubleData("muon_theta_wrtbeam",  t_muon_theta);
-       
-    truthEvent->setContainerDoubleData("proton_px", t_proton_px);
-    truthEvent->setContainerDoubleData("proton_py", t_proton_py);
-    truthEvent->setContainerDoubleData("proton_pz", t_proton_pz);
-    truthEvent->setContainerDoubleData("proton_E",  t_proton_E);
-    truthEvent->setContainerDoubleData("proton_theta_wrtbeam",  t_proton_theta);
-    
-    truthEvent->setDoubleData("pi0_px", t_pi0_px);
-    truthEvent->setDoubleData("pi0_py", t_pi0_py);
-    truthEvent->setDoubleData("pi0_pz", t_pi0_pz);
-    truthEvent->setDoubleData("pi0_E",  t_pi0_E);
-    truthEvent->setDoubleData("pi0_theta_wrtbeam",  t_pi0_theta);
-    
-    truthEvent->setContainerDoubleData("gamma_px", t_gamma_px);
-    truthEvent->setContainerDoubleData("gamma_py", t_gamma_py);
-    truthEvent->setContainerDoubleData("gamma_pz", t_gamma_pz);
-    truthEvent->setContainerDoubleData("gamma_E",  t_gamma_E);
-    truthEvent->setContainerDoubleData("gamma_theta_wrtbeam",  t_gamma_theta);
-
-}
-
-
 //------------------------------------------------------------------------------
 // setTargetMaterial() Stores Target Material using Truth information
 //------------------------------------------------------------------------------
@@ -2470,6 +2310,143 @@ void CCProtonPi0::saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int
             break;
         }
     }
+}
+
+void CCProtonPi0::SetSignalKinematics(Minerva::GenMinInteraction* truthEvent) const
+{
+    debug()<<"Enter: CCProtonPi0::SetSignalKinematics"<<endmsg;
+    
+    Minerva::TG4Trajectories* trajects = NULL;
+    Minerva::TG4Trajectories::iterator it_mcpart;
+    if( exist<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default ) ) {
+        trajects = get<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default );
+    } else {
+        warning() << "Could not get TG4Trajectories from " << Minerva::TG4TrajectoryLocation::Default << endmsg;
+        return;
+    }
+
+    // just to make sure
+    if( !trajects ) return;
+    
+    const double SENTINEL = -9.9;
+    std::vector<double> muon_4P(4,SENTINEL);
+    std::vector<double> pi0_4P(4,SENTINEL);
+    std::vector<double> proton_4P(4,SENTINEL);
+    std::vector<double> gamma1_4P(4,SENTINEL);
+    std::vector<double> gamma2_4P(4,SENTINEL);
+    
+    Gaudi::LorentzVector temp_4P;
+    int particle_PDG;
+    int particle_ID;
+    int mother_ID;
+    int pi0_ID = -1;
+    int max_protonE = 0.0;
+    bool isFirstGamma = true;
+    bool isGammaPrimary = false;
+    
+    // Identify and Save Primary Trajectory Kinematics
+    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+        
+        if ( (*it_mcpart)->GetProcessName() == "Primary"){
+            
+            temp_4P = (*it_mcpart)->GetInitialMomentum();
+            particle_PDG = (*it_mcpart)->GetPDGCode();
+            particle_ID = (*it_mcpart)->GetTrackId();
+                        
+            if (particle_PDG == PDG::muon){
+                muon_4P[0] = temp_4P.px();  
+                muon_4P[1] = temp_4P.py(); 
+                muon_4P[2] = temp_4P.pz(); 
+                muon_4P[3] = temp_4P.E(); 
+            }else if (particle_PDG == PDG::pi0){
+                pi0_ID = particle_ID;
+                pi0_4P[0] = temp_4P.px();  
+                pi0_4P[1] = temp_4P.py(); 
+                pi0_4P[2] = temp_4P.pz(); 
+                pi0_4P[3] = temp_4P.E();  
+            }else if ((particle_PDG == PDG::proton) && (max_protonE < temp_4P.E()) ){
+                proton_4P[0] = temp_4P.px();  
+                proton_4P[1] = temp_4P.py(); 
+                proton_4P[2] = temp_4P.pz(); 
+                proton_4P[3] = temp_4P.E();  
+            }else if (particle_PDG == PDG::gamma){
+                isGammaPrimary = true;
+                if (isFirstGamma){
+                    gamma1_4P[0] = temp_4P.px();  
+                    gamma1_4P[1] = temp_4P.py(); 
+                    gamma1_4P[2] = temp_4P.pz(); 
+                    gamma1_4P[3] = temp_4P.E(); 
+                    isFirstGamma = false;
+                }else{
+                    gamma2_4P[0] = temp_4P.px();  
+                    gamma2_4P[1] = temp_4P.py(); 
+                    gamma2_4P[2] = temp_4P.pz(); 
+                    gamma2_4P[3] = temp_4P.E(); 
+                }
+            }
+        }   
+    }
+    
+    
+    // If Gamma's are not Primary -- Save Pi0 Daughters
+    if (! isGammaPrimary ){
+        isFirstGamma = true;
+        
+        for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+            
+            if ( (*it_mcpart)->GetProcessName() != "Primary"){
+                temp_4P = (*it_mcpart)->GetInitialMomentum();
+                particle_PDG = (*it_mcpart)->GetPDGCode();
+                particle_ID = (*it_mcpart)->GetTrackId();
+                mother_ID = (*it_mcpart)->GetParentId();
+                
+                if (mother_ID == pi0_ID) {
+                    if (isFirstGamma){
+                        gamma1_4P[0] = temp_4P.px();  
+                        gamma1_4P[1] = temp_4P.py(); 
+                        gamma1_4P[2] = temp_4P.pz(); 
+                        gamma1_4P[3] = temp_4P.E(); 
+                        isFirstGamma = false;
+                    }else{
+                        gamma2_4P[0] = temp_4P.px();  
+                        gamma2_4P[1] = temp_4P.py(); 
+                        gamma2_4P[2] = temp_4P.pz(); 
+                        gamma2_4P[3] = temp_4P.E(); 
+                    }
+                } 
+            }   
+        }
+    }
+    
+    // Make sure Gamma1 is the more energetic one
+    if (gamma1_4P[3] < gamma2_4P[3]){
+        for(unsigned int i = 0; i < gamma1_4P.size(); i++){
+            double temp = gamma1_4P[i];
+            gamma1_4P[i] = gamma2_4P[i];
+            gamma2_4P[i] = temp;
+        }
+    }
+    
+    
+    // Check Values
+    debug()<<"True Muon 4P = ("<<muon_4P[0]<<", "<<muon_4P[1]<<", "<<muon_4P[2]<<", "<<muon_4P[3]<<")"<<endmsg;
+    debug()<<"True Proton 4P = ("<<proton_4P[0]<<", "<<proton_4P[1]<<", "<<proton_4P[2]<<", "<<proton_4P[3]<<")"<<endmsg;
+    debug()<<"True Pi0 4P = ("<<pi0_4P[0]<<","<<pi0_4P[1]<<", "<<pi0_4P[2]<<", "<<pi0_4P[3]<<")"<<endmsg;
+    debug()<<"True Gamma1 4P = ("<<gamma1_4P[0]<<", "<<gamma1_4P[1]<<", "<<gamma1_4P[2]<<", "<<gamma1_4P[3]<<")"<<endmsg;
+    debug()<<"True Gamma2 4P = ("<<gamma2_4P[0]<<", "<<gamma2_4P[1]<<", "<<gamma2_4P[2]<<", "<<gamma2_4P[3]<<")"<<endmsg;
+    
+    
+    //--------------------------------------------------------------------------
+    //! fill the truthEvent info for Signal Kinematics
+    //--------------------------------------------------------------------------
+    debug()<<"Filling ntuple for truth Signal Kinematics info!"<<endmsg;
+    
+    truthEvent->setContainerDoubleData("muon_4P", muon_4P);
+    truthEvent->setContainerDoubleData("pi0_4P", pi0_4P);
+    truthEvent->setContainerDoubleData("proton_4P", proton_4P);
+    truthEvent->setContainerDoubleData("gamma1_4P",  gamma1_4P);
+    truthEvent->setContainerDoubleData("gamma2_4P",  gamma2_4P);
+    
 }
 
 //------------------------------------------------------------------------------
@@ -3056,7 +3033,7 @@ bool CCProtonPi0::createTrackedParticles( Minerva::PhysicsEvent* event, Minerva:
         
         double showerScore = getProngShowerScore(copyProng);
         
-        event->setDoubleData("prong_showerScore", showerScore); // Save showerScore to NTuples
+        event->setDoubleData("prong_showerScore", showerScore); // TSave showerScore to NTuples
         
         delete copyProng; // Release Memory for copied Prong
         // ---------------------------------------------------------------------
@@ -3187,6 +3164,7 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
     std::vector<double> proton_start_x(10,SENTINEL);
     std::vector<double> proton_start_y(10,SENTINEL);
     std::vector<double> proton_start_z(10,SENTINEL);
+    std::vector<double> length(10,SENTINEL);
     
     std::vector<int> kinked(10,-1);
     std::vector<int> odMatch(10,-1);
@@ -3353,6 +3331,8 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
         proton_start_y[i] = (prong->minervaTracks().back())->firstState().y();
         proton_start_z[i] = (prong->minervaTracks().back())->firstState().z();
     
+        length[i] = calcDistance(   proton_end_x[i],proton_end_y[i], proton_end_z[i],
+                                    proton_start_x[i],proton_start_y[i],proton_start_z[i]);
         kinked[i]  = (int)prong->Kinked();
         odMatch[i] = (int)prong->OdMatch(); 
         chi2[i]    = particle->getDoubleData("chi2_ndf");
@@ -3383,6 +3363,7 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
         
         //----------------------------------------------------------------------
         // Debugging: Check values
+            debug()<<"length[i] = "<<length[i]<<endmsg;
             debug()<<"ekin[i] = "<<ekin[i]<<endmsg;
             debug()<<"kinked[i] = "<<kinked[i]<<endmsg;
             debug()<<"odMatch[i] = "<<odMatch[i]<<endmsg;
@@ -3408,6 +3389,7 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt ) const
     nuInt->setContainerDoubleData("proton_startPointY",proton_start_y);
     nuInt->setContainerDoubleData("proton_startPointZ",proton_start_z);
     
+    nuInt->setContainerDoubleData("proton_length",length);
     nuInt->setContainerDoubleData("proton_px",px);
     nuInt->setContainerDoubleData("proton_py",py);
     nuInt->setContainerDoubleData("proton_pz",pz);
@@ -4289,6 +4271,21 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
     isAngleScan = foundBlobs.size() == 2;
     isAngleScanApplied = true;
 
+    debug()<<"foundBlobs.size() = "<<foundBlobs.size()<<endmsg;
+
+    if (foundBlobs.size() == 1){
+        m_hitTagger->applyColorTag( (foundBlobs)[0], m_Color_Gamma1Prong ); // light green
+    }else if (foundBlobs.size() == 2){
+        m_hitTagger->applyColorTag( (foundBlobs)[0], m_Color_Gamma1Prong ); // light green
+        m_hitTagger->applyColorTag( (foundBlobs)[1], m_Color_Gamma2Prong ); // light blue   
+    }else if (foundBlobs.size() > 2){
+        m_hitTagger->applyColorTag( (foundBlobs)[0], m_Color_Gamma1Prong ); // light green
+        m_hitTagger->applyColorTag( (foundBlobs)[1], m_Color_Gamma2Prong ); // light blue
+        for(unsigned int i = 2; i < foundBlobs.size(); i++ ){
+            m_hitTagger->applyColorTag( (foundBlobs)[i], m_Color_GammaOtherProng ); // orange 
+        }
+    }
+  
 
     if (m_TrytoRecoverBlobReco && foundBlobs.size() > 2) {
 
@@ -4561,8 +4558,8 @@ void CCProtonPi0::processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerv
     if ( count != 6 ){ 
         event->filtertaglist()->setOrAddFilterTag( "is_twoDBlob", true );
     }
-    m_hitTagger->applyColorTag( (idBlobs)[0], m_Color_Gamma1Prong ); // light green
-    m_hitTagger->applyColorTag( (idBlobs)[1], m_Color_Gamma2Prong ); // light blue
+//     m_hitTagger->applyColorTag( (idBlobs)[0], m_Color_Gamma1Prong ); // light green
+//     m_hitTagger->applyColorTag( (idBlobs)[1], m_Color_Gamma2Prong ); // light blue
     
     debug() << "pi0 candidate" << endmsg;
     debug() << " photon 1 is blob: " << idBlobs[0]->key() << endmsg;

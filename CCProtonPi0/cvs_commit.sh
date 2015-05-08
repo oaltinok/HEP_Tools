@@ -1,21 +1,18 @@
-cvs commit -m "v2_09
+cvs commit -m "v2_10
 
 CCProtonPi0 Updates:
-    Improved Job Submission Script Located: /CCProtonPi0/NTupleAnalysis/Input/
-        Job Submission  for Odd and Even Run Numbers 
-        
-    Implemented selection mechanism for Found Michel Prongs
-        Save Events with Short time difference AND High michel prong energy
-        
-    Updated PreFilter() Function Parameters
-        Unused Energy in Tracker + ECAL + HCAL = [80,2000] --- > [50,2000]
-
+    TagTruth():
+        SetSignalKinematics() Improved, 
+            Pi0 Daughters: Gamma1 and Gamma 2 are saved also
+            True Particle Kinematics are saved in format: P4 = (px, py, pz, E)
+            Removed old format 
+    Proton Reconstruction:
+        Calculate Proton Track Length using end & start points
+    
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-    Added Log File Functionality
-        Instead of cout, using Log File for debugging purposes
-    Fixed Timing of the Package
-        Was using clock(), replaced it with time()
-    New Class: MichelTool - For Michel Studies
-        Collected all Histograms and Counters under MichelTool Class
-        Analyzer fills MichelTool Histograms" .
+    Fixed Class Name Conflict with the Framework:
+        Some Classes in NTupleAnalysis Package have same name 
+            with a Class in Framework
+        All Class Names are Changed as following:
+            Class -----> CCProtonPi0_Class" .

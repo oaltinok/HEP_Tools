@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Apr 22 19:14:16 2015 by ROOT version 5.34/05
+// Mon May  4 09:03:59 2015 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -467,6 +467,7 @@ public :
    Double_t        CCProtonPi0_proton_endPointX[10];
    Double_t        CCProtonPi0_proton_endPointY[10];
    Double_t        CCProtonPi0_proton_endPointZ[10];
+   Double_t        CCProtonPi0_proton_length[10];
    Double_t        CCProtonPi0_proton_p[10];
    Double_t        CCProtonPi0_proton_p_calCorrection[10];
    Double_t        CCProtonPi0_proton_p_dEdXTool[10];
@@ -1028,6 +1029,7 @@ public :
    TBranch        *b_CCProtonPi0_proton_endPointX;   //!
    TBranch        *b_CCProtonPi0_proton_endPointY;   //!
    TBranch        *b_CCProtonPi0_proton_endPointZ;   //!
+   TBranch        *b_CCProtonPi0_proton_length;   //!
    TBranch        *b_CCProtonPi0_proton_p;   //!
    TBranch        *b_CCProtonPi0_proton_p_calCorrection;   //!
    TBranch        *b_CCProtonPi0_proton_p_dEdXTool;   //!
@@ -1177,7 +1179,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/CCProtonPi0/MC/v2_08/run/grid/central_value/minerva/ana/v10r8/00/01/32/00/SIM_minerva_00013200_Subruns_0001-0002-0003-0004_CCProtonPi0_Ana_Tuple_v10r8.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/CCProtonPi0/MC/v2_10/run/grid/central_value/minerva/ana/v10r8/00/01/32/00/SIM_minerva_00013200_Subruns_0001-0002-0003-0004_CCProtonPi0_Ana_Tuple_v10r8.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1674,6 +1676,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_proton_endPointX", CCProtonPi0_proton_endPointX, &b_CCProtonPi0_proton_endPointX);
    fChain->SetBranchAddress("CCProtonPi0_proton_endPointY", CCProtonPi0_proton_endPointY, &b_CCProtonPi0_proton_endPointY);
    fChain->SetBranchAddress("CCProtonPi0_proton_endPointZ", CCProtonPi0_proton_endPointZ, &b_CCProtonPi0_proton_endPointZ);
+   fChain->SetBranchAddress("CCProtonPi0_proton_length", CCProtonPi0_proton_length, &b_CCProtonPi0_proton_length);
    fChain->SetBranchAddress("CCProtonPi0_proton_p", CCProtonPi0_proton_p, &b_CCProtonPi0_proton_p);
    fChain->SetBranchAddress("CCProtonPi0_proton_p_calCorrection", CCProtonPi0_proton_p_calCorrection, &b_CCProtonPi0_proton_p_calCorrection);
    fChain->SetBranchAddress("CCProtonPi0_proton_p_dEdXTool", CCProtonPi0_proton_p_dEdXTool, &b_CCProtonPi0_proton_p_dEdXTool);
