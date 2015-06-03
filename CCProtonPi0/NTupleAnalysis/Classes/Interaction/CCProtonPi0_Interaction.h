@@ -9,7 +9,6 @@ Class: CCProtonPi0_Interaction
             Study Histograms - Temporary (after the study will be removed)
                 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_05_07
 ================================================================================
 */
 #ifndef CCProtonPi0_Interaction_h

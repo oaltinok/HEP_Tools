@@ -12,7 +12,7 @@ using namespace std;
 void CCProtonPi0_Plotter::plotHistograms()
 {
     if (isSignalvsBackground){
-//         plotSignalBackground();
+         plotSignalBackground();
 //         plotCutHistograms();
     }else{
 //         plotInteraction();
@@ -21,7 +21,7 @@ void CCProtonPi0_Plotter::plotHistograms()
         
 //         plotProton();
         
-        plotPion();
+        //plotPion();
         
 //        plotPID();
         
@@ -33,6 +33,117 @@ void CCProtonPi0_Plotter::plotHistograms()
     
 }
 
+void CCProtonPi0_Plotter::plot_purity_efficiency(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir, bool keepEventstoRight)
+{
+    // ------------------------------------------------------------------------
+    // Create Histograms
+    // ------------------------------------------------------------------------
+    TH1D* h_purity = new TH1D;
+    TH1D* h_efficiency = new TH1D;
+    TH1D* h_purity_efficiency = new TH1D;
+
+    // Copy and Reset Histogram Content - Keeps binning and Titles
+    h_signal->Copy(*h_purity);
+    h_signal->Copy(*h_efficiency);
+    h_signal->Copy(*h_purity_efficiency);
+    
+    h_purity->Reset();
+    h_efficiency->Reset();
+    h_purity_efficiency->Reset();
+    
+    // Change Titles for the new histograms
+    if(keepEventstoRight) h_purity->SetTitle("Purity - (Keeping Events to Right)");
+    else h_purity->SetTitle("Purity - (Keeping Events to Left)");
+    h_purity->GetYaxis()->SetTitle("Purity (Captured Signal / Captured Events)");
+
+    if(keepEventstoRight) h_efficiency->SetTitle("Efficiency - (Keeping Events to Right)");
+    else h_efficiency->SetTitle("Efficiency - (Keeping Events to Left)");
+    h_efficiency->GetYaxis()->SetTitle("Efficiency (Captured Signal / Captured Events)");
+    
+    if(keepEventstoRight) h_purity_efficiency->SetTitle("Purity x Efficiency - (Keeping Events to Right)");
+    else h_purity_efficiency->SetTitle("Purity x Efficiency - (Keeping Events to Left)");
+    h_purity_efficiency->GetYaxis()->SetTitle("Purity x Efficiency");
+
+    // ------------------------------------------------------------------------
+    // Calculate Statistics
+    // ------------------------------------------------------------------------
+    double nSignal;
+    double nBackground;
+    double nSignalTotal = 0;
+    double nCapturedSignal = 0;
+    double nCapturedEvents = 0;
+    double purity;
+    double efficiency;
+    int nBins = h_signal->GetNbinsX();
+
+    // Get Total Number of Signal
+    for(int i = nBins; i > 0; i-- ){
+        nSignalTotal = nSignalTotal +  h_signal->GetBinContent(i); 
+    }
+
+    // Keep Events to Right - Start Collecting Statistics from Right
+    // Keep Events to Left - Start Collecting Statistics from Left
+    int i;
+    if (keepEventstoRight) i = nBins;
+    else i = 1;
+    while(true){
+        if(keepEventstoRight && i == 0) break;
+        if(!keepEventstoRight && i > nBins) break;
+
+        // Get Current Bin's Content
+        nSignal = h_signal->GetBinContent(i);
+        nBackground = h_background->GetBinContent(i);
+
+        // Number of Events up-to this point
+        nCapturedSignal = nCapturedSignal + nSignal;
+        nCapturedEvents = nCapturedEvents + nSignal + nBackground;
+
+        // Calculate Purity
+        if( nCapturedEvents == 0 ) purity = 0;
+        else purity = nCapturedSignal / nCapturedEvents;
+
+        // Calculate Efficiency
+        efficiency =  nCapturedSignal / nSignalTotal;
+
+        // Fill Histograms
+        h_purity->SetBinContent(i,purity);
+        h_efficiency->SetBinContent(i,efficiency);
+        h_purity_efficiency->SetBinContent(i,purity*efficiency);
+    
+        if(keepEventstoRight) i--;
+        else i++;
+    }
+
+    // Get Max(purity x efficiency)
+    double value_max = h_purity_efficiency->GetMaximum();
+    int bin_max = h_purity_efficiency->GetMaximumBin();
+    double best_cut = h_purity_efficiency->GetBinLowEdge(bin_max);
+
+    string x_title = h_purity_efficiency->GetXaxis()->GetTitle();
+    
+    h_purity_efficiency->GetXaxis()->SetTitle(Form("%s%s%f",x_title.c_str()," Best Cut = ",best_cut));
+    h_purity_efficiency->GetYaxis()->SetTitle(Form("%s%f","Purity x Efficiency, Max = ",value_max));
+    
+
+    // ------------------------------------------------------------------------
+    // Plot Histograms
+    // ------------------------------------------------------------------------
+    string tag;
+    if (keepEventstoRight) tag = "Right_";
+    else tag = "Left_";
+    string purity_fName = tag + "purity_" + fileName;
+    string efficiency_fName = tag + "efficiency_" + fileName;
+    string purity_efficiency_fName = tag + "purity_efficiency_" + fileName;
+
+    plot1D_Hist(h_purity,purity_fName,plotDir);
+    plot1D_Hist(h_efficiency,efficiency_fName,plotDir);
+    plot1D_Hist(h_purity_efficiency,purity_efficiency_fName,plotDir);
+
+    delete h_purity;
+    delete h_efficiency;
+    delete h_purity_efficiency;
+
+}
 void CCProtonPi0_Plotter::plotSignalRatio(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir, bool isReversed) 
 {
     TH1D* h_ratio = new TH1D;
@@ -125,16 +236,17 @@ void CCProtonPi0_Plotter::plotStacked(TH1D* h_signal, TH1D* h_background,
                             string signal_label, string background_label,
                             bool isRatioReversed)
 {
+  
     TH1D* h_signalRatio = new TH1D;
     TH1D* h_backgroundRatio = new TH1D;
-    
+ 
     h_signal->Copy(*h_signalRatio);
     h_background->Copy(*h_backgroundRatio);
-    
+
+    // Create Plot Objects
     TCanvas *c1 = new TCanvas();
     THStack *hs = new THStack("hs",plotName.c_str());
     TLegend *legend = new TLegend(0.7,0.8,0.9,0.9);
-    
     
     h_signal->SetFillColor(kGreen);
     h_signal->SetLineColor(kGreen);
@@ -166,6 +278,10 @@ void CCProtonPi0_Plotter::plotStacked(TH1D* h_signal, TH1D* h_background,
     
     // Plot Signal Ratio
     plotSignalRatio(h_signalRatio,h_backgroundRatio,fileName, plotDir, isRatioReversed);
+    
+    // Plot Statistics
+    plot_purity_efficiency(h_signal,h_background,fileName,plotDir,true);
+    plot_purity_efficiency(h_signal,h_background,fileName,plotDir,false);
 
     delete h_signalRatio;
     delete h_backgroundRatio;
@@ -563,7 +679,8 @@ void CCProtonPi0_Plotter::plotPion()
     
     TH1D* h_photonEnergy_Asymmetry_true = (TH1D*)f_Root->Get("photonEnergy_Asymmetry_true");
     plot1D_Hist(h_photonEnergy_Asymmetry_true,"photonEnergy_Asymmetry_true.png",plotDir);
-    
+   
+
     delete f_Root;
 }
 
@@ -858,143 +975,104 @@ void CCProtonPi0_Plotter::MichelTool(TH1D* h_vertex, TH1D* h_track, TH1D* h_trac
 void CCProtonPi0_Plotter::plotSignalBackground()
 {
     // Files
-    TFile* f_Root_Signal_Interaction = new TFile(rootDir_Interaction[0].c_str());
-    TFile* f_Root_Background_Interaction = new TFile(rootDir_Interaction[1].c_str());
-    TFile* f_Root_Signal_Muon = new TFile(rootDir_Muon[0].c_str());
-    TFile* f_Root_Background_Muon = new TFile(rootDir_Muon[1].c_str());
-    TFile* f_Root_Signal_Proton = new TFile(rootDir_Proton[0].c_str());
-    TFile* f_Root_Background_Proton = new TFile(rootDir_Proton[1].c_str());
+    //TFile* f_Root_Signal_Interaction = new TFile(rootDir_Interaction[0].c_str());
+    //TFile* f_Root_Background_Interaction = new TFile(rootDir_Interaction[1].c_str());
+    //TFile* f_Root_Signal_Muon = new TFile(rootDir_Muon[0].c_str());
+    //TFile* f_Root_Background_Muon = new TFile(rootDir_Muon[1].c_str());
+    //TFile* f_Root_Signal_Proton = new TFile(rootDir_Proton[0].c_str());
+    //TFile* f_Root_Background_Proton = new TFile(rootDir_Proton[1].c_str());
     TFile* f_Root_Signal_Pion = new TFile(rootDir_Pion[0].c_str());
     TFile* f_Root_Background_Pion = new TFile(rootDir_Pion[1].c_str());
     
-    // Proton Plots
-//     TH1D* h_signal_protonScore = (TH1D*)f_Root_Signal_Proton->Get("protonScore");
-//     TH1D* h_background_protonScore = (TH1D*)f_Root_Background_Proton->Get("protonScore");
-//     plotStacked(h_signal_protonScore, h_background_protonScore,"Proton Score", "protonScore.png", otherDir);
-//     
-//     TH1D* h_signal_pionScore = (TH1D*)f_Root_Signal_Proton->Get("pionScore");
-//     TH1D* h_background_pionScore = (TH1D*)f_Root_Background_Proton->Get("pionScore");
-//     plotStacked(h_signal_pionScore, h_background_pionScore,"PionScore", "pionScore.png", otherDir);
-        
-    TH1D* h_signal_E_Proton = (TH1D*)f_Root_Signal_Proton->Get("E_reco");
-    TH1D* h_background_E_Proton = (TH1D*)f_Root_Background_Proton->Get("E_reco");
-    plotStacked(h_signal_E_Proton, h_background_E_Proton,"Proton Energy [MeV]", "E_Proton.png", otherDir);
-    plotStackedLogScale(h_signal_E_Proton, h_background_E_Proton,"Proton Energy [MeV]", "E_Proton_Log.png", otherDir);
+    TH1D* h_signal_g1_blob_conv_length = (TH1D*)f_Root_Signal_Pion->Get("gamma1_ConvLength");
+    TH1D* h_background_g1_blob_conv_length = (TH1D*)f_Root_Background_Pion->Get("gamma1_ConvLength");
+    plotStacked(h_signal_g1_blob_conv_length, h_background_g1_blob_conv_length,"g1_blob_conv_length", "g1_blob_conv_length.png", otherDir);
+
+    TH1D* h_signal_g1_blob_energy = (TH1D*)f_Root_Signal_Pion->Get("g1_blob_energy");
+    TH1D* h_background_g1_blob_energy = (TH1D*)f_Root_Background_Pion->Get("g1_blob_energy");
+    plotStacked(h_signal_g1_blob_energy, h_background_g1_blob_energy,"g1_blob_energy", "g1_blob_energy.png", otherDir);
     
-    TH1D* h_signal_P_Proton = (TH1D*)f_Root_Signal_Proton->Get("P_reco");
-    TH1D* h_background_P_Proton = (TH1D*)f_Root_Background_Proton->Get("P_reco");
-    plotStacked(h_signal_P_Proton, h_background_P_Proton,"Proton Momentum [MeV]", "P_Proton.png", otherDir);
-    plotStackedLogScale(h_signal_P_Proton, h_background_P_Proton,"Proton Momentum [MeV]", "P_Proton_Log.png", otherDir);
-    
-    TH1D* h_signal_angleBeam_reco_Proton = (TH1D*)f_Root_Signal_Proton->Get("angleBeam_reco");
-    TH1D* h_background_angleBeam_reco_Proton = (TH1D*)f_Root_Background_Proton->Get("angleBeam_reco");
-    plotStacked(h_signal_angleBeam_reco_Proton, h_background_angleBeam_reco_Proton,"Proton Angle wrt Beam", "angleBeam_reco_Proton.png", otherDir);
-    plotStackedLogScale(h_signal_angleBeam_reco_Proton, h_background_angleBeam_reco_Proton,"Proton Angle wrt Beam", "angleBeam_reco_Proton_Log.png", otherDir);
-    
-    // Pion Plots
-//     TH1D* h_signal_gamma1_ConvLength = (TH1D*)f_Root_Signal_Pion->Get("gamma1_ConvLength");
-//     TH1D* h_background_gamma1_ConvLength = (TH1D*)f_Root_Background_Pion->Get("gamma1_ConvLength");
-//     plotStacked(h_signal_gamma1_ConvLength, h_background_gamma1_ConvLength,"Leading Photon Conversion Length [cm]", "gamma1_ConvLength.png", otherDir);
-//     
-//     TH1D* h_signal_gamma2_ConvLength = (TH1D*)f_Root_Signal_Pion->Get("gamma2_ConvLength");
-//     TH1D* h_background_gamma2_ConvLength = (TH1D*)f_Root_Background_Pion->Get("gamma2_ConvLength");
-//     plotStacked(h_signal_gamma2_ConvLength, h_background_gamma2_ConvLength,"Second Photon Conversion Length [cm]", "gamma2_ConvLength.png", otherDir);
-    
-    TH1D* h_signal_gamma1_nClusters_All = (TH1D*)f_Root_Signal_Pion->Get("gamma1_nClusters_All");
-    TH1D* h_background_gamma1_nClusters_All = (TH1D*)f_Root_Background_Pion->Get("gamma1_nClusters_All");
-    plotStacked(h_signal_gamma1_nClusters_All, h_background_gamma1_nClusters_All,"Leading Photon N(Clusters)", "gamma1_nClusters_All.png", otherDir);
-    
-    TH1D* h_signal_gamma2_nClusters_All = (TH1D*)f_Root_Signal_Pion->Get("gamma2_nClusters_All");
-    TH1D* h_background_gamma2_nClusters_All = (TH1D*)f_Root_Background_Pion->Get("gamma2_nClusters_All");
-    plotStacked(h_signal_gamma2_nClusters_All, h_background_gamma2_nClusters_All,"Second Photon N(Clusters)", "gamma2_nClusters_All.png", otherDir);
-    
-//     TH1D* h_signal_gamma1_nClusters_X = (TH1D*)f_Root_Signal_Pion->Get("gamma1_nClusters_X");
-//     TH1D* h_background_gamma1_nClusters_X = (TH1D*)f_Root_Background_Pion->Get("gamma1_nClusters_X");
-//     plotStacked(h_signal_gamma1_nClusters_X, h_background_gamma1_nClusters_X,"Number of X Clusters in the Leading Photon", "gamma1_nClusters_X.png", otherDir);
-//     
-//     TH1D* h_signal_gamma2_nClusters_X = (TH1D*)f_Root_Signal_Pion->Get("gamma2_nClusters_X");
-//     TH1D* h_background_gamma2_nClusters_X = (TH1D*)f_Root_Background_Pion->Get("gamma2_nClusters_X");
-//     plotStacked(h_signal_gamma2_nClusters_X, h_background_gamma2_nClusters_X,"Number of X Clusters in the Second Photon", "gamma2_nClusters_X.png", otherDir);
-    
-    TH1D* h_signal_gamma1_Energy= (TH1D*)f_Root_Signal_Pion->Get("gamma1_Energy");
-    TH1D* h_background_gamma1_Energy= (TH1D*)f_Root_Background_Pion->Get("gamma1_Energy");
-    plotStacked(h_signal_gamma1_Energy, h_background_gamma1_Energy,"Leading Photon Energy [GeV]", "gamma1_Energy.png", otherDir);
-    
-    TH1D* h_signal_gamma2_Energy= (TH1D*)f_Root_Signal_Pion->Get("gamma2_Energy");
-    TH1D* h_background_gamma2_Energy= (TH1D*)f_Root_Background_Pion->Get("gamma2_Energy");
-    plotStacked(h_signal_gamma2_Energy, h_background_gamma2_Energy,"Second Photon Energy [GeV]", "gamma2_Energy.png", otherDir);
-    
-    TH1D* h_signal_photonEnergy_Asymmetry= (TH1D*)f_Root_Signal_Pion->Get("photonEnergy_Asymmetry");
-    TH1D* h_background_photonEnergy_Asymmetry= (TH1D*)f_Root_Background_Pion->Get("photonEnergy_Asymmetry");
-    plotStacked(h_signal_photonEnergy_Asymmetry, h_background_photonEnergy_Asymmetry,"Photon Energy Asymmetry", "photonEnergy_Asymmetry.png", otherDir);
-    
-    TH1D* h_signal_E_Pion = (TH1D*)f_Root_Signal_Pion->Get("E_reco");
-    TH1D* h_background_E_Pion = (TH1D*)f_Root_Background_Pion->Get("E_reco");
-    plotStacked(h_signal_E_Pion, h_background_E_Pion,"Pion Energy [MeV]", "E_Pion.png", otherDir);
-    
-    TH1D* h_signal_P_Pion = (TH1D*)f_Root_Signal_Pion->Get("P_reco");
-    TH1D* h_background_P_Pion = (TH1D*)f_Root_Background_Pion->Get("P_reco");
-    plotStacked(h_signal_P_Pion, h_background_P_Pion,"Pion Momentum [MeV]", "P_Pion.png", otherDir);
-    
-    TH1D* h_signal_angleBeam_reco_Pion = (TH1D*)f_Root_Signal_Pion->Get("angleBeam_reco");
-    TH1D* h_background_angleBeam_reco_Pion = (TH1D*)f_Root_Background_Pion->Get("angleBeam_reco");
-    plotStacked(h_signal_angleBeam_reco_Pion, h_background_angleBeam_reco_Pion,"Pion Angle wrt Beam", "angleBeam_reco_Pion.png", otherDir);
-    
-    TH1D* h_signal_invMass = (TH1D*)f_Root_Signal_Pion->Get("invMass");
-    TH1D* h_background_invMass = (TH1D*)f_Root_Background_Pion->Get("invMass");
-    plotStacked(h_signal_invMass, h_background_invMass,"Pion Invariant Mass [MeV]", "invMass.png", otherDir);
+    TH1D* h_signal_g1_blob_nclusters = (TH1D*)f_Root_Signal_Pion->Get("g1_blob_nclusters");
+    TH1D* h_background_g1_blob_nclusters = (TH1D*)f_Root_Background_Pion->Get("g1_blob_nclusters");
+    plotStacked(h_signal_g1_blob_nclusters, h_background_g1_blob_nclusters,"g1_blob_nclusters", "g1_blob_nclusters.png", otherDir);
+
+    TH1D* h_signal_g1_blob_ndigits = (TH1D*)f_Root_Signal_Pion->Get("g1_blob_ndigits");
+    TH1D* h_background_g1_blob_ndigits = (TH1D*)f_Root_Background_Pion->Get("g1_blob_ndigits");
+    plotStacked(h_signal_g1_blob_ndigits, h_background_g1_blob_ndigits,"g1_blob_ndigits", "g1_blob_ndigits.png", otherDir);
+
+    TH1D* h_signal_g1_cluster_energy = (TH1D*)f_Root_Signal_Pion->Get("g1_cluster_energy");
+    TH1D* h_background_g1_cluster_energy = (TH1D*)f_Root_Background_Pion->Get("g1_cluster_energy");
+    plotStacked(h_signal_g1_cluster_energy, h_background_g1_cluster_energy,"g1_cluster_energy", "g1_cluster_energy.png", otherDir);
      
-    // Muon Plots
-    TH1D* h_signal_E_Muon = (TH1D*)f_Root_Signal_Muon->Get("E_reco");
-    TH1D* h_background_E_Muon = (TH1D*)f_Root_Background_Muon->Get("E_reco");
-    plotStacked(h_signal_E_Muon, h_background_E_Muon,"Muon Energy [GeV]", "E_Muon.png", otherDir);
+    TH1D* h_signal_g1_cluster_pe = (TH1D*)f_Root_Signal_Pion->Get("g1_cluster_pe");
+    TH1D* h_background_g1_cluster_pe = (TH1D*)f_Root_Background_Pion->Get("g1_cluster_pe");
+    plotStacked(h_signal_g1_cluster_pe, h_background_g1_cluster_pe,"g1_cluster_pe", "g1_cluster_pe.png", otherDir);
     
-    TH1D* h_signal_P_Muon = (TH1D*)f_Root_Signal_Muon->Get("P_reco");
-    TH1D* h_background_P_Muon = (TH1D*)f_Root_Background_Muon->Get("P_reco");
-    plotStacked(h_signal_P_Muon, h_background_P_Muon,"Muon Momentum [GeV]", "P_Muon.png", otherDir);
+    TH1D* h_signal_g1_cluster_ndigits = (TH1D*)f_Root_Signal_Pion->Get("g1_cluster_ndigits");
+    TH1D* h_background_g1_cluster_ndigits = (TH1D*)f_Root_Background_Pion->Get("g1_cluster_ndigits");
+    plotStacked(h_signal_g1_cluster_ndigits, h_background_g1_cluster_ndigits,"g1_cluster_ndigits", "g1_cluster_ndigits.png", otherDir);
+ 
+    TH1D* h_signal_g1_cluster_type = (TH1D*)f_Root_Signal_Pion->Get("g1_cluster_type");
+    TH1D* h_background_g1_cluster_type = (TH1D*)f_Root_Background_Pion->Get("g1_cluster_type");
+    plotStacked(h_signal_g1_cluster_type, h_background_g1_cluster_type,"g1_cluster_type", "g1_cluster_type.png", otherDir);
+ 
+    TH1D* h_signal_g1_cluster_width = (TH1D*)f_Root_Signal_Pion->Get("g1_cluster_width");
+    TH1D* h_background_g1_cluster_width = (TH1D*)f_Root_Background_Pion->Get("g1_cluster_width");
+    plotStacked(h_signal_g1_cluster_width, h_background_g1_cluster_width,"g1_cluster_width", "g1_cluster_width.png", otherDir);
+
+    TH1D* h_signal_g1_digit_pe = (TH1D*)f_Root_Signal_Pion->Get("g1_digit_pe");
+    TH1D* h_background_g1_digit_pe = (TH1D*)f_Root_Background_Pion->Get("g1_digit_pe");
+    plotStacked(h_signal_g1_digit_pe, h_background_g1_digit_pe,"g1_digit_pe", "g1_digit_pe.png", otherDir);
+
+    TH1D* h_signal_g1_digit_normEnergy = (TH1D*)f_Root_Signal_Pion->Get("g1_digit_normEnergy");
+    TH1D* h_background_g1_digit_normEnergy = (TH1D*)f_Root_Background_Pion->Get("g1_digit_normEnergy");
+    plotStacked(h_signal_g1_digit_normEnergy, h_background_g1_digit_normEnergy,"g1_digit_normEnergy", "g1_digit_normEnergy.png", otherDir);
+
+
+    // Gamma 2
+    TH1D* h_signal_g2_blob_conv_length = (TH1D*)f_Root_Signal_Pion->Get("gamma2_ConvLength");
+    TH1D* h_background_g2_blob_conv_length = (TH1D*)f_Root_Background_Pion->Get("gamma2_ConvLength");
+    plotStacked(h_signal_g2_blob_conv_length, h_background_g2_blob_conv_length,"g2_blob_conv_length", "g2_blob_conv_length.png", otherDir);
+
+    TH1D* h_signal_g2_blob_energy = (TH1D*)f_Root_Signal_Pion->Get("g2_blob_energy");
+    TH1D* h_background_g2_blob_energy = (TH1D*)f_Root_Background_Pion->Get("g2_blob_energy");
+    plotStacked(h_signal_g2_blob_energy, h_background_g2_blob_energy,"g2_blob_energy", "g2_blob_energy.png", otherDir);
     
-    TH1D* h_signal_angleBeam_reco_Muon = (TH1D*)f_Root_Signal_Muon->Get("angleBeam_reco");
-    TH1D* h_background_angleBeam_reco_Muon = (TH1D*)f_Root_Background_Muon->Get("angleBeam_reco");
-    plotStacked(h_signal_angleBeam_reco_Muon, h_background_angleBeam_reco_Muon,"Muon Angle wrt Beam", "angleBeam_reco_Muon.png", otherDir);
+    TH1D* h_signal_g2_blob_nclusters = (TH1D*)f_Root_Signal_Pion->Get("g2_blob_nclusters");
+    TH1D* h_background_g2_blob_nclusters = (TH1D*)f_Root_Background_Pion->Get("g2_blob_nclusters");
+    plotStacked(h_signal_g2_blob_nclusters, h_background_g2_blob_nclusters,"g2_blob_nclusters", "g2_blob_nclusters.png", otherDir);
+
+    TH1D* h_signal_g2_blob_ndigits = (TH1D*)f_Root_Signal_Pion->Get("g2_blob_ndigits");
+    TH1D* h_background_g2_blob_ndigits = (TH1D*)f_Root_Background_Pion->Get("g2_blob_ndigits");
+    plotStacked(h_signal_g2_blob_ndigits, h_background_g2_blob_ndigits,"g2_blob_ndigits", "g2_blob_ndigits.png", otherDir);
+
+    TH1D* h_signal_g2_cluster_energy = (TH1D*)f_Root_Signal_Pion->Get("g2_cluster_energy");
+    TH1D* h_background_g2_cluster_energy = (TH1D*)f_Root_Background_Pion->Get("g2_cluster_energy");
+    plotStacked(h_signal_g2_cluster_energy, h_background_g2_cluster_energy,"g2_cluster_energy", "g2_cluster_energy.png", otherDir);
+     
+    TH1D* h_signal_g2_cluster_pe = (TH1D*)f_Root_Signal_Pion->Get("g2_cluster_pe");
+    TH1D* h_background_g2_cluster_pe = (TH1D*)f_Root_Background_Pion->Get("g2_cluster_pe");
+    plotStacked(h_signal_g2_cluster_pe, h_background_g2_cluster_pe,"g2_cluster_pe", "g2_cluster_pe.png", otherDir);
     
-    // Interaction Plots 
-    TH1D* h_signal_q2_mc = (TH1D*)f_Root_Signal_Interaction->Get("q2_mc");
-    TH1D* h_background_q2_mc = (TH1D*)f_Root_Background_Interaction->Get("q2_mc");
-    plotStacked(h_signal_q2_mc, h_background_q2_mc,"True Q^{2} [GeV^{2}]", "Q_Square_truth.png", otherDir);
-    
-    TH1D* h_signal_q2_reco = (TH1D*)f_Root_Signal_Interaction->Get("q2_reco");
-    TH1D* h_background_q2_reco = (TH1D*)f_Root_Background_Interaction->Get("q2_reco");
-    plotStacked(h_signal_q2_reco, h_background_q2_reco,"Reconstructed Q^{2} [GeV^{2}]", "Q_Square_reco.png", otherDir);
-    
-    TH1D* h_signal_w_mc = (TH1D*)f_Root_Signal_Interaction->Get("w_mc");
-    TH1D* h_background_w_mc = (TH1D*)f_Root_Background_Interaction->Get("w_mc");
-    plotStacked(h_signal_w_mc, h_background_w_mc,"True W [GeV]", "W_truth.png", otherDir);
-    
-    TH1D* h_signal_w_reco = (TH1D*)f_Root_Signal_Interaction->Get("w_reco");
-    TH1D* h_background_w_reco = (TH1D*)f_Root_Background_Interaction->Get("w_reco");
-    plotStacked(h_signal_w_reco, h_background_w_reco,"Reconstructed W [GeV]", "W_reco.png", otherDir);
-    
-    TH1D* h_signal_wSq_reco = (TH1D*)f_Root_Signal_Interaction->Get("wSq_reco");
-    TH1D* h_background_wSq_reco = (TH1D*)f_Root_Background_Interaction->Get("wSq_reco");
-    plotStacked(h_signal_wSq_reco, h_background_wSq_reco,"Reconstructed W^{2} [GeV^{2}]", "wSq_reco.png", otherDir);
-    
-    TH1D* h_signal_beamEnergy_mc = (TH1D*)f_Root_Signal_Interaction->Get("beamEnergy_mc");
-    TH1D* h_background_beamEnergy_mc = (TH1D*)f_Root_Background_Interaction->Get("beamEnergy_mc");
-    plotStacked(h_signal_beamEnergy_mc, h_background_beamEnergy_mc,"True Beam Energy [GeV]", "BeamEnergy_truth.png", otherDir);
-    
-    TH1D* h_signal_beamEnergy_reco = (TH1D*)f_Root_Signal_Interaction->Get("beamEnergy_reco");
-    TH1D* h_background_beamEnergy_reco = (TH1D*)f_Root_Background_Interaction->Get("beamEnergy_reco");
-    plotStacked(h_signal_beamEnergy_reco, h_background_beamEnergy_reco,"Reconstructed Beam Energy [GeV]", "BeamEnergy_reco.png", otherDir);
-      
-    TH1D* h_signal_beamEnergyCal_reco = (TH1D*)f_Root_Signal_Interaction->Get("beamEnergyCal_reco");
-    TH1D* h_background_beamEnergyCal_reco = (TH1D*)f_Root_Background_Interaction->Get("beamEnergyCal_reco");
-    plotStacked(h_signal_beamEnergyCal_reco, h_background_beamEnergyCal_reco,"Reconstructed Calorimetric Beam Energy [GeV]", "BeamEnergyCal_reco.png", otherDir);
-    
-    TH1D* h_signal_total_E = (TH1D*)f_Root_Signal_Interaction->Get("total_E");
-    TH1D* h_background_total_E = (TH1D*)f_Root_Background_Interaction->Get("total_E");
-    plotStacked(h_signal_total_E, h_background_total_E,"Total FS Particle Energy [GeV]", "total_E.png", otherDir);
-    
-   
+    TH1D* h_signal_g2_cluster_ndigits = (TH1D*)f_Root_Signal_Pion->Get("g2_cluster_ndigits");
+    TH1D* h_background_g2_cluster_ndigits = (TH1D*)f_Root_Background_Pion->Get("g2_cluster_ndigits");
+    plotStacked(h_signal_g2_cluster_ndigits, h_background_g2_cluster_ndigits,"g2_cluster_ndigits", "g2_cluster_ndigits.png", otherDir);
+ 
+    TH1D* h_signal_g2_cluster_type = (TH1D*)f_Root_Signal_Pion->Get("g2_cluster_type");
+    TH1D* h_background_g2_cluster_type = (TH1D*)f_Root_Background_Pion->Get("g2_cluster_type");
+    plotStacked(h_signal_g2_cluster_type, h_background_g2_cluster_type,"g2_cluster_type", "g2_cluster_type.png", otherDir);
+ 
+    TH1D* h_signal_g2_cluster_width = (TH1D*)f_Root_Signal_Pion->Get("g2_cluster_width");
+    TH1D* h_background_g2_cluster_width = (TH1D*)f_Root_Background_Pion->Get("g2_cluster_width");
+    plotStacked(h_signal_g2_cluster_width, h_background_g2_cluster_width,"g2_cluster_width", "g2_cluster_width.png", otherDir);
+
+    TH1D* h_signal_g2_digit_pe = (TH1D*)f_Root_Signal_Pion->Get("g2_digit_pe");
+    TH1D* h_background_g2_digit_pe = (TH1D*)f_Root_Background_Pion->Get("g2_digit_pe");
+    plotStacked(h_signal_g2_digit_pe, h_background_g2_digit_pe,"g2_digit_pe", "g2_digit_pe.png", otherDir);
+
+    TH1D* h_signal_g2_digit_normEnergy = (TH1D*)f_Root_Signal_Pion->Get("g2_digit_normEnergy");
+    TH1D* h_background_g2_digit_normEnergy = (TH1D*)f_Root_Background_Pion->Get("g2_digit_normEnergy");
+    plotStacked(h_signal_g2_digit_normEnergy, h_background_g2_digit_normEnergy,"g2_digit_normEnergy", "g2_digit_normEnergy.png", otherDir);
 }
 
  

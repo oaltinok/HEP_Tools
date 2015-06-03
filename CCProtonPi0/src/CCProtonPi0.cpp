@@ -86,12 +86,16 @@
 Gaudi::LorentzVector m_muon_4P;
 Gaudi::LorentzVector m_proton_4P;
 Gaudi::LorentzVector m_pi0_4P;
-SmartRef<Minerva::Vertex>       m_PrimaryVertex;
-SmartRef<Minerva::Track>        m_MuonTrack;
-SmartRef<Minerva::Prong>        m_MuonProng;
-SmartRef<Minerva::Particle>     m_MuonParticle;
+SmartRef<Minerva::Vertex>   m_PrimaryVertex;
+SmartRef<Minerva::Track>    m_MuonTrack;
+SmartRef<Minerva::Prong>    m_MuonProng;
+SmartRef<Minerva::Particle> m_MuonParticle;
+SmartRef<Minerva::IDBlob>   m_Pi0Blob1;
+SmartRef<Minerva::IDBlob>   m_Pi0Blob2;
 Minerva::ProngVect    m_ProtonProngs;
 Minerva::ParticleVect m_ProtonParticles;
+
+
 
 // Counters for Functions - Debugging Purposes
 double N_tagTruth;
@@ -149,7 +153,8 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("DoTruthMatch",         m_DoTruthMatch          =   true);
     declareProperty("MakeShortTracks",      m_makeShortTracks       =   true);
     declareProperty("RecoNoProtonEvents",   m_reconstruct_NoProtonEvents = true);
-   
+    declareProperty("ApplyExtraMichelCuts", m_applyExtraMichelCuts = false);
+    
     declareProperty("Do_nProngCut",         m_Do_nProngCut          =   false);  
     declareProperty("max_nProngs",      	m_max_nProngs       =   2);
     
@@ -258,9 +263,6 @@ StatusCode CCProtonPi0::initialize()
     // They can be used to track events in DST and Ana
     N_tagTruth = 0;
     N_reconstructEvent = 0;
-    
-    m_michelProngMinTimeDiff    = 300;  // ns
-    m_michelProngMaxEnergy      = 100;  // MeV
     
     m_detectableGammaE      = 0;        // MeV
     m_detectablePi0KE       = 0;        // MeV
@@ -500,9 +502,32 @@ StatusCode CCProtonPi0::initialize()
     //! Select the branches you want in your AnaTuple
     //--------------------------------------------------------------------------
     double SENTINEL = -9.9;
-    
+   
+    // ------------------------------------------------------------------------
     //! Truth Branches
+    // ------------------------------------------------------------------------
     declareDoubleTruthBranch("eventID",0.0);
+    
+    declareIntTruthBranch("N_FSParticles", -1 );
+    declareIntTruthBranch("N_proton", -1 );
+    declareIntTruthBranch("N_pi0", -1 );
+    declareIntTruthBranch("N_gamma", -1 );
+    
+    declareIntTruthBranch( "vertex_module", 500);
+    declareIntTruthBranch( "vertex_plane", 0);
+    declareIntTruthBranch( "target_material", -1); 
+    
+    declareContainerDoubleTruthBranch("muon_4P", 4, SENTINEL );
+    declareContainerDoubleTruthBranch("proton_4P", 4, SENTINEL );
+    declareContainerDoubleTruthBranch("pi0_4P", 4, SENTINEL );
+    declareContainerDoubleTruthBranch("gamma1_4P", 4, SENTINEL );
+    declareContainerDoubleTruthBranch("gamma2_4P", 4, SENTINEL );
+    
+    declareIntTruthBranch("pi0_status", -9 );
+    declareIntTruthBranch("pi0_Mother", -9 );
+    declareIntTruthBranch("pi0_MotherStatus", -9 );   
+    declareIntTruthBranch("pi0_GrandMother", -9 );
+    declareIntTruthBranch("pi0_GrandMotherStatus", -9 );
     
     // Signal and Background
     declareBoolTruthBranch("isSignal");
@@ -525,15 +550,6 @@ StatusCode CCProtonPi0::initialize()
     declareBoolTruthBranch("isBckg_withPrimaryPi0");
     declareBoolTruthBranch("isBckg_withSecondaryPi0");
     
-    declareIntTruthBranch("N_FSParticles", -1 );
-    declareIntTruthBranch("N_proton", -1 );
-    declareIntTruthBranch("N_pi0", -1 );
-    declareIntTruthBranch("N_gamma", -1 );
-    
-    declareIntTruthBranch( "vertex_module", 500);
-    declareIntTruthBranch( "vertex_plane", 0);
-    declareIntTruthBranch( "target_material", -1); 
-    
     // Truth Michel Information
     declareIntTruthBranch("N_trueMichelElectrons", -1 );
     declareDoubleTruthBranch("michelElectron_P", SENTINEL );
@@ -546,17 +562,265 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleTruthBranch("michelPion_length", SENTINEL );
     declareDoubleTruthBranch("michelPion_begin_dist_vtx", SENTINEL );
 
-    declareContainerDoubleTruthBranch("muon_4P", 4, SENTINEL );
-    declareContainerDoubleTruthBranch("proton_4P", 4, SENTINEL );
-    declareContainerDoubleTruthBranch("pi0_4P", 4, SENTINEL );
-    declareContainerDoubleTruthBranch("gamma1_4P", 4, SENTINEL );
-    declareContainerDoubleTruthBranch("gamma2_4P", 4, SENTINEL );
+    // ------------------------------------------------------------------------       
+    //! Event Branches
+    // ------------------------------------------------------------------------       
+    // Cut Results
+    declareIntEventBranch( "Cut_Vertex_None", -1 );
+    declareIntEventBranch( "Cut_Vertex_Not_Reconstructable", -1 );
+    declareIntEventBranch( "Cut_Vertex_Not_Fiducial", -1 );
+	declareIntEventBranch( "Cut_nProngs", -1 );
+    declareIntEventBranch( "Cut_Muon_None",-1);
+    declareIntEventBranch( "Cut_Muon_Not_Plausible",-1);
+    declareIntEventBranch( "Cut_Muon_Score_Low",-1);
+    declareIntEventBranch( "Cut_Muon_Charge",-1);
+    declareIntEventBranch( "Cut_Vertex_Michel_Exist", -1 );
+    declareIntEventBranch( "Cut_EndPoint_Michel_Exist", -1 );
+    declareIntEventBranch( "Cut_secEndPoint_Michel_Exist", -1 );
+    declareIntEventBranch( "Cut_Particle_None", -1 );
+    declareIntEventBranch( "Cut_Proton_None", -1 );
+    declareIntEventBranch( "Cut_PreFilter_Pi0", -1 );
+    declareIntEventBranch( "Cut_VtxBlob", -1 );
+    declareIntEventBranch( "Cut_ConeBlobs", -1 );
+    declareIntEventBranch( "Cut_PreBlobCuts", -1 );
     
-    declareIntTruthBranch("pi0_status", -9 );
-    declareIntTruthBranch("pi0_Mother", -9 );
-    declareIntTruthBranch("pi0_MotherStatus", -9 );   
-    declareIntTruthBranch("pi0_GrandMother", -9 );
-    declareIntTruthBranch("pi0_GrandMotherStatus", -9 );
+    //! General Reco
+    declareIntEventBranch( "nProngs", -1);
+    declareIntEventBranch( "n_anchored_long_trk_prongs", -1 );
+    declareIntEventBranch( "n_anchored_short_trk_prongs", -1 );
+    declareIntEventBranch( "n_iso_trk_prongs", -1);
+    declareDoubleEventBranch( "time", -1.0 );
+    declareDoubleEventBranch( "reco_eventID", -1.0 );
+   
+    //! Vertex Information 
+    declareIntEventBranch("vtx_total_count",-1);
+    declareIntEventBranch("vtx_secondary_count",-1);
+    declareIntEventBranch("vtx_primary_index",-1);
+    declareIntEventBranch("vtx_primary_multiplicity",-1);
+
+    //! Michel Prong  
+    declareDoubleEventBranch( "michelProng_distance", -1.0);
+    declareDoubleEventBranch( "michelProng_energy", -1.0);
+    declareDoubleEventBranch( "michelProng_time_diff", -1.0);
+    declareDoubleEventBranch( "michelProng_end_Z", -1.0);
+    declareDoubleEventBranch( "michelProng_begin_Z", -1.0);
+    
+    //! Visible Energy inside Detector
+    declareDoubleEventBranch( "muonVisibleE", -1.0 );
+    declareDoubleEventBranch( "hadronVisibleE", -1.0 );
+    declareDoubleEventBranch( "totalVisibleE", -1.0 );
+    declareDoubleEventBranch( "totalIDVisibleE", -1.0 );
+    declareDoubleEventBranch( "totalODVisibleE", -1.0 );
+    declareDoubleEventBranch( "energyUnused_afterReco", -1.0 );
+    declareDoubleEventBranch( "energyUsed_afterReco", -1.0 );
+      
+    //! PreFilterPi0()
+    declareIntEventBranch("preFilter_Result", -1);
+    declareDoubleEventBranch("preFilter_rejectedEnergy", -1.0);
+    declareDoubleEventBranch("evis_nearvtx", -1.0);
+    declareDoubleEventBranch("evis_total", -1.0);
+    declareDoubleEventBranch("evis_NuclearTarget",  -1.0);
+    declareDoubleEventBranch("evis_Tracker",  -1.0);
+    declareDoubleEventBranch("evis_ECAL",  -1.0);
+    declareDoubleEventBranch("evis_HCAL",  -1.0);
+    declareDoubleEventBranch("evis_TotalExceptNuclearTarget", -1.0);
+    
+    //! VtxBlob()
+    declareContainerDoubleEventBranch("Vertex_energy_radii");
+    declareDoubleEventBranch("Vertex_blob_energy", -9999 );
+    declareDoubleEventBranch("Filament_Vertex_energy", -9999 );
+    declareDoubleEventBranch("Sphere_Vertex_energy", -9999 );
+    
+    //! ConeBlobs()
+    declareDoubleEventBranch("RE_energy_Tracker", -9999 );
+    declareDoubleEventBranch("RE_energy_ECAL", -9999 );
+    declareDoubleEventBranch("RE_energy_HCAL", -9999 );
+    declareIntEventBranch("anglescan_ncandx", -1);
+    declareIntEventBranch("anglescan_ncand", -1);
+    
+    //! processBlobs() -- Called from ConeBlobs()
+    declareIntEventBranch("blob_ndof_1");
+    declareIntEventBranch("blob_ndof_2");
+    declareDoubleEventBranch("blob_fval_1");
+    declareDoubleEventBranch("blob_fval_2");    
+
+    //! ODActivity() -- Called from ConeBlobs()
+    declareIntEventBranch( "od_energeticTower", -9999 );
+    declareDoubleEventBranch( "od_upstreamFrame", -9999 );
+    declareDoubleEventBranch( "od_downstreamFrame", -9999 );
+    declareDoubleEventBranch( "od_upstreamFrame_z", -9999 );
+    declareDoubleEventBranch( "od_downstreamFrame_z", -9999 );
+    declareDoubleEventBranch( "od_highStory", -9999 );
+    declareDoubleEventBranch( "od_lowStory", -9999 );
+    declareDoubleEventBranch( "od_highStory_t", -9999 );
+    declareDoubleEventBranch( "od_lowStory_t", -9999 );
+    declareDoubleEventBranch( "od_maxEnergy", -9999 );
+    declareContainerDoubleEventBranch( "od_distanceBlobTower");
+    declareContainerDoubleEventBranch( "od_towerEnergy" );
+    declareContainerDoubleEventBranch( "od_towerNClusters" );
+    declareContainerDoubleEventBranch( "od_towerTime" );
+    declareContainerDoubleEventBranch( "od_idBlobTime" );
+    declareContainerDoubleEventBranch( "od_towerTimeBlobOD" );
+    declareContainerDoubleEventBranch( "od_towerTimeBlobMuon" );
+ 
+    //! Blob Data -- Filled in setBlobData()
+    declareIntEventBranch("gamma1_blob_ndigits",-1);
+    declareIntEventBranch("gamma1_blob_nclusters",-1);
+    declareDoubleEventBranch("gamma1_blob_energy",-1);
+    declareDoubleEventBranch("gamma1_blob_minsep", -1.0);
+    
+    declareIntEventBranch("gamma2_blob_ndigits",-1);
+    declareIntEventBranch("gamma2_blob_nclusters",-1);
+    declareDoubleEventBranch("gamma2_blob_energy",-1);
+    declareDoubleEventBranch("gamma2_blob_minsep", -1.0);
+
+    //! Calculate_dEdX() -- Called from setBlobData()
+    declareIntEventBranch("g1dedx_nplane", -1);
+    declareIntEventBranch("g1dedx_doublet", -1);
+    declareIntEventBranch("g1dedx_empty_plane", -1);
+    declareDoubleEventBranch("g1dedx_total", -1.0);
+    declareDoubleEventBranch("g1dedx", -1.0);
+    declareDoubleEventBranch("g1dedx_total1", -1.0);
+    declareDoubleEventBranch("g1dedx1", -1.0);
+    declareContainerIntEventBranch("g1dedx_cluster_occupancy");
+    declareContainerDoubleEventBranch("g1dedx_cluster_energy");
+    declareContainerDoubleEventBranch("g1dedx_rev_cluster_energy");
+    
+    declareIntEventBranch("g2dedx_nplane", -1);
+    declareIntEventBranch("g2dedx_doublet", -1);
+    declareIntEventBranch("g2dedx_empty_plane", -1);
+    declareDoubleEventBranch("g2dedx_total", -1.0);
+    declareDoubleEventBranch("g2dedx", -1.0);
+    declareDoubleEventBranch("g2dedx_total1", -1.0);
+    declareDoubleEventBranch("g2dedx1", -1.0);
+    declareContainerIntEventBranch("g2dedx_cluster_occupancy");
+    declareContainerDoubleEventBranch("g2dedx_cluster_energy");
+    declareContainerDoubleEventBranch("g2dedx_rev_cluster_energy");
+ 
+    //!  blobsPassedPreCuts()
+    declareBoolEventBranch("gamma1_isGoodDirection");
+    declareBoolEventBranch("gamma1_isGoodPosition");
+    declareBoolEventBranch("gamma1_isGoodBlob");
+    declareBoolEventBranch("gamma2_isGoodDirection");
+    declareBoolEventBranch("gamma2_isGoodPosition");
+    declareBoolEventBranch("gamma2_isGoodBlob");
+        
+    //-------------------------------------------------------------------------
+    //! NeutrinoInt Branches 
+    //-------------------------------------------------------------------------
+    // Primary Vertex
+    declareIntBranch( m_hypMeths, "vtx_module", -99);
+    declareIntBranch( m_hypMeths, "vtx_plane",-1);
+    declareDoubleBranch( m_hypMeths, "vtx_x",0.0);
+    declareDoubleBranch( m_hypMeths, "vtx_y",0.0);
+    declareDoubleBranch( m_hypMeths, "vtx_z",0.0);
+    
+    //! Event Kinematics -- Filled in setEventKinematics()
+    declareDoubleBranch( m_hypMeths, "neutrino_E", -9.9);
+    declareDoubleBranch( m_hypMeths, "neutrino_E_Cal", -9.9);
+    declareDoubleBranch( m_hypMeths, "QSq", -9.9);
+    declareDoubleBranch( m_hypMeths, "WSq", -9.9);
+    declareDoubleBranch( m_hypMeths, "W", -9.9); 
+    declareDoubleBranch( m_hypMeths, "total_E", -9.9);
+    declareDoubleBranch( m_hypMeths, "total_px", -9.9);
+    declareDoubleBranch( m_hypMeths, "total_py", -9.9);
+    declareDoubleBranch( m_hypMeths, "total_pz", -9.9);
+    
+    //! Muon Kinematics  -- Filled in setMuonData()
+    declareIntBranch( m_hypMeths, "muon_hasMinosMatchTrack", -1);
+    declareIntBranch( m_hypMeths, "muon_hasMinosMatchStub", -1);
+    declareIntBranch( m_hypMeths, "muon_minervaTrack_types", -1);
+    declareIntBranch( m_hypMeths, "muon_N_minosTracks", -1);
+    declareIntBranch( m_hypMeths, "muon_minosTrackQuality", -1);
+    declareIntBranch( m_hypMeths, "muon_roadUpstreamPlanes", -1);
+    declareIntBranch( m_hypMeths, "muon_charge", -99);
+    declareDoubleBranch( m_hypMeths, "muon_roadUpstreamEnergy", 0.0);
+    declareDoubleBranch( m_hypMeths, "muon_E", 0.0);
+    declareDoubleBranch( m_hypMeths, "muon_p", 0.0);
+    declareDoubleBranch( m_hypMeths, "muon_px", 0.0);
+    declareDoubleBranch( m_hypMeths, "muon_py", 0.0);
+    declareDoubleBranch( m_hypMeths, "muon_pz", 0.0);  
+    declareDoubleBranch( m_hypMeths, "muon_theta", 0.0);
+    declareDoubleBranch( m_hypMeths, "muon_theta_biasUp", 0.0);
+    declareDoubleBranch( m_hypMeths, "muon_theta_biasDown", 0.0); 
+    declareDoubleBranch( m_hypMeths, "muon_muScore", -1.0);
+    declareDoubleBranch( m_hypMeths, "muon_qp", 99.0);
+    declareDoubleBranch( m_hypMeths, "muon_qpqpe", 99.0);
+    declareDoubleBranch( m_hypMeths, "muon_E_shift", 0.0);
+    
+    //! Proton Kinematics -- Filled in setProtonData()
+    declareContainerIntBranch(m_hypMeths,    "proton_kinked", 10,    -1);
+    declareContainerIntBranch(m_hypMeths,    "proton_odMatch", 10,  -1);
+    declareContainerIntBranch(m_hypMeths,    "proton_isRecoGood",10,-1);
+    declareContainerDoubleBranch(m_hypMeths, "proton_length",10,  SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_startPointX",10,  SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_startPointY",10,  SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_startPointZ", 10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_endPointX", 10,   SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_endPointY", 10,   SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_endPointZ", 10,   SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "protonScore",   10,  SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "pionScore",   10,  SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "protonScore_LLR",  10,   SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_chi2_ndf", 10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_theta",   10,  SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_thetaX",   10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_thetaY",   10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_phi",       10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_ekin",      10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_E",         10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p",         10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_px",        10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_py",        10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_pz",        10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p_calCorrection", 10, SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p_visEnergy",      10,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths, "proton_p_dEdXTool",       10,SENTINEL);
+    
+    //! Pi0 & Gamma1,2 Kinematics -- Filled in setPi0Data()    
+    declareDoubleBranch(m_hypMeths,"pi0_px",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_py",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_pz",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_E",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_invMass", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_theta", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_phi",   SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_thetaX", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_thetaY",   SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_openingAngle",  SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_cos_openingAngle", SENTINEL);
+    
+    declareDoubleBranch(m_hypMeths,"gamma1_px",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_py",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_pz",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_E",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_theta",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_phi",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_dEdx",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_time",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_dist_vtx",SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths,"gamma1_direction",3,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths,"gamma1_vertex",3,SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_evis_trkr", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_evis_ecal", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_evis_hcal", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_evis_scal", SENTINEL);
+       
+    declareDoubleBranch(m_hypMeths,"gamma2_px",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_py",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_pz",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_E",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_theta",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_phi",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_dEdx",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_time",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_dist_vtx",SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths,"gamma2_direction",3,SENTINEL);
+    declareContainerDoubleBranch(m_hypMeths,"gamma2_vertex",3,SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_evis_trkr", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_evis_ecal", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_evis_hcal", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_evis_scal", SENTINEL);
     
     //! Truth Match for Prongs
     declareIntBranch(m_hypMeths,    "isMuonInsideOD",        -1);
@@ -592,265 +856,7 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleBranch(m_hypMeths, "endProtonTrajXPosition",  10, -9999);
     declareContainerDoubleBranch(m_hypMeths, "endProtonTrajYPosition",  10, -9999);
     declareContainerDoubleBranch(m_hypMeths, "endProtonTrajZPosition",  10, -9999);
-    
-    //! Event - Cut Results
-    declareIntEventBranch( "Cut_Vertex_None", -1 );
-    declareIntEventBranch( "Cut_Vertex_Not_Reconstructable", -1 );
-    declareIntEventBranch( "Cut_Vertex_Not_Fiducial", -1 );
-	declareIntEventBranch( "Cut_nProngs", -1 );
-    declareIntEventBranch( "Cut_Muon_None",-1);
-    declareIntEventBranch( "Cut_Muon_Not_Plausible",-1);
-    declareIntEventBranch( "Cut_Muon_Score_Low",-1);
-    declareIntEventBranch( "Cut_Muon_Charge",-1);
-    declareIntEventBranch( "Cut_Vertex_Michel_Exist", -1 );
-    declareIntEventBranch( "Cut_EndPoint_Michel_Exist", -1 );
-    declareIntEventBranch( "Cut_secEndPoint_Michel_Exist", -1 );
-    declareIntEventBranch( "Cut_Particle_None", -1 );
-    declareIntEventBranch( "Cut_Proton_None", -1 );
-    declareIntEventBranch( "Cut_PreFilter_Pi0", -1 );
-    declareIntEventBranch( "Cut_VtxBlob", -1 );
-    declareIntEventBranch( "Cut_ConeBlobs", -1 );
-    
-    //! Event - General reco
-    declareIntEventBranch( "nProngs", -1);
-    declareIntEventBranch( "n_anchored_long_trk_prongs", -1 );
-    declareIntEventBranch( "n_anchored_short_trk_prongs", -1 );
-    declareIntEventBranch( "n_iso_trk_prongs", -1);
-    declareDoubleEventBranch( "time", -1.0 );
-    declareDoubleEventBranch( "reco_eventID", -1.0 );
-    
-    //! Event - Michel 
-    declareIntEventBranch( "n_vtx_michel_views", 0 );
-    declareDoubleEventBranch( "vtx_michel_distance", -1.0);
-    declareDoubleEventBranch( "endpoint_michel_distance", -1.0);
-    declareDoubleEventBranch( "michelProng_energy", -1.0);
-    declareDoubleEventBranch( "michelProng_time_diff", -1.0);
-    declareDoubleEventBranch( "michelProng_end_Z", -1.0);
-    declareDoubleEventBranch( "michelProng_begin_Z", -1.0);
-    
-    //! Event - Energy
-    declareDoubleEventBranch( "muonVisibleE", -1.0 );
-    declareDoubleEventBranch( "hadronVisibleE", -1.0 );
-    declareDoubleEventBranch( "totalVisibleE", -1.0 );
-    declareDoubleEventBranch( "totalIDVisibleE", -1.0 );
-    declareDoubleEventBranch( "totalODVisibleE", -1.0 );
-    declareDoubleEventBranch( "energyUnused_afterReco", -1.0 );
-    declareDoubleEventBranch( "energyUsed_afterReco", -1.0 );
-      
-    //! Event - PreFilterPi0()
-    declareIntEventBranch("preFilter_Result", -1);
-    declareDoubleEventBranch("preFilter_rejectedEnergy", -1.0);
-    declareDoubleEventBranch("evis_nearvtx", -1.0);
-    declareDoubleEventBranch("evis_total", -1.0);
-    declareDoubleEventBranch("evis_NuclearTarget",  -1.0);
-    declareDoubleEventBranch("evis_Tracker",  -1.0);
-    declareDoubleEventBranch("evis_ECAL",  -1.0);
-    declareDoubleEventBranch("evis_HCAL",  -1.0);
-    declareDoubleEventBranch("evis_TotalExceptNuclearTarget", -1.0);
-    
-    //! Event - VtxBlob()
-    declareContainerDoubleEventBranch("Vertex_energy_radii");
-    declareDoubleEventBranch("Vertex_blob_energy", -9999 );
-    declareDoubleEventBranch("Filament_Vertex_energy", -9999 );
-    declareDoubleEventBranch("Sphere_Vertex_energy", -9999 );
-    
-    //! Event - ConeBlobs()
-    declareDoubleEventBranch("RE_energy_Tracker", -9999 );
-    declareDoubleEventBranch("RE_energy_ECAL", -9999 );
-    declareDoubleEventBranch("RE_energy_HCAL", -9999 );
-    
-    declareIntEventBranch("anglescan_ncandx", -1);
-    declareIntEventBranch("anglescan_ncand", -1);
-    
-    declareContainerDoubleEventBranch("blob_cluster_energy1");
-    declareContainerDoubleEventBranch("blob_cluster_energy2");
-
-    declareDoubleEventBranch("g1blob_minsep", -1.0);
-    declareDoubleEventBranch("g2blob_minsep", -1.0);
-    
-    //! Event - Gamma dEdX Information
-    declareIntEventBranch("g1dedx_nplane", -1);
-    declareIntEventBranch("g1dedx_doublet", -1);
-    declareIntEventBranch("g1dedx_empty_plane", -1);
-    declareDoubleEventBranch("g1dedx_total", -1.0);
-    declareDoubleEventBranch("g1dedx", -1.0);
-    declareDoubleEventBranch("g1dedx_total1", -1.0);
-    declareDoubleEventBranch("g1dedx1", -1.0);
-    declareContainerIntEventBranch("g1dedx_cluster_occupancy");
-    declareContainerDoubleEventBranch("g1dedx_cluster_energy");
-    declareContainerDoubleEventBranch("g1dedx_rev_cluster_energy");
-    
-    declareIntEventBranch("g2dedx_nplane", -1);
-    declareIntEventBranch("g2dedx_doublet", -1);
-    declareIntEventBranch("g2dedx_empty_plane", -1);
-    declareDoubleEventBranch("g2dedx_total", -1.0);
-    declareDoubleEventBranch("g2dedx", -1.0);
-    declareDoubleEventBranch("g2dedx_total1", -1.0);
-    declareDoubleEventBranch("g2dedx1", -1.0);
-    declareContainerIntEventBranch("g2dedx_cluster_occupancy");
-    declareContainerDoubleEventBranch("g2dedx_cluster_energy");
-    declareContainerDoubleEventBranch("g2dedx_rev_cluster_energy");
  
-    //! Event - OD info
-    declareIntEventBranch( "od_energeticTower", -9999 );
-    declareDoubleEventBranch( "od_upstreamFrame", -9999 );
-    declareDoubleEventBranch( "od_downstreamFrame", -9999 );
-    declareDoubleEventBranch( "od_upstreamFrame_z", -9999 );
-    declareDoubleEventBranch( "od_downstreamFrame_z", -9999 );
-    declareDoubleEventBranch( "od_highStory", -9999 );
-    declareDoubleEventBranch( "od_lowStory", -9999 );
-    declareDoubleEventBranch( "od_highStory_t", -9999 );
-    declareDoubleEventBranch( "od_lowStory_t", -9999 );
-    declareDoubleEventBranch( "od_maxEnergy", -9999 );
-    declareContainerDoubleEventBranch( "od_distanceBlobTower");
-    declareContainerDoubleEventBranch( "od_towerEnergy" );
-    declareContainerDoubleEventBranch( "od_towerNClusters" );
-    declareContainerDoubleEventBranch( "od_towerTime" );
-    declareContainerDoubleEventBranch( "od_idBlobTime" );
-    declareContainerDoubleEventBranch( "od_towerTimeBlobOD" );
-    declareContainerDoubleEventBranch( "od_towerTimeBlobMuon" );
-    
-    //! Event - Prong Information -- Filled in createTrackedParticles()
-    declareDoubleEventBranch( "prong_showerScore", SENTINEL );
-    
-    //! Event - Vertex Information -- Filled in reconstructEvent()
-    declareIntEventBranch("vtx_total_count",-1);
-    declareIntEventBranch("vtx_secondary_count",-1);
-    declareIntEventBranch("vtx_primary_index",-1);
-    declareIntEventBranch("vtx_primary_multiplicity",-1);
-    
-    //! NeutrinoInt - Primary Vertex -- Filled in interpretEvent()
-    declareIntBranch( m_hypMeths, "vtx_module", -99);
-    declareIntBranch( m_hypMeths, "vtx_plane",-1);
-    declareDoubleBranch( m_hypMeths, "vtx_x",0.0);
-    declareDoubleBranch( m_hypMeths, "vtx_y",0.0);
-    declareDoubleBranch( m_hypMeths, "vtx_z",0.0);
-    
-    //! NeutrinoInt - Kinematics -- Filled in setEventKinematics()
-    declareDoubleBranch( m_hypMeths, "neutrino_E", -9.9);
-    declareDoubleBranch( m_hypMeths, "neutrino_E_Cal", -9.9);
-    declareDoubleBranch( m_hypMeths, "QSq", -9.9);
-    declareDoubleBranch( m_hypMeths, "WSq", -9.9);
-    declareDoubleBranch( m_hypMeths, "W", -9.9); 
-    declareDoubleBranch( m_hypMeths, "total_E", -9.9);
-    declareDoubleBranch( m_hypMeths, "total_px", -9.9);
-    declareDoubleBranch( m_hypMeths, "total_py", -9.9);
-    declareDoubleBranch( m_hypMeths, "total_pz", -9.9);
-    
-    //! NeutrinoInt - Muon -- Filled in setMuonData()
-    declareIntBranch( m_hypMeths, "muon_hasMinosMatchTrack", -1);
-    declareIntBranch( m_hypMeths, "muon_hasMinosMatchStub", -1);
-    declareIntBranch( m_hypMeths, "muon_minervaTrack_types", -1);
-    declareIntBranch( m_hypMeths, "muon_N_minosTracks", -1);
-    declareIntBranch( m_hypMeths, "muon_minosTrackQuality", -1);
-    declareIntBranch( m_hypMeths, "muon_roadUpstreamPlanes", -1);
-    declareIntBranch( m_hypMeths, "muon_charge", -99);
-    declareDoubleBranch( m_hypMeths, "muon_roadUpstreamEnergy", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_E", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_p", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_px", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_py", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_pz", 0.0);  
-    declareDoubleBranch( m_hypMeths, "muon_theta", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_theta_biasUp", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_theta_biasDown", 0.0); 
-    declareDoubleBranch( m_hypMeths, "muon_muScore", -1.0);
-    declareDoubleBranch( m_hypMeths, "muon_qp", 99.0);
-    declareDoubleBranch( m_hypMeths, "muon_qpqpe", 99.0);
-    declareDoubleBranch( m_hypMeths, "muon_E_shift", 0.0);
-    
-    //! NeutrinoInt - Proton -- Filled in setProtonData()
-    declareContainerIntBranch(m_hypMeths,    "proton_kinked", 10,    -1);
-    declareContainerIntBranch(m_hypMeths,    "proton_odMatch", 10,  -1);
-    declareContainerIntBranch(m_hypMeths,    "proton_isRecoGood",10,-1);
-    declareContainerDoubleBranch(m_hypMeths, "proton_length",10,  SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_startPointX",10,  SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_startPointY",10,  SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_startPointZ", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_endPointX", 10,   SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_endPointY", 10,   SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_endPointZ", 10,   SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "protonScore",   10,  SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "pionScore",   10,  SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "protonScore_LLR",  10,   SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_chi2_ndf", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_theta",   10,  SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_thetaX",   10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_thetaY",   10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_phi",       10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_ekin",      10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_E",         10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_p",         10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_px",        10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_py",        10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_pz",        10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_p_calCorrection", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_p_visEnergy",      10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "proton_p_dEdXTool",       10,SENTINEL);
-    
-    //! Event - Pi0 -- Filles in processBlobs()
-    declareIntEventBranch("blob_ndof_1");
-    declareIntEventBranch("blob_ndof_2");
-    declareDoubleEventBranch("blob_fval_1");
-    declareDoubleEventBranch("blob_fval_2");    
-
-    //! Event - Pi0 -- Filles in setPi0Data()    
-    declareDoubleEventBranch("pi0_px",SENTINEL);
-    declareDoubleEventBranch("pi0_py",SENTINEL);
-    declareDoubleEventBranch("pi0_pz",SENTINEL);
-    declareDoubleEventBranch("pi0_E",SENTINEL);
-    declareDoubleEventBranch("pi0_invMass", SENTINEL);
-    declareDoubleEventBranch("pi0_theta", SENTINEL);
-    declareDoubleEventBranch("pi0_phi",   SENTINEL);
-    declareDoubleEventBranch("pi0_thetaX", SENTINEL);
-    declareDoubleEventBranch("pi0_thetaY",   SENTINEL);
-    declareDoubleEventBranch("pi0_openingAngle",  SENTINEL);
-    declareDoubleEventBranch("pi0_cos_openingAngle", SENTINEL);
-    
-    declareDoubleEventBranch("gamma1_score",SENTINEL);
-    declareDoubleEventBranch("gamma1_px",SENTINEL);
-    declareDoubleEventBranch("gamma1_py",SENTINEL);
-    declareDoubleEventBranch("gamma1_pz",SENTINEL);
-    declareDoubleEventBranch("gamma1_E",SENTINEL);
-    declareDoubleEventBranch("gamma1_theta",SENTINEL);
-    declareDoubleEventBranch("gamma1_phi",SENTINEL);
-    declareDoubleEventBranch("gamma1_dEdx",SENTINEL);
-    declareDoubleEventBranch("gamma1_time",SENTINEL);
-    declareDoubleEventBranch("gamma1_dist_vtx",SENTINEL);
-    declareContainerDoubleEventBranch("gamma1_direction",3,SENTINEL);
-    declareContainerDoubleEventBranch("gamma1_vertex",3,SENTINEL);
-    declareIntEventBranch("gamma1_blob_ndigits",-1);
-    declareIntEventBranch("gamma1_blob_nclusters",-1);
-    declareDoubleEventBranch("gamma1_evis_trkr", SENTINEL);
-    declareDoubleEventBranch("gamma1_evis_ecal", SENTINEL);
-    declareDoubleEventBranch("gamma1_evis_hcal", SENTINEL);
-    declareDoubleEventBranch("gamma1_evis_scal", SENTINEL);
-    declareBoolEventBranch("gamma1_isGoodDirection");
-    declareBoolEventBranch("gamma1_isGoodPosition");
-    declareBoolEventBranch("gamma1_isGoodBlob");
-    
-    declareDoubleEventBranch("gamma2_score",SENTINEL);
-    declareDoubleEventBranch("gamma2_px",SENTINEL);
-    declareDoubleEventBranch("gamma2_py",SENTINEL);
-    declareDoubleEventBranch("gamma2_pz",SENTINEL);
-    declareDoubleEventBranch("gamma2_E",SENTINEL);
-    declareDoubleEventBranch("gamma2_theta",SENTINEL);
-    declareDoubleEventBranch("gamma2_phi",SENTINEL);
-    declareDoubleEventBranch("gamma2_dEdx",SENTINEL);
-    declareDoubleEventBranch("gamma2_time",SENTINEL);
-    declareDoubleEventBranch("gamma2_dist_vtx",SENTINEL);
-    declareContainerDoubleEventBranch("gamma2_direction",3,SENTINEL);
-    declareContainerDoubleEventBranch("gamma2_vertex",3,SENTINEL);
-    declareIntEventBranch("gamma2_blob_ndigits",-1);
-    declareIntEventBranch("gamma2_blob_nclusters",-1);
-    declareDoubleEventBranch("gamma2_evis_trkr", SENTINEL);
-    declareDoubleEventBranch("gamma2_evis_ecal", SENTINEL);
-    declareDoubleEventBranch("gamma2_evis_hcal", SENTINEL);
-    declareDoubleEventBranch("gamma2_evis_scal", SENTINEL);
-    declareBoolEventBranch("gamma2_isGoodDirection");
-    declareBoolEventBranch("gamma2_isGoodPosition");
-    declareBoolEventBranch("gamma2_isGoodBlob");
-    
     return sc;
 }
     
@@ -876,9 +882,11 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //--------------------------------------------------------------------------
     // SmartRefs
     m_PrimaryVertex = NULL;
-    m_MuonTrack     = NULL;
-    m_MuonProng     = NULL;
-    m_MuonParticle  = NULL;
+    m_MuonTrack = NULL;
+    m_MuonProng = NULL;
+    m_MuonParticle = NULL;
+    m_Pi0Blob1 = NULL;
+    m_Pi0Blob2 = NULL;
     // Vectors
     m_ProtonProngs.clear();
     m_ProtonParticles.clear();
@@ -1126,26 +1134,23 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     if (foundMichel) {
         debug()<<"Found a Michel Electron!"<<endmsg;
         
-        // Fill Michel Prong Info
-        double michelEnergy = vtx_michel_prong.getDoubleData("energy");
-        double michelTimeDiff = vtx_michel_prong.getDoubleData("time_diff");
+        saveMichelProngToNTuple(event,vtx_michel_prong);
         
-        event->setIntData("n_vtx_michel_views",vtx_michel_prong.getIntData("category"));
-        event->setDoubleData("vtx_michel_distance",vtx_michel_prong.getDoubleData("distance"));
-        event->setDoubleData("michelProng_energy",michelEnergy);
-        event->setDoubleData("michelProng_time_diff",michelTimeDiff);
-        event->setDoubleData("michelProng_end_Z",vtx_michel_prong.getDoubleData("edz"));
-        event->setDoubleData("michelProng_begin_Z",vtx_michel_prong.getDoubleData("bgz"));
-        
-        // Apply Michel Selections - Save Some Events
-        // Saving Events with Short Time Diff AND High Energy
-        if ( michelTimeDiff < m_michelProngMinTimeDiff && michelEnergy > m_michelProngMaxEnergy  ){
-            debug()<<"Saved Event with Time Diff = "<<michelTimeDiff<<" Energy = "<<michelEnergy<<endmsg;
+        // Apply Extra Michel Cuts - If Activated!
+        if(m_applyExtraMichelCuts){
+            if(isMichelProngGood(vtx_michel_prong)){
+                event->setIntData("Cut_Vertex_Michel_Exist",1);
+                if( m_store_all_events ) return interpretFailEvent(event); 
+                else return StatusCode::SUCCESS; 
+            }else{
+                debug()<<"Michel Prong did NOT passed Quality Cut - Keeping Event!"<<endmsg;
+            }
         }else{
             event->setIntData("Cut_Vertex_Michel_Exist",1);
             if( m_store_all_events ) return interpretFailEvent(event); 
             else return StatusCode::SUCCESS; 
         }
+    
     }else{
         debug()<<"There are NO Vertex Michel Electrons in the event!"<<endmsg;
     }
@@ -1196,25 +1201,11 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         if (foundMichel){
             debug()<<"Found an End Point Michel Electron!"<<endmsg;
                 
-            // Fill Michel Prong Info
-            double michelEnergy = michelProng.getDoubleData("energy");
-            double michelTimeDiff = michelProng.getDoubleData("time_diff");
-            
-            event->setDoubleData("endpoint_michel_distance",michelProng.getDoubleData("distance"));
-            event->setDoubleData("michelProng_energy",michelEnergy);
-            event->setDoubleData("michelProng_time_diff",michelTimeDiff);
-            event->setDoubleData("michelProng_end_Z",michelProng.getDoubleData("edz"));
-            event->setDoubleData("michelProng_begin_Z",michelProng.getDoubleData("bgz"));
+            saveMichelProngToNTuple(event,michelProng);
 
-            // Apply Michel Selections - Save Some Events
-            // Saving Events with Short Time Diff AND High Energy
-            if ( michelTimeDiff < m_michelProngMinTimeDiff && michelEnergy > m_michelProngMaxEnergy  ){
-                debug()<<"Saved Event with Time Diff = "<<michelTimeDiff<<" Energy = "<<michelEnergy<<endmsg;
-            }else{
-                event->setIntData("Cut_EndPoint_Michel_Exist",1);
-                if( m_store_all_events ) return interpretFailEvent(event); 
-                else return StatusCode::SUCCESS; 
-            }
+            event->setIntData("Cut_EndPoint_Michel_Exist",1);
+            if( m_store_all_events ) return interpretFailEvent(event); 
+            else return StatusCode::SUCCESS; 
         }
         
         // Search for secondary Michels
@@ -1227,25 +1218,11 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
                 if (foundMichel) {
                     debug()<<"Found a Secondary End Point Michel Electron!"<<endmsg;
                     
-                    // Fill Michel Prong Info
-                    double michelEnergy = michelProng.getDoubleData("energy");
-                    double michelTimeDiff = michelProng.getDoubleData("time_diff");
+                    saveMichelProngToNTuple(event,michelProng);
                     
-                    event->setDoubleData("endpoint_michel_distance",michelProng.getDoubleData("distance"));
-                    event->setDoubleData("michelProng_energy",michelEnergy);
-                    event->setDoubleData("michelProng_time_diff",michelTimeDiff);
-                    event->setDoubleData("michelProng_end_Z",michelProng.getDoubleData("edz"));
-                    event->setDoubleData("michelProng_begin_Z",michelProng.getDoubleData("bgz"));
-                    
-                    // Apply Michel Selections - Save Some Events
-                    // Saving Events with Short Time Diff AND High Energy
-                    if ( michelTimeDiff < m_michelProngMinTimeDiff && michelEnergy > m_michelProngMaxEnergy  ){
-                        debug()<<"Saved Event with Time Diff = "<<michelTimeDiff<<" Energy = "<<michelEnergy<<endmsg;
-                    }else{
-                        event->setIntData("Cut_secEndPoint_Michel_Exist",1);
-                        if( m_store_all_events ) return interpretFailEvent(event); 
-                        else return StatusCode::SUCCESS; 
-                    }
+                    event->setIntData("Cut_secEndPoint_Michel_Exist",1);
+                    if( m_store_all_events ) return interpretFailEvent(event); 
+                    else return StatusCode::SUCCESS; 
                 }
             }
         }
@@ -1295,9 +1272,22 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS;  
     }
-    
     debug()<<"FINISH: Cone Blob Reconstruction"<<endmsg;
+  
     
+    // Set Data for Blobs found in ConeBlobs()
+    setBlobData(event);
+    
+    //--------------------------------------------------------------------------
+    //! MAKE CUT - Pre Quality Check for Found Blobs
+    //--------------------------------------------------------------------------
+    bool areBlobsGood = blobsPassedPreCuts(event);
+    if (!areBlobsGood){
+        event->setIntData("Cut_PreBlobCuts",1);
+        if ( m_store_all_events ) return interpretFailEvent(event);
+        else return StatusCode::SUCCESS;
+    }
+
     //==========================================================================
     //
     // Proton Reconstruction
@@ -1314,7 +1304,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
 
     // Create new particles with Proton and Pion hypotheses
     debug() << "Creating particles with Proton and Pion hypotheses" <<endmsg;
-    bool makeParticles = createTrackedParticles(event,primaryProngs);
+    bool makeParticles = createTrackedParticles(primaryProngs);
     if (!makeParticles){
         debug() << "Creation of Particles are FAILED!"<< endmsg;
         event->setIntData("Cut_Particle_None",1);
@@ -1539,18 +1529,21 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
 //         MCTracksVector = m_MCTrackTool->getMCTracks(truthEvent);
 //     }
     
-    //--------------------------------------------------------------------------  
-    //! Calculate and Set Muon Kinematics
-    //--------------------------------------------------------------------------
+    //! Set Muon Kinematics
     bool muonFilled = setMuonData( nuInt );
     if( !muonFilled ){ 
         error()<<"Muon NTuple Branches did not filled!"<<endmsg;
         return StatusCode::SUCCESS;
     }
 
-    //--------------------------------------------------------------------------  
-    //! Calculate and Set Proton Kinematics
-    //--------------------------------------------------------------------------
+    //! Set Pi0 Kinematics
+    bool pi0Filled = setPi0Data( nuInt );
+    if( !pi0Filled ){
+        error()<<"Pi0 NTupleBranches did not filled!"<<endmsg;
+        return StatusCode::SUCCESS;
+    }
+
+    //! Set Proton Kinematics
     bool protonFilled = setProtonData( nuInt );
     if( !protonFilled ){ 
         error()<<"Proton NTuple Branches did not filled!"<<endmsg;
@@ -2999,7 +2992,7 @@ StatusCode CCProtonPi0::getNearestPlane(double z, int & module_return, int & pla
 //==============================================================================
 // Created particles for negative bit Minos prongs
 //==============================================================================
-bool CCProtonPi0::createTrackedParticles( Minerva::PhysicsEvent* event, Minerva::ProngVect& prongs ) const
+bool CCProtonPi0::createTrackedParticles(Minerva::ProngVect& prongs ) const
 {
     debug() <<"Enter CCProtonPi0::createTrackedParticles()" << endmsg;
     bool makeParticles = false;
@@ -3021,25 +3014,6 @@ bool CCProtonPi0::createTrackedParticles( Minerva::PhysicsEvent* event, Minerva:
                 continue;
             }
         }
-        
-        // Skipped prongs with particles
-        debug() << "Before EMPID: the prong has n particles = " << prongs[p]->particles().size() << endmsg;
-        if( !prongs[p]->particles().empty() ) continue;
-    
-        // ---------------------------------------------------------------------
-        // EMPID Analysis of the Prong
-        // Copy of the Prong for EMPID Analysis - Not Using the original one
-        Minerva::Prong* copyProng = new Minerva::Prong(*prongs[p]);
-        
-        double showerScore = getProngShowerScore(copyProng);
-        
-        event->setDoubleData("prong_showerScore", showerScore); // TSave showerScore to NTuples
-        
-        delete copyProng; // Release Memory for copied Prong
-        // ---------------------------------------------------------------------
-    
-        // Skipped prongs with particles - Check prongs[p] whether it is modified or not
-        debug() << "After EMPID: the prong has n particles = " << prongs[p]->particles().size() << endmsg;
         
         // Select the particle hypotheses candidates and particle tools
         std::vector< Minerva::Particle::ID > hypotheses;
@@ -3523,27 +3497,27 @@ bool CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonPro
     return isCorrected;
 }
 
-//==============================================================================
-// setPi0Data
-//==============================================================================
-
-bool CCProtonPi0::setPi0Data(   Minerva::PhysicsEvent *event, 
-                                        Minerva::IDBlob* idblob1, 
-                                        Minerva::IDBlob* idblob2) const
+bool CCProtonPi0::blobsPassedPreCuts( Minerva::PhysicsEvent *event ) const
 {
-    debug() << "CCProtonPi0::setPi0Data()" << endmsg;
-    
+    debug() << "CCProtonPi0::areBlobsGoodForPi0()" << endmsg;
+   
+    // Sanity Check
+    if( m_Pi0Blob1 == NULL || m_Pi0Blob2 == NULL){
+        warning()<<"Passed NULL m_Pi0Blob"<<endmsg;
+        return false;
+    }
+
     const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
     
     // Check Gamma1 Quality
-    bool goodPosition1  = m_idHoughBlob->GetStartPosition(idblob1, vtx_position, true );
-    bool goodDirection1 = m_idHoughBlob->GetDirection(idblob1, vtx_position );
+    bool goodPosition1  = m_idHoughBlob->GetStartPosition(m_Pi0Blob1, vtx_position, true );
+    bool goodDirection1 = m_idHoughBlob->GetDirection(m_Pi0Blob1, vtx_position );
     bool isGoodBlob1 = false;
     if (goodPosition1 && goodDirection1) isGoodBlob1 = true;
     
     // Check Gamma2 Quality
-    bool goodPosition2  = m_idHoughBlob->GetStartPosition(idblob2, vtx_position, true );
-    bool goodDirection2 = m_idHoughBlob->GetDirection(idblob2, vtx_position );
+    bool goodPosition2  = m_idHoughBlob->GetStartPosition(m_Pi0Blob2, vtx_position, true );
+    bool goodDirection2 = m_idHoughBlob->GetDirection(m_Pi0Blob2, vtx_position );
     bool isGoodBlob2 = false;
     if (goodPosition2 && goodDirection2) isGoodBlob2 = true;
     
@@ -3555,15 +3529,34 @@ bool CCProtonPi0::setPi0Data(   Minerva::PhysicsEvent *event,
     event->filtertaglist()->setOrAddFilterTag("gamma2_isGoodDirection", goodDirection2);
     event->filtertaglist()->setOrAddFilterTag("gamma2_isGoodPosition",  goodPosition2);
     
-    // Process only if we have 2 Good Blobs
-    if (!isGoodBlob1 || !isGoodBlob2){
+    if (isGoodBlob1 && isGoodBlob2){
+        debug()<< " Have 2 Good Blobs for Pi0!"<<endmsg;
+        return true;
+    }else{
         debug() << "Don't have 2 Good Blobs! -- CANNOT Set Pi0 Particle Data!" <<endmsg;
         return false;
     }
+}
+
+
+//==============================================================================
+// setPi0Data
+//==============================================================================
+bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt ) const 
+{    
+    debug()<<" Enter CCProtonPi0::setPi0Data()"<<endmsg;
+
+    // Sanity Check
+    if( m_Pi0Blob1 == NULL || m_Pi0Blob2 == NULL){
+        warning()<<"Passed NULL IDBlob"<<endmsg;
+        return false;
+    }
+    
+    const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
 
     if (m_ApplyAttenuationCorrection) {
-        ApplyAttenuationCorrection(idblob1);
-        ApplyAttenuationCorrection(idblob2);
+        ApplyAttenuationCorrection(m_Pi0Blob1);
+        ApplyAttenuationCorrection(m_Pi0Blob2);
     }
     
     // Get Blob Energy and Time
@@ -3579,54 +3572,38 @@ bool CCProtonPi0::setPi0Data(   Minerva::PhysicsEvent *event,
     double g2hcalevis = 0.0;
     double g2scalevis = 0.0;
 
-    m_idHoughBlob->getBlobEnergyTime( idblob1, g1energy, g1trkrevis, g1ecalevis, g1hcalevis, g1scalevis );
-    m_idHoughBlob->getBlobEnergyTime( idblob2, g2energy, g2trkrevis, g2ecalevis, g2hcalevis, g2scalevis );
+    m_idHoughBlob->getBlobEnergyTime( m_Pi0Blob1, g1energy, g1trkrevis, g1ecalevis, g1hcalevis, g1scalevis );
+    m_idHoughBlob->getBlobEnergyTime( m_Pi0Blob2, g2energy, g2trkrevis, g2ecalevis, g2hcalevis, g2scalevis );
 
-    //--------------------------------------------------------------------------
-    //    Make sure Gamma1 is the more energetic one 
-    //--------------------------------------------------------------------------
+    // Make sure Gamma1 is the more energetic one 
     if (g2energy > g1energy) {
-        std::swap(goodPosition1, goodPosition2);  /* Swap variables already assigned */
-        std::swap(goodDirection1,goodDirection2);
-        std::swap(isGoodBlob1,   isGoodBlob2);
-        std::swap(g1energy,g2energy);
-        std::swap(idblob1,idblob2);               /* And the blobs themselves */
+        warning()<<" Gamma2 Energy is Higher than Gamma1"<<endmsg;
     }
-    
-
-    // Get EM Shower Score
-    double shower1Score = 0.0;
-    double shower2Score = 0.0;
-//     double shower1Score = getShowerScore(idblob1);
-//     double shower2Score = getShowerScore(idblob2);
-     
-//     debug() <<"shower1Score = "<<shower1Score<<endmsg;
-//     debug() <<"shower2Score = "<<shower2Score<<endmsg;
-    
+   
     // Get Blob Time
-    double time1 = idblob1->time();
-    double time2 = idblob2->time();
+    double time1 = m_Pi0Blob1->time();
+    double time2 = m_Pi0Blob2->time();
 
     // Get Blob dEdx
     double dEdx1 = 0.0;
     double dEdx2 = 0.0;
-    m_idHoughBlob->idBlobdEdx( idblob1, dEdx1 );
-    m_idHoughBlob->idBlobdEdx( idblob2, dEdx2 );
+    m_idHoughBlob->idBlobdEdx( m_Pi0Blob1, dEdx1 );
+    m_idHoughBlob->idBlobdEdx( m_Pi0Blob2, dEdx2 );
 
     // Get Blob Directions
-    Gaudi::XYZVector direction1 = idblob1->direction(); 
-    Gaudi::XYZVector direction2	= idblob2->direction();
+    Gaudi::XYZVector direction1 = m_Pi0Blob1->direction(); 
+    Gaudi::XYZVector direction2	= m_Pi0Blob2->direction();
 
     // Save Gamma1 and Gamma2 Starting Position (blob vertex)
     std::vector<double> position1;
     std::vector<double> position2;
-    position1.push_back(idblob1->startPoint().x());
-    position1.push_back(idblob1->startPoint().y());
-    position1.push_back(idblob1->startPoint().z());
+    position1.push_back(m_Pi0Blob1->startPoint().x());
+    position1.push_back(m_Pi0Blob1->startPoint().y());
+    position1.push_back(m_Pi0Blob1->startPoint().z());
     
-    position2.push_back(idblob2->startPoint().x());
-    position2.push_back(idblob2->startPoint().y());
-    position2.push_back(idblob2->startPoint().z());
+    position2.push_back(m_Pi0Blob2->startPoint().x());
+    position2.push_back(m_Pi0Blob2->startPoint().y());
+    position2.push_back(m_Pi0Blob2->startPoint().z());
     
     // Calculate Distance between Gamma Vertex and Event Vertex
     double gamma1_dist_vtx = calcDistance(  vtx_position.X(), vtx_position.Y(), vtx_position.Z(),
@@ -3662,127 +3639,73 @@ bool CCProtonPi0::setPi0Data(   Minerva::PhysicsEvent *event,
     // Calculate invariant Mass of Pi0
     const double invMass = std::sqrt(2*g1energy*g2energy*(1-cos_openingAngle));
     
-    // Calculate dEdX for Blobs
-    CalculatedEdx(idblob1,event,1);
-    CalculatedEdx(idblob2,event,2);
-    
-    // Set Pi0 4 - Momentum
+        // Set Pi0 4 - Momentum
     m_pi0_4P.SetPxPyPzE(pimom.x(),pimom.y(),pimom.z(),g1energy+g2energy);
-    
     
     //--------------------------------------------------------------------------
     // Debugging: Check values
     debug()<<"m_pi0_4P = ( "
-    <<m_pi0_4P.px()<<", "
-    <<m_pi0_4P.py()<<", "
-    <<m_pi0_4P.pz()<<", "
-    <<m_pi0_4P.E()<<" )"
-    <<endmsg;
+        <<m_pi0_4P.px()<<", "
+        <<m_pi0_4P.py()<<", "
+        <<m_pi0_4P.pz()<<", "
+        <<m_pi0_4P.E()<<" )"
+        <<endmsg;
     //--------------------------------------------------------------------------
-    
-    
+
     //--------------------------------------------------------------------------
     //    Fill Branches
     //--------------------------------------------------------------------------
-    
+
     // Pi0 Information
-    event->setDoubleData("pi0_openingAngle", openingAngle);
-    event->setDoubleData("pi0_cos_openingAngle", cos_openingAngle );
-    event->setDoubleData("pi0_invMass", invMass);
-    event->setDoubleData("pi0_px" ,pimom.x());
-    event->setDoubleData("pi0_py", pimom.y());
-    event->setDoubleData("pi0_pz", pimom.z());
-    event->setDoubleData("pi0_E", g1energy+g2energy);
-    event->setDoubleData("pi0_theta",  pimom.Theta()*TMath::RadToDeg());
-    event->setDoubleData("pi0_phi",    pimom.Phi()*TMath::RadToDeg());
-    event->setDoubleData("pi0_thetaX", std::atan2(pimom.X(),pimom.Z())*TMath::RadToDeg());
-    event->setDoubleData("pi0_thetaY", std::atan2(pimom.Y(),pimom.Z())*TMath::RadToDeg());
+    nuInt->setDoubleData("pi0_openingAngle", openingAngle);
+    nuInt->setDoubleData("pi0_cos_openingAngle", cos_openingAngle );
+    nuInt->setDoubleData("pi0_invMass", invMass);
+    nuInt->setDoubleData("pi0_px" ,pimom.x());
+    nuInt->setDoubleData("pi0_py", pimom.y());
+    nuInt->setDoubleData("pi0_pz", pimom.z());
+    nuInt->setDoubleData("pi0_E", g1energy+g2energy);
+    nuInt->setDoubleData("pi0_theta",  pimom.Theta()*TMath::RadToDeg());
+    nuInt->setDoubleData("pi0_phi",    pimom.Phi()*TMath::RadToDeg());
+    nuInt->setDoubleData("pi0_thetaX", std::atan2(pimom.X(),pimom.Z())*TMath::RadToDeg());
+    nuInt->setDoubleData("pi0_thetaY", std::atan2(pimom.Y(),pimom.Z())*TMath::RadToDeg());
     
     // Gamma1 Information
-    event->setDoubleData("gamma1_score", shower1Score);
-    event->setDoubleData("gamma1_px",g1mom.x());
-    event->setDoubleData("gamma1_py", g1mom.y());
-    event->setDoubleData("gamma1_pz", g1mom.z());
-    event->setDoubleData("gamma1_E", g1energy);
-    event->setDoubleData("gamma1_theta",g1mom.Theta()*TMath::RadToDeg());
-    event->setDoubleData("gamma1_phi",  g1mom.Phi()*TMath::RadToDeg());
-    event->setDoubleData("gamma1_dEdx", dEdx1 );
-    event->setDoubleData("gamma1_time", time1 );
-    event->setDoubleData("gamma1_dist_vtx",gamma1_dist_vtx);
-    event->setContainerDoubleData("gamma1_direction", direc_1 );
-    event->setContainerDoubleData("gamma1_vertex", position1 );
-    event->setIntData("gamma1_blob_ndigits",  idblob1->getAllDigits().size());
-    event->setIntData("gamma1_blob_nclusters",idblob1->nclusters());
-    event->setDoubleData("gamma1_evis_trkr", g1trkrevis);
-    event->setDoubleData("gamma1_evis_ecal", g1ecalevis);
-    event->setDoubleData("gamma1_evis_hcal", g1hcalevis);
-    event->setDoubleData("gamma1_evis_scal", g1scalevis);
-    
-    // Gamma2 Information
-    event->setDoubleData("gamma2_score", shower2Score);
-    event->setDoubleData("gamma2_px", g2mom.x());
-    event->setDoubleData("gamma2_py", g2mom.y());
-    event->setDoubleData("gamma2_pz", g2mom.z());
-    event->setDoubleData("gamma2_E", g2energy);
-    event->setDoubleData("gamma2_theta", g2mom.Theta()*TMath::RadToDeg());
-    event->setDoubleData("gamma2_phi",  g2mom.Phi()*TMath::RadToDeg());
-    event->setDoubleData("gamma2_dEdx", dEdx2 );
-    event->setDoubleData("gamma2_time", time2 );
-    event->setDoubleData("gamma2_dist_vtx", gamma2_dist_vtx);
-    event->setContainerDoubleData("gamma2_direction", direc_2 );
-    event->setContainerDoubleData("gamma2_vertex", position2 );
-    event->setIntData("gamma2_blob_nclusters", idblob2->nclusters());
-    event->setIntData("gamma2_blob_ndigits",  idblob2->getAllDigits().size());
-    event->setDoubleData("gamma2_evis_trkr", g2trkrevis);
-    event->setDoubleData("gamma2_evis_ecal", g2ecalevis);
-    event->setDoubleData("gamma2_evis_hcal", g2hcalevis);
-    event->setDoubleData("gamma2_evis_scal", g2scalevis);
+    nuInt->setDoubleData("gamma1_px",g1mom.x());
+    nuInt->setDoubleData("gamma1_py", g1mom.y());
+    nuInt->setDoubleData("gamma1_pz", g1mom.z());
+    nuInt->setDoubleData("gamma1_E", g1energy);
+    nuInt->setDoubleData("gamma1_theta",g1mom.Theta()*TMath::RadToDeg());
+    nuInt->setDoubleData("gamma1_phi",  g1mom.Phi()*TMath::RadToDeg());
+    nuInt->setDoubleData("gamma1_dEdx", dEdx1 );
+    nuInt->setDoubleData("gamma1_time", time1 );
+    nuInt->setDoubleData("gamma1_dist_vtx",gamma1_dist_vtx);
+    nuInt->setContainerDoubleData("gamma1_direction", direc_1 );
+    nuInt->setContainerDoubleData("gamma1_vertex", position1 );
+    nuInt->setDoubleData("gamma1_evis_trkr", g1trkrevis);
+    nuInt->setDoubleData("gamma1_evis_ecal", g1ecalevis);
+    nuInt->setDoubleData("gamma1_evis_hcal", g1hcalevis);
+    nuInt->setDoubleData("gamma1_evis_scal", g1scalevis);
 
+    // Gamma2 Information
+    nuInt->setDoubleData("gamma2_px", g2mom.x());
+    nuInt->setDoubleData("gamma2_py", g2mom.y());
+    nuInt->setDoubleData("gamma2_pz", g2mom.z());
+    nuInt->setDoubleData("gamma2_E", g2energy);
+    nuInt->setDoubleData("gamma2_theta", g2mom.Theta()*TMath::RadToDeg());
+    nuInt->setDoubleData("gamma2_phi",  g2mom.Phi()*TMath::RadToDeg());
+    nuInt->setDoubleData("gamma2_dEdx", dEdx2 );
+    nuInt->setDoubleData("gamma2_time", time2 );
+    nuInt->setDoubleData("gamma2_dist_vtx", gamma2_dist_vtx);
+    nuInt->setContainerDoubleData("gamma2_direction", direc_2 );
+    nuInt->setContainerDoubleData("gamma2_vertex", position2 );
+    nuInt->setDoubleData("gamma2_evis_trkr", g2trkrevis);
+    nuInt->setDoubleData("gamma2_evis_ecal", g2ecalevis);
+    nuInt->setDoubleData("gamma2_evis_hcal", g2hcalevis);
+    nuInt->setDoubleData("gamma2_evis_scal", g2scalevis);
+    
     return true;
 }
 
-//==============================================================================
-//  getProngShowerScore()
-//      Uses EMPID Tool to estimate a Shower Score
-//==============================================================================
-double CCProtonPi0::getProngShowerScore(SmartRef<Minerva::Prong> prong) const
-{
-    debug() << "Enter CCProtonPi0::getProngShowerScore()" << endmsg;
-    
-    bool isEMProngGood;
-    double failedScore = -9.9; // Returns failedScore if EMPID Fails
-    double score;
-    
-    // first, we need to know what this prong's dominant axis is.
-    // if this hasn't yet been defined, do that before anything else.
-    if (!prong->hasContainerDoubleData("axis_vertex") || !prong->hasContainerDoubleData("axis_vector"))
-        FindProngAxis(prong);
-        
-    // -------------------------------------------------------------------------
-    // Initialize EMPID Tool
-    // -------------------------------------------------------------------------
-    std::vector< Minerva::Particle::ID > hypotheses;
-    hypotheses.push_back( Minerva::Particle::EMLikeShower );
-    IParticleMakerTool::NameAliasListType toolsToUse;
-    toolsToUse.push_back( std::make_pair("EMPIDTool", "EMPIDTool"));
-
-    
-    // Use Particle Maker with Hypothesis and toolsToUse
-    isEMProngGood = m_particleMaker->makeParticles(prong, hypotheses, toolsToUse);
-    
-    if( !isEMProngGood || prong->particles().size() == 0 ){
-        debug() << "Problem with EM Prong! - returning failedScore = "<<failedScore<<endmsg;   
-        score = failedScore;
-    }else{
-        debug()<< "EM Prong has " << prong->particles().size() << " number of particles attached." << endmsg;
-        Minerva::ParticleVect EMParticles = prong->particles();
-        score = EMParticles[0]->score();
-    }
-    
-    debug()<< "EM Shower Score = "<< score <<endmsg;
-    
-    return score;
-}
 
 //------------------------------------------------------------------------------
 // set the track prong Geant4 truth information
@@ -4179,14 +4102,13 @@ SmartRefVector<Minerva::IDCluster> CCProtonPi0::FilterInSphereClusters( const Sm
 bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
 {
     debug() << "Enter CCProtonPi0::ConeBlobs()" << endmsg;
-    
+
     // Initialize Bool Variables
     bool isAngleScan        = false;
     bool isAngleScanApplied = false;
     bool additional         = false;
     bool isHough            = false;
     bool isHoughApplied     = false;
-    bool isPi0DataSet       = false;
     
     // Get Vertex Position
     const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
@@ -4376,57 +4298,14 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
         if ( sc && foundBlobs.size() == 2) isHough = true;
         isHoughApplied = true;   
     }
-    
-    /* 
-        if either isAngleScan or isHough is true, the blobs are finally stored
-        in the TES, which are managed. Otherwise, delete them 
-    */
-    double minBlobSep1 = -1.;
-    double minBlobSep2 = -1.;
-    if (isAngleScan || isHough || additional) {
-        
-        processBlobs(event,foundBlobs);
-        isPi0DataSet = setPi0Data(event,foundBlobs[0],foundBlobs[1]);
+   
 
-        //----------------------------------------------------------------------
-        // Return if setPi0Data() Fails
-        // Returning false ensures no execution of interpretEvent()
-        // ---------------------------------------------------------------------
-        if (!isPi0DataSet){
-            debug() << "Pi0 Data was not Set, Returning!..."<<endmsg;
-            return false;
-        }
-        
-        minBlobSep1 = CalcMinBlobSeparation(foundBlobs[0]);
-        minBlobSep2 = CalcMinBlobSeparation(foundBlobs[1]);
 
-        debug() << "\tmin_sep: " << minBlobSep1 << " " << minBlobSep2 << endmsg;
-        
-        std::vector<double> blob_cluster_energy1 = GetBlobClusterEnergy(foundBlobs[0]);
-        std::vector<double> blob_cluster_energy2 = GetBlobClusterEnergy(foundBlobs[1]);
-        event->setContainerDoubleData("blob_cluster_energy1", blob_cluster_energy1);
-        event->setContainerDoubleData("blob_cluster_energy2", blob_cluster_energy2);
-        
-        ODActivity(event,foundBlobs);
-            
-    } else {
-        for (   std::vector<Minerva::IDBlob*>::iterator b = foundBlobs.begin();
-                b != foundBlobs.end(); 
-                ++b) 
-        { 
-            delete *b;
-        }
-        foundBlobs.clear();
-    }
-    
     event->filtertaglist()->setOrAddFilterTag( "is_anglescan", isAngleScan );
     event->filtertaglist()->setOrAddFilterTag( "is_anglescan_applied",isAngleScanApplied);
     event->filtertaglist()->setOrAddFilterTag( "is_houghtransform", isHough );
     event->filtertaglist()->setOrAddFilterTag( "is_houghtransform_applied",isHoughApplied);
-    
-    event->setDoubleData("g1blob_minsep", minBlobSep1);
-    event->setDoubleData("g2blob_minsep", minBlobSep2);
-    
+
     //storing rejected id Clusters
     Minerva::IDBlob* rejectedBlob = new Minerva::IDBlob();
     
@@ -4438,11 +4317,66 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
     }
 
     event->setDoubleData( "Rejected_blob_vis_energy", rejectedBlob->energy() );
+ 
+    /* 
+        if either isAngleScan or isHough is true, the blobs are finally stored
+        in the TES, which are managed. Otherwise, delete them 
+    */
+    if (isAngleScan || isHough || additional) {
+        
+        processBlobs(event,foundBlobs);
+        ODActivity(event,foundBlobs);
+        
+        // Save FoundBlobs to Global Variables (Energetic Blob is Blob1)
+        if( foundBlobs[0]->energy() >= foundBlobs[1]->energy()){
+            m_Pi0Blob1 = foundBlobs[0];
+            m_Pi0Blob2 = foundBlobs[1];
+        }else{
+            m_Pi0Blob1 = foundBlobs[1];
+            m_Pi0Blob2 = foundBlobs[0];
+        }
     
-    return isPi0DataSet;
-
+        return true;
+    }else{
+        // Clear foundBlobs Vector
+        std::vector<Minerva::IDBlob*>::iterator b;
+        for (b = foundBlobs.begin(); b != foundBlobs.end(); ++b) { 
+            delete *b;
+        }
+        foundBlobs.clear();
+        
+        return false;
+    }
 }
 
+void CCProtonPi0::setBlobData( Minerva::PhysicsEvent* event) const
+{
+    debug()<<"CCProtonPi0::setBlobData()"<<endmsg;
+
+    // Sanity Check
+    if( m_Pi0Blob1 == NULL || m_Pi0Blob2 == NULL){
+        warning()<< "Pi0Blobs are NULL!"<<endmsg;
+    }
+
+    // Calculate dEdX for Blobs
+    Calculate_dEdx(m_Pi0Blob1,event,1);
+    Calculate_dEdx(m_Pi0Blob2,event,2);
+
+    // Calculate Min Separation from Vertex
+    double blob1_minsep = CalcMinBlobSeparation(m_Pi0Blob1);
+    double blob2_minsep = CalcMinBlobSeparation(m_Pi0Blob2);
+   
+    event->setDoubleData("gamma1_blob_minsep", blob1_minsep);
+    event->setDoubleData("gamma1_blob_energy", m_Pi0Blob1->energy());
+    event->setIntData("gamma1_blob_nclusters", m_Pi0Blob1->nclusters());
+    event->setIntData("gamma1_blob_ndigits", m_Pi0Blob1->getAllDigits().size());
+        
+    event->setDoubleData("gamma2_blob_minsep", blob2_minsep);
+    event->setDoubleData("gamma2_blob_energy", m_Pi0Blob2->energy());
+    event->setIntData("gamma2_blob_nclusters", m_Pi0Blob2->nclusters());
+    event->setIntData("gamma2_blob_ndigits", m_Pi0Blob2->getAllDigits().size());
+
+}
 
 //==============================================================================
 //  HoughBlob
@@ -4558,8 +4492,6 @@ void CCProtonPi0::processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerv
     if ( count != 6 ){ 
         event->filtertaglist()->setOrAddFilterTag( "is_twoDBlob", true );
     }
-//     m_hitTagger->applyColorTag( (idBlobs)[0], m_Color_Gamma1Prong ); // light green
-//     m_hitTagger->applyColorTag( (idBlobs)[1], m_Color_Gamma2Prong ); // light blue
     
     debug() << "pi0 candidate" << endmsg;
     debug() << " photon 1 is blob: " << idBlobs[0]->key() << endmsg;
@@ -4583,7 +4515,7 @@ void CCProtonPi0::ApplyAttenuationCorrection(Minerva::IDBlob* blob) const
 {
     debug() << "Enter CCProtonPi0::ApplyAttenuationCorrection()" << endmsg;
 
-    info() << "AttenuationCorrection (before): " << blob->energy() << endmsg;
+    debug() << "AttenuationCorrection (before): " << blob->energy() << endmsg;
 
     const double x0 = blob->startPoint().x();
     const double y0 = blob->startPoint().y();
@@ -4851,14 +4783,17 @@ StatusCode CCProtonPi0::ODActivity( Minerva::PhysicsEvent *event, std::vector<Mi
 }
 
 //==============================================================================
-//  CalculatedEdx
+//  Calculate_dEdx
 //==============================================================================
-void CCProtonPi0::CalculatedEdx(    const Minerva::IDBlob* blob,
-                                    Minerva::PhysicsEvent* event, 
-                                    unsigned int blob_number) const
+void CCProtonPi0::Calculate_dEdx( const Minerva::IDBlob* blob, Minerva::PhysicsEvent* event,  unsigned int blob_number) const
 {
-    debug() <<"Enter CCProtonPi0::CalculatedEdx()" << endmsg;
-    
+    debug() <<"Enter CCProtonPi0::Calculate_dEdx()" << endmsg;
+   
+    //Sanit Check
+    if ( blob == NULL ){
+        warning()<<"Passed NULL Blob"<<endmsg;
+    }
+
     const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
     
     debug() << "Calculate dEdx for blob: " << blob_number <<  " (forward,backward) ("
@@ -5187,178 +5122,30 @@ double CCProtonPi0::calcDistance(  double x1, double y1, double z1,
     return d;   
 }
 
-/// \brief Determine the principal axis for the prong.
-///
-/// Find the prong's principal axis:
-///  - if there is exactly one track within the prong, 
-///    the axis is defined by the track's first node and
-///    the corresponding state.
-///  - if there are multiple tracks:
-///    - if the prong has a labeled 'source' vertex,
-///      consider only the tracks that are outgoing from it.
-///    - otherwise, consider all the tracks in the prong.
-///    In any case, use the first node and state
-///    of the longest track in this collection.
-///    (This might backfire if they're
-///    all very short, but we'll worry about that later.)
-StatusCode CCProtonPi0::FindProngAxis(Minerva::Prong * prong) const
+
+bool CCProtonPi0::isMichelProngGood(Minerva::Prong &michelProng) const
 {
-    debug() <<"Enter CCProtonPi0::FindProngAxis()" << endmsg;
+    debug()<<"Enter CCProtonPi0::isMichelProngGood()"<<endmsg;
+    
+    const double maxEnergy = 100;   // MeV
+    const double minTimeDiff = 300; // ns
 
-    SmartRef<Minerva::Vertex> vertex;
-    std::vector<double> vertex_coords;
-    std::vector<double> axis;
-    
-    SmartRefVector<Minerva::Track> tracks = prong->minervaTracks();
-    unsigned int numTracks = tracks.size();
-    
-    // shouldn't ever have no tracks, since one of the pre-cuts is n_tracks > 0
-    if (numTracks == 0)
-    {
-        verbose() << "No tracks in prong.  Can't guess prong axis..." << endmsg;
-        return StatusCode::FAILURE;
-    }
-    
-    if (prong->hasSourceVertex())
-            vertex = prong->sourceVertex();
+    double energy = michelProng.getDoubleData("energy");
+    double timeDiff = michelProng.getDoubleData("time_diff");
 
-    SmartRef<Minerva::Track> primaryTrack;
-    if (numTracks == 1)
-            primaryTrack = tracks[0];
-    else
-    {
-        // if the prong has a labeled source vertex, start there.
-        // consider only the tracks outgoing from it.
-        // (if this test fails, then we'll just consider
-        //  all the tracks within the prong.)
-        // note, however, that the vertex may also
-        // contain tracks NOT in this prong!
-        // we'll have to check that below.
-        if (prong->hasSourceVertex())
-                tracks = vertex->getOutgoingTracks();
-
-        // the 'primary' track from a collection
-        // is defined as being the longest one.
-        // but make sure to cut on chi^2,
-        // or we can end up with wacky tracks
-        // through the middle of showers and stuff.
-        verbose() << " Choosing prong axis from among " << tracks.size() << " tracks..." << endmsg;
-        int trk_index = -1;
-        unsigned int trk_nodes = 0;
-        SmartRefVector<Minerva::Track> tracksInProng = prong->minervaTracks();
-        for (unsigned int i = 0; i < numTracks; i++)
-        {
-                // see note on the 'tracks' reassignment above.
-                if ( std::find(tracksInProng.begin(), tracksInProng.end(), tracks[i]) == tracksInProng.end() )
-                        continue;
-        
-                if ( !(TrackChi2Pass(tracks[i])) )
-                        continue;
-                        
-                if (tracks[i]->nNodes() > trk_nodes)
-                        trk_index = i, trk_nodes = tracks[i]->nNodes();
-        }
-
-        // if we can't find a suitable track,
-        // this prong isn't workable.
-        if (trk_index < 0)
-        {
-                verbose() << "   ... no tracks passing chi^2/d.o.f. cut.  Won't set prong axis." << endmsg;
-                return StatusCode::FAILURE;
-        }
-        
-        verbose() << "  ... chose track " << tracks[trk_index]->key() << " as the primary prong axis." << endmsg;
-        primaryTrack = tracks[trk_index];
-    }
-
-    primaryTrack->setIntData("axis_seed_track", 1);
-    double theta = primaryTrack->theta();
-    double phi = primaryTrack->phi();
-    
-    // use the primary track to determine the axis of the prong.
-    // DON'T trust the prong's "source vertex" position, because
-    // in many cases with EM activity, there are multiple tracks
-    // at low angles relative to one another, whose
-    // "intersection point" can be determined to be basically
-    // anywhere along the tracks.  the first state is much more reliable.
-    // also, if the track is backwards, we need to flip things around...
-    verbose() << "  primary track reports (theta, phi) = (" << theta << ", " << phi << ")" << endmsg;
-    Minerva::State frontState(primaryTrack->upstreamState());
-    Minerva::State backState(primaryTrack->downstreamState());
-    if (primaryTrack->direction() == Minerva::Track::Backward)
-    {
-        verbose() << " reversing track angles to match track direction..." << endmsg;
-        frontState = primaryTrack->downstreamState();
-        backState = primaryTrack->upstreamState();
-        theta = Gaudi::Units::pi - theta;
-        phi = Gaudi::Units::twopi - phi;
-        prong->setIntData("Backward", 1);
-    }
-    
-    // store the vertex of the axis ray.
-    vertex_coords.push_back(frontState.position().X());
-    vertex_coords.push_back(frontState.position().Y());
-    vertex_coords.push_back(frontState.position().Z());
-    
-//      vertex = SmartRef<Minerva::Vertex>( new Minerva::Vertex(Gaudi::XYZPoint(vertex_coords[0], vertex_coords[1], vertex_coords[2])) );
-//      vertex->addOutgoingTrack(primaryTrack);
-//      debug() << "Prong's front and back clusters are located at (respectively): " << frontState.position() << "; " << backState.position() << endmsg;
-    
-    // now store the vector of the axis ray
-    axis.push_back(theta);
-    axis.push_back(phi);
-
-    prong->setContainerDoubleData("axis_vertex", vertex_coords);
-    prong->setContainerDoubleData("axis_vector", axis);
-    prong->setDoubleData("time", m_recoTimeTool->prongBestTime(prong));
-    prong->setDoubleData("SeedTrackChi2", primaryTrack->chi2PerDoF());
-    prong->setIntData("SeedTrackType", primaryTrack->type());
-    
-    debug() << "Prong " << prong->key() << " vertex (x, y, z) is: " << vertex_coords << endmsg;
-    debug() << "Prong " << prong->key() << " axis vector (theta, phi) is: " << axis << endmsg;
-    debug() << "Prong " << prong->key() << " time: " << prong->getDoubleData("time") << endmsg;
-    Gaudi::Polar3DVector axisvector(1, axis[0], axis[1]);
-    debug() << "Prong " << prong->key() << " axis vector (x, y, z) is: (" << axisvector.X() << ", " << axisvector.Y() << ", " << axisvector.Z() << ")" << endmsg;
-
-    return StatusCode::SUCCESS;
+    if(energy < maxEnergy && timeDiff > minTimeDiff ) return true;
+    else return false;
 }
 
-bool CCProtonPi0::TrackChi2Pass(const Minerva::Track * track) const
+void CCProtonPi0::saveMichelProngToNTuple(Minerva::PhysicsEvent* event, Minerva::Prong &michelProng) const
 {
-    debug() <<"Enter CCProtonPi0::TrackChi2Pass()" << endmsg;
-    
-    double chi2cut;
-    switch (track->type())
-    {
-            case Minerva::Track::Long:
-                    chi2cut = m_maxSeedLongTrackChi2;
-                    break;
-            
-            case Minerva::Track::Short:
-                    chi2cut = m_maxSeedShortTrackChi2;
-                    break;
-                    
-            default:
-                    warning() << "Don't know what chi^2 cut to use for track type: '" << track->type() << "'!  Using the long track one by default..." << endmsg;
-                    chi2cut = m_maxSeedLongTrackChi2;
-                    break;
-    }
-    
-    return (track->chi2PerDoF() <= chi2cut);
+    debug()<<"Enter CCProtonPi0::saveMichelProngToNTuple"<<endmsg;
+    event->setDoubleData("michelProng_distance",michelProng.getDoubleData("distance"));
+    event->setDoubleData("michelProng_energy",michelProng.getDoubleData("energy"));
+    event->setDoubleData("michelProng_time_diff",michelProng.getDoubleData("time_diff"));
+    event->setDoubleData("michelProng_end_Z",michelProng.getDoubleData("edz"));
+    event->setDoubleData("michelProng_begin_Z",michelProng.getDoubleData("bgz"));
 }
-
-  
-
-
-
 
 #endif
 
-
-
-
-
-
-
-
- 

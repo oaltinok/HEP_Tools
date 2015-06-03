@@ -13,7 +13,6 @@ Class: CCProtonPi0_Plotter
             
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_05_07
 ================================================================================
 */
 
@@ -64,8 +63,9 @@ class CCProtonPi0_Plotter
                             bool isRatioReversed = false);
         void plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
         void plotSignalRatio(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir, bool isReversed = false);
+        void plot_purity_efficiency(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir, bool keepEventstoRight = true);
         
-        // Default Plots - File: Default_Plots.cpp
+         // Default Plots - File: Default_Plots.cpp
         void plotInteraction();
         void plotMuon();
         void plotProton();

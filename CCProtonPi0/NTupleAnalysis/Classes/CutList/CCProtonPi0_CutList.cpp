@@ -44,7 +44,9 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_1Prong_Pi0_invMass.set_Name("Pi0_invMass");
     nCut_1Prong_beamEnergy.set_Name("beamEnergy");
     nCut_1Prong_UnusedE.set_Name("UnusedE");
-    
+    nCut_1Prong_Pi0BlobCuts.set_Name("Pi0BlobCuts");
+    nCut_1Prong_PreBlobCuts.set_Name("PreBlobCuts");
+
     // nProngs == 2 Cut Numbers
     nCut_2Prong_Muon_None.set_Name("Muon_None");              
     nCut_2Prong_Muon_Not_Plausible.set_Name("Muon_Not_Plausible");
@@ -65,6 +67,9 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_2Prong_beamEnergy.set_Name("beamEnergy");
     nCut_2Prong_UnusedE.set_Name("UnusedE");
     nCut_2Prong_DeltaInvMass.set_Name("Delta_invMass");
+    nCut_2Prong_Pi0BlobCuts.set_Name("Pi0BlobCuts");
+    nCut_2Prong_PreBlobCuts.set_Name("PreBlobCuts");
+
 }
 
 void CCProtonPi0_CutList::OpenTextFiles()
@@ -138,30 +143,17 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_1Prong.push_back(nCut_1Prong_PreFilter_Pi0);
     nCutVector_1Prong.push_back(nCut_1Prong_VtxBlob);
     nCutVector_1Prong.push_back(nCut_1Prong_ConeBlobs);
+    nCutVector_1Prong.push_back(nCut_1Prong_PreBlobCuts);
+    nCutVector_1Prong.push_back(nCut_1Prong_Pi0BlobCuts);
     nCutVector_1Prong.push_back(nCut_1Prong_Photon1DistanceLow);
     nCutVector_1Prong.push_back(nCut_1Prong_Photon2DistanceLow);
     nCutVector_1Prong.push_back(nCut_1Prong_Pi0_invMass);
     nCutVector_1Prong.push_back(nCut_1Prong_beamEnergy);
     nCutVector_1Prong.push_back(nCut_1Prong_UnusedE);
     
-    // Short List
-    nCutVector_1Prong_ShortList.push_back(nCut_All);
-    nCutVector_1Prong_ShortList.push_back(nCut_Vertex_Not_Fiducial);
-    nCutVector_1Prong_ShortList.push_back(nCut_nProngs);
-    nCutVector_1Prong_ShortList.push_back(nCut_1Prong_Muon_None);
-    nCutVector_1Prong_ShortList.push_back(nCut_1Prong_secEndPoint_Michel_Exist);
-    nCutVector_1Prong_ShortList.push_back(nCut_1Prong_PreFilter_Pi0);
-    nCutVector_1Prong_ShortList.push_back(nCut_1Prong_ConeBlobs);
-    nCutVector_1Prong_ShortList.push_back(nCut_1Prong_Photon1DistanceLow);
-    nCutVector_1Prong_ShortList.push_back(nCut_1Prong_Photon2DistanceLow);
-    nCutVector_1Prong_ShortList.push_back(nCut_1Prong_Pi0_invMass);
-    nCutVector_1Prong_ShortList.push_back(nCut_1Prong_beamEnergy);
-    nCutVector_1Prong_ShortList.push_back(nCut_1Prong_UnusedE);
-    
     //--------------------------------------------------------------------------
     // Form nCutVector for nProngs == 2
     //--------------------------------------------------------------------------
-    // Complete List
     nCutVector_2Prong.push_back(nCut_All);
     nCutVector_2Prong.push_back(nCut_Vertex_None);
     nCutVector_2Prong.push_back(nCut_Vertex_Not_Reconstructable); 
@@ -178,6 +170,8 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_2Prong.push_back(nCut_2Prong_PreFilter_Pi0);
     nCutVector_2Prong.push_back(nCut_2Prong_VtxBlob);
     nCutVector_2Prong.push_back(nCut_2Prong_ConeBlobs);
+    nCutVector_2Prong.push_back(nCut_2Prong_PreBlobCuts);
+    nCutVector_2Prong.push_back(nCut_2Prong_Pi0BlobCuts);
     nCutVector_2Prong.push_back(nCut_2Prong_Photon1DistanceLow);
     nCutVector_2Prong.push_back(nCut_2Prong_Photon2DistanceLow);
     nCutVector_2Prong.push_back(nCut_2Prong_Pi0_invMass);
@@ -188,23 +182,6 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_2Prong.push_back(nCut_2Prong_beamEnergy);
     nCutVector_2Prong.push_back(nCut_2Prong_UnusedE);
     
-    // Short List
-    nCutVector_2Prong_ShortList.push_back(nCut_All);
-    nCutVector_2Prong_ShortList.push_back(nCut_Vertex_Not_Fiducial);
-    nCutVector_2Prong_ShortList.push_back(nCut_nProngs);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_Muon_None);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_secEndPoint_Michel_Exist);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_PreFilter_Pi0);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_ConeBlobs);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_Photon1DistanceLow);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_Photon2DistanceLow);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_Pi0_invMass);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_Proton_None);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_ProtonScore);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_DeltaInvMass);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_beamEnergy);
-    nCutVector_2Prong_ShortList.push_back(nCut_2Prong_UnusedE);
-
 }
 
 void CCProtonPi0_CutList::writeCutTable()
@@ -215,31 +192,18 @@ void CCProtonPi0_CutList::writeCutTable()
         cout<<">> Writing "<<cutFile[t]<<endl;
     }
     
-    // Write Short List
     writeCutTableHeader();
-    writeCutTableRows(nCutVector_1Prong_ShortList, 1, true);
-    writeCutTableRows(nCutVector_2Prong_ShortList, 2, true);
-    
-    for (int t = 0; t < nTopologies; t++){
-        cutText[t]<<endl; cutText[t]<<endl;
-    }
-    
-    // Write Complete List
-    writeCutTableHeader();
-    writeCutTableRows(nCutVector_1Prong, 1, false);
-    writeCutTableRows(nCutVector_2Prong, 2, false);
+    writeCutTableRows(nCutVector_1Prong, 1);
+    writeCutTableRows(nCutVector_2Prong, 2);
 }
 
-void CCProtonPi0_CutList::writeCutTableRows(vector<CCProtonPi0_Cut> nCutVector, int nProngs, bool isShortList)
+void CCProtonPi0_CutList::writeCutTableRows(vector<CCProtonPi0_Cut> nCutVector, int nProngs)
 {
     int t; // Topology
     double efficiency;
     double purity;    
     double efficiencyBase;
-    int efficiencyInd;
-    
-    if ( isShortList ) efficiencyInd = 3;
-    else efficiencyInd = 6;
+    int efficiencyInd = 6;
     
     if (nProngs == 1) t = 0;
     if (nProngs == 2) t = 1;
@@ -281,6 +245,7 @@ void CCProtonPi0_CutList::writeCutTableRows(vector<CCProtonPi0_Cut> nCutVector, 
             cutText[t]<<endl;
     }
 }
+
 
 CCProtonPi0_CutList::~CCProtonPi0_CutList()
 {

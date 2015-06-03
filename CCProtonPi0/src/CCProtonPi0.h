@@ -21,8 +21,7 @@ CCProtonPi0
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
     Date:           2014_03_27
-    Last Revision:  2015_05_01
-    Version:        v2_10
+    Version:        v2_11
     
 ================================================================================
 */
@@ -115,9 +114,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         
         double m_beamAngleBias;
         
-        double m_michelProngMinTimeDiff;
-        double m_michelProngMaxEnergy;  
-        
         double m_detectableGammaE;
         double m_detectablePi0KE;
         double m_detectableProtonKE;
@@ -133,6 +129,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool m_DoTruthMatch;
         bool m_Do_nProngCut;
         bool m_reconstruct_NoProtonEvents;
+        bool m_applyExtraMichelCuts;
         int m_min_nProngs;
         int m_max_nProngs;
         
@@ -234,76 +231,51 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IIDAnchoredBlobCreator*     m_idConeScanBlob;
         IGetCalAttenuation*         m_AttenuationCorrectionTool;
 
-
         //! Private Functions
+        SmartRefVector<Minerva::IDCluster> FilterInSphereClusters(  const SmartRefVector<Minerva::IDCluster>& clusters, const double sphereRadius, std::vector<double>& radii) const;
+        StatusCode HoughBlob( SmartRefVector<Minerva::IDCluster> idClusters, std::vector<Minerva::IDBlob*>& outBlobs) const;
+        StatusCode ODActivity( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs ) const;
+        StatusCode getNearestPlane( double z, int & module_return, int & plane_return) const;
         StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
-        StatusCode getNearestPlane( double z, 
-                                    int & module_return, 
-                                    int & plane_return) const;
-        
-        void setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronVisibleEnergy) const;
-        void setVertexData( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent* event ) const;
-        bool setMuonData(   Minerva::NeutrinoInt* nuInt ) const;
-        bool setProtonData( Minerva::NeutrinoInt* nuInt ) const;
-        bool setPi0Data(    Minerva::PhysicsEvent *event, 
-                            Minerva::IDBlob* idblob1, 
-                            Minerva::IDBlob* idblob2) const;
-        
-        bool tagSignal(Minerva::GenMinInteraction* truthEvent) const;
-        void tagBackground(Minerva::GenMinInteraction* truthEvent) const;
-        bool isBackgroundQELike(Minerva::GenMinInteraction* truthEvent) const;
-        void SetSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
-        void setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const;
-        void writeBackgroundType(Minerva::GenMinInteraction* truthEvent) const;
-        void writeFSParticleTable(bool isSignal) const;
-        void writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
-        void setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) const;
-        bool isSinglePi0(Minerva::GenMinInteraction* truthEvent, int nPi0, int nGamma) const;
-        bool isMotherPrimary(std::vector<int>& motherList, int mother ) const;
-        bool checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const;
-        bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
-        int getMichelPion(std::vector<int>& piList, int ID ) const;
-        void saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int muon_ID) const;
-        
-        bool createTrackedParticles( Minerva::PhysicsEvent* event, Minerva::ProngVect& prongs ) const;
-        bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;
-
-
-        bool correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, 
-                                        double& p_calCorrection, 
-                                        double& p_visEnergyCorrection ) const;
-                                        
-        void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
-        double getClusterEnergy(Minerva::PhysicsEvent* event, std::string input_clusterType) const;
-        double getProngShowerScore(SmartRef<Minerva::Prong> prong) const;
-        StatusCode FindProngAxis(Minerva::Prong * prong) const;
-        bool TrackChi2Pass(const Minerva::Track * track) const;
-
-        //! CCPi0 Functions
-        SmartRefVector<Minerva::IDCluster> FilterInSphereClusters(  const SmartRefVector<Minerva::IDCluster>& clusters,
-                                                                    const double sphereRadius,
-                                                                    std::vector<double>& radii) const;
+        bool ConeBlobs( Minerva::PhysicsEvent *event ) const;
         bool PreFilterPi0( Minerva::PhysicsEvent *event ) const;
         bool VtxBlob( Minerva::PhysicsEvent *event ) const;
-        bool ConeBlobs(   Minerva::PhysicsEvent *event ) const;
-        StatusCode HoughBlob(   SmartRefVector<Minerva::IDCluster> idClusters,
-                                std::vector<Minerva::IDBlob*>& outBlobs) const;
-        void processBlobs(    Minerva::PhysicsEvent *event, 
-                                    std::vector<Minerva::IDBlob*> idBlobs) const;
-        StatusCode ODActivity( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs ) const;
-      
+        bool blobsPassedPreCuts(Minerva::PhysicsEvent *event) const;
+        bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
+        bool checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const;
+        bool correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
+        bool createTrackedParticles(Minerva::ProngVect& prongs ) const;
+        bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;
+        bool isBackgroundQELike(Minerva::GenMinInteraction* truthEvent) const;
+        bool isMichelProngGood(Minerva::Prong &michelProng) const;
+        bool isMotherPrimary(std::vector<int>& motherList, int mother ) const;
+        bool isSinglePi0( Minerva::GenMinInteraction* truthEvent, int nPi0, int nGamma) const;
+        bool setMuonData( Minerva::NeutrinoInt* nuInt ) const;
+        bool setPi0Data( Minerva::NeutrinoInt* nuInt ) const;
+        bool setProtonData( Minerva::NeutrinoInt* nuInt ) const;
+        bool tagSignal( Minerva::GenMinInteraction* truthEvent) const;
         double CalcMinBlobSeparation( const Minerva::IDBlob* blob) const;
-
-        void CalculatedEdx( const Minerva::IDBlob* blob,
-                            Minerva::PhysicsEvent* event, 
-                            unsigned int blob_number) const;
-        void ApplyAttenuationCorrection(Minerva::IDBlob* blob) const;
-
-        std::vector<double> GetBlobClusterEnergy(   const Minerva::IDBlob* blob ) const;
-        
+        double calcDistance( double x1, double y1, double z1,double x2, double y2, double z2) const;
+        double getClusterEnergy( Minerva::PhysicsEvent* event, std::string input_clusterType) const;
+        int getMichelPion(std::vector<int>& piList, int ID ) const;
         std::pair<int,double> OneParLineFitBlob(const Minerva::IDBlob* blob) const;
-        double calcDistance(  double x1, double y1, double z1,
-                              double x2, double y2, double z2) const;
+        std::vector<double> GetBlobClusterEnergy( const Minerva::IDBlob* blob ) const;
+        void ApplyAttenuationCorrection(Minerva::IDBlob* blob) const;
+        void Calculate_dEdx( const Minerva::IDBlob* blob, Minerva::PhysicsEvent* event, unsigned int blob_number) const;
+        void SetSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
+        void processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs) const;
+        void saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int muon_ID) const;
+        void saveMichelProngToNTuple(Minerva::PhysicsEvent* event, Minerva::Prong &michelProng) const;
+        void setBlobData(Minerva::PhysicsEvent* event) const;
+        void setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronVisibleEnergy) const;
+        void setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) const;
+        void setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const;
+        void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
+        void setVertexData( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent* event ) const;
+        void tagBackground(Minerva::GenMinInteraction* truthEvent) const;
+        void writeBackgroundType(Minerva::GenMinInteraction* truthEvent) const;
+        void writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
+        void writeFSParticleTable(bool isSignal) const;
        
 
 };

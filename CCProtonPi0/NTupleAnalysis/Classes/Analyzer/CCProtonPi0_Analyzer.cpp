@@ -11,11 +11,12 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
-    nMaxEvents = 100000;
+    
+    nMaxEvents = 1000000;
     
     // Control Flow
-    isDataAnalysis  = false;
-    isScanRun = true;
+    isDataAnalysis  = true;
+    isScanRun = false;
     is_pID_Studies  = false;
     isMichelStudy = false;
     applyOtherMichelCuts = false;
@@ -25,7 +26,9 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     pID_KE_Limit = 300.0;
     minProtonScore_LLR = 10.0;
     minPIDDiff = 0.45;
-    
+
+    applyPi0BlobCuts = true;
+
     applyPhotonDistance = true;
     minPhotonDistance = 15; //cm
     
@@ -85,15 +88,9 @@ void CCProtonPi0_Analyzer::run(string playlist)
     fChain->SetBranchStatus("evis_*",1);
     fChain->SetBranchStatus("energyUnused*",1);
     fChain->SetBranchStatus("energyUsed*",1);
-    fChain->SetBranchStatus("pi0_*",1);
     fChain->SetBranchStatus("gamma*",1);
-    fChain->SetBranchStatus("g1blob*",1);
-    fChain->SetBranchStatus("g2blob*",1);
     fChain->SetBranchStatus("michel*",1);
-    fChain->SetBranchStatus("endpoint_michel_distance",1);
-    
-    
-    
+     
     //------------------------------------------------------------------------
     // Loop over Chain
     //------------------------------------------------------------------------
@@ -133,8 +130,6 @@ void CCProtonPi0_Analyzer::run(string playlist)
         //----------------------------------------------------------------------
         isPassedAllCuts = getCutStatistics();
         if( !isPassedAllCuts ) continue;
-        
-        
         
         //----------------------------------------------------------------------
         // Fill Background Branches for Background Events
@@ -186,6 +181,7 @@ void CCProtonPi0_Analyzer::run(string playlist)
     muon.write_RootFile();
     proton.write_RootFile();
     pion.write_RootFile();
+    pi0Blob.write_RootFile();
     if(is_pID_Studies) pIDTool.write_RootFile();
     if(isMichelStudy) michelTool.write_RootFile();
     
@@ -201,12 +197,12 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(int nMode) :
     muon(nMode),
     proton(nMode),
     pion(nMode),
+    pi0Blob(nMode),
     pIDTool(nMode),
     bckgTool(nMode),
     michelTool(nMode),
     cutList(nMode)
 {    
-    
     specifyRunTime();
     
     openTextFiles();
@@ -341,8 +337,6 @@ void CCProtonPi0_Analyzer::fillData()
     fillInteractionTrue();
     // Fill Truth Information if Exist and Set Errors
     if( hasParticleTruthInfo ){
-        findTrueProton();
-
         fillMuonTrue();
         fillProtonTrue();
         fillPionTrue();
@@ -371,6 +365,7 @@ bool CCProtonPi0_Analyzer::analyzeEvent()
         hasParticleTruthInfo = true;
     }else if ( anaMode == 2 ){
         if( truth_isSignal) isAnalyzable = false;
+        else if(truth_isBckg_withPrimaryPi0 || truth_isBckg_withSecondaryPi0) isAnalyzable = false;
         else isAnalyzable = true;
     }else{
         isAnalyzable = true;
@@ -400,10 +395,10 @@ void CCProtonPi0_Analyzer::writeFSParticle4P(Long64_t nEntry)
                 <<" Score = "<<CCProtonPi0_protonScore_LLR[indRecoProton]
                 <<endl;
         failText[t]<<"Pi0 4-P = ( "
-                <<pi0_px<<", "
-                <<pi0_py<<", "
-                <<pi0_pz<<", "
-                <<pi0_E<<" )"
+                <<CCProtonPi0_pi0_px<<", "
+                <<CCProtonPi0_pi0_py<<", "
+                <<CCProtonPi0_pi0_pz<<", "
+                <<CCProtonPi0_pi0_E<<" )"
                 <<endl;   
     }
 }
@@ -519,18 +514,18 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // Save Found Michel Information
     if(isMichelStudy && isMichelFound){
         if (truth_isBckg_withMichel){ 
-            if (Cut_Vertex_Michel_Exist == 1 ) michelTool.trueMichel_dist_vtx->Fill(vtx_michel_distance);
+            if (Cut_Vertex_Michel_Exist == 1 ) michelTool.trueMichel_dist_vtx->Fill(michelProng_distance);
             if (Cut_Vertex_Michel_Exist == 1 ) michelTool.trueMichel_end_Z_vtx_Z->Fill(michelProng_end_Z-CCProtonPi0_vtx_z);
-            if (Cut_EndPoint_Michel_Exist == 1) michelTool.trueMichel_dist_end_point->Fill(endpoint_michel_distance);
+            if (Cut_EndPoint_Michel_Exist == 1) michelTool.trueMichel_dist_end_point->Fill(michelProng_distance);
             
             michelTool.trueMichel_end_Z->Fill(michelProng_end_Z);
             michelTool.trueMichel_energy->Fill(michelProng_energy);
             michelTool.trueMichel_time_diff->Fill(michelProng_time_diff);
         }
         else{
-            if (Cut_Vertex_Michel_Exist == 1 ) michelTool.fakeMichel_dist_vtx->Fill(vtx_michel_distance);
+            if (Cut_Vertex_Michel_Exist == 1 ) michelTool.fakeMichel_dist_vtx->Fill(michelProng_distance);
             if (Cut_Vertex_Michel_Exist == 1 ) michelTool.fakeMichel_end_Z_vtx_Z->Fill(michelProng_end_Z-CCProtonPi0_vtx_z);
-            if (Cut_EndPoint_Michel_Exist == 1) michelTool.fakeMichel_dist_end_point->Fill(endpoint_michel_distance);
+            if (Cut_EndPoint_Michel_Exist == 1) michelTool.fakeMichel_dist_end_point->Fill(michelProng_distance);
             
             michelTool.fakeMichel_end_Z->Fill(michelProng_end_Z);
             michelTool.fakeMichel_energy->Fill(michelProng_energy);
@@ -558,31 +553,38 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProngs == 1) cutList.nCut_1Prong_VtxBlob.increment(truth_isSignal, study1, study2);
     if (nProngs == 2) cutList.nCut_2Prong_VtxBlob.increment(truth_isSignal, study1, study2);
     
-    if( Cut_ConeBlobs == 1){ 
-        if(truth_isSignal) writeScanFile();
-        return false;
-    }
+    if( Cut_ConeBlobs == 1) return false;
     if (nProngs == 1) cutList.nCut_1Prong_ConeBlobs.increment(truth_isSignal, study1, study2);
     if (nProngs == 2) cutList.nCut_2Prong_ConeBlobs.increment(truth_isSignal, study1, study2);
 
+    if ( Cut_PreBlobCuts == 1 ) return false;
+    if (nProngs == 1) cutList.nCut_1Prong_PreBlobCuts.increment(truth_isSignal, study1, study2);
+    if (nProngs == 2) cutList.nCut_2Prong_PreBlobCuts.increment(truth_isSignal, study1, study2);
+
+    // Fill Blob Data
+    fillBlobData();
+
+    if ( applyPi0BlobCuts && isPi0BlobBad() ) return false;
+    if (nProngs == 1) cutList.nCut_1Prong_Pi0BlobCuts.increment(truth_isSignal, study1, study2);
+    if (nProngs == 2) cutList.nCut_2Prong_Pi0BlobCuts.increment(truth_isSignal, study1, study2);
+
     //  Photon Conversion Length
-    if (nProngs == 1) interaction.hCut_1Prong_gamma1ConvDist->Fill(gamma1_dist_vtx * 0.1);
-    if (nProngs == 2) interaction.hCut_2Prong_gamma1ConvDist->Fill(gamma1_dist_vtx * 0.1);
-    if (applyPhotonDistance && gamma1_dist_vtx * 0.1 < minPhotonDistance) return false;
+    if (nProngs == 1) interaction.hCut_1Prong_gamma1ConvDist->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1);
+    if (nProngs == 2) interaction.hCut_2Prong_gamma1ConvDist->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1);
+    if (applyPhotonDistance && CCProtonPi0_gamma1_dist_vtx * 0.1 < minPhotonDistance) return false;
     if (nProngs == 1) cutList.nCut_1Prong_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
     if (nProngs == 2) cutList.nCut_2Prong_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
 
-    if (nProngs == 1) interaction.hCut_1Prong_gamma2ConvDist->Fill(gamma2_dist_vtx * 0.1);
-    if (nProngs == 2) interaction.hCut_2Prong_gamma2ConvDist->Fill(gamma2_dist_vtx * 0.1);
-    if (applyPhotonDistance && gamma2_dist_vtx * 0.1 < minPhotonDistance) return false;
+    if (nProngs == 1) interaction.hCut_1Prong_gamma2ConvDist->Fill(CCProtonPi0_gamma2_dist_vtx * 0.1);
+    if (nProngs == 2) interaction.hCut_2Prong_gamma2ConvDist->Fill(CCProtonPi0_gamma2_dist_vtx * 0.1);
+    if (applyPhotonDistance && CCProtonPi0_gamma2_dist_vtx * 0.1 < minPhotonDistance) return false;
     if (nProngs == 1) cutList.nCut_1Prong_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
     if (nProngs == 2) cutList.nCut_2Prong_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
 
-
     // Pi0 Invariant Mass
-    if(nProngs == 1) interaction.hCut_1Prong_pi0invMass->Fill(pi0_invMass);
-    if(nProngs == 2) interaction.hCut_2Prong_pi0invMass->Fill(pi0_invMass);
-    if( pi0_invMass < min_Pi0_invMass || pi0_invMass > max_Pi0_invMass ) return false;
+    if(nProngs == 1) interaction.hCut_1Prong_pi0invMass->Fill(CCProtonPi0_pi0_invMass);
+    if(nProngs == 2) interaction.hCut_2Prong_pi0invMass->Fill(CCProtonPi0_pi0_invMass);
+    if( CCProtonPi0_pi0_invMass < min_Pi0_invMass || CCProtonPi0_pi0_invMass > max_Pi0_invMass ) return false;
     if(nProngs == 1) cutList.nCut_1Prong_Pi0_invMass.increment(truth_isSignal, study1, study2);
     if(nProngs == 2) cutList.nCut_2Prong_Pi0_invMass.increment(truth_isSignal, study1, study2);
     
@@ -639,6 +641,17 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     
     return true;
     
+}
+
+bool CCProtonPi0_Analyzer::isPi0BlobBad()
+{
+    // NDigits
+    if (gamma1_blob_ndigits < 8 || gamma2_blob_ndigits < 6 ) return true;
+    
+    // Blob Energy
+    if (gamma1_blob_energy < 60) return true;
+
+    return false;
 }
 
 void CCProtonPi0_Analyzer::fill_mc_w()
@@ -739,10 +752,10 @@ double CCProtonPi0_Analyzer::calcDeltaInvariantMass()
 {
     double invMassSq;
         
-    invMassSq = (pi0_E + CCProtonPi0_proton_E[indRecoProton]) * (pi0_E + CCProtonPi0_proton_E[indRecoProton]) -
-                ((pi0_px + CCProtonPi0_proton_px[indRecoProton])*(pi0_px + CCProtonPi0_proton_px[indRecoProton]) + 
-                 (pi0_py + CCProtonPi0_proton_py[indRecoProton])*(pi0_py + CCProtonPi0_proton_py[indRecoProton]) +
-                 (pi0_pz + CCProtonPi0_proton_pz[indRecoProton])*(pi0_pz + CCProtonPi0_proton_pz[indRecoProton]));
+    invMassSq = (CCProtonPi0_pi0_E + CCProtonPi0_proton_E[indRecoProton]) * (CCProtonPi0_pi0_E + CCProtonPi0_proton_E[indRecoProton]) -
+                ((CCProtonPi0_pi0_px + CCProtonPi0_proton_px[indRecoProton])*(CCProtonPi0_pi0_px + CCProtonPi0_proton_px[indRecoProton]) + 
+                 (CCProtonPi0_pi0_py + CCProtonPi0_proton_py[indRecoProton])*(CCProtonPi0_pi0_py + CCProtonPi0_proton_py[indRecoProton]) +
+                 (CCProtonPi0_pi0_pz + CCProtonPi0_proton_pz[indRecoProton])*(CCProtonPi0_pi0_pz + CCProtonPi0_proton_pz[indRecoProton]));
         
     return sqrt(invMassSq);
 }
@@ -758,7 +771,7 @@ void CCProtonPi0_Analyzer::writeScanFile()
         const string other        = "&slice=-1&filetype=dst";
         
         roundupText<<arachne_html<<scanFileName<<entryString<<truth_eventID<<other<<" ";
-        roundupText<<gamma1_dist_vtx<<"^"<<gamma2_dist_vtx<<"^"<<mc_incomingE<<endl;
+        roundupText<<CCProtonPi0_gamma1_dist_vtx<<"^"<<CCProtonPi0_gamma2_dist_vtx<<"^"<<mc_incomingE<<endl;
     }else{
         cout<<"WARNING! ScanRun is NOT Activated! Are you sure what you are doing?"<<endl;    
     }
@@ -840,10 +853,10 @@ void CCProtonPi0_Analyzer::openTextFiles()
 void CCProtonPi0_Analyzer::fillProtonTrue()
 {    
     // Fill 4-Momentum
-    proton.set_p4(  truth_proton_px[indTrueProton],
-                    truth_proton_py[indTrueProton],
-                    truth_proton_pz[indTrueProton],
-                    truth_proton_E[indTrueProton], 
+    proton.set_p4(  truth_proton_4P[0],
+                    truth_proton_4P[1],
+                    truth_proton_4P[2],
+                    truth_proton_4P[3], 
                     true);
        
     // set Angle wrt Beam
@@ -879,25 +892,6 @@ void CCProtonPi0_Analyzer::fillProtonReco()
     
 }
 
-//--------------------------------------------------------------------------
-//  findTrueProton()
-//      finds Truth Proton using Proton Energy - Highest Energy Proton
-//--------------------------------------------------------------------------
-void CCProtonPi0_Analyzer::findTrueProton()
-{
-    double tempInd = 0;
-    double tempE = truth_proton_E[0];
-    
-    for ( int i = 1; i < 20; i++){
-        if (truth_proton_E[i] == SENTINEL) break;
-        if (truth_proton_E[i] > tempE){
-            tempE = truth_proton_E[i];
-            tempInd = 0;
-        }
-    }
-    
-    indTrueProton = tempInd;
-}
 
 //--------------------------------------------------------------------------
 //  findRecoProton()
@@ -926,10 +920,10 @@ void CCProtonPi0_Analyzer::fillPionReco()
     double photon_E_asym;
     
     // Fill 4-Momentum
-    pion.set_p4(    pi0_px,
-                    pi0_py,
-                    pi0_pz,
-                    pi0_E,
+    pion.set_p4(    CCProtonPi0_pi0_px,
+                    CCProtonPi0_pi0_py,
+                    CCProtonPi0_pi0_pz,
+                    CCProtonPi0_pi0_E,
                     false);
     
     
@@ -940,42 +934,49 @@ void CCProtonPi0_Analyzer::fillPionReco()
     pion.set_angleMuon(muon, false);
     
     // Set Invariant Mass
-    pion.invMass->Fill(pi0_invMass);
+    pion.invMass->Fill(CCProtonPi0_pi0_invMass);
     
     // Set Photon Conversion Length in [cm]
-    pion.gamma1_ConvLength->Fill(gamma1_dist_vtx * 0.1);
-    pion.gamma2_ConvLength->Fill(gamma2_dist_vtx * 0.1);
-    pion.ConvLength_gamma2_gamma1->Fill(gamma2_dist_vtx, gamma1_dist_vtx);
+    pion.gamma1_ConvLength->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1);
+    pion.gamma2_ConvLength->Fill(CCProtonPi0_gamma2_dist_vtx * 0.1);
+    pion.ConvLength_gamma2_gamma1->Fill(CCProtonPi0_gamma2_dist_vtx, CCProtonPi0_gamma1_dist_vtx);
         
-    // Set Photon N(Clusters)
-    pion.gamma1_nClusters_All->Fill(gamma1_blob_nclusters);
-    pion.gamma2_nClusters_All->Fill(gamma2_blob_nclusters);
-    pion.nClusters_All_gamma2_gamma1->Fill(gamma2_blob_nclusters,gamma1_blob_nclusters);
-    
-    // Set Photon Energy [GeV]
-    pion.gamma1_Energy->Fill(gamma1_E * HEP_Functions::MeV_to_GeV);
-    pion.gamma2_Energy->Fill(gamma2_E * HEP_Functions::MeV_to_GeV);
-    pion.Energy_gamma2_gamma1->Fill(gamma2_E * HEP_Functions::MeV_to_GeV,gamma1_E * HEP_Functions::MeV_to_GeV );
-    
     // Set Photon Energy Assymmetry
-    photon_E_asym = abs((gamma1_E - gamma2_E) / (gamma1_E + gamma2_E));  
+    photon_E_asym = abs((CCProtonPi0_gamma1_E - CCProtonPi0_gamma2_E) / (CCProtonPi0_gamma1_E + CCProtonPi0_gamma2_E));  
     pion.photonEnergy_Asymmetry->Fill(photon_E_asym);
+
+}
+
+void CCProtonPi0_Analyzer::fillBlobData()
+{
+    // Set Gamma Blob Information
+    pi0Blob.g1_blob_energy->Fill(gamma1_blob_energy);
+    pi0Blob.g1_blob_minsep->Fill(gamma1_blob_minsep);
+    pi0Blob.g1_blob_nclusters->Fill(gamma1_blob_nclusters);
+    pi0Blob.g1_blob_ndigits->Fill(gamma1_blob_ndigits);
+    
+    pi0Blob.g2_blob_energy->Fill(gamma2_blob_energy);
+    pi0Blob.g2_blob_minsep->Fill(gamma2_blob_minsep);
+    pi0Blob.g2_blob_nclusters->Fill(gamma2_blob_nclusters);
+    pi0Blob.g2_blob_ndigits->Fill(gamma2_blob_ndigits);
+
 }
 
 void CCProtonPi0_Analyzer::fillPionTrue()
 {
     // Fill 4-Momentum
-    if (truth_pi0_E != -1){
-        pion.set_p4(truth_pi0_px,
-                    truth_pi0_py,
-                    truth_pi0_pz,
-                    truth_pi0_E,
+    if (truth_pi0_4P[3] != -1){
+        pion.set_p4(truth_pi0_4P[0],
+                    truth_pi0_4P[1],
+                    truth_pi0_4P[2],
+                    truth_pi0_4P[3],
                     true);
     }else{
-        pion.set_p4(truth_gamma_px[0]+truth_gamma_px[1] ,
-                    truth_gamma_py[0]+truth_gamma_py[1],
-                    truth_gamma_pz[0]+truth_gamma_pz[1],
-                    truth_gamma_E[0]+truth_gamma_E[1],
+        cout<<"gamma1_E = "<<truth_gamma1_4P[3]<<" gamma2_E = "<<truth_gamma2_4P[3]<<endl;
+        pion.set_p4(truth_gamma1_4P[0]+truth_gamma2_4P[0] ,
+                    truth_gamma1_4P[1]+truth_gamma2_4P[1],
+                    truth_gamma1_4P[2]+truth_gamma2_4P[2],
+                    truth_gamma1_4P[3]+truth_gamma2_4P[3],
                     true);
     }
     
@@ -990,10 +991,10 @@ void CCProtonPi0_Analyzer::fillMuonTrue()
 {
 
     // Fill 4-Momentum
-    muon.set_p4(    truth_muon_px * HEP_Functions::MeV_to_GeV,
-                    truth_muon_py * HEP_Functions::MeV_to_GeV,
-                    truth_muon_pz * HEP_Functions::MeV_to_GeV,
-                    truth_muon_E, 
+    muon.set_p4(    truth_muon_4P[0] * HEP_Functions::MeV_to_GeV,
+                    truth_muon_4P[1] * HEP_Functions::MeV_to_GeV,
+                    truth_muon_4P[2] * HEP_Functions::MeV_to_GeV,
+                    truth_muon_4P[3], 
                     true);
        
     // set Angle wrt Beam
@@ -1058,8 +1059,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
 
    // Set branch addresses and branch pointers
    fChain->SetMakeClass(1);
-   
-   fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
+  fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("physEvtNum", &physEvtNum, &b_physEvtNum);
    fChain->SetBranchAddress("n_hyps", &n_hyps, &b_n_hyps);
    fChain->SetBranchAddress("processType", &processType, &b_processType);
@@ -1093,6 +1093,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("Cut_Muon_Not_Plausible", &Cut_Muon_Not_Plausible, &b_Cut_Muon_Not_Plausible);
    fChain->SetBranchAddress("Cut_Muon_Score_Low", &Cut_Muon_Score_Low, &b_Cut_Muon_Score_Low);
    fChain->SetBranchAddress("Cut_Particle_None", &Cut_Particle_None, &b_Cut_Particle_None);
+   fChain->SetBranchAddress("Cut_PreBlobCuts", &Cut_PreBlobCuts, &b_Cut_PreBlobCuts);
    fChain->SetBranchAddress("Cut_PreFilter_Pi0", &Cut_PreFilter_Pi0, &b_Cut_PreFilter_Pi0);
    fChain->SetBranchAddress("Cut_Proton_None", &Cut_Proton_None, &b_Cut_Proton_None);
    fChain->SetBranchAddress("Cut_Vertex_Michel_Exist", &Cut_Vertex_Michel_Exist, &b_Cut_Vertex_Michel_Exist);
@@ -1121,7 +1122,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("n_anchored_long_trk_prongs", &n_anchored_long_trk_prongs, &b_n_anchored_long_trk_prongs);
    fChain->SetBranchAddress("n_anchored_short_trk_prongs", &n_anchored_short_trk_prongs, &b_n_anchored_short_trk_prongs);
    fChain->SetBranchAddress("n_iso_trk_prongs", &n_iso_trk_prongs, &b_n_iso_trk_prongs);
-   fChain->SetBranchAddress("n_vtx_michel_views", &n_vtx_michel_views, &b_n_vtx_michel_views);
    fChain->SetBranchAddress("od_energeticTower", &od_energeticTower, &b_od_energeticTower);
    fChain->SetBranchAddress("phys_energy_in_road_downstream_nplanes", &phys_energy_in_road_downstream_nplanes, &b_phys_energy_in_road_downstream_nplanes);
    fChain->SetBranchAddress("phys_energy_in_road_upstream_nplanes", &phys_energy_in_road_upstream_nplanes, &b_phys_energy_in_road_upstream_nplanes);
@@ -1144,7 +1144,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("Vertex_blob_energy", &Vertex_blob_energy, &b_Vertex_blob_energy);
    fChain->SetBranchAddress("blob_fval_1", &blob_fval_1, &b_blob_fval_1);
    fChain->SetBranchAddress("blob_fval_2", &blob_fval_2, &b_blob_fval_2);
-   fChain->SetBranchAddress("endpoint_michel_distance", &endpoint_michel_distance, &b_endpoint_michel_distance);
    fChain->SetBranchAddress("energyUnused_afterReco", &energyUnused_afterReco, &b_energyUnused_afterReco);
    fChain->SetBranchAddress("energyUsed_afterReco", &energyUsed_afterReco, &b_energyUsed_afterReco);
    fChain->SetBranchAddress("energy_from_mc", &energy_from_mc, &b_energy_from_mc);
@@ -1157,46 +1156,21 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("evis_Tracker", &evis_Tracker, &b_evis_Tracker);
    fChain->SetBranchAddress("evis_nearvtx", &evis_nearvtx, &b_evis_nearvtx);
    fChain->SetBranchAddress("evis_total", &evis_total, &b_evis_total);
-   fChain->SetBranchAddress("g1blob_minsep", &g1blob_minsep, &b_g1blob_minsep);
    fChain->SetBranchAddress("g1dedx", &g1dedx, &b_g1dedx);
    fChain->SetBranchAddress("g1dedx1", &g1dedx1, &b_g1dedx1);
    fChain->SetBranchAddress("g1dedx_total", &g1dedx_total, &b_g1dedx_total);
    fChain->SetBranchAddress("g1dedx_total1", &g1dedx_total1, &b_g1dedx_total1);
-   fChain->SetBranchAddress("g2blob_minsep", &g2blob_minsep, &b_g2blob_minsep);
    fChain->SetBranchAddress("g2dedx", &g2dedx, &b_g2dedx);
    fChain->SetBranchAddress("g2dedx1", &g2dedx1, &b_g2dedx1);
    fChain->SetBranchAddress("g2dedx_total", &g2dedx_total, &b_g2dedx_total);
    fChain->SetBranchAddress("g2dedx_total1", &g2dedx_total1, &b_g2dedx_total1);
-   fChain->SetBranchAddress("gamma1_E", &gamma1_E, &b_gamma1_E);
-   fChain->SetBranchAddress("gamma1_dEdx", &gamma1_dEdx, &b_gamma1_dEdx);
-   fChain->SetBranchAddress("gamma1_dist_vtx", &gamma1_dist_vtx, &b_gamma1_dist_vtx);
-   fChain->SetBranchAddress("gamma1_evis_ecal", &gamma1_evis_ecal, &b_gamma1_evis_ecal);
-   fChain->SetBranchAddress("gamma1_evis_hcal", &gamma1_evis_hcal, &b_gamma1_evis_hcal);
-   fChain->SetBranchAddress("gamma1_evis_scal", &gamma1_evis_scal, &b_gamma1_evis_scal);
-   fChain->SetBranchAddress("gamma1_evis_trkr", &gamma1_evis_trkr, &b_gamma1_evis_trkr);
-   fChain->SetBranchAddress("gamma1_phi", &gamma1_phi, &b_gamma1_phi);
-   fChain->SetBranchAddress("gamma1_px", &gamma1_px, &b_gamma1_px);
-   fChain->SetBranchAddress("gamma1_py", &gamma1_py, &b_gamma1_py);
-   fChain->SetBranchAddress("gamma1_pz", &gamma1_pz, &b_gamma1_pz);
-   fChain->SetBranchAddress("gamma1_score", &gamma1_score, &b_gamma1_score);
-   fChain->SetBranchAddress("gamma1_theta", &gamma1_theta, &b_gamma1_theta);
-   fChain->SetBranchAddress("gamma1_time", &gamma1_time, &b_gamma1_time);
-   fChain->SetBranchAddress("gamma2_E", &gamma2_E, &b_gamma2_E);
-   fChain->SetBranchAddress("gamma2_dEdx", &gamma2_dEdx, &b_gamma2_dEdx);
-   fChain->SetBranchAddress("gamma2_dist_vtx", &gamma2_dist_vtx, &b_gamma2_dist_vtx);
-   fChain->SetBranchAddress("gamma2_evis_ecal", &gamma2_evis_ecal, &b_gamma2_evis_ecal);
-   fChain->SetBranchAddress("gamma2_evis_hcal", &gamma2_evis_hcal, &b_gamma2_evis_hcal);
-   fChain->SetBranchAddress("gamma2_evis_scal", &gamma2_evis_scal, &b_gamma2_evis_scal);
-   fChain->SetBranchAddress("gamma2_evis_trkr", &gamma2_evis_trkr, &b_gamma2_evis_trkr);
-   fChain->SetBranchAddress("gamma2_phi", &gamma2_phi, &b_gamma2_phi);
-   fChain->SetBranchAddress("gamma2_px", &gamma2_px, &b_gamma2_px);
-   fChain->SetBranchAddress("gamma2_py", &gamma2_py, &b_gamma2_py);
-   fChain->SetBranchAddress("gamma2_pz", &gamma2_pz, &b_gamma2_pz);
-   fChain->SetBranchAddress("gamma2_score", &gamma2_score, &b_gamma2_score);
-   fChain->SetBranchAddress("gamma2_theta", &gamma2_theta, &b_gamma2_theta);
-   fChain->SetBranchAddress("gamma2_time", &gamma2_time, &b_gamma2_time);
+   fChain->SetBranchAddress("gamma1_blob_energy", &gamma1_blob_energy, &b_gamma1_blob_energy);
+   fChain->SetBranchAddress("gamma1_blob_minsep", &gamma1_blob_minsep, &b_gamma1_blob_minsep);
+   fChain->SetBranchAddress("gamma2_blob_energy", &gamma2_blob_energy, &b_gamma2_blob_energy);
+   fChain->SetBranchAddress("gamma2_blob_minsep", &gamma2_blob_minsep, &b_gamma2_blob_minsep);
    fChain->SetBranchAddress("hadronVisibleE", &hadronVisibleE, &b_hadronVisibleE);
    fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);
+   fChain->SetBranchAddress("michelProng_distance", &michelProng_distance, &b_michelProng_distance);
    fChain->SetBranchAddress("michelProng_end_Z", &michelProng_end_Z, &b_michelProng_end_Z);
    fChain->SetBranchAddress("michelProng_energy", &michelProng_energy, &b_michelProng_energy);
    fChain->SetBranchAddress("michelProng_time_diff", &michelProng_time_diff, &b_michelProng_time_diff);
@@ -1218,36 +1192,19 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("phys_energy_in_road_downstream", &phys_energy_in_road_downstream, &b_phys_energy_in_road_downstream);
    fChain->SetBranchAddress("phys_energy_in_road_upstream", &phys_energy_in_road_upstream, &b_phys_energy_in_road_upstream);
    fChain->SetBranchAddress("phys_energy_unattached", &phys_energy_unattached, &b_phys_energy_unattached);
-   fChain->SetBranchAddress("pi0_E", &pi0_E, &b_pi0_E);
-   fChain->SetBranchAddress("pi0_cos_openingAngle", &pi0_cos_openingAngle, &b_pi0_cos_openingAngle);
-   fChain->SetBranchAddress("pi0_invMass", &pi0_invMass, &b_pi0_invMass);
-   fChain->SetBranchAddress("pi0_openingAngle", &pi0_openingAngle, &b_pi0_openingAngle);
-   fChain->SetBranchAddress("pi0_phi", &pi0_phi, &b_pi0_phi);
-   fChain->SetBranchAddress("pi0_px", &pi0_px, &b_pi0_px);
-   fChain->SetBranchAddress("pi0_py", &pi0_py, &b_pi0_py);
-   fChain->SetBranchAddress("pi0_pz", &pi0_pz, &b_pi0_pz);
-   fChain->SetBranchAddress("pi0_theta", &pi0_theta, &b_pi0_theta);
-   fChain->SetBranchAddress("pi0_thetaX", &pi0_thetaX, &b_pi0_thetaX);
-   fChain->SetBranchAddress("pi0_thetaY", &pi0_thetaY, &b_pi0_thetaY);
    fChain->SetBranchAddress("preFilter_rejectedEnergy", &preFilter_rejectedEnergy, &b_preFilter_rejectedEnergy);
    fChain->SetBranchAddress("prim_vtx_smallest_opening_angle", &prim_vtx_smallest_opening_angle, &b_prim_vtx_smallest_opening_angle);
-   fChain->SetBranchAddress("prong_showerScore", &prong_showerScore, &b_prong_showerScore);
    fChain->SetBranchAddress("reco_eventID", &reco_eventID, &b_reco_eventID);
    fChain->SetBranchAddress("time", &time, &b_time);
    fChain->SetBranchAddress("totalIDVisibleE", &totalIDVisibleE, &b_totalIDVisibleE);
    fChain->SetBranchAddress("totalODVisibleE", &totalODVisibleE, &b_totalODVisibleE);
    fChain->SetBranchAddress("totalVisibleE", &totalVisibleE, &b_totalVisibleE);
-   fChain->SetBranchAddress("vtx_michel_distance", &vtx_michel_distance, &b_vtx_michel_distance);
    fChain->SetBranchAddress("g1dedx_cluster_occupancy_sz", &g1dedx_cluster_occupancy_sz, &b_g1dedx_cluster_occupancy_sz);
    fChain->SetBranchAddress("g1dedx_cluster_occupancy", g1dedx_cluster_occupancy, &b_g1dedx_cluster_occupancy);
    fChain->SetBranchAddress("g2dedx_cluster_occupancy_sz", &g2dedx_cluster_occupancy_sz, &b_g2dedx_cluster_occupancy_sz);
    fChain->SetBranchAddress("g2dedx_cluster_occupancy", g2dedx_cluster_occupancy, &b_g2dedx_cluster_occupancy);
    fChain->SetBranchAddress("Vertex_energy_radii_sz", &Vertex_energy_radii_sz, &b_Vertex_energy_radii_sz);
    fChain->SetBranchAddress("Vertex_energy_radii", Vertex_energy_radii, &b_Vertex_energy_radii);
-   fChain->SetBranchAddress("blob_cluster_energy1_sz", &blob_cluster_energy1_sz, &b_blob_cluster_energy1_sz);
-   fChain->SetBranchAddress("blob_cluster_energy1", blob_cluster_energy1, &b_blob_cluster_energy1);
-   fChain->SetBranchAddress("blob_cluster_energy2_sz", &blob_cluster_energy2_sz, &b_blob_cluster_energy2_sz);
-   fChain->SetBranchAddress("blob_cluster_energy2", blob_cluster_energy2, &b_blob_cluster_energy2);
    fChain->SetBranchAddress("g1dedx_cluster_energy_sz", &g1dedx_cluster_energy_sz, &b_g1dedx_cluster_energy_sz);
    fChain->SetBranchAddress("g1dedx_cluster_energy", g1dedx_cluster_energy, &b_g1dedx_cluster_energy);
    fChain->SetBranchAddress("g1dedx_rev_cluster_energy_sz", &g1dedx_rev_cluster_energy_sz, &b_g1dedx_rev_cluster_energy_sz);
@@ -1256,10 +1213,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("g2dedx_cluster_energy", g2dedx_cluster_energy, &b_g2dedx_cluster_energy);
    fChain->SetBranchAddress("g2dedx_rev_cluster_energy_sz", &g2dedx_rev_cluster_energy_sz, &b_g2dedx_rev_cluster_energy_sz);
    fChain->SetBranchAddress("g2dedx_rev_cluster_energy", g2dedx_rev_cluster_energy, &b_g2dedx_rev_cluster_energy);
-   fChain->SetBranchAddress("gamma1_direction", gamma1_direction, &b_gamma1_direction);
-   fChain->SetBranchAddress("gamma1_vertex", gamma1_vertex, &b_gamma1_vertex);
-   fChain->SetBranchAddress("gamma2_direction", gamma2_direction, &b_gamma2_direction);
-   fChain->SetBranchAddress("gamma2_vertex", gamma2_vertex, &b_gamma2_vertex);
    fChain->SetBranchAddress("od_distanceBlobTower_sz", &od_distanceBlobTower_sz, &b_od_distanceBlobTower_sz);
    fChain->SetBranchAddress("od_distanceBlobTower", od_distanceBlobTower, &b_od_distanceBlobTower);
    fChain->SetBranchAddress("od_idBlobTime_sz", &od_idBlobTime_sz, &b_od_idBlobTime_sz);
@@ -1295,7 +1248,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
    fChain->SetBranchAddress("truth_N_proton", &truth_N_proton, &b_truth_N_proton);
    fChain->SetBranchAddress("truth_N_trueMichelElectrons", &truth_N_trueMichelElectrons, &b_truth_N_trueMichelElectrons);
-   fChain->SetBranchAddress("truth_muon_charge", &truth_muon_charge, &b_truth_muon_charge);
    fChain->SetBranchAddress("truth_pi0_GrandMother", &truth_pi0_GrandMother, &b_truth_pi0_GrandMother);
    fChain->SetBranchAddress("truth_pi0_GrandMotherStatus", &truth_pi0_GrandMotherStatus, &b_truth_pi0_GrandMotherStatus);
    fChain->SetBranchAddress("truth_pi0_Mother", &truth_pi0_Mother, &b_truth_pi0_Mother);
@@ -1313,21 +1265,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("truth_michelPion_P", &truth_michelPion_P, &b_truth_michelPion_P);
    fChain->SetBranchAddress("truth_michelPion_begin_dist_vtx", &truth_michelPion_begin_dist_vtx, &b_truth_michelPion_begin_dist_vtx);
    fChain->SetBranchAddress("truth_michelPion_length", &truth_michelPion_length, &b_truth_michelPion_length);
-   fChain->SetBranchAddress("truth_muon_E", &truth_muon_E, &b_truth_muon_E);
-   fChain->SetBranchAddress("truth_muon_px", &truth_muon_px, &b_truth_muon_px);
-   fChain->SetBranchAddress("truth_muon_py", &truth_muon_py, &b_truth_muon_py);
-   fChain->SetBranchAddress("truth_muon_pz", &truth_muon_pz, &b_truth_muon_pz);
-   fChain->SetBranchAddress("truth_muon_theta_wrtbeam", &truth_muon_theta_wrtbeam, &b_truth_muon_theta_wrtbeam);
-   fChain->SetBranchAddress("truth_pi0_E", &truth_pi0_E, &b_truth_pi0_E);
-   fChain->SetBranchAddress("truth_pi0_px", &truth_pi0_px, &b_truth_pi0_px);
-   fChain->SetBranchAddress("truth_pi0_py", &truth_pi0_py, &b_truth_pi0_py);
-   fChain->SetBranchAddress("truth_pi0_pz", &truth_pi0_pz, &b_truth_pi0_pz);
-   fChain->SetBranchAddress("truth_pi0_theta_wrtbeam", &truth_pi0_theta_wrtbeam, &b_truth_pi0_theta_wrtbeam);
-   fChain->SetBranchAddress("truth_gamma_E", truth_gamma_E, &b_truth_gamma_E);
-   fChain->SetBranchAddress("truth_gamma_px", truth_gamma_px, &b_truth_gamma_px);
-   fChain->SetBranchAddress("truth_gamma_py", truth_gamma_py, &b_truth_gamma_py);
-   fChain->SetBranchAddress("truth_gamma_pz", truth_gamma_pz, &b_truth_gamma_pz);
-   fChain->SetBranchAddress("truth_gamma_theta_wrtbeam", truth_gamma_theta_wrtbeam, &b_truth_gamma_theta_wrtbeam);
+   fChain->SetBranchAddress("truth_gamma1_4P", truth_gamma1_4P, &b_truth_gamma1_4P);
+   fChain->SetBranchAddress("truth_gamma2_4P", truth_gamma2_4P, &b_truth_gamma2_4P);
    fChain->SetBranchAddress("genie_wgt_n_shifts", &genie_wgt_n_shifts, &b_genie_wgt_n_shifts);
    fChain->SetBranchAddress("truth_genie_wgt_AGKYxF1pi", truth_genie_wgt_AGKYxF1pi, &b_truth_genie_wgt_AGKYxF1pi);
    fChain->SetBranchAddress("truth_genie_wgt_AhtBY", truth_genie_wgt_AhtBY, &b_truth_genie_wgt_AhtBY);
@@ -1366,11 +1305,9 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("truth_genie_wgt_VecFFCCQEshape", truth_genie_wgt_VecFFCCQEshape, &b_truth_genie_wgt_VecFFCCQEshape);
    fChain->SetBranchAddress("truth_genie_wgt_shifts", truth_genie_wgt_shifts, &b_truth_genie_wgt_shifts);
    fChain->SetBranchAddress("truth_michelMuon_endPoint", truth_michelMuon_endPoint, &b_truth_michelMuon_endPoint);
-   fChain->SetBranchAddress("truth_proton_E", truth_proton_E, &b_truth_proton_E);
-   fChain->SetBranchAddress("truth_proton_px", truth_proton_px, &b_truth_proton_px);
-   fChain->SetBranchAddress("truth_proton_py", truth_proton_py, &b_truth_proton_py);
-   fChain->SetBranchAddress("truth_proton_pz", truth_proton_pz, &b_truth_proton_pz);
-   fChain->SetBranchAddress("truth_proton_theta_wrtbeam", truth_proton_theta_wrtbeam, &b_truth_proton_theta_wrtbeam);
+   fChain->SetBranchAddress("truth_muon_4P", truth_muon_4P, &b_truth_muon_4P);
+   fChain->SetBranchAddress("truth_pi0_4P", truth_pi0_4P, &b_truth_pi0_4P);
+   fChain->SetBranchAddress("truth_proton_4P", truth_proton_4P, &b_truth_proton_4P);
    fChain->SetBranchAddress("CCProtonPi0_nuFlavor", &CCProtonPi0_nuFlavor, &b_CCProtonPi0_nuFlavor);
    fChain->SetBranchAddress("CCProtonPi0_nuHelicity", &CCProtonPi0_nuHelicity, &b_CCProtonPi0_nuHelicity);
    fChain->SetBranchAddress("CCProtonPi0_intCurrent", &CCProtonPi0_intCurrent, &b_CCProtonPi0_intCurrent);
@@ -1411,6 +1348,32 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajXPosition", &CCProtonPi0_endMuonTrajXPosition, &b_CCProtonPi0_endMuonTrajXPosition);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajYPosition", &CCProtonPi0_endMuonTrajYPosition, &b_CCProtonPi0_endMuonTrajYPosition);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajZPosition", &CCProtonPi0_endMuonTrajZPosition, &b_CCProtonPi0_endMuonTrajZPosition);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_E", &CCProtonPi0_gamma1_E, &b_CCProtonPi0_gamma1_E);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_dEdx", &CCProtonPi0_gamma1_dEdx, &b_CCProtonPi0_gamma1_dEdx);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_dist_vtx", &CCProtonPi0_gamma1_dist_vtx, &b_CCProtonPi0_gamma1_dist_vtx);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_ecal", &CCProtonPi0_gamma1_evis_ecal, &b_CCProtonPi0_gamma1_evis_ecal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_hcal", &CCProtonPi0_gamma1_evis_hcal, &b_CCProtonPi0_gamma1_evis_hcal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_scal", &CCProtonPi0_gamma1_evis_scal, &b_CCProtonPi0_gamma1_evis_scal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_trkr", &CCProtonPi0_gamma1_evis_trkr, &b_CCProtonPi0_gamma1_evis_trkr);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_phi", &CCProtonPi0_gamma1_phi, &b_CCProtonPi0_gamma1_phi);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_px", &CCProtonPi0_gamma1_px, &b_CCProtonPi0_gamma1_px);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_py", &CCProtonPi0_gamma1_py, &b_CCProtonPi0_gamma1_py);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_pz", &CCProtonPi0_gamma1_pz, &b_CCProtonPi0_gamma1_pz);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_theta", &CCProtonPi0_gamma1_theta, &b_CCProtonPi0_gamma1_theta);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_time", &CCProtonPi0_gamma1_time, &b_CCProtonPi0_gamma1_time);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_E", &CCProtonPi0_gamma2_E, &b_CCProtonPi0_gamma2_E);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_dEdx", &CCProtonPi0_gamma2_dEdx, &b_CCProtonPi0_gamma2_dEdx);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_dist_vtx", &CCProtonPi0_gamma2_dist_vtx, &b_CCProtonPi0_gamma2_dist_vtx);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_ecal", &CCProtonPi0_gamma2_evis_ecal, &b_CCProtonPi0_gamma2_evis_ecal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_hcal", &CCProtonPi0_gamma2_evis_hcal, &b_CCProtonPi0_gamma2_evis_hcal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_scal", &CCProtonPi0_gamma2_evis_scal, &b_CCProtonPi0_gamma2_evis_scal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_trkr", &CCProtonPi0_gamma2_evis_trkr, &b_CCProtonPi0_gamma2_evis_trkr);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_phi", &CCProtonPi0_gamma2_phi, &b_CCProtonPi0_gamma2_phi);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_px", &CCProtonPi0_gamma2_px, &b_CCProtonPi0_gamma2_px);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_py", &CCProtonPi0_gamma2_py, &b_CCProtonPi0_gamma2_py);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_pz", &CCProtonPi0_gamma2_pz, &b_CCProtonPi0_gamma2_pz);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_theta", &CCProtonPi0_gamma2_theta, &b_CCProtonPi0_gamma2_theta);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_time", &CCProtonPi0_gamma2_time, &b_CCProtonPi0_gamma2_time);
    fChain->SetBranchAddress("CCProtonPi0_minos_trk_bave", &CCProtonPi0_minos_trk_bave, &b_CCProtonPi0_minos_trk_bave);
    fChain->SetBranchAddress("CCProtonPi0_minos_trk_chi2", &CCProtonPi0_minos_trk_chi2, &b_CCProtonPi0_minos_trk_chi2);
    fChain->SetBranchAddress("CCProtonPi0_minos_trk_end_u", &CCProtonPi0_minos_trk_end_u, &b_CCProtonPi0_minos_trk_end_u);
@@ -1444,6 +1407,17 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCProtonPi0_muon_theta_biasUp", &CCProtonPi0_muon_theta_biasUp, &b_CCProtonPi0_muon_theta_biasUp);
    fChain->SetBranchAddress("CCProtonPi0_neutrino_E", &CCProtonPi0_neutrino_E, &b_CCProtonPi0_neutrino_E);
    fChain->SetBranchAddress("CCProtonPi0_neutrino_E_Cal", &CCProtonPi0_neutrino_E_Cal, &b_CCProtonPi0_neutrino_E_Cal);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_E", &CCProtonPi0_pi0_E, &b_CCProtonPi0_pi0_E);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_cos_openingAngle", &CCProtonPi0_pi0_cos_openingAngle, &b_CCProtonPi0_pi0_cos_openingAngle);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_invMass", &CCProtonPi0_pi0_invMass, &b_CCProtonPi0_pi0_invMass);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_openingAngle", &CCProtonPi0_pi0_openingAngle, &b_CCProtonPi0_pi0_openingAngle);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_phi", &CCProtonPi0_pi0_phi, &b_CCProtonPi0_pi0_phi);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_px", &CCProtonPi0_pi0_px, &b_CCProtonPi0_pi0_px);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_py", &CCProtonPi0_pi0_py, &b_CCProtonPi0_pi0_py);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_pz", &CCProtonPi0_pi0_pz, &b_CCProtonPi0_pi0_pz);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_theta", &CCProtonPi0_pi0_theta, &b_CCProtonPi0_pi0_theta);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_thetaX", &CCProtonPi0_pi0_thetaX, &b_CCProtonPi0_pi0_thetaX);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_thetaY", &CCProtonPi0_pi0_thetaY, &b_CCProtonPi0_pi0_thetaY);
    fChain->SetBranchAddress("CCProtonPi0_r_minos_trk_bdL", &CCProtonPi0_r_minos_trk_bdL, &b_CCProtonPi0_r_minos_trk_bdL);
    fChain->SetBranchAddress("CCProtonPi0_r_minos_trk_end_dcosx", &CCProtonPi0_r_minos_trk_end_dcosx, &b_CCProtonPi0_r_minos_trk_end_dcosx);
    fChain->SetBranchAddress("CCProtonPi0_r_minos_trk_end_dcosy", &CCProtonPi0_r_minos_trk_end_dcosy, &b_CCProtonPi0_r_minos_trk_end_dcosy);
@@ -1495,6 +1469,10 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCProtonPi0_endProtonTrajXPosition", CCProtonPi0_endProtonTrajXPosition, &b_CCProtonPi0_endProtonTrajXPosition);
    fChain->SetBranchAddress("CCProtonPi0_endProtonTrajYPosition", CCProtonPi0_endProtonTrajYPosition, &b_CCProtonPi0_endProtonTrajYPosition);
    fChain->SetBranchAddress("CCProtonPi0_endProtonTrajZPosition", CCProtonPi0_endProtonTrajZPosition, &b_CCProtonPi0_endProtonTrajZPosition);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_direction", CCProtonPi0_gamma1_direction, &b_CCProtonPi0_gamma1_direction);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_vertex", CCProtonPi0_gamma1_vertex, &b_CCProtonPi0_gamma1_vertex);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_direction", CCProtonPi0_gamma2_direction, &b_CCProtonPi0_gamma2_direction);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_vertex", CCProtonPi0_gamma2_vertex, &b_CCProtonPi0_gamma2_vertex);
    fChain->SetBranchAddress("CCProtonPi0_pionScore", CCProtonPi0_pionScore, &b_CCProtonPi0_pionScore);
    fChain->SetBranchAddress("CCProtonPi0_protonScore", CCProtonPi0_protonScore, &b_CCProtonPi0_protonScore);
    fChain->SetBranchAddress("CCProtonPi0_protonScore_LLR", CCProtonPi0_protonScore_LLR, &b_CCProtonPi0_protonScore_LLR);
@@ -1619,6 +1597,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
    fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
    fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
+
+
 }
 
 CCProtonPi0_Analyzer::~CCProtonPi0_Analyzer()

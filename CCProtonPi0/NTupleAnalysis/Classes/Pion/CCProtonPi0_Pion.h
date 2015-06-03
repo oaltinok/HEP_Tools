@@ -5,7 +5,6 @@ Class: CCProtonPi0_Pion -> Derived Class from Particle Base Clas
                 extends base class with pion specific parameters
 
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_05_07
 ================================================================================
 */
 
@@ -21,31 +20,25 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         ~CCProtonPi0_Pion();
         void set_kineticEnergy(bool isMC);
 
-        TH1D* gamma1_nClusters_All;
-        TH1D* gamma2_nClusters_All;
-        TH2D* nClusters_All_gamma2_gamma1;
-        
         TH1D* gamma1_ConvLength;
         TH1D* gamma2_ConvLength;
         TH2D* ConvLength_gamma2_gamma1;
-
-        TH1D* gamma1_Energy;
-        TH1D* gamma2_Energy;
-        TH2D* Energy_gamma2_gamma1;
            
         TH1D* photonEnergy_Asymmetry;
         TH1D* photonEnergy_Asymmetry_true;
 
         TH1D* invMass;
+ 
     private:
+        void initHistograms();
+
         static const double restMass = 134.98;
         
         CCProtonPi0_SingleBin bin_invMass;
+        CCProtonPi0_SingleBin bin_blob_energy;
         CCProtonPi0_SingleBin bin_photonConvLength;
-        CCProtonPi0_SingleBin bin_gammaClusters;
-        CCProtonPi0_SingleBin bin_gammaEnergy;
+
 };
 
-
-
 #endif
+

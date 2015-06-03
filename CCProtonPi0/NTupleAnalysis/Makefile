@@ -3,7 +3,6 @@
 # Makefile for NTupleAnalysis Package
 # 	Statistical Data Analysis Package for CCProtonPi0
 #	Author: Ozgur Altinok
-#	Last Revision: 2015_05_07
 #
 # ==============================================================================
 
@@ -26,7 +25,8 @@ PARTICLECPP = Classes/Particle/CCProtonPi0_Particle.cpp
 MUONCPP = Classes/Muon/CCProtonPi0_Muon.cpp
 PROTONCPP = Classes/Proton/CCProtonPi0_Proton.cpp
 PIONCPP = Classes/Pion/CCProtonPi0_Pion.cpp
-ALLPARTICLESCPP = $(INTERACTIONCPP) $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP)
+PI0BLOBCPP = Classes/Pi0Blob/CCProtonPi0_Pi0Blob.cpp
+ALLPARTICLESCPP = $(INTERACTIONCPP) $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP) $(PI0BLOBCPP)
 
 # Tools for Detailed Studies
 PIDTOOLCPP = Classes/PIDTool/CCProtonPi0_PIDTool.cpp

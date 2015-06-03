@@ -1,13 +1,13 @@
-CCPROTONPI0_V="v2_10c"
+CCPROTONPI0_V="v2_11"
 OUTPUTFOLDER="run"
-OTHEROPTIONS="--dst"
+OTHEROPTIONS=""
 
 echo "Submitting Jobs ..."
 echo "... CCProtonPi0 Version: ${CCPROTONPI0_V}" 
 echo "... Output Folder: ${OUTPUTFOLDER}"
 
 runNumber_first=13201
-runNumber_last=13225
+runNumber_last=13215
 
 for ((runNumber=${runNumber_first}; runNumber <= ${runNumber_last}; runNumber=runNumber+2 )); do
         echo "Submitting Run = ${runNumber}"

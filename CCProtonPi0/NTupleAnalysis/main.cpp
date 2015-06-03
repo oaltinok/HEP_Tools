@@ -26,7 +26,6 @@ main.cpp
             > ./main.exe plot 4
         
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_04_21
 ================================================================================
 */
 
@@ -104,7 +103,7 @@ int main(int argc, char *argv[] )
         }else if(isPlaylist){
             t.run("Input/Playlists/pl_MC_minerva13C.dat");
         }else{
-            t.run("Input/Playlists/pl_MC_Run_2_10c.dat");
+            t.run("Input/Playlists/pl_MC_v2_11.dat");
         }
     }
     
