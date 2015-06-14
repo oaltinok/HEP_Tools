@@ -13,7 +13,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(int nMode) : CCProtonPi0_NTupleAnalysis
     cout<<"Initializing CCProtonPi0_CutList"<<endl;
     
     SetCutNames();
-    OpenTextFiles();
+    OpenOutputFile();
 
     cout<<"Done!"<<endl;
 }
@@ -26,232 +26,261 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_Vertex_Not_Reconstructable.set_Name("Vertex_Not_Reconstructable"); 
     nCut_Vertex_Not_Fiducial.set_Name("Vertex_Not_Fiducial");
     nCut_Vertex_Count.set_Name("Vertex_Count");  
-    nCut_nProngs.set_Name("nProngs");
-    
-    // nProngs == 1 Cut Numbers
-    nCut_1Prong_Muon_None.set_Name("Muon_None");              
-    nCut_1Prong_Muon_Not_Plausible.set_Name("Muon_Not_Plausible");
-    nCut_1Prong_Muon_Score_Low.set_Name("Muon_Score_Low");
-    nCut_1Prong_Muon_Charge.set_Name("Muon_Charge");
-    nCut_1Prong_Vertex_Michel_Exist.set_Name("Vertex_Michel_Exist"); 
-    nCut_1Prong_EndPoint_Michel_Exist.set_Name("EndPoint_Michel_Exist");
-    nCut_1Prong_secEndPoint_Michel_Exist.set_Name("secEndPoint_Michel_Exist");
-    nCut_1Prong_PreFilter_Pi0.set_Name("PreFilter_Pi0");
-    nCut_1Prong_VtxBlob.set_Name("VtxBlob");
-    nCut_1Prong_ConeBlobs.set_Name("ConeBlobs");
-    nCut_1Prong_Photon1DistanceLow.set_Name("Photon1DistanceLow");
-    nCut_1Prong_Photon2DistanceLow.set_Name("Photon2DistanceLow");
-    nCut_1Prong_Pi0_invMass.set_Name("Pi0_invMass");
+    nCut_Muon_None.set_Name("Muon_None");              
+    nCut_Muon_Not_Plausible.set_Name("Muon_Not_Plausible");
+    nCut_Muon_Score_Low.set_Name("Muon_Score_Low");
+    nCut_Muon_Charge.set_Name("Muon_Charge");
+    nCut_Vertex_Michel_Exist.set_Name("Vertex_Michel_Exist"); 
+    nCut_EndPoint_Michel_Exist.set_Name("EndPoint_Michel_Exist");
+    nCut_secEndPoint_Michel_Exist.set_Name("secEndPoint_Michel_Exist");
+    nCut_PreFilter_Pi0.set_Name("PreFilter_Pi0");
+    nCut_ConeBlobs.set_Name("ConeBlobs");
+    nCut_BlobsBad.set_Name("BlobsBad");
+    nCut_Pi0BlobCuts.set_Name("Pi0BlobCuts");
+    nCut_Photon1DistanceLow.set_Name("Photon1DistanceLow");
+    nCut_Photon2DistanceLow.set_Name("Photon2DistanceLow");
+    nCut_Pi0_invMass.set_Name("Pi0_invMass");
+
+    // nProngs == 1 Cut Numbers (Muon + Pi0)
+    nCut_1Prong_Particle_None.set_Name("Particle_None");
+    nCut_1Prong_Proton_None.set_Name("Proton_None");            
+    nCut_1Prong_ProtonScore.set_Name("Proton_Score");
+    nCut_1Prong_DeltaInvMass.set_Name("Delta_invMass");
     nCut_1Prong_beamEnergy.set_Name("beamEnergy");
     nCut_1Prong_UnusedE.set_Name("UnusedE");
-    nCut_1Prong_Pi0BlobCuts.set_Name("Pi0BlobCuts");
-    nCut_1Prong_PreBlobCuts.set_Name("PreBlobCuts");
 
-    // nProngs == 2 Cut Numbers
-    nCut_2Prong_Muon_None.set_Name("Muon_None");              
-    nCut_2Prong_Muon_Not_Plausible.set_Name("Muon_Not_Plausible");
-    nCut_2Prong_Muon_Score_Low.set_Name("Muon_Score_Low");
-    nCut_2Prong_Muon_Charge.set_Name("Muon_Charge");
-    nCut_2Prong_Vertex_Michel_Exist.set_Name("Vertex_Michel_Exist"); 
-    nCut_2Prong_EndPoint_Michel_Exist.set_Name("EndPoint_Michel_Exist");
-    nCut_2Prong_secEndPoint_Michel_Exist.set_Name("secEndPoint_Michel_Exist");
+    // nProngs >= 2 Cut Numbers (Muon + Pi0 + X(No Meson))
     nCut_2Prong_Particle_None.set_Name("Particle_None");
     nCut_2Prong_Proton_None.set_Name("Proton_None");            
     nCut_2Prong_ProtonScore.set_Name("Proton_Score");
-    nCut_2Prong_PreFilter_Pi0.set_Name("PreFilter_Pi0");
-    nCut_2Prong_VtxBlob.set_Name("VtxBlob");
-    nCut_2Prong_ConeBlobs.set_Name("ConeBlobs");
-    nCut_2Prong_Photon1DistanceLow.set_Name("Photon1DistanceLow");
-    nCut_2Prong_Photon2DistanceLow.set_Name("Photon1DistanceLow");
-    nCut_2Prong_Pi0_invMass.set_Name("Pi0_invMass");
+    nCut_2Prong_DeltaInvMass.set_Name("Delta_invMass");
     nCut_2Prong_beamEnergy.set_Name("beamEnergy");
     nCut_2Prong_UnusedE.set_Name("UnusedE");
-    nCut_2Prong_DeltaInvMass.set_Name("Delta_invMass");
-    nCut_2Prong_Pi0BlobCuts.set_Name("Pi0BlobCuts");
-    nCut_2Prong_PreBlobCuts.set_Name("PreBlobCuts");
 
 }
 
-void CCProtonPi0_CutList::OpenTextFiles()
+void CCProtonPi0_CutList::OpenOutputFile()
 {
     // Open Cut Files
-    cutFile[0] = Folder_List::output + Folder_List::textOut + branchDir + "CutTable_1Prong.txt";
-    cutFile[1] = Folder_List::output + Folder_List::textOut + branchDir + "CutTable_2Prong.txt";
+    cutFile = Folder_List::output + Folder_List::textOut + branchDir + "CutTable.txt";
     
-    for (int i = 0; i < nTopologies; i++){
-        cutText[i].open( cutFile[i].c_str() );
-        if( !cutText[i].is_open() ){
-            cerr<<"Cannot open output text file: "<<cutFile[i]<<endl;
-            exit(1);
-        }else{
-            cout<<"\t"<<cutFile[i]<<endl;
-        }
-    } 
+    cutText.open( cutFile.c_str() );
+    if( !cutText.is_open() ){
+        cerr<<"Cannot open output text file: "<<cutFile<<endl;
+        exit(1);
+    }else{
+        cout<<"\t"<<cutFile<<endl;
+    }
+     
 }
 
 void CCProtonPi0_CutList::writeCutTableHeader()
 {
-    for (int i = 0; i < nTopologies; i++){
-        cutText[i]<<std::left;
-        
-        cutText[i].width(35); cutText[i]<<"Cut"<<" "; 
-        
-        cutText[i].width(12); cutText[i]<<"N(Events)"<<" ";    
-        cutText[i].width(12); cutText[i]<<"N(Signal)"<<" ";      
-        cutText[i].width(12); cutText[i]<<"Efficiency"<<" ";      
-        cutText[i].width(12); cutText[i]<<"Purity"<<" ";
-        cutText[i].width(12); cutText[i]<<"N(Study1)"<<" "; 
-        cutText[i].width(12); cutText[i]<<"N(Study2)"<<" "; 
-        cutText[i]<<endl;
-    }
-
+    cutText<<std::left;
+    
+    cutText.width(35); cutText<<"Cut"<<" "; 
+    
+    cutText.width(12); cutText<<"N(Events)"<<" ";    
+    cutText.width(12); cutText<<"N(Signal)"<<" ";      
+    cutText.width(12); cutText<<"Eff(FidVol)"<<" ";      
+    cutText.width(12); cutText<<"Eff(MINOS)"<<" ";      
+    cutText.width(12); cutText<<"Purity"<<" ";
+    cutText.width(12); cutText<<"N(Study1)"<<" "; 
+    cutText.width(12); cutText<<"N(Study2)"<<" "; 
+    cutText<<endl;
 }
 
-double CCProtonPi0_CutList::getCutEfficiency(double nSig, double effBase)
+double CCProtonPi0_CutList::getCutEfficiency(CCProtonPi0_Cut& currentCut, CCProtonPi0_Cut& effBase) const
 {
-    double eff;   
-    eff = (nSig / effBase) * 100.0;
+    double nSignal_current = currentCut.nSignal.getCount();
+    double nSignal_effBase = effBase.nSignal.getCount(); 
+    double eff = (nSignal_current / nSignal_effBase) * 100.0;
     return eff;   
 }
 
-double CCProtonPi0_CutList::getCutPurity(double nSig, double nEvents)
+double CCProtonPi0_CutList::getCutPurity(CCProtonPi0_Cut& currentCut) const
 {
-    double purity;   
-    purity = (nSig / nEvents) * 100.0;
+    double nSignal_current = currentCut.nSignal.getCount();
+    double nEvents_current = currentCut.nEvent.getCount();
+    double purity  = (nSignal_current / nEvents_current) * 100.0;
     return purity;   
 }
 
-void CCProtonPi0_CutList::formCutVectors()
+void CCProtonPi0_CutList::formCutVector()
 {   
-    //--------------------------------------------------------------------------
-    // Form nCutVector for nProngs == 1
-    //--------------------------------------------------------------------------
-    // Complete List
-    nCutVector_1Prong.push_back(nCut_All);
-    nCutVector_1Prong.push_back(nCut_Vertex_None);
-    nCutVector_1Prong.push_back(nCut_Vertex_Not_Reconstructable); 
-    nCutVector_1Prong.push_back(nCut_Vertex_Not_Fiducial);
-    nCutVector_1Prong.push_back(nCut_Vertex_Count); 
-    nCutVector_1Prong.push_back(nCut_nProngs);
-    nCutVector_1Prong.push_back(nCut_1Prong_Muon_None);              
-    nCutVector_1Prong.push_back(nCut_1Prong_Muon_Not_Plausible);
-    nCutVector_1Prong.push_back(nCut_1Prong_Muon_Score_Low);
-    nCutVector_1Prong.push_back(nCut_1Prong_Muon_Charge);
-    nCutVector_1Prong.push_back(nCut_1Prong_Vertex_Michel_Exist); 
-    nCutVector_1Prong.push_back(nCut_1Prong_EndPoint_Michel_Exist);
-    nCutVector_1Prong.push_back(nCut_1Prong_secEndPoint_Michel_Exist);
-    nCutVector_1Prong.push_back(nCut_1Prong_PreFilter_Pi0);
-    nCutVector_1Prong.push_back(nCut_1Prong_VtxBlob);
-    nCutVector_1Prong.push_back(nCut_1Prong_ConeBlobs);
-    nCutVector_1Prong.push_back(nCut_1Prong_PreBlobCuts);
-    nCutVector_1Prong.push_back(nCut_1Prong_Pi0BlobCuts);
-    nCutVector_1Prong.push_back(nCut_1Prong_Photon1DistanceLow);
-    nCutVector_1Prong.push_back(nCut_1Prong_Photon2DistanceLow);
-    nCutVector_1Prong.push_back(nCut_1Prong_Pi0_invMass);
-    nCutVector_1Prong.push_back(nCut_1Prong_beamEnergy);
-    nCutVector_1Prong.push_back(nCut_1Prong_UnusedE);
-    
-    //--------------------------------------------------------------------------
-    // Form nCutVector for nProngs == 2
-    //--------------------------------------------------------------------------
-    nCutVector_2Prong.push_back(nCut_All);
-    nCutVector_2Prong.push_back(nCut_Vertex_None);
-    nCutVector_2Prong.push_back(nCut_Vertex_Not_Reconstructable); 
-    nCutVector_2Prong.push_back(nCut_Vertex_Not_Fiducial);
-    nCutVector_2Prong.push_back(nCut_Vertex_Count); 
-    nCutVector_2Prong.push_back(nCut_nProngs);
-    nCutVector_2Prong.push_back(nCut_2Prong_Muon_None);              
-    nCutVector_2Prong.push_back(nCut_2Prong_Muon_Not_Plausible);
-    nCutVector_2Prong.push_back(nCut_2Prong_Muon_Score_Low);
-    nCutVector_2Prong.push_back(nCut_2Prong_Muon_Charge);
-    nCutVector_2Prong.push_back(nCut_2Prong_Vertex_Michel_Exist); 
-    nCutVector_2Prong.push_back(nCut_2Prong_EndPoint_Michel_Exist);
-    nCutVector_2Prong.push_back(nCut_2Prong_secEndPoint_Michel_Exist);
-    nCutVector_2Prong.push_back(nCut_2Prong_PreFilter_Pi0);
-    nCutVector_2Prong.push_back(nCut_2Prong_VtxBlob);
-    nCutVector_2Prong.push_back(nCut_2Prong_ConeBlobs);
-    nCutVector_2Prong.push_back(nCut_2Prong_PreBlobCuts);
-    nCutVector_2Prong.push_back(nCut_2Prong_Pi0BlobCuts);
-    nCutVector_2Prong.push_back(nCut_2Prong_Photon1DistanceLow);
-    nCutVector_2Prong.push_back(nCut_2Prong_Photon2DistanceLow);
-    nCutVector_2Prong.push_back(nCut_2Prong_Pi0_invMass);
-    nCutVector_2Prong.push_back(nCut_2Prong_Particle_None);
-    nCutVector_2Prong.push_back(nCut_2Prong_Proton_None);
-    nCutVector_2Prong.push_back(nCut_2Prong_ProtonScore);
-    nCutVector_2Prong.push_back(nCut_2Prong_DeltaInvMass);
-    nCutVector_2Prong.push_back(nCut_2Prong_beamEnergy);
-    nCutVector_2Prong.push_back(nCut_2Prong_UnusedE);
+    nCutVector.push_back(nCut_All);
+    nCutVector.push_back(nCut_Vertex_None);
+    nCutVector.push_back(nCut_Vertex_Not_Reconstructable); 
+    nCutVector.push_back(nCut_Vertex_Not_Fiducial);
+    nCutVector.push_back(nCut_Vertex_Count); 
+    nCutVector.push_back(nCut_Muon_None);              
+    nCutVector.push_back(nCut_Muon_Not_Plausible);
+    nCutVector.push_back(nCut_Muon_Score_Low);
+    nCutVector.push_back(nCut_Muon_Charge);
+    nCutVector.push_back(nCut_Vertex_Michel_Exist); 
+    nCutVector.push_back(nCut_EndPoint_Michel_Exist);
+    nCutVector.push_back(nCut_secEndPoint_Michel_Exist);
+    nCutVector.push_back(nCut_PreFilter_Pi0);
+    nCutVector.push_back(nCut_ConeBlobs);
+    nCutVector.push_back(nCut_BlobsBad);
+    nCutVector.push_back(nCut_Pi0BlobCuts);
+    nCutVector.push_back(nCut_Photon1DistanceLow);
+    nCutVector.push_back(nCut_Photon2DistanceLow);
+    nCutVector.push_back(nCut_Pi0_invMass);
     
 }
 
 void CCProtonPi0_CutList::writeCutTable()
 {
-    formCutVectors();
+    formCutVector();
     
-    for (int t = 0; t < nTopologies; t++){
-        cout<<">> Writing "<<cutFile[t]<<endl;
-    }
+    cout<<">> Writing "<<cutFile<<endl;
     
     writeCutTableHeader();
-    writeCutTableRows(nCutVector_1Prong, 1);
-    writeCutTableRows(nCutVector_2Prong, 2);
+    writeCutTableRows();
 }
 
-void CCProtonPi0_CutList::writeCutTableRows(vector<CCProtonPi0_Cut> nCutVector, int nProngs)
+void CCProtonPi0_CutList::writeCutTableRows()
 {
-    int t; // Topology
-    double efficiency;
-    double purity;    
-    double efficiencyBase;
-    int efficiencyInd = 6;
-    
-    if (nProngs == 1) t = 0;
-    if (nProngs == 2) t = 1;
-
-    // Efficiency Base is MINOS Matched Muons
-    efficiencyBase = nCutVector[efficiencyInd].nSignal.getCount();
-      
-    // Loop over Each Cut    
+    // Write General Cuts upto Proton Reconstruction    
     for( unsigned int i = 0; i < nCutVector.size(); i++){
-
-            efficiency = getCutEfficiency(nCutVector[i].nSignal.getCount(),efficiencyBase);
-            purity = getCutPurity(nCutVector[i].nSignal.getCount(),nCutVector[i].nEvent.getCount());
-            
-            cutText[t].unsetf( std::ios::floatfield ); 
-            cutText[t].width(35); cutText[t]<<nCutVector[i].get_Name()<<" ";
-            cutText[t].width(12); cutText[t]<<nCutVector[i].nEvent.getCount()<<" ";
-            
-            // Total Signal
-            cutText[t].width(12); cutText[t]<<nCutVector[i].nSignal.getCount()<<" ";
-
-            cutText[t].precision(4); 
-        
-            if ( efficiency <= 100){
-                cutText[t].width(12); cutText[t]<<efficiency<<" ";
-            }else{
-                cutText[t].width(12); cutText[t]<<"N/A"<<" ";    
-            }
-
-            if ( efficiency <= 100){
-                cutText[t].width(12); cutText[t]<<purity<<" ";
-            }else{
-                cutText[t].width(12);  cutText[t]<<"N/A"<<" ";    
-            }
-            
-            // Number of Events which are studied
-            cutText[t].width(12); cutText[t]<<nCutVector[i].nStudy1.getCount()<<" ";
-            cutText[t].width(12); cutText[t]<<nCutVector[i].nStudy2.getCount()<<" ";
-            
-            cutText[t]<<endl;
+        writeSingleRow(nCutVector[i]);    
     }
+
+    cutText<<endl;
+
+    //Write Separate Cuts;
+    writeSingleRow(nCut_1Prong_Particle_None, nCut_2Prong_Particle_None);
+    writeSingleRow(nCut_1Prong_Proton_None, nCut_2Prong_Proton_None);
+    writeSingleRow(nCut_1Prong_ProtonScore, nCut_2Prong_ProtonScore);
+    writeSingleRow(nCut_1Prong_DeltaInvMass, nCut_2Prong_DeltaInvMass);
+    writeSingleRow(nCut_1Prong_beamEnergy, nCut_2Prong_beamEnergy);
+    writeSingleRow(nCut_1Prong_UnusedE, nCut_2Prong_UnusedE);
 }
 
+void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& currentCut)
+{
+    double eff_FidVolume;
+    double eff_MINOS;
+    double purity;    
+
+    eff_FidVolume = getCutEfficiency(currentCut,nCut_Vertex_Not_Fiducial);
+    eff_MINOS = getCutEfficiency(currentCut,nCut_Muon_None);
+    purity = getCutPurity(currentCut);
+            
+    cutText.width(35); cutText<<currentCut.get_Name()<<" ";
+    cutText.width(12); cutText<<currentCut.nEvent.getCount()<<" ";
+    
+    // Total Signal
+    cutText.width(12); cutText<<currentCut.nSignal.getCount()<<" ";
+
+    // Efficiency
+    if ( eff_FidVolume <= 100){
+        cutText.width(12); cutText<<eff_FidVolume<<" ";
+    }else{
+        cutText.width(12); cutText<<"N/A"<<" ";    
+    }
+
+    if ( eff_MINOS <= 100){
+        cutText.width(12); cutText<<eff_MINOS<<" ";
+    }else{
+        cutText.width(12); cutText<<"N/A"<<" ";    
+    }    
+    
+    // Purity
+    cutText.width(12); cutText<<purity<<" ";
+
+    // Number of Events which are studied
+    cutText.width(12); cutText<<currentCut.nStudy1.getCount()<<" ";
+    cutText.width(12); cutText<<currentCut.nStudy2.getCount()<<" ";
+    
+    cutText<<endl;
+}
+
+
+
+void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& nCut_1Prong, CCProtonPi0_Cut& nCut_2Prong)
+{
+    double eff_FidVolume;
+    double eff_MINOS;
+    double purity;    
+
+    // ------------------------------------------------------------------------
+    // Write nCut_1Prong  Statistics
+    // ------------------------------------------------------------------------
+    eff_FidVolume = getCutEfficiency(nCut_1Prong,nCut_Vertex_Not_Fiducial);
+    eff_MINOS = getCutEfficiency(nCut_1Prong,nCut_Muon_None);
+    purity = getCutPurity(nCut_1Prong);
+            
+    cutText.unsetf( std::ios::floatfield ); 
+    cutText.width(35); cutText<<nCut_1Prong.get_Name()<<" ";
+    cutText.width(12); cutText<<nCut_1Prong.nEvent.getCount()<<" ";
+    
+    // Total Signal
+    cutText.width(12); cutText<<nCut_1Prong.nSignal.getCount()<<" ";
+
+    cutText.precision(4); 
+
+    // Efficiency
+    if ( eff_FidVolume <= 100){
+        cutText.width(12); cutText<<eff_FidVolume<<" ";
+    }else{
+        cutText.width(12); cutText<<"N/A"<<" ";    
+    }
+
+    if ( eff_MINOS <= 100){
+        cutText.width(12); cutText<<eff_MINOS<<" ";
+    }else{
+        cutText.width(12); cutText<<"N/A"<<" ";    
+    }    
+    
+    // Purity
+    cutText.width(12); cutText<<purity<<" ";
+
+    // Number of Events which are studied
+    cutText.width(12); cutText<<nCut_1Prong.nStudy1.getCount()<<" ";
+    cutText.width(12); cutText<<nCut_1Prong.nStudy2.getCount()<<" ";
+
+    // ------------------------------------------------------------------------
+    // Write nCut_2Prong Statistics
+    // ------------------------------------------------------------------------
+    eff_FidVolume = getCutEfficiency(nCut_2Prong,nCut_Vertex_Not_Fiducial);
+    eff_MINOS = getCutEfficiency(nCut_2Prong,nCut_Muon_None);
+    purity = getCutPurity(nCut_2Prong);
+            
+    cutText.width(12); cutText<<nCut_2Prong.nEvent.getCount()<<" ";
+    
+    // Total Signal
+    cutText.width(12); cutText<<nCut_2Prong.nSignal.getCount()<<" ";
+
+    cutText.precision(4); 
+
+    // Efficiency
+    if ( eff_FidVolume <= 100){
+        cutText.width(12); cutText<<eff_FidVolume<<" ";
+    }else{
+        cutText.width(12); cutText<<"N/A"<<" ";    
+    }
+
+    if ( eff_MINOS <= 100){
+        cutText.width(12); cutText<<eff_MINOS<<" ";
+    }else{
+        cutText.width(12); cutText<<"N/A"<<" ";    
+    }    
+    
+    // Purity
+    cutText.width(12); cutText<<purity<<" ";
+
+    // Number of Events which are studied
+    cutText.width(12); cutText<<nCut_2Prong.nStudy1.getCount()<<" ";
+    cutText.width(12); cutText<<nCut_2Prong.nStudy2.getCount()<<" ";
+
+    cutText<<endl;
+}
 
 CCProtonPi0_CutList::~CCProtonPi0_CutList()
 {
-    for (int i = 0; i < nTopologies; i++){
-        cutText[i].close(); 
-    }
+    cutText.close(); 
 }
 
 

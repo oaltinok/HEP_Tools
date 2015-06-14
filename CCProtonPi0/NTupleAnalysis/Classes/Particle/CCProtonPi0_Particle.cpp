@@ -14,7 +14,7 @@ CCProtonPi0_Particle::CCProtonPi0_Particle(int nMode) : CCProtonPi0_NTupleAnalys
 {
     bin_partScore.setBin(100,0.0,1.0);
     bin_error.setBin(400, -2.0, 2.0);
-    bin_angle.setBin(180, 0.0, 180.0);
+    bin_angle.setBin(18, 0.0, 180.0);
 }
 
 void CCProtonPi0_Particle::fill_Histograms()

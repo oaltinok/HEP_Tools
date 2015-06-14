@@ -32,17 +32,31 @@ class CCProtonPi0_Pi0Blob : public CCProtonPi0_NTupleAnalysis
         void write_RootFile();
 
         // Histograms
+        
+        // Standard Blob Variables
         TH1D* g1_blob_ndigits;
         TH1D* g1_blob_nclusters;
         TH1D* g1_blob_energy;
         TH1D* g1_blob_minsep;
-
         TH1D* g2_blob_ndigits;
         TH1D* g2_blob_nclusters;
         TH1D* g2_blob_energy;
         TH1D* g2_blob_minsep;
 
-    private:
+
+        // Fit Results
+        TH1D* g1_blob_ndof;
+        TH1D* g1_blob_fval;
+
+        // dEdX 
+        TH1D* g1_blob_dEdx_doublet;
+        TH1D* g1_blob_dEdx_empty_plane;
+        TH1D* g1_blob_dEdx;
+        TH1D* g1_blob_dEdx1;
+        TH1D* g1_blob_dEdx_nplane;
+        TH1D* g1_blob_dEdx_cluster_energy;
+
+        private:
         void initHistograms();
 
         TFile* f;
@@ -53,6 +67,12 @@ class CCProtonPi0_Pi0Blob : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_SingleBin bin_blob_energy;
         CCProtonPi0_SingleBin bin_blob_ndigits;
         CCProtonPi0_SingleBin bin_blob_minsep;
+        CCProtonPi0_SingleBin bin_blob_ndof;
+        CCProtonPi0_SingleBin bin_blob_fval;
+        CCProtonPi0_SingleBin bin_blob_dEdx_doublet;
+        CCProtonPi0_SingleBin bin_blob_dEdx;
+        CCProtonPi0_SingleBin bin_blob_dEdx_nplane;
+        CCProtonPi0_SingleBin bin_blob_dEdx_cluster_energy;
 
 };
 

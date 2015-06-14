@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun  3 12:15:06 2015 by ROOT version 5.34/05
+// Wed Jun 10 10:02:29 2015 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -43,12 +43,7 @@ public :
    Bool_t          minos_track_inside_partial_plane;
    Bool_t          prim_vtx_has_misassigned_track_direction;
    Bool_t          prim_vtx_has_broken_track;
-   Bool_t          gamma1_isGoodDirection;
-   Bool_t          gamma1_isGoodPosition;
-   Bool_t          gamma1_isGoodBlob;
-   Bool_t          gamma2_isGoodDirection;
-   Bool_t          gamma2_isGoodPosition;
-   Bool_t          gamma2_isGoodBlob;
+   Int_t           Cut_BlobsBad;
    Int_t           Cut_ConeBlobs;
    Int_t           Cut_EndPoint_Michel_Exist;
    Int_t           Cut_Muon_Charge;
@@ -56,15 +51,12 @@ public :
    Int_t           Cut_Muon_Not_Plausible;
    Int_t           Cut_Muon_Score_Low;
    Int_t           Cut_Particle_None;
-   Int_t           Cut_PreBlobCuts;
    Int_t           Cut_PreFilter_Pi0;
    Int_t           Cut_Proton_None;
    Int_t           Cut_Vertex_Michel_Exist;
    Int_t           Cut_Vertex_None;
    Int_t           Cut_Vertex_Not_Fiducial;
    Int_t           Cut_Vertex_Not_Reconstructable;
-   Int_t           Cut_VtxBlob;
-   Int_t           Cut_nProngs;
    Int_t           Cut_secEndPoint_Michel_Exist;
    Int_t           anglescan_ncand;
    Int_t           anglescan_ncandx;
@@ -171,7 +163,7 @@ public :
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[56];   //[g1dedx_rev_cluster_energy_sz]
+   Double_t        g1dedx_rev_cluster_energy[44];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
@@ -512,26 +504,26 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[23];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[23];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[23];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[23];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[23];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[19];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[19];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[19];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[19];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[19];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[52];   //[mc_er_nPart]
-   Int_t           mc_er_status[52];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[52];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[52];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[52];   //[mc_er_nPart]
-   Double_t        mc_er_Px[52];   //[mc_er_nPart]
-   Double_t        mc_er_Py[52];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[52];   //[mc_er_nPart]
-   Double_t        mc_er_E[52];   //[mc_er_nPart]
-   Int_t           mc_er_FD[52];   //[mc_er_nPart]
-   Int_t           mc_er_LD[52];   //[mc_er_nPart]
-   Int_t           mc_er_mother[52];   //[mc_er_nPart]
+   Int_t           mc_er_ID[46];   //[mc_er_nPart]
+   Int_t           mc_er_status[46];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[46];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[46];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[46];   //[mc_er_nPart]
+   Double_t        mc_er_Px[46];   //[mc_er_nPart]
+   Double_t        mc_er_Py[46];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[46];   //[mc_er_nPart]
+   Double_t        mc_er_E[46];   //[mc_er_nPart]
+   Int_t           mc_er_FD[46];   //[mc_er_nPart]
+   Int_t           mc_er_LD[46];   //[mc_er_nPart]
+   Int_t           mc_er_mother[46];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[8];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[7];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -553,11 +545,11 @@ public :
    Int_t           mc_wgt_Flux_NA49_sz;
    Double_t        mc_wgt_Flux_NA49[100];   //[mc_wgt_Flux_NA49_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[5];   //[n_prongs]
-   Double_t        prong_part_score[5];   //[n_prongs]
-   Double_t        prong_part_mass[5];   //[n_prongs]
-   Int_t           prong_part_charge[5];   //[n_prongs]
-   Int_t           prong_part_pid[5];   //[n_prongs]
+   Int_t           prong_nParticles[6];   //[n_prongs]
+   Double_t        prong_part_score[6];   //[n_prongs]
+   Double_t        prong_part_mass[6];   //[n_prongs]
+   Int_t           prong_part_charge[6];   //[n_prongs]
+   Int_t           prong_part_pid[6];   //[n_prongs]
    vector<vector<double> > *prong_part_E;
    vector<vector<double> > *prong_part_pos;
 
@@ -583,12 +575,7 @@ public :
    TBranch        *b_minos_track_inside_partial_plane;   //!
    TBranch        *b_prim_vtx_has_misassigned_track_direction;   //!
    TBranch        *b_prim_vtx_has_broken_track;   //!
-   TBranch        *b_gamma1_isGoodDirection;   //!
-   TBranch        *b_gamma1_isGoodPosition;   //!
-   TBranch        *b_gamma1_isGoodBlob;   //!
-   TBranch        *b_gamma2_isGoodDirection;   //!
-   TBranch        *b_gamma2_isGoodPosition;   //!
-   TBranch        *b_gamma2_isGoodBlob;   //!
+   TBranch        *b_Cut_BlobsBad;   //!
    TBranch        *b_Cut_ConeBlobs;   //!
    TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
    TBranch        *b_Cut_Muon_Charge;   //!
@@ -596,15 +583,12 @@ public :
    TBranch        *b_Cut_Muon_Not_Plausible;   //!
    TBranch        *b_Cut_Muon_Score_Low;   //!
    TBranch        *b_Cut_Particle_None;   //!
-   TBranch        *b_Cut_PreBlobCuts;   //!
    TBranch        *b_Cut_PreFilter_Pi0;   //!
    TBranch        *b_Cut_Proton_None;   //!
    TBranch        *b_Cut_Vertex_Michel_Exist;   //!
    TBranch        *b_Cut_Vertex_None;   //!
    TBranch        *b_Cut_Vertex_Not_Fiducial;   //!
    TBranch        *b_Cut_Vertex_Not_Reconstructable;   //!
-   TBranch        *b_Cut_VtxBlob;   //!
-   TBranch        *b_Cut_nProngs;   //!
    TBranch        *b_Cut_secEndPoint_Michel_Exist;   //!
    TBranch        *b_anglescan_ncand;   //!
    TBranch        *b_anglescan_ncandx;   //!
@@ -1135,7 +1119,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/CCProtonPi0/MC/v2_11/test/grid/central_value/minerva/ana/v10r8/00/01/32/00/SIM_minerva_00013200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/CCProtonPi0/MC/v2_12b/run/grid/central_value/minerva/ana/v10r8/00/01/32/00/SIM_minerva_00013200_Subruns_0005-0006-0007-0008_CCProtonPi0_Ana_Tuple_v10r8.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1208,12 +1192,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("minos_track_inside_partial_plane", &minos_track_inside_partial_plane, &b_minos_track_inside_partial_plane);
    fChain->SetBranchAddress("prim_vtx_has_misassigned_track_direction", &prim_vtx_has_misassigned_track_direction, &b_prim_vtx_has_misassigned_track_direction);
    fChain->SetBranchAddress("prim_vtx_has_broken_track", &prim_vtx_has_broken_track, &b_prim_vtx_has_broken_track);
-   fChain->SetBranchAddress("gamma1_isGoodDirection", &gamma1_isGoodDirection, &b_gamma1_isGoodDirection);
-   fChain->SetBranchAddress("gamma1_isGoodPosition", &gamma1_isGoodPosition, &b_gamma1_isGoodPosition);
-   fChain->SetBranchAddress("gamma1_isGoodBlob", &gamma1_isGoodBlob, &b_gamma1_isGoodBlob);
-   fChain->SetBranchAddress("gamma2_isGoodDirection", &gamma2_isGoodDirection, &b_gamma2_isGoodDirection);
-   fChain->SetBranchAddress("gamma2_isGoodPosition", &gamma2_isGoodPosition, &b_gamma2_isGoodPosition);
-   fChain->SetBranchAddress("gamma2_isGoodBlob", &gamma2_isGoodBlob, &b_gamma2_isGoodBlob);
+   fChain->SetBranchAddress("Cut_BlobsBad", &Cut_BlobsBad, &b_Cut_BlobsBad);
    fChain->SetBranchAddress("Cut_ConeBlobs", &Cut_ConeBlobs, &b_Cut_ConeBlobs);
    fChain->SetBranchAddress("Cut_EndPoint_Michel_Exist", &Cut_EndPoint_Michel_Exist, &b_Cut_EndPoint_Michel_Exist);
    fChain->SetBranchAddress("Cut_Muon_Charge", &Cut_Muon_Charge, &b_Cut_Muon_Charge);
@@ -1221,15 +1200,12 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("Cut_Muon_Not_Plausible", &Cut_Muon_Not_Plausible, &b_Cut_Muon_Not_Plausible);
    fChain->SetBranchAddress("Cut_Muon_Score_Low", &Cut_Muon_Score_Low, &b_Cut_Muon_Score_Low);
    fChain->SetBranchAddress("Cut_Particle_None", &Cut_Particle_None, &b_Cut_Particle_None);
-   fChain->SetBranchAddress("Cut_PreBlobCuts", &Cut_PreBlobCuts, &b_Cut_PreBlobCuts);
    fChain->SetBranchAddress("Cut_PreFilter_Pi0", &Cut_PreFilter_Pi0, &b_Cut_PreFilter_Pi0);
    fChain->SetBranchAddress("Cut_Proton_None", &Cut_Proton_None, &b_Cut_Proton_None);
    fChain->SetBranchAddress("Cut_Vertex_Michel_Exist", &Cut_Vertex_Michel_Exist, &b_Cut_Vertex_Michel_Exist);
    fChain->SetBranchAddress("Cut_Vertex_None", &Cut_Vertex_None, &b_Cut_Vertex_None);
    fChain->SetBranchAddress("Cut_Vertex_Not_Fiducial", &Cut_Vertex_Not_Fiducial, &b_Cut_Vertex_Not_Fiducial);
    fChain->SetBranchAddress("Cut_Vertex_Not_Reconstructable", &Cut_Vertex_Not_Reconstructable, &b_Cut_Vertex_Not_Reconstructable);
-   fChain->SetBranchAddress("Cut_VtxBlob", &Cut_VtxBlob, &b_Cut_VtxBlob);
-   fChain->SetBranchAddress("Cut_nProngs", &Cut_nProngs, &b_Cut_nProngs);
    fChain->SetBranchAddress("Cut_secEndPoint_Michel_Exist", &Cut_secEndPoint_Michel_Exist, &b_Cut_secEndPoint_Michel_Exist);
    fChain->SetBranchAddress("anglescan_ncand", &anglescan_ncand, &b_anglescan_ncand);
    fChain->SetBranchAddress("anglescan_ncandx", &anglescan_ncandx, &b_anglescan_ncandx);

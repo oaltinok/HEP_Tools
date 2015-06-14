@@ -21,7 +21,7 @@ CCProtonPi0_Muon::CCProtonPi0_Muon(int nMode) : CCProtonPi0_Particle(nMode)
     f = new TFile(rootDir.c_str(),"RECREATE");
 
     // Initialize Bins
-    bin_P.setBin(100,0.0,10.0);
+    bin_P.setBin(10,0.0,10.0);
     bin_KE.setBin(100,0.0,10.0);
     bin_AngleBeam.setBin(90,0.0,90.0);
     

@@ -85,6 +85,7 @@ class CCProtonPi0_Plotter
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
         void plotSignalBackground();
+        void plotSignalBackground_Pi0Blob();
         void plotCutHistograms();
         void plotMichel();
         void MichelTool(TH1D* vertex, TH1D* track, TH1D* track2, TH1D* missed,
@@ -111,7 +112,10 @@ class CCProtonPi0_Plotter
         
         string rootDir_Pion[nBranches];
         string plotDir_Pion[nBranches];
-    
+        
+        string rootDir_Pi0Blob[nBranches];
+        string plotDir_Pi0Blob[nBranches];
+   
 };
 
 

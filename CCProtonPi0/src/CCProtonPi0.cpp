@@ -155,9 +155,6 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("RecoNoProtonEvents",   m_reconstruct_NoProtonEvents = true);
     declareProperty("ApplyExtraMichelCuts", m_applyExtraMichelCuts = false);
     
-    declareProperty("Do_nProngCut",         m_Do_nProngCut          =   false);  
-    declareProperty("max_nProngs",      	m_max_nProngs       =   2);
-    
     declareProperty("BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian );
     
     declareProperty("MinMuonScore",        m_minMuonScore = 0.9 );
@@ -166,7 +163,6 @@ MinervaAnalysisTool( type, name, parent )
     declareProperty("MaxSeedLongTrackChi2",  m_maxSeedLongTrackChi2 = 10 );
     declareProperty("MaxSeedShortTrackChi2", m_maxSeedShortTrackChi2 = 50 );  // short tracks can be constructed from > 1 cluster per plane, so chi^2s are usually bigger
 	 
-
     //--------------------------------------------------------------------------
     // Arachne Colors
     //--------------------------------------------------------------------------
@@ -569,7 +565,6 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch( "Cut_Vertex_None", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Reconstructable", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Fiducial", -1 );
-	declareIntEventBranch( "Cut_nProngs", -1 );
     declareIntEventBranch( "Cut_Muon_None",-1);
     declareIntEventBranch( "Cut_Muon_Not_Plausible",-1);
     declareIntEventBranch( "Cut_Muon_Score_Low",-1);
@@ -580,9 +575,8 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch( "Cut_Particle_None", -1 );
     declareIntEventBranch( "Cut_Proton_None", -1 );
     declareIntEventBranch( "Cut_PreFilter_Pi0", -1 );
-    declareIntEventBranch( "Cut_VtxBlob", -1 );
     declareIntEventBranch( "Cut_ConeBlobs", -1 );
-    declareIntEventBranch( "Cut_PreBlobCuts", -1 );
+    declareIntEventBranch( "Cut_BlobsBad", -1 );
     
     //! General Reco
     declareIntEventBranch( "nProngs", -1);
@@ -696,15 +690,7 @@ StatusCode CCProtonPi0::initialize()
     declareContainerIntEventBranch("g2dedx_cluster_occupancy");
     declareContainerDoubleEventBranch("g2dedx_cluster_energy");
     declareContainerDoubleEventBranch("g2dedx_rev_cluster_energy");
- 
-    //!  blobsPassedPreCuts()
-    declareBoolEventBranch("gamma1_isGoodDirection");
-    declareBoolEventBranch("gamma1_isGoodPosition");
-    declareBoolEventBranch("gamma1_isGoodBlob");
-    declareBoolEventBranch("gamma2_isGoodDirection");
-    declareBoolEventBranch("gamma2_isGoodPosition");
-    declareBoolEventBranch("gamma2_isGoodBlob");
-        
+
     //-------------------------------------------------------------------------
     //! NeutrinoInt Branches 
     //-------------------------------------------------------------------------
@@ -868,7 +854,7 @@ StatusCode CCProtonPi0::initialize()
 StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const
 {
     debug()<<"Enter CCProtonPi0::reconstructEvent()" << endmsg;
-    
+    debug()<<"Version: Modified while the job test2 is Running!"<<endmsg; 
     //--------------------------------------------------------------------------
     //! Count Events Enters reconstructEvent()
     //      N_reconstructEvent is used as the reco_eventID
@@ -1020,26 +1006,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     
     debug() << "FINISH: Vertex Reconstruction!" << endmsg;
 	 
-    //==========================================================================
-    //
-    // Prong Cuts
-    //
-    //==========================================================================
-	int nPrimaryProngs = event->primaryProngs().size();
-	event->setIntData("nProngs", nPrimaryProngs);
-    //--------------------------------------------------------------------------
-    //! MAKE CUT - if nPrimaryProngs is not Valid
-    //-------------------------------------------------------------------------- 
-    if( m_Do_nProngCut ){
-        debug()<<"nProngs Cut with "<<"max_nProngs = "<<m_max_nProngs<<endmsg;
-        if( nPrimaryProngs > m_max_nProngs ){
-            debug()<<"Cut: N(Prongs) = "<<nPrimaryProngs<<endmsg;
-            event->setIntData("Cut_nProngs",1);
-            if( m_store_all_events ) return interpretFailEvent(event); 
-            else return StatusCode::SUCCESS; 
-        }
-    }
-
+	    
     //==========================================================================
     //
     // Muon Reconstruction
@@ -1235,108 +1202,99 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     // Pi0 Reconstruction
     //
     //==========================================================================
-        
+    
+    debug()<<"START: Pi0 Reconstruction"<<endmsg;
     //--------------------------------------------------------------------------
     //! MAKE CUT - if fails PreFilterPi0()
     //--------------------------------------------------------------------------
-    if ( PreFilterPi0(event) ){
-        debug()<<"Passed PreFilterPi0()"<<endmsg;
-    }else{
+    if ( !PreFilterPi0(event) ){
         event->setIntData("Cut_PreFilter_Pi0",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS;  
     }
     
-    //--------------------------------------------------------------------------
-    //! MAKE CUT - if fails VtxBlob()
-    //--------------------------------------------------------------------------
-    debug() << "START: Vertex Blob Reconstruction" << endmsg;
-    if ( VtxBlob(event) ){
-        debug()<<"Succesful VtxBlob Reconstruction!"<<endmsg;
-    }else{
-        event->setIntData("Cut_VtxBlob",1);
-        if( m_store_all_events ) return interpretFailEvent(event); 
-        else return StatusCode::SUCCESS;  
-    }
+    //! Vertex Blob Reconstruction
+    VtxBlob(event);
     
-    debug()<<"FINISH: Vertex Blob Reconstruction"<<endmsg;
-    
-    //--------------------------------------------------------------------------
-    //! MAKE CUT - if fails ConeBlobs() -- Main Function for Pi0 Reconstruction
-    //--------------------------------------------------------------------------
-    debug() << "START: Cone Blob Reconstruction" << endmsg;
-    if ( ConeBlobs(event) ){
-        debug()<<"Succesful ConeBlobs Reconstruction!"<<endmsg;
-    }else{
+    //! Blob Reconstruction -- ConeBlobs()
+    //! MAKE CUT - If ConeBlobs Can NOT Find Two Blobs
+    bool FoundTwoBlobs = ConeBlobs(event);
+    if ( !FoundTwoBlobs ){
         event->setIntData("Cut_ConeBlobs",1);
         if( m_store_all_events ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS;  
     }
-    debug()<<"FINISH: Cone Blob Reconstruction"<<endmsg;
   
-    
     // Set Data for Blobs found in ConeBlobs()
     setBlobData(event);
-    
-    //--------------------------------------------------------------------------
-    //! MAKE CUT - Pre Quality Check for Found Blobs
-    //--------------------------------------------------------------------------
-    bool areBlobsGood = blobsPassedPreCuts(event);
-    if (!areBlobsGood){
-        event->setIntData("Cut_PreBlobCuts",1);
-        if ( m_store_all_events ) return interpretFailEvent(event);
-        else return StatusCode::SUCCESS;
-    }
 
+    //! MAKE CUT - If Blobs are NOT Good
+    bool blobsGood = AreBlobsGood();
+     if ( !blobsGood ){
+        event->setIntData("Cut_BlobsBad",1);
+        if( m_store_all_events ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS;  
+    }
+  
+   
+    debug()<<"FINISH: Pi0 Reconstruction"<<endmsg;
+    
     //==========================================================================
     //
     // Proton Reconstruction
+    //      Only If there are more than 1 Prong (1 Prong = Muon)
     //
     //==========================================================================
-
-    debug() << "START: Proton Reconstruction" << endmsg;
-       
-    //--------------------------------------------------------------------------
-    //! MAKE CUT - if Particle Creation Fails (Proton and Pion Hypotheses)
-    //--------------------------------------------------------------------------
-    // Get all of the primary prongs in the event
-    primaryProngs = event->primaryProngs();
-
-    // Create new particles with Proton and Pion hypotheses
-    debug() << "Creating particles with Proton and Pion hypotheses" <<endmsg;
-    bool makeParticles = createTrackedParticles(primaryProngs);
-    if (!makeParticles){
-        debug() << "Creation of Particles are FAILED!"<< endmsg;
-        event->setIntData("Cut_Particle_None",1);
-        if ( m_reconstruct_NoProtonEvents ){
-            debug() << "Reconstructing Event even there is no Proton Candidate!"<< endmsg;
-        }else{
-            if( m_store_all_events ) return interpretFailEvent(event); 
-            else return StatusCode::SUCCESS; 
-        }
-    }
-
-    //--------------------------------------------------------------------------
-    //! MAKE CUT - if NO Prong contains a Proton Particle
-    //--------------------------------------------------------------------------
-    bool foundProton = getProtonProng(primaryProngs);
-    if( foundProton ) {
-        for(unsigned int i = 0; i < m_ProtonProngs.size(); i++) {
-            debug() << "Tag the proton's prong with bit-field = " << m_ProtonProngs[i]->typeBitsToString() << endmsg;
-        }
-    }else {
-        debug() << "Didn't find any contained in the tracker bit-positive prong with a proton particle!" << endmsg;
-        event->setIntData("Cut_Proton_None",1);
-        if ( m_reconstruct_NoProtonEvents ){
-            debug() << "Reconstructing Event even there is no Proton Candidate!"<< endmsg;
-        }else{
-            if( m_store_all_events ) return interpretFailEvent(event); 
-            else return StatusCode::SUCCESS; 
-        }
-    }
     
+    int nPrimaryProngs = event->primaryProngs().size();
+	event->setIntData("nProngs", nPrimaryProngs);
+    debug()<<"nProngs in Event = "<<nPrimaryProngs<<endmsg;
     
-    debug()<<"FINISH: Proton Reconstruction"<<endmsg;
+    if (nPrimaryProngs > 1){
+   
+        debug() << "START: Proton Reconstruction" << endmsg;
+           
+        //--------------------------------------------------------------------------
+        //! MAKE CUT - if Particle Creation Fails (Proton and Pion Hypotheses)
+        //--------------------------------------------------------------------------
+        // Get all of the primary prongs in the event
+        primaryProngs = event->primaryProngs();
+
+        // Create new particles with Proton and Pion hypotheses
+        debug() << "Creating particles with Proton and Pion hypotheses" <<endmsg;
+        bool makeParticles = createTrackedParticles(primaryProngs);
+        if (!makeParticles){
+            debug() << "Creation of Particles are FAILED!"<< endmsg;
+            event->setIntData("Cut_Particle_None",1);
+            if ( m_reconstruct_NoProtonEvents ){
+                debug() << "Reconstructing Event even there is no Proton Candidate!"<< endmsg;
+            }else{
+                if( m_store_all_events ) return interpretFailEvent(event); 
+                else return StatusCode::SUCCESS; 
+            }
+        }
+
+        //--------------------------------------------------------------------------
+        //! MAKE CUT - if NO Prong contains a Proton Particle
+        //--------------------------------------------------------------------------
+        bool foundProton = getProtonProng(primaryProngs);
+        if( foundProton ) {
+            for(unsigned int i = 0; i < m_ProtonProngs.size(); i++) {
+                debug() << "Tag the proton's prong with bit-field = " << m_ProtonProngs[i]->typeBitsToString() << endmsg;
+            }
+        }else {
+            debug() << "Didn't find any contained in the tracker bit-positive prong with a proton particle!" << endmsg;
+            event->setIntData("Cut_Proton_None",1);
+            if ( m_reconstruct_NoProtonEvents ){
+                debug() << "Reconstructing Event even there is no Proton Candidate!"<< endmsg;
+            }else{
+                if( m_store_all_events ) return interpretFailEvent(event); 
+                else return StatusCode::SUCCESS; 
+            }
+        }
+        
+        debug()<<"FINISH: Proton Reconstruction"<<endmsg;
+    }
     
     //==========================================================================
     //
@@ -1355,27 +1313,30 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //--------------------------------------------------------------------------
     //! Write FS Particle Table and Event Record for Reconstructed Events
     //--------------------------------------------------------------------------
-    bool isSignal = truthEvent->filtertaglist()->isFilterTagTrue("isSignal");
-    if (m_writeFSParticle_Table){
-        info()<<"FS Particle Table and Event Record for Reconstructed Event!"<<endmsg;
-        writeBackgroundType(truthEvent);
-        writeFSParticleTable(isSignal);
-        writeEventRecord(truthEvent,isSignal);
+    if(truthEvent){
+        bool isSignal = truthEvent->filtertaglist()->isFilterTagTrue("isSignal");
+        if (m_writeFSParticle_Table){
+            info()<<"FS Particle Table and Event Record for Reconstructed Event!"<<endmsg;
+            writeBackgroundType(truthEvent);
+            writeFSParticleTable(isSignal);
+            writeEventRecord(truthEvent,isSignal);
+        }
     }
      
     //--------------------------------------------------------------------------
     //! Get total visible energy in PhysicsEvent
     //--------------------------------------------------------------------------
+    debug()<<"Get Total Visible Energy in the Event"<<endmsg;
     SmartRefVector<IDCluster> idClusters = event->select<IDCluster>("Used:Unused","!XTalkCandidate");
     SmartRefVector<ODCluster> odClusters = event->select<ODCluster>("Used:Unused","!XTalkCandidate");  
     double idVisibleEnergy = m_extraEnergyTool->getIDEnergy(idClusters, -1.0);
     double odVisibleEnergy = m_extraEnergyTool->getODEnergy(odClusters, -1.0);
     double totalVisibleEnergy = idVisibleEnergy + odVisibleEnergy;  
 
-
     //--------------------------------------------------------------------------
     //! Color Inner Detector Unused Clusters
     //--------------------------------------------------------------------------
+    debug()<<"Color Unused Clusters!"<<endmsg;
     for (   SmartRefVector<Minerva::IDCluster>::iterator iter_c = idClusters.begin();
             iter_c != idClusters.end(); 
             ++iter_c) 
@@ -1807,7 +1768,7 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     
     //--------------------------------------------------------------------------
     //! Find Signal --  CC Neutrino Interaction
-    //!                 FS Particles: muon, pi0(2xGamma), (proton)
+    //!                 FS Particles: muon, pi0(2xGamma), X (No Meson)
     //--------------------------------------------------------------------------
     bool is1Pi0 = false;
     
@@ -1833,7 +1794,7 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
 // tagBackground() 
 //      Tags Background Event
 //      Signal: CC-Neutrino Interaction inside Fiducial Volume, 
-//              FS Particles: Single Pi0, 1+ Proton, No Other
+//              FS Particles: Single Pi0 + X (No Meson)
 //      returns TRUE if it is a Signal Event    
 //------------------------------------------------------------------------------
 void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
@@ -2872,12 +2833,42 @@ bool CCProtonPi0::setMuonData( Minerva::NeutrinoInt* nuInt ) const
     return true;
 }
 
+double CCProtonPi0::Calc_QSq(double Enu) const
+{
+    const double Mmu = MinervaUnits::M_mu;  // Muon Rest Mass [MeV]
+    
+    // Assumption: Beam is on Z Direction only. (Neutrino Px = Py = 0)
+    double QSq = 2 * Enu *( m_muon_4P.E() - m_muon_4P.pz() ) - (Mmu * Mmu);
+
+    return QSq;
+}
+
+double CCProtonPi0::Calc_WSq(double QSq) const
+{
+    const double Mn = MinervaUnits::M_n;    // Neutron Rest Mass [MeV]
+    const double Mp = MinervaUnits::M_p;    // Proton Rest Mass [MeV]
+    
+    double Tp = m_proton_4P.E() - Mp;
+    double WSq = (Mn * Mn) + 2 * Mn * (m_pi0_4P.E() + Tp) - QSq;
+    
+    //--------------------------------------------------------------------------
+    // Debugging: Check values
+        if(WSq < 0){
+            debug()<<"WSq is negative!"<<endmsg;
+            debug()<<WSq<<" = "<<(Mn * Mn) + 2 * Mn * (m_pi0_4P.E() + Tp)<<" - "<<QSq<<endmsg;
+            debug()<<"Tp = "<<Tp<<endmsg;
+            debug()<<"Epi = "<<m_pi0_4P.E()<<endmsg;
+            debug()<<"QSq = "<<QSq<<endmsg;
+        }
+    //--------------------------------------------------------------------------
+ 
+    return WSq;
+}
+
 //==============================================================================
 // Calculates and Set Event Kinematics
 //      Uses 4-Momentum of Final State Particles
 //==============================================================================
-//! @todo WSq can be negative, investigate
-//! @todo Make sure the 4P info used for calculations are same as the ones written to NTuples
 void CCProtonPi0::setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronVisibleEnergy) const
 {
     debug() << "Enter CCProtonPi0::setEventKinematics()" << endmsg;
@@ -2891,9 +2882,7 @@ void CCProtonPi0::setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronV
     debug()<<"\tHadron Visible Energy = "<<hadronVisibleEnergy<<endmsg;
     //--------------------------------------------------------------------------
     
-    const double Mn = MinervaUnits::M_n;    // Neutron Rest Mass [MeV]
     const double Mp = MinervaUnits::M_p;    // Proton Rest Mass [MeV]
-    const double Mmu = MinervaUnits::M_mu;  // Muon Rest Mass [MeV]
     double Tp;                              // Proton Kinetic Energy
     double Enu;                             // Neutrino Energy
     double Enu_Cal;                         // Neutrino Energy - Calorimetric
@@ -2903,7 +2892,6 @@ void CCProtonPi0::setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronV
     double total_px;                        // Total Px of FS Particles
     double total_py;                        // Total Py of FS Particles
     double total_pz;                        // Total Pz of FS Particles
-    
     
     //--------------------------------------------------------------------------
     // Calculate Neutrino Energy using Tp
@@ -2916,29 +2904,12 @@ void CCProtonPi0::setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronV
     //--------------------------------------------------------------------------
     Enu_Cal = m_muon_4P.E() + hadronVisibleEnergy;
     
-    //--------------------------------------------------------------------------
     // Calculate Q-Square
-    //      Assumption: Beam is on Z Direction only. (Neutrino Px = Py = 0)
-    //--------------------------------------------------------------------------
-    QSq = 2 * Enu *( m_muon_4P.E() - m_muon_4P.pz() ) - (Mmu * Mmu);
-    
-    //--------------------------------------------------------------------------
+    QSq = Calc_QSq(Enu); 
+
     // Calculate W-Square
-    //--------------------------------------------------------------------------
-    WSq = (Mn * Mn) + 2 * Mn * (m_pi0_4P.E() + Tp) - QSq;
-    
-    
-    //--------------------------------------------------------------------------
-    // Debugging: Check values
-        if(WSq < 0){
-            debug()<<"WSq is negative!"<<endmsg;
-            debug()<<WSq<<" = "<<(Mn * Mn) + 2 * Mn * (m_pi0_4P.E() + Tp)<<" - "<<QSq<<endmsg;
-            debug()<<"Tp = "<<Tp<<endmsg;
-            debug()<<"Epi = "<<m_pi0_4P.E()<<endmsg;
-            debug()<<"QSq = "<<QSq<<endmsg;
-        }
-    //--------------------------------------------------------------------------
-    
+    WSq = Calc_WSq(QSq);
+   
     //--------------------------------------------------------------------------
     // Total 4-Momentum of Final State Particles
     //--------------------------------------------------------------------------
@@ -2960,7 +2931,6 @@ void CCProtonPi0::setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronV
     nuInt->setDoubleData("total_py",total_py);
     nuInt->setDoubleData("total_pz",total_pz);
     nuInt->setDoubleData("total_E",total_E);
-
 }
 
 //==============================================================================
@@ -3497,48 +3467,6 @@ bool CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonPro
     return isCorrected;
 }
 
-bool CCProtonPi0::blobsPassedPreCuts( Minerva::PhysicsEvent *event ) const
-{
-    debug() << "CCProtonPi0::areBlobsGoodForPi0()" << endmsg;
-   
-    // Sanity Check
-    if( m_Pi0Blob1 == NULL || m_Pi0Blob2 == NULL){
-        warning()<<"Passed NULL m_Pi0Blob"<<endmsg;
-        return false;
-    }
-
-    const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
-    
-    // Check Gamma1 Quality
-    bool goodPosition1  = m_idHoughBlob->GetStartPosition(m_Pi0Blob1, vtx_position, true );
-    bool goodDirection1 = m_idHoughBlob->GetDirection(m_Pi0Blob1, vtx_position );
-    bool isGoodBlob1 = false;
-    if (goodPosition1 && goodDirection1) isGoodBlob1 = true;
-    
-    // Check Gamma2 Quality
-    bool goodPosition2  = m_idHoughBlob->GetStartPosition(m_Pi0Blob2, vtx_position, true );
-    bool goodDirection2 = m_idHoughBlob->GetDirection(m_Pi0Blob2, vtx_position );
-    bool isGoodBlob2 = false;
-    if (goodPosition2 && goodDirection2) isGoodBlob2 = true;
-    
-    event->filtertaglist()->setOrAddFilterTag("gamma1_isGoodDirection", goodDirection1);
-    event->filtertaglist()->setOrAddFilterTag("gamma1_isGoodPosition",  goodPosition1);
-    event->filtertaglist()->setOrAddFilterTag("gamma1_isGoodBlob", isGoodBlob1);
-    
-    event->filtertaglist()->setOrAddFilterTag("gamma2_isGoodBlob", isGoodBlob2);
-    event->filtertaglist()->setOrAddFilterTag("gamma2_isGoodDirection", goodDirection2);
-    event->filtertaglist()->setOrAddFilterTag("gamma2_isGoodPosition",  goodPosition2);
-    
-    if (isGoodBlob1 && isGoodBlob2){
-        debug()<< " Have 2 Good Blobs for Pi0!"<<endmsg;
-        return true;
-    }else{
-        debug() << "Don't have 2 Good Blobs! -- CANNOT Set Pi0 Particle Data!" <<endmsg;
-        return false;
-    }
-}
-
-
 //==============================================================================
 // setPi0Data
 //==============================================================================
@@ -3639,7 +3567,7 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt ) const
     // Calculate invariant Mass of Pi0
     const double invMass = std::sqrt(2*g1energy*g2energy*(1-cos_openingAngle));
     
-        // Set Pi0 4 - Momentum
+    // Set Pi0 4 - Momentum
     m_pi0_4P.SetPxPyPzE(pimom.x(),pimom.y(),pimom.z(),g1energy+g2energy);
     
     //--------------------------------------------------------------------------
@@ -3924,6 +3852,7 @@ double CCProtonPi0::getClusterEnergy(Minerva::PhysicsEvent* event, std::string i
         warning()<<"Cluster Type can be only = Used, Unused or Used:Unused"<<endmsg;
         return -1.0;
     }
+   
     
     SmartRefVector<IDCluster> idClusters = event->select<IDCluster>(clusterType,energyType);
     SmartRefVector<ODCluster> odClusters = event->select<ODCluster>(clusterType,energyType);  
@@ -3931,6 +3860,11 @@ double CCProtonPi0::getClusterEnergy(Minerva::PhysicsEvent* event, std::string i
     double odEnergy = m_extraEnergyTool->getODEnergy(odClusters, -1.0);
     double totalEnergy = idEnergy  + odEnergy;
    
+    debug()<<"idEnergy = "<<idEnergy<<endmsg;
+    debug()<<"odEnergy = "<<odEnergy<<endmsg;
+
+    debug()<<"Exit: CCProtonPi0::getClusterEnergy() "<<idEnergy<<endmsg;
+    
     return totalEnergy;
 }
 
@@ -3943,7 +3877,7 @@ double CCProtonPi0::getClusterEnergy(Minerva::PhysicsEvent* event, std::string i
 //==============================================================================
 //  VtxBlob
 //==============================================================================
-bool CCProtonPi0::VtxBlob(Minerva::PhysicsEvent *event) const
+void CCProtonPi0::VtxBlob(Minerva::PhysicsEvent *event) const
 {
     debug() << "Enter CCProtonPi0::VtxBlob()" << endmsg;
     
@@ -4026,7 +3960,6 @@ bool CCProtonPi0::VtxBlob(Minerva::PhysicsEvent *event) const
   event->setDoubleData( "Filament_Vertex_energy", vertex_energy_filament );
   event->setDoubleData( "Sphere_Vertex_energy", vertex_energy_sphere );
     
-    return true;
 
 }
 
@@ -4323,7 +4256,7 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
         in the TES, which are managed. Otherwise, delete them 
     */
     if (isAngleScan || isHough || additional) {
-        
+  
         processBlobs(event,foundBlobs);
         ODActivity(event,foundBlobs);
         
@@ -4347,6 +4280,35 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
         
         return false;
     }
+}
+
+bool CCProtonPi0::AreBlobsGood() const
+{
+    debug() << "CCProtonPi0::AreBlobsGood()" << endmsg;
+   
+    // Sanity Check
+    if( m_Pi0Blob1 == NULL || m_Pi0Blob2 == NULL){
+        warning()<<"Passed NULL m_Pi0Blob"<<endmsg;
+        return false;
+    }
+
+    const Gaudi::XYZPoint& vtx_position = m_PrimaryVertex->position();
+    
+    // Check Gamma1 Quality
+    bool goodPosition1  = m_idHoughBlob->GetStartPosition(m_Pi0Blob1, vtx_position, true );
+    bool goodDirection1 = m_idHoughBlob->GetDirection(m_Pi0Blob1, vtx_position );
+    bool isGoodBlob1 = false;
+    if (goodPosition1 && goodDirection1) isGoodBlob1 = true;
+    
+    // Check Gamma2 Quality
+    bool goodPosition2  = m_idHoughBlob->GetStartPosition(m_Pi0Blob2, vtx_position, true );
+    bool goodDirection2 = m_idHoughBlob->GetDirection(m_Pi0Blob2, vtx_position );
+    bool isGoodBlob2 = false;
+    if (goodPosition2 && goodDirection2) isGoodBlob2 = true;
+   
+
+    if (isGoodBlob1 && isGoodBlob2)  return true;
+    else return false;
 }
 
 void CCProtonPi0::setBlobData( Minerva::PhysicsEvent* event) const
@@ -4826,16 +4788,15 @@ void CCProtonPi0::Calculate_dEdx( const Minerva::IDBlob* blob, Minerva::PhysicsE
     double total1    = 0.0; // exclude the first plane
     bool doublet     = false;
     bool empty_plane = false;
-    for (std::map<int, std::vector<double> >::iterator pl = planeClusterEnergyMap.begin();
-         pl != planeClusterEnergyMap.end(); ++pl) {
+    
+    for ( std::map<int, std::vector<double> >::iterator pl = planeClusterEnergyMap.begin(); pl != planeClusterEnergyMap.end(); ++pl) {
         const int plane = pl->first;
         const std::vector<double>& clusterEnergies = pl->second;
         
         std::map<int, std::vector<double> >::iterator next_pl = pl; ++next_pl;
         const int next_plane = next_pl->first;
 
-        const double total_plane_energy
-            = std::accumulate(clusterEnergies.begin(), clusterEnergies.end(), 0.0);
+        const double total_plane_energy = std::accumulate(clusterEnergies.begin(), clusterEnergies.end(), 0.0);
         blob_cluster_occupancy.push_back(clusterEnergies.size());
         blob_cluster_energy.push_back(total_plane_energy);
 
@@ -4853,15 +4814,13 @@ void CCProtonPi0::Calculate_dEdx( const Minerva::IDBlob* blob, Minerva::PhysicsE
     // Less complicated logic for cluster energies from the shower back since
     // I'm not making plot for the NIM paper!
     std::vector<double> blob_rev_cluster_energy; // cluster energies from the shower back (rev. for reverse)
-    for (std::map<int, std::vector<double> >::reverse_iterator pl = planeClusterEnergyMap.rbegin();
-         pl != planeClusterEnergyMap.rend(); ++pl) {
+    std::map<int, std::vector<double> >::reverse_iterator pl; 
+    for ( std::map<int, std::vector<double> >::reverse_iterator pl = planeClusterEnergyMap.rbegin(); pl != planeClusterEnergyMap.rend(); ++pl) {
         const std::vector<double>& clusterEnergies = pl->second;
-        const double total_plane_energy
-            = std::accumulate(clusterEnergies.begin(), clusterEnergies.end(), 0.0);
+        const double total_plane_energy = std::accumulate(clusterEnergies.begin(), clusterEnergies.end(), 0.0);
         blob_rev_cluster_energy.push_back(total_plane_energy);
     }
     
-
     if (blob_number == 1) {
         event->setIntData("g1dedx_nplane", planeClusterEnergyMap.size());
         event->setIntData("g1dedx_doublet", (int) doublet);

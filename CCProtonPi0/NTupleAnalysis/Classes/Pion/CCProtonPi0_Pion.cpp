@@ -21,7 +21,7 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(int nMode) : CCProtonPi0_Particle(nMode)
     f = new TFile(rootDir.c_str(),"RECREATE");
 
     // Initialize Bins
-    bin_P.setBin(30, 0.0, 3000.0);
+    bin_P.setBin(17, 0.0, 1700.0);
     bin_KE.setBin(30, 0.0, 3000.0);
     bin_invMass.setBin(60,0.0,600.0);
     bin_photonConvLength.setBin(50,0.0,100.0);

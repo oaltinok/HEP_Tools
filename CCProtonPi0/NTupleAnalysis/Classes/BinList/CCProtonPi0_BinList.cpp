@@ -28,11 +28,10 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     int_channel.setBin(9,0.0,9.0);
     vertex_z.setBin(94,4300.0,9000.0);
     vertex_x_y.setBin(200,-1000.0,1000.0);
-    deltaInvMass.setBin(20,800.0,2800.0);
+    deltaInvMass.setBin(100,800.0,2800.0);
     preFilter_Status.setBin(4,0,4);
     preFilter_RejectedEnergy.setBin(50,0.0,5000.0);
 
-    
     muonE.setBin(100,0,10.0);
     pionE.setBin(30, 0.0, 3.0);
     protonKE.setBin(40, -1.0, 3.0);

@@ -149,7 +149,10 @@ void CCProtonPi0_Interaction::initHistograms()
     int_channel = new TH1D( "int_channel","Interaction Channel",binList.int_channel.get_nBins(), binList.int_channel.get_min(), binList.int_channel.get_max() );
     int_channel->GetXaxis()->SetTitle("1 = QE, 2 = Resonant, 3 = DIS, 4 = Coh pi");
     int_channel->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.int_channel.get_width()));
-    
+   
+    nProngs_hist = new TH1D( "nProngs_hist","Number of Prongs",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+    nProngs_hist->GetXaxis()->SetTitle("Number of Prongs");
+    nProngs_hist->GetYaxis()->SetTitle("Candidates");
     
     // Vertex
     vertex_count = new TH1D( "vertex_count","Number of Vertices",binList.objectCount.get_nBins(), binList.objectCount.get_min(), binList.objectCount.get_max() );
@@ -210,10 +213,6 @@ void CCProtonPi0_Interaction::initHistograms()
     pFilter_RejectedEnergy->GetXaxis()->SetTitle("Rejected Energy by preFilter()");
     pFilter_RejectedEnergy->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.preFilter_RejectedEnergy.get_width()));
     
-    nProngs_hist = new TH1D( "nProngs_hist","Number of Prongs",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
-    nProngs_hist->GetXaxis()->SetTitle("Number of Prongs");
-    nProngs_hist->GetYaxis()->SetTitle("Candidates"); 
-
     // Cluster Energy after Pi0 Reconstruction
     E_Unused_afterReco = new TH1D( "E_Unused_afterReco","Unused Cluster Energy after Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
     E_Unused_afterReco->GetXaxis()->SetTitle("Unused Cluster Energy after Reconstruction [MeV]");
@@ -243,34 +242,30 @@ void CCProtonPi0_Interaction::initHistograms()
     hCut_vertexCount = new TH1D( "hCut_vertexCount","Number of Vertices",binList.objectCount.get_nBins(), binList.objectCount.get_min(), binList.objectCount.get_max() );
     hCut_vertexCount->GetXaxis()->SetTitle("Number of Vertices");
     hCut_vertexCount->GetYaxis()->SetTitle("N(Events)");
-    
-    hCut_nProngs = new TH1D( "hCut_nProngs","Number of Prongs before CUTS",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
-    hCut_nProngs->GetXaxis()->SetTitle("Number of Prongs");
-    hCut_nProngs->GetYaxis()->SetTitle("N(Events)");
-    
-    hCut_1Prong_Michel = new TH1D( "hCut_1Prong_Michel","Event Has Michel?",binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
-    hCut_1Prong_Michel->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
-    hCut_1Prong_Michel->GetYaxis()->SetTitle("N(Events)");
+        
+    hCut_Michel = new TH1D( "hCut_Michel","Event Has Michel?",binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
+    hCut_Michel->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
+    hCut_Michel->GetYaxis()->SetTitle("N(Events)");
 
-    hCut_1Prong_eVis_nuclearTarget = new TH1D( "hCut_1Prong_eVis_nuclearTarget","Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
-    hCut_1Prong_eVis_nuclearTarget->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
-    hCut_1Prong_eVis_nuclearTarget->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
+    hCut_eVis_nuclearTarget = new TH1D( "hCut_eVis_nuclearTarget","Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
+    hCut_eVis_nuclearTarget->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
+    hCut_eVis_nuclearTarget->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
     
-    hCut_1Prong_eVis_other = new TH1D( "hCut_1Prong_eVis_other","Visible Energy in Tracker + ECAL + HCAL",binList.eVis_other.get_nBins(), binList.eVis_other.get_min(), binList.eVis_other.get_max() );
-    hCut_1Prong_eVis_other->GetXaxis()->SetTitle("Visible Energy in Tracker + ECAL + HCAL [MeV]");
-    hCut_1Prong_eVis_other->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_other.get_width()));
+    hCut_eVis_other = new TH1D( "hCut_eVis_other","Visible Energy in Tracker + ECAL + HCAL",binList.eVis_other.get_nBins(), binList.eVis_other.get_min(), binList.eVis_other.get_max() );
+    hCut_eVis_other->GetXaxis()->SetTitle("Visible Energy in Tracker + ECAL + HCAL [MeV]");
+    hCut_eVis_other->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_other.get_width()));
     
-    hCut_1Prong_gamma1ConvDist = new TH1D( "hCut_1Prong_gamma1ConvDist","Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
-    hCut_1Prong_gamma1ConvDist->GetXaxis()->SetTitle("Leading Photon Conversion Distance");
-    hCut_1Prong_gamma1ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
+    hCut_gamma1ConvDist = new TH1D( "hCut_gamma1ConvDist","Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+    hCut_gamma1ConvDist->GetXaxis()->SetTitle("Leading Photon Conversion Distance");
+    hCut_gamma1ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
     
-    hCut_1Prong_gamma2ConvDist = new TH1D( "hCut_1Prong_gamma2ConvDist","Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
-    hCut_1Prong_gamma2ConvDist->GetXaxis()->SetTitle("Second Photon Conversion Distance");
-    hCut_1Prong_gamma2ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
+    hCut_gamma2ConvDist = new TH1D( "hCut_gamma2ConvDist","Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+    hCut_gamma2ConvDist->GetXaxis()->SetTitle("Second Photon Conversion Distance");
+    hCut_gamma2ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
     
-    hCut_1Prong_pi0invMass = new TH1D( "hCut_1Prong_pi0invMass","Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-    hCut_1Prong_pi0invMass->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-    hCut_1Prong_pi0invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+    hCut_pi0invMass = new TH1D( "hCut_pi0invMass","Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    hCut_pi0invMass->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+    hCut_pi0invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
     
     hCut_1Prong_neutrinoE = new TH1D( "hCut_1Prong_neutrinoE","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
     hCut_1Prong_neutrinoE->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
@@ -279,31 +274,7 @@ void CCProtonPi0_Interaction::initHistograms()
     hCut_1Prong_UnusedE = new TH1D( "hCut_1Prong_UnusedE","Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
     hCut_1Prong_UnusedE->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
     hCut_1Prong_UnusedE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
-    
-    hCut_2Prong_Michel = new TH1D( "hCut_2Prong_Michel","Event Has Michel?",binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
-    hCut_2Prong_Michel->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
-    hCut_2Prong_Michel->GetYaxis()->SetTitle("N(Events)");
-
-    hCut_2Prong_eVis_nuclearTarget = new TH1D( "hCut_2Prong_eVis_nuclearTarget","Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
-    hCut_2Prong_eVis_nuclearTarget->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
-    hCut_2Prong_eVis_nuclearTarget->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
-    
-    hCut_2Prong_eVis_other = new TH1D( "hCut_2Prong_eVis_other","Visible Energy in Tracker + ECAL + HCAL",binList.eVis_other.get_nBins(), binList.eVis_other.get_min(), binList.eVis_other.get_max() );
-    hCut_2Prong_eVis_other->GetXaxis()->SetTitle("Visible Energy in Tracker + ECAL + HCAL [MeV]");
-    hCut_2Prong_eVis_other->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_other.get_width()));
-    
-    hCut_2Prong_gamma1ConvDist = new TH1D( "hCut_2Prong_gamma1ConvDist","Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
-    hCut_2Prong_gamma1ConvDist->GetXaxis()->SetTitle("Leading Photon Conversion Distance");
-    hCut_2Prong_gamma1ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
-    
-    hCut_2Prong_gamma2ConvDist = new TH1D( "hCut_2Prong_gamma2ConvDist","Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
-    hCut_2Prong_gamma2ConvDist->GetXaxis()->SetTitle("Second Photon Conversion Distance");
-    hCut_2Prong_gamma2ConvDist->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
-    
-    hCut_2Prong_pi0invMass = new TH1D( "hCut_2Prong_pi0invMass","Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-    hCut_2Prong_pi0invMass->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-    hCut_2Prong_pi0invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
-    
+        
     hCut_2Prong_neutrinoE = new TH1D( "hCut_2Prong_neutrinoE","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
     hCut_2Prong_neutrinoE->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
     hCut_2Prong_neutrinoE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
@@ -312,9 +283,9 @@ void CCProtonPi0_Interaction::initHistograms()
     hCut_2Prong_UnusedE->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
     hCut_2Prong_UnusedE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
     
-    hCut_pIDDiff = new TH1D( "hCut_pIDDiff","Proton Score - Pion Score",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
-    hCut_pIDDiff->GetXaxis()->SetTitle("Proton Score - Pion Score");
-    hCut_pIDDiff->GetYaxis()->SetTitle("N(Events)");
+    hCut_protonScore_pIDDiff = new TH1D( "hCut_protonScore_pIDDiff","Proton Score - Pion Score",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
+    hCut_protonScore_pIDDiff->GetXaxis()->SetTitle("Proton Score - Pion Score");
+    hCut_protonScore_pIDDiff->GetYaxis()->SetTitle("N(Events)");
     
     hCut_protonScore_LLR = new TH1D( "hCut_protonScore_LLR","proton_protonScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
     hCut_protonScore_LLR->GetXaxis()->SetTitle("proton_protonScore_LLR");

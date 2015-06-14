@@ -9,7 +9,6 @@ Class: CCProtonPi0_CutList
         Classes/CutList
         
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2015_05_07
 ================================================================================
 */
 #ifndef CCProtonPi0_CutList_h
@@ -43,64 +42,52 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_Vertex_Not_Reconstructable; 
         CCProtonPi0_Cut nCut_Vertex_Not_Fiducial;
         CCProtonPi0_Cut nCut_Vertex_Count;
-        CCProtonPi0_Cut nCut_nProngs;
+        CCProtonPi0_Cut nCut_Muon_None;              
+        CCProtonPi0_Cut nCut_Muon_Not_Plausible;
+        CCProtonPi0_Cut nCut_Muon_Score_Low;
+        CCProtonPi0_Cut nCut_Muon_Charge;
+        CCProtonPi0_Cut nCut_Vertex_Michel_Exist; 
+        CCProtonPi0_Cut nCut_EndPoint_Michel_Exist;
+        CCProtonPi0_Cut nCut_secEndPoint_Michel_Exist;
+        CCProtonPi0_Cut nCut_PreFilter_Pi0;
+        CCProtonPi0_Cut nCut_ConeBlobs;
+        CCProtonPi0_Cut nCut_BlobsBad;
+        CCProtonPi0_Cut nCut_Pi0BlobCuts;
+        CCProtonPi0_Cut nCut_Photon1DistanceLow;
+        CCProtonPi0_Cut nCut_Photon2DistanceLow;
+        CCProtonPi0_Cut nCut_Pi0_invMass;
         
-        // nProngs == 1 CCProtonPi0_Cut Numbers
-        CCProtonPi0_Cut nCut_1Prong_Muon_None;              
-        CCProtonPi0_Cut nCut_1Prong_Muon_Not_Plausible;
-        CCProtonPi0_Cut nCut_1Prong_Muon_Score_Low;
-        CCProtonPi0_Cut nCut_1Prong_Muon_Charge;
-        CCProtonPi0_Cut nCut_1Prong_Vertex_Michel_Exist; 
-        CCProtonPi0_Cut nCut_1Prong_EndPoint_Michel_Exist;
-        CCProtonPi0_Cut nCut_1Prong_secEndPoint_Michel_Exist;
-        CCProtonPi0_Cut nCut_1Prong_PreFilter_Pi0;
-        CCProtonPi0_Cut nCut_1Prong_VtxBlob;
-        CCProtonPi0_Cut nCut_1Prong_ConeBlobs;
-        CCProtonPi0_Cut nCut_1Prong_Pi0_invMass;
-        CCProtonPi0_Cut nCut_1Prong_Photon1DistanceLow;
-        CCProtonPi0_Cut nCut_1Prong_Photon2DistanceLow;
+        // nProngs == 1 Cut Numbers (Muon + Pi0 )
+        CCProtonPi0_Cut nCut_1Prong_Particle_None;
+        CCProtonPi0_Cut nCut_1Prong_Proton_None;            
+        CCProtonPi0_Cut nCut_1Prong_ProtonScore;
+        CCProtonPi0_Cut nCut_1Prong_DeltaInvMass;
         CCProtonPi0_Cut nCut_1Prong_beamEnergy;
         CCProtonPi0_Cut nCut_1Prong_UnusedE;
-        CCProtonPi0_Cut nCut_1Prong_Pi0BlobCuts;
-        CCProtonPi0_Cut nCut_1Prong_PreBlobCuts;
-
-        // nProngs == 2 CCProtonPi0_Cut Numbers
-        CCProtonPi0_Cut nCut_2Prong_Muon_None;              
-        CCProtonPi0_Cut nCut_2Prong_Muon_Not_Plausible;
-        CCProtonPi0_Cut nCut_2Prong_Muon_Score_Low;
-        CCProtonPi0_Cut nCut_2Prong_Muon_Charge;
-        CCProtonPi0_Cut nCut_2Prong_Vertex_Michel_Exist; 
-        CCProtonPi0_Cut nCut_2Prong_EndPoint_Michel_Exist;
-        CCProtonPi0_Cut nCut_2Prong_secEndPoint_Michel_Exist;
-        CCProtonPi0_Cut nCut_2Prong_PreFilter_Pi0;
-        CCProtonPi0_Cut nCut_2Prong_VtxBlob;
-        CCProtonPi0_Cut nCut_2Prong_ConeBlobs;
-        CCProtonPi0_Cut nCut_2Prong_Pi0_invMass;
-        CCProtonPi0_Cut nCut_2Prong_Photon1DistanceLow;
-        CCProtonPi0_Cut nCut_2Prong_Photon2DistanceLow;
-        CCProtonPi0_Cut nCut_2Prong_beamEnergy;
-        CCProtonPi0_Cut nCut_2Prong_UnusedE;
+        
+        // nProngs >= 2 Cut Numbers (Muon + Pi0 + X(No Meson))
         CCProtonPi0_Cut nCut_2Prong_Particle_None;
         CCProtonPi0_Cut nCut_2Prong_Proton_None;            
         CCProtonPi0_Cut nCut_2Prong_ProtonScore;
         CCProtonPi0_Cut nCut_2Prong_DeltaInvMass;
-        CCProtonPi0_Cut nCut_2Prong_Pi0BlobCuts;
-        CCProtonPi0_Cut nCut_2Prong_PreBlobCuts;
-        
+        CCProtonPi0_Cut nCut_2Prong_beamEnergy;
+        CCProtonPi0_Cut nCut_2Prong_UnusedE;
+               
     private:
         void SetCutNames();
-        void OpenTextFiles();
-        void formCutVectors();
+        void OpenOutputFile();
+        void formCutVector();
         void writeCutTableHeader();
-        void writeCutTableRows(vector<CCProtonPi0_Cut> nCutVector, int nProngs);
-        double getCutEfficiency(double nSig, double effBase);
-        double getCutPurity(double nSig, double nEvents);
+        void writeCutTableRows();
+        void writeSingleRow(CCProtonPi0_Cut& currentCut);
+        void writeSingleRow(CCProtonPi0_Cut& nCut_1Prong, CCProtonPi0_Cut& nCut_2Prong);
+        double getCutEfficiency(CCProtonPi0_Cut& currentCut, CCProtonPi0_Cut& effBase) const;
+        double getCutPurity(CCProtonPi0_Cut& currentCut) const;
+
+        vector<CCProtonPi0_Cut> nCutVector;
         
-        vector<CCProtonPi0_Cut> nCutVector_1Prong;
-        vector<CCProtonPi0_Cut> nCutVector_2Prong;
-        
-        ofstream cutText[nTopologies];
-        string cutFile[nTopologies];
+        ofstream cutText;
+        string cutFile;
         
 };
 

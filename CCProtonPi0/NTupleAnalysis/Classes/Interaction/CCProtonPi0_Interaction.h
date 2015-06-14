@@ -57,8 +57,6 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* deltaInvMass_error;
         TH2D* deltaInvMass_reco_mc;
         
-        TH1D* nProngs_hist;
-        
         TH1D* pFilter_Status;
         TH1D* pFilter_RejectedEnergy;
         
@@ -83,7 +81,8 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* int_channel;
         TH2D* vertex_x_y_true;
         TH2D* vertex_x_y_reco;
-        
+       
+        TH1D* nProngs_hist;
         TH1D* mc_w_DIS;
         TH1D* mc_w_RES;
         TH1D* mc_w_CCQE;
@@ -109,21 +108,13 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         // -------------------------------------------------------------------------
         // Common
         TH1D* hCut_vertexCount;
-        TH1D* hCut_nProngs;
+        TH1D* hCut_Michel;
+        TH1D* hCut_eVis_nuclearTarget;
+        TH1D* hCut_eVis_other;
+        TH1D* hCut_pi0invMass;
+        TH1D* hCut_gamma1ConvDist;
+        TH1D* hCut_gamma2ConvDist;
         
-        // Topology Dependent
-        TH1D* hCut_1Prong_Michel;
-        TH1D* hCut_2Prong_Michel;
-        TH1D* hCut_1Prong_eVis_nuclearTarget;
-        TH1D* hCut_2Prong_eVis_nuclearTarget;
-        TH1D* hCut_1Prong_eVis_other;
-        TH1D* hCut_2Prong_eVis_other;
-        TH1D* hCut_1Prong_pi0invMass;
-        TH1D* hCut_2Prong_pi0invMass;
-        TH1D* hCut_1Prong_gamma1ConvDist;
-        TH1D* hCut_2Prong_gamma1ConvDist;
-        TH1D* hCut_1Prong_gamma2ConvDist;
-        TH1D* hCut_2Prong_gamma2ConvDist;
         TH1D* hCut_1Prong_neutrinoE;
         TH1D* hCut_2Prong_neutrinoE;
         TH1D* hCut_1Prong_UnusedE;
@@ -131,7 +122,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
 
         
         // 2 Prong Specific
-        TH1D* hCut_pIDDiff;
+        TH1D* hCut_protonScore_pIDDiff;
         TH1D* hCut_protonScore_LLR;
         TH1D* hCut_deltaInvMass;
     

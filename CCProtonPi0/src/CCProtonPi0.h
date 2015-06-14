@@ -20,8 +20,7 @@ CCProtonPi0
 
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Date:           2014_03_27
-    Version:        v2_11
+    Version:        v2_12
     
 ================================================================================
 */
@@ -127,11 +126,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool m_makeShortTracks;
         bool m_DoPlausibilityCuts;
         bool m_DoTruthMatch;
-        bool m_Do_nProngCut;
         bool m_reconstruct_NoProtonEvents;
         bool m_applyExtraMichelCuts;
-        int m_min_nProngs;
-        int m_max_nProngs;
         
         // Tool Names
         std::string m_particleToolName;
@@ -224,7 +220,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IParticleTool*              m_LikelihoodPIDTool;
         IMinervaMathTool*           m_mathTool;
         
-        
         IBlobCreatorUtils*          m_blobUtils;
         IHoughBlob*                 m_idHoughBlob;
         IHoughTool*                 m_idHoughTool;
@@ -239,8 +234,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
         bool ConeBlobs( Minerva::PhysicsEvent *event ) const;
         bool PreFilterPi0( Minerva::PhysicsEvent *event ) const;
-        bool VtxBlob( Minerva::PhysicsEvent *event ) const;
-        bool blobsPassedPreCuts(Minerva::PhysicsEvent *event) const;
+        bool AreBlobsGood() const;
+        void VtxBlob( Minerva::PhysicsEvent *event ) const;
         bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
         bool checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const;
         bool correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
@@ -254,6 +249,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool setPi0Data( Minerva::NeutrinoInt* nuInt ) const;
         bool setProtonData( Minerva::NeutrinoInt* nuInt ) const;
         bool tagSignal( Minerva::GenMinInteraction* truthEvent) const;
+        double Calc_QSq(double Enu) const;
+        double Calc_WSq(double QSq) const;
         double CalcMinBlobSeparation( const Minerva::IDBlob* blob) const;
         double calcDistance( double x1, double y1, double z1,double x2, double y2, double z2) const;
         double getClusterEnergy( Minerva::PhysicsEvent* event, std::string input_clusterType) const;
