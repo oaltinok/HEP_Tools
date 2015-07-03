@@ -22,9 +22,9 @@ CCProtonPi0_Proton::CCProtonPi0_Proton(int nMode) : CCProtonPi0_Particle(nMode)
     f = new TFile(rootDir.c_str(),"RECREATE");
 
     // Initialize Bins
-    bin_E.setBin(30,0.0,3000.0);
-    bin_P.setBin(20, 0.0, 2000.0);
-    bin_KE.setBin(20, 0.0, 2000.0);
+    bin_E.setBin(60,0.0,3000.0);
+    bin_P.setBin(40, 0.0, 2000.0);
+    bin_KE.setBin(40, 0.0, 2000.0);
     bin_trackLength.setBin(250,0.0,2500.0);
     bin_trackKinked.setBin(2,0.0,2.0);
     
@@ -38,9 +38,9 @@ CCProtonPi0_Proton::CCProtonPi0_Proton(int nMode) : CCProtonPi0_Particle(nMode)
     trackKinked->GetYaxis()->SetTitle("N(Events)");
 
     // Default Histograms
-    partScore = new TH1D( "partScore","Proton Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
+    partScore = new TH1D( "partScore","Proton Particle Score",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");
-    partScore->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f ",bin_partScore.get_width()));
+    partScore->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f ",binList.particleScore_LLR.get_width()));
     
     E_mc = new TH1D( "E_mc","True Proton Energy",bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max() );
     E_mc->GetXaxis()->SetTitle("True Proton Energy [MeV]");

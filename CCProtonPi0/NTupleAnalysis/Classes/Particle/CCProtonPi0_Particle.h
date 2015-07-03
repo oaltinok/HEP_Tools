@@ -7,7 +7,6 @@ Class: CCProtonPi0_Particle
     Uses ROOT Specific classes
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_05_07
 ================================================================================
 */
 
@@ -29,7 +28,7 @@ Class: CCProtonPi0_Particle
 
 //Classes
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
-#include "../SingleBin/CCProtonPi0_SingleBin.h"
+#include "../BinList/CCProtonPi0_BinList.h"
 
 using namespace std;
 
@@ -88,6 +87,7 @@ class CCProtonPi0_Particle : public CCProtonPi0_NTupleAnalysis
         TH2D* angleMuon_reco_mc;
         
         // Bins for Histograms
+        CCProtonPi0_BinList binList;
         CCProtonPi0_SingleBin bin_error;
         CCProtonPi0_SingleBin bin_E;
         CCProtonPi0_SingleBin bin_P;

@@ -26,6 +26,15 @@ CCProtonPi0_Interaction::CCProtonPi0_Interaction(int nMode) : CCProtonPi0_NTuple
 
 void CCProtonPi0_Interaction::initHistograms()
 {
+ 
+    proton_p = new TH1D( "proton_p","Proton Momentum Original",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    proton_p->GetXaxis()->SetTitle("(Reco-True)/True");
+    proton_p->GetYaxis()->SetTitle("Reco NOT Modified");
+    
+    proton_p_shifted = new TH1D( "proton_p_shifted","Proton Momentum Shifted",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    proton_p_shifted->GetXaxis()->SetTitle("(Reco-True)/True");
+    proton_p_shifted->GetYaxis()->SetTitle("Reco Modified by a factor 1.050");
+ 
     status_Pi0 = new TH1D( "status_Pi0","Pi0 Status",binList.particleStatus.get_nBins(), binList.particleStatus.get_min(), binList.particleStatus.get_max() );
     status_Pi0->GetXaxis()->SetTitle("GENIE Status Codes");
     status_Pi0->GetYaxis()->SetTitle("N(Events)");
@@ -38,47 +47,65 @@ void CCProtonPi0_Interaction::initHistograms()
     status_Pi0_GrandMother->GetXaxis()->SetTitle("GENIE Status Codes");
     status_Pi0_GrandMother->GetYaxis()->SetTitle("N(Events)");
     
-    beamEnergy_mc = new TH1D( "beamEnergy_mc","True Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    beamEnergy_mc->GetXaxis()->SetTitle("True Beam Energy [GeV]");
-    beamEnergy_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
+    Enu_1Track_mc = new TH1D( "Enu_1Track_mc","True Beam Energy - 1 Track",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    Enu_1Track_mc->GetXaxis()->SetTitle("True Beam Energy [GeV]");
+    Enu_1Track_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
     
-    beamEnergy_reco = new TH1D( "beamEnergy_reco","Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    beamEnergy_reco->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
-    beamEnergy_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
+    Enu_1Track_reco = new TH1D( "Enu_1Track_reco","Reconstructed Beam Energy - 1 Track",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    Enu_1Track_reco->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
+    Enu_1Track_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
     
-    beamEnergy_error = new TH1D( "beamEnergy_error","Error on Beam Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
-    beamEnergy_error->GetXaxis()->SetTitle("(True-Reco) / True");
-    beamEnergy_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
+    Enu_1Track_error = new TH1D( "Enu_1Track_error","Error on Beam Energy - 1 Track",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    Enu_1Track_error->GetXaxis()->SetTitle("(True-Reco) / True");
+    Enu_1Track_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
     
-    beamEnergy_reco_mc = new TH2D( "beamEnergy_reco_mc","True vs Reconstructed Beam Energy",
+    Enu_1Track_reco_mc = new TH2D( "Enu_1Track_reco_mc","True vs Reconstructed Beam Energy - 1 Track",
     binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),
     binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
-    beamEnergy_reco_mc->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
-    beamEnergy_reco_mc->GetYaxis()->SetTitle("True Beam Energy [GeV]");
+    Enu_1Track_reco_mc->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
+    Enu_1Track_reco_mc->GetYaxis()->SetTitle("True Beam Energy [GeV]");
     
-    beamEnergyCal_mc = new TH1D( "beamEnergyCal_mc","True Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    beamEnergyCal_mc->GetXaxis()->SetTitle("True Beam Energy [GeV]");
-    beamEnergyCal_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
+    Enu_2Track_mc = new TH1D( "Enu_2Track_mc","True Beam Energy - 2 Track",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    Enu_2Track_mc->GetXaxis()->SetTitle("True Beam Energy [GeV]");
+    Enu_2Track_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
     
-    beamEnergyCal_reco = new TH1D( "beamEnergyCal_reco","Reconstructed Calorimetric Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    beamEnergyCal_reco->GetXaxis()->SetTitle("Reconstructed Calorimetric  Beam Energy [GeV]");
-    beamEnergyCal_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
+    Enu_2Track_reco = new TH1D( "Enu_2Track_reco","Reconstructed Beam Energy - 2 Track",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    Enu_2Track_reco->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
+    Enu_2Track_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
     
-    beamEnergyCal_error = new TH1D( "beamEnergyCal_error","Error on Calorimetric Beam Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
-    beamEnergyCal_error->GetXaxis()->SetTitle("(True-Reco) / True");
-    beamEnergyCal_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
+    Enu_2Track_error = new TH1D( "Enu_2Track_error","Error on Beam Energy - 2 Track",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    Enu_2Track_error->GetXaxis()->SetTitle("(True-Reco) / True");
+    Enu_2Track_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
     
-    beamEnergyCal_reco_mc = new TH2D( "beamEnergyCal_reco_mc","True vs Reconstructed Calorimetric Beam Energy",
+    Enu_2Track_reco_mc = new TH2D( "Enu_2Track_reco_mc","True vs Reconstructed Beam Energy - 2 Track",
+    binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),
+    binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    Enu_2Track_reco_mc->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
+    Enu_2Track_reco_mc->GetYaxis()->SetTitle("True Beam Energy [GeV]");
+
+    Enu_Cal_mc = new TH1D( "Enu_Cal_mc","True Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    Enu_Cal_mc->GetXaxis()->SetTitle("True Beam Energy [GeV]");
+    Enu_Cal_mc->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
+    
+    Enu_Cal_reco = new TH1D( "Enu_Cal_reco","Reconstructed Calorimetric Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    Enu_Cal_reco->GetXaxis()->SetTitle("Reconstructed Calorimetric  Beam Energy [GeV]");
+    Enu_Cal_reco->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
+    
+    Enu_Cal_error = new TH1D( "Enu_Cal_error","Error on Calorimetric Beam Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    Enu_Cal_error->GetXaxis()->SetTitle("(True-Reco) / True");
+    Enu_Cal_error->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.error.get_width()));
+    
+    Enu_Cal_reco_mc = new TH2D( "Enu_Cal_reco_mc","True vs Reconstructed Calorimetric Beam Energy",
                                    binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),
                                    binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
-    beamEnergyCal_reco_mc->GetXaxis()->SetTitle("Reconstructed Calorimetric Beam Energy [GeV]");
-    beamEnergyCal_reco_mc->GetYaxis()->SetTitle("True Beam Energy [GeV]");
+    Enu_Cal_reco_mc->GetXaxis()->SetTitle("Reconstructed Calorimetric Beam Energy [GeV]");
+    Enu_Cal_reco_mc->GetYaxis()->SetTitle("True Beam Energy [GeV]");
     
-    beamEnergy_beamEnergyCal = new TH2D( "beamEnergy_beamEnergyCal","Calorimetric Beam Energy vs Beam Energy from Tp",
+    Enu_1Track_Enu_Cal = new TH2D( "Enu_1Track_Enu_Cal","Calorimetric Beam Energy vs Beam Energy from Tp",
                                       binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),
                                       binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
-    beamEnergy_beamEnergyCal->GetXaxis()->SetTitle("Reconstructed Beam Energy from Tp [GeV]");
-    beamEnergy_beamEnergyCal->GetYaxis()->SetTitle("Reconstructed Calorimetric Beam Energy [GeV]");
+    Enu_1Track_Enu_Cal->GetXaxis()->SetTitle("Reconstructed Beam Energy from Tp [GeV]");
+    Enu_1Track_Enu_Cal->GetYaxis()->SetTitle("Reconstructed Calorimetric Beam Energy [GeV]");
     
     q2_mc = new TH1D( "q2_mc","True Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
     q2_mc->GetXaxis()->SetTitle("True Q^{2} [GeV^{2}]");

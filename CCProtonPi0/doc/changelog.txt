@@ -1,4 +1,45 @@
+==================================================================================
+v2_14b 
+
+Commit before major NTupleAnalysis Update
+	No Major Updates
+
 ================================================================================
+v2_14a 
+
+Commit after fixing compilation Errors
+	No Major Updates
+	Removed: static const double SENTINEL from header file
+===============================================================================
+v2_14 
+
+Commit after fixing compilation Errors
+	No Major Updates
+===============================================================================
+v2_13 
+
+CCProtonPi0 Updates:
+	General:
+		Ran successfully with Eroica
+		Refactored Event Kinematics
+			Modular Design
+			Neutrino Energy 
+				1 Track Events uses Equation from DocDB: 9749-v2
+				2 Track Events uses Final State Particles
+				Muon Energy + Hadron Visible Energy
+			Q2 and W2
+				Calculated for two different Neutrino Energy
+	Proton Reconstruction:
+		Something wrong with it. 
+			dEdXTool returns wrong 4-Momentum
+			Committing to compare changes
+		
+	Pi0 Reconstruction:
+
+-------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+
+===============================================================================
 v2_12 - Version for Rochester Meeting June 2015
 
 CCProtonPi0 Updates:

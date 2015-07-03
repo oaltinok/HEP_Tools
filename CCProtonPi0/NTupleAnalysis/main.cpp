@@ -103,7 +103,7 @@ int main(int argc, char *argv[] )
         }else if(isPlaylist){
             t.run("Input/Playlists/pl_MC_minerva13C.dat");
         }else{
-            t.run("Input/Playlists/pl_Data_v2_12b.dat");
+            t.run("Input/Playlists/pl_MC_v2_13b.dat");
         }
     }
     

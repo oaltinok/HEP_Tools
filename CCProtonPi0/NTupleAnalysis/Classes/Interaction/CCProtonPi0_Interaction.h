@@ -40,17 +40,22 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         //     Histograms
         //--------------------------------------------------------------------------
         // Event Kinematics
-        TH1D* beamEnergy_mc;
-        TH1D* beamEnergy_reco;
-        TH1D* beamEnergy_error;
-        TH2D* beamEnergy_reco_mc;
+        TH1D* Enu_1Track_mc;
+        TH1D* Enu_1Track_reco;
+        TH1D* Enu_1Track_error;
+        TH2D* Enu_1Track_reco_mc;
+         
+        TH1D* Enu_2Track_mc;
+        TH1D* Enu_2Track_reco;
+        TH1D* Enu_2Track_error;
+        TH2D* Enu_2Track_reco_mc;
+       
+        TH1D* Enu_Cal_mc;
+        TH1D* Enu_Cal_reco;
+        TH1D* Enu_Cal_error;
+        TH2D* Enu_Cal_reco_mc;
         
-        TH1D* beamEnergyCal_mc;
-        TH1D* beamEnergyCal_reco;
-        TH1D* beamEnergyCal_error;
-        TH2D* beamEnergyCal_reco_mc;
-        
-        TH2D* beamEnergy_beamEnergyCal;
+        TH2D* Enu_1Track_Enu_Cal;
         
         TH1D* deltaInvMass_mc;
         TH1D* deltaInvMass_reco;
@@ -86,6 +91,9 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_w_DIS;
         TH1D* mc_w_RES;
         TH1D* mc_w_CCQE;
+        
+        TH1D* proton_p;
+        TH1D* proton_p_shifted;
         
         TH1D* final_mc_w_DIS;
         TH1D* final_mc_w_RES;

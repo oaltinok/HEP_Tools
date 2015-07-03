@@ -38,8 +38,8 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     applyUnusedE = true;
     maxUnusedE = 300;
     
-    min_Pi0_invMass = 40.0;
-    max_Pi0_invMass = 200.0;
+    min_Pi0_invMass = 75.0;
+    max_Pi0_invMass = 195.0;
     
     applyDeltaInvMass = false;
     min_Delta_invMass = 40.0;
@@ -334,13 +334,13 @@ void CCProtonPi0_Analyzer::fillData()
     fillInteractionReco();
     fillMuonReco();
     fillPionReco();
-    if(nProngs > 1 && CCProtonPi0_proton_pz[indRecoProton] > 1.0) fillProtonReco();
+    if(nProngs > 1) fillProtonReco();
     
-    fillInteractionTrue();
     // Fill Truth Information if Exist and Set Errors
     if( hasParticleTruthInfo ){
+        fillInteractionTrue();
         fillMuonTrue();
-        fillProtonTrue();
+        if(nProngs > 1) fillProtonTrue();
         fillPionTrue();
         
         muon.set_errors();
@@ -361,10 +361,11 @@ bool CCProtonPi0_Analyzer::analyzeEvent()
 {
     bool isAnalyzable;
     
+    hasParticleTruthInfo = true;
+    
     if ( anaMode == 1 ){
         if( truth_isSignal) isAnalyzable = true;
         else isAnalyzable = false;
-        hasParticleTruthInfo = true;
     }else if ( anaMode == 2 ){
         if( truth_isSignal) isAnalyzable = false;
         else isAnalyzable = true;
@@ -558,9 +559,9 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     //      Muon + Pi0 + X (No Meson)
     //-------------------------------------------------------------------------
     // Fill Neutrino Energy Cut Hists
-    if(nProngs == 1) interaction.hCut_1Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E * HEP_Functions::MeV_to_GeV);
-    if(nProngs >= 2) interaction.hCut_2Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E * HEP_Functions::MeV_to_GeV); 
-    if( applyBeamEnergy && ((CCProtonPi0_neutrino_E * HEP_Functions::MeV_to_GeV) > max_beamEnergy)) return false;
+    if(nProngs == 1) interaction.hCut_1Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
+    if(nProngs >= 2) interaction.hCut_2Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV); 
+    if( applyBeamEnergy && ((CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV) > max_beamEnergy)) return false;
     if(nProngs == 1) cutList.nCut_1Prong_beamEnergy.increment(truth_isSignal, study1, study2);
     if(nProngs >= 2) cutList.nCut_2Prong_beamEnergy.increment(truth_isSignal, study1, study2);
    
@@ -638,29 +639,35 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
 {
     if (nProngs >= 2) interaction.deltaInvMass_reco->Fill(calcDeltaInvariantMass());
 
-    interaction.beamEnergy_mc->Fill(mc_incomingE * HEP_Functions::MeV_to_GeV);    
-    interaction.beamEnergy_reco->Fill(CCProtonPi0_neutrino_E * HEP_Functions::MeV_to_GeV);
-    interaction.beamEnergy_error->Fill( Data_Functions::getError(mc_incomingE,CCProtonPi0_neutrino_E) );
-    interaction.beamEnergy_reco_mc->Fill(CCProtonPi0_neutrino_E * HEP_Functions::MeV_to_GeV,mc_incomingE * HEP_Functions::MeV_to_GeV);
-    
-    interaction.beamEnergyCal_mc->Fill(mc_incomingE * HEP_Functions::MeV_to_GeV);    
-    interaction.beamEnergyCal_reco->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
-    interaction.beamEnergyCal_error->Fill( Data_Functions::getError(mc_incomingE,CCProtonPi0_neutrino_E_Cal) );
-    interaction.beamEnergyCal_reco_mc->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV,mc_incomingE * HEP_Functions::MeV_to_GeV);
-    
-    interaction.beamEnergy_beamEnergyCal->Fill(CCProtonPi0_neutrino_E * HEP_Functions::MeV_to_GeV, CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
+    if (nProngs == 1){
+        interaction.Enu_1Track_mc->Fill(mc_incomingE * HEP_Functions::MeV_to_GeV);    
+        interaction.Enu_1Track_reco->Fill(CCProtonPi0_neutrino_E_1Track * HEP_Functions::MeV_to_GeV);
+        interaction.Enu_1Track_error->Fill( Data_Functions::getError(mc_incomingE,CCProtonPi0_neutrino_E_1Track) );
+        interaction.Enu_1Track_reco_mc->Fill(CCProtonPi0_neutrino_E_1Track * HEP_Functions::MeV_to_GeV,mc_incomingE * HEP_Functions::MeV_to_GeV);
+        interaction.Enu_1Track_Enu_Cal->Fill(CCProtonPi0_neutrino_E_1Track * HEP_Functions::MeV_to_GeV, CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
+    }else{
+        interaction.Enu_2Track_mc->Fill(mc_incomingE * HEP_Functions::MeV_to_GeV);    
+        interaction.Enu_2Track_reco->Fill(CCProtonPi0_neutrino_E_2Track * HEP_Functions::MeV_to_GeV);
+        interaction.Enu_2Track_error->Fill( Data_Functions::getError(mc_incomingE,CCProtonPi0_neutrino_E_2Track) );
+        interaction.Enu_2Track_reco_mc->Fill(CCProtonPi0_neutrino_E_2Track * HEP_Functions::MeV_to_GeV,mc_incomingE * HEP_Functions::MeV_to_GeV);
+    }
+
+    interaction.Enu_Cal_mc->Fill(mc_incomingE * HEP_Functions::MeV_to_GeV);    
+    interaction.Enu_Cal_reco->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
+    interaction.Enu_Cal_error->Fill( Data_Functions::getError(mc_incomingE,CCProtonPi0_neutrino_E_Cal) );
+    interaction.Enu_Cal_reco_mc->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV,mc_incomingE * HEP_Functions::MeV_to_GeV);
 
     interaction.q2_mc->Fill(mc_Q2 * HEP_Functions::MeVSq_to_GeVSq);
-    interaction.q2_reco->Fill(CCProtonPi0_QSq * HEP_Functions::MeVSq_to_GeVSq);
-    interaction.q2_error->Fill( Data_Functions::getError(mc_Q2,CCProtonPi0_QSq) );
-    interaction.q2_reco_mc->Fill(CCProtonPi0_QSq * HEP_Functions::MeVSq_to_GeVSq,mc_Q2* HEP_Functions::MeVSq_to_GeVSq);
+    interaction.q2_reco->Fill(CCProtonPi0_QSq_Cal * HEP_Functions::MeVSq_to_GeVSq);
+    interaction.q2_error->Fill( Data_Functions::getError(mc_Q2,CCProtonPi0_QSq_Cal) );
+    interaction.q2_reco_mc->Fill(CCProtonPi0_QSq_Cal * HEP_Functions::MeVSq_to_GeVSq,mc_Q2* HEP_Functions::MeVSq_to_GeVSq);
     
     interaction.w_mc->Fill(mc_w * HEP_Functions::MeV_to_GeV);
-    interaction.w_reco->Fill(CCProtonPi0_W* HEP_Functions::MeV_to_GeV);
-    interaction.w_error->Fill( Data_Functions::getError(mc_w,CCProtonPi0_W) );
-    interaction.w_reco_mc->Fill(CCProtonPi0_W* HEP_Functions::MeV_to_GeV,mc_w * HEP_Functions::MeV_to_GeV);
+    interaction.w_reco->Fill(CCProtonPi0_W_Cal* HEP_Functions::MeV_to_GeV);
+    interaction.w_error->Fill( Data_Functions::getError(mc_w,CCProtonPi0_W_Cal) );
+    interaction.w_reco_mc->Fill(CCProtonPi0_W_Cal* HEP_Functions::MeV_to_GeV,mc_w * HEP_Functions::MeV_to_GeV);
     
-    interaction.wSq_reco->Fill(CCProtonPi0_WSq * HEP_Functions::MeVSq_to_GeVSq);
+    interaction.wSq_reco->Fill(CCProtonPi0_WSq_Cal * HEP_Functions::MeVSq_to_GeVSq);
     
     interaction.vertex_count->Fill(vtx_total_count);
     
@@ -668,9 +675,6 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
     interaction.vertex_z_reco->Fill(CCProtonPi0_vtx[2]);
     
     interaction.nProngs_hist->Fill(nProngs);
-    
-    interaction.total_E->Fill(CCProtonPi0_total_E * HEP_Functions::MeV_to_GeV);
-    interaction.total_E_neutrinoE->Fill(CCProtonPi0_total_E * HEP_Functions::MeV_to_GeV, CCProtonPi0_neutrino_E * HEP_Functions::MeV_to_GeV);
     
     interaction.E_Unused_afterReco->Fill(energyUnused_afterReco);
     interaction.E_Used_afterReco->Fill(energyUsed_afterReco);
@@ -786,12 +790,12 @@ void CCProtonPi0_Analyzer::openTextFiles()
 }
 
 void CCProtonPi0_Analyzer::fillProtonTrue()
-{    
+{   
     // Fill 4-Momentum
-    proton.set_p4(  truth_proton_4P[0],
-                    truth_proton_4P[1],
-                    truth_proton_4P[2],
-                    truth_proton_4P[3], 
+    proton.set_p4(  CCProtonPi0_trajProtonProngPx[indRecoProton],
+                    CCProtonPi0_trajProtonProngPy[indRecoProton],
+                    CCProtonPi0_trajProtonProngPz[indRecoProton],
+                    CCProtonPi0_trajProtonProngEnergy[indRecoProton],
                     true);
        
     // set Angle wrt Beam
@@ -803,7 +807,7 @@ void CCProtonPi0_Analyzer::fillProtonTrue()
 }
 
 void CCProtonPi0_Analyzer::fillProtonReco()
-{   
+{  
     // Set Particle Score
     proton.particleScore = CCProtonPi0_protonScore_LLR[indRecoProton];
 
@@ -813,16 +817,7 @@ void CCProtonPi0_Analyzer::fillProtonReco()
                     CCProtonPi0_proton_pz[indRecoProton],
                     CCProtonPi0_proton_E[indRecoProton],
                     false);
-  if(proton.momentum[0] < 200){
-    cout<<"nProngs = "<<nProngs<<endl;
-    cout<<"PDG = "<<CCProtonPi0_trajProtonProngPDG[indRecoProton]<<endl;
-    cout<<"P = "<<proton.momentum[0]<<endl;
-    cout<<"Px = "<<CCProtonPi0_proton_px[indRecoProton]<<" "<<CCProtonPi0_trajProtonProngPx[indRecoProton]<<endl;
-    cout<<"Py = "<<CCProtonPi0_proton_py[indRecoProton]<<" "<<CCProtonPi0_trajProtonProngPy[indRecoProton]<<endl;
-    cout<<"Pz = "<<CCProtonPi0_proton_pz[indRecoProton]<<" "<<CCProtonPi0_trajProtonProngPz[indRecoProton]<<endl;
-    cout<<"E = "<<CCProtonPi0_proton_E[indRecoProton]<<" "<<CCProtonPi0_trajProtonProngEnergy[indRecoProton]<<endl;
-    cout<<"ind = "<<indRecoProton<<endl;
-  }
+    
     // set Angle wrt Beam
     proton.set_angleBeam(beam_p3, false);
     
@@ -831,9 +826,19 @@ void CCProtonPi0_Analyzer::fillProtonReco()
     
     proton.trackLength->Fill(CCProtonPi0_proton_length[indRecoProton]);
     proton.trackKinked->Fill(CCProtonPi0_proton_kinked[indRecoProton]);
-    
-//     cout<<CCProtonPi0_proton_length[indRecoProton]<<" "<<CCProtonPi0_proton_kinked[indRecoProton]<<endl;
-    
+  
+    if (CCProtonPi0_trajProtonProngPDG[indRecoProton] == 2212){
+        double p_true = CCProtonPi0_trajProtonProngMomentum[indRecoProton];
+        double p_reco = CCProtonPi0_proton_p[indRecoProton];
+        double p_reco_modified = 1.050 * p_reco;
+        double error = (p_reco - p_true) /  p_true; 
+        double error_mod = (p_reco_modified - p_true)/p_true;
+        
+        failText[1]<<CCProtonPi0_trajProtonProngMomentum[indRecoProton]<<"\t"<<CCProtonPi0_proton_p[indRecoProton]<<endl;
+        
+        interaction.proton_p->Fill(error);
+        interaction.proton_p_shifted->Fill(error_mod);
+    }
 }
 
 
@@ -843,15 +848,15 @@ void CCProtonPi0_Analyzer::fillProtonReco()
 //--------------------------------------------------------------------------
 void CCProtonPi0_Analyzer::findRecoProton()
 {
-    double tempScore = CCProtonPi0_protonScore_LLR[0];
-    double currentScore;
+    double temp_p = CCProtonPi0_proton_p[0];
+    double current_p;
     int tempInd = 0;
    
     for( int i = 0; i < 10; i++){
-        currentScore = CCProtonPi0_protonScore_LLR[i];
-        if( currentScore == SENTINEL ) break;
-        if( currentScore > tempScore){
-            tempScore = currentScore;
+        current_p = CCProtonPi0_proton_p[i];
+        //if( current_p == SENTINEL ) break;
+        if( current_p > temp_p){
+            temp_p = current_p;
             tempInd = i;
         }
     }
@@ -1020,7 +1025,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
 
    // Set branch addresses and branch pointers
    fChain->SetMakeClass(1);
-     fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
+      fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("physEvtNum", &physEvtNum, &b_physEvtNum);
    fChain->SetBranchAddress("n_hyps", &n_hyps, &b_n_hyps);
    fChain->SetBranchAddress("processType", &processType, &b_processType);
@@ -1051,6 +1056,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("Cut_Particle_None", &Cut_Particle_None, &b_Cut_Particle_None);
    fChain->SetBranchAddress("Cut_PreFilter_Pi0", &Cut_PreFilter_Pi0, &b_Cut_PreFilter_Pi0);
    fChain->SetBranchAddress("Cut_Proton_None", &Cut_Proton_None, &b_Cut_Proton_None);
+   fChain->SetBranchAddress("Cut_UnattachedProngsWithTracks", &Cut_UnattachedProngsWithTracks, &b_Cut_UnattachedProngsWithTracks);
    fChain->SetBranchAddress("Cut_Vertex_Michel_Exist", &Cut_Vertex_Michel_Exist, &b_Cut_Vertex_Michel_Exist);
    fChain->SetBranchAddress("Cut_Vertex_None", &Cut_Vertex_None, &b_Cut_Vertex_None);
    fChain->SetBranchAddress("Cut_Vertex_Not_Fiducial", &Cut_Vertex_Not_Fiducial, &b_Cut_Vertex_Not_Fiducial);
@@ -1072,9 +1078,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("gamma2_blob_nclusters", &gamma2_blob_nclusters, &b_gamma2_blob_nclusters);
    fChain->SetBranchAddress("gamma2_blob_ndigits", &gamma2_blob_ndigits, &b_gamma2_blob_ndigits);
    fChain->SetBranchAddress("nProngs", &nProngs, &b_nProngs);
-   fChain->SetBranchAddress("n_anchored_long_trk_prongs", &n_anchored_long_trk_prongs, &b_n_anchored_long_trk_prongs);
-   fChain->SetBranchAddress("n_anchored_short_trk_prongs", &n_anchored_short_trk_prongs, &b_n_anchored_short_trk_prongs);
-   fChain->SetBranchAddress("n_iso_trk_prongs", &n_iso_trk_prongs, &b_n_iso_trk_prongs);
+   fChain->SetBranchAddress("nTracks", &nTracks, &b_nTracks);
    fChain->SetBranchAddress("od_energeticTower", &od_energeticTower, &b_od_energeticTower);
    fChain->SetBranchAddress("phys_energy_in_road_downstream_nplanes", &phys_energy_in_road_downstream_nplanes, &b_phys_energy_in_road_downstream_nplanes);
    fChain->SetBranchAddress("phys_energy_in_road_upstream_nplanes", &phys_energy_in_road_upstream_nplanes, &b_phys_energy_in_road_upstream_nplanes);
@@ -1085,6 +1089,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("phys_n_dead_discr_pair_upstream_prim_track_proj", &phys_n_dead_discr_pair_upstream_prim_track_proj, &b_phys_n_dead_discr_pair_upstream_prim_track_proj);
    fChain->SetBranchAddress("phys_vertex_is_fiducial", &phys_vertex_is_fiducial, &b_phys_vertex_is_fiducial);
    fChain->SetBranchAddress("preFilter_Result", &preFilter_Result, &b_preFilter_Result);
+   fChain->SetBranchAddress("vtx_fit_converged", &vtx_fit_converged, &b_vtx_fit_converged);
    fChain->SetBranchAddress("vtx_primary_index", &vtx_primary_index, &b_vtx_primary_index);
    fChain->SetBranchAddress("vtx_primary_multiplicity", &vtx_primary_multiplicity, &b_vtx_primary_multiplicity);
    fChain->SetBranchAddress("vtx_secondary_count", &vtx_secondary_count, &b_vtx_secondary_count);
@@ -1152,12 +1157,14 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("totalIDVisibleE", &totalIDVisibleE, &b_totalIDVisibleE);
    fChain->SetBranchAddress("totalODVisibleE", &totalODVisibleE, &b_totalODVisibleE);
    fChain->SetBranchAddress("totalVisibleE", &totalVisibleE, &b_totalVisibleE);
+   fChain->SetBranchAddress("vtx_fit_chi2", &vtx_fit_chi2, &b_vtx_fit_chi2);
    fChain->SetBranchAddress("g1dedx_cluster_occupancy_sz", &g1dedx_cluster_occupancy_sz, &b_g1dedx_cluster_occupancy_sz);
    fChain->SetBranchAddress("g1dedx_cluster_occupancy", g1dedx_cluster_occupancy, &b_g1dedx_cluster_occupancy);
    fChain->SetBranchAddress("g2dedx_cluster_occupancy_sz", &g2dedx_cluster_occupancy_sz, &b_g2dedx_cluster_occupancy_sz);
    fChain->SetBranchAddress("g2dedx_cluster_occupancy", g2dedx_cluster_occupancy, &b_g2dedx_cluster_occupancy);
    fChain->SetBranchAddress("Vertex_energy_radii_sz", &Vertex_energy_radii_sz, &b_Vertex_energy_radii_sz);
    fChain->SetBranchAddress("Vertex_energy_radii", Vertex_energy_radii, &b_Vertex_energy_radii);
+   fChain->SetBranchAddress("fit_vtx", fit_vtx, &b_fit_vtx);
    fChain->SetBranchAddress("g1dedx_cluster_energy_sz", &g1dedx_cluster_energy_sz, &b_g1dedx_cluster_energy_sz);
    fChain->SetBranchAddress("g1dedx_cluster_energy", g1dedx_cluster_energy, &b_g1dedx_cluster_energy);
    fChain->SetBranchAddress("g1dedx_rev_cluster_energy_sz", &g1dedx_rev_cluster_energy_sz, &b_g1dedx_rev_cluster_energy_sz);
@@ -1295,8 +1302,12 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCProtonPi0_trajMuonProngPrimary", &CCProtonPi0_trajMuonProngPrimary, &b_CCProtonPi0_trajMuonProngPrimary);
    fChain->SetBranchAddress("CCProtonPi0_vtx_module", &CCProtonPi0_vtx_module, &b_CCProtonPi0_vtx_module);
    fChain->SetBranchAddress("CCProtonPi0_vtx_plane", &CCProtonPi0_vtx_plane, &b_CCProtonPi0_vtx_plane);
-   fChain->SetBranchAddress("CCProtonPi0_QSq", &CCProtonPi0_QSq, &b_CCProtonPi0_QSq);
-   fChain->SetBranchAddress("CCProtonPi0_WSq", &CCProtonPi0_WSq, &b_CCProtonPi0_WSq);
+   fChain->SetBranchAddress("CCProtonPi0_QSq_1Track", &CCProtonPi0_QSq_1Track, &b_CCProtonPi0_QSq_1Track);
+   fChain->SetBranchAddress("CCProtonPi0_QSq_Cal", &CCProtonPi0_QSq_Cal, &b_CCProtonPi0_QSq_Cal);
+   fChain->SetBranchAddress("CCProtonPi0_WSq_1Track", &CCProtonPi0_WSq_1Track, &b_CCProtonPi0_WSq_1Track);
+   fChain->SetBranchAddress("CCProtonPi0_WSq_Cal", &CCProtonPi0_WSq_Cal, &b_CCProtonPi0_WSq_Cal);
+   fChain->SetBranchAddress("CCProtonPi0_W_1Track", &CCProtonPi0_W_1Track, &b_CCProtonPi0_W_1Track);
+   fChain->SetBranchAddress("CCProtonPi0_W_Cal", &CCProtonPi0_W_Cal, &b_CCProtonPi0_W_Cal);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajMomentum", &CCProtonPi0_endMuonTrajMomentum, &b_CCProtonPi0_endMuonTrajMomentum);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajXPosition", &CCProtonPi0_endMuonTrajXPosition, &b_CCProtonPi0_endMuonTrajXPosition);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajYPosition", &CCProtonPi0_endMuonTrajYPosition, &b_CCProtonPi0_endMuonTrajYPosition);
@@ -1358,7 +1369,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCProtonPi0_muon_theta", &CCProtonPi0_muon_theta, &b_CCProtonPi0_muon_theta);
    fChain->SetBranchAddress("CCProtonPi0_muon_theta_biasDown", &CCProtonPi0_muon_theta_biasDown, &b_CCProtonPi0_muon_theta_biasDown);
    fChain->SetBranchAddress("CCProtonPi0_muon_theta_biasUp", &CCProtonPi0_muon_theta_biasUp, &b_CCProtonPi0_muon_theta_biasUp);
-   fChain->SetBranchAddress("CCProtonPi0_neutrino_E", &CCProtonPi0_neutrino_E, &b_CCProtonPi0_neutrino_E);
+   fChain->SetBranchAddress("CCProtonPi0_neutrino_E_1Track", &CCProtonPi0_neutrino_E_1Track, &b_CCProtonPi0_neutrino_E_1Track);
+   fChain->SetBranchAddress("CCProtonPi0_neutrino_E_2Track", &CCProtonPi0_neutrino_E_2Track, &b_CCProtonPi0_neutrino_E_2Track);
    fChain->SetBranchAddress("CCProtonPi0_neutrino_E_Cal", &CCProtonPi0_neutrino_E_Cal, &b_CCProtonPi0_neutrino_E_Cal);
    fChain->SetBranchAddress("CCProtonPi0_pi0_E", &CCProtonPi0_pi0_E, &b_CCProtonPi0_pi0_E);
    fChain->SetBranchAddress("CCProtonPi0_pi0_cos_openingAngle", &CCProtonPi0_pi0_cos_openingAngle, &b_CCProtonPi0_pi0_cos_openingAngle);
@@ -1396,10 +1408,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCProtonPi0_t_minos_trk_primFSLepMnvInitX", &CCProtonPi0_t_minos_trk_primFSLepMnvInitX, &b_CCProtonPi0_t_minos_trk_primFSLepMnvInitX);
    fChain->SetBranchAddress("CCProtonPi0_t_minos_trk_primFSLepMnvInitY", &CCProtonPi0_t_minos_trk_primFSLepMnvInitY, &b_CCProtonPi0_t_minos_trk_primFSLepMnvInitY);
    fChain->SetBranchAddress("CCProtonPi0_t_minos_trk_primFSLepMnvInitZ", &CCProtonPi0_t_minos_trk_primFSLepMnvInitZ, &b_CCProtonPi0_t_minos_trk_primFSLepMnvInitZ);
-   fChain->SetBranchAddress("CCProtonPi0_total_E", &CCProtonPi0_total_E, &b_CCProtonPi0_total_E);
-   fChain->SetBranchAddress("CCProtonPi0_total_px", &CCProtonPi0_total_px, &b_CCProtonPi0_total_px);
-   fChain->SetBranchAddress("CCProtonPi0_total_py", &CCProtonPi0_total_py, &b_CCProtonPi0_total_py);
-   fChain->SetBranchAddress("CCProtonPi0_total_pz", &CCProtonPi0_total_pz, &b_CCProtonPi0_total_pz);
    fChain->SetBranchAddress("CCProtonPi0_trajMuonPhi", &CCProtonPi0_trajMuonPhi, &b_CCProtonPi0_trajMuonPhi);
    fChain->SetBranchAddress("CCProtonPi0_trajMuonProngEnergy", &CCProtonPi0_trajMuonProngEnergy, &b_CCProtonPi0_trajMuonProngEnergy);
    fChain->SetBranchAddress("CCProtonPi0_trajMuonProngMomentum", &CCProtonPi0_trajMuonProngMomentum, &b_CCProtonPi0_trajMuonProngMomentum);
@@ -1413,7 +1421,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("CCProtonPi0_vtx_z", &CCProtonPi0_vtx_z, &b_CCProtonPi0_vtx_z);
    fChain->SetBranchAddress("CCProtonPi0_isProtonInsideOD", CCProtonPi0_isProtonInsideOD, &b_CCProtonPi0_isProtonInsideOD);
    fChain->SetBranchAddress("CCProtonPi0_ntrajProtonProng", CCProtonPi0_ntrajProtonProng, &b_CCProtonPi0_ntrajProtonProng);
-   fChain->SetBranchAddress("CCProtonPi0_proton_isRecoGood", CCProtonPi0_proton_isRecoGood, &b_CCProtonPi0_proton_isRecoGood);
    fChain->SetBranchAddress("CCProtonPi0_proton_kinked", CCProtonPi0_proton_kinked, &b_CCProtonPi0_proton_kinked);
    fChain->SetBranchAddress("CCProtonPi0_proton_odMatch", CCProtonPi0_proton_odMatch, &b_CCProtonPi0_proton_odMatch);
    fChain->SetBranchAddress("CCProtonPi0_trajProtonProngPDG", CCProtonPi0_trajProtonProngPDG, &b_CCProtonPi0_trajProtonProngPDG);
@@ -1542,6 +1549,22 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("mc_wgt_Flux_BeamFocus", mc_wgt_Flux_BeamFocus, &b_mc_wgt_Flux_BeamFocus);
    fChain->SetBranchAddress("mc_wgt_Flux_NA49_sz", &mc_wgt_Flux_NA49_sz, &b_mc_wgt_Flux_NA49_sz);
    fChain->SetBranchAddress("mc_wgt_Flux_NA49", mc_wgt_Flux_NA49, &b_mc_wgt_Flux_NA49);
+   fChain->SetBranchAddress("mc_wgt_Norm_sz", &mc_wgt_Norm_sz, &b_mc_wgt_Norm_sz);
+   fChain->SetBranchAddress("mc_wgt_Norm", &mc_wgt_Norm, &b_mc_wgt_Norm);
+   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPNumiYields_sz", &mc_wgt_ppfx_MIPPNumiYields_sz, &b_mc_wgt_ppfx_MIPPNumiYields_sz);
+   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPNumiYields", &mc_wgt_ppfx_MIPPNumiYields, &b_mc_wgt_ppfx_MIPPNumiYields);
+   fChain->SetBranchAddress("mc_wgt_ppfx_TargetAttenuation_sz", &mc_wgt_ppfx_TargetAttenuation_sz, &b_mc_wgt_ppfx_TargetAttenuation_sz);
+   fChain->SetBranchAddress("mc_wgt_ppfx_TargetAttenuation", &mc_wgt_ppfx_TargetAttenuation, &b_mc_wgt_ppfx_TargetAttenuation);
+   fChain->SetBranchAddress("mc_wgt_ppfx_NA49_sz", &mc_wgt_ppfx_NA49_sz, &b_mc_wgt_ppfx_NA49_sz);
+   fChain->SetBranchAddress("mc_wgt_ppfx_NA49", &mc_wgt_ppfx_NA49, &b_mc_wgt_ppfx_NA49);
+   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPKaonsYields_sz", &mc_wgt_ppfx_MIPPKaonsYields_sz, &b_mc_wgt_ppfx_MIPPKaonsYields_sz);
+   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPKaonsYields", &mc_wgt_ppfx_MIPPKaonsYields, &b_mc_wgt_ppfx_MIPPKaonsYields);
+   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPThinTarget_sz", &mc_wgt_ppfx_MIPPThinTarget_sz, &b_mc_wgt_ppfx_MIPPThinTarget_sz);
+   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPThinTarget", &mc_wgt_ppfx_MIPPThinTarget, &b_mc_wgt_ppfx_MIPPThinTarget);
+   fChain->SetBranchAddress("mc_wgt_ppfx_Absorption_sz", &mc_wgt_ppfx_Absorption_sz, &b_mc_wgt_ppfx_Absorption_sz);
+   fChain->SetBranchAddress("mc_wgt_ppfx_Absorption", &mc_wgt_ppfx_Absorption, &b_mc_wgt_ppfx_Absorption);
+   fChain->SetBranchAddress("mc_wgt_ppfx_Others_sz", &mc_wgt_ppfx_Others_sz, &b_mc_wgt_ppfx_Others_sz);
+   fChain->SetBranchAddress("mc_wgt_ppfx_Others", &mc_wgt_ppfx_Others, &b_mc_wgt_ppfx_Others);
    fChain->SetBranchAddress("n_prongs", &n_prongs, &b_n_prongs);
    fChain->SetBranchAddress("prong_nParticles", prong_nParticles, &b_prong_nParticles);
    fChain->SetBranchAddress("prong_part_score", prong_part_score, &b_prong_part_score);

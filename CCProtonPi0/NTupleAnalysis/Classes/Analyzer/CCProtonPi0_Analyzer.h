@@ -163,8 +163,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TTree          *fChain;   //!pointer to the analyzed TTree or TChain
         Int_t           fCurrent; //!current Tree number in a TChain
 
-        // Declaration of leaf types
-    Double_t        eventID;
+    // Declaration of leaf types
+      Double_t        eventID;
    Int_t           physEvtNum;
    Int_t           n_hyps;
    Int_t           processType;
@@ -195,6 +195,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           Cut_Particle_None;
    Int_t           Cut_PreFilter_Pi0;
    Int_t           Cut_Proton_None;
+   Int_t           Cut_UnattachedProngsWithTracks;
    Int_t           Cut_Vertex_Michel_Exist;
    Int_t           Cut_Vertex_None;
    Int_t           Cut_Vertex_Not_Fiducial;
@@ -216,9 +217,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           gamma2_blob_nclusters;
    Int_t           gamma2_blob_ndigits;
    Int_t           nProngs;
-   Int_t           n_anchored_long_trk_prongs;
-   Int_t           n_anchored_short_trk_prongs;
-   Int_t           n_iso_trk_prongs;
+   Int_t           nTracks;
    Int_t           od_energeticTower;
    Int_t           phys_energy_in_road_downstream_nplanes;
    Int_t           phys_energy_in_road_upstream_nplanes;
@@ -229,6 +228,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           phys_n_dead_discr_pair_upstream_prim_track_proj;
    Int_t           phys_vertex_is_fiducial;
    Int_t           preFilter_Result;
+   Int_t           vtx_fit_converged;
    Int_t           vtx_primary_index;
    Int_t           vtx_primary_multiplicity;
    Int_t           vtx_secondary_count;
@@ -296,20 +296,22 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        totalIDVisibleE;
    Double_t        totalODVisibleE;
    Double_t        totalVisibleE;
+   Double_t        vtx_fit_chi2;
    Int_t           g1dedx_cluster_occupancy_sz;
    Int_t           g1dedx_cluster_occupancy[6];   //[g1dedx_cluster_occupancy_sz]
    Int_t           g2dedx_cluster_occupancy_sz;
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
    Int_t           Vertex_energy_radii_sz;
    Double_t        Vertex_energy_radii[7];   //[Vertex_energy_radii_sz]
+   Double_t        fit_vtx[3];
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[44];   //[g1dedx_rev_cluster_energy_sz]
+   Double_t        g1dedx_rev_cluster_energy[51];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[46];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[39];   //[g2dedx_rev_cluster_energy_sz]
    Int_t           od_distanceBlobTower_sz;
    Double_t        od_distanceBlobTower[2];   //[od_distanceBlobTower_sz]
    Int_t           od_idBlobTime_sz;
@@ -439,8 +441,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           CCProtonPi0_trajMuonProngPrimary;
    Int_t           CCProtonPi0_vtx_module;
    Int_t           CCProtonPi0_vtx_plane;
-   Double_t        CCProtonPi0_QSq;
-   Double_t        CCProtonPi0_WSq;
+   Double_t        CCProtonPi0_QSq_1Track;
+   Double_t        CCProtonPi0_QSq_Cal;
+   Double_t        CCProtonPi0_WSq_1Track;
+   Double_t        CCProtonPi0_WSq_Cal;
+   Double_t        CCProtonPi0_W_1Track;
+   Double_t        CCProtonPi0_W_Cal;
    Double_t        CCProtonPi0_endMuonTrajMomentum;
    Double_t        CCProtonPi0_endMuonTrajXPosition;
    Double_t        CCProtonPi0_endMuonTrajYPosition;
@@ -502,7 +508,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        CCProtonPi0_muon_theta;
    Double_t        CCProtonPi0_muon_theta_biasDown;
    Double_t        CCProtonPi0_muon_theta_biasUp;
-   Double_t        CCProtonPi0_neutrino_E;
+   Double_t        CCProtonPi0_neutrino_E_1Track;
+   Double_t        CCProtonPi0_neutrino_E_2Track;
    Double_t        CCProtonPi0_neutrino_E_Cal;
    Double_t        CCProtonPi0_pi0_E;
    Double_t        CCProtonPi0_pi0_cos_openingAngle;
@@ -540,10 +547,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        CCProtonPi0_t_minos_trk_primFSLepMnvInitX;
    Double_t        CCProtonPi0_t_minos_trk_primFSLepMnvInitY;
    Double_t        CCProtonPi0_t_minos_trk_primFSLepMnvInitZ;
-   Double_t        CCProtonPi0_total_E;
-   Double_t        CCProtonPi0_total_px;
-   Double_t        CCProtonPi0_total_py;
-   Double_t        CCProtonPi0_total_pz;
    Double_t        CCProtonPi0_trajMuonPhi;
    Double_t        CCProtonPi0_trajMuonProngEnergy;
    Double_t        CCProtonPi0_trajMuonProngMomentum;
@@ -557,7 +560,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        CCProtonPi0_vtx_z;
    Int_t           CCProtonPi0_isProtonInsideOD[10];
    Int_t           CCProtonPi0_ntrajProtonProng[10];
-   Int_t           CCProtonPi0_proton_isRecoGood[10];
    Int_t           CCProtonPi0_proton_kinked[10];
    Int_t           CCProtonPi0_proton_odMatch[10];
    Int_t           CCProtonPi0_trajProtonProngPDG[10];
@@ -646,26 +648,26 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[19];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[19];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[19];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[19];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[19];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[31];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[31];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[31];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[31];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[31];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[46];   //[mc_er_nPart]
-   Int_t           mc_er_status[46];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[46];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[46];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[46];   //[mc_er_nPart]
-   Double_t        mc_er_Px[46];   //[mc_er_nPart]
-   Double_t        mc_er_Py[46];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[46];   //[mc_er_nPart]
-   Double_t        mc_er_E[46];   //[mc_er_nPart]
-   Int_t           mc_er_FD[46];   //[mc_er_nPart]
-   Int_t           mc_er_LD[46];   //[mc_er_nPart]
-   Int_t           mc_er_mother[46];   //[mc_er_nPart]
+   Int_t           mc_er_ID[45];   //[mc_er_nPart]
+   Int_t           mc_er_status[45];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[45];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[45];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[45];   //[mc_er_nPart]
+   Double_t        mc_er_Px[45];   //[mc_er_nPart]
+   Double_t        mc_er_Py[45];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[45];   //[mc_er_nPart]
+   Double_t        mc_er_E[45];   //[mc_er_nPart]
+   Int_t           mc_er_FD[45];   //[mc_er_nPart]
+   Int_t           mc_er_LD[45];   //[mc_er_nPart]
+   Int_t           mc_er_mother[45];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[7];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[8];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -686,12 +688,28 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        mc_wgt_Flux_BeamFocus[100];   //[mc_wgt_Flux_BeamFocus_sz]
    Int_t           mc_wgt_Flux_NA49_sz;
    Double_t        mc_wgt_Flux_NA49[100];   //[mc_wgt_Flux_NA49_sz]
+   Int_t           mc_wgt_Norm_sz;
+   Double_t        mc_wgt_Norm[1];   //[mc_wgt_Norm_sz]
+   Int_t           mc_wgt_ppfx_MIPPNumiYields_sz;
+   Double_t        mc_wgt_ppfx_MIPPNumiYields[1];   //[mc_wgt_ppfx_MIPPNumiYields_sz]
+   Int_t           mc_wgt_ppfx_TargetAttenuation_sz;
+   Double_t        mc_wgt_ppfx_TargetAttenuation[1];   //[mc_wgt_ppfx_TargetAttenuation_sz]
+   Int_t           mc_wgt_ppfx_NA49_sz;
+   Double_t        mc_wgt_ppfx_NA49[1];   //[mc_wgt_ppfx_NA49_sz]
+   Int_t           mc_wgt_ppfx_MIPPKaonsYields_sz;
+   Double_t        mc_wgt_ppfx_MIPPKaonsYields[1];   //[mc_wgt_ppfx_MIPPKaonsYields_sz]
+   Int_t           mc_wgt_ppfx_MIPPThinTarget_sz;
+   Double_t        mc_wgt_ppfx_MIPPThinTarget[1];   //[mc_wgt_ppfx_MIPPThinTarget_sz]
+   Int_t           mc_wgt_ppfx_Absorption_sz;
+   Double_t        mc_wgt_ppfx_Absorption[1];   //[mc_wgt_ppfx_Absorption_sz]
+   Int_t           mc_wgt_ppfx_Others_sz;
+   Double_t        mc_wgt_ppfx_Others[1];   //[mc_wgt_ppfx_Others_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[6];   //[n_prongs]
-   Double_t        prong_part_score[6];   //[n_prongs]
-   Double_t        prong_part_mass[6];   //[n_prongs]
-   Int_t           prong_part_charge[6];   //[n_prongs]
-   Int_t           prong_part_pid[6];   //[n_prongs]
+   Int_t           prong_nParticles[8];   //[n_prongs]
+   Double_t        prong_part_score[8];   //[n_prongs]
+   Double_t        prong_part_mass[8];   //[n_prongs]
+   Int_t           prong_part_charge[8];   //[n_prongs]
+   Int_t           prong_part_pid[8];   //[n_prongs]
    vector<vector<double> > *prong_part_E;
    vector<vector<double> > *prong_part_pos;
 
@@ -727,6 +745,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_Cut_Particle_None;   //!
    TBranch        *b_Cut_PreFilter_Pi0;   //!
    TBranch        *b_Cut_Proton_None;   //!
+   TBranch        *b_Cut_UnattachedProngsWithTracks;   //!
    TBranch        *b_Cut_Vertex_Michel_Exist;   //!
    TBranch        *b_Cut_Vertex_None;   //!
    TBranch        *b_Cut_Vertex_Not_Fiducial;   //!
@@ -748,9 +767,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_gamma2_blob_nclusters;   //!
    TBranch        *b_gamma2_blob_ndigits;   //!
    TBranch        *b_nProngs;   //!
-   TBranch        *b_n_anchored_long_trk_prongs;   //!
-   TBranch        *b_n_anchored_short_trk_prongs;   //!
-   TBranch        *b_n_iso_trk_prongs;   //!
+   TBranch        *b_nTracks;   //!
    TBranch        *b_od_energeticTower;   //!
    TBranch        *b_phys_energy_in_road_downstream_nplanes;   //!
    TBranch        *b_phys_energy_in_road_upstream_nplanes;   //!
@@ -761,6 +778,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_phys_n_dead_discr_pair_upstream_prim_track_proj;   //!
    TBranch        *b_phys_vertex_is_fiducial;   //!
    TBranch        *b_preFilter_Result;   //!
+   TBranch        *b_vtx_fit_converged;   //!
    TBranch        *b_vtx_primary_index;   //!
    TBranch        *b_vtx_primary_multiplicity;   //!
    TBranch        *b_vtx_secondary_count;   //!
@@ -828,12 +846,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_totalIDVisibleE;   //!
    TBranch        *b_totalODVisibleE;   //!
    TBranch        *b_totalVisibleE;   //!
+   TBranch        *b_vtx_fit_chi2;   //!
    TBranch        *b_g1dedx_cluster_occupancy_sz;   //!
    TBranch        *b_g1dedx_cluster_occupancy;   //!
    TBranch        *b_g2dedx_cluster_occupancy_sz;   //!
    TBranch        *b_g2dedx_cluster_occupancy;   //!
    TBranch        *b_Vertex_energy_radii_sz;   //!
    TBranch        *b_Vertex_energy_radii;   //!
+   TBranch        *b_fit_vtx;   //!
    TBranch        *b_g1dedx_cluster_energy_sz;   //!
    TBranch        *b_g1dedx_cluster_energy;   //!
    TBranch        *b_g1dedx_rev_cluster_energy_sz;   //!
@@ -971,8 +991,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_CCProtonPi0_trajMuonProngPrimary;   //!
    TBranch        *b_CCProtonPi0_vtx_module;   //!
    TBranch        *b_CCProtonPi0_vtx_plane;   //!
-   TBranch        *b_CCProtonPi0_QSq;   //!
-   TBranch        *b_CCProtonPi0_WSq;   //!
+   TBranch        *b_CCProtonPi0_QSq_1Track;   //!
+   TBranch        *b_CCProtonPi0_QSq_Cal;   //!
+   TBranch        *b_CCProtonPi0_WSq_1Track;   //!
+   TBranch        *b_CCProtonPi0_WSq_Cal;   //!
+   TBranch        *b_CCProtonPi0_W_1Track;   //!
+   TBranch        *b_CCProtonPi0_W_Cal;   //!
    TBranch        *b_CCProtonPi0_endMuonTrajMomentum;   //!
    TBranch        *b_CCProtonPi0_endMuonTrajXPosition;   //!
    TBranch        *b_CCProtonPi0_endMuonTrajYPosition;   //!
@@ -1034,7 +1058,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_CCProtonPi0_muon_theta;   //!
    TBranch        *b_CCProtonPi0_muon_theta_biasDown;   //!
    TBranch        *b_CCProtonPi0_muon_theta_biasUp;   //!
-   TBranch        *b_CCProtonPi0_neutrino_E;   //!
+   TBranch        *b_CCProtonPi0_neutrino_E_1Track;   //!
+   TBranch        *b_CCProtonPi0_neutrino_E_2Track;   //!
    TBranch        *b_CCProtonPi0_neutrino_E_Cal;   //!
    TBranch        *b_CCProtonPi0_pi0_E;   //!
    TBranch        *b_CCProtonPi0_pi0_cos_openingAngle;   //!
@@ -1072,10 +1097,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_CCProtonPi0_t_minos_trk_primFSLepMnvInitX;   //!
    TBranch        *b_CCProtonPi0_t_minos_trk_primFSLepMnvInitY;   //!
    TBranch        *b_CCProtonPi0_t_minos_trk_primFSLepMnvInitZ;   //!
-   TBranch        *b_CCProtonPi0_total_E;   //!
-   TBranch        *b_CCProtonPi0_total_px;   //!
-   TBranch        *b_CCProtonPi0_total_py;   //!
-   TBranch        *b_CCProtonPi0_total_pz;   //!
    TBranch        *b_CCProtonPi0_trajMuonPhi;   //!
    TBranch        *b_CCProtonPi0_trajMuonProngEnergy;   //!
    TBranch        *b_CCProtonPi0_trajMuonProngMomentum;   //!
@@ -1089,7 +1110,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_CCProtonPi0_vtx_z;   //!
    TBranch        *b_CCProtonPi0_isProtonInsideOD;   //!
    TBranch        *b_CCProtonPi0_ntrajProtonProng;   //!
-   TBranch        *b_CCProtonPi0_proton_isRecoGood;   //!
    TBranch        *b_CCProtonPi0_proton_kinked;   //!
    TBranch        *b_CCProtonPi0_proton_odMatch;   //!
    TBranch        *b_CCProtonPi0_trajProtonProngPDG;   //!
@@ -1218,6 +1238,22 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_mc_wgt_Flux_BeamFocus;   //!
    TBranch        *b_mc_wgt_Flux_NA49_sz;   //!
    TBranch        *b_mc_wgt_Flux_NA49;   //!
+   TBranch        *b_mc_wgt_Norm_sz;   //!
+   TBranch        *b_mc_wgt_Norm;   //!
+   TBranch        *b_mc_wgt_ppfx_MIPPNumiYields_sz;   //!
+   TBranch        *b_mc_wgt_ppfx_MIPPNumiYields;   //!
+   TBranch        *b_mc_wgt_ppfx_TargetAttenuation_sz;   //!
+   TBranch        *b_mc_wgt_ppfx_TargetAttenuation;   //!
+   TBranch        *b_mc_wgt_ppfx_NA49_sz;   //!
+   TBranch        *b_mc_wgt_ppfx_NA49;   //!
+   TBranch        *b_mc_wgt_ppfx_MIPPKaonsYields_sz;   //!
+   TBranch        *b_mc_wgt_ppfx_MIPPKaonsYields;   //!
+   TBranch        *b_mc_wgt_ppfx_MIPPThinTarget_sz;   //!
+   TBranch        *b_mc_wgt_ppfx_MIPPThinTarget;   //!
+   TBranch        *b_mc_wgt_ppfx_Absorption_sz;   //!
+   TBranch        *b_mc_wgt_ppfx_Absorption;   //!
+   TBranch        *b_mc_wgt_ppfx_Others_sz;   //!
+   TBranch        *b_mc_wgt_ppfx_Others;   //!
    TBranch        *b_n_prongs;   //!
    TBranch        *b_prong_nParticles;   //!
    TBranch        *b_prong_part_score;   //!
@@ -1226,7 +1262,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_prong_part_pid;   //!
    TBranch        *b_prong_part_E;   //!
    TBranch        *b_prong_part_pos;   //!
-  
 
 };
 

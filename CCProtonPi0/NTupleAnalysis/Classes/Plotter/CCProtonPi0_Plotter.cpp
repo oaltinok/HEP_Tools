@@ -15,13 +15,13 @@ void CCProtonPi0_Plotter::plotHistograms()
          //plotSignalBackground();
          //plotCutHistograms();
     }else{
-//         plotInteraction();
+         plotInteraction();
         
-         plotMuon();
+         //plotMuon();
         
-         plotProton();
+         //plotProton();
         
-        plotPion();
+        //plotPion();
         
 //        plotPID();
         
@@ -444,103 +444,133 @@ void CCProtonPi0_Plotter::plotInteraction()
         TH1D* h_status_Pi0_GrandMother = (TH1D*)f_Root->Get("status_Pi0_GrandMother");
         plot1D_Hist(h_status_Pi0_GrandMother,"status_Pi0_GrandMother.png",plotDir);
     }
-     
-    TH1D* h_beamEnergy_mc= (TH1D*)f_Root->Get("beamEnergy_mc");
-    plot1D_Hist(h_beamEnergy_mc,"beamEnergy_mc.png",plotDir);
+   
+    TH1D* h_proton_p_shifted= (TH1D*)f_Root->Get("proton_p_shifted");
+    plot1D_Hist(h_proton_p_shifted,"proton_p_shifted.png",plotDir);
+
+    TH1D* h_proton_p= (TH1D*)f_Root->Get("proton_p");
+    plot1D_Hist(h_proton_p,"proton_p.png",plotDir);
+
+    int maxbin_shifted = h_proton_p_shifted->GetMaximumBin();
+    double max_shifted_value = h_proton_p_shifted->GetBinLowEdge(maxbin_shifted);
     
+    int maxbin_normal = h_proton_p->GetMaximumBin();
+    double max_normal_value = h_proton_p->GetBinLowEdge(maxbin_normal);
+
+    cout<<"Default Center = "<<max_normal_value<<endl;
+    cout<<"Shifted Center = "<<max_shifted_value<<endl;
+
+    // Enu 1 Track
+    TH1D* h_Enu_1Track_mc= (TH1D*)f_Root->Get("Enu_1Track_mc");
+    plot1D_Hist(h_Enu_1Track_mc,"Enu_1Track_mc.png",plotDir);
+   
+    TH2D* h_Enu_1Track_reco_mc= (TH2D*)f_Root->Get("Enu_1Track_reco_mc");
+    plot2D_Hist(h_Enu_1Track_reco_mc,"Enu_1Track_reco_mc.png",plotDir);
+
+    TH1D* h_Enu_1Track_error= (TH1D*)f_Root->Get("Enu_1Track_error");
+    plot1D_Hist(h_Enu_1Track_error,"Enu_1Track_error.png",plotDir);
+
+    TH1D* h_Enu_1Track_reco= (TH1D*)f_Root->Get("Enu_1Track_reco");
+    plot1D_Hist(h_Enu_1Track_reco,"Enu_1Track_reco.png",plotDir);
+
+    // Enu 2 Track
+    TH1D* h_Enu_2Track_mc= (TH1D*)f_Root->Get("Enu_2Track_mc");
+    plot1D_Hist(h_Enu_2Track_mc,"Enu_2Track_mc.png",plotDir);
+   
+    TH2D* h_Enu_2Track_reco_mc= (TH2D*)f_Root->Get("Enu_2Track_reco_mc");
+    plot2D_Hist(h_Enu_2Track_reco_mc,"Enu_2Track_reco_mc.png",plotDir);
+
+    TH1D* h_Enu_2Track_error= (TH1D*)f_Root->Get("Enu_2Track_error");
+    plot1D_Hist(h_Enu_2Track_error,"Enu_2Track_error.png",plotDir);
+
+    TH1D* h_Enu_2Track_reco= (TH1D*)f_Root->Get("Enu_2Track_reco");
+    plot1D_Hist(h_Enu_2Track_reco,"Enu_2Track_reco.png",plotDir);
+
+    // Enu Cal
+    TH1D* h_Enu_Cal_mc= (TH1D*)f_Root->Get("Enu_Cal_mc");
+    plot1D_Hist(h_Enu_Cal_mc,"Enu_Cal_mc.png",plotDir);
+
+    TH1D* h_Enu_Cal_reco= (TH1D*)f_Root->Get("Enu_Cal_reco");
+    plot1D_Hist(h_Enu_Cal_reco,"Enu_Cal_reco.png",plotDir);
+
+    TH2D* h_Enu_Cal_reco_mc= (TH2D*)f_Root->Get("Enu_Cal_reco_mc");
+    plot2D_Hist(h_Enu_Cal_reco_mc,"Enu_Cal_reco_mc.png",plotDir);
+    
+    TH1D* h_Enu_Cal_error= (TH1D*)f_Root->Get("Enu_Cal_error");
+    plot1D_Hist(h_Enu_Cal_error,"Enu_Cal_error.png",plotDir);
+
+    // Q-Sq
     TH1D* h_q2_mc= (TH1D*)f_Root->Get("q2_mc");
     plot1D_Hist(h_q2_mc,"q2_mc.png",plotDir);
     
-    TH1D* h_w_mc= (TH1D*)f_Root->Get("w_mc");
-    plot1D_Hist(h_w_mc,"w_mc.png",plotDir);
-    
-    TH1D* h_int_channel= (TH1D*)f_Root->Get("int_channel");
-    plot1D_Hist(h_int_channel,"int_channel.png",plotDir);
-    
-    TH1D* h_vertex_z_true= (TH1D*)f_Root->Get("vertex_z_true");
-    plot1D_Hist(h_vertex_z_true,"vertex_z_true.png",plotDir);
-    
-    TH2D* h_vertex_x_y_true= (TH2D*)f_Root->Get("vertex_x_y_true");
-    plot2D_Hist(h_vertex_x_y_true,"vertex_x_y_true.png",plotDir);
-
-    TH1D* h_total_E = (TH1D*)f_Root->Get("total_E");
-    plot1D_Hist(h_total_E,"total_E.png",plotDir);
-    
-    TH1D* h_nProngs_hist = (TH1D*)f_Root->Get("nProngs_hist");
-    plot1D_Hist(h_nProngs_hist,"nProngs_hist.png",plotDir);
-    
-    TH1D* h_deltaInvMass_reco = (TH1D*)f_Root->Get("deltaInvMass_reco");
-    plot1D_Hist(h_deltaInvMass_reco,"deltaInvMass_reco.png",plotDir);
-    
-    TH1D* h_vertex_z_reco= (TH1D*)f_Root->Get("vertex_z_reco");
-    plot1D_Hist(h_vertex_z_reco,"vertex_z_reco.png",plotDir);
-    
-    TH2D* h_vertex_x_y_reco= (TH2D*)f_Root->Get("vertex_x_y_reco");
-    plot2D_Hist(h_vertex_x_y_reco,"vertex_x_y_reco.png",plotDir);
-    
-    TH1D* h_pFilter_Status = (TH1D*)f_Root->Get("pFilter_Status");
-    plot1D_Hist(h_pFilter_Status,"pFilter_Status.png",plotDir);
-    
-    TH1D* h_pFilter_RejectedEnergy = (TH1D*)f_Root->Get("pFilter_RejectedEnergy");
-    plot1D_Hist(h_pFilter_RejectedEnergy,"pFilter_RejectedEnergy.png",plotDir);
-    
-    TH1D* h_beamEnergy_reco= (TH1D*)f_Root->Get("beamEnergy_reco");
-    plot1D_Hist(h_beamEnergy_reco,"beamEnergy_reco.png",plotDir);
-    
-    TH1D* h_beamEnergyCal_reco= (TH1D*)f_Root->Get("beamEnergyCal_reco");
-    plot1D_Hist(h_beamEnergyCal_reco,"beamEnergyCal_reco.png",plotDir);
-    
     TH1D* h_q2_reco= (TH1D*)f_Root->Get("q2_reco");
     plot1D_Hist(h_q2_reco,"q2_reco.png",plotDir);    
-    
-    TH1D* h_w_reco= (TH1D*)f_Root->Get("w_reco");
-    plot1D_Hist(h_w_reco,"w_reco.png",plotDir); 
-    
-    TH1D* h_wSq_reco= (TH1D*)f_Root->Get("wSq_reco");
-    plot1D_Hist(h_wSq_reco,"wSq_reco.png",plotDir); 
 
-    TH2D* h_total_E_neutrinoE = (TH2D*)f_Root->Get("total_E_neutrinoE");
-    plot2D_Hist(h_total_E_neutrinoE,"total_E_neutrinoE.png",plotDir);
-    
-    TH2D* h_deltaInvMass_reco_mc = (TH2D*)f_Root->Get("deltaInvMass_reco_mc");
-    plot2D_Hist(h_deltaInvMass_reco_mc,"deltaInvMass_reco_mc.png",plotDir);
-    
-    TH1D* h_deltaInvMass_error = (TH1D*)f_Root->Get("deltaInvMass_error");
-    plot1D_Hist(h_deltaInvMass_error,"deltaInvMass_error.png",plotDir);
-        
-    TH2D* h_beamEnergy_reco_mc= (TH2D*)f_Root->Get("beamEnergy_reco_mc");
-    plot2D_Hist(h_beamEnergy_reco_mc,"beamEnergy_reco_mc.png",plotDir);
-
-    TH1D* h_beamEnergy_error= (TH1D*)f_Root->Get("beamEnergy_error");
-    plot1D_Hist(h_beamEnergy_error,"beamEnergy_error.png",plotDir);
-    
-    TH2D* h_beamEnergyCal_reco_mc= (TH2D*)f_Root->Get("beamEnergyCal_reco_mc");
-    plot2D_Hist(h_beamEnergyCal_reco_mc,"beamEnergyCal_reco_mc.png",plotDir);
-    
-    TH1D* h_beamEnergyCal_error= (TH1D*)f_Root->Get("beamEnergyCal_error");
-    plot1D_Hist(h_beamEnergyCal_error,"beamEnergyCal_error.png",plotDir);
-    
-    TH2D* h_beamEnergy_beamEnergyCal= (TH2D*)f_Root->Get("beamEnergy_beamEnergyCal");
-    plot2D_Hist(h_beamEnergy_beamEnergyCal,"beamEnergy_beamEnergyCal.png",plotDir);
-    
     TH2D* h_q2_reco_mc= (TH2D*)f_Root->Get("q2_reco_mc");
     plot2D_Hist(h_q2_reco_mc,"q2_reco_mc.png",plotDir);
     
     TH1D* h_q2_error= (TH1D*)f_Root->Get("q2_error");
     plot1D_Hist(h_q2_error,"q2_error.png",plotDir);
+
+    // W
+    TH1D* h_w_mc= (TH1D*)f_Root->Get("w_mc");
+    plot1D_Hist(h_w_mc,"w_mc.png",plotDir);
     
+    TH1D* h_w_reco= (TH1D*)f_Root->Get("w_reco");
+    plot1D_Hist(h_w_reco,"w_reco.png",plotDir); 
+
     TH2D* h_w_reco_mc= (TH2D*)f_Root->Get("w_reco_mc");
     plot2D_Hist(h_w_reco_mc,"w_reco_mc.png",plotDir);
     
     TH1D* h_w_error= (TH1D*)f_Root->Get("w_error");
     plot1D_Hist(h_w_error,"w_error.png",plotDir);
 
+    TH1D* h_wSq_reco= (TH1D*)f_Root->Get("wSq_reco");
+    plot1D_Hist(h_wSq_reco,"wSq_reco.png",plotDir); 
+    
+    // Vertex Z
+    TH1D* h_vertex_z_true= (TH1D*)f_Root->Get("vertex_z_true");
+    plot1D_Hist(h_vertex_z_true,"vertex_z_true.png",plotDir);
+
+    TH1D* h_vertex_z_reco= (TH1D*)f_Root->Get("vertex_z_reco");
+    plot1D_Hist(h_vertex_z_reco,"vertex_z_reco.png",plotDir);
+
     TH2D* h_vertex_z_reco_mc= (TH2D*)f_Root->Get("vertex_z_reco_mc");
     plot2D_Hist(h_vertex_z_reco_mc,"vertex_z_reco_mc.png",plotDir);
     
     TH1D* h_vertex_z_error= (TH1D*)f_Root->Get("vertex_z_error");
     plot1D_Hist(h_vertex_z_error,"vertex_z_error.png",plotDir);
+
+    // Vertex X-Y
+    TH2D* h_vertex_x_y_true= (TH2D*)f_Root->Get("vertex_x_y_true");
+    plot2D_Hist(h_vertex_x_y_true,"vertex_x_y_true.png",plotDir);
     
+    TH2D* h_vertex_x_y_reco= (TH2D*)f_Root->Get("vertex_x_y_reco");
+    plot2D_Hist(h_vertex_x_y_reco,"vertex_x_y_reco.png",plotDir);
+
+    // Delta Invariant Mass
+    TH1D* h_deltaInvMass_reco = (TH1D*)f_Root->Get("deltaInvMass_reco");
+    plot1D_Hist(h_deltaInvMass_reco,"deltaInvMass_reco.png",plotDir);
+
+    TH2D* h_deltaInvMass_reco_mc = (TH2D*)f_Root->Get("deltaInvMass_reco_mc");
+    plot2D_Hist(h_deltaInvMass_reco_mc,"deltaInvMass_reco_mc.png",plotDir);
+    
+    TH1D* h_deltaInvMass_error = (TH1D*)f_Root->Get("deltaInvMass_error");
+    plot1D_Hist(h_deltaInvMass_error,"deltaInvMass_error.png",plotDir);
+
+    // Other
+    TH1D* h_nProngs_hist = (TH1D*)f_Root->Get("nProngs_hist");
+    plot1D_Hist(h_nProngs_hist,"nProngs_hist.png",plotDir);
+        
+    TH1D* h_pFilter_Status = (TH1D*)f_Root->Get("pFilter_Status");
+    plot1D_Hist(h_pFilter_Status,"pFilter_Status.png",plotDir);
+    
+    TH1D* h_pFilter_RejectedEnergy = (TH1D*)f_Root->Get("pFilter_RejectedEnergy");
+    plot1D_Hist(h_pFilter_RejectedEnergy,"pFilter_RejectedEnergy.png",plotDir);
+        
+    TH1D* h_int_channel= (TH1D*)f_Root->Get("int_channel");
+    plot1D_Hist(h_int_channel,"int_channel.png",plotDir);
+       
     delete f_Root;
     
 }

@@ -20,7 +20,7 @@ CCProtonPi0
 
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Version:        v2_12
+    Version:        v2_13
     
 ================================================================================
 */
@@ -36,32 +36,35 @@ CCProtonPi0
 //-- Forward Declarations
 #include "Event/MinervaEventFwd.h"
 
-class TRandom3;
-class IMichelTool;
-class IMinervaCoordSysTool;
-class IProtonUtils;
-class IEnergyCorrectionTool;
-class IHitTaggerTool;
-class IMinervaMathTool;
-class IProngClassificationTool;
-class IODProngClassificationTool;
-class IParticleMakerTool;
-class ICCPionIncUtils;
-class IRecoObjectTimeTool;
-class IMinervaObjectAssociator;
-class ICalorimetryUtils;
-class IIDAnchoredBlobCreator;
-class IParticleTool;
-class IExtraEnergyTool;
-class IGetDeadTime;
-class IMCTrackTool;
-class IGiGaGeomCnvSvc;
-class IGeomUtilSvc;
-
+class IAnchoredTrackFormation;
 class IBlobCreatorUtils;
+class ICCPionIncUtils;
+class ICalorimetryUtils;
+class IConeUtilsTool;
+class IEnergyCorrectionTool;
+class IExtraEnergyTool;
+class IGeomUtilSvc;
+class IGetCalAttenuation;
+class IGetDeadTime;
+class IGiGaGeomCnvSvc;
+class IHitTaggerTool;
 class IHoughBlob;
 class IHoughTool;
-class IGetCalAttenuation;
+class IIDAnchoredBlobCreator;
+class IMCTrackTool;
+class IMichelTool;
+class IMinervaCoordSysTool;
+class IMinervaMathTool;
+class IMinervaObjectAssociator;
+class IODProngClassificationTool;
+class IParticleMakerTool;
+class IParticleTool;
+class IProngClassificationTool;
+class IProtonUtils;
+class IRecoObjectTimeTool;
+class IVertexEnergyStudyTool;
+class IVertexFitter;
+class TRandom3;
 
 namespace Minerva {
   class DeDetector;
@@ -101,6 +104,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool truthIsPlausible( const Minerva::PhysicsEvent*) const;
         
     private:
+        std::vector<std::string>   m_dedx_uncertainties;
+        
         // Fiducial Volume
         double m_fidHexApothem;
         double m_fidUpStreamZ;
@@ -197,34 +202,37 @@ class CCProtonPi0 : public MinervaAnalysisTool
         const Minerva::DeDetector*      m_idDet;                ///< Inner detector
         const Minerva::DeOuterDetector* m_odDet;                ///< Outer detector
         
-        IGeomUtilSvc*               m_GeomUtilSvc;          ///< GeomUtilSvc
-        IMinervaCoordSysTool*       m_coordSysTool;
-        IMichelTool*                m_michelTrkTool;
-        IMichelTool*                m_michelVtxTool;
-        IProtonUtils*               m_protonUtils;
-        IEnergyCorrectionTool*      m_energyCorrectionTool;
-        IHitTaggerTool*             m_hitTagger;
-        IProngClassificationTool*   m_prongIntersection;
+        IAnchoredTrackFormation* m_anchoredTracker;
+        IBlobCreatorUtils* m_blobUtils;
+        ICCPionIncUtils* m_ccPionIncUtils;
+        ICalorimetryUtils* m_caloUtils;
+        IConeUtilsTool* m_coneUtilsTool;
+        IEnergyCorrectionTool* m_energyCorrectionTool;
+        IExtraEnergyTool* m_extraEnergyTool;
+        IGeomUtilSvc* m_GeomUtilSvc;
+        IGetCalAttenuation* m_AttenuationCorrectionTool;
+        IGetDeadTime* m_getDeadTimeTool;
+        IGiGaGeomCnvSvc* m_gigaCnvSvc;
+        IHitTaggerTool* m_hitTagger;
+        IHoughBlob* m_idHoughBlob;
+        IHoughTool* m_idHoughTool;
+        IIDAnchoredBlobCreator* m_idConeScanBlob;
+        IIDAnchoredBlobCreator* m_stopPointBlobTool;
+        IMCTrackTool* m_MCTrackTool;
+        IMichelTool* m_michelTrkTool;
+        IMichelTool* m_michelVtxTool;
+        IMinervaCoordSysTool* m_coordSysTool;
+        IMinervaMathTool* m_mathTool;
+        IMinervaObjectAssociator* m_objectAssociator;
         IODProngClassificationTool* m_odMatchTool;
-        IParticleMakerTool*         m_particleMaker;
-        ICCPionIncUtils*            m_ccPionIncUtils;
-        IRecoObjectTimeTool*        m_recoTimeTool;
-        IMinervaObjectAssociator*   m_objectAssociator;
-        ICalorimetryUtils*          m_caloUtils;
-        IIDAnchoredBlobCreator*     m_stopPointBlobTool;
-        IExtraEnergyTool*           m_extraEnergyTool;
-        IGetDeadTime*               m_getDeadTimeTool;
-        IMCTrackTool*               m_MCTrackTool;
-        IGiGaGeomCnvSvc*            m_gigaCnvSvc;
-        IParticleTool*              m_particleTool;
-        IParticleTool*              m_LikelihoodPIDTool;
-        IMinervaMathTool*           m_mathTool;
-        
-        IBlobCreatorUtils*          m_blobUtils;
-        IHoughBlob*                 m_idHoughBlob;
-        IHoughTool*                 m_idHoughTool;
-        IIDAnchoredBlobCreator*     m_idConeScanBlob;
-        IGetCalAttenuation*         m_AttenuationCorrectionTool;
+        IParticleMakerTool* m_particleMaker;
+        IParticleTool* m_LikelihoodPIDTool;
+        IParticleTool* m_particleTool;
+        IProngClassificationTool* m_prongIntersection;
+        IProtonUtils* m_protonUtils;
+        IRecoObjectTimeTool* m_recoTimeTool;
+        IVertexEnergyStudyTool* m_vertexEnergyStudyTool;
+        IVertexFitter* m_vertexFitter;
 
         //! Private Functions
         SmartRefVector<Minerva::IDCluster> FilterInSphereClusters(  const SmartRefVector<Minerva::IDCluster>& clusters, const double sphereRadius, std::vector<double>& radii) const;
@@ -238,7 +246,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void VtxBlob( Minerva::PhysicsEvent *event ) const;
         bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
         bool checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const;
-        bool correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
+        void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
         bool createTrackedParticles(Minerva::ProngVect& prongs ) const;
         bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;
         bool isBackgroundQELike(Minerva::GenMinInteraction* truthEvent) const;
@@ -250,7 +258,13 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool setProtonData( Minerva::NeutrinoInt* nuInt ) const;
         bool tagSignal( Minerva::GenMinInteraction* truthEvent) const;
         double Calc_QSq(double Enu) const;
-        double Calc_WSq(double QSq) const;
+        double Calc_WSq(double Enu, double QSq) const;
+        double Calc_Enu_Cal(double hadronEnergy) const;
+        double Calc_Enu_1Track() const;
+        double Calc_Enu_2Track() const;
+        double Calc_Longitudinal_Momentum(Gaudi::LorentzVector particle_4P) const;
+        double Calc_Px_wrt_Beam(Gaudi::LorentzVector particle_4P) const;
+        double Calc_Py_wrt_Beam(Gaudi::LorentzVector particle_4P) const;
         double CalcMinBlobSeparation( const Minerva::IDBlob* blob) const;
         double calcDistance( double x1, double y1, double z1,double x2, double y2, double z2) const;
         double getClusterEnergy( Minerva::PhysicsEvent* event, std::string input_clusterType) const;
@@ -273,8 +287,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void writeBackgroundType(Minerva::GenMinInteraction* truthEvent) const;
         void writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
         void writeFSParticleTable(bool isSignal) const;
-       
-
+        void setTrackDirection( Minerva::Track* track, Minerva::Vertex* vertex ) const;
+        Minerva::IDClusterVect getClusters( Minerva::PhysicsEvent* event ) const;
+        bool createdAnchoredShortTracks( Minerva::PhysicsEvent* event, Minerva::Vertex* vertex, bool make_primary_short_tracks ) const;
 };
 
 #endif // CCPROTONPI0_H 
