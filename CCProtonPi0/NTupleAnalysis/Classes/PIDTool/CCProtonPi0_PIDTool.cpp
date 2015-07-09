@@ -155,15 +155,26 @@ void CCProtonPi0_PIDTool::FillHistograms(   double protonScore_LLR, double proto
 CCProtonPi0_PIDTool::CCProtonPi0_PIDTool(int nMode) : CCProtonPi0_NTupleAnalysis(nMode)
 {
     cout<<"Initializing CCProtonPi0_PIDTool"<<endl;
-        
-    // File Locations
-    rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "PIDStatistics.root";
+     
+    if(nMode == 0){
+        cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
+    }else{
+        // File Locations
+        rootDir = Folder_List::rootOut_analyzed + branchDir + "PIDStatistics.root";
 
-    cout<<"\tRoot File: "<<rootDir<<endl;
-    
-    // Create Root File 
-    f = new TFile(rootDir.c_str(),"RECREATE");
-    
+        cout<<"\tRoot File: "<<rootDir<<endl;
+        
+        // Create Root File 
+        f = new TFile(rootDir.c_str(),"RECREATE");
+        
+        initHistograms();   
+    }
+    cout<<"Done!"<<endl;
+
+}
+
+void CCProtonPi0_PIDTool::initHistograms()
+{
     // Initialize Histograms
     purity_LLR = new TH1D( "purity_LLR","Proton Purity",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max()  );
     purity_LLR->GetXaxis()->SetTitle("Proton Purity = Captured Proton / Captured Total Events");
@@ -301,11 +312,9 @@ CCProtonPi0_PIDTool::CCProtonPi0_PIDTool(int nMode) : CCProtonPi0_NTupleAnalysis
     KE_other_LLR = new TH1D( "KE_other_LLR","Kinetic Energy of Fake Protons LLR",bin_KE.get_nBins(), bin_KE.get_min(), bin_KE.get_max() );
     KE_other_LLR->GetXaxis()->SetTitle("Fake Proton Kinetic Energy [MeV]");
     KE_other_LLR->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f [MeV] ",bin_KE.get_width()));
-    
-    cout<<"Done!"<<endl;
+ 
 
 }
-
 void CCProtonPi0_PIDTool::write_RootFile()
 {
     cout<<">> Writing "<<rootDir<<endl;

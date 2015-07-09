@@ -109,31 +109,6 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         
         TH1D* total_E;
         TH2D* total_E_neutrinoE;
-        
-
-        // -------------------------------------------------------------------------
-        // Cut Histograms
-        // -------------------------------------------------------------------------
-        // Common
-        TH1D* hCut_vertexCount;
-        TH1D* hCut_Michel;
-        TH1D* hCut_eVis_nuclearTarget;
-        TH1D* hCut_eVis_other;
-        TH1D* hCut_pi0invMass;
-        TH1D* hCut_gamma1ConvDist;
-        TH1D* hCut_gamma2ConvDist;
-        
-        TH1D* hCut_1Prong_neutrinoE;
-        TH1D* hCut_2Prong_neutrinoE;
-        TH1D* hCut_1Prong_UnusedE;
-        TH1D* hCut_2Prong_UnusedE;
-
-        
-        // 2 Prong Specific
-        TH1D* hCut_protonScore_pIDDiff;
-        TH1D* hCut_protonScore_LLR;
-        TH1D* hCut_deltaInvMass;
-    
 
     private:
         void initHistograms();
@@ -142,10 +117,6 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         string rootDir;
         
         CCProtonPi0_BinList binList;
-        
-    
-
-
 };
 
 

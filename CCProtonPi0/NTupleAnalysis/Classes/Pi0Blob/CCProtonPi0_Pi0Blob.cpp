@@ -12,27 +12,30 @@ CCProtonPi0_Pi0Blob::CCProtonPi0_Pi0Blob(int nMode) : CCProtonPi0_NTupleAnalysis
 {
     cout<<"Initializing CCProtonPi0_Pi0Blob"<<endl;
 
-    rootDir = Folder_List::output + Folder_List::rootOut + branchDir + "Pi0Blob.root";
-    
-    cout<<"\tRoot File: "<<rootDir<<endl;
- 
-    // Create Root File 
-    f = new TFile(rootDir.c_str(),"RECREATE");
+    if(nMode == 0){
+        cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
+    }else{
+        rootDir = Folder_List::rootOut_analyzed + branchDir + "Pi0Blob.root";
+        
+        cout<<"\tRoot File: "<<rootDir<<endl;
+     
+        // Create Root File 
+        f = new TFile(rootDir.c_str(),"RECREATE");
 
-    // Initialize Bins
-    bin_blob_nclusters.setBin(40,0.0,40.0);
-    bin_blob_minsep.setBin(200,0.0,2000.0);
-    bin_blob_energy.setBin(100,0.0,1000);
-    bin_blob_ndigits.setBin(100,0,100);
-    bin_blob_ndof.setBin(70,0,70);
-    bin_blob_fval.setBin(100,0,5000);
-    bin_blob_dEdx_doublet.setBin(2,0,2);
-    bin_blob_dEdx.setBin(50,0,100);
-    bin_blob_dEdx_nplane.setBin(40,0,40);
-    bin_blob_dEdx_cluster_energy.setBin(100,0,500);
-   
-    initHistograms();
-  
+        // Initialize Bins
+        bin_blob_nclusters.setBin(40,0.0,40.0);
+        bin_blob_minsep.setBin(200,0.0,2000.0);
+        bin_blob_energy.setBin(100,0.0,1000);
+        bin_blob_ndigits.setBin(100,0,100);
+        bin_blob_ndof.setBin(70,0,70);
+        bin_blob_fval.setBin(100,0,5000);
+        bin_blob_dEdx_doublet.setBin(2,0,2);
+        bin_blob_dEdx.setBin(50,0,100);
+        bin_blob_dEdx_nplane.setBin(40,0,40);
+        bin_blob_dEdx_cluster_energy.setBin(100,0,500);
+       
+        initHistograms();
+    }  
     cout<<"Done!"<<endl;
 }
 

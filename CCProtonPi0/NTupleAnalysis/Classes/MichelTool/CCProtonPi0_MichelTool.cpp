@@ -8,34 +8,38 @@ using namespace std;
 CCProtonPi0_MichelTool::CCProtonPi0_MichelTool(int nMode) : CCProtonPi0_NTupleAnalysis(nMode)
 {
     cout<<"Initializing CCProtonPi0_MichelTool"<<endl;
-        
-    // File Locations
-    rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "MichelTool.root";
+    
+    if(nMode == 0){
+        cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
+    }else{
+        // File Locations
+        rootDir = Folder_List::rootOut_analyzed + branchDir + "MichelTool.root";
 
-    cout<<"\tRoot File: "<<rootDir<<endl;
-    
-    // Create Root File 
-    f = new TFile(rootDir.c_str(),"RECREATE");
-    
-    initHistograms();
-    
-    N_trueMichel_before = 0.0;
-    N_trueMichel_after = 0.0;
-    N_trueMichel_afterAll = 0.0;
-    N_noMichel_before = 0.0;
-    N_noMichel_after = 0.0;
-    N_detectedMichel_true = 0.0;
-    N_detectedMichel_fake = 0.0;
-    N_missedMichel_true = 0.0;
-    N_missedMichel_fake = 0.0;
-    N_detectedMichel_true_signal = 0.0;
-    N_detectedMichel_fake_signal = 0.0;
-    N_missedMichel_true_signal = 0.0;
-    N_missedMichel_fake_signal = 0.0;
-    N_selected_detectedMichel_true = 0.0;
-    N_selected_detectedMichel_fake = 0.0;
-    N_selected_missedMichel_true = 0.0;
-    N_selected_missedMichel_fake = 0.0;
+        cout<<"\tRoot File: "<<rootDir<<endl;
+        
+        // Create Root File 
+        f = new TFile(rootDir.c_str(),"RECREATE");
+        
+        initHistograms();
+        
+        N_trueMichel_before = 0.0;
+        N_trueMichel_after = 0.0;
+        N_trueMichel_afterAll = 0.0;
+        N_noMichel_before = 0.0;
+        N_noMichel_after = 0.0;
+        N_detectedMichel_true = 0.0;
+        N_detectedMichel_fake = 0.0;
+        N_missedMichel_true = 0.0;
+        N_missedMichel_fake = 0.0;
+        N_detectedMichel_true_signal = 0.0;
+        N_detectedMichel_fake_signal = 0.0;
+        N_missedMichel_true_signal = 0.0;
+        N_missedMichel_fake_signal = 0.0;
+        N_selected_detectedMichel_true = 0.0;
+        N_selected_detectedMichel_fake = 0.0;
+        N_selected_missedMichel_true = 0.0;
+        N_selected_missedMichel_fake = 0.0;
+    }
     
     cout<<"Done!"<<endl;
 }

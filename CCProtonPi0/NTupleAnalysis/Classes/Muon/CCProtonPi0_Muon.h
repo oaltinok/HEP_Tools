@@ -27,7 +27,7 @@ class CCProtonPi0_Muon : public CCProtonPi0_Particle
         static const double restMass = 105.66;
         bool isMinosMatched;
         CCProtonPi0_SingleBin bin_AngleBeam;
-        
+        void initHistograms();        
 };
 
 #endif

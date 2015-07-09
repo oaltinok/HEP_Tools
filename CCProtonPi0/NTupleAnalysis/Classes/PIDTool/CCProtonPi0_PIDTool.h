@@ -5,7 +5,6 @@ Class: CCProtonPi0_PIDTool
     Generates pID specific Histograms and Statistics
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_05_07
 ================================================================================
 */
 #ifndef CCProtonPi0_PIDTool_h
@@ -78,7 +77,8 @@ class CCProtonPi0_PIDTool : public CCProtonPi0_NTupleAnalysis
         std::string rootDir;
         
         CCProtonPi0_BinList binList;
-        
+
+        void initHistograms();
 };
 
 

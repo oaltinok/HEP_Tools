@@ -1175,6 +1175,7 @@ Int_t MC_Sample::GetEntry(Long64_t entry)
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
+
 Long64_t MC_Sample::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry

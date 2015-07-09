@@ -13,7 +13,6 @@ Usage:
 > PDG_List::output      // Returns default Output Directory
 
 Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-Last Revision:  2014_11_11
 ================================================================================
 */
 
@@ -24,12 +23,19 @@ Last Revision:  2014_11_11
 
 namespace Folder_List
 {
+    //-------------------------------------------------------------------------
+    // Data files on /minerva/data/ Disk
+    //-------------------------------------------------------------------------
+    const std::string rootOut_analyzed = "/minerva/data/users/oaltinok/NTupleAnalysis/Analyzed/";
+    const std::string rootOut_reduced = "/minerva/data/users/oaltinok/NTupleAnalysis/Reduced/"; 
 
+    //-------------------------------------------------------------------------
+    // NTuple Analysis Output
+    //-------------------------------------------------------------------------
     // Default Folder for Output
     const std::string output = "Output/";
     
     // SubFolders for Output
-    const std::string rootOut = "RootFiles/";
     const std::string textOut = "TextFiles/";
     const std::string plotOut = "Plots/";
     
@@ -37,10 +43,8 @@ namespace Folder_List
     const std::string signal = "Signal/";
     const std::string background = "Background/";
     const std::string allEvents = "AllEvents/";
-    
-    // Other
     const std::string other = "Other/";
-
+    
 }
 
 #endif 

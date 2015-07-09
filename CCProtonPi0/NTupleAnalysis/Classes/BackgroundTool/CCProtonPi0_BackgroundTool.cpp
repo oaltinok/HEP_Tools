@@ -8,25 +8,27 @@ using namespace std;
 CCProtonPi0_BackgroundTool::CCProtonPi0_BackgroundTool(int nMode) : CCProtonPi0_NTupleAnalysis(nMode)
 {
     cout<<"Initializing CCProtonPi0_BackgroundTool"<<endl;
-    
-    OpenTextFiles();
-    
-    // Init Background Vectors
-    for(int i = 0; i < nBckgBranch; i++){
-            bckg_1Prong_QELike.push_back(0.0);
-            bckg_1Prong_SinglePiPlus.push_back(0.0);
-            bckg_1Prong_SinglePiMinus.push_back(0.0);
-            bckg_1Prong_MultiPion.push_back(0.0);
-            bckg_1Prong_MultiPiZero.push_back(0.0);
-            bckg_1Prong_Other.push_back(0.0);
-            bckg_2Prong_QELike.push_back(0.0);
-            bckg_2Prong_SinglePiPlus.push_back(0.0);
-            bckg_2Prong_SinglePiMinus.push_back(0.0);
-            bckg_2Prong_MultiPion.push_back(0.0);
-            bckg_2Prong_MultiPiZero.push_back(0.0);
-            bckg_2Prong_Other.push_back(0.0);
+    if(nMode == 0){
+        cout<<"\tNTuple Reduce Mode -- Will not create Text Files"<<endl;
+    }else{
+        OpenTextFiles();
+        
+        // Init Background Vectors
+        for(int i = 0; i < nBckgBranch; i++){
+                bckg_1Prong_QELike.push_back(0.0);
+                bckg_1Prong_SinglePiPlus.push_back(0.0);
+                bckg_1Prong_SinglePiMinus.push_back(0.0);
+                bckg_1Prong_MultiPion.push_back(0.0);
+                bckg_1Prong_MultiPiZero.push_back(0.0);
+                bckg_1Prong_Other.push_back(0.0);
+                bckg_2Prong_QELike.push_back(0.0);
+                bckg_2Prong_SinglePiPlus.push_back(0.0);
+                bckg_2Prong_SinglePiMinus.push_back(0.0);
+                bckg_2Prong_MultiPion.push_back(0.0);
+                bckg_2Prong_MultiPiZero.push_back(0.0);
+                bckg_2Prong_Other.push_back(0.0);
+        }
     }
-    
     cout<<"Done!"<<endl;
     
 }

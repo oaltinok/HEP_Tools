@@ -401,22 +401,22 @@ void CCProtonPi0_Plotter::setFolders()
         else if ( i == 1) branchDir = Folder_List::background;
         else branchDir = Folder_List::allEvents;
         
-        rootDir_Interaction[i] = Folder_List::output + Folder_List::rootOut + branchDir + "Interaction.root";
+        rootDir_Interaction[i] = Folder_List::rootOut_analyzed + branchDir + "Interaction.root";
         plotDir_Interaction[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Interaction/";
         
-        rootDir_PID[i] = Folder_List::output + Folder_List::rootOut + branchDir + "PIDStatistics.root";
+        rootDir_PID[i] = Folder_List::rootOut_analyzed + branchDir + "PIDStatistics.root";
         plotDir_PID[i] = Folder_List::output + Folder_List::plotOut + branchDir + "PIDStatistics/";
 
-        rootDir_Muon[i] = Folder_List::output + Folder_List::rootOut + branchDir + "Muon.root";
+        rootDir_Muon[i] = Folder_List::rootOut_analyzed + branchDir + "Muon.root";
         plotDir_Muon[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Muon/";
 
-        rootDir_Proton[i] = Folder_List::output + Folder_List::rootOut + branchDir + "Proton.root";
+        rootDir_Proton[i] = Folder_List::rootOut_analyzed + branchDir + "Proton.root";
         plotDir_Proton[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Proton/";
 
-        rootDir_Pion[i] = Folder_List::output + Folder_List::rootOut + branchDir + "Pion.root";
+        rootDir_Pion[i] = Folder_List::rootOut_analyzed + branchDir + "Pion.root";
         plotDir_Pion[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Pion/";
        
-        rootDir_Pi0Blob[i] = Folder_List::output + Folder_List::rootOut + branchDir + "Pi0Blob.root";
+        rootDir_Pi0Blob[i] = Folder_List::rootOut_analyzed + branchDir + "Pi0Blob.root";
         plotDir_Pi0Blob[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Pion/";
 
     }

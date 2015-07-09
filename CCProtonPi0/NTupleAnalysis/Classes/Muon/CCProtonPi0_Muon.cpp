@@ -11,20 +11,32 @@ using namespace std;
 CCProtonPi0_Muon::CCProtonPi0_Muon(int nMode) : CCProtonPi0_Particle(nMode)
 {
     cout<<"Initializing CCProtonPi0_Muon"<<endl;
+      
+    if(nMode == 0){
+        cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
+    }else{
+        // File Locations
+        rootDir = Folder_List::rootOut_analyzed + branchDir + "Muon.root";
+
+        cout<<"\tRoot File: "<<rootDir<<endl;
         
-    // File Locations
-    rootDir = Folder_List::output + Folder_List::rootOut + branchDir + "Muon.root";
+        // Create Root File 
+        f = new TFile(rootDir.c_str(),"RECREATE");
 
-    cout<<"\tRoot File: "<<rootDir<<endl;
+        // Initialize Bins
+        bin_P.setBin(10,0.0,10.0);
+        bin_KE.setBin(100,0.0,10.0);
+        bin_AngleBeam.setBin(90,0.0,90.0);
+        
+        initHistograms();
+    }
     
-    // Create Root File 
-    f = new TFile(rootDir.c_str(),"RECREATE");
+    cout<<"Done!"<<endl;
+}
 
-    // Initialize Bins
-    bin_P.setBin(10,0.0,10.0);
-    bin_KE.setBin(100,0.0,10.0);
-    bin_AngleBeam.setBin(90,0.0,90.0);
-    
+
+void CCProtonPi0_Muon::initHistograms()
+{
     partScore = new TH1D( "partScore","Muon Particle Score",bin_partScore.get_nBins(), bin_partScore.get_min(), bin_partScore.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");
     partScore->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f ",bin_partScore.get_width()));
@@ -118,8 +130,7 @@ CCProtonPi0_Muon::CCProtonPi0_Muon(int nMode) : CCProtonPi0_Particle(nMode)
                                 bin_AngleBeam.get_nBins(), bin_AngleBeam.get_min(), bin_AngleBeam.get_max());
     angleBeam_reco_mc->GetXaxis()->SetTitle("Reconstructed Muon Angle wrt. Beam [Degree]");
     angleBeam_reco_mc->GetYaxis()->SetTitle("True Muon Angle wrt. Beam [Degree]");
-    
-    cout<<"Done!"<<endl;
+
 }
 
 bool CCProtonPi0_Muon::get_isMinosMatched()

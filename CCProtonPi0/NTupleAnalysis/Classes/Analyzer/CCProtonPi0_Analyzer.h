@@ -58,9 +58,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         //     void run(): Generates a .root file with selected histograms
         //         playlist -> address of the playlist
         //---------------------------------------------------------------------
-        void run(std::string playlist);
+        void analyze(string playlist);
+        void reduce(string playlist);
     
-    private: 
+    private:
         //  Runtime and CCProtonPi0_Analyzer Functions
         bool analyzeEvent();
         bool getCutStatistics();

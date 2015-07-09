@@ -13,21 +13,32 @@ CCProtonPi0_Proton::CCProtonPi0_Proton(int nMode) : CCProtonPi0_Particle(nMode)
 {
     cout<<"Initializing CCProtonPi0_Proton"<<endl;
         
-    // File Locations
-    rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "Proton.root";
-    
-    cout<<"\tRoot File: "<<rootDir<<endl;
-    
-    // Create Root File 
-    f = new TFile(rootDir.c_str(),"RECREATE");
+    if(nMode == 0){
+        cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
+    }else{
+        // File Locations
+        rootDir = Folder_List::rootOut_analyzed + branchDir + "Proton.root";
+        
+        cout<<"\tRoot File: "<<rootDir<<endl;
+        
+        // Create Root File 
+        f = new TFile(rootDir.c_str(),"RECREATE");
 
-    // Initialize Bins
-    bin_E.setBin(60,0.0,3000.0);
-    bin_P.setBin(40, 0.0, 2000.0);
-    bin_KE.setBin(40, 0.0, 2000.0);
-    bin_trackLength.setBin(250,0.0,2500.0);
-    bin_trackKinked.setBin(2,0.0,2.0);
-    
+        // Initialize Bins
+        bin_E.setBin(60,0.0,3000.0);
+        bin_P.setBin(40, 0.0, 2000.0);
+        bin_KE.setBin(40, 0.0, 2000.0);
+        bin_trackLength.setBin(250,0.0,2500.0);
+        bin_trackKinked.setBin(2,0.0,2.0);
+        
+        initHistograms();        
+    }
+    cout<<"Done!"<<endl;
+}
+
+
+void CCProtonPi0_Proton::initHistograms()
+{
     // Unique Histograms
     trackLength = new TH1D( "trackLength","Proton Track Length",bin_trackLength.get_nBins(), bin_trackLength.get_min(), bin_trackLength.get_max() );
     trackLength->GetXaxis()->SetTitle("Proton Track Length [mm]");
@@ -131,10 +142,8 @@ CCProtonPi0_Proton::CCProtonPi0_Proton(int nMode) : CCProtonPi0_Particle(nMode)
                                 bin_angle.get_nBins(), bin_angle.get_min(), bin_angle.get_max());
     angleBeam_reco_mc->GetXaxis()->SetTitle("Reconstructed Proton Angle wrt. Beam [Degree]");
     angleBeam_reco_mc->GetYaxis()->SetTitle("True Proton Angle wrt. Beam [Degree]");
-    
-    cout<<"Done!"<<endl;
-}
 
+}
 void CCProtonPi0_Proton::set_kineticEnergy(bool isMC)
 {
     int type = getDataType(isMC);

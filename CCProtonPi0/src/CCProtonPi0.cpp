@@ -3946,8 +3946,7 @@ void CCProtonPi0::VtxBlob(Minerva::PhysicsEvent *event) const
             double dummy_ecalevis = 0.0;
             double dummy_hcalevis = 0.0;
             double dummy_scalevis = 0.0;
-            m_idHoughBlob->getBlobEnergyTime(vtxFilaBlob,vertex_energy_filament, 
-                                            dummy_trkrevis,dummy_ecalevis, dummy_hcalevis, dummy_scalevis);
+            m_idHoughBlob->getBlobEnergyTime(vtxFilaBlob,vertex_energy_filament, dummy_trkrevis,dummy_ecalevis, dummy_hcalevis, dummy_scalevis);
     
             debug() << " Adding Filament vertex " << vtxFilaBlob->nclusters()
                     << " clusters; energy = "  << vertex_energy_filament << endmsg;

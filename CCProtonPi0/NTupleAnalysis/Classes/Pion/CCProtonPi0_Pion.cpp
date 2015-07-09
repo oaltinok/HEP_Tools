@@ -12,22 +12,26 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(int nMode) : CCProtonPi0_Particle(nMode)
 {
     cout<<"Initializing CCProtonPi0_Pion"<<endl;    
     
-    // File Locations
-    rootDir =   Folder_List::output + Folder_List::rootOut + branchDir + "Pion.root";
-    
-    cout<<"\tRoot File: "<<rootDir<<endl;
-    
-    // Create Root File 
-    f = new TFile(rootDir.c_str(),"RECREATE");
+    if(nMode == 0){
+        cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
+    }else{
+        // File Locations
+        rootDir = Folder_List::rootOut_analyzed + branchDir + "Pion.root";
+        
+        cout<<"\tRoot File: "<<rootDir<<endl;
+        
+        // Create Root File 
+        f = new TFile(rootDir.c_str(),"RECREATE");
 
-    // Initialize Bins
-    bin_P.setBin(17, 0.0, 1700.0);
-    bin_KE.setBin(30, 0.0, 3000.0);
-    bin_invMass.setBin(60,0.0,600.0);
-    bin_photonConvLength.setBin(50,0.0,100.0);
-    bin_blob_energy.setBin(100,0.0,1000);
-    
-    initHistograms();   
+        // Initialize Bins
+        bin_P.setBin(17, 0.0, 1700.0);
+        bin_KE.setBin(30, 0.0, 3000.0);
+        bin_invMass.setBin(60,0.0,600.0);
+        bin_photonConvLength.setBin(50,0.0,100.0);
+        bin_blob_energy.setBin(100,0.0,1000);
+        
+        initHistograms();   
+    }
     
     cout<<"Done!"<<endl;
 }

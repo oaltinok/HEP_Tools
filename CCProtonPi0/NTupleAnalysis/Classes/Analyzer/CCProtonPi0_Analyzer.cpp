@@ -55,7 +55,61 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     beam_p3.SetTheta(0.059);
 }
 
-void CCProtonPi0_Analyzer::run(string playlist)
+void CCProtonPi0_Analyzer::reduce(string playlist)
+{
+    // Open File
+    string rootDir = Folder_List::rootOut_reduced + "ReducedNTuple.root";
+    cout<<"Reducing NTuple Files to a single file"<<endl;
+    cout<<"\tRoot File: "<<rootDir<<endl;
+    TFile* f = new TFile(rootDir.c_str(),"RECREATE");
+    
+    // Create Chain and Initialize
+    TChain* fChain = new TChain("CCProtonPi0");
+    Init(playlist, fChain);
+    if (!fChain) return;
+    if (fChain == 0) return;
+        
+    // Clone Tree from Chain
+    TTree* tree = fChain->CloneTree(0);
+    
+    //------------------------------------------------------------------------
+    // Loop over Chain
+    //------------------------------------------------------------------------
+    cout<<"Looping over all entries"<<endl;
+    
+    Long64_t nbytes = 0, nb = 0;
+    Long64_t nentries = fChain->GetEntriesFast();
+    
+    for (Long64_t jentry=0; jentry < nentries; jentry++) {
+        Long64_t ientry = fChain->GetEntry(jentry);
+        if (ientry < 0) break;
+        nb = fChain->GetEntry(jentry);   nbytes += nb;    
+        
+        if (ientry == 0) {
+            cout<<"\tGetEntry failure "<<jentry<<endl;
+            break;
+        }
+        
+        // Progress Message on Terminal
+        if (jentry%25000 == 0) cout<<"\tEntry "<<jentry<<endl;
+        
+        // Get Cut Statistics
+        isPassedAllCuts = getCutStatistics();
+        if( !isPassedAllCuts ) continue;
+
+        tree->Fill();
+    }
+    
+    cutList.writeCutTable();
+    cutList.writeRootFile();
+   
+    cout<<">> Writing "<<rootDir<<endl;
+    tree->AutoSave();    
+    f->Write();
+}
+
+
+void CCProtonPi0_Analyzer::analyze(string playlist)
 {
     if (!isAnalysisModeSelected){
         cout<<"Warning No Analysis Mode Selected!"<<endl;
@@ -73,33 +127,12 @@ void CCProtonPi0_Analyzer::run(string playlist)
     if (fChain == 0) return;
       
     //------------------------------------------------------------------------
-    // Branch Selection for Performance
-    //------------------------------------------------------------------------
-    fChain->SetBranchStatus("*",0);  // disable all branches
-    fChain->SetBranchStatus("reco_eventID",1);
-    fChain->SetBranchStatus("Cut_*",1);  // Cut List Activated by Default
-    fChain->SetBranchStatus("ev_*",1);
-    fChain->SetBranchStatus("truth_*",1);
-    fChain->SetBranchStatus("mc_*",1);
-    fChain->SetBranchStatus("CCProtonPi0*",1);
-    fChain->SetBranchStatus("preFilter_*",1);
-    fChain->SetBranchStatus("nProngs",1);
-    fChain->SetBranchStatus("vtx*",1);
-    fChain->SetBranchStatus("evis_*",1);
-    fChain->SetBranchStatus("energyUnused*",1);
-    fChain->SetBranchStatus("energyUsed*",1);
-    fChain->SetBranchStatus("gamma*",1);
-    fChain->SetBranchStatus("michel*",1);
-    fChain->SetBranchStatus("blob*",1);
-    fChain->SetBranchStatus("g1dedx*",1);
-     
-    //------------------------------------------------------------------------
     // Loop over Chain
     //------------------------------------------------------------------------
     cout<<"Looping over all entries"<<endl;
     
     // Get First Line for the first File
-    getline(DSTFileList,scanFileName);
+    //getline(DSTFileList,scanFileName);
     
     Long64_t nbytes = 0, nb = 0;
     Long64_t nentries = fChain->GetEntriesFast();
@@ -112,6 +145,7 @@ void CCProtonPi0_Analyzer::run(string playlist)
             cout<<"\tGetEntry failure "<<jentry<<endl;
             break;
         }
+    
         // Progress Message on Terminal
         if (jentry%25000 == 0) cout<<"\tEntry "<<jentry<<endl;
         
@@ -121,18 +155,11 @@ void CCProtonPi0_Analyzer::run(string playlist)
         }
         
         // Update scanFileName if running for scan
-        if(isScanRun) UpdateScanFileName();
+        //if(isScanRun) UpdateScanFileName();
        
         // Decide to Analyze Event or NOT
         if( !analyzeEvent() ) continue;
        
-        
-        //----------------------------------------------------------------------
-        // Get Cut Statistics
-        //----------------------------------------------------------------------
-        isPassedAllCuts = getCutStatistics();
-        if( !isPassedAllCuts ) continue;
-
         //----------------------------------------------------------------------
         // Fill Background Branches for Background Events
         //----------------------------------------------------------------------
@@ -172,7 +199,6 @@ void CCProtonPi0_Analyzer::run(string playlist)
     //--------------------------------------------------------------------------
     // Write Text Files
     //--------------------------------------------------------------------------
-    cutList.writeCutTable();
     bckgTool.writeBackgroundTable();
     getPi0Family(); // Pi0 Family Information written inside FailFile
     
@@ -186,7 +212,6 @@ void CCProtonPi0_Analyzer::run(string playlist)
     pi0Blob.write_RootFile();
     if(is_pID_Studies) pIDTool.write_RootFile();
     if(isMichelStudy) michelTool.write_RootFile();
-    
     
 }
 
@@ -204,11 +229,16 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(int nMode) :
     bckgTool(nMode),
     michelTool(nMode),
     cutList(nMode)
-{    
+{   
+    cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
     specifyRunTime();
     
-    openTextFiles();
-   
+    if (nMode == 0){
+        cout<<"\tNTuple Reduce Mode -- Will not create Text Files"<<endl;
+    }else{
+        openTextFiles();
+    }
+
     cout<<"Initialization Finished!\n"<<endl;
 }
 
@@ -440,7 +470,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_Vertex_Not_Fiducial.increment(truth_isSignal, study1, study2);
    
     // Fill Vertex Count Cut Hist 
-    interaction.hCut_vertexCount->Fill(vtx_total_count);
+    cutList.hCut_vertexCount->Fill(vtx_total_count);
     if( vtx_total_count > 1) return false;
     cutList.nCut_Vertex_Count.increment(truth_isSignal, study1, study2);
     
@@ -448,7 +478,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_Muon_None.increment(truth_isSignal, study1, study2);
 
     // Fill Truth_W for MINOS Matched Signal Events
-    if (truth_isSignal) fill_mc_w(); 
+    //if (truth_isSignal) fill_mc_w(); 
         
     if( Cut_Muon_Not_Plausible == 1) return false;
     cutList.nCut_Muon_Not_Plausible.increment(truth_isSignal, study1, study2);
@@ -461,9 +491,9 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
    
     // Fill Michel Cut Hist
     if( Cut_Vertex_Michel_Exist == 1 || Cut_EndPoint_Michel_Exist == 1 || Cut_secEndPoint_Michel_Exist == 1 ){
-        interaction.hCut_Michel->Fill(1);
+        cutList.hCut_Michel->Fill(1);
     }else{
-        interaction.hCut_Michel->Fill(0);
+        cutList.hCut_Michel->Fill(0);
     } 
     if( Cut_Vertex_Michel_Exist == 1) return false;
     cutList.nCut_Vertex_Michel_Exist.increment(truth_isSignal, study1, study2);
@@ -475,8 +505,8 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_secEndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
     
     // Fill PreFilter Cut Hists
-    interaction.hCut_eVis_nuclearTarget->Fill(evis_NuclearTarget);
-    interaction.hCut_eVis_other->Fill(evis_TotalExceptNuclearTarget);
+    cutList.hCut_eVis_nuclearTarget->Fill(evis_NuclearTarget);
+    cutList.hCut_eVis_other->Fill(evis_TotalExceptNuclearTarget);
     if( Cut_PreFilter_Pi0 == 1) return false;
     cutList.nCut_PreFilter_Pi0.increment(truth_isSignal, study1, study2);
     
@@ -487,23 +517,23 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_BlobsBad.increment(truth_isSignal, study1, study2);
 
     // Fill Blob Data
-    fillBlobData();
+    //fillBlobData();
 
     if ( applyPi0BlobCuts && isPi0BlobBad() ) return false;
     cutList.nCut_Pi0BlobCuts.increment(truth_isSignal, study1, study2);
 
     // Fill Gamma1 Conv Length Cut Hist
-    interaction.hCut_gamma1ConvDist->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1);
+    cutList.hCut_gamma1ConvDist->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1);
     if (applyPhotonDistance && CCProtonPi0_gamma1_dist_vtx * 0.1 < minPhotonDistance) return false;
     cutList.nCut_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
 
     // Fill Gamma2 Conv Length Cut Hist
-    interaction.hCut_gamma2ConvDist->Fill(CCProtonPi0_gamma2_dist_vtx * 0.1);
+    cutList.hCut_gamma2ConvDist->Fill(CCProtonPi0_gamma2_dist_vtx * 0.1);
     if (applyPhotonDistance && CCProtonPi0_gamma2_dist_vtx * 0.1 < minPhotonDistance) return false;
     cutList.nCut_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
 
     // Fill Pi0 Invariant Mass Cut Hist
-    interaction.hCut_pi0invMass->Fill(CCProtonPi0_pi0_invMass);
+    cutList.hCut_pi0invMass->Fill(CCProtonPi0_pi0_invMass);
     if( CCProtonPi0_pi0_invMass < min_Pi0_invMass || CCProtonPi0_pi0_invMass > max_Pi0_invMass ) return false;
     cutList.nCut_Pi0_invMass.increment(truth_isSignal, study1, study2);
    
@@ -534,10 +564,10 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
                 // Use LLR for KE > pID_KE_Limit
                 if (CCProtonPi0_proton_ekin[i] < pID_KE_Limit ){
                     double pIDDiff = CCProtonPi0_protonScore[i] - CCProtonPi0_pionScore[i];
-                    interaction.hCut_protonScore_pIDDiff->Fill(pIDDiff);
+                    cutList.hCut_protonScore_pIDDiff->Fill(pIDDiff);
                     if ( pIDDiff < minPIDDiff ) return false;
                 }else{
-                    interaction.hCut_protonScore_LLR->Fill(CCProtonPi0_protonScore_LLR[i]);
+                    cutList.hCut_protonScore_LLR->Fill(CCProtonPi0_protonScore_LLR[i]);
                     if ( CCProtonPi0_protonScore_LLR[i] < minProtonScore_LLR ) return false;
                 }
             }
@@ -545,7 +575,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         cutList.nCut_2Prong_ProtonScore.increment(truth_isSignal, study1, study2);
         
         double delta_invMass = calcDeltaInvariantMass();
-        interaction.hCut_deltaInvMass->Fill(delta_invMass);
+        cutList.hCut_deltaInvMass->Fill(delta_invMass);
         if (applyDeltaInvMass){
             if ( delta_invMass < min_Delta_invMass || delta_invMass > max_Delta_invMass) return false;  
         }
@@ -559,15 +589,15 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     //      Muon + Pi0 + X (No Meson)
     //-------------------------------------------------------------------------
     // Fill Neutrino Energy Cut Hists
-    if(nProngs == 1) interaction.hCut_1Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
-    if(nProngs >= 2) interaction.hCut_2Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV); 
+    if(nProngs == 1) cutList.hCut_1Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
+    if(nProngs >= 2) cutList.hCut_2Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV); 
     if( applyBeamEnergy && ((CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV) > max_beamEnergy)) return false;
     if(nProngs == 1) cutList.nCut_1Prong_beamEnergy.increment(truth_isSignal, study1, study2);
     if(nProngs >= 2) cutList.nCut_2Prong_beamEnergy.increment(truth_isSignal, study1, study2);
    
     // Fill Unused Energy Cut Hists 
-    if(nProngs == 1) interaction.hCut_1Prong_UnusedE->Fill(energyUnused_afterReco);
-    if(nProngs >= 2) interaction.hCut_2Prong_UnusedE->Fill(energyUnused_afterReco);
+    if(nProngs == 1) cutList.hCut_1Prong_UnusedE->Fill(energyUnused_afterReco);
+    if(nProngs >= 2) cutList.hCut_2Prong_UnusedE->Fill(energyUnused_afterReco);
     if( applyUnusedE && (energyUnused_afterReco > maxUnusedE)) return false;
     if(nProngs == 1) cutList.nCut_1Prong_UnusedE.increment(truth_isSignal, study1, study2);
     if(nProngs >= 2) cutList.nCut_2Prong_UnusedE.increment(truth_isSignal, study1, study2);
@@ -741,7 +771,7 @@ void CCProtonPi0_Analyzer::closeTextFiles()
 void CCProtonPi0_Analyzer::openTextFiles()
 {
     cout<<"Opening Text Files:"<<endl;
-    
+   
     logFileName = Folder_List::output + Folder_List::textOut + branchDir + "LogFile.txt";
     logFile.open(logFileName.c_str());
     if( !logFile.is_open() ){
@@ -1011,21 +1041,22 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         cout<<"Reading Playlist: "<<playlist.c_str()<<endl;
     }
     
-    
-   while (input_pl) {
-     input_pl>>filename;
+    while (input_pl) {
+        input_pl>>filename;
      
-     if (!input_pl) break;
+        if (!input_pl) break;
     
-     if (filename[0] != '/') break;
+        if (filename[0] != '/') break;
     
-     fChain->Add( filename.c_str() );
-//      cout<<" Added "<<filename.c_str()<<endl;
-   }
+        fChain->Add( filename.c_str() );
+        //cout<<" Added "<<filename.c_str()<<endl;
+    }
+
 
    // Set branch addresses and branch pointers
    fChain->SetMakeClass(1);
-      fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
+
+   fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("physEvtNum", &physEvtNum, &b_physEvtNum);
    fChain->SetBranchAddress("n_hyps", &n_hyps, &b_n_hyps);
    fChain->SetBranchAddress("processType", &processType, &b_processType);
@@ -1571,9 +1602,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("prong_part_mass", prong_part_mass, &b_prong_part_mass);
    fChain->SetBranchAddress("prong_part_charge", prong_part_charge, &b_prong_part_charge);
    fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
-   fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
-   fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
-
+//   fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
+//   fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
 
 }
 
