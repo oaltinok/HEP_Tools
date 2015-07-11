@@ -16,7 +16,7 @@ Function: makeClass()
 
 void makeClass(){
 
-    string playlist = "../Input/Playlists/pl_MC_v2_13b.dat";
+    string playlist = "../Input/Playlists/pl_MC_All.dat";
     TChain fChain("CCProtonPi0") ;
 
     ifstream input_pl( playlist.c_str() );
@@ -40,6 +40,6 @@ void makeClass(){
      cout<<" Added "<<filename.c_str()<<endl;
    }
 
-    fChain.MakeClass("MC_Sample2");
+    fChain.MakeClass("MC_Sample");
 
 }

@@ -101,7 +101,6 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_Vertex_Count.set_Name("Vertex_Count");  
     nCut_Muon_None.set_Name("Muon_None");              
     nCut_Muon_Not_Plausible.set_Name("Muon_Not_Plausible");
-    nCut_Muon_Score_Low.set_Name("Muon_Score_Low");
     nCut_Muon_Charge.set_Name("Muon_Charge");
     nCut_Vertex_Michel_Exist.set_Name("Vertex_Michel_Exist"); 
     nCut_EndPoint_Michel_Exist.set_Name("EndPoint_Michel_Exist");
@@ -188,7 +187,6 @@ void CCProtonPi0_CutList::formCutVector()
     nCutVector.push_back(nCut_Vertex_Count); 
     nCutVector.push_back(nCut_Muon_None);              
     nCutVector.push_back(nCut_Muon_Not_Plausible);
-    nCutVector.push_back(nCut_Muon_Score_Low);
     nCutVector.push_back(nCut_Muon_Charge);
     nCutVector.push_back(nCut_Vertex_Michel_Exist); 
     nCutVector.push_back(nCut_EndPoint_Michel_Exist);

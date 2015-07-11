@@ -42,7 +42,7 @@ main.cpp
 
 using namespace std;
 
-string pl_reduce = "Input/Playlists/pl_MC_v2_13b.dat"; 
+string pl_reduce = "Input/Playlists/pl_MC_All.dat"; 
 string pl_analyze = "Input/Playlists/pl_MC_Reduced.dat"; 
 
 const string runOption_Run = "run";

@@ -20,8 +20,6 @@ CCProtonPi0
 
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Version:        v2_13
-    
 ================================================================================
 */
 #ifndef CCPROTONPI0_H 
@@ -38,7 +36,6 @@ CCProtonPi0
 
 class IAnchoredTrackFormation;
 class IBlobCreatorUtils;
-class ICCPionIncUtils;
 class ICalorimetryUtils;
 class IConeUtilsTool;
 class IEnergyCorrectionTool;
@@ -51,7 +48,6 @@ class IHitTaggerTool;
 class IHoughBlob;
 class IHoughTool;
 class IIDAnchoredBlobCreator;
-class IMCTrackTool;
 class IMichelTool;
 class IMinervaCoordSysTool;
 class IMinervaMathTool;
@@ -59,7 +55,6 @@ class IMinervaObjectAssociator;
 class IODProngClassificationTool;
 class IParticleMakerTool;
 class IParticleTool;
-class IProngClassificationTool;
 class IProtonUtils;
 class IRecoObjectTimeTool;
 class IVertexEnergyStudyTool;
@@ -118,29 +113,13 @@ class CCProtonPi0 : public MinervaAnalysisTool
         
         double m_beamAngleBias;
         
-        double m_detectableGammaE;
-        double m_detectablePi0KE;
-        double m_detectableProtonKE;
-        
-        double m_minMuonScore;
-        double m_minProtonScore;
-        
         // Algorihm Flow
         bool m_writeFSParticle_Table;
         bool m_store_all_events;
-        bool m_makeShortTracks;
         bool m_DoPlausibilityCuts;
         bool m_DoTruthMatch;
-        bool m_reconstruct_NoProtonEvents;
         bool m_applyExtraMichelCuts;
-        
-        // Tool Names
-        std::string m_particleToolName;
-        std::string m_particleToolAlias;
-        std::string m_protonUtilsAlias;
-        std::string m_michelTrkToolAlias;
-        std::string m_michelVtxToolAlias;
-        
+            
         // Prong and Cluster Colors
         int m_Color_muonProng;
         int m_Color_protonProng;
@@ -157,7 +136,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int m_Color_VertexSphere;
         int m_Color_RejectedBlob;
              
-        // VtxBlob
+        // VertexBlob
         bool 	 m_sphereVertex;
         double  m_maxSearchD;
         double  m_maxStartingD;
@@ -166,12 +145,10 @@ class CCProtonPi0 : public MinervaAnalysisTool
         double  m_maxSearchDFila;
         double  m_maxStartingDFila;
         double  m_maxSearchGapFila;
-        bool    m_filterClusterTypes;
         bool    fSkipLowEnergyClusterVtxEnergy;
         bool    fThresholdVertexEnergy;
         
         // ConeBlobs
-        double m_qOverpChargeCut;      ///< q/p charge cut
         double m_energyHoughlimit;     ///< Energy limit to start using Hough T.
         double m_rejectedClustersTime; ///< window time  to allow clusters
         
@@ -182,16 +159,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         double m_UVMatchTolerance;
         double m_UVMatchMoreTolerance;
   
-        double m_extraEnergyCylinderRadius;           ///< Cylinder Cut (mm) 
-        double m_extraEnergyCylinderUpstreamLength;   ///< Cylinder Cut (mm) 
-        double m_extraEnergyCylinderDownstreamLength; ///< Cylinder Cut (mm) 
-        double m_extraEnergyLowerTimeWindow;          ///< Cylinder Cut (ns) 
-        double m_extraEnergyUpperTimeWindow;          ///< Cylinder Cut (ns) 
-        double m_extraEnergyPECut;                    ///< Cylinder Cut (MeV)?
-        
-        double m_maxSeedLongTrackChi2;
-        double m_maxSeedShortTrackChi2;
-        
         TRandom3*                 m_randomGen;
         unsigned long int         m_randomSeed;
         
@@ -204,7 +171,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         
         IAnchoredTrackFormation* m_anchoredTracker;
         IBlobCreatorUtils* m_blobUtils;
-        ICCPionIncUtils* m_ccPionIncUtils;
         ICalorimetryUtils* m_caloUtils;
         IConeUtilsTool* m_coneUtilsTool;
         IEnergyCorrectionTool* m_energyCorrectionTool;
@@ -216,9 +182,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IHitTaggerTool* m_hitTagger;
         IHoughBlob* m_idHoughBlob;
         IHoughTool* m_idHoughTool;
-        IIDAnchoredBlobCreator* m_idConeScanBlob;
         IIDAnchoredBlobCreator* m_stopPointBlobTool;
-        IMCTrackTool* m_MCTrackTool;
         IMichelTool* m_michelTrkTool;
         IMichelTool* m_michelVtxTool;
         IMinervaCoordSysTool* m_coordSysTool;
@@ -227,8 +191,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IODProngClassificationTool* m_odMatchTool;
         IParticleMakerTool* m_particleMaker;
         IParticleTool* m_LikelihoodPIDTool;
-        IParticleTool* m_particleTool;
-        IProngClassificationTool* m_prongIntersection;
         IProtonUtils* m_protonUtils;
         IRecoObjectTimeTool* m_recoTimeTool;
         IVertexEnergyStudyTool* m_vertexEnergyStudyTool;
@@ -243,12 +205,12 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool ConeBlobs( Minerva::PhysicsEvent *event ) const;
         bool PreFilterPi0( Minerva::PhysicsEvent *event ) const;
         bool AreBlobsGood() const;
-        void VtxBlob( Minerva::PhysicsEvent *event ) const;
+        void VertexBlob( Minerva::PhysicsEvent *event ) const;
         bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
         bool checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const;
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
-        bool createTrackedParticles(Minerva::ProngVect& prongs ) const;
-        bool getProtonProng(    Minerva::ProngVect& primaryProngs ) const;
+        bool createTrackedParticles(Minerva::PhysicsEvent *event ) const;
+        bool getProtonProng(Minerva::PhysicsEvent *event ) const;
         bool isBackgroundQELike(Minerva::GenMinInteraction* truthEvent) const;
         bool isMichelProngGood(Minerva::Prong &michelProng) const;
         bool isMotherPrimary(std::vector<int>& motherList, int mother ) const;
@@ -290,6 +252,22 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void setTrackDirection( Minerva::Track* track, Minerva::Vertex* vertex ) const;
         Minerva::IDClusterVect getClusters( Minerva::PhysicsEvent* event ) const;
         bool createdAnchoredShortTracks( Minerva::PhysicsEvent* event, Minerva::Vertex* vertex, bool make_primary_short_tracks ) const;
+        void SetVertexCount(Minerva::PhysicsEvent *event) const;
+        void RefitVertex_Using_AnchoredShortTracks(Minerva::PhysicsEvent *event) const;
+        bool vertexInFiducialVolume(Minerva::PhysicsEvent *event) const;
+        bool vertexInRecoVolume(Minerva::PhysicsEvent *event) const;
+        bool hasEventVertex(Minerva::PhysicsEvent *event) const;
+        bool ShouldReconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const;
+        bool isMuonPlausible(Minerva::PhysicsEvent *event) const;
+        bool hasEventMinosMatchedMuon(Minerva::PhysicsEvent *event) const;
+        bool isMuonChargeNegative(Minerva::PhysicsEvent *event) const;
+        void tagPrimaryMuon(Minerva::PhysicsEvent *event) const;
+        bool VertexHasMichels(Minerva::PhysicsEvent *event) const;
+        bool TrackEndPointHasMichels(Minerva::PhysicsEvent *event) const;
+        void SaveEventTime(Minerva::PhysicsEvent *event) const;
+        void ColorUnusedIDClusters(Minerva::PhysicsEvent *event) const;
+        void SaveEventVisibleEnergy(Minerva::PhysicsEvent *event) const;
+        int GetNPrimaryProngs(Minerva::PhysicsEvent *event) const;
 };
 
 #endif // CCPROTONPI0_H 

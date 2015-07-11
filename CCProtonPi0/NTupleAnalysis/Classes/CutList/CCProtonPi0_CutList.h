@@ -49,7 +49,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_Vertex_Count;
         CCProtonPi0_Cut nCut_Muon_None;              
         CCProtonPi0_Cut nCut_Muon_Not_Plausible;
-        CCProtonPi0_Cut nCut_Muon_Score_Low;
         CCProtonPi0_Cut nCut_Muon_Charge;
         CCProtonPi0_Cut nCut_Vertex_Michel_Exist; 
         CCProtonPi0_Cut nCut_EndPoint_Michel_Exist;
