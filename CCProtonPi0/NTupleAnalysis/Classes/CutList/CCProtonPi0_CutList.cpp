@@ -16,7 +16,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(int nMode) : CCProtonPi0_NTupleAnalysis
         SetCutNames();
         OpenOutputFile();
 
-        rootDir = Folder_List::rootOut_reduced + "CutHistograms.root";
+       rootDir = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms.root";
         
         cout<<"\tRoot File: "<<rootDir<<endl;
  

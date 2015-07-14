@@ -5,7 +5,7 @@
 
 using namespace std;
 
-CCProtonPi0_MichelTool::CCProtonPi0_MichelTool(int nMode) : CCProtonPi0_NTupleAnalysis(nMode)
+CCProtonPi0_MichelTool::CCProtonPi0_MichelTool(int nMode, bool isMC) : CCProtonPi0_NTupleAnalysis(nMode)
 {
     cout<<"Initializing CCProtonPi0_MichelTool"<<endl;
     
@@ -13,7 +13,8 @@ CCProtonPi0_MichelTool::CCProtonPi0_MichelTool(int nMode) : CCProtonPi0_NTupleAn
         cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
     }else{
         // File Locations
-        rootDir = Folder_List::rootOut_analyzed + branchDir + "MichelTool.root";
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + branchDir + "MichelTool.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + branchDir + "MichelTool.root";      
 
         cout<<"\tRoot File: "<<rootDir<<endl;
         

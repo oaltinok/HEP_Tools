@@ -5,7 +5,6 @@ Class: MichelTool
     Generates Michel Tool specific Histograms
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_05_07
 ================================================================================
 */
 
@@ -31,7 +30,7 @@ Class: MichelTool
 class CCProtonPi0_MichelTool : public CCProtonPi0_NTupleAnalysis
 {
     public: 
-        CCProtonPi0_MichelTool(int nMode);
+        CCProtonPi0_MichelTool(int nMode, bool isMC);
         void write_RootFile();
 
         // Histograms 

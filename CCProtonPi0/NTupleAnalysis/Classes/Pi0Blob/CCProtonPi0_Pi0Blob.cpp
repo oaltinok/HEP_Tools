@@ -8,15 +8,17 @@
 
 using namespace std;
 
-CCProtonPi0_Pi0Blob::CCProtonPi0_Pi0Blob(int nMode) : CCProtonPi0_NTupleAnalysis(nMode)
+CCProtonPi0_Pi0Blob::CCProtonPi0_Pi0Blob(int nMode, bool isMC) : CCProtonPi0_NTupleAnalysis(nMode)
 {
     cout<<"Initializing CCProtonPi0_Pi0Blob"<<endl;
 
     if(nMode == 0){
         cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
     }else{
-        rootDir = Folder_List::rootOut_analyzed + branchDir + "Pi0Blob.root";
-        
+        // File Locations
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + branchDir + "Pi0Blob.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + branchDir + "Pi0Blob.root";      
+
         cout<<"\tRoot File: "<<rootDir<<endl;
      
         // Create Root File 

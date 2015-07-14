@@ -27,7 +27,7 @@ using namespace std;
 class CCProtonPi0_Pi0Blob : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_Pi0Blob(int nMode);
+        CCProtonPi0_Pi0Blob(int nMode, bool isMC);
 
         void write_RootFile();
 

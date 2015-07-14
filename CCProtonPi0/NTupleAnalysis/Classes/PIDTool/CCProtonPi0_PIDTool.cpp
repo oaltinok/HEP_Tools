@@ -8,6 +8,28 @@
 
 using namespace std;
 
+CCProtonPi0_PIDTool::CCProtonPi0_PIDTool(int nMode, bool isMC) : CCProtonPi0_NTupleAnalysis(nMode)
+{
+    cout<<"Initializing CCProtonPi0_PIDTool"<<endl;
+     
+    if(nMode == 0){
+        cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
+    }else{
+        // File Locations
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + branchDir + "PIDStatistics.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + branchDir + "PIDStatistics.root";      
+        
+        cout<<"\tRoot File: "<<rootDir<<endl;
+        
+        // Create Root File 
+        f = new TFile(rootDir.c_str(),"RECREATE");
+        
+        initHistograms();   
+    }
+    cout<<"Done!"<<endl;
+
+}
+
 void CCProtonPi0_PIDTool::get_pID_Stats()
 {
     get_pID_Stats_LLR();
@@ -151,27 +173,6 @@ void CCProtonPi0_PIDTool::FillHistograms(   double protonScore_LLR, double proto
     
 }
 
-
-CCProtonPi0_PIDTool::CCProtonPi0_PIDTool(int nMode) : CCProtonPi0_NTupleAnalysis(nMode)
-{
-    cout<<"Initializing CCProtonPi0_PIDTool"<<endl;
-     
-    if(nMode == 0){
-        cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
-    }else{
-        // File Locations
-        rootDir = Folder_List::rootOut_analyzed + branchDir + "PIDStatistics.root";
-
-        cout<<"\tRoot File: "<<rootDir<<endl;
-        
-        // Create Root File 
-        f = new TFile(rootDir.c_str(),"RECREATE");
-        
-        initHistograms();   
-    }
-    cout<<"Done!"<<endl;
-
-}
 
 void CCProtonPi0_PIDTool::initHistograms()
 {

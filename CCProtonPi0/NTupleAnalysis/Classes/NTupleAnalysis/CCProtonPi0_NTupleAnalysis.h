@@ -18,6 +18,8 @@ Class: CCProtonPi0_NTupleAnalysis
 #include <cstdlib>
 #include <string>
 
+#include "Cintex/Cintex.h"
+
 #include "../../Libraries/Folder_List.h"
 
 using namespace std;

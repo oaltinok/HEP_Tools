@@ -32,7 +32,7 @@ using namespace std;
 class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_Interaction(int nMode);
+        CCProtonPi0_Interaction(int nMode, bool isMC);
         
         void write_RootFile();
         

@@ -8,14 +8,15 @@
 
 using namespace std;
 
-CCProtonPi0_Interaction::CCProtonPi0_Interaction(int nMode) : CCProtonPi0_NTupleAnalysis(nMode)
+CCProtonPi0_Interaction::CCProtonPi0_Interaction(int nMode, bool isMC) : CCProtonPi0_NTupleAnalysis(nMode)
 {
     cout<<"Initializing CCProtonPi0_Interaction"<<endl;
     
     if(nMode == 0){
         cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
     }else{
-        rootDir = Folder_List::rootOut_analyzed + branchDir + "Interaction.root";
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed +  branchDir + "Interaction.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + branchDir + "Interaction.root";
         
         cout<<"\tRoot File: "<<rootDir<<endl;
  

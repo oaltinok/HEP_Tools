@@ -13,29 +13,24 @@ Class: CCProtonPi0_Pion -> Derived Class from Particle Base Clas
 
 #include "../Particle/CCProtonPi0_Particle.h"
 
+using namespace PlotUtils;
+
 class CCProtonPi0_Pion : public CCProtonPi0_Particle
 {
     public:
-        CCProtonPi0_Pion(int nMode);
-        ~CCProtonPi0_Pion();
-        void set_kineticEnergy(bool isMC);
-
-        TH1D* gamma1_ConvLength;
-        TH1D* gamma2_ConvLength;
-        TH2D* ConvLength_gamma2_gamma1;
-           
-        TH1D* photonEnergy_Asymmetry;
-        TH1D* photonEnergy_Asymmetry_true;
-
-        TH1D* invMass;
+        MnvH1D* gamma1_ConvLength;
+        MnvH1D* gamma2_ConvLength;
+        MnvH2D* ConvLength_gamma2_gamma1;
+        MnvH1D* photonEnergy_Asymmetry;
+        MnvH1D* invMass;
  
-    private:
+        CCProtonPi0_Pion(int nMode, bool isMC);
         void initHistograms();
+        void writeHistograms();
 
-        static const double restMass = 134.98;
-        
+    private:
         CCProtonPi0_SingleBin bin_invMass;
-        CCProtonPi0_SingleBin bin_blob_energy;
+        CCProtonPi0_SingleBin bin_photonEnergy_Asymmetry;
         CCProtonPi0_SingleBin bin_photonConvLength;
 
 };

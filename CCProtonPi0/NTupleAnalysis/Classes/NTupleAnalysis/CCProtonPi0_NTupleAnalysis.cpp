@@ -7,6 +7,8 @@ using namespace std;
 
 CCProtonPi0_NTupleAnalysis::CCProtonPi0_NTupleAnalysis(int nMode)
 {
+    ROOT::Cintex::Cintex::Enable();
+    
     SetAnalysisMode(nMode);
 }
 

@@ -39,12 +39,6 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin deltaInvMass;
         CCProtonPi0_SingleBin preFilter_Status;
         CCProtonPi0_SingleBin preFilter_RejectedEnergy;
-
-        
-        CCProtonPi0_SingleBin muonE;
-        CCProtonPi0_SingleBin pionE;
-        CCProtonPi0_SingleBin protonKE;
-        
         
         // Analysis
         CCProtonPi0_SingleBin beamE;

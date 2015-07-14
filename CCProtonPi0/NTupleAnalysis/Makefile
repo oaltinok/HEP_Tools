@@ -45,25 +45,29 @@ ALLOTHERCPP = $(BINLISTCPP) $(SINGLEBINCPP) $(CUTLISTCPP) $(CUTCPP) $(CUTSTATCPP
 # ALL Classes Required for the Package
 ALLCPP = $(MAINCPP) $(NTUPLEANALYSISCPP) $(ANALYZERCPP) $(ALLPARTICLESCPP) $(ALLTOOLCPP) $(ALLOTHERCPP) $(PLOTTERCPP)
 
+# PlotUtils from MINERvA Framework
+INCLUDES += -I$(PLOTUTILSROOT)/ -I$(UNFOLDUTILSROOT)/
+LDLIBS += -L$(PLOTUTILSROOT)/$(CMTCONFIG) -lplotutils -L$(UNFOLDUTILSROOT)/$(CMTCONFIG) -lUnfoldUtils
+
 # ------------------------------------------------------------------------------
 # Commands and Flags
 # ------------------------------------------------------------------------------
 CC = g++
-CFLAGS = -c -Wall -Wextra
-ROOTFLAGS = `root-config --libs --cflags`
+CFLAGS = -g -Wall -Wextra
+ROOTFLAGS = `root-config --glibs --cflags`
 RM = rm -f
 
 SOURCES = $(ALLCPP)
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = $(MAINEXE)
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(ROOTFLAGS) $(OBJECTS) -o $@
+	$(CC) $(ROOTFLAGS) $(CFLAGS) $(INCLUDES) -o $(EXECUTABLE) $(OBJECTS) $(LDLIBS) 
 
 .cpp.o:
-	$(CC) $(ROOTFLAGS) $(CFLAGS) $< -o $@
+	$(CC) $(ROOTFLAGS) $(CFLAGS) $(INCLUDES) -c $< -o $@
 	
 clean: 
 	$(RM) $(MAINEXE) $(OBJECTS)

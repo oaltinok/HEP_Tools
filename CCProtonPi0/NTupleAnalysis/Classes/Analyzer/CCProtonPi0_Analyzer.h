@@ -51,7 +51,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
     
     public :
   
-        CCProtonPi0_Analyzer(int nMode);
+        CCProtonPi0_Analyzer(int nMode, bool isMC);
         ~CCProtonPi0_Analyzer();
 
         // --------------------------------------------------------------------
@@ -70,7 +70,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void specifyRunTime();
         void openTextFiles();
         void closeTextFiles();
-        void fillHistograms();
         void fill_mc_w();
         void writeScanFile();
         void writeFSParticle4P(Long64_t nEntry);
@@ -93,8 +92,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         //  Pion Specific Functions
         void getPi0Family();
         void fillBlobData();
-        void fillPionTrue();
-        void fillPionReco();
+        void fillPi0True();
+        void fillPi0Reco();
         bool isPi0BlobBad();
 
         //  Default Functions
@@ -106,7 +105,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         CCProtonPi0_Interaction interaction;
         CCProtonPi0_Muon muon;
         CCProtonPi0_Proton proton;
-        CCProtonPi0_Pion pion;
+        CCProtonPi0_Pion pi0;
         CCProtonPi0_Pi0Blob pi0Blob;
         CCProtonPi0_PIDTool pIDTool;
         CCProtonPi0_BackgroundTool bckgTool;
@@ -118,6 +117,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool isMichelStudy;
         
         // Other Variables
+        bool m_isMC;
         bool isScanRun;
         bool isDataAnalysis;
         bool hasParticleTruthInfo;

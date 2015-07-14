@@ -36,14 +36,14 @@ main.cpp
 // Include Required Classes
 #include "Classes/Analyzer/CCProtonPi0_Analyzer.h"
 #include "Classes/Plotter/CCProtonPi0_Plotter.h"
+#include "Cintex/Cintex.h"
 
 #include <string>
 #include <ctime>
 
 using namespace std;
 
-string pl_reduce = "Input/Playlists/pl_MC_All.dat"; 
-string pl_analyze = "Input/Playlists/pl_MC_Reduced.dat"; 
+bool isMC = false;
 
 const string runOption_Run = "run";
 const string runOption_Plot = "plot";
@@ -74,13 +74,27 @@ int main(int argc, char *argv[] )
     double timeDiff;
     int timeDiff_m;
     int timeDiff_s;
-       
+    string pl_reduce;
+    string pl_analyze;
+
     // Check User Command
     if ( !isValidCommand(argc, argv)){
         showInputError(argv);
         return 0;
     }
     
+    if (isMC){
+        cout<<"MC Playlists Selected!"<<endl;
+        pl_reduce = "Input/Playlists/pl_MC_Merged.dat"; 
+        pl_analyze = "Input/Playlists/pl_MC_Reduced.dat"; 
+    }else{
+        cout<<"Data Playlists Selected!"<<endl;
+        pl_reduce = "Input/Playlists/pl_Data_Merged.dat"; 
+        pl_analyze = "Input/Playlists/pl_Data_Reduced.dat"; 
+    }
+   
+    ROOT::Cintex::Cintex::Enable();
+  
     if (isModeReduce(argc,argv)){
         Reduce(pl_reduce);
     }else{
@@ -105,23 +119,24 @@ int main(int argc, char *argv[] )
     return 0;
 }
 
+
 void Reduce(string playlist)
 {
     // nMode == 0 for Reduce Mode
     int nMode = 0;
-    CCProtonPi0_Analyzer t(nMode);
+    CCProtonPi0_Analyzer t(nMode,isMC);
     t.reduce(playlist);
 }
 
 void Plot(int nMode)
 {
-    CCProtonPi0_Plotter p(nMode);
+    CCProtonPi0_Plotter p(nMode, isMC);
     p.plotHistograms();
 }
 
 void Analyze(string playlist, int nMode)
 {
-    CCProtonPi0_Analyzer t(nMode);
+    CCProtonPi0_Analyzer t(nMode, isMC);
     t.analyze(playlist);
 }
 

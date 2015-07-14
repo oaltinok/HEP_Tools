@@ -26,8 +26,12 @@ namespace Folder_List
     //-------------------------------------------------------------------------
     // Data files on /minerva/data/ Disk
     //-------------------------------------------------------------------------
-    const std::string rootOut_analyzed = "/minerva/data/users/oaltinok/NTupleAnalysis/Analyzed/";
-    const std::string rootOut_reduced = "/minerva/data/users/oaltinok/NTupleAnalysis/Reduced/"; 
+    const std::string rootOut = "/minerva/data/users/oaltinok/NTupleAnalysis/";
+    const std::string MC = "MC/";
+    const std::string Data = "Data/";
+    
+    const std::string analyzed = "Analyzed/";
+    const std::string reduced = "Reduced/"; 
 
     //-------------------------------------------------------------------------
     // NTuple Analysis Output

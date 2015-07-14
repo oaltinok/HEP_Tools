@@ -1,12 +1,11 @@
-cvs commit -m "v2_16
+cvs commit -m "v2_17
 CCProtonPi0 Updates:
-	Refactored reconstructEvent() Function
-		Removed Unused Cuts
-		Improved Modular Design
-	Reorganized Tools and Services
-		Removed Unused Tools
-		Initialize all tools under one try-catch 
-	Saving Leading Proton Kinematics in addition to all_protons
+	No Major Changes
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	No Major Changes" .
+	Integrated <PlotUtils> and <UnfoldUtils> to the package
+	Refactored Particle Classes
+		Improved performance by removing all calculations
+		Minerva style histograms
+	Refactored Plotter to use <MnvPlotter>
+	Reorganized Input/Output Mechanism" .

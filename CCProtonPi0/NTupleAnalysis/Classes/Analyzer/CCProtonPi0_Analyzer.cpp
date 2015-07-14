@@ -57,8 +57,11 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
 {
-    // Open File
-    string rootDir = Folder_List::rootOut_reduced + "ReducedNTuple.root";
+
+    string rootDir;
+    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple.root";
+    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple.root";
+
     cout<<"Reducing NTuple Files to a single file"<<endl;
     cout<<"\tRoot File: "<<rootDir<<endl;
     TFile* f = new TFile(rootDir.c_str(),"RECREATE");
@@ -206,32 +209,36 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     // Write Root Files
     //--------------------------------------------------------------------------
     interaction.write_RootFile();
-    muon.write_RootFile();
-    proton.write_RootFile();
-    pion.write_RootFile();
+    muon.writeHistograms();
+    proton.writeHistograms();
+    pi0.writeHistograms();
     pi0Blob.write_RootFile();
     if(is_pID_Studies) pIDTool.write_RootFile();
     if(isMichelStudy) michelTool.write_RootFile();
     
 }
 
+    
 //------------------------------------------------------------------------------
 //  Constructor
 //------------------------------------------------------------------------------
-CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(int nMode) : 
+CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(int nMode, bool isMC) : 
     CCProtonPi0_NTupleAnalysis(nMode),
-    interaction(nMode),
-    muon(nMode),
-    proton(nMode),
-    pion(nMode),
-    pi0Blob(nMode),
-    pIDTool(nMode),
+    interaction(nMode, isMC),
+    muon(nMode, isMC),
+    proton(nMode, isMC),
+    pi0(nMode, isMC),
+    pi0Blob(nMode, isMC),
+    pIDTool(nMode, isMC),
     bckgTool(nMode),
-    michelTool(nMode),
+    michelTool(nMode, isMC),
     cutList(nMode)
 {   
     cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
+    
     specifyRunTime();
+    
+    m_isMC = isMC;
     
     if (nMode == 0){
         cout<<"\tNTuple Reduce Mode -- Will not create Text Files"<<endl;
@@ -363,7 +370,7 @@ void CCProtonPi0_Analyzer::fillData()
     // Fill Reconstructed Information
     fillInteractionReco();
     fillMuonReco();
-    fillPionReco();
+    fillPi0Reco();
     if(nProngs > 1) fillProtonReco();
     
     // Fill Truth Information if Exist and Set Errors
@@ -371,16 +378,8 @@ void CCProtonPi0_Analyzer::fillData()
         fillInteractionTrue();
         fillMuonTrue();
         if(nProngs > 1) fillProtonTrue();
-        fillPionTrue();
-        
-        muon.set_errors();
-        proton.set_errors();
-        pion.set_errors();
+        fillPi0True();
     }
-    
-    // Fill Histograms
-    fillHistograms();            
-   
 }
 
 //------------------------------------------------------------------------------
@@ -390,8 +389,6 @@ void CCProtonPi0_Analyzer::fillData()
 bool CCProtonPi0_Analyzer::analyzeEvent()
 {
     bool isAnalyzable;
-    
-    hasParticleTruthInfo = true;
     
     if ( anaMode == 1 ){
         if( truth_isSignal) isAnalyzable = true;
@@ -578,7 +575,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         }
         cutList.nCut_2Prong_DeltaInvMass.increment(truth_isSignal, study1, study2);
     }
-   
 
     //-------------------------------------------------------------------------
     // Different Statistics for Different Topologies
@@ -599,7 +595,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if(nProngs == 1) cutList.nCut_1Prong_UnusedE.increment(truth_isSignal, study1, study2);
     if(nProngs >= 2) cutList.nCut_2Prong_UnusedE.increment(truth_isSignal, study1, study2);
         
-    
     return true;
     
 }
@@ -743,14 +738,6 @@ void CCProtonPi0_Analyzer::writeScanFile()
     }
 }
 
-
-void CCProtonPi0_Analyzer::fillHistograms()
-{
-    muon.fill_Histograms();
-    pion.fill_Histograms();
-    proton.fill_Histograms();
-}
-
 void CCProtonPi0_Analyzer::closeTextFiles()
 {
     logFile.close();
@@ -818,54 +805,22 @@ void CCProtonPi0_Analyzer::openTextFiles()
 
 void CCProtonPi0_Analyzer::fillProtonTrue()
 {   
-    // Fill 4-Momentum
-    proton.set_p4(  CCProtonPi0_trajProtonProngPx[indRecoProton],
-                    CCProtonPi0_trajProtonProngPy[indRecoProton],
-                    CCProtonPi0_trajProtonProngPz[indRecoProton],
-                    CCProtonPi0_trajProtonProngEnergy[indRecoProton],
-                    true);
-       
-    // set Angle wrt Beam
-    proton.set_angleBeam(beam_p3, true);
-    
-    // set Angle wrt Muon
-    proton.set_angleMuon(muon, true);
-    
+    // Do Nothing! 
 }
 
 void CCProtonPi0_Analyzer::fillProtonReco()
 {  
-    // Set Particle Score
-    proton.particleScore = CCProtonPi0_proton_LLRScore;
-
-    // Fill 4-Momentum
-    proton.set_p4(  CCProtonPi0_proton_px,
-                    CCProtonPi0_proton_py,
-                    CCProtonPi0_proton_pz,
-                    CCProtonPi0_proton_E,
-                    false);
-    
-    // set Angle wrt Beam
-    proton.set_angleBeam(beam_p3, false);
-    
-    // set Angle wrt Muon
-    proton.set_angleMuon(muon, false);
-    
+    // Unique Histograms
+    proton.partScore->Fill(CCProtonPi0_proton_LLRScore);
     proton.trackLength->Fill(CCProtonPi0_proton_length);
     proton.trackKinked->Fill(CCProtonPi0_proton_kinked);
-  
-    if (CCProtonPi0_trajProtonProngPDG[indRecoProton] == 2212){
-        double p_true = CCProtonPi0_trajProtonProngMomentum[indRecoProton];
-        double p_reco = CCProtonPi0_proton_P;
-        double p_reco_modified = 1.050 * p_reco;
-        double error = (p_reco - p_true) /  p_true; 
-        double error_mod = (p_reco_modified - p_true)/p_true;
-        
-        failText[1]<<CCProtonPi0_trajProtonProngMomentum[indRecoProton]<<"\t"<<CCProtonPi0_proton_P<<endl;
-        
-        interaction.proton_p->Fill(error);
-        interaction.proton_p_shifted->Fill(error_mod);
-    }
+ 
+    // Standard Histograms
+    proton.E->Fill(CCProtonPi0_proton_E);
+    proton.P->Fill(CCProtonPi0_proton_P);
+    proton.KE->Fill(CCProtonPi0_proton_ekin);
+    proton.theta->Fill(CCProtonPi0_proton_theta * TMath::RadToDeg());
+    proton.phi->Fill(CCProtonPi0_proton_phi * TMath::RadToDeg());
 }
 
 
@@ -891,36 +846,7 @@ void CCProtonPi0_Analyzer::findRecoProton()
     indRecoProton = tempInd;
 }
 
-void CCProtonPi0_Analyzer::fillPionReco()
-{
-    double photon_E_asym;
-    
-    // Fill 4-Momentum
-    pion.set_p4(    CCProtonPi0_pi0_px,
-                    CCProtonPi0_pi0_py,
-                    CCProtonPi0_pi0_pz,
-                    CCProtonPi0_pi0_E,
-                    false);
-    
-    // set Angle wrt Beam
-    pion.set_angleBeam(beam_p3, false);
-    
-    // set Angle wrt Muon
-    pion.set_angleMuon(muon, false);
-    
-    // Set Invariant Mass
-    pion.invMass->Fill(CCProtonPi0_pi0_invMass);
-    
-    // Set Photon Conversion Length in [cm]
-    pion.gamma1_ConvLength->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1);
-    pion.gamma2_ConvLength->Fill(CCProtonPi0_gamma2_dist_vtx * 0.1);
-    pion.ConvLength_gamma2_gamma1->Fill(CCProtonPi0_gamma2_dist_vtx, CCProtonPi0_gamma1_dist_vtx);
-        
-    // Set Photon Energy Assymmetry
-    photon_E_asym = abs((CCProtonPi0_gamma1_E - CCProtonPi0_gamma2_E) / (CCProtonPi0_gamma1_E + CCProtonPi0_gamma2_E));  
-    pion.photonEnergy_Asymmetry->Fill(photon_E_asym);
 
-}
 
 void CCProtonPi0_Analyzer::fillBlobData()
 {
@@ -952,69 +878,45 @@ void CCProtonPi0_Analyzer::fillBlobData()
     //cout<<"g1dedx1 = "<<g1dedx1<<endl;
     //cout<<"g1dedx_nplane = "<<g1dedx_nplane<<endl;
     //cout<<"-----"<<endl;
-    // 
+
 }
 
-void CCProtonPi0_Analyzer::fillPionTrue()
+void CCProtonPi0_Analyzer::fillPi0True()
 {
-    // Fill 4-Momentum
-    if (truth_pi0_4P[3] != -1){
-        pion.set_p4(truth_pi0_4P[0],
-                    truth_pi0_4P[1],
-                    truth_pi0_4P[2],
-                    truth_pi0_4P[3],
-                    true);
-    }else{
-        cout<<"gamma1_E = "<<truth_gamma1_4P[3]<<" gamma2_E = "<<truth_gamma2_4P[3]<<endl;
-        pion.set_p4(truth_gamma1_4P[0]+truth_gamma2_4P[0] ,
-                    truth_gamma1_4P[1]+truth_gamma2_4P[1],
-                    truth_gamma1_4P[2]+truth_gamma2_4P[2],
-                    truth_gamma1_4P[3]+truth_gamma2_4P[3],
-                    true);
-    }
-    
-    // set Angle wrt Beam
-    pion.set_angleBeam(beam_p3, true);
-    
-    // set Angle wrt Muon
-    pion.set_angleMuon(muon, true);
+  // Do Nothing 
 }
 
+void CCProtonPi0_Analyzer::fillPi0Reco()
+{
+    // Unique Histograms
+    pi0.invMass->Fill(CCProtonPi0_pi0_invMass);
+    pi0.gamma1_ConvLength->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1);
+    pi0.gamma2_ConvLength->Fill(CCProtonPi0_gamma2_dist_vtx * 0.1);
+    pi0.ConvLength_gamma2_gamma1->Fill(CCProtonPi0_gamma2_dist_vtx, CCProtonPi0_gamma1_dist_vtx);
+    
+    double photon_E_asym = abs((CCProtonPi0_gamma1_E - CCProtonPi0_gamma2_E) / (CCProtonPi0_gamma1_E + CCProtonPi0_gamma2_E));  
+    pi0.photonEnergy_Asymmetry->Fill(photon_E_asym);
+    
+    // Standard Histograms
+    pi0.E->Fill(CCProtonPi0_pi0_E);
+    pi0.P->Fill(CCProtonPi0_pi0_P);
+    pi0.KE->Fill(0);
+    pi0.theta->Fill(CCProtonPi0_pi0_theta);
+    pi0.phi->Fill(CCProtonPi0_pi0_phi);
+        
+}
 void CCProtonPi0_Analyzer::fillMuonTrue()
 {
-
-    // Fill 4-Momentum
-    muon.set_p4(    truth_muon_4P[0] * HEP_Functions::MeV_to_GeV,
-                    truth_muon_4P[1] * HEP_Functions::MeV_to_GeV,
-                    truth_muon_4P[2] * HEP_Functions::MeV_to_GeV,
-                    truth_muon_4P[3], 
-                    true);
-       
-    // set Angle wrt Beam
-    muon.set_angleBeam(beam_p3, true);
-    
-    // set Angle wrt Muon
-    muon.set_angleMuon(muon, true);
-    
+    // Do Nothing
 }
 
 void CCProtonPi0_Analyzer::fillMuonReco()
 {
-    // Set Particle Score
-    muon.particleScore = CCProtonPi0_muon_muScore;
-    
-    // Fill 4-Momentum
-    muon.set_p4(    CCProtonPi0_muon_px * HEP_Functions::MeV_to_GeV,
-                    CCProtonPi0_muon_py * HEP_Functions::MeV_to_GeV,
-                    CCProtonPi0_muon_pz * HEP_Functions::MeV_to_GeV,
-                    CCProtonPi0_muon_E * HEP_Functions::MeV_to_GeV,
-                    false);
-    
-    // set Angle wrt Beam
-    muon.set_angleBeam(beam_p3, false);
-    
-    // set Angle wrt Muon
-    muon.set_angleMuon(muon, false);
+    muon.E->Fill(CCProtonPi0_muon_E * 0.001);
+    muon.P->Fill(CCProtonPi0_muon_P * 0.001);
+    muon.KE->Fill(0);
+    muon.theta->Fill(CCProtonPi0_muon_theta * TMath::RadToDeg());
+    muon.phi->Fill(0);
 }
 
 

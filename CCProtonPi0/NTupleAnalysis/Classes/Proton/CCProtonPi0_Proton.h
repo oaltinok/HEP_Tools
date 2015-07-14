@@ -12,21 +12,22 @@ Class: CCProtonPi0_Proton -> Derived Class from Particle Base Clas
 
 #include "../Particle/CCProtonPi0_Particle.h"
 
+using namespace PlotUtils;
+
 class CCProtonPi0_Proton : public CCProtonPi0_Particle
 {
     public:
-        CCProtonPi0_Proton(int nMode);
-        void set_kineticEnergy(bool isMC);
-        
-        TH1D* trackLength;
-        TH1D* trackKinked;
-                
+        MnvH1D* trackLength;
+        MnvH1D* trackKinked;
+        MnvH1D* partScore;
+
+        CCProtonPi0_Proton(int nMode,bool isMC);
+        void initHistograms();
+        void writeHistograms();
+    
     private:
-        static const double restMass = 938.27;
         CCProtonPi0_SingleBin bin_trackLength;
         CCProtonPi0_SingleBin bin_trackKinked;
-        void initHistograms();        
-        
 };
 
 

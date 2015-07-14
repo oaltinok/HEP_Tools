@@ -7,22 +7,21 @@
 
 #include "CCProtonPi0_Plotter.h"
 
-using namespace std;
+using namespace PlotUtils;
 
 void CCProtonPi0_Plotter::plotHistograms()
 {
+    //Test_Plots();
+    plotMuon();
+    plotProton();
+    plotPion();
+ 
     if (isSignalvsBackground){
          //plotSignalBackground();
          //plotCutHistograms();
     }else{
-         plotInteraction();
-        
-         //plotMuon();
-        
-         //plotProton();
-        
-        //plotPion();
-        
+         //plotInteraction();
+               
 //        plotPID();
         
 //         plot_mc_w_Stacked();
@@ -33,7 +32,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     
 }
 
-void CCProtonPi0_Plotter::plot_purity_efficiency(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir, bool keepEventstoRight)
+void CCProtonPi0_Plotter::plot_purity_efficiency(TH1D* h_signal, TH1D* h_background, std::string fileName, std::string plotDir, bool keepEventstoRight)
 {
     // ------------------------------------------------------------------------
     // Create Histograms
@@ -119,7 +118,7 @@ void CCProtonPi0_Plotter::plot_purity_efficiency(TH1D* h_signal, TH1D* h_backgro
     int bin_max = h_purity_efficiency->GetMaximumBin();
     double best_cut = h_purity_efficiency->GetBinLowEdge(bin_max);
 
-    string x_title = h_purity_efficiency->GetXaxis()->GetTitle();
+    std::string x_title = h_purity_efficiency->GetXaxis()->GetTitle();
     
     h_purity_efficiency->GetXaxis()->SetTitle(Form("%s%s%f",x_title.c_str()," Best Cut = ",best_cut));
     h_purity_efficiency->GetYaxis()->SetTitle(Form("%s%f","Purity x Efficiency, Max = ",value_max));
@@ -128,12 +127,12 @@ void CCProtonPi0_Plotter::plot_purity_efficiency(TH1D* h_signal, TH1D* h_backgro
     // ------------------------------------------------------------------------
     // Plot Histograms
     // ------------------------------------------------------------------------
-    string tag;
+    std::string tag;
     if (keepEventstoRight) tag = "Right_";
     else tag = "Left_";
-    string purity_fName = tag + "purity_" + fileName;
-    string efficiency_fName = tag + "efficiency_" + fileName;
-    string purity_efficiency_fName = tag + "purity_efficiency_" + fileName;
+    std::string purity_fName = tag + "purity_" + fileName;
+    std::string efficiency_fName = tag + "efficiency_" + fileName;
+    std::string purity_efficiency_fName = tag + "purity_efficiency_" + fileName;
 
     plot1D_Hist(h_purity,purity_fName,plotDir);
     plot1D_Hist(h_efficiency,efficiency_fName,plotDir);
@@ -144,7 +143,7 @@ void CCProtonPi0_Plotter::plot_purity_efficiency(TH1D* h_signal, TH1D* h_backgro
     delete h_purity_efficiency;
 
 }
-void CCProtonPi0_Plotter::plotSignalRatio(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir, bool isReversed) 
+void CCProtonPi0_Plotter::plotSignalRatio(TH1D* h_signal, TH1D* h_background, std::string fileName, std::string plotDir, bool isReversed) 
 {
     TH1D* h_ratio = new TH1D;
     
@@ -174,14 +173,22 @@ void CCProtonPi0_Plotter::plotSignalRatio(TH1D* h_signal, TH1D* h_background, st
 }
 
 
-void CCProtonPi0_Plotter::inform(string rootDir, string plotDir)
+void CCProtonPi0_Plotter::inform(std::string rootDir, std::string plotDir)
 {
-    cout<<"------------ Plotting ------------"<<endl;
-    cout<<"Input File: "<<rootDir<<endl;
-    cout<<"Output Folder: "<<plotDir<<endl;
+    std::cout<<"------------ Plotting ------------"<<std::endl;
+    std::cout<<"Input File: "<<rootDir<<std::endl;
+    std::cout<<"Output Folder: "<<plotDir<<std::endl;
 }
 
-void CCProtonPi0_Plotter::plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir)
+void CCProtonPi0_Plotter::inform(std::string rootDir_mc, std::string rootDir_data, std::string plotDir)
+{
+    std::cout<<"------------ Plotting ------------"<<std::endl;
+    std::cout<<"MC Input File: "<<rootDir_mc<<std::endl;
+    std::cout<<"Data Input File: "<<rootDir_data<<std::endl;
+    std::cout<<"Plot Output Folder: "<<plotDir<<std::endl;
+}
+
+void CCProtonPi0_Plotter::plotStackedLogScale(TH1D* h_signal, TH1D* h_background, std::string plotName, std::string fileName, std::string plotDir)
 {
     TH1D* h_signalRatio = new TH1D;
     TH1D* h_backgroundRatio = new TH1D;
@@ -232,8 +239,8 @@ void CCProtonPi0_Plotter::plotStackedLogScale(TH1D* h_signal, TH1D* h_background
 }
 
 void CCProtonPi0_Plotter::plotStacked(TH1D* h_signal, TH1D* h_background, 
-                            string plotName, string fileName, string plotDir, 
-                            string signal_label, string background_label,
+                            std::string plotName, std::string fileName, std::string plotDir, 
+                            std::string signal_label, std::string background_label,
                             bool isRatioReversed)
 {
   
@@ -287,7 +294,42 @@ void CCProtonPi0_Plotter::plotStacked(TH1D* h_signal, TH1D* h_background,
     delete h_backgroundRatio;
 }
 
-void CCProtonPi0_Plotter::plot1D_HistLogScale(TH1D* hist1D, string fileName, string plotDir)
+void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir)
+{
+    std::string rootDir_mc = dir.mc_all;
+    std::string rootDir_data = dir.data;
+    
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+    TFile* f_data = new TFile(rootDir_data.c_str());
+    
+    MnvH1D* mc = (MnvH1D*)f_mc->Get(var_name.c_str());
+    MnvH1D* data = (MnvH1D*)f_data->Get(var_name.c_str()); 
+
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas();
+ 
+    // POT Normalize
+    const int POT_exp = 19;
+    const double POT_mc = 90.89; // E+19
+    const double POT_data = 9.56; // E+19
+    double weight = POT_data/POT_mc;
+   
+    plotter->DrawDataMC(data, mc, weight, "TR", false);
+    
+    // Add Plot Labels
+    const double y_pos = 0.88;
+    const double y_diff = 0.033;
+    //plotter->AddPlotLabel("MINERvA Preliminary",0.3,y_pos,y_diff,kBlue);
+    plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
+    plotter->AddPlotLabel("POT Normalized",0.3,y_pos-2*y_diff, y_diff); 
+    plotter->AddPlotLabel(Form("%3.2fE%d Data POT",POT_data,POT_exp),0.3,y_pos-3*y_diff,y_diff);
+
+    // Print Plot
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+
+    delete c;
+}
+void CCProtonPi0_Plotter::plot1D_HistLogScale(TH1D* hist1D, std::string fileName, std::string plotDir)
 {
     TCanvas* c1 = new TCanvas();
     c1->SetLogy();
@@ -309,7 +351,7 @@ void CCProtonPi0_Plotter::plot1D_HistLogScale(TH1D* hist1D, string fileName, str
 }
 
 
-void CCProtonPi0_Plotter::plot1D_Hist(TH1D* hist1D, string fileName, string plotDir)
+void CCProtonPi0_Plotter::plot1D_Hist(TH1D* hist1D, std::string fileName, std::string plotDir)
 {
     TCanvas* c1 = new TCanvas();
     hist1D->SetLineColor(kRed);
@@ -328,7 +370,7 @@ void CCProtonPi0_Plotter::plot1D_Hist(TH1D* hist1D, string fileName, string plot
     
 }
 
-void CCProtonPi0_Plotter::plot2D_Hist(TH2D* hist2D, string fileName, string plotDir)
+void CCProtonPi0_Plotter::plot2D_Hist(TH2D* hist2D, std::string fileName, std::string plotDir)
 {
     // Canvas
     Double_t w = 800; 
@@ -365,69 +407,87 @@ void CCProtonPi0_Plotter::plot2D_Hist(TH2D* hist2D, string fileName, string plot
 //      2) Background Events
 //      Other) All Events
 //------------------------------------------------------------------------------
-CCProtonPi0_Plotter::CCProtonPi0_Plotter(int nMode)
+CCProtonPi0_Plotter::CCProtonPi0_Plotter(int nMode, bool isMC)
 {
     isSignalvsBackground = false;
+
+    m_isMC = isMC;
     
     if ( nMode == 1) {
-        cout<<"----------------------------------------------------------------------"<<endl;
-        cout<<"Plot Mode: Signal - Only Signal Events will be Plotted"<<endl;
+        std::cout<<"----------------------------------------------------------------------"<<std::endl;
+        std::cout<<"Plot Mode: Signal - Only Signal Events will be Plotted"<<std::endl;
         branchInd = 0;
     }else if ( nMode == 2){
-        cout<<"----------------------------------------------------------------------"<<endl;
-        cout<<"Plot Mode: Background - Only Background Events will be Plotted"<<endl;
+        std::cout<<"----------------------------------------------------------------------"<<std::endl;
+        std::cout<<"Plot Mode: Background - Only Background Events will be Plotted"<<std::endl;
         branchInd = 1;
     }else if (nMode == 3){
-        cout<<"----------------------------------------------------------------------"<<endl;
-        cout<<"Plot Mode: All - All Events will be Plotted"<<endl;
+        std::cout<<"----------------------------------------------------------------------"<<std::endl;
+        std::cout<<"Plot Mode: All - All Events will be Plotted"<<std::endl;
         branchInd = 2;
     }else{
-        cout<<"----------------------------------------------------------------------"<<endl;
-        cout<<"Plot Mode: Signal vs Background"<<endl;
+        std::cout<<"----------------------------------------------------------------------"<<std::endl;
+        std::cout<<"Plot Mode: Signal vs Background"<<std::endl;
         isSignalvsBackground = true;
     }
     
-    cout<<"----------------------------------------------------------------------"<<endl;
-    
-    setFolders();
+    std::cout<<"----------------------------------------------------------------------"<<std::endl;
+   
+    setRootDirs(rootDir_Muon,"Muon.root");
+    setRootDirs(rootDir_Proton,"Proton.root");
+    setRootDirs(rootDir_Pion,"Pion.root");
+    setPlotDirs();
 }
 
-void CCProtonPi0_Plotter::setFolders()
+
+void CCProtonPi0_Plotter::setRootDirs(rootDir& dirs, std::string fileName )
 {
+    dirs.mc_signal = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + Folder_List::signal + fileName;
+    dirs.mc_background = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + Folder_List::background + fileName;
+    dirs.mc_all = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + Folder_List::allEvents + fileName;
+    dirs.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + Folder_List::allEvents + fileName;
+}
+
+
+void CCProtonPi0_Plotter::setPlotDirs()
+{
+    std::string dataType;
+
+    // MC Data Locations
     for ( int i = 0 ; i < nBranches; i++){
         
         // Set Branch: 0 = Signal, 1 = Background, Other = All Events
         if ( i == 0 ) branchDir = Folder_List::signal;
         else if ( i == 1) branchDir = Folder_List::background;
         else branchDir = Folder_List::allEvents;
-        
-        rootDir_Interaction[i] = Folder_List::rootOut_analyzed + branchDir + "Interaction.root";
+       
+        if (m_isMC) dataType = Folder_List::MC;
+        else dataType = Folder_List::Data;
+
+        rootDir_Interaction[i] = Folder_List::rootOut + dataType + branchDir + "Interaction.root";
         plotDir_Interaction[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Interaction/";
         
-        rootDir_PID[i] = Folder_List::rootOut_analyzed + branchDir + "PIDStatistics.root";
+        rootDir_PID[i] = Folder_List::rootOut + dataType + branchDir + "PIDStatistics.root";
         plotDir_PID[i] = Folder_List::output + Folder_List::plotOut + branchDir + "PIDStatistics/";
 
-        rootDir_Muon[i] = Folder_List::rootOut_analyzed + branchDir + "Muon.root";
         plotDir_Muon[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Muon/";
 
-        rootDir_Proton[i] = Folder_List::rootOut_analyzed + branchDir + "Proton.root";
         plotDir_Proton[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Proton/";
 
-        rootDir_Pion[i] = Folder_List::rootOut_analyzed + branchDir + "Pion.root";
         plotDir_Pion[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Pion/";
        
-        rootDir_Pi0Blob[i] = Folder_List::rootOut_analyzed + branchDir + "Pi0Blob.root";
+        rootDir_Pi0Blob[i] = Folder_List::rootOut + dataType + branchDir + "Pi0Blob.root";
         plotDir_Pi0Blob[i] = Folder_List::output + Folder_List::plotOut + branchDir + "Pion/";
-
     }
     
     otherDir = Folder_List::output + Folder_List::plotOut + Folder_List::other;
 }
 
+
 void CCProtonPi0_Plotter::plotInteraction()
 {
-    string rootDir = rootDir_Interaction[branchInd];
-    string plotDir = plotDir_Interaction[branchInd];
+    std::string rootDir = rootDir_Interaction[branchInd];
+    std::string plotDir = plotDir_Interaction[branchInd];
     
     inform(rootDir, plotDir);
     
@@ -457,8 +517,8 @@ void CCProtonPi0_Plotter::plotInteraction()
     int maxbin_normal = h_proton_p->GetMaximumBin();
     double max_normal_value = h_proton_p->GetBinLowEdge(maxbin_normal);
 
-    cout<<"Default Center = "<<max_normal_value<<endl;
-    cout<<"Shifted Center = "<<max_shifted_value<<endl;
+    std::cout<<"Default Center = "<<max_normal_value<<std::endl;
+    std::cout<<"Shifted Center = "<<max_shifted_value<<std::endl;
 
     // Enu 1 Track
     TH1D* h_Enu_1Track_mc= (TH1D*)f_Root->Get("Enu_1Track_mc");
@@ -575,146 +635,47 @@ void CCProtonPi0_Plotter::plotInteraction()
     
 }
 
-
-void CCProtonPi0_Plotter::plotParticleInfo(  string rootDir, string plotDir)
+void CCProtonPi0_Plotter::plotStandardHistograms(rootDir &dir, std::string plotDir)
 {
-
-    inform(rootDir, plotDir);
+    std::cout<<"Plotting Standard Histograms"<<std::endl;
     
-    TFile* f_Root = new TFile(rootDir.c_str());
-
-    TH1D* h_E_mc = (TH1D*)f_Root->Get("E_mc");
-    plot1D_Hist(h_E_mc,"P_mc.png",plotDir);
-    
-    TH1D* h_P_mc = (TH1D*)f_Root->Get("P_mc");
-    plot1D_Hist(h_P_mc,"P_mc.png",plotDir);
-    
-    TH1D* h_KE_mc = (TH1D*)f_Root->Get("KE_mc");
-    plot1D_Hist(h_KE_mc,"KE_mc.png",plotDir);
-    
-    TH1D* h_angleBeam_mc = (TH1D*)f_Root->Get("angleBeam_mc");
-    plot1D_Hist(h_angleBeam_mc,"angleBeam_mc.png",plotDir);
-    
-    TH1D* h_angleMuon_mc = (TH1D*)f_Root->Get("angleMuon_mc");
-    plot1D_Hist(h_angleMuon_mc,"angleMuon_mc.png",plotDir);
-
-    TH1D* h_partScore = (TH1D*)f_Root->Get("partScore");
-    plot1D_Hist(h_partScore,"partScore.png",plotDir);
-    
-    TH1D* h_E_reco = (TH1D*)f_Root->Get("E_reco");
-    plot1D_Hist(h_E_reco,"E_reco.png",plotDir);
-    plot1D_HistLogScale(h_E_reco,"E_reco_log.png",plotDir);
-    
-    TH1D* h_P_reco = (TH1D*)f_Root->Get("P_reco");
-    plot1D_Hist(h_P_reco,"P_reco.png",plotDir);
-    plot1D_HistLogScale(h_P_reco,"P_reco_log.png",plotDir);
-    
-    TH1D* h_KE_reco = (TH1D*)f_Root->Get("KE_reco");
-    plot1D_Hist(h_KE_reco,"KE_reco.png",plotDir);    
-    
-    TH1D* h_angleBeam_reco = (TH1D*)f_Root->Get("angleBeam_reco");
-    plot1D_Hist(h_angleBeam_reco,"angleBeam_reco.png",plotDir);
-    
-    TH1D* h_angleMuon_reco = (TH1D*)f_Root->Get("angleMuon_reco");
-    plot1D_Hist(h_angleMuon_reco,"angleMuon_reco.png",plotDir);
-
-    TH2D* h_E_reco_mc = (TH2D*)f_Root->Get("E_reco_mc");
-    plot2D_Hist(h_E_reco_mc,"E_reco_mc.png",plotDir);
-    
-    TH2D* h_P_reco_mc = (TH2D*)f_Root->Get("P_reco_mc");
-    plot2D_Hist(h_P_reco_mc,"P_reco_mc.png",plotDir);
-    
-    TH1D* h_E_error = (TH1D*)f_Root->Get("E_error");
-    plot1D_Hist(h_E_error,"E_error.png",plotDir);
-
-    TH1D* h_P_error = (TH1D*)f_Root->Get("P_error");
-    plot1D_Hist(h_P_error,"P_error.png",plotDir);
-    
-    TH2D* h_KE_reco_mc = (TH2D*)f_Root->Get("KE_reco_mc");
-    plot2D_Hist(h_KE_reco_mc,"KE_reco_mc.png",plotDir);
-    
-    TH1D* h_KE_error = (TH1D*)f_Root->Get("KE_error");
-    plot1D_Hist(h_KE_error,"KE_error.png",plotDir);
-    
-    TH2D* h_angleBeam_reco_mc = (TH2D*)f_Root->Get("angleBeam_reco_mc");
-    plot2D_Hist(h_angleBeam_reco_mc,"angleBeam_reco_mc.png",plotDir);
-    
-    TH1D* h_angleBeam_error = (TH1D*)f_Root->Get("angleBeam_error");
-    plot1D_Hist(h_angleBeam_error,"angleBeam_error.png",plotDir);
-    
-    TH2D* h_angleMuon_reco_mc = (TH2D*)f_Root->Get("angleMuon_reco_mc");
-    plot2D_Hist(h_angleMuon_reco_mc,"angleMuon_reco_mc.png",plotDir);
-    
-    TH1D* h_angleMuon_error = (TH1D*)f_Root->Get("angleMuon_error");
-    plot1D_Hist(h_angleMuon_error,"angleMuon_error.png",plotDir);
-
-    delete f_Root;
+    DrawDataMC(dir, "E", plotDir);
+    DrawDataMC(dir, "P", plotDir);
+    DrawDataMC(dir, "KE", plotDir);
+    DrawDataMC(dir, "theta", plotDir);
+    DrawDataMC(dir, "phi", plotDir);
 }
 
 void CCProtonPi0_Plotter::plotMuon()
 {
-    plotParticleInfo(rootDir_Muon[branchInd], plotDir_Muon[branchInd]);
+    std::string plotDir = plotDir_Muon[branchInd];
+    plotStandardHistograms(rootDir_Muon, plotDir);
 }
 
 void CCProtonPi0_Plotter::plotProton()
 {    
-    string rootDir = rootDir_Proton[branchInd];
-    string plotDir = plotDir_Proton[branchInd];
+    std::string plotDir = plotDir_Proton[branchInd];
     
-    // Standard Plots
-    plotParticleInfo(rootDir, plotDir);
-    
+    plotStandardHistograms(rootDir_Proton, plotDir);
+   
     // Unique Plots
-    TFile* f_Root = new TFile(rootDir.c_str());
-    
-    TH1D* h_trackLength = (TH1D*)f_Root->Get("trackLength");
-    plot1D_Hist(h_trackLength,"trackLength.png",plotDir);
-    
-    TH1D* h_trackKinked = (TH1D*)f_Root->Get("trackKinked");
-    plot1D_Hist(h_trackKinked,"trackKinked.png",plotDir);
-    
+    DrawDataMC(rootDir_Proton,"trackLength",plotDir);
+    DrawDataMC(rootDir_Proton,"trackKinked",plotDir);
+    DrawDataMC(rootDir_Proton,"partScore",plotDir);
 }
 
 void CCProtonPi0_Plotter::plotPion()
 {
-    string rootDir = rootDir_Pion[branchInd];
-    string plotDir = plotDir_Pion[branchInd];
+    std::string plotDir = plotDir_Pion[branchInd];
     
     // Standard Plots
-    plotParticleInfo(rootDir, plotDir);
+    plotStandardHistograms(rootDir_Pion, plotDir);
     
     // Unique Plots
-    TFile* f_Root = new TFile(rootDir.c_str());
-    
-    TH1D* h_invMass = (TH1D*)f_Root->Get("invMass");
-    plot1D_Hist(h_invMass,"invMass.png",plotDir);
-    
-    // Photon Conversion Length
-    TH1D* h_gamma1_ConvLength = (TH1D*)f_Root->Get("gamma1_ConvLength");
-    plot1D_Hist(h_gamma1_ConvLength,"gamma1_ConvLength.png",plotDir);
-    
-    TH1D* h_gamma2_ConvLength = (TH1D*)f_Root->Get("gamma2_ConvLength");
-    plot1D_Hist(h_gamma2_ConvLength,"gamma2_ConvLength.png",plotDir);
-    
-    TH2D* h_ConvLength_gamma2_gamma1 = (TH2D*)f_Root->Get("ConvLength_gamma2_gamma1");
-    plot2D_Hist(h_ConvLength_gamma2_gamma1,"ConvLength_gamma2_gamma1.png",plotDir);
-    
-    // nClusters
-    TH2D* h_nClusters_All_gamma2_gamma1 = (TH2D*)f_Root->Get("nClusters_All_gamma2_gamma1");
-    plot2D_Hist(h_nClusters_All_gamma2_gamma1,"nClusters_All_gamma2_gamma1.png",plotDir);
-    
-    // Gamma Energy
-    TH2D* h_Energy_gamma2_gamma1 = (TH2D*)f_Root->Get("Energy_gamma2_gamma1");
-    plot2D_Hist(h_Energy_gamma2_gamma1,"Energy_gamma2_gamma1.png",plotDir);
-    
-    TH1D* h_photonEnergy_Asymmetry = (TH1D*)f_Root->Get("photonEnergy_Asymmetry");
-    plot1D_Hist(h_photonEnergy_Asymmetry,"photonEnergy_Asymmetry.png",plotDir);
-    
-    TH1D* h_photonEnergy_Asymmetry_true = (TH1D*)f_Root->Get("photonEnergy_Asymmetry_true");
-    plot1D_Hist(h_photonEnergy_Asymmetry_true,"photonEnergy_Asymmetry_true.png",plotDir);
-   
-
-    delete f_Root;
+    DrawDataMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
+    DrawDataMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
+    DrawDataMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+    DrawDataMC(rootDir_Pion,"invMass",plotDir);
 }
 
 void CCProtonPi0_Plotter::plotCutHistograms()
@@ -805,7 +766,7 @@ void CCProtonPi0_Plotter::plotCutHistograms()
 
 void CCProtonPi0_Plotter::plotMichel()
 {
-    string rootDir = rootDir_Interaction[branchInd];
+    std::string rootDir = rootDir_Interaction[branchInd];
     
     inform(rootDir, otherDir);
     
@@ -934,7 +895,7 @@ void CCProtonPi0_Plotter::plotMichel()
 
 
 void CCProtonPi0_Plotter::MichelTool(TH1D* h_vertex, TH1D* h_track, TH1D* h_track2, TH1D* h_missed,
-                         string plotName, string fileName, string plotDir)
+                         std::string plotName, std::string fileName, std::string plotDir)
 {    
     TCanvas* c1 = new TCanvas();
     THStack *hs = new THStack("hs",plotName.c_str());
@@ -1046,48 +1007,48 @@ void CCProtonPi0_Plotter::plotSignalBackground()
     // Files
     //TFile* f_Root_Signal_Interaction = new TFile(rootDir_Interaction[0].c_str());
     //TFile* f_Root_Background_Interaction = new TFile(rootDir_Interaction[1].c_str());
-    TFile* f_Root_Signal_Muon = new TFile(rootDir_Muon[0].c_str());
-    TFile* f_Root_Background_Muon = new TFile(rootDir_Muon[1].c_str());
-    TFile* f_Root_Signal_Proton = new TFile(rootDir_Proton[0].c_str());
-    TFile* f_Root_Background_Proton = new TFile(rootDir_Proton[1].c_str());
-    TFile* f_Root_Signal_Pion = new TFile(rootDir_Pion[0].c_str());
-    TFile* f_Root_Background_Pion = new TFile(rootDir_Pion[1].c_str());
-
-    TH1D* h_signal_P_Muon = (TH1D*)f_Root_Signal_Muon->Get("P_reco");
-    TH1D* h_background_P_Muon = (TH1D*)f_Root_Background_Muon->Get("P_reco");
-    plotStacked(h_signal_P_Muon, h_background_P_Muon,"Muon Momentum [GeV]", "P_Muon.png", otherDir);
-    
-    TH1D* h_signal_angleBeam_reco_Muon = (TH1D*)f_Root_Signal_Muon->Get("angleBeam_reco");
-    TH1D* h_background_angleBeam_reco_Muon = (TH1D*)f_Root_Background_Muon->Get("angleBeam_reco");
-    plotStacked(h_signal_angleBeam_reco_Muon, h_background_angleBeam_reco_Muon,"Muon Angle wrt Beam", "angleBeam_reco_Muon.png", otherDir);
-
-    TH1D* h_signal_P_Proton = (TH1D*)f_Root_Signal_Proton->Get("P_reco");
-    TH1D* h_background_P_Proton = (TH1D*)f_Root_Background_Proton->Get("P_reco");
-    plotStacked(h_signal_P_Proton, h_background_P_Proton,"Proton Momentum [MeV]", "P_Proton.png", otherDir);
-    plotStackedLogScale(h_signal_P_Proton, h_background_P_Proton,"Proton Momentum [MeV]", "P_Proton_Log.png", otherDir);
-    
-    TH1D* h_signal_angleBeam_reco_Proton = (TH1D*)f_Root_Signal_Proton->Get("angleBeam_reco");
-    TH1D* h_background_angleBeam_reco_Proton = (TH1D*)f_Root_Background_Proton->Get("angleBeam_reco");
-    plotStacked(h_signal_angleBeam_reco_Proton, h_background_angleBeam_reco_Proton,"Proton Angle wrt Beam", "angleBeam_reco_Proton.png", otherDir);
-    plotStackedLogScale(h_signal_angleBeam_reco_Proton, h_background_angleBeam_reco_Proton,"Proton Angle wrt Beam", "angleBeam_reco_Proton_Log.png", otherDir);
-
-    TH1D* h_signal_P_Pion = (TH1D*)f_Root_Signal_Pion->Get("P_reco");
-    TH1D* h_background_P_Pion = (TH1D*)f_Root_Background_Pion->Get("P_reco");
-    plotStacked(h_signal_P_Pion, h_background_P_Pion,"Pion Momentum [MeV]", "P_Pion.png", otherDir);
-    
-    TH1D* h_signal_angleBeam_reco_Pion = (TH1D*)f_Root_Signal_Pion->Get("angleBeam_reco");
-    TH1D* h_background_angleBeam_reco_Pion = (TH1D*)f_Root_Background_Pion->Get("angleBeam_reco");
-    plotStacked(h_signal_angleBeam_reco_Pion, h_background_angleBeam_reco_Pion,"Pion Angle wrt Beam", "angleBeam_reco_Pion.png", otherDir);
-
+//    TFile* f_Root_Signal_Muon = new TFile(rootDir_Muon[0].c_str());
+//    TFile* f_Root_Background_Muon = new TFile(rootDir_Muon[1].c_str());
+//    TFile* f_Root_Signal_Proton = new TFile(rootDir_Proton[0].c_str());
+//    TFile* f_Root_Background_Proton = new TFile(rootDir_Proton[1].c_str());
+//    TFile* f_Root_Signal_Pion = new TFile(rootDir_Pion[0].c_str());
+//    TFile* f_Root_Background_Pion = new TFile(rootDir_Pion[1].c_str());
+//
+//    TH1D* h_signal_P_Muon = (TH1D*)f_Root_Signal_Muon->Get("P_reco");
+//    TH1D* h_background_P_Muon = (TH1D*)f_Root_Background_Muon->Get("P_reco");
+//    plotStacked(h_signal_P_Muon, h_background_P_Muon,"Muon Momentum [GeV]", "P_Muon.png", otherDir);
+//    
+//    TH1D* h_signal_angleBeam_reco_Muon = (TH1D*)f_Root_Signal_Muon->Get("angleBeam_reco");
+//    TH1D* h_background_angleBeam_reco_Muon = (TH1D*)f_Root_Background_Muon->Get("angleBeam_reco");
+//    plotStacked(h_signal_angleBeam_reco_Muon, h_background_angleBeam_reco_Muon,"Muon Angle wrt Beam", "angleBeam_reco_Muon.png", otherDir);
+//
+//    TH1D* h_signal_P_Proton = (TH1D*)f_Root_Signal_Proton->Get("P_reco");
+//    TH1D* h_background_P_Proton = (TH1D*)f_Root_Background_Proton->Get("P_reco");
+//    plotStacked(h_signal_P_Proton, h_background_P_Proton,"Proton Momentum [MeV]", "P_Proton.png", otherDir);
+//    plotStackedLogScale(h_signal_P_Proton, h_background_P_Proton,"Proton Momentum [MeV]", "P_Proton_Log.png", otherDir);
+//    
+//    TH1D* h_signal_angleBeam_reco_Proton = (TH1D*)f_Root_Signal_Proton->Get("angleBeam_reco");
+//    TH1D* h_background_angleBeam_reco_Proton = (TH1D*)f_Root_Background_Proton->Get("angleBeam_reco");
+//    plotStacked(h_signal_angleBeam_reco_Proton, h_background_angleBeam_reco_Proton,"Proton Angle wrt Beam", "angleBeam_reco_Proton.png", otherDir);
+//    plotStackedLogScale(h_signal_angleBeam_reco_Proton, h_background_angleBeam_reco_Proton,"Proton Angle wrt Beam", "angleBeam_reco_Proton_Log.png", otherDir);
+//
+//    TH1D* h_signal_P_Pion = (TH1D*)f_Root_Signal_Pion->Get("P_reco");
+//    TH1D* h_background_P_Pion = (TH1D*)f_Root_Background_Pion->Get("P_reco");
+//    plotStacked(h_signal_P_Pion, h_background_P_Pion,"Pion Momentum [MeV]", "P_Pion.png", otherDir);
+//    
+//    TH1D* h_signal_angleBeam_reco_Pion = (TH1D*)f_Root_Signal_Pion->Get("angleBeam_reco");
+//    TH1D* h_background_angleBeam_reco_Pion = (TH1D*)f_Root_Background_Pion->Get("angleBeam_reco");
+//    plotStacked(h_signal_angleBeam_reco_Pion, h_background_angleBeam_reco_Pion,"Pion Angle wrt Beam", "angleBeam_reco_Pion.png", otherDir);
+//
 }
 
  
 void CCProtonPi0_Plotter::plot_mc_w_Stacked()
 {
-    string rootDir = rootDir_Interaction[branchInd];
-    string plotDir = plotDir_Interaction[branchInd];
+    std::string rootDir = rootDir_Interaction[branchInd];
+    std::string plotDir = plotDir_Interaction[branchInd];
     
-    cout<<"\nPlottting Stacked mc_w"<<endl;
+    std::cout<<"\nPlottting Stacked mc_w"<<std::endl;
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());
@@ -1127,10 +1088,10 @@ void CCProtonPi0_Plotter::plot_mc_w_Stacked()
 
 void CCProtonPi0_Plotter::plot_final_mc_w_Stacked()
 {
-    string rootDir = rootDir_Interaction[branchInd];
-    string plotDir = plotDir_Interaction[branchInd];
+    std::string rootDir = rootDir_Interaction[branchInd];
+    std::string plotDir = plotDir_Interaction[branchInd];
     
-    cout<<"\nPlottting Stacked final_mc_w"<<endl;
+    std::cout<<"\nPlottting Stacked final_mc_w"<<std::endl;
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());
@@ -1180,10 +1141,10 @@ void CCProtonPi0_Plotter::plotPID()
 
 void CCProtonPi0_Plotter::KE()
 {
-    string rootDir = rootDir_PID[branchInd];
-    string plotDir = plotDir_PID[branchInd];
+    std::string rootDir = rootDir_PID[branchInd];
+    std::string plotDir = plotDir_PID[branchInd];
     
-    cout<<"\nPlottting Kinetic Energy Plots"<<endl;
+    std::cout<<"\nPlottting Kinetic Energy Plots"<<std::endl;
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());
@@ -1200,10 +1161,10 @@ void CCProtonPi0_Plotter::KE()
 
 void CCProtonPi0_Plotter::pIDStats()
 {
-    string rootDir = rootDir_PID[branchInd];
-    string plotDir = plotDir_PID[branchInd];
+    std::string rootDir = rootDir_PID[branchInd];
+    std::string plotDir = plotDir_PID[branchInd];
     
-    cout<<"\nPlottting pID Statistics"<<endl;
+    std::cout<<"\nPlottting pID Statistics"<<std::endl;
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());
@@ -1229,10 +1190,10 @@ void CCProtonPi0_Plotter::pIDStats()
 
 void CCProtonPi0_Plotter::pID_proton()
 {
-    string rootDir = rootDir_PID[branchInd];
-    string plotDir = plotDir_PID[branchInd];
+    std::string rootDir = rootDir_PID[branchInd];
+    std::string plotDir = plotDir_PID[branchInd];
     
-    cout<<"\nPlottting pID for Proton"<<endl;
+    std::cout<<"\nPlottting pID for Proton"<<std::endl;
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());
@@ -1287,10 +1248,10 @@ void CCProtonPi0_Plotter::pID_proton()
 
 void CCProtonPi0_Plotter::pIDDiff()
 {
-    string rootDir = rootDir_PID[branchInd];
-    string plotDir = plotDir_PID[branchInd];
+    std::string rootDir = rootDir_PID[branchInd];
+    std::string plotDir = plotDir_PID[branchInd];
     
-    cout<<"\nPlottting pIDDiff"<<endl;
+    std::cout<<"\nPlottting pIDDiff"<<std::endl;
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());
@@ -1344,10 +1305,10 @@ void CCProtonPi0_Plotter::pIDDiff()
 
 void CCProtonPi0_Plotter::plot_2D_pID()
 {
-    string rootDir = rootDir_PID[branchInd];
-    string plotDir = plotDir_PID[branchInd];
+    std::string rootDir = rootDir_PID[branchInd];
+    std::string plotDir = plotDir_PID[branchInd];
     
-    cout<<"\nPlottting 2D pID Plots"<<endl;
+    std::cout<<"\nPlottting 2D pID Plots"<<std::endl;
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());
@@ -1377,10 +1338,10 @@ void CCProtonPi0_Plotter::plot_2D_pID()
 
 void CCProtonPi0_Plotter::pID_proton_LLR()
 {
-    string rootDir = rootDir_PID[branchInd];
-    string plotDir = plotDir_PID[branchInd];
+    std::string rootDir = rootDir_PID[branchInd];
+    std::string plotDir = plotDir_PID[branchInd];
     
-    cout<<"\nPlottting pID for Proton"<<endl;
+    std::cout<<"\nPlottting pID for Proton"<<std::endl;
     inform(rootDir, plotDir);
     
     TFile* f_Root = new TFile(rootDir.c_str());
@@ -1432,6 +1393,7 @@ void CCProtonPi0_Plotter::pID_proton_LLR()
     delete c1;
     
 }
+
 
 #endif
 

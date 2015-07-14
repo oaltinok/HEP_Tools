@@ -5105,10 +5105,9 @@ bool CCProtonPi0::TrackEndPointHasMichels(Minerva::PhysicsEvent *event) const
         }
     }//end loop over primary prongs
     
-    return false;
-
     debug()<<"Exit CCProtonPi0::TrackEndPointHasMichels"<<endmsg;
- 
+    
+    return false;
 }
 
 int CCProtonPi0::GetNPrimaryProngs(Minerva::PhysicsEvent *event) const

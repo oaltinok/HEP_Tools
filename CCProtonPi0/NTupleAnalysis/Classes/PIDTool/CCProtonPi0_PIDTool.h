@@ -29,7 +29,7 @@ class CCProtonPi0_PIDTool : public CCProtonPi0_NTupleAnalysis
 {
     public:
         // Functions
-        CCProtonPi0_PIDTool(int nMode);
+        CCProtonPi0_PIDTool(int nMode, bool isMC);
         void FillHistograms(double protonScore_LLR, double protonScore, double pionScore,
                             int truthPDG, double prongE);
         void get_pID_Stats();

@@ -9,7 +9,7 @@ Class: CCProtonPi0_Plotter
     Usage:
         > #include "Classes/Plotter/CCProtonPi0_Plotter.cpp" 
         > CCProtonPi0_Plotter p;
-        > p.plotHistograms(string mcFile, string plotDir)
+        > p.plotHistograms(std::string mcFile, std::string plotDir)
             
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
@@ -32,10 +32,23 @@ Class: CCProtonPi0_Plotter
 #include <TLegend.h>
 #include <TGraph.h>
 #include <TVectorD.h>
+#include <PlotUtils/MnvPlotter.h>
+#include <PlotUtils/MnvH1D.h>
+#include <PlotUtils/MnvH2D.h>
+#include <PlotUtils/MnvFluxConstraint.h>
+#include "Cintex/Cintex.h"
 
 #include "../../Libraries/Folder_List.h"
 
-using namespace std;
+using namespace PlotUtils;
+
+struct rootDir
+{
+    std::string mc_signal;
+    std::string mc_background;
+    std::string mc_all;
+    std::string data;
+};
 
 const int nBranches = 3;
 
@@ -48,30 +61,44 @@ class CCProtonPi0_Plotter
         //         mcFile-> name of the .root file
         //         plotDir -> folder name for the plots will be created         
         //--------------------------------------------------------------------------
-        CCProtonPi0_Plotter(int nMode);
-        void setFolders();
+        CCProtonPi0_Plotter(int nMode, bool isMC);
         void plotHistograms();
-        void inform(string rootDir, string plotDir);
         
-        // Plottting Macros
-        void plot1D_Hist(TH1D* hist1D, string fileName, string plotDir);
-        void plot2D_Hist(TH2D* hist2D, string fileName, string plotDir);
-        void plot1D_HistLogScale(TH1D* hist1D, string fileName, string plotDir);
-        void plotStacked(TH1D* h_signal, TH1D* h_background, 
-                            string plotName, string fileName, string plotDir, 
-                            string signal_label = "Signal", string background_label = "Background",
-                            bool isRatioReversed = false);
-        void plotStackedLogScale(TH1D* h_signal, TH1D* h_background, string plotName, string fileName, string plotDir);
-        void plotSignalRatio(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir, bool isReversed = false);
-        void plot_purity_efficiency(TH1D* h_signal, TH1D* h_background, string fileName, string plotDir, bool keepEventstoRight = true);
+    private:
+        bool m_isMC;
+        bool isSignalvsBackground;
+        int branchInd;
+        std::string branchDir;
+        std::string otherDir;
+
+        rootDir rootDir_Muon;
+        rootDir rootDir_Proton;
+        rootDir rootDir_Pion;
+
+        std::string rootDir_Interaction[nBranches];
+        std::string plotDir_Interaction[nBranches];
         
-         // Default Plots - File: Default_Plots.cpp
+        std::string rootDir_PID[nBranches];
+        std::string plotDir_PID[nBranches];
+        
+        std::string plotDir_Muon[nBranches];
+        std::string plotDir_Proton[nBranches];
+        std::string plotDir_Pion[nBranches];
+        
+        std::string rootDir_Pi0Blob[nBranches];
+        std::string plotDir_Pi0Blob[nBranches];
+  
+        void inform(std::string rootDir_mc, std::string rootDir_data, std::string plotDir);
+        void inform(std::string rootDir, std::string plotDir);
+        void setRootDirs(rootDir& dirs, std::string fileName );
+        void setPlotDirs();
+       
+        // Default Plots - File: Default_Plots.cpp
         void plotInteraction();
         void plotMuon();
         void plotProton();
         void plotPion();
-        void plotParticleInfo(  string rootDir, string plotDir);
-                                
+        
         // pID Plots - File: pID_Plots.cpp
         void plotPID();
         void pID_proton();
@@ -88,34 +115,23 @@ class CCProtonPi0_Plotter
         void plotSignalBackground_Pi0Blob();
         void plotCutHistograms();
         void plotMichel();
-        void MichelTool(TH1D* vertex, TH1D* track, TH1D* track2, TH1D* missed,
-                         string plotName, string fileName, string plotDir);
+        void MichelTool(TH1D* vertex, TH1D* track, TH1D* track2, TH1D* missed, std::string plotName, std::string fileName, std::string plotDir);
+        void plotStandardHistograms(rootDir &dir, std::string plotDir);
+
+         // Plottting Macros
+        void plot1D_Hist(TH1D* hist1D, std::string fileName, std::string plotDir);
+        void plot2D_Hist(TH2D* hist2D, std::string fileName, std::string plotDir);
+        void plot1D_HistLogScale(TH1D* hist1D, std::string fileName, std::string plotDir);
+        void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
+        void plotStacked(TH1D* h_signal, TH1D* h_background, 
+                            std::string plotName, std::string fileName, std::string plotDir, 
+                            std::string signal_label = "Signal", std::string background_label = "Background",
+                            bool isRatioReversed = false);
+        void plotStackedLogScale(TH1D* h_signal, TH1D* h_background, std::string plotName, std::string fileName, std::string plotDir);
+        void plotSignalRatio(TH1D* h_signal, TH1D* h_background, std::string fileName, std::string plotDir, bool isReversed = false);
+        void plot_purity_efficiency(TH1D* h_signal, TH1D* h_background, std::string fileName, std::string plotDir, bool keepEventstoRight = true);
         
-    
-    private:
-        bool isSignalvsBackground;
-        int branchInd;
-        string branchDir;
-        string otherDir;
-        
-        string rootDir_Interaction[nBranches];
-        string plotDir_Interaction[nBranches];
-        
-        string rootDir_PID[nBranches];
-        string plotDir_PID[nBranches];
-        
-        string rootDir_Muon[nBranches];
-        string plotDir_Muon[nBranches];
-        
-        string rootDir_Proton[nBranches];
-        string plotDir_Proton[nBranches];
-        
-        string rootDir_Pion[nBranches];
-        string plotDir_Pion[nBranches];
-        
-        string rootDir_Pi0Blob[nBranches];
-        string plotDir_Pi0Blob[nBranches];
-   
+
 };
 
 
