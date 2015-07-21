@@ -23,17 +23,14 @@ class CCProtonPi0_BinList
         CCProtonPi0_BinList();
         
         // Standard Bins
-        CCProtonPi0_SingleBin objectCount;
         CCProtonPi0_SingleBin error;
         CCProtonPi0_SingleBin angle;
-        CCProtonPi0_SingleBin trackLength;
         CCProtonPi0_SingleBin particleScore;
         CCProtonPi0_SingleBin particleScore_LLR;
         CCProtonPi0_SingleBin particleScoreSum;
         CCProtonPi0_SingleBin particleScoreDiff;
         CCProtonPi0_SingleBin particleStatus;
         CCProtonPi0_SingleBin multiplicity;
-        CCProtonPi0_SingleBin int_channel;
         CCProtonPi0_SingleBin vertex_z;
         CCProtonPi0_SingleBin vertex_x_y;
         CCProtonPi0_SingleBin deltaInvMass;
@@ -45,11 +42,9 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin q2;
         CCProtonPi0_SingleBin wSq;
         CCProtonPi0_SingleBin w;
-        CCProtonPi0_SingleBin wfail;
         
         CCProtonPi0_SingleBin UsedE;
         CCProtonPi0_SingleBin UnusedE;
-        CCProtonPi0_SingleBin time;
         
         // Cut Histograms
         CCProtonPi0_SingleBin eVis_nuclearTarget;

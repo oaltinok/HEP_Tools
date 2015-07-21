@@ -1,9 +1,12 @@
 #ifndef CCProtonPi0_Pi0BlobTool_cpp
 #define CCProtonPi0_Pi0BlobTool_cpp
 
-// #include <Event/Vertex.h>
-#include <Event/IDCluster.h>
-#include <Event/IDBlob.h>
+#include "MinervaDet/DeDetector.h"
+#include "MinervaDet/DePlane.h"
+#include "Event/IDCluster.h"
+#include "Event/IDBlob.h"
+#include "Event/Node.h"
+#include "Event/Track.h"
 
 #include "Pi0BlobTool.h"
 
@@ -14,41 +17,57 @@ Pi0BlobTool::Pi0BlobTool()
     // Do Nothing!
 }
 
-bool Pi0BlobTool::isBlob1_Good( Minerva::IDBlob* blob )
+bool Pi0BlobTool::isBlobGood( const Minerva::IDBlob* pi0_blob, const Minerva::DeDetector* idDet )
 {
+    cout<<"Enter Pi0BlobTool::isBlobGood()"<<endl;
+    
     // Sanity Check
-    if (blob == NULL) return false;
-
-    bool isBlobGood =   isNDigitsHigh(blob, minNDigits_blob1 ) &&
-                        isEnergyHigh(blob, minEnergy_blob1);
-
-    return isBlobGood;
+    if (pi0_blob == NULL) return false;
+   
+    FillNodesVector(pi0_blob, idDet);
+   
+    // Set Track
+    Pi0Blob_Track = new Minerva::Track(nodes);
+    
+    cout<<"Track Parameters"<<endl;
+    cout<<"Position = "<<Pi0Blob_Track->position()<<endl;
+    cout<<"Slopes = "<<Pi0Blob_Track->slopes()<<endl;
+    cout<<"Chi2 = "<<Pi0Blob_Track->chi2()<<endl;
+    
+    cout<<"Exit Pi0BlobTool::isBlobGood()"<<endl;
+    
+    return true;
 }
 
-bool Pi0BlobTool::isBlob2_Good( Minerva::IDBlob* blob )
+void Pi0BlobTool::FillNodesVector(const Minerva::IDBlob* pi0_blob, const Minerva::DeDetector* idDet)
 {
-    // Sanity Check
-    if (blob == NULL) return false;
+    cout<<"Enter Pi0BlobTool::FillNodesVector()"<<endl;
+    
+    Minerva::Node* tempNode = NULL;
+    SmartRefVector<Minerva::IDCluster> clusters = pi0_blob->clusters();
+    SmartRefVector<Minerva::IDCluster>::iterator iter_c;
+    
+    for (iter_c = clusters.begin(); iter_c != clusters.end(); ++iter_c){
+        tempNode = new Minerva::Node(*iter_c);
+        nodes.push_back(tempNode);
+    }
+ 
+    // Check nodes
+    for( unsigned int i = 0; i < nodes.size(); i++){
+        cout<<i<<" Node View: "<<nodes[i]->view()<<" Position: "<<nodes[i]->position()<<endl;
+        AlignNode(nodes[i], idDet);
+        cout<<i<<" Node View: "<<nodes[i]->view()<<" Position: "<<nodes[i]->position()<<endl;
+        cout<<"----"<<endl;
+    }
+  
 
-    bool isBlobGood = isNDigitsHigh(blob, minNDigits_blob2 );
-
-    return isBlobGood;
+    cout<<"Exit Pi0BlobTool::FillNodesVector()"<<endl;
 }
 
-bool Pi0BlobTool::isNDigitsHigh( Minerva::IDBlob* blob, const double minNDigits)
+void Pi0BlobTool::AlignNode(Minerva::Node* node, const Minerva::DeDetector* idDet)
 {
-    double blob_ndigits = blob->getAllDigits().size();
-
-    if (blob_ndigits > minNDigits ) return true;
-    else return false;
-}
-
-bool Pi0BlobTool::isEnergyHigh( Minerva::IDBlob* blob, const double minEnergy )
-{
-    double blob_energy = blob->energy();
-
-    if ( blob_energy > minEnergy) return true;
-    else return false;
+    Minerva::DePlane const * plane = idDet->getDePlane( node->planeid() );
+    node->idcluster()->setLpos( plane->getLPos( node->position() ) );
 }
 
 #endif

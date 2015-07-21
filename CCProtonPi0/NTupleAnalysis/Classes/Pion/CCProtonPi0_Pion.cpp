@@ -25,11 +25,11 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(int nMode, bool isMC) : CCProtonPi0_Particle(
         f = new TFile(rootDir.c_str(),"RECREATE");
 
         // Initialize Bins
-        bin_P.setBin(17, 0.0, 1700.0);
-        bin_KE.setBin(30, 0.0, 3000.0);
+        bin_P.setBin(17, 0.0, 1.7);
+        bin_KE.setBin(30, 0.0, 3.0);
         bin_invMass.setBin(60,0.0,600.0);
         bin_photonConvLength.setBin(50,0.0,100.0);
-        bin_photonEnergy_Asymmetry.setBin(100,0.0,1000);
+        bin_photonEnergy_Asymmetry.setBin(100,0.0,1.0);
         
         initHistograms();   
     }
@@ -41,12 +41,12 @@ void CCProtonPi0_Pion::initHistograms()
 {
     // Unique Histograms
     gamma1_ConvLength = new MnvH1D( "gamma1_ConvLength","Leading Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
-    gamma1_ConvLength->GetXaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
-    gamma1_ConvLength->GetYaxis()->SetTitle("N(Events)");
+    gamma1_ConvLength->GetXaxis()->SetTitle("Photon Conversion Length [cm]");
+    gamma1_ConvLength->GetYaxis()->SetTitle(Form("Events / %3.2f [cm]",bin_photonConvLength.get_width()));
     
     gamma2_ConvLength = new MnvH1D( "gamma2_ConvLength","Secondary Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
-    gamma2_ConvLength->GetXaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
-    gamma2_ConvLength->GetYaxis()->SetTitle("N(Events)");
+    gamma2_ConvLength->GetXaxis()->SetTitle("Photon Conversion Length [cm]");
+    gamma2_ConvLength->GetYaxis()->SetTitle(Form("Events / %3.2f [cm]",bin_photonConvLength.get_width()));
     
     ConvLength_gamma2_gamma1= new MnvH2D( "ConvLength_gamma2_gamma1","Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
     ConvLength_gamma2_gamma1->GetXaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
@@ -57,29 +57,29 @@ void CCProtonPi0_Pion::initHistograms()
     photonEnergy_Asymmetry->GetYaxis()->SetTitle("N(Events)");
    
     invMass = new MnvH1D( "invMass","Reconstructed Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
-    invMass->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-    invMass->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",bin_invMass.get_width()));   
+    invMass->GetXaxis()->SetTitle("Reconstructed m_{#gamma#gamma} [MeV]");
+    invMass->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV]",bin_invMass.get_width()));   
 
     // Standard Histograms 
     E = new MnvH1D( "E","Reconstructed Pion Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    E->GetXaxis()->SetTitle("Reconstructed Pion Energy [MeV]");
-    E->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_P.get_width()));
+    E->GetXaxis()->SetTitle("Reconstructed E_{#pi^{0}} [GeV]");
+    E->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",bin_P.get_width()));
       
     P = new MnvH1D( "P","Reconstructed Pion Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    P->GetXaxis()->SetTitle("Reconstructed Pion Momentum [MeV]");
-    P->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_P.get_width()));
+    P->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
+    P->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",bin_P.get_width()));
     
     KE = new MnvH1D( "KE","Reconstructed Pion Kinetic Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    KE->GetXaxis()->SetTitle("Reconstructed Pion Kinetic Energy [MeV]");
-    KE->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [MeV]",bin_P.get_width()));
+    KE->GetXaxis()->SetTitle("Reconstructed T_{#pi^{0}} [GeV]");
+    KE->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",bin_P.get_width()));
     
     theta = new MnvH1D( "theta","Reconstructed Pion Theta",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-    theta->GetXaxis()->SetTitle("Theta [Degree]");
-    theta->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [Degree]",binList.angle.get_width()));
+    theta->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [Degree]");
+    theta->GetYaxis()->SetTitle(Form("Pions / %3.1f [Degree]",binList.angle.get_width()));
     
     phi = new MnvH1D( "phi","Reconstructed Pion Phi",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-    phi->GetXaxis()->SetTitle("Phi [Degree]");
-    phi->GetYaxis()->SetTitle(Form("Number of Pions / %3.1f [Degree]",binList.angle.get_width()));
+    phi->GetXaxis()->SetTitle("Reconstructed #phi_{#pi^{0}} [Degree]");
+    phi->GetYaxis()->SetTitle(Form("Pions / %3.1f [Degree]",binList.angle.get_width()));
 
 }
 

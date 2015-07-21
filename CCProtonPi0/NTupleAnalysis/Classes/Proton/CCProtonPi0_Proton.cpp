@@ -26,10 +26,10 @@ CCProtonPi0_Proton::CCProtonPi0_Proton(int nMode, bool isMC) : CCProtonPi0_Parti
         f = new TFile(rootDir.c_str(),"RECREATE");
 
         // Initialize Bins
-        bin_E.setBin(60,0.0,3000.0);
-        bin_P.setBin(40, 0.0, 2000.0);
-        bin_KE.setBin(40, 0.0, 2000.0);
-        bin_trackLength.setBin(250,0.0,2500.0);
+        bin_E.setBin(25, 0.5 ,3.0);
+        bin_P.setBin(20, 0.0, 2.0);
+        bin_KE.setBin(20, 0.0, 2.0);
+        bin_trackLength.setBin(25,0.0,250.0);
         bin_trackKinked.setBin(2,0.0,2.0);
         
         initHistograms();        
@@ -41,8 +41,8 @@ void CCProtonPi0_Proton::initHistograms()
 {
     // Unique Histograms
     trackLength = new MnvH1D( "trackLength","Proton Track Length",bin_trackLength.get_nBins(), bin_trackLength.get_min(), bin_trackLength.get_max() );
-    trackLength->GetXaxis()->SetTitle("Proton Track Length [mm]");
-    trackLength->GetYaxis()->SetTitle("N(Events)");
+    trackLength->GetXaxis()->SetTitle("Proton Track Length [cm]");
+    trackLength->GetYaxis()->SetTitle(Form("Protons / %3.1f cm ",bin_trackLength.get_width()));
     
     trackKinked = new MnvH1D( "trackKinked","Proton Track Kinked or NOT",bin_trackKinked.get_nBins(), bin_trackKinked.get_min(), bin_trackKinked.get_max() );
     trackKinked->GetXaxis()->SetTitle("Proton Track Kinked or NOT");
@@ -50,29 +50,36 @@ void CCProtonPi0_Proton::initHistograms()
 
     partScore = new MnvH1D( "partScore","Proton Particle Score (LLR)",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
     partScore->GetXaxis()->SetTitle("Particle Score");
-    partScore->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f ",binList.particleScore_LLR.get_width()));
+    partScore->GetYaxis()->SetTitle(Form("Protons / %3.1f ",binList.particleScore_LLR.get_width()));
    
     // Standard Histograms
     E = new MnvH1D( "E","Reconstructed Proton Energy",bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max() );
-    E->GetXaxis()->SetTitle("Reconstructed Proton Energy [MeV]");
-    E->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f [MeV] ",bin_E.get_width()));
+    E->GetXaxis()->SetTitle("Reconstructed E_{p} [GeV]");
+    E->GetYaxis()->SetTitle(Form("Protons / %3.1f [GeV] ",bin_E.get_width()));
     
     P = new MnvH1D( "P","Reconstructed Proton Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    P->GetXaxis()->SetTitle("Reconstructed Proton Momentum [MeV]");
-    P->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f [MeV] ",bin_P.get_width()));
+    P->GetXaxis()->SetTitle("Reconstructed P_{p} [GeV]");
+    P->GetYaxis()->SetTitle(Form("Protons / %3.1f [GeV] ",bin_P.get_width()));
        
     KE = new MnvH1D( "KE","Reconstructed Proton Kinetic Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    KE->GetXaxis()->SetTitle("Reconstructed Proton Kinetic Energy [MeV]");
-    KE->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f [MeV] ",bin_P.get_width()));
+    KE->GetXaxis()->SetTitle("Reconstructed T_{p} [GeV]");
+    KE->GetYaxis()->SetTitle(Form("Protons / %3.1f [GeV] ",bin_P.get_width()));
     
-    theta = new MnvH1D( "theta","Reconstructed Proton Theta",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-    theta->GetXaxis()->SetTitle("Theta [Degree]");
-    theta->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f [Degree]",binList.angle.get_width()));
+    theta = new MnvH1D( "theta","Reconstructed #theta_{p}",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+    theta->GetXaxis()->SetTitle("Reconstructed #theta_{p} [Degree]");
+    theta->GetYaxis()->SetTitle(Form("Protons / %3.1f [Degree]",binList.angle.get_width()));
     
-    phi = new MnvH1D( "phi","Reconstructed Proton Phi",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-    phi->GetXaxis()->SetTitle("Phi [Degree]");
-    phi->GetYaxis()->SetTitle(Form("Number of Protons / %3.1f [Degree]",binList.angle.get_width()));
+    phi = new MnvH1D( "phi","Reconstructed #phi_{p}",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+    phi->GetXaxis()->SetTitle("Reconstructed #phi_{p} [Degree]");
+    phi->GetYaxis()->SetTitle(Form("Protons / %3.1f [Degree]",binList.angle.get_width()));
 
+    reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed Proton Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(), bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
+    reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{p} [GeV]");
+    reco_P_true_P->GetYaxis()->SetTitle("True P_{p} [GeV]");
+
+    P_error = new TH1D( "P_error","Error on Proton Momentum",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    P_error->GetXaxis()->SetTitle("(P_{Reco}-P_{True})/P_{True}");
+    P_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
 }
 
 void CCProtonPi0_Proton::writeHistograms()
@@ -87,6 +94,8 @@ void CCProtonPi0_Proton::writeHistograms()
     KE->Write();
     theta->Write();
     phi->Write();
+    reco_P_true_P->Write();
+    P_error->Write();
 }
 
 #endif

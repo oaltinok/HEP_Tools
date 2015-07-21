@@ -96,7 +96,7 @@ void CCProtonPi0_MichelTool::initHistograms()
     fakeMichel_end_Z_vtx_Z->GetXaxis()->SetTitle("Michel Muon End Point Z - Vertex Z");
     fakeMichel_end_Z_vtx_Z->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.michelMuon_Z_vtx.get_width()));    
     
-    N_michelElectrons = new TH1D( "N_michelElectrons","Number of Michel Electrons in an Event",binList.objectCount.get_nBins(), binList.objectCount.get_min(), binList.objectCount.get_max() );
+    N_michelElectrons = new TH1D( "N_michelElectrons","Number of Michel Electrons in an Event",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
     N_michelElectrons->GetXaxis()->SetTitle("Number of Michel Electrons");
     N_michelElectrons->GetYaxis()->SetTitle("N(Events)");
     

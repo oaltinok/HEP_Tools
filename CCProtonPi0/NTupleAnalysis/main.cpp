@@ -43,7 +43,7 @@ main.cpp
 
 using namespace std;
 
-bool isMC = false;
+bool isMC = true;
 
 const string runOption_Run = "run";
 const string runOption_Plot = "plot";

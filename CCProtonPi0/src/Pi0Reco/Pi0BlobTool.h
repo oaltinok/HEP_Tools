@@ -11,16 +11,15 @@ class Pi0BlobTool
 {
     public:
         Pi0BlobTool();
-        bool isBlob1_Good(Minerva::IDBlob* blob);
-        bool isBlob2_Good(Minerva::IDBlob* blob);
+        bool isBlobGood( const Minerva::IDBlob* pi0_blob, const Minerva::DeDetector* idDet);
 
     private:
-        static const double minNDigits_blob1 = 8;
-        static const double minNDigits_blob2 = 6;
-        static const double minEnergy_blob1 = 60;     // MeV
+        std::vector<Minerva::Node*> nodes;
+        SmartRef<Minerva::Track> Pi0Blob_Track;
         
-        bool isNDigitsHigh(Minerva::IDBlob* blob, const double minNDigits);
-        bool isEnergyHigh(Minerva::IDBlob* blob, const double minEnergy);
+        void FillNodesVector(const Minerva::IDBlob* pi0_blob, const Minerva::DeDetector* idDet);
+        void AlignNode(Minerva::Node* node, const Minerva::DeDetector* idDet);
+
 };
 
 #endif

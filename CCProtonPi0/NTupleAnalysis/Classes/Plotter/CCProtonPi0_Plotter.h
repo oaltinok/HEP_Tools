@@ -55,12 +55,6 @@ const int nBranches = 3;
 class CCProtonPi0_Plotter
 {
     public:
-   
-        // -------------------------------------------------------------------------
-        //     void plotHistograms: Generates plots for the output of run() function
-        //         mcFile-> name of the .root file
-        //         plotDir -> folder name for the plots will be created         
-        //--------------------------------------------------------------------------
         CCProtonPi0_Plotter(int nMode, bool isMC);
         void plotHistograms();
         
@@ -71,25 +65,20 @@ class CCProtonPi0_Plotter
         std::string branchDir;
         std::string otherDir;
 
+        rootDir rootDir_Interaction;
+        rootDir rootDir_PIDStatistics;
+        rootDir rootDir_Pi0Blob;
         rootDir rootDir_Muon;
         rootDir rootDir_Proton;
         rootDir rootDir_Pion;
-
-        std::string rootDir_Interaction[nBranches];
+        
         std::string plotDir_Interaction[nBranches];
-        
-        std::string rootDir_PID[nBranches];
         std::string plotDir_PID[nBranches];
-        
         std::string plotDir_Muon[nBranches];
         std::string plotDir_Proton[nBranches];
         std::string plotDir_Pion[nBranches];
-        
-        std::string rootDir_Pi0Blob[nBranches];
         std::string plotDir_Pi0Blob[nBranches];
   
-        void inform(std::string rootDir_mc, std::string rootDir_data, std::string plotDir);
-        void inform(std::string rootDir, std::string plotDir);
         void setRootDirs(rootDir& dirs, std::string fileName );
         void setPlotDirs();
        
@@ -118,11 +107,11 @@ class CCProtonPi0_Plotter
         void MichelTool(TH1D* vertex, TH1D* track, TH1D* track2, TH1D* missed, std::string plotName, std::string fileName, std::string plotDir);
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
 
-         // Plottting Macros
-        void plot1D_Hist(TH1D* hist1D, std::string fileName, std::string plotDir);
-        void plot2D_Hist(TH2D* hist2D, std::string fileName, std::string plotDir);
-        void plot1D_HistLogScale(TH1D* hist1D, std::string fileName, std::string plotDir);
+        // Plottting Macros
+        void Draw1DHist(rootDir& dir, std::string var_name, std::string plotDir, bool isLogScale = false);
+        void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
+        void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir);
         void plotStacked(TH1D* h_signal, TH1D* h_background, 
                             std::string plotName, std::string fileName, std::string plotDir, 
                             std::string signal_label = "Signal", std::string background_label = "Background",

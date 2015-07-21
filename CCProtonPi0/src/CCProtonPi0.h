@@ -99,6 +99,22 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool truthIsPlausible( const Minerva::PhysicsEvent*) const;
         
     private:
+        // mutable Member Variables which can be modified by const functions
+        mutable Gaudi::LorentzVector m_muon_4P;
+        mutable Gaudi::LorentzVector m_proton_4P;
+        mutable Gaudi::LorentzVector m_pi0_4P;
+        mutable SmartRef<Minerva::Vertex>   m_PrimaryVertex;
+        mutable SmartRef<Minerva::Prong>    m_MuonProng;
+        mutable SmartRef<Minerva::Particle> m_MuonParticle;
+        mutable SmartRef<Minerva::IDBlob>   m_Pi0Blob1;
+        mutable SmartRef<Minerva::IDBlob>   m_Pi0Blob2;
+        mutable Minerva::ProngVect    m_ProtonProngs;
+        mutable Minerva::ParticleVect m_ProtonParticles;
+
+        // Counters for Functions - Debugging Purposes
+        mutable double N_tagTruth;
+        mutable double N_reconstructEvent;
+
         std::vector<std::string>   m_dedx_uncertainties;
         
         // Fiducial Volume
@@ -197,13 +213,15 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IVertexFitter* m_vertexFitter;
 
         //! Private Functions
-        SmartRefVector<Minerva::IDCluster> FilterInSphereClusters(  const SmartRefVector<Minerva::IDCluster>& clusters, const double sphereRadius, std::vector<double>& radii) const;
+        SmartRefVector<Minerva::IDCluster> FilterInSphereClusters( Minerva::PhysicsEvent *event, const SmartRefVector<Minerva::IDCluster>& clusters, const double sphereRadius, std::vector<double>& radii) const;
+
         StatusCode HoughBlob( SmartRefVector<Minerva::IDCluster> idClusters, std::vector<Minerva::IDBlob*>& outBlobs) const;
         StatusCode ODActivity( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs ) const;
         StatusCode getNearestPlane( double z, int & module_return, int & plane_return) const;
         StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
         bool ConeBlobs( Minerva::PhysicsEvent *event ) const;
         bool PreFilterPi0( Minerva::PhysicsEvent *event ) const;
+        bool AreBlobsDirectionGood() const;
         bool AreBlobsGood() const;
         void VertexBlob( Minerva::PhysicsEvent *event ) const;
         bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
@@ -214,7 +232,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool isBackgroundQELike(Minerva::GenMinInteraction* truthEvent) const;
         bool isMichelProngGood(Minerva::Prong &michelProng) const;
         bool isMotherPrimary(std::vector<int>& motherList, int mother ) const;
-        bool isSinglePi0( Minerva::GenMinInteraction* truthEvent, int nPi0, int nGamma) const;
         bool setMuonData( Minerva::NeutrinoInt* nuInt ) const;
         bool setPi0Data( Minerva::NeutrinoInt* nuInt ) const;
         bool setProtonData( Minerva::NeutrinoInt* nuInt ) const;

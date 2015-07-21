@@ -15,33 +15,28 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     //     Initialization
     //--------------------------------------------------------------------------
     // Standard Bins
-    objectCount.setBin(10,0.0,10.0);
     error.setBin(400, -2.0, 2.0);
     angle.setBin(18, 0.0, 180.0);
-    trackLength.setBin(200, 0.0, 2000.0 );
     particleScore.setBin(100,0.0,1.0);
-    particleScore_LLR.setBin(100,-100.0,100.0);
+    particleScore_LLR.setBin(40,-100.0,100.0);
     particleScoreSum.setBin(200,0.0,2.0);
     particleScoreDiff.setBin(100,-1.0,1.0);
     particleStatus.setBin(17,-1,16);
     multiplicity.setBin(10,0.0,10.0);
-    int_channel.setBin(9,0.0,9.0);
     vertex_z.setBin(94,4300.0,9000.0);
     vertex_x_y.setBin(200,-1000.0,1000.0);
-    deltaInvMass.setBin(100,800.0,2800.0);
+    deltaInvMass.setBin(20,800.0,2800.0);
     preFilter_Status.setBin(4,0,4);
     preFilter_RejectedEnergy.setBin(50,0.0,5000.0);
 
     // Neutrino Specific Bins
-    beamE.setBin(200,0,20.0);
+    beamE.setBin(20,0,20.0);
     q2.setBin(40,0.0,4.0);
-    w.setBin(150,0.0,3.0);
-    wSq.setBin(300,-5.0,5.0);
-    wfail.setBin(300,-3.0,3.0);
+    w.setBin(30,0.0,3.0);
+    wSq.setBin(50,0.0,5.0);
     
     UsedE.setBin(40,0.0,2000.0);
     UnusedE.setBin(20,0.0,1000.0);
-    time.setBin(1000,0.0,10000.0);
     
     // Cut Histograms
     eVis_nuclearTarget.setBin(50,0.0,25.0);

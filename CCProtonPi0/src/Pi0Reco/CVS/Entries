@@ -2,22 +2,11 @@
 /AngleScan.h/1.1/Fri Feb 13 21:55:40 2015//
 /ClusterVectorInfo.cpp/1.1/Fri Feb 13 21:55:40 2015//
 /ClusterVectorInfo.h/1.1/Fri Feb 13 21:55:40 2015//
-/DigitVectorTruthInfo.cpp/1.1/Fri Feb 13 21:55:40 2015//
-/DigitVectorTruthInfo.h/1.1/Fri Feb 13 21:55:40 2015//
 /HTBlob.cpp/1.1/Fri Feb 13 21:55:40 2015//
 /HTBlob.h/1.1/Fri Feb 13 21:55:40 2015//
 /HTtool.cpp/1.1/Fri Feb 13 21:55:40 2015//
 /HTtool.h/1.1/Fri Feb 13 21:55:40 2015//
-/HitVectorTruthInfo.cpp/1.1/Fri Feb 13 21:55:40 2015//
-/HitVectorTruthInfo.h/1.1/Fri Feb 13 21:55:40 2015//
 /OneParLineFit.h/1.1/Fri Feb 13 21:55:40 2015//
-/Par.cpp/1.1/Fri Feb 13 21:55:40 2015//
-/Par.h/1.1/Fri Feb 13 21:55:40 2015//
-/Pi0BlobTool.cpp/1.1/Wed Jun  3 22:19:13 2015//
-/Pi0BlobTool.h/1.1/Wed Jun  3 22:19:13 2015//
-/TrackTruthInfo.cpp/1.1/Fri Feb 13 21:55:40 2015//
-/TrackTruthInfo.h/1.1/Fri Feb 13 21:55:40 2015//
-/TraverseHistory.cpp/1.1/Fri Feb 13 21:55:40 2015//
-/TraverseHistory.h/1.1/Fri Feb 13 21:55:40 2015//
-/TwoParLineFit.h/1.1/Fri Feb 13 21:55:40 2015//
+/Pi0BlobTool.cpp/1.2/Tue Jul 21 02:32:46 2015//
+/Pi0BlobTool.h/1.2/Tue Jul 21 02:32:28 2015//
 D

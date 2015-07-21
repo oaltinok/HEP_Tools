@@ -111,7 +111,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         CCProtonPi0_BackgroundTool bckgTool;
         CCProtonPi0_MichelTool michelTool;
         CCProtonPi0_CutList cutList;
-        TVector3 beam_p3;
         
         // Michel Study
         bool isMichelStudy;

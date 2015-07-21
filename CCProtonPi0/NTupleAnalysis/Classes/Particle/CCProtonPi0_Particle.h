@@ -2,9 +2,8 @@
 ================================================================================
 Class: CCProtonPi0_Particle
     CCProtonPi0_Particle Class defines a particle which will be used in the analysis
-    Contains analysis specific information such as 4-Momentum and Angle wrt Beam
    
-    Uses ROOT Specific classes
+    Uses ROOT and MINERvA Specific classes
     
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 ================================================================================
@@ -18,6 +17,8 @@ Class: CCProtonPi0_Particle
 #include <cstdlib>
 
 #include <TFile.h>
+#include <TH1.h>
+#include <TH2.h>
 #include <PlotUtils/MnvH1D.h>
 #include <PlotUtils/MnvH2D.h>
 
@@ -38,7 +39,10 @@ class CCProtonPi0_Particle : public CCProtonPi0_NTupleAnalysis
         MnvH1D* KE;
         MnvH1D* theta;
         MnvH1D* phi;
-        
+
+        TH2D* reco_P_true_P;
+        TH1D* P_error;
+
         // Bins for Histograms
         CCProtonPi0_BinList binList;
         CCProtonPi0_SingleBin bin_E;

@@ -33,7 +33,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(int nMode) : CCProtonPi0_NTupleAnalysis
 
 void CCProtonPi0_CutList::initHistograms()
 {
-    hCut_vertexCount = new TH1D( "hCut_vertexCount","Number of Vertices",binList.objectCount.get_nBins(), binList.objectCount.get_min(), binList.objectCount.get_max() );
+    hCut_vertexCount = new TH1D( "hCut_vertexCount","Number of Vertices",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
     hCut_vertexCount->GetXaxis()->SetTitle("Number of Vertices");
     hCut_vertexCount->GetYaxis()->SetTitle("N(Events)");
         

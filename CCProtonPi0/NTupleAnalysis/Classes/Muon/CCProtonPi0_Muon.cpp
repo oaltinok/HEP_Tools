@@ -39,24 +39,24 @@ CCProtonPi0_Muon::CCProtonPi0_Muon(int nMode, bool isMC) : CCProtonPi0_Particle(
 void CCProtonPi0_Muon::initHistograms()
 {
     E = new MnvH1D( "E","Reconstructed Muon Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    E->GetXaxis()->SetTitle("Reconstructed Muon Energy [GeV]");
-    E->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [GeV] ",bin_P.get_width()));
+    E->GetXaxis()->SetTitle("Reconstructed E_{#mu} [GeV]");
+    E->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV] ",bin_P.get_width()));
     
     P = new MnvH1D( "P","Reconstructed Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    P->GetXaxis()->SetTitle("Reconstructed Muon Momentum [GeV]");
-    P->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [GeV] ",bin_P.get_width()));
+    P->GetXaxis()->SetTitle("Reconstructed P_{#mu} [GeV]");
+    P->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV] ",bin_P.get_width()));
     
     KE = new MnvH1D( "KE","Reconstructed Muon Kinetic Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    KE->GetXaxis()->SetTitle("Reconstructed Muon Kinetic Energy [GeV]");
-    KE->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [GeV]",bin_P.get_width()));
+    KE->GetXaxis()->SetTitle("Reconstructed T_{#mu} [GeV]");
+    KE->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV]",bin_P.get_width()));
    
     theta = new MnvH1D( "theta","Reconstructed Muon Theta",bin_muonTheta.get_nBins(), bin_muonTheta.get_min(), bin_muonTheta.get_max() );
-    theta->GetXaxis()->SetTitle("Theta [Degree]");
-    theta->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [Degree] ",bin_muonTheta.get_width()));
+    theta->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [Degree]");
+    theta->GetYaxis()->SetTitle(Form("Muons / %3.1f [Degree] ",bin_muonTheta.get_width()));
 
     phi = new MnvH1D( "phi","Reconstructed Muon Phi",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-    phi->GetXaxis()->SetTitle("Phi [Degree]");
-    phi->GetYaxis()->SetTitle(Form("Number of Muons / %3.1f [Degree]",binList.angle.get_width()));
+    phi->GetXaxis()->SetTitle("Reconstructed #phi_{#mu}[Degree]");
+    phi->GetYaxis()->SetTitle(Form("Muons / %3.1f [Degree]",binList.angle.get_width()));
 }
 
 void CCProtonPi0_Muon::writeHistograms()
