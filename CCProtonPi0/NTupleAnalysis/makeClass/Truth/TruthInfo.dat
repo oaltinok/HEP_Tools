@@ -1,0 +1,12 @@
+nAll = 17980013.00
+nFidVol = 4331846.00 24.09%
+nNoFidVol = 13648167.00 75.91%
+----------------------------------------------------------------
+nSignal = 249047.00 5.75%
+nBckg_QELike = 581279.00 13.42%
+nBckg_SinglePiPlus = 1285290.00 29.67%
+nBckg_SinglePiMinus = 303181.00 7.00%
+nBckg_MultiPion = 1192823.00 27.54%
+nBckg_MultiPiZero = 136438.00 3.15%
+nBckg_Other = 583788.00 13.48%
+Total Signal & Background = 4331846.00 100.00%

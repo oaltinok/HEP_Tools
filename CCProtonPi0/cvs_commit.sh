@@ -1,19 +1,21 @@
-cvs commit -m "v2_18
+cvs commit -m "v2_19
 CCProtonPi0 Updates:
-	Changed Global Variables to mutable Member Variables
-	Removed Unused/Old Classes
 	Signal Definition Changed
-		No Longer Requiring 2x Gamma Out of Nucleus
-		Current Definition:
-			CC Neutrino Interaction
-			Single Pi0 out of nucleus
-			No Mesons out of nucleus
-	VertexBlob() Modified
-		FilamentVertex Calculation removed -- Trung's suggestion
+		Signal Definition explicitly checks for Fiducial Volume
+			Actually True Vertex Fiducial Volume is required for ALL Events,
+			This addition just for a better Signal Definition
+	Background Study Improved: Two Different Background Sets
+		Background Type
+			AntiNeutrino, QELike, SinglePion, DoublePion, MultiPion
+		Background with Pi0
+			NoPi0, SinglePi0, MultiPi0
+	Do NOT Reconstruct MC Event
+		If TRUE vertex is NOT Fiducial
+		If TRUE Interaction is NOT ChargedCurrent 
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Interaction Class Modified to use MnvH1D 
-	Plotter Class Improved
-		Implementation for Plotting Macros in another file
-	CCProtonPi0_Plotter_Macros.cpp
+	makeClass Folder Structure Improved for different TBranches
+		CCProtonPi0 , Truth, Other
+		Truth Branch is used to Analyze All Truth Events
+			Get Total Number of Signal Events    
 " .

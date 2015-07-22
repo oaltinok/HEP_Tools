@@ -110,6 +110,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         void writeSingleRow(CCProtonPi0_Cut& currentCut);
         void writeSingleRow(CCProtonPi0_Cut& nCut_1Prong, CCProtonPi0_Cut& nCut_2Prong);
         double getCutEfficiency(CCProtonPi0_Cut& currentCut, CCProtonPi0_Cut& effBase) const;
+        double getCutEfficiency(CCProtonPi0_Cut& currentCut, double effBase) const;
         double getCutPurity(CCProtonPi0_Cut& currentCut) const;
 
         vector<CCProtonPi0_Cut> nCutVector;
@@ -121,7 +122,9 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         
         TFile* f;
         string rootDir;
- 
+
+        // Number of Signal Events from Truth Info
+        double nTrueSignal;
 };
 
 

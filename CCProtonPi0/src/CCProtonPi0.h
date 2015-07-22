@@ -225,11 +225,11 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool AreBlobsGood() const;
         void VertexBlob( Minerva::PhysicsEvent *event ) const;
         bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
-        bool checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const;
+        bool isTrueVertexFiducial(Minerva::GenMinInteraction* truthEvent) const;
+        bool isInteractionCC(Minerva::GenMinInteraction* truthEvent) const;
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
         bool createTrackedParticles(Minerva::PhysicsEvent *event ) const;
         bool getProtonProng(Minerva::PhysicsEvent *event ) const;
-        bool isBackgroundQELike(Minerva::GenMinInteraction* truthEvent) const;
         bool isMichelProngGood(Minerva::Prong &michelProng) const;
         bool isMotherPrimary(std::vector<int>& motherList, int mother ) const;
         bool setMuonData( Minerva::NeutrinoInt* nuInt ) const;
@@ -263,6 +263,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
         void setVertexData( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent* event ) const;
         void tagBackground(Minerva::GenMinInteraction* truthEvent) const;
+        void tagBackgroundWithPi0(Minerva::GenMinInteraction* truthEvent) const;
         void writeBackgroundType(Minerva::GenMinInteraction* truthEvent) const;
         void writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
         void writeFSParticleTable(bool isSignal) const;

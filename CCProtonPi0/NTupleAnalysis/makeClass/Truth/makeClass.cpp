@@ -2,22 +2,21 @@
 ================================================================================
 Function: makeClass()
     Reads the ROOT files exist in the playlist
-    Outputs MC_Sample.C and MC_Sample.h files
-    MC_Sample.h contains member variables for the ROOT File
-    Copy these member variables and branch addresses to Corresponding Class
-    
+    Outputs Truth_Branch.C and Truth_Branch.h files
+    Truth_Branch.h contains member variables for the ROOT File
+    Use Truth.C to analyze ALL Truth events
+
     Usage:
         > .L makeClass.cpp
         > makeClass()
     
-    Last Revision: 2014_01_06
 ================================================================================
 */
 
 void makeClass(){
 
-    string playlist = "../Input/Playlists/pl_MC_All.dat";
-    TChain fChain("CCProtonPi0") ;
+    string playlist = "../../Input/Playlists/pl_MC_Merged.dat";
+    TChain fChain("Truth") ;
 
     ifstream input_pl( playlist.c_str() );
     string filename;
@@ -40,6 +39,6 @@ void makeClass(){
      cout<<" Added "<<filename.c_str()<<endl;
    }
 
-    fChain.MakeClass("MC_Sample");
+    fChain.MakeClass("Truth_Branch");
 
 }

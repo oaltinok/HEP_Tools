@@ -275,26 +275,7 @@ StatusCode CCProtonPi0::initialize()
     declareIntTruthBranch("pi0_MotherStatus", -9 );   
     declareIntTruthBranch("pi0_GrandMother", -9 );
     declareIntTruthBranch("pi0_GrandMotherStatus", -9 );
-    
-    // Signal and Background
-    declareBoolTruthBranch("isSignal");
-    declareBoolTruthBranch("isFidVol");
-    declareBoolTruthBranch("AnalyzeEvent");
-    
-    // Background Types
-    declareBoolTruthBranch("isBckg_QELike");
-    declareBoolTruthBranch("isBckg_SinglePiPlus");
-    declareBoolTruthBranch("isBckg_SinglePiMinus");
-    declareBoolTruthBranch("isBckg_MultiPion");
-    declareBoolTruthBranch("isBckg_MultiPiZero");
-    declareBoolTruthBranch("isBckg_Other");
-    
-    // Background Branching - For Each Background Type
-    declareBoolTruthBranch("isBckg_withAntiMuon");
-    declareBoolTruthBranch("isBckg_withMichel");
-    declareBoolTruthBranch("isBckg_withPrimaryPi0");
-    declareBoolTruthBranch("isBckg_withSecondaryPi0");
-    
+   
     // Truth Michel Information
     declareIntTruthBranch("N_trueMichelElectrons", -1 );
     declareDoubleTruthBranch("michelElectron_P", SENTINEL );
@@ -307,6 +288,34 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleTruthBranch("michelPion_length", SENTINEL );
     declareDoubleTruthBranch("michelPion_begin_dist_vtx", SENTINEL );
 
+    // ------------------------------------------------------------------------
+    // Signal and Background
+    // ------------------------------------------------------------------------
+    declareBoolTruthBranch("isSignal");
+    declareBoolTruthBranch("isFidVol");
+    declareBoolTruthBranch("ReconstructEvent");
+    
+    // BackgroundWithPi0
+    declareIntTruthBranch("Bckg_nPi0_Primary", -1);
+    declareIntTruthBranch("Bckg_nPi0_Secondary", -1);
+    declareIntTruthBranch("Bckg_nPi0_Total", -1);
+    declareBoolTruthBranch("Bckg_NoPi0");
+    declareBoolTruthBranch("Bckg_SinglePi0");
+    declareBoolTruthBranch("Bckg_MultiPi0");
+
+    // Background Types
+    declareIntTruthBranch("Bckg_nPion", -1);
+    declareIntTruthBranch("Bckg_nOther", -1);
+    declareBoolTruthBranch("isBckg_AntiNeutrino");
+    declareBoolTruthBranch("isBckg_QELike");
+    declareBoolTruthBranch("isBckg_SinglePion");
+    declareBoolTruthBranch("isBckg_DoublePion");
+    declareBoolTruthBranch("isBckg_MultiPion");
+    declareBoolTruthBranch("isBckg_Other");
+    
+    // Background Branching - For Each Background Type
+    declareBoolTruthBranch("isBckg_withMichel");
+    
     // ------------------------------------------------------------------------       
     // Event Branches
     // ------------------------------------------------------------------------       
@@ -637,9 +646,15 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     debug()<<"reconstructEvent() Count = "<<N_reconstructEvent<<" tagTruth() Count = "<<N_tagTruth-1<<endmsg;
     event->setDoubleData("reco_eventID", N_reconstructEvent);
     N_reconstructEvent++;
-    
+   
+    bool shouldRecoEvent = ShouldReconstructEvent(event,truthEvent);
+    if(!shouldRecoEvent){
+        debug()<<"Skipping Event!"<<endmsg;
+        return StatusCode::SUCCESS;
+    }
+
     //--------------------------------------------------------------------------
-    // Initialize Global Variables
+    // Reset Mutable Member Variables
     //--------------------------------------------------------------------------
     // SmartRefs
     m_PrimaryVertex = NULL;
@@ -651,13 +666,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     m_ProtonProngs.clear();
     m_ProtonParticles.clear();
     
-     
-    bool shouldRecoEvent = ShouldReconstructEvent(event,truthEvent);
-    if(!shouldRecoEvent){
-        debug()<<"Skipping Event!"<<endmsg;
-        return StatusCode::SUCCESS;
-    }
-   
+       
     //==========================================================================
     // Vertex Reconstruction
     //==========================================================================
@@ -1011,15 +1020,20 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     }
     
     //--------------------------------------------------------------------------
-    // is Truth Vertex inside  Fiducial volume
+    // Decide To Reconstruct Event or NOT
     //--------------------------------------------------------------------------
-    bool isFidVol = FiducialPointTool->isFiducial(truthEvent, m_fidHexApothem, m_fidUpStreamZ, m_fidDownStreamZ );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isFidVol", isFidVol );
-    debug()<<"Finished determining true_isFidVol: "<<isFidVol<<endmsg;
+     
+    // Return immediately - If True Vertex is NOT inside Fid Volume
+    if ( !isTrueVertexFiducial(truthEvent) ){ 
+        debug() <<"Do NOT Reconstruct Event - True vtx is not in Fiducial Volume!" << endmsg;
+        truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", false );
+        return StatusCode::SUCCESS;
+    }  
     
-    // Return immediately - if Event is not inside Fid Volume
-    if (!isFidVol){ 
-        debug() <<"Exit CCProtonPi0::tagTruth() - True vtx is not in Fiducial Volume!" << endmsg;
+    // Return immediately - If the interaction is NOT CC
+    if ( !isInteractionCC(truthEvent)){
+        debug() <<"Do NOT Reconstruct Event - Neutral Current Interaction" << endmsg;
+        truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", false );
         return StatusCode::SUCCESS;
     }
     
@@ -1040,7 +1054,9 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
         setPi0GenieRecord(truthEvent);  
         SetSignalKinematics(truthEvent);
     }else{
+        // Two Different Backround Sets
         tagBackground(truthEvent);
+        tagBackgroundWithPi0(truthEvent);
     }
     
     //--------------------------------------------------------------------------
@@ -1072,15 +1088,15 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     truthEvent->setIntData("vertex_plane", vertex_plane);
     
     //--------------------------------------------------------------------------
-    // Decide whether to Analyze the Event or NOT
-    //    Set AnalyzeEvent true to Analyze All Events
+    // Decide whether to Reconstruct the Event or NOT
+    //    Set ReconstructEvent true to Reconstruct All Events
     //--------------------------------------------------------------------------
-    truthEvent->filtertaglist()->setOrAddFilterTag( "AnalyzeEvent", true );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", true );
 //     if ( truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withMichel") ){
 //         debug()<<"Event with True Michel - Will Analyze the Event..."<<endmsg;
-//         truthEvent->filtertaglist()->setOrAddFilterTag( "AnalyzeEvent", true );
+//         truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", true );
 //     }else{
-//         truthEvent->filtertaglist()->setOrAddFilterTag( "AnalyzeEvent", false );    
+//         truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", false );    
 //     }
     
     debug()<<"tagTruth Reached End"<<endmsg;
@@ -1132,8 +1148,6 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
 {
     debug() << "Enter CCProtonPi0::tagSignal()" << endmsg;
     
-    bool isSignal = false;
-        
     //--------------------------------------------------------------------------
     // get TG4Trajectories
     //--------------------------------------------------------------------------
@@ -1184,25 +1198,116 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     truthEvent->setIntData("N_other",  N_other);
     
     //--------------------------------------------------------------------------
-    // Find Signal --  CC Neutrino Interaction
+    // Find Signal --  Inside Fiducial Volume
+    //                 CC Neutrino Interaction
     //                 FS Particles: muon, pi0, X (No Meson)
     //--------------------------------------------------------------------------
+    bool isSignal = false;
+    bool isFidVol = false;    
+    bool isCCNeutrino = false;
+    bool isFSGood = false;
     int t_current = truthEvent->current();
     int t_neutrinoPDG = truthEvent->incoming();
+   
+    isFidVol = truthEvent->filtertaglist()->isFilterTagTrue("isFidVol");
+    isCCNeutrino = (t_current == 1 && t_neutrinoPDG == PDG::nu_mu);
+    isFSGood = (N_pi0 == 1 && N_other == 0);
+
+    if(isFidVol && isCCNeutrino && isFSGood){
+        isSignal = true;
+        debug()<<"Found a Signal Event!"<<endmsg;
+    }
+
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal", isSignal );
+
+    return isSignal;
+}
+
+void CCProtonPi0::tagBackgroundWithPi0(Minerva::GenMinInteraction* truthEvent) const
+{
+    debug() << "Enter CCProtonPi0::tagBackgroundWithPi0()" << endmsg;
     
-    // Signal Must be CC Neutrino Interaction in Fiducial Volume
-    if ( t_current == 1 && t_neutrinoPDG == PDG::nu_mu ){
-       
-        // Signal Must have Single Pi0 and No Other Particles except proton and neutron
-        if( N_pi0 == 1 && N_other == 0){ 
-            isSignal = true;
-            debug()<<"Found a Signal Event!"<<endmsg;
-        }
+    Minerva::TG4Trajectories::iterator it_mcpart;
+    Minerva::TG4Trajectories* trajects = NULL;
+    if( exist<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default ) ) {
+        trajects = get<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default );
+    } else {
+        warning() << "Could not get TG4Trajectories from " << Minerva::TG4TrajectoryLocation::Default << endmsg;
+        return;
     }
     
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal", isSignal );
+    // just to make sure
+    if( !trajects ) return;
+ 
+    std::vector<int> primary_Pi0_ID;
+    std::vector<int> primary_particle_ID;
+    int particle_PDG = 0;
+    int particle_ID = 0;
+    int mother_ID = 0;
+
+    int nPi0_Primary = 0;
+    int nPi0_Secondary = 0;
     
-    return isSignal;
+    // Loop over Primary Trajectories to Count Primary Pi0
+    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+        
+        // Skip NonPrimary Trajectories
+        if ( (*it_mcpart)->GetProcessName() != "Primary") continue;
+
+        particle_PDG = (*it_mcpart)->GetPDGCode();
+        particle_ID = (*it_mcpart)->GetTrackId();
+        primary_particle_ID.push_back(particle_ID);
+
+        if (particle_PDG == PDG::pi0){
+            nPi0_Primary++; 
+            primary_Pi0_ID.push_back(particle_ID);
+        }
+    }
+ 
+    // Loop over Secondary Trajectories to Check Secondary Pi0
+    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+        
+        // Skip Primary Trajectories
+        if ( (*it_mcpart)->GetProcessName() == "Primary") continue;
+       
+        particle_PDG = (*it_mcpart)->GetPDGCode();
+        mother_ID = (*it_mcpart)->GetParentId();
+        
+        // Loop over only Secondary Particles
+        if ( isMotherPrimary(primary_particle_ID, mother_ID) ){
+            // Check Trajectory Mother is NOT a Primary Pi0 - Scattering
+            if ( particle_PDG == PDG::pi0 && !isMotherPrimary(primary_Pi0_ID, mother_ID) ){
+                nPi0_Secondary++;
+            }
+        }
+    }
+
+    // Get Total Number of Pi0 in Final State
+    int nPi0_Total = nPi0_Primary + nPi0_Secondary;
+
+    // Set Background Type
+    bool NoPi0 = false;
+    bool SinglePi0 = false;
+    bool MultiPi0 = false;
+    if (nPi0_Total == 0) NoPi0 = true;
+    if (nPi0_Total == 1) SinglePi0 = true;
+    if (nPi0_Total > 1) MultiPi0 = true;
+
+    truthEvent->setIntData("Bckg_nPi0_Primary",nPi0_Primary);
+    truthEvent->setIntData("Bckg_nPi0_Secondary",nPi0_Secondary);
+    truthEvent->setIntData("Bckg_nPi0_Total",nPi0_Total);
+    truthEvent->filtertaglist()->setOrAddFilterTag( "Bckg_NoPi0", NoPi0 );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "Bckg_SinglePi0", SinglePi0 );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "Bckg_MultiPi0", MultiPi0 );
+   
+    debug()<<"\tnPi0_Primary = "<<nPi0_Primary<<endmsg;
+    debug()<<"\tnPi0_Secondary = "<<nPi0_Secondary<<endmsg;
+    debug()<<"\tnPi0_Total = "<<nPi0_Total<<endmsg;
+    debug()<<"\tBckg_NoPi0 = "<<NoPi0<<endmsg;    
+    debug()<<"\tBckg_SinglePi0 = "<<SinglePi0<<endmsg;    
+    debug()<<"\tBckg_MultiPi0 = "<<MultiPi0<<endmsg;    
+    
+    debug()<<"Exit CCProtonPi0::tagBackgroundWithPi0()"<<endmsg;
 }
 
 //------------------------------------------------------------------------------
@@ -1228,171 +1333,78 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
     // just to make sure
     if( !trajects ) return;
     
-    int nPiPlus = 0;
-    int nPiMinus = 0;
-    int nPrimaryPiZero = 0;
-    int nSecondaryPiZero = 0;
-    int nAntiMuon = 0;
     int particle_PDG = -1;
-    int particle_ID = -1;
-    int mother_ID = -1;
-    
-    bool isQELike = false;
-    bool isSinglePiPlus = false;
-    bool isSinglePiMinus = false;
-    bool isMultiPion = false;
-    bool isMultiPiZero = false;
-    bool isOther = false;
-    
-    bool hasAntiMuon = false;
-    bool hasMichel = false;
-    bool hasPrimaryPi0 = false;
-    bool hasSecondaryPi0 = false;
-    
-    std::vector<int> primary_traj_ID;
-    std::vector<int> primary_Pi0_ID;
-    
-    // Identify Primary Trajectories
+    int nAntiMuon = 0;
+    int nMuon = 0;
+    int nNucleon = 0;
+    int nPion = 0;
+    int nOther = 0;
+    // Count FS Primary Particles 
     for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
         
         if ( (*it_mcpart)->GetProcessName() == "Primary"){
             
             particle_PDG = (*it_mcpart)->GetPDGCode();
-            particle_ID = (*it_mcpart)->GetTrackId();
-            
-            // Save Primary Trajectory IDs
-            primary_traj_ID.push_back(particle_ID);
-            
-            // Count Particles
-            if (particle_PDG == -(PDG::muon)) nAntiMuon++;
-            if (particle_PDG == PDG::pi) nPiPlus++;
-            if (particle_PDG == -(PDG::pi)) nPiMinus++;
-            if (particle_PDG == PDG::pi0){ 
-                nPrimaryPiZero++;
-                primary_Pi0_ID.push_back(particle_ID);
-            } 
-        }   
-    }
+    
+            if ( particle_PDG == -(PDG::muon) ) nAntiMuon++;
+            else if (particle_PDG == PDG::muon) nMuon++;
+            else if ( (particle_PDG == PDG::proton) || (particle_PDG == PDG::neutron) ) nNucleon++;
+            else if ( (std::abs(particle_PDG) == PDG::pi) || (particle_PDG == PDG::pi0 ) ) nPion++;
+            else nOther++;    
+        }
+    } 
     
     // -------------------------------------------------------------------------
     // Background Types 
     // -------------------------------------------------------------------------
-    if( isBackgroundQELike(truthEvent) ) isQELike = true;    // Check for QE-Like Events
-    else if (nPiPlus == 1 && nPiMinus == 0 ) isSinglePiPlus = true;                
-    else if (nPiPlus == 0 && nPiMinus == 1 ) isSinglePiMinus = true;
-    else if ((nPiPlus + nPiMinus) > 1 ) isMultiPion = true; //MultiPion is Multiple Charged Pion
-    // If there is NO Charged Pion out of nucleus, check for Multiple Pi0
-    else if ( ((nPiPlus + nPiMinus) == 0) && nPrimaryPiZero > 1 )isMultiPiZero = true;
+    bool isAntiNeutrino = false;
+    bool isQELike = false;
+    bool isSinglePion = false;
+    bool isDoublePion = false;
+    bool isMultiPion = false;
+    bool isOther = false;
+    
+    if (nAntiMuon == 1) isAntiNeutrino = true;
+    else if (nPion == 0 && nOther == 0) isQELike = true;
+    else if (nPion == 1) isSinglePion = true;
+    else if (nPion == 2) isDoublePion = true;
+    else if (nPion > 2) isMultiPion = true;
     else isOther = true;
     
-    
     // -------------------------------------------------------------------------
-    // Check for Background Branching: hasMichel, hasPrimaryPi0, hasSecondaryPi0
+    // Check for Background Branching: hasMichel
     // -------------------------------------------------------------------------
- 
-    if(nAntiMuon > 0) hasAntiMuon = true;
+    bool hasMichel = false;
     hasMichel = checkMichel(truthEvent);
-    
-    // Loop over Secondary Trajectories to Check Secondary Pi0
-    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
-        
-        // Skip Primary Trajectories
-        if ( (*it_mcpart)->GetProcessName() == "Primary") continue;
-        
-        particle_PDG =  (*it_mcpart)->GetPDGCode();
-        mother_ID = (*it_mcpart)->GetParentId();
-        
-        // Check Trajectory Mother is NOT a Primary Pi0 - Scattering
-        if ( particle_PDG == PDG::pi0 && !isMotherPrimary(primary_Pi0_ID, mother_ID) ){
-            nSecondaryPiZero++;
-        }
-    }
-    
-    if (nPrimaryPiZero > 0) hasPrimaryPi0 = true;
-    if (nSecondaryPiZero > 0) hasSecondaryPi0 = true;
-
-    
+  
+    debug()<<"nAntiMuon = "<<nAntiMuon<<endmsg;
+    debug()<<"nNucleon = "<<nNucleon<<endmsg;
+    debug()<<"nPion = "<<nPion<<endmsg;
+    debug()<<"nOther = "<<nOther<<endmsg;
     debug()<<"Interaction Type = "<<truthEvent->interactionType()<<endmsg;
     debug()<<"Background Type!"<<endmsg;
-    debug()<<"  QuasiElastic Like = "<<isQELike<<endmsg;
-    debug()<<"  SinglePiPlus = "<<isSinglePiPlus<<endmsg;
-    debug()<<"  SinglePiMinus = "<<isSinglePiMinus<<endmsg;
-    debug()<<"  MultiPion = "<<isMultiPion<<endmsg;
-    debug()<<"  MultiPiZero = "<<isMultiPiZero<<endmsg;
-    debug()<<"  Other = "<<isOther<<endmsg;
+    debug()<<"\tisAntiNeutrino = "<<isAntiNeutrino<<endmsg;
+    debug()<<"\tisQELike = "<<isQELike<<endmsg;
+    debug()<<"\tisSinglePion = "<<isSinglePion<<endmsg;
+    debug()<<"\tisDoublePion = "<<isDoublePion<<endmsg;
+    debug()<<"\tisMultiPion = "<<isMultiPion<<endmsg;
+    debug()<<"\tisOther = "<<isOther<<endmsg;
     debug()<<"Background Branching!"<<endmsg;
-    debug()<<"  hasAntiMuon = "<<hasAntiMuon<<endmsg;
-    debug()<<"  hasMichel = "<<hasMichel<<endmsg;
-    debug()<<"  hasPrimaryPi0 = "<<hasPrimaryPi0<<endmsg;
-    debug()<<"  hasSecondaryPi0 = "<<hasSecondaryPi0<<endmsg;
- 
+    debug()<<"\thasMichel = "<<hasMichel<<endmsg;
+
+    truthEvent->setIntData("Bckg_nPion",nPion);
+    truthEvent->setIntData("Bckg_nOther",nOther);
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_AntiNeutrino", isAntiNeutrino );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_QELike", isQELike );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_SinglePiPlus", isSinglePiPlus );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_SinglePiMinus", isSinglePiMinus );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_SinglePion", isSinglePion );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_DoublePion", isDoublePion );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_MultiPion", isMultiPion );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_MultiPiZero", isMultiPiZero );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_Other", isOther );
-    
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_withAntiMuon", hasAntiMuon );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_withMichel", hasMichel );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_withPrimaryPi0", hasPrimaryPi0 );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_withSecondaryPi0", hasSecondaryPi0 );
-    
+
+    debug()<<"Exit CCProtonPi0::tagBackground()"<<endmsg;
 }
 
-
-
-//------------------------------------------------------------------------------
-// isBackgoundQELike() 
-//      Check Primary Trajectories for a Background Event to decide whether it is a QE like or not
-//      Returns TRUE if event has only protons and neutrons outside of Nucleus (muon is OK)
-//------------------------------------------------------------------------------
-bool CCProtonPi0::isBackgroundQELike(Minerva::GenMinInteraction* truthEvent) const
-{
-    debug() << "Enter CCProtonPi0::isBackgoundQELike()" << endmsg;
-    
-    const SmartRefVector<Minerva::TG4Trajectory> pri_trajectories = truthEvent->trajectories();
-    SmartRefVector<Minerva::TG4Trajectory>::const_iterator it_mcpart;
-    int N_other = 0;
-    int particle_PDG;
-    
-    for (it_mcpart = pri_trajectories.begin(); it_mcpart != pri_trajectories.end(); ++it_mcpart){
-        particle_PDG =  (*it_mcpart)->GetPDGCode();
-        if (  particle_PDG == PDG::proton ) continue;
-        else if ( particle_PDG == PDG::neutron ) continue;
-        else if ( particle_PDG == PDG::muon ) continue;
-        else if ( particle_PDG == -(PDG::muon) ) continue;
-        else N_other++;
-    }
-    
-    // If there are Other Particles than proton, neutron, muon, or antimuon
-    if (N_other > 0) return false;
-    else return true;
-    
-}
-
-
-//------------------------------------------------------------------------------
-// checkPionAbsorption() 
-//      Checks for Pion Absorption inside Nucleus for Events Does not have a pion outside
-//      Returns TRUE if there is a pion inside (pi+,pi-,pi0)
-//------------------------------------------------------------------------------
-bool CCProtonPi0::checkPionAbsorption(Minerva::GenMinInteraction* truthEvent) const
-{
-    debug() <<"Enter: CCProtonPi0::checkPionAbsorption()" << endmsg;
-    
-    const Minerva::GenMinEventRecord* eventRecord = truthEvent->eventRecord();
-    const std::vector<int> eRecPartID = eventRecord->eRecPartID();
-
-    for(unsigned int g_part = 0; g_part < eRecPartID.size(); g_part++ ){
-        if (eRecPartID[g_part] == PDG::pi) return true;
-        if (eRecPartID[g_part] == -(PDG::pi)) return true;
-        if (eRecPartID[g_part] == PDG::pi0) return true;
-    }
-    
-    return false;
-    
-}
 //------------------------------------------------------------------------------
 // checkMichel() 
 //      Check MC Trajectories for a PiPlus to MuPlus Decay
@@ -1880,7 +1892,6 @@ void CCProtonPi0::writeFSParticleTable(bool isSignal) const
         particle_PDG =  (*rit_mcpart)->GetPDGCode();
         mother_ID = (*rit_mcpart)->GetParentId();
         
-        
         if ( isMotherPrimary(primary_traj_ID, mother_ID) ){
             if (particle_PDG == -(PDG::muon) ){
                 std::cout<<"Michel!"<<std::endl;
@@ -1981,7 +1992,6 @@ void CCProtonPi0::setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) cons
     int t_pi0_GrandMotherStatus= -9;
     int ind_Mother;
     int ind_GrandMother;
-    
 
     for (unsigned int g_part = 0; g_part < eRecPartID.size(); g_part++){
         if (eRecPartID[g_part] == 111){
@@ -4718,18 +4728,11 @@ bool CCProtonPi0::ShouldReconstructEvent( Minerva::PhysicsEvent *event, Minerva:
 {
     //--------------------------------------------------------------------------
     // Do NOT Reconstruct the Event -
-    //      if the TRUE Vertex is NOT Fiducial
-    //      if the AnalyzeEvent is False - TagTruth() Decides This
+    //      if the ReconstructEvent is False - tagTruth() Decides This
     //--------------------------------------------------------------------------    
     if( truthEvent ){
-        info() << "This is a MC event." << endmsg;
-        if ( !(truthEvent->filtertaglist()->isFilterTagTrue("isFidVol")) ){
-            debug() << "True Vertex is NOT Fiducial!" <<endmsg;
-            return false;
-        }
-        
-        if ( !(truthEvent->filtertaglist()->isFilterTagTrue("AnalyzeEvent")) ){
-            debug() << "TagTruth() Marked Event as Do NOT Analyze!" <<endmsg;
+        if ( !(truthEvent->filtertaglist()->isFilterTagTrue("ReconstructEvent")) ){
+            debug() << "TagTruth() Marked Event as Do NOT Reconstruct!" <<endmsg;
             return false; 
         }
     }
@@ -5098,5 +5101,26 @@ void CCProtonPi0::SaveEventTime(Minerva::PhysicsEvent *event) const
     event->setIntData( "tdead", tdead );
 
 }
+
+bool CCProtonPi0::isTrueVertexFiducial(Minerva::GenMinInteraction* truthEvent) const
+{
+    bool isFidVol = FiducialPointTool->isFiducial(truthEvent, m_fidHexApothem, m_fidUpStreamZ, m_fidDownStreamZ );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isFidVol", isFidVol );
+    return isFidVol;
+}
+
+bool CCProtonPi0::isInteractionCC(Minerva::GenMinInteraction* truthEvent) const
+{
+    bool isCC = false;
+    int current = truthEvent->current();
+    
+    if ( current == 1 ) isCC = true;
+    else isCC = false;
+    
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isCC", isCC );
+
+    return isCC;
+}
+
 #endif
 

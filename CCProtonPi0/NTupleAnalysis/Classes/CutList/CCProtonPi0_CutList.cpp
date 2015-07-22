@@ -13,6 +13,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(int nMode) : CCProtonPi0_NTupleAnalysis
     cout<<"Initializing CCProtonPi0_CutList"<<endl;
     
     if(nMode == 0){
+        nTrueSignal = 249047;
         SetCutNames();
         OpenOutputFile();
 
@@ -154,7 +155,7 @@ void CCProtonPi0_CutList::writeCutTableHeader()
     
     cutText.width(12); cutText<<"N(Events)"<<" ";    
     cutText.width(12); cutText<<"N(Signal)"<<" ";      
-    cutText.width(12); cutText<<"Eff(FidVol)"<<" ";      
+    cutText.width(12); cutText<<"Eff(AllSignal)"<<" ";      
     cutText.width(12); cutText<<"Eff(MINOS)"<<" ";      
     cutText.width(12); cutText<<"Purity"<<" ";
     cutText.width(12); cutText<<"N(Study1)"<<" "; 
@@ -166,6 +167,14 @@ double CCProtonPi0_CutList::getCutEfficiency(CCProtonPi0_Cut& currentCut, CCProt
 {
     double nSignal_current = currentCut.nSignal.getCount();
     double nSignal_effBase = effBase.nSignal.getCount(); 
+    double eff = (nSignal_current / nSignal_effBase) * 100.0;
+    return eff;   
+}
+
+double CCProtonPi0_CutList::getCutEfficiency(CCProtonPi0_Cut& currentCut, double effBase) const
+{
+    double nSignal_current = currentCut.nSignal.getCount();
+    double nSignal_effBase = effBase; 
     double eff = (nSignal_current / nSignal_effBase) * 100.0;
     return eff;   
 }
@@ -231,11 +240,11 @@ void CCProtonPi0_CutList::writeCutTableRows()
 
 void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& currentCut)
 {
-    double eff_FidVolume;
+    double eff_AllSignal;
     double eff_MINOS;
     double purity;    
 
-    eff_FidVolume = getCutEfficiency(currentCut,nCut_Vertex_Not_Fiducial);
+    eff_AllSignal = getCutEfficiency(currentCut,nTrueSignal);
     eff_MINOS = getCutEfficiency(currentCut,nCut_Muon_None);
     purity = getCutPurity(currentCut);
             
@@ -246,8 +255,8 @@ void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& currentCut)
     cutText.width(12); cutText<<currentCut.nSignal.getCount()<<" ";
 
     // Efficiency
-    if ( eff_FidVolume <= 100){
-        cutText.width(12); cutText<<eff_FidVolume<<" ";
+    if ( eff_AllSignal <= 100){
+        cutText.width(12); cutText<<eff_AllSignal<<" ";
     }else{
         cutText.width(12); cutText<<"N/A"<<" ";    
     }
@@ -272,14 +281,14 @@ void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& currentCut)
 
 void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& nCut_1Prong, CCProtonPi0_Cut& nCut_2Prong)
 {
-    double eff_FidVolume;
+    double eff_AllSignal;
     double eff_MINOS;
     double purity;    
 
     // ------------------------------------------------------------------------
     // Write nCut_1Prong  Statistics
     // ------------------------------------------------------------------------
-    eff_FidVolume = getCutEfficiency(nCut_1Prong,nCut_Vertex_Not_Fiducial);
+    eff_AllSignal = getCutEfficiency(nCut_1Prong,nTrueSignal);
     eff_MINOS = getCutEfficiency(nCut_1Prong,nCut_Muon_None);
     purity = getCutPurity(nCut_1Prong);
             
@@ -293,8 +302,8 @@ void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& nCut_1Prong, CCProtonP
     cutText.precision(4); 
 
     // Efficiency
-    if ( eff_FidVolume <= 100){
-        cutText.width(12); cutText<<eff_FidVolume<<" ";
+    if ( eff_AllSignal <= 100){
+        cutText.width(12); cutText<<eff_AllSignal<<" ";
     }else{
         cutText.width(12); cutText<<"N/A"<<" ";    
     }
@@ -315,7 +324,7 @@ void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& nCut_1Prong, CCProtonP
     // ------------------------------------------------------------------------
     // Write nCut_2Prong Statistics
     // ------------------------------------------------------------------------
-    eff_FidVolume = getCutEfficiency(nCut_2Prong,nCut_Vertex_Not_Fiducial);
+    eff_AllSignal = getCutEfficiency(nCut_2Prong,nCut_Vertex_Not_Fiducial);
     eff_MINOS = getCutEfficiency(nCut_2Prong,nCut_Muon_None);
     purity = getCutPurity(nCut_2Prong);
             
@@ -327,8 +336,8 @@ void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& nCut_1Prong, CCProtonP
     cutText.precision(4); 
 
     // Efficiency
-    if ( eff_FidVolume <= 100){
-        cutText.width(12); cutText<<eff_FidVolume<<" ";
+    if ( eff_AllSignal <= 100){
+        cutText.width(12); cutText<<eff_AllSignal<<" ";
     }else{
         cutText.width(12); cutText<<"N/A"<<" ";    
     }
