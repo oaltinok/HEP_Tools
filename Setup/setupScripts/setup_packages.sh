@@ -6,6 +6,7 @@
 Package_List=(Tools/SystemTests
     Tools/CondorUtils
     Tools/ProductionScripts
+    Rec/ParticleMaker
     Ana/CCProtonPi0
     Ana/PlotUtils
     Ana/UnfoldUtils)
