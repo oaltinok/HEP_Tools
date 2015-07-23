@@ -41,6 +41,6 @@
 
 ### Setup Scripts for CCProtonPi0
 
-* CCProtonPi0 Package requires MINERvA Software Framwork to run
-* These setup scripts make sure user have the correct environmental variables
+* CCProtonPi0 Package requires MINERvA Software Framework to run
+* These setup scripts make sure that the user have the correct environmental variables
   
