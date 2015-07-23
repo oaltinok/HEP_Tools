@@ -1,8 +1,8 @@
 # Packages for Minerva Neutrino Experiment
 
-|Statistical Data Analysis |MINERvA Operations| Other Algorithms	|
-|----|-----|-----|
-|CCProtonPi0	|CAMAC_DataReader|dEdX Improvement	|
+|Statistical Data Analysis |MINERvA Operations| Other Algorithms|Setup|
+|----|-----|-----|-----|
+|CCProtonPi0|CAMAC_DataReader|dEdX Improvement|Setup Scripts for CCProtonPi0|
 
 
 * These packages are specialized for MINERvA Experiment data format.
@@ -37,5 +37,10 @@
 
 * Improvement on pID Calculation: Algorithm improves the pID in case the particle trajectory overlaps with another trajectory.
 
+## Setup:
 
+### Setup Scripts for CCProtonPi0
+
+* CCProtonPi0 Package requires MINERvA Software Framwork to run
+* These setup scripts make sure user have the correct environmental variables
   
