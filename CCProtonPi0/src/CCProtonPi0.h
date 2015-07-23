@@ -226,7 +226,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void VertexBlob( Minerva::PhysicsEvent *event ) const;
         bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
         bool isTrueVertexFiducial(Minerva::GenMinInteraction* truthEvent) const;
-        bool isInteractionCC(Minerva::GenMinInteraction* truthEvent) const;
+        bool isInteractionNC(Minerva::GenMinInteraction* truthEvent) const;
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
         bool createTrackedParticles(Minerva::PhysicsEvent *event ) const;
         bool getProtonProng(Minerva::PhysicsEvent *event ) const;

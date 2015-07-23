@@ -293,6 +293,7 @@ StatusCode CCProtonPi0::initialize()
     // ------------------------------------------------------------------------
     declareBoolTruthBranch("isSignal");
     declareBoolTruthBranch("isFidVol");
+    declareBoolTruthBranch("isNC");
     declareBoolTruthBranch("ReconstructEvent");
     
     // BackgroundWithPi0
@@ -306,6 +307,7 @@ StatusCode CCProtonPi0::initialize()
     // Background Types
     declareIntTruthBranch("Bckg_nPion", -1);
     declareIntTruthBranch("Bckg_nOther", -1);
+    declareBoolTruthBranch("isBckg_NC");
     declareBoolTruthBranch("isBckg_AntiNeutrino");
     declareBoolTruthBranch("isBckg_QELike");
     declareBoolTruthBranch("isBckg_SinglePion");
@@ -1029,14 +1031,7 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
         truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", false );
         return StatusCode::SUCCESS;
     }  
-    
-    // Return immediately - If the interaction is NOT CC
-    if ( !isInteractionCC(truthEvent)){
-        debug() <<"Do NOT Reconstruct Event - Neutral Current Interaction" << endmsg;
-        truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", false );
-        return StatusCode::SUCCESS;
-    }
-    
+       
     //--------------------------------------------------------------------------
     // Fill GENIE Weight Branches
     //--------------------------------------------------------------------------
@@ -1357,14 +1352,16 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
     // -------------------------------------------------------------------------
     // Background Types 
     // -------------------------------------------------------------------------
+    bool isNC = isInteractionNC(truthEvent);
     bool isAntiNeutrino = false;
     bool isQELike = false;
     bool isSinglePion = false;
     bool isDoublePion = false;
     bool isMultiPion = false;
     bool isOther = false;
-    
-    if (nAntiMuon == 1) isAntiNeutrino = true;
+   
+    if (isNC) ; //Do Nothing
+    else if (nAntiMuon == 1) isAntiNeutrino = true;
     else if (nPion == 0 && nOther == 0) isQELike = true;
     else if (nPion == 1) isSinglePion = true;
     else if (nPion == 2) isDoublePion = true;
@@ -1383,6 +1380,7 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
     debug()<<"nOther = "<<nOther<<endmsg;
     debug()<<"Interaction Type = "<<truthEvent->interactionType()<<endmsg;
     debug()<<"Background Type!"<<endmsg;
+    debug()<<"\tisNC = "<<isNC<<endmsg;
     debug()<<"\tisAntiNeutrino = "<<isAntiNeutrino<<endmsg;
     debug()<<"\tisQELike = "<<isQELike<<endmsg;
     debug()<<"\tisSinglePion = "<<isSinglePion<<endmsg;
@@ -1394,6 +1392,7 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
 
     truthEvent->setIntData("Bckg_nPion",nPion);
     truthEvent->setIntData("Bckg_nOther",nOther);
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_NC", isNC );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_AntiNeutrino", isAntiNeutrino );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_QELike", isQELike );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_SinglePion", isSinglePion );
@@ -3617,8 +3616,8 @@ bool CCProtonPi0::AreBlobsGood() const
 {
     Pi0BlobTool Pi0Blob_Tool;
 
-    bool isPi0Blob1Good = Pi0Blob_Tool.isBlobGood(m_Pi0Blob1, m_idDet);
-    bool isPi0Blob2Good = Pi0Blob_Tool.isBlobGood(m_Pi0Blob2, m_idDet);
+    bool isPi0Blob1Good = Pi0Blob_Tool.isBlobGood(m_Pi0Blob1);
+    bool isPi0Blob2Good = Pi0Blob_Tool.isBlobGood(m_Pi0Blob2);
 
     if (isPi0Blob1Good && isPi0Blob2Good){
         debug()<<"Both Pi0Blobs are Good! -- Returning true"<<endmsg;
@@ -5109,17 +5108,17 @@ bool CCProtonPi0::isTrueVertexFiducial(Minerva::GenMinInteraction* truthEvent) c
     return isFidVol;
 }
 
-bool CCProtonPi0::isInteractionCC(Minerva::GenMinInteraction* truthEvent) const
+bool CCProtonPi0::isInteractionNC(Minerva::GenMinInteraction* truthEvent) const
 {
-    bool isCC = false;
+    bool isNC = false;
     int current = truthEvent->current();
     
-    if ( current == 1 ) isCC = true;
-    else isCC = false;
+    if ( current == 2 ) isNC = true;
+    else isNC = false;
     
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isCC", isCC );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isNC", isNC );
 
-    return isCC;
+    return isNC;
 }
 
 #endif

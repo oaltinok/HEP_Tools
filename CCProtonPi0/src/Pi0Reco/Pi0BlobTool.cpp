@@ -17,32 +17,63 @@ Pi0BlobTool::Pi0BlobTool()
     // Do Nothing!
 }
 
-bool Pi0BlobTool::isBlobGood( const Minerva::IDBlob* pi0_blob, const Minerva::DeDetector* idDet )
+bool Pi0BlobTool::isBlobGood( const Minerva::IDBlob* pi0_blob)
 {
     cout<<"Enter Pi0BlobTool::isBlobGood()"<<endl;
     
     // Sanity Check
     if (pi0_blob == NULL) return false;
    
-    FillNodesVector(pi0_blob, idDet);
-   
-    // Set Track
-    Pi0Blob_Track = new Minerva::Track(nodes);
+    FillNodesVector_and_SetTrack(pi0_blob);
     
-    cout<<"Track Parameters"<<endl;
-    cout<<"Position = "<<Pi0Blob_Track->position()<<endl;
-    cout<<"Slopes = "<<Pi0Blob_Track->slopes()<<endl;
-    cout<<"Chi2 = "<<Pi0Blob_Track->chi2()<<endl;
-    
+    FillClusterVectors();
+
+    CheckClusterVectors();
+
+
     cout<<"Exit Pi0BlobTool::isBlobGood()"<<endl;
     
     return true;
 }
 
-void Pi0BlobTool::FillNodesVector(const Minerva::IDBlob* pi0_blob, const Minerva::DeDetector* idDet)
+void Pi0BlobTool::CheckClusterVectors()
 {
-    cout<<"Enter Pi0BlobTool::FillNodesVector()"<<endl;
+    CheckClusterVector(All_clusters);
+    CheckClusterVector(X_clusters);
+    CheckClusterVector(U_clusters);
+    CheckClusterVector(V_clusters);
+}
+
+void Pi0BlobTool::CheckClusterVector(std::vector<Minerva::IDCluster*> &clusters)
+{
+    for (unsigned int i = 0; i < clusters.size(); i++){
+        cout<<"View = "<<clusters[i]->view();
+        cout<<" Z = "<<clusters[i]->z();
+        cout<<" Pos = "<<clusters[i]->position();
+        cout<<" L-Pos = "<<clusters[i]->lpos()<<endl; 
+    }
+    cout<<"----------------------------"<<endl;
+}
+
+void Pi0BlobTool::FillClusterVectors()
+{
+    std::vector<Minerva::IDCluster*> clusters = Pi0Blob_Track->idclusters();
+    Minerva::IDCluster* tempCluster = NULL;
     
+    for( unsigned int i = 0; i < clusters.size(); i ++){
+        tempCluster = new Minerva::IDCluster(*(clusters[i]));
+        
+        All_clusters.push_back(tempCluster);
+        
+        // Fill Each View
+        if ( tempCluster->view() == Minerva::IDCluster::X) X_clusters.push_back(tempCluster);
+        else if ( tempCluster->view() == Minerva::IDCluster::U) U_clusters.push_back(tempCluster);
+        else if ( tempCluster->view() == Minerva::IDCluster::V) V_clusters.push_back(tempCluster);
+    }
+}
+
+void Pi0BlobTool::FillNodesVector_and_SetTrack(const Minerva::IDBlob* pi0_blob)
+{
     Minerva::Node* tempNode = NULL;
     SmartRefVector<Minerva::IDCluster> clusters = pi0_blob->clusters();
     SmartRefVector<Minerva::IDCluster>::iterator iter_c;
@@ -51,24 +82,11 @@ void Pi0BlobTool::FillNodesVector(const Minerva::IDBlob* pi0_blob, const Minerva
         tempNode = new Minerva::Node(*iter_c);
         nodes.push_back(tempNode);
     }
- 
-    // Check nodes
-    for( unsigned int i = 0; i < nodes.size(); i++){
-        cout<<i<<" Node View: "<<nodes[i]->view()<<" Position: "<<nodes[i]->position()<<endl;
-        AlignNode(nodes[i], idDet);
-        cout<<i<<" Node View: "<<nodes[i]->view()<<" Position: "<<nodes[i]->position()<<endl;
-        cout<<"----"<<endl;
-    }
-  
 
-    cout<<"Exit Pi0BlobTool::FillNodesVector()"<<endl;
+    // Set Track
+    Pi0Blob_Track = new Minerva::Track(nodes);
 }
 
-void Pi0BlobTool::AlignNode(Minerva::Node* node, const Minerva::DeDetector* idDet)
-{
-    Minerva::DePlane const * plane = idDet->getDePlane( node->planeid() );
-    node->idcluster()->setLpos( plane->getLPos( node->position() ) );
-}
 
 #endif
 
