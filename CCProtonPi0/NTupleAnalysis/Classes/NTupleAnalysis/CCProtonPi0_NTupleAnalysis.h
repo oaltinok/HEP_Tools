@@ -29,7 +29,8 @@ class CCProtonPi0_NTupleAnalysis
     public:
         CCProtonPi0_NTupleAnalysis(int nMode);
         
-        // Constants
+        // Constants 
+        static const int nHistograms = 12;
         static const int nTopologies = 2;
         static const double SENTINEL = -9.9;
         
@@ -40,7 +41,6 @@ class CCProtonPi0_NTupleAnalysis
     private:
         void SetAnalysisMode(int nMode);
 };
-
 
 
 #endif

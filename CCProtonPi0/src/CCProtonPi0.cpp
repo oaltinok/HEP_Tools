@@ -300,9 +300,9 @@ StatusCode CCProtonPi0::initialize()
     declareIntTruthBranch("Bckg_nPi0_Primary", -1);
     declareIntTruthBranch("Bckg_nPi0_Secondary", -1);
     declareIntTruthBranch("Bckg_nPi0_Total", -1);
-    declareBoolTruthBranch("Bckg_NoPi0");
-    declareBoolTruthBranch("Bckg_SinglePi0");
-    declareBoolTruthBranch("Bckg_MultiPi0");
+    declareBoolTruthBranch("isBckg_NoPi0");
+    declareBoolTruthBranch("isBckg_SinglePi0");
+    declareBoolTruthBranch("isBckg_MultiPi0");
 
     // Background Types
     declareIntTruthBranch("Bckg_nPion", -1);
@@ -774,8 +774,8 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     // Use Pi0BlobTool to check Pi0Blob Quality
     if ( !AreBlobsGood() ){
         event->setIntData("Cut_BlobsBad",1);
-        if( m_store_all_events ) return interpretFailEvent(event); 
-        else return StatusCode::SUCCESS;  
+        //if( m_store_all_events ) return interpretFailEvent(event); 
+        //else return StatusCode::SUCCESS;  
     }
 
     debug()<<"FINISH: Pi0 Reconstruction"<<endmsg;
@@ -1291,9 +1291,9 @@ void CCProtonPi0::tagBackgroundWithPi0(Minerva::GenMinInteraction* truthEvent) c
     truthEvent->setIntData("Bckg_nPi0_Primary",nPi0_Primary);
     truthEvent->setIntData("Bckg_nPi0_Secondary",nPi0_Secondary);
     truthEvent->setIntData("Bckg_nPi0_Total",nPi0_Total);
-    truthEvent->filtertaglist()->setOrAddFilterTag( "Bckg_NoPi0", NoPi0 );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "Bckg_SinglePi0", SinglePi0 );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "Bckg_MultiPi0", MultiPi0 );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_NoPi0", NoPi0 );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_SinglePi0", SinglePi0 );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_MultiPi0", MultiPi0 );
    
     debug()<<"\tnPi0_Primary = "<<nPi0_Primary<<endmsg;
     debug()<<"\tnPi0_Secondary = "<<nPi0_Secondary<<endmsg;
@@ -1558,23 +1558,27 @@ void CCProtonPi0::writeBackgroundType(Minerva::GenMinInteraction* truthEvent) co
     if(truthEvent->filtertaglist()->isFilterTagTrue("isSignal")) return;
      
     // Print Background Type
-    if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_QELike")) info() <<"Background: QE Like"<<endmsg;
-    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_AntiMuon")) info() <<"Background: Anti-Muon"<<endmsg;
-    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_SinglePiPlus")) info() <<"Background: Single PiPlus"<<endmsg;
-    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_SinglePiMinus")) info() <<"Background: Single PiMinus"<<endmsg;
-    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_MultiPion")) info() <<"Background: Multiple Charged Pion"<<endmsg;
-    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_MultiPiZero")) info() <<"Background: Multiple PiZero"<<endmsg;
-    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_PionAbsorption")) info() <<"Background: Pion Absorption"<<endmsg;
-    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_Other")) info() <<"Background: Other"<<endmsg;
+    info()<<"Background With Pi0"<<endmsg;
+    if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_NoPi0")) info() <<"\tBackground without Pi0"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_SinglePi0")) info() <<"\tBackground with Single Pi0"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_MultiPi0")) info() <<"\tBackground with Multi Pi0"<<endmsg;
+    else warning()<<"No BackgroundWithPi0!"<<endmsg;
+    
+    info()<<"Background Type"<<endmsg;
+    if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_NC")) info()<<"\tBackground: NC"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_AntiNeutrino")) info() <<"\tBackground: AntiNeutrino"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_QELike")) info() <<"\tBackground: QE Like (No Pion)"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_SinglePion")) info() <<"\tBackground: Single Pion"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_DoublePion")) info() <<"\tBackground: Double Pion"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_MultiPion")) info() <<"\tBackground: Multiple Pion"<<endmsg;
+    else if (truthEvent->filtertaglist()->isFilterTagTrue("isBckg_Other")) info() <<"\tBackground: Other"<<endmsg;
     else warning()<< "No Background Type!"<<endmsg;
     
     // Print Branching Information
     bool hasMichel = truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withMichel");
-    bool hasPi0 = truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withPi0");
-    bool hasGamma = truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withGamma");
     
     info()<<"Background Branching: "<<endmsg;
-    info()<<"   Michel = "<<hasMichel<<" hasPi0 = "<<hasPi0<<" hasGamma = "<<hasGamma<<endmsg;
+    info()<<"\tMichel = "<<hasMichel<<endmsg;
 }
 
 //------------------------------------------------------------------------------
@@ -3614,18 +3618,18 @@ bool CCProtonPi0::ConeBlobs( Minerva::PhysicsEvent *event ) const
 
 bool CCProtonPi0::AreBlobsGood() const
 {
-    Pi0BlobTool Pi0Blob_Tool;
+    Pi0BlobTool Pi0Blob_Tool_1;
 
-    bool isPi0Blob1Good = Pi0Blob_Tool.isBlobGood(m_Pi0Blob1);
-    bool isPi0Blob2Good = Pi0Blob_Tool.isBlobGood(m_Pi0Blob2);
+    bool isPi0Blob1Good = Pi0Blob_Tool_1.isBlobGood(m_Pi0Blob1);
 
-    if (isPi0Blob1Good && isPi0Blob2Good){
-        debug()<<"Both Pi0Blobs are Good! -- Returning true"<<endmsg;
-        return true;
-    }else{
-        debug()<<"Pi0Blobs are Bad! -- Returning false"<<endmsg;
-        return false;
-    }
+    return isPi0Blob1Good;
+//    if (isPi0Blob1Good && isPi0Blob2Good){
+//        debug()<<"Both Pi0Blobs are Good! -- Returning true"<<endmsg;
+//        return true;
+//    }else{
+//        debug()<<"Pi0Blobs are Bad! -- Returning false"<<endmsg;
+//        return false;
+//    }
 }
 
 bool CCProtonPi0::AreBlobsDirectionGood() const

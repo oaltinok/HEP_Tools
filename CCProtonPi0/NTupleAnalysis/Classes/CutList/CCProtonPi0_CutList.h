@@ -20,15 +20,15 @@ Class: CCProtonPi0_CutList
 #include <cstdlib>
 #include <string>
 #include <TMath.h>
-#include <TH1.h>
-#include <TH2.h>
 #include <TFile.h>
+#include <PlotUtils/MnvH1D.h>
+#include <PlotUtils/MnvH2D.h>
 
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 #include "../Cut/CCProtonPi0_Cut.h"
 #include "../BinList/CCProtonPi0_BinList.h"
 
-using namespace std;
+using namespace PlotUtils;
 
 class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis 
 {
@@ -37,7 +37,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         ~CCProtonPi0_CutList();
         
         void writeCutTable();
-        void writeRootFile(); 
+        void writeHistograms();
         // -------------------------------------------------------------------------
         //     CCProtonPi0_Cut Numbers
         //--------------------------------------------------------------------------
@@ -46,7 +46,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_Vertex_None;
         CCProtonPi0_Cut nCut_Vertex_Not_Reconstructable; 
         CCProtonPi0_Cut nCut_Vertex_Not_Fiducial;
-        CCProtonPi0_Cut nCut_Vertex_Count;
         CCProtonPi0_Cut nCut_Muon_None;              
         CCProtonPi0_Cut nCut_Muon_Not_Plausible;
         CCProtonPi0_Cut nCut_Muon_Charge;
@@ -55,8 +54,8 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_secEndPoint_Michel_Exist;
         CCProtonPi0_Cut nCut_PreFilter_Pi0;
         CCProtonPi0_Cut nCut_ConeBlobs;
+        CCProtonPi0_Cut nCut_BlobDirectionBad;
         CCProtonPi0_Cut nCut_BlobsBad;
-        CCProtonPi0_Cut nCut_Pi0BlobCuts;
         CCProtonPi0_Cut nCut_Photon1DistanceLow;
         CCProtonPi0_Cut nCut_Photon2DistanceLow;
         CCProtonPi0_Cut nCut_Pi0_invMass;
@@ -81,24 +80,22 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         // Cut Histograms
         // -------------------------------------------------------------------------
         // Common
-        TH1D* hCut_vertexCount;
-        TH1D* hCut_Michel;
-        TH1D* hCut_eVis_nuclearTarget;
-        TH1D* hCut_eVis_other;
-        TH1D* hCut_pi0invMass;
-        TH1D* hCut_gamma1ConvDist;
-        TH1D* hCut_gamma2ConvDist;
+        vector<MnvH1D*> hCut_Michel;
+        vector<MnvH1D*> hCut_eVis_nuclearTarget;
+        vector<MnvH1D*> hCut_eVis_other;
+        vector<MnvH1D*> hCut_pi0invMass;
+        vector<MnvH1D*> hCut_gamma1ConvDist;
+        vector<MnvH1D*> hCut_gamma2ConvDist;
         
-        TH1D* hCut_1Prong_neutrinoE;
-        TH1D* hCut_2Prong_neutrinoE;
-        TH1D* hCut_1Prong_UnusedE;
-        TH1D* hCut_2Prong_UnusedE;
+        vector<MnvH1D*> hCut_1Prong_neutrinoE;
+        vector<MnvH1D*> hCut_2Prong_neutrinoE;
+        vector<MnvH1D*> hCut_1Prong_UnusedE;
+        vector<MnvH1D*> hCut_2Prong_UnusedE;
 
-        
         // 2 Prong Specific
-        TH1D* hCut_protonScore_pIDDiff;
-        TH1D* hCut_protonScore_LLR;
-        TH1D* hCut_deltaInvMass;
+        vector<MnvH1D*> hCut_protonScore_pIDDiff;
+        vector<MnvH1D*> hCut_protonScore_LLR;
+        vector<MnvH1D*> hCut_deltaInvMass;
                
     private:
         void initHistograms();

@@ -1,14 +1,16 @@
-cvs commit -m "v2_20
+cvs commit -m "v2_21 
+Playlist minerva1 for Data and MC
 CCProtonPi0 Updates:
-	Updating the HEAD Version of the package
-		Will continue working with Minerva Release v10r8p6
-	Changed <Do NOT Reconstruct NC Events>
-		Added NC Interactions as Background
-		Thanks Trung for warning me!
-	Pi0BlobTool Updates
-		Not complete!
-		
+	No Major Change
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	No Change
+	Photon Histograms added under Pion Object
+	BackgroundTool completely redesigned
+		Data Structures and Function Designs are improved
+			Now it is easier to add/remove new Backgrounds
+		Text Output is modified to be Excel Ready
+	CutList Histograms Improved
+		Now saving different Histograms for different Event Types 
+			Signal vs Background
+		See <Ozgurs Scratch Page> on Wiki for more information
 " .

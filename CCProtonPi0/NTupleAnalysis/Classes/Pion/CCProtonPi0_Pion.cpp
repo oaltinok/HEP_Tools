@@ -29,6 +29,7 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(int nMode, bool isMC) : CCProtonPi0_Particle(
         bin_KE.setBin(30, 0.0, 3.0);
         bin_invMass.setBin(60,0.0,600.0);
         bin_photonConvLength.setBin(50,0.0,100.0);
+        bin_photonP.setBin(20,0.0,1.0);
         bin_photonEnergy_Asymmetry.setBin(100,0.0,1.0);
         
         initHistograms();   
@@ -40,18 +41,55 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(int nMode, bool isMC) : CCProtonPi0_Particle(
 void CCProtonPi0_Pion::initHistograms()
 {
     // Unique Histograms
+    // Leading Photon - Energetic Photon
     gamma1_ConvLength = new MnvH1D( "gamma1_ConvLength","Leading Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
     gamma1_ConvLength->GetXaxis()->SetTitle("Photon Conversion Length [cm]");
     gamma1_ConvLength->GetYaxis()->SetTitle(Form("Events / %3.2f [cm]",bin_photonConvLength.get_width()));
     
+    gamma1_P = new MnvH1D( "gamma1_P","Leading Photon Momentum",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
+    gamma1_P->GetXaxis()->SetTitle("P_{#gamma_{1}} [GeV]");
+    gamma1_P->GetYaxis()->SetTitle(Form("Events / %3.2f [GeV]",bin_photonP.get_width()));
+
+    gamma1_theta = new MnvH1D( "gamma1_theta","Reconstructed Leading Photon Theta",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+    gamma1_theta->GetXaxis()->SetTitle("Reconstructed #theta_{#gamma_{1}} [Degree]");
+    gamma1_theta->GetYaxis()->SetTitle(Form("Events / %3.1f [Degree]",binList.angle.get_width()));
+
+    gamma1_reco_P_true_P = new TH2D( "gamma1_reco_P_true_P","Leading Photon True vs Reconstructed Momentum",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
+    gamma1_reco_P_true_P->GetXaxis()->SetTitle("Reco P_{#gamma_{1}} [GeV]");
+    gamma1_reco_P_true_P->GetYaxis()->SetTitle("True P_{#gamma_{1}} [GeV]");
+
+    gamma1_P_error = new TH1D( "gamma1_P_error","Error on Leading Photon Momentum",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    gamma1_P_error->GetXaxis()->SetTitle("(P_{Reco}-P_{True})/P_{True}");
+    gamma1_P_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+
     gamma2_ConvLength = new MnvH1D( "gamma2_ConvLength","Secondary Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
     gamma2_ConvLength->GetXaxis()->SetTitle("Photon Conversion Length [cm]");
     gamma2_ConvLength->GetYaxis()->SetTitle(Form("Events / %3.2f [cm]",bin_photonConvLength.get_width()));
     
-    ConvLength_gamma2_gamma1= new MnvH2D( "ConvLength_gamma2_gamma1","Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
-    ConvLength_gamma2_gamma1->GetXaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
-    ConvLength_gamma2_gamma1->GetYaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
+    gamma2_P = new MnvH1D( "gamma2_P","Secondary Photon Momentum",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
+    gamma2_P->GetXaxis()->SetTitle("P_{#gamma_{1}} [GeV]");
+    gamma2_P->GetYaxis()->SetTitle(Form("Events / %3.2f [GeV]",bin_photonP.get_width()));
+
+    gamma2_theta = new MnvH1D( "gamma2_theta","Reconstructed Secondary Photon Theta",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+    gamma2_theta->GetXaxis()->SetTitle("Reconstructed #theta_{#gamma_{1}} [Degree]");
+    gamma2_theta->GetYaxis()->SetTitle(Form("Events / %3.1f [Degree]",binList.angle.get_width()));
+
+    gamma2_reco_P_true_P = new TH2D( "gamma2_reco_P_true_P","Secondary Photon True vs Reconstructed Momentum",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
+    gamma2_reco_P_true_P->GetXaxis()->SetTitle("Reco P_{#gamma_{1}} [GeV]");
+    gamma2_reco_P_true_P->GetYaxis()->SetTitle("True P_{#gamma_{1}} [GeV]");
+ 
+    gamma2_P_error = new TH1D( "gamma2_P_error","Error on Secondary Photon Momentum",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    gamma2_P_error->GetXaxis()->SetTitle("(P_{Reco}-P_{True})/P_{True}");
+    gamma2_P_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+   
+    gamma1_convLength_gamma2_convLength= new TH2D( "gamma1_convLength_gamma2_convLength","Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
+    gamma1_convLength_gamma2_convLength->GetXaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
+    gamma1_convLength_gamma2_convLength->GetYaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
      
+    gamma1_P_gamma2_P = new TH2D( "gamma1_P_gamma2_P","Leading Photon vs Secondary Photon Momentum",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
+    gamma1_P_gamma2_P->GetXaxis()->SetTitle("Reconstructed P_{#gamma_{1}} [GeV]");
+    gamma1_P_gamma2_P->GetYaxis()->SetTitle("Reconstructed P_{#gamma_{2}} [GeV]");
+    
     photonEnergy_Asymmetry = new MnvH1D( "photonEnergy_Asymmetry","Photon Energy Asymmetry",bin_photonEnergy_Asymmetry.get_nBins(), bin_photonEnergy_Asymmetry.get_min(), bin_photonEnergy_Asymmetry.get_max());
     photonEnergy_Asymmetry->GetXaxis()->SetTitle("Photon Energy Asymmetry - E(G2)/E(G1)");
     photonEnergy_Asymmetry->GetYaxis()->SetTitle("N(Events)");
@@ -87,11 +125,30 @@ void CCProtonPi0_Pion::writeHistograms()
 {
     std::cout<<">> Writing "<<rootDir<<std::endl;
     f->cd();
-    gamma1_ConvLength->Write();
-    gamma2_ConvLength->Write();
-    ConvLength_gamma2_gamma1->Write();
-    photonEnergy_Asymmetry->Write();
+
+    // Unique Histograms
     invMass->Write();
+    
+    // Leading Photon
+    gamma1_ConvLength->Write();
+    gamma1_P->Write();
+    gamma1_theta->Write();
+    gamma1_reco_P_true_P->Write();
+    gamma1_P_error->Write();
+
+    // Secondary Photon
+    gamma2_ConvLength->Write();
+    gamma2_P->Write();
+    gamma2_theta->Write();
+    gamma2_reco_P_true_P->Write();
+    gamma2_P_error->Write();
+ 
+    // Photon Comparsion
+    gamma1_P_gamma2_P->Write();
+    gamma1_convLength_gamma2_convLength->Write();
+    photonEnergy_Asymmetry->Write();
+    
+    // Standard Histograms
     E->Write();
     P->Write();
     KE->Write();

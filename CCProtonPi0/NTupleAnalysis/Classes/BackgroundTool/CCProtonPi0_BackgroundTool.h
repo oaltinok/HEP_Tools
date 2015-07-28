@@ -9,7 +9,6 @@ Class: CCProtonPi0_BackgroundTool
         Classes/BackgroundTool
  
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2015_05_07
 ================================================================================
 */
 #ifndef CCProtonPi0_BackgroundTool_h
@@ -19,10 +18,18 @@ Class: CCProtonPi0_BackgroundTool
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 
 using namespace std;
+
+struct Background
+{ 
+    string name; 
+    double nAll;
+    double nWithMichel;
+};
 
 class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
 {
@@ -31,45 +38,49 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
         ~CCProtonPi0_BackgroundTool();
         
         void writeBackgroundTable();
-        void fillBackgroundBranches(    int nProngs,
-                                        bool truth_isBckg_QELike, 
-                                        bool truth_isBckg_SinglePiPlus, 
-                                        bool truth_isBckg_SinglePiMinus, 
-                                        bool truth_isBckg_MultiPion, 
-                                        bool truth_isBckg_MultiPiZero, 
-                                        bool truth_isBckg_Other,
-                                        bool truth_isBckg_withAntiMuon,
-                                        bool truth_isBckg_withMichel,
-                                        bool truth_isBckg_withPrimaryPi0,
-                                        bool truth_isBckg_withSecondaryPi0);
-
+        void fillBackgroundWithPi0( int nProngs, bool NoPi0, bool SinglePi0, bool MultiPi0, bool withMichel);
+        
+        void fillBackground(int nProngs,
+                            bool NC,
+                            bool AntiNeutrino,
+                            bool QELike,
+                            bool SinglePion,
+                            bool DoublePion,
+                            bool MultiPion,
+                            bool Other,
+                            bool withMichel);
     private:
-        static const int nBckgBranch = 6;
+        string fileName[nTopologies];
+        ofstream textFile[nTopologies];
         
-        string backgroundFile[nTopologies];
-        ofstream backgroundText[nTopologies];
+        vector< vector<Background> > BackgroundWithPi0Vector;
+        vector< vector<Background> > BackgroundTypeVector;
+       
+        // Background with Pi0
+        vector<Background> bckg_NoPi0;
+        vector<Background> bckg_SinglePi0;
+        vector<Background> bckg_MultiPi0;
+        vector<Background> bckg_Total_WithPi0;
         
-        vector< vector<double> > bckgVector_1Prong;
-        vector< vector<double> > bckgVector_2Prong;
+        // Background Types 
+        vector<Background> bckg_NC;
+        vector<Background> bckg_AntiNeutrino;
+        vector<Background> bckg_QELike;
+        vector<Background> bckg_SinglePion;
+        vector<Background> bckg_DoublePion;
+        vector<Background> bckg_MultiPion;
+        vector<Background> bckg_Other;
+        vector<Background> bckg_Total;
+
+        void updateBackground(Background &b, bool withMichel);
+        int setArrayInd(int nProngs);
         
-        vector<double> bckg_1Prong_QELike;
-        vector<double> bckg_1Prong_SinglePiPlus;
-        vector<double> bckg_1Prong_SinglePiMinus;
-        vector<double> bckg_1Prong_MultiPion;
-        vector<double> bckg_1Prong_MultiPiZero;
-        vector<double> bckg_1Prong_Other;
-        
-        vector<double> bckg_2Prong_QELike;
-        vector<double> bckg_2Prong_SinglePiPlus;
-        vector<double> bckg_2Prong_SinglePiMinus;
-        vector<double> bckg_2Prong_MultiPion;
-        vector<double> bckg_2Prong_MultiPiZero;
-        vector<double> bckg_2Prong_Other;
-        
-        void setBackgroundBranch(vector<double>& background, bool hasAntiMuon, bool hasMichel, bool hasPrimaryPi0, bool hasSecondaryPi0 );
+        double calcPercent(double nEvents, double nBase);
         void formBackgroundVectors();
-        void writeBackgroundTableHeader();
-        void writeBackgroundTableRows(vector< vector<double> > bckgVector, int nProngs);
+        void initBackgroundVectors();
+        void initSingleBackgroundVector(vector<Background> &b, string name);
+        void writeBackgroundTableHeader(int nProngs);
+        void writeBackgroundTableRows(vector< vector<Background> > &bckgVector, int nProngs);
         void OpenTextFiles();
 
 };

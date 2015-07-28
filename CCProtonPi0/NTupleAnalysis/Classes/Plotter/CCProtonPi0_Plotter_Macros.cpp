@@ -9,6 +9,173 @@
 
 using namespace PlotUtils;
 
+void CCProtonPi0_Plotter::DrawStackedMC(std::string root_dir, std::string var_name, std::string plotDir)
+{
+   DrawStackedMC_BckgAll(root_dir,var_name,plotDir); 
+   DrawStackedMC_BckgWithPi0(root_dir,var_name,plotDir); 
+   DrawStackedMC_BckgType(root_dir,var_name,plotDir); 
+}
+
+void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(std::string root_dir, std::string var_name, std::string plotDir)
+{
+    TFile* f_mc = new TFile(root_dir.c_str());
+
+    // ------------------------------------------------------------------------
+    // Fill TObjArray
+    // ------------------------------------------------------------------------
+    TObjArray* mc_hists = new TObjArray;
+    MnvH1D* temp;
+    std::string var;
+   
+    // Get Signal
+    var = Form("%s_%d",var_name.c_str(),0);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Signal");
+    mc_hists->Add(temp);
+    
+    // Get All Background
+    var = Form("%s_%d",var_name.c_str(),1);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Background");
+    mc_hists->Add(temp);
+    
+    
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas();
+    plotter->DrawStackedMC(mc_hists,1.0 ,"TR");
+    
+    // Print Plot
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all.png"), "png");
+
+    delete c;
+}
+
+void CCProtonPi0_Plotter::DrawStackedMC_BckgType(std::string root_dir, std::string var_name, std::string plotDir)
+{
+    TFile* f_mc = new TFile(root_dir.c_str());
+
+    // ------------------------------------------------------------------------
+    // Fill TObjArray
+    // ------------------------------------------------------------------------
+    TObjArray* mc_hists = new TObjArray;
+    MnvH1D* temp;
+    std::string var;
+   
+    // Get Signal
+    var = Form("%s_%d",var_name.c_str(),0);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Signal");
+    mc_hists->Add(temp);
+    
+    // Get Bckg: NC
+    var = Form("%s_%d",var_name.c_str(),5);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: NC");
+    mc_hists->Add(temp);
+    
+    // Get Bckg: AntiNeutrino
+    var = Form("%s_%d",var_name.c_str(),6);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: AntiNeutrino");
+    mc_hists->Add(temp);
+
+    // Get Bckg: QELike
+    var = Form("%s_%d",var_name.c_str(),7);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: QELike");
+    mc_hists->Add(temp);
+   
+    // Get Bckg: SinglePion
+    var = Form("%s_%d",var_name.c_str(),8);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: SinglePion");
+    mc_hists->Add(temp);
+
+    // Get Bckg: DoublePion
+    var = Form("%s_%d",var_name.c_str(),9);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: DoublePion");
+    mc_hists->Add(temp);
+
+    // Get Bckg: MultiPion
+    var = Form("%s_%d",var_name.c_str(),10);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: MultiPion");
+    mc_hists->Add(temp);
+ 
+    // Get Bckg: Other
+    var = Form("%s_%d",var_name.c_str(),11);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: Other");
+    mc_hists->Add(temp);
+    
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+    plotter->DrawStackedMC(mc_hists,1.0 ,"TR");
+    plotter->AddCutArrow(1.0, 0.0, 400, 0.4, "R"); 
+    PlotUtils::t_PlotStyle style = kCompactStyle;    
+    plotter->ApplyStyle(style); 
+    
+    // Print Plot
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_Type.png"), "png");
+
+    delete c;
+}
+void CCProtonPi0_Plotter::DrawStackedMC_BckgWithPi0(std::string root_dir, std::string var_name, std::string plotDir)
+{
+    TFile* f_mc = new TFile(root_dir.c_str());
+
+    // ------------------------------------------------------------------------
+    // Fill TObjArray
+    // ------------------------------------------------------------------------
+    TObjArray* mc_hists = new TObjArray;
+    MnvH1D* temp;
+    std::string var;
+   
+    // Get Signal
+    var = Form("%s_%d",var_name.c_str(),0);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Signal");
+    mc_hists->Add(temp);
+    
+    // Get Bckg: NoPi0
+    var = Form("%s_%d",var_name.c_str(),2);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: NoPi0");
+    mc_hists->Add(temp);
+    
+    // Get Bckg: SinglePi0
+    var = Form("%s_%d",var_name.c_str(),3);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: SinglePi0");
+    mc_hists->Add(temp);
+
+    // Get Bckg: MultiPi0
+    var = Form("%s_%d",var_name.c_str(),4);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: MultiPi0");
+    mc_hists->Add(temp);
+    
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas();
+    plotter->DrawStackedMC(mc_hists,1.0 ,"TR");
+    t_PlotStyle style = kCCCohStyle;    
+    plotter->ApplyStyle(style); 
+    
+    // Print Plot
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_Pi0.png"), "png");
+
+    delete c;
+}
 void CCProtonPi0_Plotter::DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir)
 {
     std::string rootDir_mc = dir.mc_all;

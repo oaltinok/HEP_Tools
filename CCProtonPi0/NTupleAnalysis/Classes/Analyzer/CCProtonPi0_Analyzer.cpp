@@ -10,7 +10,7 @@ using namespace std;
 
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
-    applyMaxEvents = false;
+    applyMaxEvents = true;
 
     nMaxEvents = 100000;
     
@@ -47,14 +47,13 @@ void CCProtonPi0_Analyzer::specifyRunTime()
         
     latest_ScanID = 0.0;
     
-    hasParticleTruthInfo = true;
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
 {
 
     string rootDir;
-    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple2.root";
+    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_Test.root";
     else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple.root";
 
     cout<<"Reducing NTuple Files to a single file"<<endl;
@@ -91,6 +90,11 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         // Progress Message on Terminal
         if (jentry%25000 == 0) cout<<"\tEntry "<<jentry<<endl;
         
+        if (applyMaxEvents && jentry == nMaxEvents){
+            cout<<"\tReached Event Limit!"<<endl;
+            break;
+        }
+       
         // Get Cut Statistics
         isPassedAllCuts = getCutStatistics();
         if( !isPassedAllCuts ) continue;
@@ -99,8 +103,8 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     }
     
     cutList.writeCutTable();
-    cutList.writeRootFile();
-   
+    cutList.writeHistograms();
+
     cout<<">> Writing "<<rootDir<<endl;
     tree->AutoSave();    
     f->Write();
@@ -161,18 +165,9 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         //----------------------------------------------------------------------
         // Fill Background Branches for Background Events
         //----------------------------------------------------------------------
-        if(!truth_isSignal) {
-            bckgTool.fillBackgroundBranches(    nProngs,
-                                                truth_isBckg_QELike, 
-                                                truth_isBckg_SinglePiPlus, 
-                                                truth_isBckg_SinglePiMinus, 
-                                                truth_isBckg_MultiPion, 
-                                                truth_isBckg_MultiPiZero, 
-                                                truth_isBckg_Other,
-                                                truth_isBckg_withAntiMuon,
-                                                truth_isBckg_withMichel,
-                                                truth_isBckg_withPrimaryPi0,
-                                                truth_isBckg_withSecondaryPi0);
+        if(m_isMC && !truth_isSignal) {
+            bckgTool.fillBackgroundWithPi0(nProngs,truth_isBckg_NoPi0, truth_isBckg_SinglePi0, truth_isBckg_MultiPi0, truth_isBckg_withMichel);                                    
+            bckgTool.fillBackground(nProngs,truth_isBckg_NC, truth_isBckg_AntiNeutrino, truth_isBckg_QELike, truth_isBckg_SinglePion, truth_isBckg_DoublePion, truth_isBckg_MultiPion, truth_isBckg_Other, truth_isBckg_withMichel);                                    
         }
 
 
@@ -182,7 +177,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         if (isDataAnalysis) fillData();
         if (is_pID_Studies && nProngs == 2){ 
             pIDTool.FillHistograms(CCProtonPi0_proton_LLRScore,CCProtonPi0_proton_protonScore,CCProtonPi0_proton_pionScore,
-                                    CCProtonPi0_trajProtonProngPDG[indRecoProton],CCProtonPi0_proton_E );
+                                    CCProtonPi0_trajProtonProngPDG[CCProtonPi0_proton_leadingIndice],CCProtonPi0_proton_E );
         }
         if (writeFSParticleMomentum) writeFSParticle4P(jentry);
         
@@ -369,11 +364,11 @@ void CCProtonPi0_Analyzer::fillData()
     if(nProngs > 1) fillProtonReco();
     
     // Fill Truth Information if Exist and Set Errors
-    if( hasParticleTruthInfo ){
+    if( m_isMC ){
         //fillInteractionTrue();
         //fillMuonTrue();
         if(nProngs > 1) fillProtonTrue();
-        //fillPi0True();
+        fillPi0True();
     }
 }
 
@@ -449,7 +444,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     //
     //==========================================================================
 
-    // Increment Cut Number for Both Topologies at the Same Time Until nProngs Cut   
     cutList.nCut_All.increment(truth_isSignal, study1, study2); // Count All Events before Cuts
 
     if( Cut_Vertex_None == 1) return false;
@@ -460,11 +454,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     
     if( Cut_Vertex_Not_Fiducial == 1) return false;
     cutList.nCut_Vertex_Not_Fiducial.increment(truth_isSignal, study1, study2);
-   
-    // Fill Vertex Count Cut Hist 
-    cutList.hCut_vertexCount->Fill(vtx_total_count);
-    if( vtx_total_count > 1) return false;
-    cutList.nCut_Vertex_Count.increment(truth_isSignal, study1, study2);
     
     if( Cut_Muon_None == 1) return false;
     cutList.nCut_Muon_None.increment(truth_isSignal, study1, study2);
@@ -480,9 +469,9 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
    
     // Fill Michel Cut Hist
     if( Cut_Vertex_Michel_Exist == 1 || Cut_EndPoint_Michel_Exist == 1 || Cut_secEndPoint_Michel_Exist == 1 ){
-        cutList.hCut_Michel->Fill(1);
+        FillHistogram(cutList.hCut_Michel,1);
     }else{
-        cutList.hCut_Michel->Fill(0);
+        FillHistogram(cutList.hCut_Michel,0);
     } 
     if( Cut_Vertex_Michel_Exist == 1) return false;
     cutList.nCut_Vertex_Michel_Exist.increment(truth_isSignal, study1, study2);
@@ -494,35 +483,32 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_secEndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
     
     // Fill PreFilter Cut Hists
-    cutList.hCut_eVis_nuclearTarget->Fill(evis_NuclearTarget);
-    cutList.hCut_eVis_other->Fill(evis_TotalExceptNuclearTarget);
+    FillHistogram(cutList.hCut_eVis_nuclearTarget,evis_NuclearTarget);
+    FillHistogram(cutList.hCut_eVis_other,evis_TotalExceptNuclearTarget);
     if( Cut_PreFilter_Pi0 == 1) return false;
     cutList.nCut_PreFilter_Pi0.increment(truth_isSignal, study1, study2);
     
     if( Cut_ConeBlobs == 1) return false;
     cutList.nCut_ConeBlobs.increment(truth_isSignal, study1, study2);
 
-    if ( Cut_BlobsBad == 1 ) return false;
+    if ( Cut_BlobDirectionBad == 1 ) return false;
+    cutList.nCut_BlobDirectionBad.increment(truth_isSignal, study1, study2);
+    
+    //if ( Cut_BlobsBad == 1 ) return false;
     cutList.nCut_BlobsBad.increment(truth_isSignal, study1, study2);
 
-    // Fill Blob Data
-    //fillBlobData();
-
-    if ( applyPi0BlobCuts && isPi0BlobBad() ) return false;
-    cutList.nCut_Pi0BlobCuts.increment(truth_isSignal, study1, study2);
-
     // Fill Gamma1 Conv Length Cut Hist
-    cutList.hCut_gamma1ConvDist->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1);
+    FillHistogram(cutList.hCut_gamma1ConvDist,CCProtonPi0_gamma1_dist_vtx * 0.1);
     if (applyPhotonDistance && CCProtonPi0_gamma1_dist_vtx * 0.1 < minPhotonDistance) return false;
     cutList.nCut_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
 
     // Fill Gamma2 Conv Length Cut Hist
-    cutList.hCut_gamma2ConvDist->Fill(CCProtonPi0_gamma2_dist_vtx * 0.1);
+    FillHistogram(cutList.hCut_gamma2ConvDist,CCProtonPi0_gamma2_dist_vtx * 0.1);
     if (applyPhotonDistance && CCProtonPi0_gamma2_dist_vtx * 0.1 < minPhotonDistance) return false;
     cutList.nCut_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
 
     // Fill Pi0 Invariant Mass Cut Hist
-    cutList.hCut_pi0invMass->Fill(CCProtonPi0_pi0_invMass);
+    FillHistogram(cutList.hCut_pi0invMass,CCProtonPi0_pi0_invMass);
     if( CCProtonPi0_pi0_invMass < min_Pi0_invMass || CCProtonPi0_pi0_invMass > max_Pi0_invMass ) return false;
     cutList.nCut_Pi0_invMass.increment(truth_isSignal, study1, study2);
    
@@ -542,21 +528,18 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         
         if( Cut_Proton_None == 1) return false;
         cutList.nCut_2Prong_Proton_None.increment(truth_isSignal, study1, study2);
-        
-        // Find Best Proton in Reco
-        findRecoProton(); 
        
         // Apply Proton Score to All Proton Candidates
         for( unsigned int i = 0; i < 10 && CCProtonPi0_all_protons_LLRScore[i] != -9.9; i++){
             if ( applyProtonScore ){
                 // Use pID Difference for KE < pID_KE_Limit 
                 // Use LLR for KE > pID_KE_Limit
-                if (CCProtonPi0_all_protons_ekin[i] < pID_KE_Limit ){
+                if (CCProtonPi0_all_protons_KE[i] < pID_KE_Limit ){
                     double pIDDiff = CCProtonPi0_all_protons_protonScore[i] - CCProtonPi0_all_protons_pionScore[i];
-                    cutList.hCut_protonScore_pIDDiff->Fill(pIDDiff);
+                    FillHistogram(cutList.hCut_protonScore_pIDDiff,pIDDiff);
                     if ( pIDDiff < minPIDDiff ) return false;
                 }else{
-                    cutList.hCut_protonScore_LLR->Fill(CCProtonPi0_all_protons_LLRScore[i]);
+                    FillHistogram(cutList.hCut_protonScore_LLR,CCProtonPi0_all_protons_LLRScore[i]);
                     if ( CCProtonPi0_all_protons_LLRScore[i] < minProtonScore_LLR ) return false;
                 }
             }
@@ -564,7 +547,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         cutList.nCut_2Prong_ProtonScore.increment(truth_isSignal, study1, study2);
         
         double delta_invMass = calcDeltaInvariantMass();
-        cutList.hCut_deltaInvMass->Fill(delta_invMass);
+        FillHistogram(cutList.hCut_deltaInvMass,delta_invMass);
         if (applyDeltaInvMass){
             if ( delta_invMass < min_Delta_invMass || delta_invMass > max_Delta_invMass) return false;  
         }
@@ -577,39 +560,21 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     //      Muon + Pi0 + X (No Meson)
     //-------------------------------------------------------------------------
     // Fill Neutrino Energy Cut Hists
-    if(nProngs == 1) cutList.hCut_1Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
-    if(nProngs >= 2) cutList.hCut_2Prong_neutrinoE->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV); 
+    if(nProngs == 1) FillHistogram(cutList.hCut_1Prong_neutrinoE,CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
+    if(nProngs >= 2) FillHistogram(cutList.hCut_2Prong_neutrinoE,CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV); 
     if( applyBeamEnergy && ((CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV) > max_beamEnergy)) return false;
     if(nProngs == 1) cutList.nCut_1Prong_beamEnergy.increment(truth_isSignal, study1, study2);
     if(nProngs >= 2) cutList.nCut_2Prong_beamEnergy.increment(truth_isSignal, study1, study2);
    
     // Fill Unused Energy Cut Hists 
-    if(nProngs == 1) cutList.hCut_1Prong_UnusedE->Fill(energyUnused_afterReco);
-    if(nProngs >= 2) cutList.hCut_2Prong_UnusedE->Fill(energyUnused_afterReco);
+    if(nProngs == 1) FillHistogram(cutList.hCut_1Prong_UnusedE,energyUnused_afterReco);
+    if(nProngs >= 2) FillHistogram(cutList.hCut_2Prong_UnusedE,energyUnused_afterReco);
     if( applyUnusedE && (energyUnused_afterReco > maxUnusedE)) return false;
     if(nProngs == 1) cutList.nCut_1Prong_UnusedE.increment(truth_isSignal, study1, study2);
     if(nProngs >= 2) cutList.nCut_2Prong_UnusedE.increment(truth_isSignal, study1, study2);
         
     return true;
     
-}
-
-bool CCProtonPi0_Analyzer::isPi0BlobBad()
-{
-    // NDigits
-    if (gamma1_blob_ndigits < 7 || gamma2_blob_ndigits < 5 ) return true;
-    
-    // Blob Energy
-    //if (gamma1_blob_energy < 60) return true;
-
-    // Fit Results
-    if ( blob_ndof_1 < 5) return true;
-
-    // dEdx
-    if ( g1dedx_nplane < 3 ) return true;
-    if ( g1dedx >= 35) return true;
-
-    return false;
 }
 
 void CCProtonPi0_Analyzer::fill_mc_w()
@@ -765,7 +730,7 @@ void CCProtonPi0_Analyzer::openTextFiles()
 void CCProtonPi0_Analyzer::fillProtonTrue()
 {   
     double reco_P = CCProtonPi0_proton_P * HEP_Functions::MeV_to_GeV;
-    double true_P = CCProtonPi0_trajProtonProngMomentum[indRecoProton] * HEP_Functions::MeV_to_GeV;
+    double true_P = CCProtonPi0_trajProtonProngMomentum[CCProtonPi0_proton_leadingIndice] * HEP_Functions::MeV_to_GeV;
     double error_P = (reco_P - true_P) / true_P;
 
     proton.reco_P_true_P->Fill(reco_P,true_P);
@@ -782,35 +747,10 @@ void CCProtonPi0_Analyzer::fillProtonReco()
     // Standard Histograms
     proton.E->Fill(CCProtonPi0_proton_E * HEP_Functions::MeV_to_GeV);
     proton.P->Fill(CCProtonPi0_proton_P * HEP_Functions::MeV_to_GeV);
-    proton.KE->Fill(CCProtonPi0_proton_ekin * HEP_Functions::MeV_to_GeV);
+    proton.KE->Fill(CCProtonPi0_proton_KE * HEP_Functions::MeV_to_GeV);
     proton.theta->Fill(CCProtonPi0_proton_theta * TMath::RadToDeg());
     proton.phi->Fill(CCProtonPi0_proton_phi * TMath::RadToDeg());
 }
-
-
-//--------------------------------------------------------------------------
-//  findRecoProton()
-//      finds Reco Proton using Proton Score
-//--------------------------------------------------------------------------
-void CCProtonPi0_Analyzer::findRecoProton()
-{
-    double temp_p = CCProtonPi0_all_protons_P[0];
-    double current_p;
-    int tempInd = 0;
-   
-    for( int i = 0; i < 10; i++){
-        current_p = CCProtonPi0_all_protons_P[i];
-        //if( current_p == SENTINEL ) break;
-        if( current_p > temp_p){
-            temp_p = current_p;
-            tempInd = i;
-        }
-    }
-    
-    indRecoProton = tempInd;
-}
-
-
 
 void CCProtonPi0_Analyzer::fillBlobData()
 {
@@ -847,16 +787,40 @@ void CCProtonPi0_Analyzer::fillBlobData()
 
 void CCProtonPi0_Analyzer::fillPi0True()
 {
-  // Do Nothing 
+  if (truth_isSignal){
+        double g1_reco_P = CCProtonPi0_gamma1_P * HEP_Functions::MeV_to_GeV;
+        double g1_true_P = HEP_Functions::calcMomentum(truth_gamma1_4P[0],truth_gamma1_4P[1],truth_gamma1_4P[2]) * HEP_Functions::MeV_to_GeV;
+        double g1_P_error = Data_Functions::getError(g1_true_P, g1_reco_P);
+        double g2_reco_P = CCProtonPi0_gamma2_P * HEP_Functions::MeV_to_GeV;
+        double g2_true_P = HEP_Functions::calcMomentum(truth_gamma1_4P[0],truth_gamma1_4P[1],truth_gamma1_4P[2]) * HEP_Functions::MeV_to_GeV;
+        double g2_P_error = Data_Functions::getError(g2_true_P, g2_reco_P);
+        
+        pi0.gamma1_reco_P_true_P->Fill(g1_reco_P, g1_true_P);
+        pi0.gamma1_P_error->Fill(g1_P_error);
+
+        pi0.gamma2_reco_P_true_P->Fill(g2_reco_P, g2_true_P);
+        pi0.gamma2_P_error->Fill(g2_P_error);
+  }
 }
 
 void CCProtonPi0_Analyzer::fillPi0Reco()
 {
     // Unique Histograms
     pi0.invMass->Fill(CCProtonPi0_pi0_invMass);
+    
+    // Leading Photon - Energetic Photon
     pi0.gamma1_ConvLength->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1);
+    pi0.gamma1_P->Fill(CCProtonPi0_gamma1_P * HEP_Functions::MeV_to_GeV);
+    pi0.gamma1_theta->Fill(CCProtonPi0_gamma1_theta * TMath::RadToDeg());
+
+    // Secondary Photon
     pi0.gamma2_ConvLength->Fill(CCProtonPi0_gamma2_dist_vtx * 0.1);
-    pi0.ConvLength_gamma2_gamma1->Fill(CCProtonPi0_gamma2_dist_vtx, CCProtonPi0_gamma1_dist_vtx);
+    pi0.gamma2_P->Fill(CCProtonPi0_gamma2_P * HEP_Functions::MeV_to_GeV);
+    pi0.gamma2_theta->Fill(CCProtonPi0_gamma2_theta * TMath::RadToDeg());
+    
+    // Photon Comparison
+    pi0.gamma1_P_gamma2_P->Fill(CCProtonPi0_gamma1_P * HEP_Functions::MeV_to_GeV, CCProtonPi0_gamma2_P * HEP_Functions::MeV_to_GeV);
+    pi0.gamma1_convLength_gamma2_convLength->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1, CCProtonPi0_gamma2_dist_vtx * 0.1);
     
     double photon_E_asym = abs((CCProtonPi0_gamma1_E - CCProtonPi0_gamma2_E) / (CCProtonPi0_gamma1_E + CCProtonPi0_gamma2_E));  
     pi0.photonEnergy_Asymmetry->Fill(photon_E_asym);
@@ -864,11 +828,12 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
     // Standard Histograms
     pi0.E->Fill(CCProtonPi0_pi0_E * HEP_Functions::MeV_to_GeV);
     pi0.P->Fill(CCProtonPi0_pi0_P * HEP_Functions::MeV_to_GeV);
-    pi0.KE->Fill(0 * HEP_Functions::MeV_to_GeV);
-    pi0.theta->Fill(CCProtonPi0_pi0_theta);
-    pi0.phi->Fill(CCProtonPi0_pi0_phi);
+    pi0.KE->Fill(CCProtonPi0_pi0_KE * HEP_Functions::MeV_to_GeV);
+    pi0.theta->Fill(CCProtonPi0_pi0_theta * TMath::RadToDeg());
+    pi0.phi->Fill(CCProtonPi0_pi0_phi * TMath::RadToDeg());
         
 }
+
 void CCProtonPi0_Analyzer::fillMuonTrue()
 {
     // Do Nothing
@@ -876,11 +841,11 @@ void CCProtonPi0_Analyzer::fillMuonTrue()
 
 void CCProtonPi0_Analyzer::fillMuonReco()
 {
-    muon.E->Fill(CCProtonPi0_muon_E * 0.001);
-    muon.P->Fill(CCProtonPi0_muon_P * 0.001);
-    muon.KE->Fill(0);
+    muon.E->Fill(CCProtonPi0_muon_E * HEP_Functions::MeV_to_GeV);
+    muon.P->Fill(CCProtonPi0_muon_P * HEP_Functions::MeV_to_GeV);
+    muon.KE->Fill(CCProtonPi0_muon_KE * HEP_Functions::MeV_to_GeV);
     muon.theta->Fill(CCProtonPi0_muon_theta * TMath::RadToDeg());
-    muon.phi->Fill(0);
+    muon.phi->Fill(CCProtonPi0_muon_phi * TMath::RadToDeg());
 }
 
 
@@ -921,7 +886,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
 
    // Set branch addresses and branch pointers
    fChain->SetMakeClass(1);
-fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
+   fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("physEvtNum", &physEvtNum, &b_physEvtNum);
    fChain->SetBranchAddress("n_hyps", &n_hyps, &b_n_hyps);
    fChain->SetBranchAddress("processType", &processType, &b_processType);
@@ -942,6 +907,7 @@ fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("minos_track_inside_partial_plane", &minos_track_inside_partial_plane, &b_minos_track_inside_partial_plane);
    fChain->SetBranchAddress("prim_vtx_has_misassigned_track_direction", &prim_vtx_has_misassigned_track_direction, &b_prim_vtx_has_misassigned_track_direction);
    fChain->SetBranchAddress("prim_vtx_has_broken_track", &prim_vtx_has_broken_track, &b_prim_vtx_has_broken_track);
+   fChain->SetBranchAddress("Cut_BlobDirectionBad", &Cut_BlobDirectionBad, &b_Cut_BlobDirectionBad);
    fChain->SetBranchAddress("Cut_BlobsBad", &Cut_BlobsBad, &b_Cut_BlobsBad);
    fChain->SetBranchAddress("Cut_ConeBlobs", &Cut_ConeBlobs, &b_Cut_ConeBlobs);
    fChain->SetBranchAddress("Cut_EndPoint_Michel_Exist", &Cut_EndPoint_Michel_Exist, &b_Cut_EndPoint_Michel_Exist);
@@ -1083,22 +1049,27 @@ fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("od_towerTimeBlobOD", od_towerTimeBlobOD, &b_od_towerTimeBlobOD);
    fChain->SetBranchAddress("truth_has_physics_event", &truth_has_physics_event, &b_truth_has_physics_event);
    fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
-   fChain->SetBranchAddress("truth_isSignal_1Pi0", &truth_isSignal_1Pi0, &b_truth_isSignal_1Pi0);
-   fChain->SetBranchAddress("truth_isSignal_2Gamma", &truth_isSignal_2Gamma, &b_truth_isSignal_2Gamma);
    fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
-   fChain->SetBranchAddress("truth_AnalyzeEvent", &truth_AnalyzeEvent, &b_truth_AnalyzeEvent);
+   fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
+   fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);
+   fChain->SetBranchAddress("truth_isBckg_NoPi0", &truth_isBckg_NoPi0, &b_truth_isBckg_NoPi0);
+   fChain->SetBranchAddress("truth_isBckg_SinglePi0", &truth_isBckg_SinglePi0, &b_truth_isBckg_SinglePi0);
+   fChain->SetBranchAddress("truth_isBckg_MultiPi0", &truth_isBckg_MultiPi0, &b_truth_isBckg_MultiPi0);
+   fChain->SetBranchAddress("truth_isBckg_NC", &truth_isBckg_NC, &b_truth_isBckg_NC);
+   fChain->SetBranchAddress("truth_isBckg_AntiNeutrino", &truth_isBckg_AntiNeutrino, &b_truth_isBckg_AntiNeutrino);
    fChain->SetBranchAddress("truth_isBckg_QELike", &truth_isBckg_QELike, &b_truth_isBckg_QELike);
-   fChain->SetBranchAddress("truth_isBckg_SinglePiPlus", &truth_isBckg_SinglePiPlus, &b_truth_isBckg_SinglePiPlus);
-   fChain->SetBranchAddress("truth_isBckg_SinglePiMinus", &truth_isBckg_SinglePiMinus, &b_truth_isBckg_SinglePiMinus);
+   fChain->SetBranchAddress("truth_isBckg_SinglePion", &truth_isBckg_SinglePion, &b_truth_isBckg_SinglePion);
+   fChain->SetBranchAddress("truth_isBckg_DoublePion", &truth_isBckg_DoublePion, &b_truth_isBckg_DoublePion);
    fChain->SetBranchAddress("truth_isBckg_MultiPion", &truth_isBckg_MultiPion, &b_truth_isBckg_MultiPion);
-   fChain->SetBranchAddress("truth_isBckg_MultiPiZero", &truth_isBckg_MultiPiZero, &b_truth_isBckg_MultiPiZero);
    fChain->SetBranchAddress("truth_isBckg_Other", &truth_isBckg_Other, &b_truth_isBckg_Other);
-   fChain->SetBranchAddress("truth_isBckg_withAntiMuon", &truth_isBckg_withAntiMuon, &b_truth_isBckg_withAntiMuon);
    fChain->SetBranchAddress("truth_isBckg_withMichel", &truth_isBckg_withMichel, &b_truth_isBckg_withMichel);
-   fChain->SetBranchAddress("truth_isBckg_withPrimaryPi0", &truth_isBckg_withPrimaryPi0, &b_truth_isBckg_withPrimaryPi0);
-   fChain->SetBranchAddress("truth_isBckg_withSecondaryPi0", &truth_isBckg_withSecondaryPi0, &b_truth_isBckg_withSecondaryPi0);
+   fChain->SetBranchAddress("truth_Bckg_nOther", &truth_Bckg_nOther, &b_truth_Bckg_nOther);
+   fChain->SetBranchAddress("truth_Bckg_nPi0_Primary", &truth_Bckg_nPi0_Primary, &b_truth_Bckg_nPi0_Primary);
+   fChain->SetBranchAddress("truth_Bckg_nPi0_Secondary", &truth_Bckg_nPi0_Secondary, &b_truth_Bckg_nPi0_Secondary);
+   fChain->SetBranchAddress("truth_Bckg_nPi0_Total", &truth_Bckg_nPi0_Total, &b_truth_Bckg_nPi0_Total);
+   fChain->SetBranchAddress("truth_Bckg_nPion", &truth_Bckg_nPion, &b_truth_Bckg_nPion);
    fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
-   fChain->SetBranchAddress("truth_N_gamma", &truth_N_gamma, &b_truth_N_gamma);
+   fChain->SetBranchAddress("truth_N_other", &truth_N_other, &b_truth_N_other);
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
    fChain->SetBranchAddress("truth_N_proton", &truth_N_proton, &b_truth_N_proton);
    fChain->SetBranchAddress("truth_N_trueMichelElectrons", &truth_N_trueMichelElectrons, &b_truth_N_trueMichelElectrons);
@@ -1190,6 +1161,7 @@ fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("CCProtonPi0_muon_roadUpstreamPlanes", &CCProtonPi0_muon_roadUpstreamPlanes, &b_CCProtonPi0_muon_roadUpstreamPlanes);
    fChain->SetBranchAddress("CCProtonPi0_ntrajMuonProng", &CCProtonPi0_ntrajMuonProng, &b_CCProtonPi0_ntrajMuonProng);
    fChain->SetBranchAddress("CCProtonPi0_proton_kinked", &CCProtonPi0_proton_kinked, &b_CCProtonPi0_proton_kinked);
+   fChain->SetBranchAddress("CCProtonPi0_proton_leadingIndice", &CCProtonPi0_proton_leadingIndice, &b_CCProtonPi0_proton_leadingIndice);
    fChain->SetBranchAddress("CCProtonPi0_r_minos_trk_vtx_plane", &CCProtonPi0_r_minos_trk_vtx_plane, &b_CCProtonPi0_r_minos_trk_vtx_plane);
    fChain->SetBranchAddress("CCProtonPi0_t_minos_trk_numFSMuons", &CCProtonPi0_t_minos_trk_numFSMuons, &b_CCProtonPi0_t_minos_trk_numFSMuons);
    fChain->SetBranchAddress("CCProtonPi0_t_minos_trk_primFSLeptonPDG", &CCProtonPi0_t_minos_trk_primFSLeptonPDG, &b_CCProtonPi0_t_minos_trk_primFSLeptonPDG);
@@ -1255,8 +1227,10 @@ fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("CCProtonPi0_minos_trk_vtx_z", &CCProtonPi0_minos_trk_vtx_z, &b_CCProtonPi0_minos_trk_vtx_z);
    fChain->SetBranchAddress("CCProtonPi0_muon_E", &CCProtonPi0_muon_E, &b_CCProtonPi0_muon_E);
    fChain->SetBranchAddress("CCProtonPi0_muon_E_shift", &CCProtonPi0_muon_E_shift, &b_CCProtonPi0_muon_E_shift);
+   fChain->SetBranchAddress("CCProtonPi0_muon_KE", &CCProtonPi0_muon_KE, &b_CCProtonPi0_muon_KE);
    fChain->SetBranchAddress("CCProtonPi0_muon_P", &CCProtonPi0_muon_P, &b_CCProtonPi0_muon_P);
    fChain->SetBranchAddress("CCProtonPi0_muon_muScore", &CCProtonPi0_muon_muScore, &b_CCProtonPi0_muon_muScore);
+   fChain->SetBranchAddress("CCProtonPi0_muon_phi", &CCProtonPi0_muon_phi, &b_CCProtonPi0_muon_phi);
    fChain->SetBranchAddress("CCProtonPi0_muon_px", &CCProtonPi0_muon_px, &b_CCProtonPi0_muon_px);
    fChain->SetBranchAddress("CCProtonPi0_muon_py", &CCProtonPi0_muon_py, &b_CCProtonPi0_muon_py);
    fChain->SetBranchAddress("CCProtonPi0_muon_pz", &CCProtonPi0_muon_pz, &b_CCProtonPi0_muon_pz);
@@ -1270,6 +1244,7 @@ fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("CCProtonPi0_neutrino_E_2Track", &CCProtonPi0_neutrino_E_2Track, &b_CCProtonPi0_neutrino_E_2Track);
    fChain->SetBranchAddress("CCProtonPi0_neutrino_E_Cal", &CCProtonPi0_neutrino_E_Cal, &b_CCProtonPi0_neutrino_E_Cal);
    fChain->SetBranchAddress("CCProtonPi0_pi0_E", &CCProtonPi0_pi0_E, &b_CCProtonPi0_pi0_E);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_KE", &CCProtonPi0_pi0_KE, &b_CCProtonPi0_pi0_KE);
    fChain->SetBranchAddress("CCProtonPi0_pi0_P", &CCProtonPi0_pi0_P, &b_CCProtonPi0_pi0_P);
    fChain->SetBranchAddress("CCProtonPi0_pi0_cos_openingAngle", &CCProtonPi0_pi0_cos_openingAngle, &b_CCProtonPi0_pi0_cos_openingAngle);
    fChain->SetBranchAddress("CCProtonPi0_pi0_invMass", &CCProtonPi0_pi0_invMass, &b_CCProtonPi0_pi0_invMass);
@@ -1282,9 +1257,9 @@ fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("CCProtonPi0_pi0_thetaX", &CCProtonPi0_pi0_thetaX, &b_CCProtonPi0_pi0_thetaX);
    fChain->SetBranchAddress("CCProtonPi0_pi0_thetaY", &CCProtonPi0_pi0_thetaY, &b_CCProtonPi0_pi0_thetaY);
    fChain->SetBranchAddress("CCProtonPi0_proton_E", &CCProtonPi0_proton_E, &b_CCProtonPi0_proton_E);
+   fChain->SetBranchAddress("CCProtonPi0_proton_KE", &CCProtonPi0_proton_KE, &b_CCProtonPi0_proton_KE);
    fChain->SetBranchAddress("CCProtonPi0_proton_LLRScore", &CCProtonPi0_proton_LLRScore, &b_CCProtonPi0_proton_LLRScore);
    fChain->SetBranchAddress("CCProtonPi0_proton_P", &CCProtonPi0_proton_P, &b_CCProtonPi0_proton_P);
-   fChain->SetBranchAddress("CCProtonPi0_proton_ekin", &CCProtonPi0_proton_ekin, &b_CCProtonPi0_proton_ekin);
    fChain->SetBranchAddress("CCProtonPi0_proton_length", &CCProtonPi0_proton_length, &b_CCProtonPi0_proton_length);
    fChain->SetBranchAddress("CCProtonPi0_proton_phi", &CCProtonPi0_proton_phi, &b_CCProtonPi0_proton_phi);
    fChain->SetBranchAddress("CCProtonPi0_proton_pionScore", &CCProtonPi0_proton_pionScore, &b_CCProtonPi0_proton_pionScore);
@@ -1338,10 +1313,10 @@ fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("CCProtonPi0_trajProtonProngPDG", CCProtonPi0_trajProtonProngPDG, &b_CCProtonPi0_trajProtonProngPDG);
    fChain->SetBranchAddress("CCProtonPi0_trajProtonProngPrimary", CCProtonPi0_trajProtonProngPrimary, &b_CCProtonPi0_trajProtonProngPrimary);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_E", CCProtonPi0_all_protons_E, &b_CCProtonPi0_all_protons_E);
+   fChain->SetBranchAddress("CCProtonPi0_all_protons_KE", CCProtonPi0_all_protons_KE, &b_CCProtonPi0_all_protons_KE);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_LLRScore", CCProtonPi0_all_protons_LLRScore, &b_CCProtonPi0_all_protons_LLRScore);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_P", CCProtonPi0_all_protons_P, &b_CCProtonPi0_all_protons_P);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_chi2_ndf", CCProtonPi0_all_protons_chi2_ndf, &b_CCProtonPi0_all_protons_chi2_ndf);
-   fChain->SetBranchAddress("CCProtonPi0_all_protons_ekin", CCProtonPi0_all_protons_ekin, &b_CCProtonPi0_all_protons_ekin);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_endPointX", CCProtonPi0_all_protons_endPointX, &b_CCProtonPi0_all_protons_endPointX);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_endPointY", CCProtonPi0_all_protons_endPointY, &b_CCProtonPi0_all_protons_endPointY);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_endPointZ", CCProtonPi0_all_protons_endPointZ, &b_CCProtonPi0_all_protons_endPointZ);
@@ -1453,7 +1428,6 @@ fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("mc_cvweight_totalFlux", &mc_cvweight_totalFlux, &b_mc_cvweight_totalFlux);
    fChain->SetBranchAddress("mc_cvweight_totalXsec", &mc_cvweight_totalXsec, &b_mc_cvweight_totalXsec);
    fChain->SetBranchAddress("mc_cvweight_NA49", &mc_cvweight_NA49, &b_mc_cvweight_NA49);
-   fChain->SetBranchAddress("ppfx_cv_wgt", &ppfx_cv_wgt, &b_ppfx_cv_wgt);
    fChain->SetBranchAddress("mc_wgt_GENIE_sz", &mc_wgt_GENIE_sz, &b_mc_wgt_GENIE_sz);
    fChain->SetBranchAddress("mc_wgt_GENIE", mc_wgt_GENIE, &b_mc_wgt_GENIE);
    fChain->SetBranchAddress("mc_wgt_Flux_Tertiary_sz", &mc_wgt_Flux_Tertiary_sz, &b_mc_wgt_Flux_Tertiary_sz);
@@ -1462,22 +1436,6 @@ fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("mc_wgt_Flux_BeamFocus", mc_wgt_Flux_BeamFocus, &b_mc_wgt_Flux_BeamFocus);
    fChain->SetBranchAddress("mc_wgt_Flux_NA49_sz", &mc_wgt_Flux_NA49_sz, &b_mc_wgt_Flux_NA49_sz);
    fChain->SetBranchAddress("mc_wgt_Flux_NA49", mc_wgt_Flux_NA49, &b_mc_wgt_Flux_NA49);
-   fChain->SetBranchAddress("mc_wgt_Norm_sz", &mc_wgt_Norm_sz, &b_mc_wgt_Norm_sz);
-   fChain->SetBranchAddress("mc_wgt_Norm", &mc_wgt_Norm, &b_mc_wgt_Norm);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPNumiYields_sz", &mc_wgt_ppfx_MIPPNumiYields_sz, &b_mc_wgt_ppfx_MIPPNumiYields_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPNumiYields", &mc_wgt_ppfx_MIPPNumiYields, &b_mc_wgt_ppfx_MIPPNumiYields);
-   fChain->SetBranchAddress("mc_wgt_ppfx_TargetAttenuation_sz", &mc_wgt_ppfx_TargetAttenuation_sz, &b_mc_wgt_ppfx_TargetAttenuation_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_TargetAttenuation", &mc_wgt_ppfx_TargetAttenuation, &b_mc_wgt_ppfx_TargetAttenuation);
-   fChain->SetBranchAddress("mc_wgt_ppfx_NA49_sz", &mc_wgt_ppfx_NA49_sz, &b_mc_wgt_ppfx_NA49_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_NA49", &mc_wgt_ppfx_NA49, &b_mc_wgt_ppfx_NA49);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPKaonsYields_sz", &mc_wgt_ppfx_MIPPKaonsYields_sz, &b_mc_wgt_ppfx_MIPPKaonsYields_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPKaonsYields", &mc_wgt_ppfx_MIPPKaonsYields, &b_mc_wgt_ppfx_MIPPKaonsYields);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPThinTarget_sz", &mc_wgt_ppfx_MIPPThinTarget_sz, &b_mc_wgt_ppfx_MIPPThinTarget_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPThinTarget", &mc_wgt_ppfx_MIPPThinTarget, &b_mc_wgt_ppfx_MIPPThinTarget);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Absorption_sz", &mc_wgt_ppfx_Absorption_sz, &b_mc_wgt_ppfx_Absorption_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Absorption", &mc_wgt_ppfx_Absorption, &b_mc_wgt_ppfx_Absorption);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Others_sz", &mc_wgt_ppfx_Others_sz, &b_mc_wgt_ppfx_Others_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Others", &mc_wgt_ppfx_Others, &b_mc_wgt_ppfx_Others);
    fChain->SetBranchAddress("n_prongs", &n_prongs, &b_n_prongs);
    fChain->SetBranchAddress("prong_nParticles", prong_nParticles, &b_prong_nParticles);
    fChain->SetBranchAddress("prong_part_score", prong_part_score, &b_prong_part_score);
@@ -1486,7 +1444,6 @@ fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
    fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
    fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
-
 
 }
 
@@ -1514,6 +1471,71 @@ Long64_t CCProtonPi0_Analyzer::LoadTree(Long64_t entry)
    return centry;
 }
 
+void CCProtonPi0_Analyzer::FillHistogram(vector<MnvH1D*> &hist, double par)
+{
+    // Fill if Data & Return
+    if (!m_isMC){ 
+        hist[0]->Fill(par);
+        return;
+    }
 
+    // Fill if Signal & Return
+    if (truth_isSignal){
+        hist[0]->Fill(par);
+        return;
+    }
+
+    // Fill Background
+    hist[1]->Fill(par); // Always Fill ind == 1 -- All Background
+    
+    // Fill Background with Pi0
+    int ind = GetBackgroundWithPi0Ind();
+    hist[ind]->Fill(par);
+
+    // Fill Background Type
+    ind = GetBackgroundTypeInd();
+    hist[ind]->Fill(par);
+}
+
+int CCProtonPi0_Analyzer::GetBackgroundWithPi0Ind()
+{
+    // Check For Signal
+    if (truth_isSignal){
+        cout<<"WARNING! Signal Event requested Background Ind! - Returning -1"<<endl;
+        return -1;
+    }
+
+    // Background With Pi0
+    if (truth_isBckg_NoPi0) return 2;
+    else if (truth_isBckg_SinglePi0) return 3;
+    else if (truth_isBckg_MultiPi0) return 4;
+    else{
+        cout<<"WARNING! No Background Type Found - Returning -1"<<endl;
+        return -1;
+    }
+}
+
+int CCProtonPi0_Analyzer::GetBackgroundTypeInd()
+{
+    // Check For Signal
+    if (truth_isSignal){
+        cout<<"WARNING! Signal Event requested Background Ind! - Returning -1"<<endl;
+        return -1;
+    }
+
+    // Background With Pi0
+    if (truth_isBckg_NC) return 5;
+    else if (truth_isBckg_AntiNeutrino) return 6;
+    else if (truth_isBckg_QELike) return 7;
+    else if (truth_isBckg_SinglePion) return 8;
+    else if (truth_isBckg_DoublePion) return 9;
+    else if (truth_isBckg_MultiPion) return 10;
+    else if (truth_isBckg_Other) return 11;
+    else{
+        cout<<"WARNING! No Background Type Found - Returning -1"<<endl;
+        return -1;
+    }
+}
 
 #endif //CCProtonPi0_Analyzer_cpp
+

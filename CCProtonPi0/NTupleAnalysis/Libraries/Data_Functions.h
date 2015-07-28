@@ -25,7 +25,7 @@ namespace Data_Functions
 inline double getError(double trueValue, double recoValue)
 {
     double error;
-    error = (recoValue- trueValue) / trueValue;
+    error = (recoValue - trueValue) / trueValue;
     return error;
 }
 

@@ -21,10 +21,16 @@ class Pi0BlobTool
         std::vector<Minerva::Node*> nodes;
         SmartRef<Minerva::Track> Pi0Blob_Track;
        
+        bool IsBlobStartTrackLike(std::vector<Minerva::IDCluster*> &clusters);
         void CheckClusterVectors();
         void FillClusterVectors();
         void FillNodesVector_and_SetTrack(const Minerva::IDBlob* pi0_blob);
-        void CheckClusterVector(std::vector<Minerva::IDCluster*> &clusters);
+        void CheckClusterVector( std::vector<Minerva::IDCluster*> &clusters);
+        bool isClusterOrderedinZ( std::vector<Minerva::IDCluster*> &clusters);
+        int getNPlanes(std::vector<Minerva::IDCluster*> &clusters);
+        void FillClusterPosVariance(std::vector<Minerva::IDCluster*> &clusters);
+        void getPosVarianceStats(std::vector<double> &pos_vars);
+
 };
 
 #endif

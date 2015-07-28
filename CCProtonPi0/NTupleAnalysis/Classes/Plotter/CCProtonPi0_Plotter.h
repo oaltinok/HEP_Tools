@@ -79,6 +79,8 @@ class CCProtonPi0_Plotter
         std::string plotDir_Pion[nBranches];
         std::string plotDir_Pi0Blob[nBranches];
   
+        std::string rootDir_CutHists;
+
         void setRootDirs(rootDir& dirs, std::string fileName );
         void setPlotDirs();
        
@@ -109,6 +111,10 @@ class CCProtonPi0_Plotter
 
         // Plottting Macros
         void Draw1DHist(rootDir& dir, std::string var_name, std::string plotDir, bool isLogScale = false);
+        void DrawStackedMC(std::string root_dir, std::string var_name, std::string plotDir);
+        void DrawStackedMC_BckgAll(std::string root_dir, std::string var_name, std::string plotDir);
+        void DrawStackedMC_BckgWithPi0(std::string root_dir, std::string var_name, std::string plotDir);
+        void DrawStackedMC_BckgType(std::string root_dir, std::string var_name, std::string plotDir);
         void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir);

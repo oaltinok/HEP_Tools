@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sat Jul 11 15:35:08 2015 by ROOT version 5.34/05
+// Mon Jul 27 11:09:22 2015 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -43,6 +43,7 @@ public :
    Bool_t          minos_track_inside_partial_plane;
    Bool_t          prim_vtx_has_misassigned_track_direction;
    Bool_t          prim_vtx_has_broken_track;
+   Int_t           Cut_BlobDirectionBad;
    Int_t           Cut_BlobsBad;
    Int_t           Cut_ConeBlobs;
    Int_t           Cut_EndPoint_Michel_Exist;
@@ -163,7 +164,7 @@ public :
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[91];   //[g1dedx_rev_cluster_energy_sz]
+   Double_t        g1dedx_rev_cluster_energy[90];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
@@ -184,22 +185,27 @@ public :
    Double_t        od_towerTimeBlobOD[2];   //[od_towerTimeBlobOD_sz]
    Bool_t          truth_has_physics_event;
    Bool_t          truth_isSignal;
-   Bool_t          truth_isSignal_1Pi0;
-   Bool_t          truth_isSignal_2Gamma;
    Bool_t          truth_isFidVol;
-   Bool_t          truth_AnalyzeEvent;
+   Bool_t          truth_isNC;
+   Bool_t          truth_ReconstructEvent;
+   Bool_t          truth_isBckg_NoPi0;
+   Bool_t          truth_isBckg_SinglePi0;
+   Bool_t          truth_isBckg_MultiPi0;
+   Bool_t          truth_isBckg_NC;
+   Bool_t          truth_isBckg_AntiNeutrino;
    Bool_t          truth_isBckg_QELike;
-   Bool_t          truth_isBckg_SinglePiPlus;
-   Bool_t          truth_isBckg_SinglePiMinus;
+   Bool_t          truth_isBckg_SinglePion;
+   Bool_t          truth_isBckg_DoublePion;
    Bool_t          truth_isBckg_MultiPion;
-   Bool_t          truth_isBckg_MultiPiZero;
    Bool_t          truth_isBckg_Other;
-   Bool_t          truth_isBckg_withAntiMuon;
    Bool_t          truth_isBckg_withMichel;
-   Bool_t          truth_isBckg_withPrimaryPi0;
-   Bool_t          truth_isBckg_withSecondaryPi0;
+   Int_t           truth_Bckg_nOther;
+   Int_t           truth_Bckg_nPi0_Primary;
+   Int_t           truth_Bckg_nPi0_Secondary;
+   Int_t           truth_Bckg_nPi0_Total;
+   Int_t           truth_Bckg_nPion;
    Int_t           truth_N_FSParticles;
-   Int_t           truth_N_gamma;
+   Int_t           truth_N_other;
    Int_t           truth_N_pi0;
    Int_t           truth_N_proton;
    Int_t           truth_N_trueMichelElectrons;
@@ -291,6 +297,7 @@ public :
    Int_t           CCProtonPi0_muon_roadUpstreamPlanes;
    Int_t           CCProtonPi0_ntrajMuonProng;
    Int_t           CCProtonPi0_proton_kinked;
+   Int_t           CCProtonPi0_proton_leadingIndice;
    Int_t           CCProtonPi0_r_minos_trk_vtx_plane;
    Int_t           CCProtonPi0_t_minos_trk_numFSMuons;
    Int_t           CCProtonPi0_t_minos_trk_primFSLeptonPDG;
@@ -356,8 +363,10 @@ public :
    Double_t        CCProtonPi0_minos_trk_vtx_z;
    Double_t        CCProtonPi0_muon_E;
    Double_t        CCProtonPi0_muon_E_shift;
+   Double_t        CCProtonPi0_muon_KE;
    Double_t        CCProtonPi0_muon_P;
    Double_t        CCProtonPi0_muon_muScore;
+   Double_t        CCProtonPi0_muon_phi;
    Double_t        CCProtonPi0_muon_px;
    Double_t        CCProtonPi0_muon_py;
    Double_t        CCProtonPi0_muon_pz;
@@ -371,6 +380,7 @@ public :
    Double_t        CCProtonPi0_neutrino_E_2Track;
    Double_t        CCProtonPi0_neutrino_E_Cal;
    Double_t        CCProtonPi0_pi0_E;
+   Double_t        CCProtonPi0_pi0_KE;
    Double_t        CCProtonPi0_pi0_P;
    Double_t        CCProtonPi0_pi0_cos_openingAngle;
    Double_t        CCProtonPi0_pi0_invMass;
@@ -383,9 +393,9 @@ public :
    Double_t        CCProtonPi0_pi0_thetaX;
    Double_t        CCProtonPi0_pi0_thetaY;
    Double_t        CCProtonPi0_proton_E;
+   Double_t        CCProtonPi0_proton_KE;
    Double_t        CCProtonPi0_proton_LLRScore;
    Double_t        CCProtonPi0_proton_P;
-   Double_t        CCProtonPi0_proton_ekin;
    Double_t        CCProtonPi0_proton_length;
    Double_t        CCProtonPi0_proton_phi;
    Double_t        CCProtonPi0_proton_pionScore;
@@ -439,10 +449,10 @@ public :
    Int_t           CCProtonPi0_trajProtonProngPDG[10];
    Int_t           CCProtonPi0_trajProtonProngPrimary[10];
    Double_t        CCProtonPi0_all_protons_E[10];
+   Double_t        CCProtonPi0_all_protons_KE[10];
    Double_t        CCProtonPi0_all_protons_LLRScore[10];
    Double_t        CCProtonPi0_all_protons_P[10];
    Double_t        CCProtonPi0_all_protons_chi2_ndf[10];
-   Double_t        CCProtonPi0_all_protons_ekin[10];
    Double_t        CCProtonPi0_all_protons_endPointX[10];
    Double_t        CCProtonPi0_all_protons_endPointY[10];
    Double_t        CCProtonPi0_all_protons_endPointZ[10];
@@ -554,7 +564,6 @@ public :
    Double_t        mc_cvweight_totalFlux;
    Double_t        mc_cvweight_totalXsec;
    Double_t        mc_cvweight_NA49;
-   Double_t        ppfx_cv_wgt;
    Int_t           mc_wgt_GENIE_sz;
    Double_t        mc_wgt_GENIE[100];   //[mc_wgt_GENIE_sz]
    Int_t           mc_wgt_Flux_Tertiary_sz;
@@ -563,22 +572,6 @@ public :
    Double_t        mc_wgt_Flux_BeamFocus[100];   //[mc_wgt_Flux_BeamFocus_sz]
    Int_t           mc_wgt_Flux_NA49_sz;
    Double_t        mc_wgt_Flux_NA49[100];   //[mc_wgt_Flux_NA49_sz]
-   Int_t           mc_wgt_Norm_sz;
-   Double_t        mc_wgt_Norm[1];   //[mc_wgt_Norm_sz]
-   Int_t           mc_wgt_ppfx_MIPPNumiYields_sz;
-   Double_t        mc_wgt_ppfx_MIPPNumiYields[1];   //[mc_wgt_ppfx_MIPPNumiYields_sz]
-   Int_t           mc_wgt_ppfx_TargetAttenuation_sz;
-   Double_t        mc_wgt_ppfx_TargetAttenuation[1];   //[mc_wgt_ppfx_TargetAttenuation_sz]
-   Int_t           mc_wgt_ppfx_NA49_sz;
-   Double_t        mc_wgt_ppfx_NA49[1];   //[mc_wgt_ppfx_NA49_sz]
-   Int_t           mc_wgt_ppfx_MIPPKaonsYields_sz;
-   Double_t        mc_wgt_ppfx_MIPPKaonsYields[1];   //[mc_wgt_ppfx_MIPPKaonsYields_sz]
-   Int_t           mc_wgt_ppfx_MIPPThinTarget_sz;
-   Double_t        mc_wgt_ppfx_MIPPThinTarget[1];   //[mc_wgt_ppfx_MIPPThinTarget_sz]
-   Int_t           mc_wgt_ppfx_Absorption_sz;
-   Double_t        mc_wgt_ppfx_Absorption[1];   //[mc_wgt_ppfx_Absorption_sz]
-   Int_t           mc_wgt_ppfx_Others_sz;
-   Double_t        mc_wgt_ppfx_Others[1];   //[mc_wgt_ppfx_Others_sz]
    Int_t           n_prongs;
    Int_t           prong_nParticles[9];   //[n_prongs]
    Double_t        prong_part_score[9];   //[n_prongs]
@@ -610,6 +603,7 @@ public :
    TBranch        *b_minos_track_inside_partial_plane;   //!
    TBranch        *b_prim_vtx_has_misassigned_track_direction;   //!
    TBranch        *b_prim_vtx_has_broken_track;   //!
+   TBranch        *b_Cut_BlobDirectionBad;   //!
    TBranch        *b_Cut_BlobsBad;   //!
    TBranch        *b_Cut_ConeBlobs;   //!
    TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
@@ -751,22 +745,27 @@ public :
    TBranch        *b_od_towerTimeBlobOD;   //!
    TBranch        *b_truth_has_physics_event;   //!
    TBranch        *b_truth_isSignal;   //!
-   TBranch        *b_truth_isSignal_1Pi0;   //!
-   TBranch        *b_truth_isSignal_2Gamma;   //!
    TBranch        *b_truth_isFidVol;   //!
-   TBranch        *b_truth_AnalyzeEvent;   //!
+   TBranch        *b_truth_isNC;   //!
+   TBranch        *b_truth_ReconstructEvent;   //!
+   TBranch        *b_truth_isBckg_NoPi0;   //!
+   TBranch        *b_truth_isBckg_SinglePi0;   //!
+   TBranch        *b_truth_isBckg_MultiPi0;   //!
+   TBranch        *b_truth_isBckg_NC;   //!
+   TBranch        *b_truth_isBckg_AntiNeutrino;   //!
    TBranch        *b_truth_isBckg_QELike;   //!
-   TBranch        *b_truth_isBckg_SinglePiPlus;   //!
-   TBranch        *b_truth_isBckg_SinglePiMinus;   //!
+   TBranch        *b_truth_isBckg_SinglePion;   //!
+   TBranch        *b_truth_isBckg_DoublePion;   //!
    TBranch        *b_truth_isBckg_MultiPion;   //!
-   TBranch        *b_truth_isBckg_MultiPiZero;   //!
    TBranch        *b_truth_isBckg_Other;   //!
-   TBranch        *b_truth_isBckg_withAntiMuon;   //!
    TBranch        *b_truth_isBckg_withMichel;   //!
-   TBranch        *b_truth_isBckg_withPrimaryPi0;   //!
-   TBranch        *b_truth_isBckg_withSecondaryPi0;   //!
+   TBranch        *b_truth_Bckg_nOther;   //!
+   TBranch        *b_truth_Bckg_nPi0_Primary;   //!
+   TBranch        *b_truth_Bckg_nPi0_Secondary;   //!
+   TBranch        *b_truth_Bckg_nPi0_Total;   //!
+   TBranch        *b_truth_Bckg_nPion;   //!
    TBranch        *b_truth_N_FSParticles;   //!
-   TBranch        *b_truth_N_gamma;   //!
+   TBranch        *b_truth_N_other;   //!
    TBranch        *b_truth_N_pi0;   //!
    TBranch        *b_truth_N_proton;   //!
    TBranch        *b_truth_N_trueMichelElectrons;   //!
@@ -858,6 +857,7 @@ public :
    TBranch        *b_CCProtonPi0_muon_roadUpstreamPlanes;   //!
    TBranch        *b_CCProtonPi0_ntrajMuonProng;   //!
    TBranch        *b_CCProtonPi0_proton_kinked;   //!
+   TBranch        *b_CCProtonPi0_proton_leadingIndice;   //!
    TBranch        *b_CCProtonPi0_r_minos_trk_vtx_plane;   //!
    TBranch        *b_CCProtonPi0_t_minos_trk_numFSMuons;   //!
    TBranch        *b_CCProtonPi0_t_minos_trk_primFSLeptonPDG;   //!
@@ -923,8 +923,10 @@ public :
    TBranch        *b_CCProtonPi0_minos_trk_vtx_z;   //!
    TBranch        *b_CCProtonPi0_muon_E;   //!
    TBranch        *b_CCProtonPi0_muon_E_shift;   //!
+   TBranch        *b_CCProtonPi0_muon_KE;   //!
    TBranch        *b_CCProtonPi0_muon_P;   //!
    TBranch        *b_CCProtonPi0_muon_muScore;   //!
+   TBranch        *b_CCProtonPi0_muon_phi;   //!
    TBranch        *b_CCProtonPi0_muon_px;   //!
    TBranch        *b_CCProtonPi0_muon_py;   //!
    TBranch        *b_CCProtonPi0_muon_pz;   //!
@@ -938,6 +940,7 @@ public :
    TBranch        *b_CCProtonPi0_neutrino_E_2Track;   //!
    TBranch        *b_CCProtonPi0_neutrino_E_Cal;   //!
    TBranch        *b_CCProtonPi0_pi0_E;   //!
+   TBranch        *b_CCProtonPi0_pi0_KE;   //!
    TBranch        *b_CCProtonPi0_pi0_P;   //!
    TBranch        *b_CCProtonPi0_pi0_cos_openingAngle;   //!
    TBranch        *b_CCProtonPi0_pi0_invMass;   //!
@@ -950,9 +953,9 @@ public :
    TBranch        *b_CCProtonPi0_pi0_thetaX;   //!
    TBranch        *b_CCProtonPi0_pi0_thetaY;   //!
    TBranch        *b_CCProtonPi0_proton_E;   //!
+   TBranch        *b_CCProtonPi0_proton_KE;   //!
    TBranch        *b_CCProtonPi0_proton_LLRScore;   //!
    TBranch        *b_CCProtonPi0_proton_P;   //!
-   TBranch        *b_CCProtonPi0_proton_ekin;   //!
    TBranch        *b_CCProtonPi0_proton_length;   //!
    TBranch        *b_CCProtonPi0_proton_phi;   //!
    TBranch        *b_CCProtonPi0_proton_pionScore;   //!
@@ -1006,10 +1009,10 @@ public :
    TBranch        *b_CCProtonPi0_trajProtonProngPDG;   //!
    TBranch        *b_CCProtonPi0_trajProtonProngPrimary;   //!
    TBranch        *b_CCProtonPi0_all_protons_E;   //!
+   TBranch        *b_CCProtonPi0_all_protons_KE;   //!
    TBranch        *b_CCProtonPi0_all_protons_LLRScore;   //!
    TBranch        *b_CCProtonPi0_all_protons_P;   //!
    TBranch        *b_CCProtonPi0_all_protons_chi2_ndf;   //!
-   TBranch        *b_CCProtonPi0_all_protons_ekin;   //!
    TBranch        *b_CCProtonPi0_all_protons_endPointX;   //!
    TBranch        *b_CCProtonPi0_all_protons_endPointY;   //!
    TBranch        *b_CCProtonPi0_all_protons_endPointZ;   //!
@@ -1121,7 +1124,6 @@ public :
    TBranch        *b_mc_cvweight_totalFlux;   //!
    TBranch        *b_mc_cvweight_totalXsec;   //!
    TBranch        *b_mc_cvweight_NA49;   //!
-   TBranch        *b_ppfx_cv_wgt;   //!
    TBranch        *b_mc_wgt_GENIE_sz;   //!
    TBranch        *b_mc_wgt_GENIE;   //!
    TBranch        *b_mc_wgt_Flux_Tertiary_sz;   //!
@@ -1130,22 +1132,6 @@ public :
    TBranch        *b_mc_wgt_Flux_BeamFocus;   //!
    TBranch        *b_mc_wgt_Flux_NA49_sz;   //!
    TBranch        *b_mc_wgt_Flux_NA49;   //!
-   TBranch        *b_mc_wgt_Norm_sz;   //!
-   TBranch        *b_mc_wgt_Norm;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPNumiYields_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPNumiYields;   //!
-   TBranch        *b_mc_wgt_ppfx_TargetAttenuation_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_TargetAttenuation;   //!
-   TBranch        *b_mc_wgt_ppfx_NA49_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_NA49;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPKaonsYields_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPKaonsYields;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPThinTarget_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPThinTarget;   //!
-   TBranch        *b_mc_wgt_ppfx_Absorption_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_Absorption;   //!
-   TBranch        *b_mc_wgt_ppfx_Others_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_Others;   //!
    TBranch        *b_n_prongs;   //!
    TBranch        *b_prong_nParticles;   //!
    TBranch        *b_prong_part_score;   //!
@@ -1189,7 +1175,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/Reduced/all.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/all_v2_21.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1262,6 +1248,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("minos_track_inside_partial_plane", &minos_track_inside_partial_plane, &b_minos_track_inside_partial_plane);
    fChain->SetBranchAddress("prim_vtx_has_misassigned_track_direction", &prim_vtx_has_misassigned_track_direction, &b_prim_vtx_has_misassigned_track_direction);
    fChain->SetBranchAddress("prim_vtx_has_broken_track", &prim_vtx_has_broken_track, &b_prim_vtx_has_broken_track);
+   fChain->SetBranchAddress("Cut_BlobDirectionBad", &Cut_BlobDirectionBad, &b_Cut_BlobDirectionBad);
    fChain->SetBranchAddress("Cut_BlobsBad", &Cut_BlobsBad, &b_Cut_BlobsBad);
    fChain->SetBranchAddress("Cut_ConeBlobs", &Cut_ConeBlobs, &b_Cut_ConeBlobs);
    fChain->SetBranchAddress("Cut_EndPoint_Michel_Exist", &Cut_EndPoint_Michel_Exist, &b_Cut_EndPoint_Michel_Exist);
@@ -1403,22 +1390,27 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("od_towerTimeBlobOD", od_towerTimeBlobOD, &b_od_towerTimeBlobOD);
    fChain->SetBranchAddress("truth_has_physics_event", &truth_has_physics_event, &b_truth_has_physics_event);
    fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
-   fChain->SetBranchAddress("truth_isSignal_1Pi0", &truth_isSignal_1Pi0, &b_truth_isSignal_1Pi0);
-   fChain->SetBranchAddress("truth_isSignal_2Gamma", &truth_isSignal_2Gamma, &b_truth_isSignal_2Gamma);
    fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
-   fChain->SetBranchAddress("truth_AnalyzeEvent", &truth_AnalyzeEvent, &b_truth_AnalyzeEvent);
+   fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
+   fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);
+   fChain->SetBranchAddress("truth_isBckg_NoPi0", &truth_isBckg_NoPi0, &b_truth_isBckg_NoPi0);
+   fChain->SetBranchAddress("truth_isBckg_SinglePi0", &truth_isBckg_SinglePi0, &b_truth_isBckg_SinglePi0);
+   fChain->SetBranchAddress("truth_isBckg_MultiPi0", &truth_isBckg_MultiPi0, &b_truth_isBckg_MultiPi0);
+   fChain->SetBranchAddress("truth_isBckg_NC", &truth_isBckg_NC, &b_truth_isBckg_NC);
+   fChain->SetBranchAddress("truth_isBckg_AntiNeutrino", &truth_isBckg_AntiNeutrino, &b_truth_isBckg_AntiNeutrino);
    fChain->SetBranchAddress("truth_isBckg_QELike", &truth_isBckg_QELike, &b_truth_isBckg_QELike);
-   fChain->SetBranchAddress("truth_isBckg_SinglePiPlus", &truth_isBckg_SinglePiPlus, &b_truth_isBckg_SinglePiPlus);
-   fChain->SetBranchAddress("truth_isBckg_SinglePiMinus", &truth_isBckg_SinglePiMinus, &b_truth_isBckg_SinglePiMinus);
+   fChain->SetBranchAddress("truth_isBckg_SinglePion", &truth_isBckg_SinglePion, &b_truth_isBckg_SinglePion);
+   fChain->SetBranchAddress("truth_isBckg_DoublePion", &truth_isBckg_DoublePion, &b_truth_isBckg_DoublePion);
    fChain->SetBranchAddress("truth_isBckg_MultiPion", &truth_isBckg_MultiPion, &b_truth_isBckg_MultiPion);
-   fChain->SetBranchAddress("truth_isBckg_MultiPiZero", &truth_isBckg_MultiPiZero, &b_truth_isBckg_MultiPiZero);
    fChain->SetBranchAddress("truth_isBckg_Other", &truth_isBckg_Other, &b_truth_isBckg_Other);
-   fChain->SetBranchAddress("truth_isBckg_withAntiMuon", &truth_isBckg_withAntiMuon, &b_truth_isBckg_withAntiMuon);
    fChain->SetBranchAddress("truth_isBckg_withMichel", &truth_isBckg_withMichel, &b_truth_isBckg_withMichel);
-   fChain->SetBranchAddress("truth_isBckg_withPrimaryPi0", &truth_isBckg_withPrimaryPi0, &b_truth_isBckg_withPrimaryPi0);
-   fChain->SetBranchAddress("truth_isBckg_withSecondaryPi0", &truth_isBckg_withSecondaryPi0, &b_truth_isBckg_withSecondaryPi0);
+   fChain->SetBranchAddress("truth_Bckg_nOther", &truth_Bckg_nOther, &b_truth_Bckg_nOther);
+   fChain->SetBranchAddress("truth_Bckg_nPi0_Primary", &truth_Bckg_nPi0_Primary, &b_truth_Bckg_nPi0_Primary);
+   fChain->SetBranchAddress("truth_Bckg_nPi0_Secondary", &truth_Bckg_nPi0_Secondary, &b_truth_Bckg_nPi0_Secondary);
+   fChain->SetBranchAddress("truth_Bckg_nPi0_Total", &truth_Bckg_nPi0_Total, &b_truth_Bckg_nPi0_Total);
+   fChain->SetBranchAddress("truth_Bckg_nPion", &truth_Bckg_nPion, &b_truth_Bckg_nPion);
    fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
-   fChain->SetBranchAddress("truth_N_gamma", &truth_N_gamma, &b_truth_N_gamma);
+   fChain->SetBranchAddress("truth_N_other", &truth_N_other, &b_truth_N_other);
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
    fChain->SetBranchAddress("truth_N_proton", &truth_N_proton, &b_truth_N_proton);
    fChain->SetBranchAddress("truth_N_trueMichelElectrons", &truth_N_trueMichelElectrons, &b_truth_N_trueMichelElectrons);
@@ -1510,6 +1502,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_muon_roadUpstreamPlanes", &CCProtonPi0_muon_roadUpstreamPlanes, &b_CCProtonPi0_muon_roadUpstreamPlanes);
    fChain->SetBranchAddress("CCProtonPi0_ntrajMuonProng", &CCProtonPi0_ntrajMuonProng, &b_CCProtonPi0_ntrajMuonProng);
    fChain->SetBranchAddress("CCProtonPi0_proton_kinked", &CCProtonPi0_proton_kinked, &b_CCProtonPi0_proton_kinked);
+   fChain->SetBranchAddress("CCProtonPi0_proton_leadingIndice", &CCProtonPi0_proton_leadingIndice, &b_CCProtonPi0_proton_leadingIndice);
    fChain->SetBranchAddress("CCProtonPi0_r_minos_trk_vtx_plane", &CCProtonPi0_r_minos_trk_vtx_plane, &b_CCProtonPi0_r_minos_trk_vtx_plane);
    fChain->SetBranchAddress("CCProtonPi0_t_minos_trk_numFSMuons", &CCProtonPi0_t_minos_trk_numFSMuons, &b_CCProtonPi0_t_minos_trk_numFSMuons);
    fChain->SetBranchAddress("CCProtonPi0_t_minos_trk_primFSLeptonPDG", &CCProtonPi0_t_minos_trk_primFSLeptonPDG, &b_CCProtonPi0_t_minos_trk_primFSLeptonPDG);
@@ -1575,8 +1568,10 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_minos_trk_vtx_z", &CCProtonPi0_minos_trk_vtx_z, &b_CCProtonPi0_minos_trk_vtx_z);
    fChain->SetBranchAddress("CCProtonPi0_muon_E", &CCProtonPi0_muon_E, &b_CCProtonPi0_muon_E);
    fChain->SetBranchAddress("CCProtonPi0_muon_E_shift", &CCProtonPi0_muon_E_shift, &b_CCProtonPi0_muon_E_shift);
+   fChain->SetBranchAddress("CCProtonPi0_muon_KE", &CCProtonPi0_muon_KE, &b_CCProtonPi0_muon_KE);
    fChain->SetBranchAddress("CCProtonPi0_muon_P", &CCProtonPi0_muon_P, &b_CCProtonPi0_muon_P);
    fChain->SetBranchAddress("CCProtonPi0_muon_muScore", &CCProtonPi0_muon_muScore, &b_CCProtonPi0_muon_muScore);
+   fChain->SetBranchAddress("CCProtonPi0_muon_phi", &CCProtonPi0_muon_phi, &b_CCProtonPi0_muon_phi);
    fChain->SetBranchAddress("CCProtonPi0_muon_px", &CCProtonPi0_muon_px, &b_CCProtonPi0_muon_px);
    fChain->SetBranchAddress("CCProtonPi0_muon_py", &CCProtonPi0_muon_py, &b_CCProtonPi0_muon_py);
    fChain->SetBranchAddress("CCProtonPi0_muon_pz", &CCProtonPi0_muon_pz, &b_CCProtonPi0_muon_pz);
@@ -1590,6 +1585,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_neutrino_E_2Track", &CCProtonPi0_neutrino_E_2Track, &b_CCProtonPi0_neutrino_E_2Track);
    fChain->SetBranchAddress("CCProtonPi0_neutrino_E_Cal", &CCProtonPi0_neutrino_E_Cal, &b_CCProtonPi0_neutrino_E_Cal);
    fChain->SetBranchAddress("CCProtonPi0_pi0_E", &CCProtonPi0_pi0_E, &b_CCProtonPi0_pi0_E);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_KE", &CCProtonPi0_pi0_KE, &b_CCProtonPi0_pi0_KE);
    fChain->SetBranchAddress("CCProtonPi0_pi0_P", &CCProtonPi0_pi0_P, &b_CCProtonPi0_pi0_P);
    fChain->SetBranchAddress("CCProtonPi0_pi0_cos_openingAngle", &CCProtonPi0_pi0_cos_openingAngle, &b_CCProtonPi0_pi0_cos_openingAngle);
    fChain->SetBranchAddress("CCProtonPi0_pi0_invMass", &CCProtonPi0_pi0_invMass, &b_CCProtonPi0_pi0_invMass);
@@ -1602,9 +1598,9 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_pi0_thetaX", &CCProtonPi0_pi0_thetaX, &b_CCProtonPi0_pi0_thetaX);
    fChain->SetBranchAddress("CCProtonPi0_pi0_thetaY", &CCProtonPi0_pi0_thetaY, &b_CCProtonPi0_pi0_thetaY);
    fChain->SetBranchAddress("CCProtonPi0_proton_E", &CCProtonPi0_proton_E, &b_CCProtonPi0_proton_E);
+   fChain->SetBranchAddress("CCProtonPi0_proton_KE", &CCProtonPi0_proton_KE, &b_CCProtonPi0_proton_KE);
    fChain->SetBranchAddress("CCProtonPi0_proton_LLRScore", &CCProtonPi0_proton_LLRScore, &b_CCProtonPi0_proton_LLRScore);
    fChain->SetBranchAddress("CCProtonPi0_proton_P", &CCProtonPi0_proton_P, &b_CCProtonPi0_proton_P);
-   fChain->SetBranchAddress("CCProtonPi0_proton_ekin", &CCProtonPi0_proton_ekin, &b_CCProtonPi0_proton_ekin);
    fChain->SetBranchAddress("CCProtonPi0_proton_length", &CCProtonPi0_proton_length, &b_CCProtonPi0_proton_length);
    fChain->SetBranchAddress("CCProtonPi0_proton_phi", &CCProtonPi0_proton_phi, &b_CCProtonPi0_proton_phi);
    fChain->SetBranchAddress("CCProtonPi0_proton_pionScore", &CCProtonPi0_proton_pionScore, &b_CCProtonPi0_proton_pionScore);
@@ -1658,10 +1654,10 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_trajProtonProngPDG", CCProtonPi0_trajProtonProngPDG, &b_CCProtonPi0_trajProtonProngPDG);
    fChain->SetBranchAddress("CCProtonPi0_trajProtonProngPrimary", CCProtonPi0_trajProtonProngPrimary, &b_CCProtonPi0_trajProtonProngPrimary);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_E", CCProtonPi0_all_protons_E, &b_CCProtonPi0_all_protons_E);
+   fChain->SetBranchAddress("CCProtonPi0_all_protons_KE", CCProtonPi0_all_protons_KE, &b_CCProtonPi0_all_protons_KE);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_LLRScore", CCProtonPi0_all_protons_LLRScore, &b_CCProtonPi0_all_protons_LLRScore);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_P", CCProtonPi0_all_protons_P, &b_CCProtonPi0_all_protons_P);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_chi2_ndf", CCProtonPi0_all_protons_chi2_ndf, &b_CCProtonPi0_all_protons_chi2_ndf);
-   fChain->SetBranchAddress("CCProtonPi0_all_protons_ekin", CCProtonPi0_all_protons_ekin, &b_CCProtonPi0_all_protons_ekin);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_endPointX", CCProtonPi0_all_protons_endPointX, &b_CCProtonPi0_all_protons_endPointX);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_endPointY", CCProtonPi0_all_protons_endPointY, &b_CCProtonPi0_all_protons_endPointY);
    fChain->SetBranchAddress("CCProtonPi0_all_protons_endPointZ", CCProtonPi0_all_protons_endPointZ, &b_CCProtonPi0_all_protons_endPointZ);
@@ -1773,7 +1769,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("mc_cvweight_totalFlux", &mc_cvweight_totalFlux, &b_mc_cvweight_totalFlux);
    fChain->SetBranchAddress("mc_cvweight_totalXsec", &mc_cvweight_totalXsec, &b_mc_cvweight_totalXsec);
    fChain->SetBranchAddress("mc_cvweight_NA49", &mc_cvweight_NA49, &b_mc_cvweight_NA49);
-   fChain->SetBranchAddress("ppfx_cv_wgt", &ppfx_cv_wgt, &b_ppfx_cv_wgt);
    fChain->SetBranchAddress("mc_wgt_GENIE_sz", &mc_wgt_GENIE_sz, &b_mc_wgt_GENIE_sz);
    fChain->SetBranchAddress("mc_wgt_GENIE", mc_wgt_GENIE, &b_mc_wgt_GENIE);
    fChain->SetBranchAddress("mc_wgt_Flux_Tertiary_sz", &mc_wgt_Flux_Tertiary_sz, &b_mc_wgt_Flux_Tertiary_sz);
@@ -1782,22 +1777,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("mc_wgt_Flux_BeamFocus", mc_wgt_Flux_BeamFocus, &b_mc_wgt_Flux_BeamFocus);
    fChain->SetBranchAddress("mc_wgt_Flux_NA49_sz", &mc_wgt_Flux_NA49_sz, &b_mc_wgt_Flux_NA49_sz);
    fChain->SetBranchAddress("mc_wgt_Flux_NA49", mc_wgt_Flux_NA49, &b_mc_wgt_Flux_NA49);
-   fChain->SetBranchAddress("mc_wgt_Norm_sz", &mc_wgt_Norm_sz, &b_mc_wgt_Norm_sz);
-   fChain->SetBranchAddress("mc_wgt_Norm", &mc_wgt_Norm, &b_mc_wgt_Norm);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPNumiYields_sz", &mc_wgt_ppfx_MIPPNumiYields_sz, &b_mc_wgt_ppfx_MIPPNumiYields_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPNumiYields", &mc_wgt_ppfx_MIPPNumiYields, &b_mc_wgt_ppfx_MIPPNumiYields);
-   fChain->SetBranchAddress("mc_wgt_ppfx_TargetAttenuation_sz", &mc_wgt_ppfx_TargetAttenuation_sz, &b_mc_wgt_ppfx_TargetAttenuation_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_TargetAttenuation", &mc_wgt_ppfx_TargetAttenuation, &b_mc_wgt_ppfx_TargetAttenuation);
-   fChain->SetBranchAddress("mc_wgt_ppfx_NA49_sz", &mc_wgt_ppfx_NA49_sz, &b_mc_wgt_ppfx_NA49_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_NA49", &mc_wgt_ppfx_NA49, &b_mc_wgt_ppfx_NA49);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPKaonsYields_sz", &mc_wgt_ppfx_MIPPKaonsYields_sz, &b_mc_wgt_ppfx_MIPPKaonsYields_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPKaonsYields", &mc_wgt_ppfx_MIPPKaonsYields, &b_mc_wgt_ppfx_MIPPKaonsYields);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPThinTarget_sz", &mc_wgt_ppfx_MIPPThinTarget_sz, &b_mc_wgt_ppfx_MIPPThinTarget_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPThinTarget", &mc_wgt_ppfx_MIPPThinTarget, &b_mc_wgt_ppfx_MIPPThinTarget);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Absorption_sz", &mc_wgt_ppfx_Absorption_sz, &b_mc_wgt_ppfx_Absorption_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Absorption", &mc_wgt_ppfx_Absorption, &b_mc_wgt_ppfx_Absorption);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Others_sz", &mc_wgt_ppfx_Others_sz, &b_mc_wgt_ppfx_Others_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Others", &mc_wgt_ppfx_Others, &b_mc_wgt_ppfx_Others);
    fChain->SetBranchAddress("n_prongs", &n_prongs, &b_n_prongs);
    fChain->SetBranchAddress("prong_nParticles", prong_nParticles, &b_prong_nParticles);
    fChain->SetBranchAddress("prong_part_score", prong_part_score, &b_prong_part_score);

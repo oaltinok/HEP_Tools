@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jul 21 14:04:44 2015 by ROOT version 5.34/05
+// Mon Jul 27 11:13:33 2015 by ROOT version 5.34/05
 // from TChain Truth/
 //////////////////////////////////////////////////////////
 
@@ -24,22 +24,27 @@ public :
    Double_t        eventID;
    Bool_t          truth_has_physics_event;
    Bool_t          truth_isSignal;
-   Bool_t          truth_isSignal_1Pi0;
-   Bool_t          truth_isSignal_2Gamma;
    Bool_t          truth_isFidVol;
-   Bool_t          truth_AnalyzeEvent;
+   Bool_t          truth_isNC;
+   Bool_t          truth_ReconstructEvent;
+   Bool_t          truth_isBckg_NoPi0;
+   Bool_t          truth_isBckg_SinglePi0;
+   Bool_t          truth_isBckg_MultiPi0;
+   Bool_t          truth_isBckg_NC;
+   Bool_t          truth_isBckg_AntiNeutrino;
    Bool_t          truth_isBckg_QELike;
-   Bool_t          truth_isBckg_SinglePiPlus;
-   Bool_t          truth_isBckg_SinglePiMinus;
+   Bool_t          truth_isBckg_SinglePion;
+   Bool_t          truth_isBckg_DoublePion;
    Bool_t          truth_isBckg_MultiPion;
-   Bool_t          truth_isBckg_MultiPiZero;
    Bool_t          truth_isBckg_Other;
-   Bool_t          truth_isBckg_withAntiMuon;
    Bool_t          truth_isBckg_withMichel;
-   Bool_t          truth_isBckg_withPrimaryPi0;
-   Bool_t          truth_isBckg_withSecondaryPi0;
+   Int_t           truth_Bckg_nOther;
+   Int_t           truth_Bckg_nPi0_Primary;
+   Int_t           truth_Bckg_nPi0_Secondary;
+   Int_t           truth_Bckg_nPi0_Total;
+   Int_t           truth_Bckg_nPion;
    Int_t           truth_N_FSParticles;
-   Int_t           truth_N_gamma;
+   Int_t           truth_N_other;
    Int_t           truth_N_pi0;
    Int_t           truth_N_proton;
    Int_t           truth_N_trueMichelElectrons;
@@ -139,11 +144,11 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[198];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[198];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[198];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[198];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[198];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[190];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[190];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[190];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[190];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[190];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
    Int_t           mc_er_ID[245];   //[mc_er_nPart]
    Int_t           mc_er_status[245];   //[mc_er_nPart]
@@ -158,7 +163,7 @@ public :
    Int_t           mc_er_LD[245];   //[mc_er_nPart]
    Int_t           mc_er_mother[245];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[11];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -171,7 +176,6 @@ public :
    Double_t        mc_cvweight_totalFlux;
    Double_t        mc_cvweight_totalXsec;
    Double_t        mc_cvweight_NA49;
-   Double_t        ppfx_cv_wgt;
    Int_t           mc_wgt_GENIE_sz;
    Double_t        mc_wgt_GENIE[100];   //[mc_wgt_GENIE_sz]
    Int_t           mc_wgt_Flux_Tertiary_sz;
@@ -180,43 +184,32 @@ public :
    Double_t        mc_wgt_Flux_BeamFocus[100];   //[mc_wgt_Flux_BeamFocus_sz]
    Int_t           mc_wgt_Flux_NA49_sz;
    Double_t        mc_wgt_Flux_NA49[100];   //[mc_wgt_Flux_NA49_sz]
-   Int_t           mc_wgt_Norm_sz;
-   Double_t        mc_wgt_Norm[1];   //[mc_wgt_Norm_sz]
-   Int_t           mc_wgt_ppfx_MIPPNumiYields_sz;
-   Double_t        mc_wgt_ppfx_MIPPNumiYields[1];   //[mc_wgt_ppfx_MIPPNumiYields_sz]
-   Int_t           mc_wgt_ppfx_TargetAttenuation_sz;
-   Double_t        mc_wgt_ppfx_TargetAttenuation[1];   //[mc_wgt_ppfx_TargetAttenuation_sz]
-   Int_t           mc_wgt_ppfx_NA49_sz;
-   Double_t        mc_wgt_ppfx_NA49[1];   //[mc_wgt_ppfx_NA49_sz]
-   Int_t           mc_wgt_ppfx_MIPPKaonsYields_sz;
-   Double_t        mc_wgt_ppfx_MIPPKaonsYields[1];   //[mc_wgt_ppfx_MIPPKaonsYields_sz]
-   Int_t           mc_wgt_ppfx_MIPPThinTarget_sz;
-   Double_t        mc_wgt_ppfx_MIPPThinTarget[1];   //[mc_wgt_ppfx_MIPPThinTarget_sz]
-   Int_t           mc_wgt_ppfx_Absorption_sz;
-   Double_t        mc_wgt_ppfx_Absorption[1];   //[mc_wgt_ppfx_Absorption_sz]
-   Int_t           mc_wgt_ppfx_Others_sz;
-   Double_t        mc_wgt_ppfx_Others[1];   //[mc_wgt_ppfx_Others_sz]
 
    // List of branches
    TBranch        *b_eventID;   //!
    TBranch        *b_truth_has_physics_event;   //!
    TBranch        *b_truth_isSignal;   //!
-   TBranch        *b_truth_isSignal_1Pi0;   //!
-   TBranch        *b_truth_isSignal_2Gamma;   //!
    TBranch        *b_truth_isFidVol;   //!
-   TBranch        *b_truth_AnalyzeEvent;   //!
+   TBranch        *b_truth_isNC;   //!
+   TBranch        *b_truth_ReconstructEvent;   //!
+   TBranch        *b_truth_isBckg_NoPi0;   //!
+   TBranch        *b_truth_isBckg_SinglePi0;   //!
+   TBranch        *b_truth_isBckg_MultiPi0;   //!
+   TBranch        *b_truth_isBckg_NC;   //!
+   TBranch        *b_truth_isBckg_AntiNeutrino;   //!
    TBranch        *b_truth_isBckg_QELike;   //!
-   TBranch        *b_truth_isBckg_SinglePiPlus;   //!
-   TBranch        *b_truth_isBckg_SinglePiMinus;   //!
+   TBranch        *b_truth_isBckg_SinglePion;   //!
+   TBranch        *b_truth_isBckg_DoublePion;   //!
    TBranch        *b_truth_isBckg_MultiPion;   //!
-   TBranch        *b_truth_isBckg_MultiPiZero;   //!
    TBranch        *b_truth_isBckg_Other;   //!
-   TBranch        *b_truth_isBckg_withAntiMuon;   //!
    TBranch        *b_truth_isBckg_withMichel;   //!
-   TBranch        *b_truth_isBckg_withPrimaryPi0;   //!
-   TBranch        *b_truth_isBckg_withSecondaryPi0;   //!
+   TBranch        *b_truth_Bckg_nOther;   //!
+   TBranch        *b_truth_Bckg_nPi0_Primary;   //!
+   TBranch        *b_truth_Bckg_nPi0_Secondary;   //!
+   TBranch        *b_truth_Bckg_nPi0_Total;   //!
+   TBranch        *b_truth_Bckg_nPion;   //!
    TBranch        *b_truth_N_FSParticles;   //!
-   TBranch        *b_truth_N_gamma;   //!
+   TBranch        *b_truth_N_other;   //!
    TBranch        *b_truth_N_pi0;   //!
    TBranch        *b_truth_N_proton;   //!
    TBranch        *b_truth_N_trueMichelElectrons;   //!
@@ -348,7 +341,6 @@ public :
    TBranch        *b_mc_cvweight_totalFlux;   //!
    TBranch        *b_mc_cvweight_totalXsec;   //!
    TBranch        *b_mc_cvweight_NA49;   //!
-   TBranch        *b_ppfx_cv_wgt;   //!
    TBranch        *b_mc_wgt_GENIE_sz;   //!
    TBranch        *b_mc_wgt_GENIE;   //!
    TBranch        *b_mc_wgt_Flux_Tertiary_sz;   //!
@@ -357,22 +349,6 @@ public :
    TBranch        *b_mc_wgt_Flux_BeamFocus;   //!
    TBranch        *b_mc_wgt_Flux_NA49_sz;   //!
    TBranch        *b_mc_wgt_Flux_NA49;   //!
-   TBranch        *b_mc_wgt_Norm_sz;   //!
-   TBranch        *b_mc_wgt_Norm;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPNumiYields_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPNumiYields;   //!
-   TBranch        *b_mc_wgt_ppfx_TargetAttenuation_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_TargetAttenuation;   //!
-   TBranch        *b_mc_wgt_ppfx_NA49_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_NA49;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPKaonsYields_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPKaonsYields;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPThinTarget_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_MIPPThinTarget;   //!
-   TBranch        *b_mc_wgt_ppfx_Absorption_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_Absorption;   //!
-   TBranch        *b_mc_wgt_ppfx_Others_sz;   //!
-   TBranch        *b_mc_wgt_ppfx_Others;   //!
 
    Truth_Branch(TTree *tree=0);
    virtual ~Truth_Branch();
@@ -408,7 +384,7 @@ Truth_Branch::Truth_Branch(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("Truth","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1.root/Truth");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/all_v2_21.root/Truth");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -460,22 +436,27 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
    fChain->SetBranchAddress("truth_has_physics_event", &truth_has_physics_event, &b_truth_has_physics_event);
    fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
-   fChain->SetBranchAddress("truth_isSignal_1Pi0", &truth_isSignal_1Pi0, &b_truth_isSignal_1Pi0);
-   fChain->SetBranchAddress("truth_isSignal_2Gamma", &truth_isSignal_2Gamma, &b_truth_isSignal_2Gamma);
    fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
-   fChain->SetBranchAddress("truth_AnalyzeEvent", &truth_AnalyzeEvent, &b_truth_AnalyzeEvent);
+   fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
+   fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);
+   fChain->SetBranchAddress("truth_isBckg_NoPi0", &truth_isBckg_NoPi0, &b_truth_isBckg_NoPi0);
+   fChain->SetBranchAddress("truth_isBckg_SinglePi0", &truth_isBckg_SinglePi0, &b_truth_isBckg_SinglePi0);
+   fChain->SetBranchAddress("truth_isBckg_MultiPi0", &truth_isBckg_MultiPi0, &b_truth_isBckg_MultiPi0);
+   fChain->SetBranchAddress("truth_isBckg_NC", &truth_isBckg_NC, &b_truth_isBckg_NC);
+   fChain->SetBranchAddress("truth_isBckg_AntiNeutrino", &truth_isBckg_AntiNeutrino, &b_truth_isBckg_AntiNeutrino);
    fChain->SetBranchAddress("truth_isBckg_QELike", &truth_isBckg_QELike, &b_truth_isBckg_QELike);
-   fChain->SetBranchAddress("truth_isBckg_SinglePiPlus", &truth_isBckg_SinglePiPlus, &b_truth_isBckg_SinglePiPlus);
-   fChain->SetBranchAddress("truth_isBckg_SinglePiMinus", &truth_isBckg_SinglePiMinus, &b_truth_isBckg_SinglePiMinus);
+   fChain->SetBranchAddress("truth_isBckg_SinglePion", &truth_isBckg_SinglePion, &b_truth_isBckg_SinglePion);
+   fChain->SetBranchAddress("truth_isBckg_DoublePion", &truth_isBckg_DoublePion, &b_truth_isBckg_DoublePion);
    fChain->SetBranchAddress("truth_isBckg_MultiPion", &truth_isBckg_MultiPion, &b_truth_isBckg_MultiPion);
-   fChain->SetBranchAddress("truth_isBckg_MultiPiZero", &truth_isBckg_MultiPiZero, &b_truth_isBckg_MultiPiZero);
    fChain->SetBranchAddress("truth_isBckg_Other", &truth_isBckg_Other, &b_truth_isBckg_Other);
-   fChain->SetBranchAddress("truth_isBckg_withAntiMuon", &truth_isBckg_withAntiMuon, &b_truth_isBckg_withAntiMuon);
    fChain->SetBranchAddress("truth_isBckg_withMichel", &truth_isBckg_withMichel, &b_truth_isBckg_withMichel);
-   fChain->SetBranchAddress("truth_isBckg_withPrimaryPi0", &truth_isBckg_withPrimaryPi0, &b_truth_isBckg_withPrimaryPi0);
-   fChain->SetBranchAddress("truth_isBckg_withSecondaryPi0", &truth_isBckg_withSecondaryPi0, &b_truth_isBckg_withSecondaryPi0);
+   fChain->SetBranchAddress("truth_Bckg_nOther", &truth_Bckg_nOther, &b_truth_Bckg_nOther);
+   fChain->SetBranchAddress("truth_Bckg_nPi0_Primary", &truth_Bckg_nPi0_Primary, &b_truth_Bckg_nPi0_Primary);
+   fChain->SetBranchAddress("truth_Bckg_nPi0_Secondary", &truth_Bckg_nPi0_Secondary, &b_truth_Bckg_nPi0_Secondary);
+   fChain->SetBranchAddress("truth_Bckg_nPi0_Total", &truth_Bckg_nPi0_Total, &b_truth_Bckg_nPi0_Total);
+   fChain->SetBranchAddress("truth_Bckg_nPion", &truth_Bckg_nPion, &b_truth_Bckg_nPion);
    fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
-   fChain->SetBranchAddress("truth_N_gamma", &truth_N_gamma, &b_truth_N_gamma);
+   fChain->SetBranchAddress("truth_N_other", &truth_N_other, &b_truth_N_other);
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
    fChain->SetBranchAddress("truth_N_proton", &truth_N_proton, &b_truth_N_proton);
    fChain->SetBranchAddress("truth_N_trueMichelElectrons", &truth_N_trueMichelElectrons, &b_truth_N_trueMichelElectrons);
@@ -607,7 +588,6 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("mc_cvweight_totalFlux", &mc_cvweight_totalFlux, &b_mc_cvweight_totalFlux);
    fChain->SetBranchAddress("mc_cvweight_totalXsec", &mc_cvweight_totalXsec, &b_mc_cvweight_totalXsec);
    fChain->SetBranchAddress("mc_cvweight_NA49", &mc_cvweight_NA49, &b_mc_cvweight_NA49);
-   fChain->SetBranchAddress("ppfx_cv_wgt", &ppfx_cv_wgt, &b_ppfx_cv_wgt);
    fChain->SetBranchAddress("mc_wgt_GENIE_sz", &mc_wgt_GENIE_sz, &b_mc_wgt_GENIE_sz);
    fChain->SetBranchAddress("mc_wgt_GENIE", mc_wgt_GENIE, &b_mc_wgt_GENIE);
    fChain->SetBranchAddress("mc_wgt_Flux_Tertiary_sz", &mc_wgt_Flux_Tertiary_sz, &b_mc_wgt_Flux_Tertiary_sz);
@@ -616,22 +596,6 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("mc_wgt_Flux_BeamFocus", mc_wgt_Flux_BeamFocus, &b_mc_wgt_Flux_BeamFocus);
    fChain->SetBranchAddress("mc_wgt_Flux_NA49_sz", &mc_wgt_Flux_NA49_sz, &b_mc_wgt_Flux_NA49_sz);
    fChain->SetBranchAddress("mc_wgt_Flux_NA49", mc_wgt_Flux_NA49, &b_mc_wgt_Flux_NA49);
-   fChain->SetBranchAddress("mc_wgt_Norm_sz", &mc_wgt_Norm_sz, &b_mc_wgt_Norm_sz);
-   fChain->SetBranchAddress("mc_wgt_Norm", &mc_wgt_Norm, &b_mc_wgt_Norm);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPNumiYields_sz", &mc_wgt_ppfx_MIPPNumiYields_sz, &b_mc_wgt_ppfx_MIPPNumiYields_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPNumiYields", &mc_wgt_ppfx_MIPPNumiYields, &b_mc_wgt_ppfx_MIPPNumiYields);
-   fChain->SetBranchAddress("mc_wgt_ppfx_TargetAttenuation_sz", &mc_wgt_ppfx_TargetAttenuation_sz, &b_mc_wgt_ppfx_TargetAttenuation_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_TargetAttenuation", &mc_wgt_ppfx_TargetAttenuation, &b_mc_wgt_ppfx_TargetAttenuation);
-   fChain->SetBranchAddress("mc_wgt_ppfx_NA49_sz", &mc_wgt_ppfx_NA49_sz, &b_mc_wgt_ppfx_NA49_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_NA49", &mc_wgt_ppfx_NA49, &b_mc_wgt_ppfx_NA49);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPKaonsYields_sz", &mc_wgt_ppfx_MIPPKaonsYields_sz, &b_mc_wgt_ppfx_MIPPKaonsYields_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPKaonsYields", &mc_wgt_ppfx_MIPPKaonsYields, &b_mc_wgt_ppfx_MIPPKaonsYields);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPThinTarget_sz", &mc_wgt_ppfx_MIPPThinTarget_sz, &b_mc_wgt_ppfx_MIPPThinTarget_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_MIPPThinTarget", &mc_wgt_ppfx_MIPPThinTarget, &b_mc_wgt_ppfx_MIPPThinTarget);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Absorption_sz", &mc_wgt_ppfx_Absorption_sz, &b_mc_wgt_ppfx_Absorption_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Absorption", &mc_wgt_ppfx_Absorption, &b_mc_wgt_ppfx_Absorption);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Others_sz", &mc_wgt_ppfx_Others_sz, &b_mc_wgt_ppfx_Others_sz);
-   fChain->SetBranchAddress("mc_wgt_ppfx_Others", &mc_wgt_ppfx_Others, &b_mc_wgt_ppfx_Others);
    Notify();
 }
 

@@ -14,7 +14,7 @@ Function: makeClass()
 
 void makeClass(){
 
-    string playlist = "../../Input/Playlists/pl_MC_All.dat";
+    string playlist = "../../Input/Playlists/pl_MC_Merged.dat";
     TChain fChain("CCProtonPi0") ;
 
     ifstream input_pl( playlist.c_str() );
