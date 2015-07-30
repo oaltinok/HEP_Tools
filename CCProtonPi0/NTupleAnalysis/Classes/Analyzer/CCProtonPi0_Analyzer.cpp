@@ -10,16 +10,13 @@ using namespace std;
 
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
-    applyMaxEvents = true;
+    applyMaxEvents = false;
 
     nMaxEvents = 100000;
     
     // Control Flow
     isDataAnalysis  = true;
     isScanRun = false;
-    is_pID_Studies  = false;
-    isMichelStudy = false;
-    applyOtherMichelCuts = false;
     writeFSParticleMomentum = false;
     
     applyProtonScore = true;
@@ -27,10 +24,8 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     minProtonScore_LLR = 10.0;
     minPIDDiff = 0.45;
 
-    applyPi0BlobCuts = true;
-
     applyPhotonDistance = true;
-    minPhotonDistance = 14; //cm
+    minPhotonDistance = 15; //cm
     
     applyBeamEnergy = true;
     max_beamEnergy = 20.0; // GeV
@@ -53,7 +48,7 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
 {
 
     string rootDir;
-    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_Test.root";
+    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple.root";
     else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple.root";
 
     cout<<"Reducing NTuple Files to a single file"<<endl;
@@ -113,12 +108,6 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
 
 void CCProtonPi0_Analyzer::analyze(string playlist)
 {
-    if (!isAnalysisModeSelected){
-        cout<<"Warning No Analysis Mode Selected!"<<endl;
-        cout<<"Returning!..."<<endl;
-        return;
-    }
-    
     //------------------------------------------------------------------------
     // Create chain
     //------------------------------------------------------------------------
@@ -159,9 +148,6 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         // Update scanFileName if running for scan
         //if(isScanRun) UpdateScanFileName();
        
-        // Decide to Analyze Event or NOT
-        if( !analyzeEvent() ) continue;
-       
         //----------------------------------------------------------------------
         // Fill Background Branches for Background Events
         //----------------------------------------------------------------------
@@ -175,10 +161,6 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         // Data Analysis and Other Studies
         //----------------------------------------------------------------------
         if (isDataAnalysis) fillData();
-        if (is_pID_Studies && nProngs == 2){ 
-            pIDTool.FillHistograms(CCProtonPi0_proton_LLRScore,CCProtonPi0_proton_protonScore,CCProtonPi0_proton_pionScore,
-                                    CCProtonPi0_trajProtonProngPDG[CCProtonPi0_proton_leadingIndice],CCProtonPi0_proton_E );
-        }
         if (writeFSParticleMomentum) writeFSParticle4P(jentry);
         
 
@@ -187,7 +169,6 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     //--------------------------------------------------------------------------
     // Studies
     //--------------------------------------------------------------------------
-    if(is_pID_Studies) pIDTool.get_pID_Stats();
     
     //--------------------------------------------------------------------------
     // Write Text Files
@@ -202,35 +183,28 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     muon.writeHistograms();
     proton.writeHistograms();
     pi0.writeHistograms();
-    pi0Blob.write_RootFile();
-    if(is_pID_Studies) pIDTool.write_RootFile();
-    if(isMichelStudy) michelTool.write_RootFile();
-    
 }
 
     
 //------------------------------------------------------------------------------
 //  Constructor
 //------------------------------------------------------------------------------
-CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(int nMode, bool isMC) : 
-    CCProtonPi0_NTupleAnalysis(nMode),
-    interaction(nMode, isMC),
-    muon(nMode, isMC),
-    proton(nMode, isMC),
-    pi0(nMode, isMC),
-    pi0Blob(nMode, isMC),
-    pIDTool(nMode, isMC),
-    bckgTool(nMode),
-    michelTool(nMode, isMC),
-    cutList(nMode)
+CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) : 
+    CCProtonPi0_NTupleAnalysis(),
+    interaction(isModeReduce, isMC),
+    muon(isModeReduce, isMC),
+    proton(isModeReduce, isMC),
+    pi0(isModeReduce, isMC),
+    bckgTool(isModeReduce),
+    cutList(isModeReduce, isMC)
 {   
     cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
     
-    specifyRunTime();
-    
     m_isMC = isMC;
     
-    if (nMode == 0){
+    specifyRunTime();
+    
+    if (isModeReduce){
         cout<<"\tNTuple Reduce Mode -- Will not create Text Files"<<endl;
     }else{
         openTextFiles();
@@ -372,28 +346,6 @@ void CCProtonPi0_Analyzer::fillData()
     }
 }
 
-//------------------------------------------------------------------------------
-// analyzeEvent()
-//      Decides to Analyze or Skip the Event using Analysis Mode
-//------------------------------------------------------------------------------
-bool CCProtonPi0_Analyzer::analyzeEvent()
-{
-    bool isAnalyzable;
-    
-    if ( anaMode == 1 ){
-        if( truth_isSignal) isAnalyzable = true;
-        else isAnalyzable = false;
-    }else if ( anaMode == 2 ){
-        if( truth_isSignal) isAnalyzable = false;
-        else isAnalyzable = true;
-    }else{
-        isAnalyzable = true;
-    }
-    
-    return isAnalyzable;
-    
-}
-
 void CCProtonPi0_Analyzer::writeFSParticle4P(Long64_t nEntry)
 {
     for (int t = 0; t < nTopologies; t++){
@@ -459,7 +411,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_Muon_None.increment(truth_isSignal, study1, study2);
 
     // Fill Truth_W for MINOS Matched Signal Events
-    //if (truth_isSignal) fill_mc_w(); 
+    if (m_isMC && truth_isSignal) fill_mc_w(); 
         
     if( Cut_Muon_Not_Plausible == 1) return false;
     cutList.nCut_Muon_Not_Plausible.increment(truth_isSignal, study1, study2);
@@ -579,9 +531,9 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
 
 void CCProtonPi0_Analyzer::fill_mc_w()
 {
-    if(mc_intType == 1) interaction.mc_w_CCQE->Fill(mc_w * HEP_Functions::MeV_to_GeV);
-    if(mc_intType == 2) interaction.mc_w_RES->Fill(mc_w * HEP_Functions::MeV_to_GeV);
-    if(mc_intType == 3) interaction.mc_w_DIS->Fill(mc_w * HEP_Functions::MeV_to_GeV);
+    if(mc_intType == 1) cutList.mc_w_CCQE->Fill(mc_w * HEP_Functions::MeV_to_GeV);
+    if(mc_intType == 2) cutList.mc_w_RES->Fill(mc_w * HEP_Functions::MeV_to_GeV);
+    if(mc_intType == 3) cutList.mc_w_DIS->Fill(mc_w * HEP_Functions::MeV_to_GeV);
 }
 
 /*
@@ -606,33 +558,30 @@ bool CCProtonPi0_Analyzer::KeepMichelEvent()
 
 void CCProtonPi0_Analyzer::fillInteractionTrue()
 {
-    // Do Nothing!
-}
-
-void CCProtonPi0_Analyzer::fillInteractionReco()
-{
-    // Event Kinematics
-    if (nProngs == 1) interaction.Enu_1Track->Fill(CCProtonPi0_neutrino_E_1Track * HEP_Functions::MeV_to_GeV);
-    else interaction.Enu_2Track->Fill(CCProtonPi0_neutrino_E_2Track * HEP_Functions::MeV_to_GeV);
-    interaction.Enu_Cal->Fill(CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
-    interaction.q2->Fill(CCProtonPi0_QSq_Cal * HEP_Functions::MeVSq_to_GeVSq);
-    interaction.w->Fill(CCProtonPi0_W_Cal* HEP_Functions::MeV_to_GeV);
-    interaction.wSq->Fill(CCProtonPi0_WSq_Cal * HEP_Functions::MeVSq_to_GeVSq);
-   
-    // Reconstruction 
-    interaction.E_Unused_afterReco->Fill(energyUnused_afterReco);
-    interaction.E_Used_afterReco->Fill(energyUsed_afterReco);
-
-    // Other Event Parameters
-    if (nProngs >= 2) interaction.deltaInvMass->Fill(calcDeltaInvariantMass());
-    interaction.nProngs_hist->Fill(nProngs);
-    
-    // MC Only
     if(truth_isSignal){
         if(mc_intType == 1) interaction.final_mc_w_CCQE->Fill(mc_w * HEP_Functions::MeV_to_GeV);
         if(mc_intType == 2) interaction.final_mc_w_RES->Fill(mc_w * HEP_Functions::MeV_to_GeV);
         if(mc_intType == 3) interaction.final_mc_w_DIS->Fill(mc_w * HEP_Functions::MeV_to_GeV);
     }
+}
+
+void CCProtonPi0_Analyzer::fillInteractionReco()
+{
+    // Event Kinematics
+    if (nProngs == 1) FillHistogram(interaction.Enu_1Track, CCProtonPi0_neutrino_E_1Track * HEP_Functions::MeV_to_GeV);
+    else FillHistogram(interaction.Enu_2Track, CCProtonPi0_neutrino_E_2Track * HEP_Functions::MeV_to_GeV);
+    FillHistogram(interaction.Enu_Cal, CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
+    FillHistogram(interaction.q2, CCProtonPi0_QSq_Cal * HEP_Functions::MeVSq_to_GeVSq);
+    FillHistogram(interaction.w, CCProtonPi0_W_Cal* HEP_Functions::MeV_to_GeV);
+    FillHistogram(interaction.wSq, CCProtonPi0_WSq_Cal * HEP_Functions::MeVSq_to_GeVSq);
+   
+    // Reconstruction 
+    FillHistogram(interaction.E_Unused_afterReco, energyUnused_afterReco);
+    FillHistogram(interaction.E_Used_afterReco, energyUsed_afterReco);
+
+    // Other Event Parameters
+    if (nProngs >= 2) FillHistogram(interaction.deltaInvMass, calcDeltaInvariantMass());
+    FillHistogram(interaction.nProngs_hist, nProngs);
 }
 
 double CCProtonPi0_Analyzer::calcDeltaInvariantMass()
@@ -680,7 +629,7 @@ void CCProtonPi0_Analyzer::openTextFiles()
 {
     cout<<"Opening Text Files:"<<endl;
    
-    logFileName = Folder_List::output + Folder_List::textOut + branchDir + "LogFile.txt";
+    logFileName = Folder_List::output + Folder_List::textOut + "LogFile.txt";
     logFile.open(logFileName.c_str());
     if( !logFile.is_open() ){
         cerr<<"Cannot open output text file: "<<logFileName<<endl;
@@ -690,8 +639,8 @@ void CCProtonPi0_Analyzer::openTextFiles()
     }
     
     // Open Fail-Check Files
-    failFile[0] = Folder_List::output + Folder_List::textOut + branchDir + "FailChecks_1Prong.txt";
-    failFile[1] = Folder_List::output + Folder_List::textOut + branchDir + "FailChecks_2Prong.txt";
+    failFile[0] = Folder_List::output + Folder_List::textOut + "FailChecks_1Prong.txt";
+    failFile[1] = Folder_List::output + Folder_List::textOut + "FailChecks_2Prong.txt";
     
     for (int i = 0; i < nTopologies; i++){
         failText[i].open( failFile[i].c_str() );
@@ -705,7 +654,7 @@ void CCProtonPi0_Analyzer::openTextFiles()
     
     if(isScanRun){
         // Open Roundup Text for Arachne Scanning
-        string roundupFile = Folder_List::output + Folder_List::textOut + branchDir + "ArachneRoundup.txt";
+        string roundupFile = Folder_List::output + Folder_List::textOut + "ArachneRoundup.txt";
         roundupText.open(roundupFile.c_str() );
         if( !roundupText.is_open() ){
             cerr<<"Cannot open output text file: "<<roundupFile<<endl;
@@ -740,49 +689,16 @@ void CCProtonPi0_Analyzer::fillProtonTrue()
 void CCProtonPi0_Analyzer::fillProtonReco()
 {  
     // Unique Histograms
-    proton.partScore->Fill(CCProtonPi0_proton_LLRScore);
-    proton.trackLength->Fill(CCProtonPi0_proton_length * HEP_Functions::mm_to_cm);
-    proton.trackKinked->Fill(CCProtonPi0_proton_kinked);
+    FillHistogram(proton.partScore, CCProtonPi0_proton_LLRScore);
+    FillHistogram(proton.trackLength, CCProtonPi0_proton_length * HEP_Functions::mm_to_cm);
+    FillHistogram(proton.trackKinked, CCProtonPi0_proton_kinked);
  
     // Standard Histograms
-    proton.E->Fill(CCProtonPi0_proton_E * HEP_Functions::MeV_to_GeV);
-    proton.P->Fill(CCProtonPi0_proton_P * HEP_Functions::MeV_to_GeV);
-    proton.KE->Fill(CCProtonPi0_proton_KE * HEP_Functions::MeV_to_GeV);
-    proton.theta->Fill(CCProtonPi0_proton_theta * TMath::RadToDeg());
-    proton.phi->Fill(CCProtonPi0_proton_phi * TMath::RadToDeg());
-}
-
-void CCProtonPi0_Analyzer::fillBlobData()
-{
-    // Set Gamma Blob Information
-    pi0Blob.g1_blob_energy->Fill(gamma1_blob_energy);
-    pi0Blob.g1_blob_minsep->Fill(gamma1_blob_minsep);
-    pi0Blob.g1_blob_nclusters->Fill(gamma1_blob_nclusters);
-    pi0Blob.g1_blob_ndigits->Fill(gamma1_blob_ndigits);
-    
-    pi0Blob.g2_blob_energy->Fill(gamma2_blob_energy);
-    pi0Blob.g2_blob_minsep->Fill(gamma2_blob_minsep);
-    pi0Blob.g2_blob_nclusters->Fill(gamma2_blob_nclusters);
-    pi0Blob.g2_blob_ndigits->Fill(gamma2_blob_ndigits);
-
-    pi0Blob.g1_blob_ndof->Fill(blob_ndof_1);
-    pi0Blob.g1_blob_fval->Fill(blob_fval_1);
-    pi0Blob.g1_blob_dEdx_doublet->Fill(g1dedx_doublet);
-    pi0Blob.g1_blob_dEdx_empty_plane->Fill(g1dedx_empty_plane);
-    pi0Blob.g1_blob_dEdx->Fill(g1dedx);
-    pi0Blob.g1_blob_dEdx1->Fill(g1dedx1);
-    pi0Blob.g1_blob_dEdx_nplane->Fill(g1dedx_nplane);
-    //pi0Blob.g1_blob_dEdx_cluster_energy->Fill(g1dedx_cluster_energy);
-  
-    //cout<<"blob_ndof_1 = "<<blob_ndof_1<<endl;
-    //cout<<"blob_fval_1 = "<<blob_fval_1<<endl;
-    //cout<<"g1dedx_doublet = "<<g1dedx_doublet<<endl;
-    //cout<<"g1dedx_empty_plane = "<<g1dedx_empty_plane<<endl;
-    //cout<<"g1dedx = "<<g1dedx<<endl;
-    //cout<<"g1dedx1 = "<<g1dedx1<<endl;
-    //cout<<"g1dedx_nplane = "<<g1dedx_nplane<<endl;
-    //cout<<"-----"<<endl;
-
+    FillHistogram(proton.E, CCProtonPi0_proton_E * HEP_Functions::MeV_to_GeV);
+    FillHistogram(proton.P, CCProtonPi0_proton_P * HEP_Functions::MeV_to_GeV);
+    FillHistogram(proton.KE, CCProtonPi0_proton_KE * HEP_Functions::MeV_to_GeV);
+    FillHistogram(proton.theta, CCProtonPi0_proton_theta * TMath::RadToDeg());
+    FillHistogram(proton.phi, CCProtonPi0_proton_phi * TMath::RadToDeg());
 }
 
 void CCProtonPi0_Analyzer::fillPi0True()
@@ -806,32 +722,32 @@ void CCProtonPi0_Analyzer::fillPi0True()
 void CCProtonPi0_Analyzer::fillPi0Reco()
 {
     // Unique Histograms
-    pi0.invMass->Fill(CCProtonPi0_pi0_invMass);
+    FillHistogram(pi0.invMass, CCProtonPi0_pi0_invMass);
     
     // Leading Photon - Energetic Photon
-    pi0.gamma1_ConvLength->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1);
-    pi0.gamma1_P->Fill(CCProtonPi0_gamma1_P * HEP_Functions::MeV_to_GeV);
-    pi0.gamma1_theta->Fill(CCProtonPi0_gamma1_theta * TMath::RadToDeg());
+    FillHistogram(pi0.gamma1_ConvLength, CCProtonPi0_gamma1_dist_vtx * 0.1);
+    FillHistogram(pi0.gamma1_P, CCProtonPi0_gamma1_P * HEP_Functions::MeV_to_GeV);
+    FillHistogram(pi0.gamma1_theta, CCProtonPi0_gamma1_theta * TMath::RadToDeg());
 
     // Secondary Photon
-    pi0.gamma2_ConvLength->Fill(CCProtonPi0_gamma2_dist_vtx * 0.1);
-    pi0.gamma2_P->Fill(CCProtonPi0_gamma2_P * HEP_Functions::MeV_to_GeV);
-    pi0.gamma2_theta->Fill(CCProtonPi0_gamma2_theta * TMath::RadToDeg());
+    FillHistogram(pi0.gamma2_ConvLength, CCProtonPi0_gamma2_dist_vtx * 0.1);
+    FillHistogram(pi0.gamma2_P, CCProtonPi0_gamma2_P * HEP_Functions::MeV_to_GeV);
+    FillHistogram(pi0.gamma2_theta, CCProtonPi0_gamma2_theta * TMath::RadToDeg());
     
+    double photon_E_asym = abs((CCProtonPi0_gamma1_E - CCProtonPi0_gamma2_E) / (CCProtonPi0_gamma1_E + CCProtonPi0_gamma2_E));  
+    FillHistogram(pi0.photonEnergy_Asymmetry, photon_E_asym);
+    
+    // Standard Histograms
+    FillHistogram(pi0.E, CCProtonPi0_pi0_E * HEP_Functions::MeV_to_GeV);
+    FillHistogram(pi0.P, CCProtonPi0_pi0_P * HEP_Functions::MeV_to_GeV);
+    FillHistogram(pi0.KE, CCProtonPi0_pi0_KE * HEP_Functions::MeV_to_GeV);
+    FillHistogram(pi0.theta, CCProtonPi0_pi0_theta * TMath::RadToDeg());
+    FillHistogram(pi0.phi, CCProtonPi0_pi0_phi * TMath::RadToDeg());
+     
     // Photon Comparison
     pi0.gamma1_P_gamma2_P->Fill(CCProtonPi0_gamma1_P * HEP_Functions::MeV_to_GeV, CCProtonPi0_gamma2_P * HEP_Functions::MeV_to_GeV);
     pi0.gamma1_convLength_gamma2_convLength->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1, CCProtonPi0_gamma2_dist_vtx * 0.1);
     
-    double photon_E_asym = abs((CCProtonPi0_gamma1_E - CCProtonPi0_gamma2_E) / (CCProtonPi0_gamma1_E + CCProtonPi0_gamma2_E));  
-    pi0.photonEnergy_Asymmetry->Fill(photon_E_asym);
-    
-    // Standard Histograms
-    pi0.E->Fill(CCProtonPi0_pi0_E * HEP_Functions::MeV_to_GeV);
-    pi0.P->Fill(CCProtonPi0_pi0_P * HEP_Functions::MeV_to_GeV);
-    pi0.KE->Fill(CCProtonPi0_pi0_KE * HEP_Functions::MeV_to_GeV);
-    pi0.theta->Fill(CCProtonPi0_pi0_theta * TMath::RadToDeg());
-    pi0.phi->Fill(CCProtonPi0_pi0_phi * TMath::RadToDeg());
-        
 }
 
 void CCProtonPi0_Analyzer::fillMuonTrue()
@@ -841,11 +757,11 @@ void CCProtonPi0_Analyzer::fillMuonTrue()
 
 void CCProtonPi0_Analyzer::fillMuonReco()
 {
-    muon.E->Fill(CCProtonPi0_muon_E * HEP_Functions::MeV_to_GeV);
-    muon.P->Fill(CCProtonPi0_muon_P * HEP_Functions::MeV_to_GeV);
-    muon.KE->Fill(CCProtonPi0_muon_KE * HEP_Functions::MeV_to_GeV);
-    muon.theta->Fill(CCProtonPi0_muon_theta * TMath::RadToDeg());
-    muon.phi->Fill(CCProtonPi0_muon_phi * TMath::RadToDeg());
+    FillHistogram(muon.E, CCProtonPi0_muon_E * HEP_Functions::MeV_to_GeV);
+    FillHistogram(muon.P, CCProtonPi0_muon_P * HEP_Functions::MeV_to_GeV);
+    FillHistogram(muon.KE, CCProtonPi0_muon_KE * HEP_Functions::MeV_to_GeV);
+    FillHistogram(muon.theta, CCProtonPi0_muon_theta * TMath::RadToDeg());
+    FillHistogram(muon.phi, CCProtonPi0_muon_phi * TMath::RadToDeg());
 }
 
 
@@ -1473,29 +1389,29 @@ Long64_t CCProtonPi0_Analyzer::LoadTree(Long64_t entry)
 
 void CCProtonPi0_Analyzer::FillHistogram(vector<MnvH1D*> &hist, double par)
 {
-    // Fill if Data & Return
-    if (!m_isMC){ 
-        hist[0]->Fill(par);
-        return;
-    }
+    // Always Fill hist[0]
+    hist[0]->Fill(par);
 
-    // Fill if Signal & Return
-    if (truth_isSignal){
-        hist[0]->Fill(par);
-        return;
-    }
+    // Fill others only if Analyzing MC
+    if (m_isMC){
+        // Fill Signal
+        if (truth_isSignal){
+            hist[1]->Fill(par);
+        }else{
+            // Fill Background
+            hist[2]->Fill(par); // Always Fill ind == 2 -- All Background
+        
+            // Fill Background with Pi0
+            int ind = GetBackgroundWithPi0Ind();
+            hist[ind]->Fill(par);
 
-    // Fill Background
-    hist[1]->Fill(par); // Always Fill ind == 1 -- All Background
-    
-    // Fill Background with Pi0
-    int ind = GetBackgroundWithPi0Ind();
-    hist[ind]->Fill(par);
-
-    // Fill Background Type
-    ind = GetBackgroundTypeInd();
-    hist[ind]->Fill(par);
+            // Fill Background Type
+            ind = GetBackgroundTypeInd();
+            hist[ind]->Fill(par);
+        }
+   }
 }
+    
 
 int CCProtonPi0_Analyzer::GetBackgroundWithPi0Ind()
 {
@@ -1506,9 +1422,9 @@ int CCProtonPi0_Analyzer::GetBackgroundWithPi0Ind()
     }
 
     // Background With Pi0
-    if (truth_isBckg_NoPi0) return 2;
-    else if (truth_isBckg_SinglePi0) return 3;
-    else if (truth_isBckg_MultiPi0) return 4;
+    if (truth_isBckg_NoPi0) return 3;
+    else if (truth_isBckg_SinglePi0) return 4;
+    else if (truth_isBckg_MultiPi0) return 5;
     else{
         cout<<"WARNING! No Background Type Found - Returning -1"<<endl;
         return -1;
@@ -1524,13 +1440,13 @@ int CCProtonPi0_Analyzer::GetBackgroundTypeInd()
     }
 
     // Background With Pi0
-    if (truth_isBckg_NC) return 5;
-    else if (truth_isBckg_AntiNeutrino) return 6;
-    else if (truth_isBckg_QELike) return 7;
-    else if (truth_isBckg_SinglePion) return 8;
-    else if (truth_isBckg_DoublePion) return 9;
-    else if (truth_isBckg_MultiPion) return 10;
-    else if (truth_isBckg_Other) return 11;
+    if (truth_isBckg_NC) return 6;
+    else if (truth_isBckg_AntiNeutrino) return 7;
+    else if (truth_isBckg_QELike) return 8;
+    else if (truth_isBckg_SinglePion) return 9;
+    else if (truth_isBckg_DoublePion) return 10;
+    else if (truth_isBckg_MultiPion) return 11;
+    else if (truth_isBckg_Other) return 12;
     else{
         cout<<"WARNING! No Background Type Found - Returning -1"<<endl;
         return -1;

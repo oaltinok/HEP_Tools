@@ -10,7 +10,7 @@
 using namespace std;
 
 
-CCProtonPi0_Particle::CCProtonPi0_Particle(int nMode) : CCProtonPi0_NTupleAnalysis(nMode)
+CCProtonPi0_Particle::CCProtonPi0_Particle() : CCProtonPi0_NTupleAnalysis()
 {
     // Do Nothing!
 }

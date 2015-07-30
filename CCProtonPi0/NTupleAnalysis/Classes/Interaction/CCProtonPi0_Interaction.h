@@ -14,17 +14,6 @@ Class: CCProtonPi0_Interaction
 #ifndef CCProtonPi0_Interaction_h
 #define CCProtonPi0_Interaction_h
 
-#include <iostream>
-#include <string>
-#include <cstdlib>
-
-#include <TMath.h>
-#include <TH1.h>
-#include <TH2.h>
-#include <TFile.h>
-#include <PlotUtils/MnvH1D.h>
-#include <PlotUtils/MnvH2D.h>
-
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 #include "../BinList/CCProtonPi0_BinList.h"
 
@@ -33,33 +22,29 @@ using namespace PlotUtils;
 class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_Interaction(int nMode, bool isMC);
+        CCProtonPi0_Interaction(bool isModeReduce, bool isMC);
         void writeHistograms();
         
         //--------------------------------------------------------------------------
         //     Histograms
         //--------------------------------------------------------------------------
         // Event Kinematics
-        MnvH1D* Enu_1Track;
-        MnvH1D* Enu_2Track;
-        MnvH1D* Enu_Cal;
-        MnvH1D* q2;
-        MnvH1D* w;
-        MnvH1D* wSq;
+        std::vector<MnvH1D*> Enu_1Track;
+        std::vector<MnvH1D*> Enu_2Track;
+        std::vector<MnvH1D*> Enu_Cal;
+        std::vector<MnvH1D*> q2;
+        std::vector<MnvH1D*> w;
+        std::vector<MnvH1D*> wSq;
        
         // Reconstruction 
-        MnvH1D* E_Unused_afterReco;
-        MnvH1D* E_Used_afterReco;
+        std::vector<MnvH1D*> E_Unused_afterReco;
+        std::vector<MnvH1D*> E_Used_afterReco;
         
         // Other Event Parameters 
-        MnvH1D* deltaInvMass;
-        MnvH1D* nProngs_hist;
+        std::vector<MnvH1D*> deltaInvMass;
+        std::vector<MnvH1D*> nProngs_hist;
        
         // MC Only Histograms
-        TH1D* mc_w_DIS;
-        TH1D* mc_w_RES;
-        TH1D* mc_w_CCQE;
-        
         TH1D* final_mc_w_DIS;
         TH1D* final_mc_w_RES;
         TH1D* final_mc_w_CCQE;

@@ -19,22 +19,22 @@ Class: CCProtonPi0_Plotter
 #ifndef CCProtonPi0_Plotter_H
 #define CCProtonPi0_Plotter_h
 
-#include <iostream>
-#include <TH1.h>
-#include <TH2.h>
-#include <TMath.h>
-#include <TStyle.h>
-#include <TCanvas.h>
-#include <TPad.h>
-#include <TFile.h>
-#include <THStack.h>
-#include <TPaveStats.h>
-#include <TLegend.h>
-#include <TGraph.h>
 #include <TVectorD.h>
+#include <TStyle.h>
+#include <TROOT.h>
+#include <TPaveStats.h>
+#include <TPad.h>
+#include <TMath.h>
+#include <TLegend.h>
+#include <THStack.h>
+#include <TH2.h>
+#include <TH1.h>
+#include <TGraph.h>
+#include <TFile.h>
+#include <TCanvas.h>
 #include <PlotUtils/MnvPlotter.h>
-#include <PlotUtils/MnvH1D.h>
 #include <PlotUtils/MnvH2D.h>
+#include <PlotUtils/MnvH1D.h>
 #include <PlotUtils/MnvFluxConstraint.h>
 #include "Cintex/Cintex.h"
 
@@ -42,90 +42,86 @@ Class: CCProtonPi0_Plotter
 
 using namespace PlotUtils;
 
-struct rootDir
+class CutArrow
 {
-    std::string mc_signal;
-    std::string mc_background;
-    std::string mc_all;
-    std::string data;
+    public:
+        CutArrow(){ /* Do Nothing */ }
+        CutArrow(double cut, double y1, double y2, double arrow_l, std::string arrow_d )
+        {
+            cut_location = cut;
+            ymin = y1;
+            ymax = y2;
+            arrow_length = arrow_l;
+            arrow_direction = arrow_d;
+        }
+        
+        double cut_location;
+        double ymin;
+        double ymax;
+        double arrow_length;
+        std::string arrow_direction;
 };
 
-const int nBranches = 3;
+struct rootDir
+{
+    std::string data;
+    std::string mc;
+};
 
 class CCProtonPi0_Plotter
 {
     public:
-        CCProtonPi0_Plotter(int nMode, bool isMC);
+        CCProtonPi0_Plotter();
         void plotHistograms();
         
     private:
-        bool m_isMC;
-        bool isSignalvsBackground;
-        int branchInd;
-        std::string branchDir;
+        // POT Stats
+        double data_POT;
+        double mc_POT;
+        double POT_Ratio_data_mc;
+        
         std::string otherDir;
 
+        rootDir rootDir_CutHists;
         rootDir rootDir_Interaction;
-        rootDir rootDir_PIDStatistics;
-        rootDir rootDir_Pi0Blob;
         rootDir rootDir_Muon;
         rootDir rootDir_Proton;
         rootDir rootDir_Pion;
         
-        std::string plotDir_Interaction[nBranches];
-        std::string plotDir_PID[nBranches];
-        std::string plotDir_Muon[nBranches];
-        std::string plotDir_Proton[nBranches];
-        std::string plotDir_Pion[nBranches];
-        std::string plotDir_Pi0Blob[nBranches];
-  
-        std::string rootDir_CutHists;
-
-        void setRootDirs(rootDir& dirs, std::string fileName );
+        std::string plotDir_CutHists;
+        std::string plotDir_Interaction;
+        std::string plotDir_Muon;
+        std::string plotDir_Proton;
+        std::string plotDir_Pion;
+        
+        void setRootDirs();
         void setPlotDirs();
        
-        // Default Plots - File: Default_Plots.cpp
+        // Default Plots
         void plotInteraction();
         void plotMuon();
         void plotProton();
         void plotPion();
         
-        // pID Plots - File: pID_Plots.cpp
-        void plotPID();
-        void pID_proton();
-        void pID_proton_LLR();
-        void plot_2D_pID();
-        void pIDDiff();
-        void pIDStats();
-        void KE();
-        
-        // Other Plots - File: Other_Plots.cpp
+        // Other Plots 
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
-        void plotSignalBackground();
-        void plotSignalBackground_Pi0Blob();
         void plotCutHistograms();
-        void plotMichel();
-        void MichelTool(TH1D* vertex, TH1D* track, TH1D* track2, TH1D* missed, std::string plotName, std::string fileName, std::string plotDir);
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
 
+        // Helper Functions
+        void ApplyStyle(MnvPlotter* plotter);
+        void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow);
+        
         // Plottting Macros
-        void Draw1DHist(rootDir& dir, std::string var_name, std::string plotDir, bool isLogScale = false);
-        void DrawStackedMC(std::string root_dir, std::string var_name, std::string plotDir);
-        void DrawStackedMC_BckgAll(std::string root_dir, std::string var_name, std::string plotDir);
-        void DrawStackedMC_BckgWithPi0(std::string root_dir, std::string var_name, std::string plotDir);
-        void DrawStackedMC_BckgType(std::string root_dir, std::string var_name, std::string plotDir);
+        void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
+        void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
+        void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
+        void DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
+        void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir);
-        void plotStacked(TH1D* h_signal, TH1D* h_background, 
-                            std::string plotName, std::string fileName, std::string plotDir, 
-                            std::string signal_label = "Signal", std::string background_label = "Background",
-                            bool isRatioReversed = false);
-        void plotStackedLogScale(TH1D* h_signal, TH1D* h_background, std::string plotName, std::string fileName, std::string plotDir);
-        void plotSignalRatio(TH1D* h_signal, TH1D* h_background, std::string fileName, std::string plotDir, bool isReversed = false);
-        void plot_purity_efficiency(TH1D* h_signal, TH1D* h_background, std::string fileName, std::string plotDir, bool keepEventstoRight = true);
-        
 
 };
 
@@ -133,4 +129,3 @@ class CCProtonPi0_Plotter
 
 
 #endif
-

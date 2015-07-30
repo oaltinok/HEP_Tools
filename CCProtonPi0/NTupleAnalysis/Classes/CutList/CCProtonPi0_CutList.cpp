@@ -8,16 +8,18 @@
 
 using namespace PlotUtils;
 
-CCProtonPi0_CutList::CCProtonPi0_CutList(int nMode) : CCProtonPi0_NTupleAnalysis(nMode)
+CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProtonPi0_NTupleAnalysis()
 {
     cout<<"Initializing CCProtonPi0_CutList"<<endl;
     
-    if(nMode == 0){
-        nTrueSignal = 76794;
+    if(isModeReduce){
+        nTrueSignal = 240237;
         SetCutNames();
         OpenOutputFile();
-
-       rootDir = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms.root";
+        
+        // File Locations
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms.root";
         
         cout<<"\tRoot File: "<<rootDir<<endl;
  
@@ -59,12 +61,12 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","hCut_gamma1ConvDist",i),"Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
         temp->GetXaxis()->SetTitle("Leading Photon Conversion Distance");
-        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [cm]",binList.bin_photonConvLength.get_width()));
         hCut_gamma1ConvDist.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_gamma2ConvDist",i),"Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
         temp->GetXaxis()->SetTitle("Second Photon Conversion Distance");
-        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.bin_photonConvLength.get_width()));
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [cm]",binList.bin_photonConvLength.get_width()));
         hCut_gamma2ConvDist.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_pi0invMass",i),"Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
@@ -106,7 +108,20 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetXaxis()->SetTitle("hCut_deltaInvMass");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.deltaInvMass.get_width()));
         hCut_deltaInvMass.push_back(temp);
-    } 
+    }
+
+    // MC Only Histograms
+    mc_w_DIS = new TH1D( "mc_w_DIS","True W for DIS",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    mc_w_DIS->GetXaxis()->SetTitle("True W for DIS [GeV]");
+    mc_w_DIS->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
+    
+    mc_w_RES = new TH1D( "mc_w_RES","True W for RES",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    mc_w_RES->GetXaxis()->SetTitle("True W for RES [GeV]");
+    mc_w_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
+    
+    mc_w_CCQE = new TH1D( "mc_w_CCQE","True W for CCQE",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    mc_w_CCQE->GetXaxis()->SetTitle("True W for CCQE [GeV]");
+    mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
 }
 
 void CCProtonPi0_CutList::SetCutNames()
@@ -401,6 +416,13 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_protonScore_LLR[i]->Write();
         hCut_deltaInvMass[i]->Write();
     }
+
+    // MC Only
+    mc_w_DIS->Write();
+    mc_w_RES->Write();
+    mc_w_CCQE->Write();
+
+    f->Close();
 }
 
 #endif

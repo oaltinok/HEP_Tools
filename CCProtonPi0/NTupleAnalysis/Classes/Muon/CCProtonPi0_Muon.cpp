@@ -8,16 +8,16 @@
 
 using namespace PlotUtils;
 
-CCProtonPi0_Muon::CCProtonPi0_Muon(int nMode, bool isMC) : CCProtonPi0_Particle(nMode)
+CCProtonPi0_Muon::CCProtonPi0_Muon(bool isModeReduce, bool isMC) : CCProtonPi0_Particle()
 {
     std::cout<<"Initializing CCProtonPi0_Muon"<<std::endl;
     
-    if(nMode == 0){
+    if(isModeReduce){
         std::cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<std::endl;
     }else{
         // File Locations
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + branchDir + "Muon.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + branchDir + "Muon.root";
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "Muon.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "Muon.root";
 
         std::cout<<"\tRoot File: "<<rootDir<<std::endl;
         
@@ -38,36 +38,50 @@ CCProtonPi0_Muon::CCProtonPi0_Muon(int nMode, bool isMC) : CCProtonPi0_Particle(
 
 void CCProtonPi0_Muon::initHistograms()
 {
-    E = new MnvH1D( "E","Reconstructed Muon Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    E->GetXaxis()->SetTitle("Reconstructed E_{#mu} [GeV]");
-    E->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV] ",bin_P.get_width()));
-    
-    P = new MnvH1D( "P","Reconstructed Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    P->GetXaxis()->SetTitle("Reconstructed P_{#mu} [GeV]");
-    P->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV] ",bin_P.get_width()));
-    
-    KE = new MnvH1D( "KE","Reconstructed Muon Kinetic Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
-    KE->GetXaxis()->SetTitle("Reconstructed T_{#mu} [GeV]");
-    KE->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV]",bin_P.get_width()));
-   
-    theta = new MnvH1D( "theta","Reconstructed Muon Theta",bin_muonTheta.get_nBins(), bin_muonTheta.get_min(), bin_muonTheta.get_max() );
-    theta->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [Degree]");
-    theta->GetYaxis()->SetTitle(Form("Muons / %3.1f [Degree] ",bin_muonTheta.get_width()));
+    MnvH1D* temp = NULL;
 
-    phi = new MnvH1D( "phi","Reconstructed Muon Phi",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-    phi->GetXaxis()->SetTitle("Reconstructed #phi_{#mu}[Degree]");
-    phi->GetYaxis()->SetTitle(Form("Muons / %3.1f [Degree]",binList.angle.get_width()));
+    for (int i = 0; i < nHistograms; i++){
+        temp = new MnvH1D( Form("%s_%d","E",i),"Reconstructed Muon Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed E_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV] ",bin_P.get_width()));
+        E.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","P",i),"Reconstructed Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed P_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV] ",bin_P.get_width()));
+        P.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","KE",i),"Reconstructed Muon Kinetic Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed T_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV]",bin_P.get_width()));
+        KE.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","theta",i),"Reconstructed Muon Theta",bin_muonTheta.get_nBins(), bin_muonTheta.get_min(), bin_muonTheta.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [Degree]");
+        temp->GetYaxis()->SetTitle(Form("Muons / %3.1f [Degree] ",bin_muonTheta.get_width()));
+        theta.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","phi",i),"Reconstructed Muon Phi",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed #phi_{#mu}[Degree]");
+        temp->GetYaxis()->SetTitle(Form("Muons / %3.1f [Degree]",binList.angle.get_width()));
+        phi.push_back(temp);
+    }
 }
 
 void CCProtonPi0_Muon::writeHistograms()
 {
     std::cout<<">> Writing "<<rootDir<<std::endl;
     f->cd();
-    E->Write();
-    P->Write();
-    KE->Write();
-    theta->Write();
-    phi->Write();
+
+    for (int i = 0; i < nHistograms; i++){
+        E[i]->Write();
+        P[i]->Write();
+        KE[i]->Write();
+        theta[i]->Write();
+        phi[i]->Write();
+    }
+
+    f->Close();
 }
 
 

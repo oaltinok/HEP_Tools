@@ -28,13 +28,13 @@ MUONCPP = Classes/Muon/CCProtonPi0_Muon.cpp
 PROTONCPP = Classes/Proton/CCProtonPi0_Proton.cpp
 PIONCPP = Classes/Pion/CCProtonPi0_Pion.cpp
 PI0BLOBCPP = Classes/Pi0Blob/CCProtonPi0_Pi0Blob.cpp
-ALLPARTICLESCPP = $(INTERACTIONCPP) $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP) $(PI0BLOBCPP)
+ALLPARTICLESCPP = $(INTERACTIONCPP) $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP) 
 
 # Tools for Detailed Studies
 PIDTOOLCPP = Classes/PIDTool/CCProtonPi0_PIDTool.cpp
 BACKGROUNDTOOLCPP = Classes/BackgroundTool/CCProtonPi0_BackgroundTool.cpp
 MICHELTOOLCPP = Classes/MichelTool/CCProtonPi0_MichelTool.cpp
-ALLTOOLCPP = $(PIDTOOLCPP) $(BACKGROUNDTOOLCPP) $(MICHELTOOLCPP)
+ALLTOOLCPP = $(BACKGROUNDTOOLCPP) 
 
 # Other Helper Classes
 BINLISTCPP = Classes/BinList/CCProtonPi0_BinList.cpp

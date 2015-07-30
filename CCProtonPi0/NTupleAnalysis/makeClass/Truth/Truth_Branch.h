@@ -384,7 +384,7 @@ Truth_Branch::Truth_Branch(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("Truth","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/all_v2_21.root/Truth");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1.root/Truth");
       tree = chain;
 #endif // SINGLE_TREE
 

@@ -14,16 +14,6 @@ Class: CCProtonPi0_CutList
 #ifndef CCProtonPi0_CutList_h
 #define CCProtonPi0_CutList_h
 
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <cstdlib>
-#include <string>
-#include <TMath.h>
-#include <TFile.h>
-#include <PlotUtils/MnvH1D.h>
-#include <PlotUtils/MnvH2D.h>
-
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 #include "../Cut/CCProtonPi0_Cut.h"
 #include "../BinList/CCProtonPi0_BinList.h"
@@ -33,7 +23,7 @@ using namespace PlotUtils;
 class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis 
 {
     public:
-        CCProtonPi0_CutList(int nMode);
+        CCProtonPi0_CutList(bool isModeReduce, bool isMC);
         ~CCProtonPi0_CutList();
         
         void writeCutTable();
@@ -96,7 +86,12 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_protonScore_pIDDiff;
         vector<MnvH1D*> hCut_protonScore_LLR;
         vector<MnvH1D*> hCut_deltaInvMass;
-               
+ 
+        // MC Only Histograms
+        TH1D* mc_w_DIS;
+        TH1D* mc_w_RES;
+        TH1D* mc_w_CCQE;
+              
     private:
         void initHistograms();
         void SetCutNames();

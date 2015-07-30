@@ -14,12 +14,6 @@ Class: CCProtonPi0_BackgroundTool
 #ifndef CCProtonPi0_BackgroundTool_h
 #define CCProtonPi0_BackgroundTool_h
 
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 
 using namespace std;
@@ -34,7 +28,7 @@ struct Background
 class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_BackgroundTool(int nMode);
+        CCProtonPi0_BackgroundTool(bool isModeReduce);
         ~CCProtonPi0_BackgroundTool();
         
         void writeBackgroundTable();

@@ -19,39 +19,22 @@ Class: CCProtonPi0_Analyzer
 #ifndef CCProtonPi0_Analyzer_h
 #define CCProtonPi0_Analyzer_h
 
-#include <TROOT.h>
 #include <TChain.h>
-#include <TMath.h>
-
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <cstdlib>
-
-// Libraries
-#include "../../Libraries/PDG_List.h"
-#include "../../Libraries/Folder_List.h"
-#include "../../Libraries/Data_Functions.h"
-#include "../../Libraries/HEP_Functions.h"
 
 // Classes
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 #include "../CutList/CCProtonPi0_CutList.h"
-#include "../PIDTool/CCProtonPi0_PIDTool.h"
-#include "../MichelTool/CCProtonPi0_MichelTool.h"
 #include "../Interaction/CCProtonPi0_Interaction.h"
 #include "../Muon/CCProtonPi0_Muon.h"
 #include "../Proton/CCProtonPi0_Proton.h"
 #include "../Pion/CCProtonPi0_Pion.h"
-#include "../Pi0Blob/CCProtonPi0_Pi0Blob.h"
 #include "../BackgroundTool/CCProtonPi0_BackgroundTool.h"
 
 class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
     
     public :
   
-        CCProtonPi0_Analyzer(int nMode, bool isMC);
+        CCProtonPi0_Analyzer(bool isModeReduce, bool isMC);
         ~CCProtonPi0_Analyzer();
 
         // --------------------------------------------------------------------
@@ -63,7 +46,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
     
     private:
         //  Runtime and CCProtonPi0_Analyzer Functions
-        bool analyzeEvent();
         bool getCutStatistics();
         bool KeepMichelEvent();
         void fillData();
@@ -94,7 +76,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         
         //  Pion Specific Functions
         void getPi0Family();
-        void fillBlobData();
         void fillPi0True();
         void fillPi0Reco();
         bool isPi0BlobBad();
@@ -109,24 +90,15 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         CCProtonPi0_Muon muon;
         CCProtonPi0_Proton proton;
         CCProtonPi0_Pion pi0;
-        CCProtonPi0_Pi0Blob pi0Blob;
-        CCProtonPi0_PIDTool pIDTool;
         CCProtonPi0_BackgroundTool bckgTool;
-        CCProtonPi0_MichelTool michelTool;
         CCProtonPi0_CutList cutList;
-        
-        // Michel Study
-        bool isMichelStudy;
         
         // Other Variables
         bool m_isMC;
         bool isScanRun;
         bool isDataAnalysis;
-        bool is_pID_Studies;
         bool applyProtonScore;
         bool applyPhotonDistance;
-        bool applyOtherMichelCuts;
-        bool applyPi0BlobCuts;
         bool applyBeamEnergy;
         bool applyUnusedE;
         bool writeFSParticleMomentum;

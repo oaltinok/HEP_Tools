@@ -16,7 +16,7 @@ Class: CCProtonPi0_Muon -> Derived Class from Particle Base Clas
 class CCProtonPi0_Muon : public CCProtonPi0_Particle
 {
     public:
-        CCProtonPi0_Muon(int nMode, bool isMC);
+        CCProtonPi0_Muon(bool isModeReduce, bool isMC);
         void initHistograms();
         void writeHistograms();
 

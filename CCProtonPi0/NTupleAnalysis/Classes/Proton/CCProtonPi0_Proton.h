@@ -17,11 +17,11 @@ using namespace PlotUtils;
 class CCProtonPi0_Proton : public CCProtonPi0_Particle
 {
     public:
-        MnvH1D* trackLength;
-        MnvH1D* trackKinked;
-        MnvH1D* partScore;
+        vector<MnvH1D*> trackLength;
+        vector<MnvH1D*> trackKinked;
+        vector<MnvH1D*> partScore;
 
-        CCProtonPi0_Proton(int nMode,bool isMC);
+        CCProtonPi0_Proton(bool isModeReduce, bool isMC);
         void initHistograms();
         void writeHistograms();
     

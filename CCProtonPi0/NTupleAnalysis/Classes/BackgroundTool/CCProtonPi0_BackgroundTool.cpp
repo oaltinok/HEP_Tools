@@ -5,10 +5,10 @@
 
 using namespace std;
 
-CCProtonPi0_BackgroundTool::CCProtonPi0_BackgroundTool(int nMode) : CCProtonPi0_NTupleAnalysis(nMode)
+CCProtonPi0_BackgroundTool::CCProtonPi0_BackgroundTool(bool isModeReduce) : CCProtonPi0_NTupleAnalysis()
 {
     cout<<"Initializing CCProtonPi0_BackgroundTool"<<endl;
-    if(nMode == 0){
+    if(isModeReduce){
         cout<<"\tNTuple Reduce Mode -- Will not create Text Files"<<endl;
     }else{
         OpenTextFiles();
@@ -174,8 +174,8 @@ void CCProtonPi0_BackgroundTool::writeBackgroundTable()
 void CCProtonPi0_BackgroundTool::OpenTextFiles()
 {
     // Open Background Files
-    fileName[0] = Folder_List::output + Folder_List::textOut + branchDir + "BackgroundTable_1Prong.txt";
-    fileName[1] = Folder_List::output + Folder_List::textOut + branchDir + "BackgroundTable_2Prong.txt";
+    fileName[0] = Folder_List::output + Folder_List::textOut + "BackgroundTable_1Prong.txt";
+    fileName[1] = Folder_List::output + Folder_List::textOut + "BackgroundTable_2Prong.txt";
     
     for (int i = 0; i < nTopologies; i++){
         textFile[i].open( fileName[i].c_str() );
