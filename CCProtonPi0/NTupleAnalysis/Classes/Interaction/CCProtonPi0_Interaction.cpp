@@ -8,15 +8,15 @@
 
 using namespace PlotUtils;
 
-CCProtonPi0_Interaction::CCProtonPi0_Interaction(bool isModeReduce, bool isMC) : CCProtonPi0_NTupleAnalysis()
+CCProtonPi0_Interaction::CCProtonPi0_Interaction(bool isModeReduce, bool isMC, std::string ana_folder) : CCProtonPi0_NTupleAnalysis()
 {
     std::cout<<"Initializing CCProtonPi0_Interaction"<<std::endl;
     
     if(isModeReduce){
         std::cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<std::endl;
     }else{
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "Interaction.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed  + "Interaction.root";
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Interaction.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed  + ana_folder + "Interaction.root";
         
         std::cout<<"\tRoot File: "<<rootDir<<std::endl;
  

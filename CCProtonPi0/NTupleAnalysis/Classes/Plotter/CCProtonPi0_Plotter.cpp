@@ -13,13 +13,12 @@ void CCProtonPi0_Plotter::plotHistograms()
 {
     //plotMuon();
     //plotProton();
-    //plotPion();
+    plotPion();
     //plotInteraction();
-    plotCutHistograms();
+    //plotCutHistograms();
 }
 
-
-CCProtonPi0_Plotter::CCProtonPi0_Plotter()
+CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
 {
     data_POT = 9.57E19;
     mc_POT = 9.90E20;
@@ -28,8 +27,8 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter()
     std::cout<<"POT MC = "<<mc_POT<<std::endl;
     std::cout<<"POT_Data / POT_MC = "<<POT_Ratio_data_mc<<std::endl;
     
-    setRootDirs(); 
-    setPlotDirs();
+    setRootDirs(ana_folder); 
+    setPlotDirs(ana_folder);
 }
 
 void CCProtonPi0_Plotter::plotInteraction()
@@ -106,16 +105,25 @@ void CCProtonPi0_Plotter::plotPion()
     
     std::cout<<">> Plotting Unique Histograms"<<std::endl;
     // Unique Plots
-    DrawDataMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
-    DrawDataMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
-    DrawDataMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
-    DrawDataMC(rootDir_Pion,"invMass",plotDir);
-
-    DrawDataStackedMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
-    DrawDataStackedMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
-    DrawDataStackedMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
-    DrawDataStackedMC(rootDir_Pion,"invMass",plotDir);
-
+//    DrawDataMC(rootDir_Pion,"gamma1_P",plotDir);
+//    DrawDataMC(rootDir_Pion,"gamma2_P",plotDir);
+//    DrawDataMC(rootDir_Pion,"gamma1_theta",plotDir);
+//    DrawDataMC(rootDir_Pion,"gamma2_theta",plotDir);
+//    DrawDataMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
+//    DrawDataMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
+//    DrawDataMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+//    DrawDataMC(rootDir_Pion,"invMass",plotDir);
+//
+//    DrawDataStackedMC(rootDir_Pion,"gamma1_P",plotDir);
+//    DrawDataStackedMC(rootDir_Pion,"gamma2_P",plotDir);
+//    DrawDataStackedMC(rootDir_Pion,"gamma1_theta",plotDir);
+//    DrawDataStackedMC(rootDir_Pion,"gamma2_theta",plotDir);
+//    DrawDataStackedMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
+//    DrawDataStackedMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
+//    DrawDataStackedMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+//    DrawDataStackedMC(rootDir_Pion,"invMass",plotDir);
+//
+    
     Draw1DHist(rootDir_Pion,"gamma1_P_error",plotDir);
     Draw2DHist(rootDir_Pion,"gamma1_reco_P_true_P",plotDir);
     Draw1DHist(rootDir_Pion,"gamma2_P_error",plotDir);
@@ -275,31 +283,31 @@ void CCProtonPi0_Plotter::plot_final_mc_w_Stacked()
     delete c1;
 }
 
-void CCProtonPi0_Plotter::setRootDirs()
+void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
 {
     // Set MC Root Dir
-    rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms.root";
-    rootDir_Interaction.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "Interaction.root";
-    rootDir_Muon.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "Muon.root";
-    rootDir_Proton.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "Proton.root";
-    rootDir_Pion.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "Pion.root";
+    rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "CutHistograms.root";
+    rootDir_Interaction.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Interaction.root";
+    rootDir_Muon.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Muon.root";
+    rootDir_Proton.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Proton.root";
+    rootDir_Pion.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Pion.root";
 
     // Set Data Root Dir
-    rootDir_CutHists.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms.root";
-    rootDir_Interaction.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "Interaction.root";
-    rootDir_Muon.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "Muon.root";
-    rootDir_Proton.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "Proton.root";
-    rootDir_Pion.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "Pion.root";
+    rootDir_CutHists.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "CutHistograms.root";
+    rootDir_Interaction.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Interaction.root";
+    rootDir_Muon.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Muon.root";
+    rootDir_Proton.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Proton.root";
+    rootDir_Pion.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Pion.root";
 }
 
-void CCProtonPi0_Plotter::setPlotDirs()
+void CCProtonPi0_Plotter::setPlotDirs(std::string ana_folder)
 {
-    plotDir_Interaction = Folder_List::output + Folder_List::plotOut + "Interaction/";
-    plotDir_CutHists = Folder_List::output + Folder_List::plotOut + "CutHists/";
-    plotDir_Muon = Folder_List::output + Folder_List::plotOut + "Muon/";
-    plotDir_Proton = Folder_List::output + Folder_List::plotOut + "Proton/";
-    plotDir_Pion = Folder_List::output + Folder_List::plotOut + "Pion/";
-    otherDir = Folder_List::output + Folder_List::plotOut + Folder_List::other;
+    plotDir_Interaction = Folder_List::output + Folder_List::plotOut + ana_folder + "Interaction/";
+    plotDir_CutHists = Folder_List::output + Folder_List::plotOut + ana_folder + "CutHists/";
+    plotDir_Muon = Folder_List::output + Folder_List::plotOut + ana_folder + "Muon/";
+    plotDir_Proton = Folder_List::output + Folder_List::plotOut + ana_folder + "Proton/";
+    plotDir_Pion = Folder_List::output + Folder_List::plotOut + ana_folder + "Pion/";
+    otherDir = Folder_List::output + Folder_List::plotOut + ana_folder + Folder_List::other;
 }
 
 #endif

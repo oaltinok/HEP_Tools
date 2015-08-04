@@ -48,8 +48,8 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
 {
 
     string rootDir;
-    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple.root";
-    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple.root";
+    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_Test.root";
+    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_Test.root";
 
     cout<<"Reducing NTuple Files to a single file"<<endl;
     cout<<"\tRoot File: "<<rootDir<<endl;
@@ -144,7 +144,10 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             cout<<"\tReached Event Limit!"<<endl;
             break;
         }
-        
+       
+        // Analyze Event or NOT -- Depend on the 1Track or 2 Track Analysis
+        if (!AnalyzeEvent() ) continue;
+
         // Update scanFileName if running for scan
         //if(isScanRun) UpdateScanFileName();
        
@@ -152,8 +155,8 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         // Fill Background Branches for Background Events
         //----------------------------------------------------------------------
         if(m_isMC && !truth_isSignal) {
-            bckgTool.fillBackgroundWithPi0(nProngs,truth_isBckg_NoPi0, truth_isBckg_SinglePi0, truth_isBckg_MultiPi0, truth_isBckg_withMichel);                                    
-            bckgTool.fillBackground(nProngs,truth_isBckg_NC, truth_isBckg_AntiNeutrino, truth_isBckg_QELike, truth_isBckg_SinglePion, truth_isBckg_DoublePion, truth_isBckg_MultiPion, truth_isBckg_Other, truth_isBckg_withMichel);                                    
+            bckgTool.fillBackgroundWithPi0(truth_isBckg_NoPi0, truth_isBckg_SinglePi0, truth_isBckg_MultiPi0, truth_isBckg_withMichel);                                    
+            bckgTool.fillBackground(truth_isBckg_NC, truth_isBckg_AntiNeutrino, truth_isBckg_QELike, truth_isBckg_SinglePion, truth_isBckg_DoublePion, truth_isBckg_MultiPion, truth_isBckg_Other, truth_isBckg_withMichel);                                    
         }
 
 
@@ -174,7 +177,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     // Write Text Files
     //--------------------------------------------------------------------------
     bckgTool.writeBackgroundTable();
-    getPi0Family(); // Pi0 Family Information written inside FailFile
+    //getPi0Family(); // Pi0 Family Information written inside FailFile
     
     //--------------------------------------------------------------------------
     // Write Root Files
@@ -189,18 +192,19 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
 //------------------------------------------------------------------------------
 //  Constructor
 //------------------------------------------------------------------------------
-CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) : 
+CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC, std::string ana_folder) : 
     CCProtonPi0_NTupleAnalysis(),
-    interaction(isModeReduce, isMC),
-    muon(isModeReduce, isMC),
-    proton(isModeReduce, isMC),
-    pi0(isModeReduce, isMC),
-    bckgTool(isModeReduce),
+    interaction(isModeReduce, isMC, ana_folder),
+    muon(isModeReduce, isMC, ana_folder),
+    proton(isModeReduce, isMC, ana_folder),
+    pi0(isModeReduce, isMC, ana_folder),
+    bckgTool(isModeReduce, ana_folder),
     cutList(isModeReduce, isMC)
 {   
     cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
     
     m_isMC = isMC;
+    m_ana_folder = ana_folder;
     
     specifyRunTime();
     
@@ -229,6 +233,25 @@ void CCProtonPi0_Analyzer::UpdateScanFileName()
         getline(DSTFileList,scanFileName);
     }
     latest_ScanID = truth_eventID;   
+}
+
+bool CCProtonPi0_Analyzer::AnalyzeEvent()
+{
+    const string ana_folder_all = "All/";
+    const string ana_folder_1 = "1Track/";
+    const string ana_folder_2 = "2Track/";
+
+    if (m_ana_folder.compare(ana_folder_all) == 0) return true;
+    else if (m_ana_folder.compare(ana_folder_1) == 0 ){
+        if (nProngs == 1) return true;
+        else return false;
+    }else if (m_ana_folder.compare(ana_folder_2) == 0 ){
+        if (nProngs > 1 ) return true;
+        else return false;
+    }else{
+        cout<<"WARNING! None of the analysis modes matched!"<<endl;
+        return false;
+    }
 }
 
 void CCProtonPi0_Analyzer::getPi0Family()
@@ -277,7 +300,6 @@ void CCProtonPi0_Analyzer::getPi0Family()
         else if(PDG_pi0_Mother[i] == -9) nMother_NoPDG++; 
         else{ 
             nMother_Other ++;
-//             failText[t]<<"Mother = "<<PDG_pi0_Mother[i]<<endl;
         }
             
             
@@ -290,42 +312,39 @@ void CCProtonPi0_Analyzer::getPi0Family()
         else if (PDG_pi0_GrandMother[i] == -9) nGrandMother_NoPDG++; 
         else{ 
             nGrandMother_Other++;
-//             failText[t]<<"GrandMother = "<<PDG_pi0_GrandMother[i]<<endl;
         }
     }
-    
-    for(int t = 0; t < nTopologies; t++){
-        cout<<">> Writing "<<failFile[t]<<endl;
-        
-        failText[t]<<std::left;
-        failText[t]<<"-----------------------------------------------------------------"<<endl;
-        failText[t].width(20); failText[t]<<"Mother"<<endl;
-        failText[t].width(20); failText[t]<<"DIS"<<" = "<<nMother_DIS<<endl;
-        failText[t].width(20); failText[t]<<"Delta_p_1232"<<" = "<<nMother_Delta_p_1232<<endl;
-        failText[t].width(20); failText[t]<<"Delta_p_1620"<<" = "<<nMother_Delta_p_1620<<endl;
-        failText[t].width(20); failText[t]<<"Delta_p_1700"<<" = "<<nMother_Delta_p_1700<<endl;
-        failText[t].width(20); failText[t]<<"N_p_1440"<<" = "<<nMother_N_p_1440<<endl;
-        failText[t].width(20); failText[t]<<"N_p_1520"<<" = "<<nMother_N_p_1520<<endl;
-        failText[t].width(20); failText[t]<<"N_p_1535"<<" = "<<nMother_N_p_1535<<endl;
-        failText[t].width(20); failText[t]<<"N_p_1650"<<" = "<<nMother_N_p_1650<<endl;
-        failText[t].width(20); failText[t]<<"N_p_1675"<<" = "<<nMother_N_p_1675<<endl;
-        failText[t].width(20); failText[t]<<"N_p_1680"<<" = "<<nMother_N_p_1680<<endl;
-        failText[t].width(20); failText[t]<<"pi_plus"<<" = "<<nMother_pi_plus<<endl;
-        failText[t].width(20); failText[t]<<"pi_minus"<<" = "<<nMother_pi_minus<<endl;
-        failText[t].width(20); failText[t]<<"No PDG"<<" = "<<nMother_NoPDG<<endl;
-        failText[t].width(20); failText[t]<<"Other"<<" = "<<nMother_Other<<endl;
-        
-        failText[t]<<endl;
-        failText[t].width(20); failText[t]<<"GrandMother"<<endl;
-        failText[t].width(20); failText[t]<<"neutron"<<" = "<<nGrandMother_neutron<<endl;
-        failText[t].width(20); failText[t]<<"proton"<<" = "<<nGrandMother_proton<<endl;
-        failText[t].width(20); failText[t]<<"Delta_pp_1232"<<" = "<<nGrandMother_Delta_pp_1232<<endl;
-        failText[t].width(20); failText[t]<<"Delta_pp_1620"<<" = "<<nGrandMother_Delta_pp_1620<<endl;
-        failText[t].width(20); failText[t]<<"Delta_pp_1700"<<" = "<<nGrandMother_Delta_pp_1700<<endl;
-        failText[t].width(20); failText[t]<<"No PDG"<<" = "<<nGrandMother_NoPDG<<endl;
-        failText[t].width(20); failText[t]<<"Other"<<" = "<<nGrandMother_Other<<endl;
-        failText[t]<<"-----------------------------------------------------------------"<<endl;
-    }
+
+    cout<<">> Writing "<<failFile<<endl;
+
+    failText<<std::left;
+    failText<<"-----------------------------------------------------------------"<<endl;
+    failText.width(20); failText<<"Mother"<<endl;
+    failText.width(20); failText<<"DIS"<<" = "<<nMother_DIS<<endl;
+    failText.width(20); failText<<"Delta_p_1232"<<" = "<<nMother_Delta_p_1232<<endl;
+    failText.width(20); failText<<"Delta_p_1620"<<" = "<<nMother_Delta_p_1620<<endl;
+    failText.width(20); failText<<"Delta_p_1700"<<" = "<<nMother_Delta_p_1700<<endl;
+    failText.width(20); failText<<"N_p_1440"<<" = "<<nMother_N_p_1440<<endl;
+    failText.width(20); failText<<"N_p_1520"<<" = "<<nMother_N_p_1520<<endl;
+    failText.width(20); failText<<"N_p_1535"<<" = "<<nMother_N_p_1535<<endl;
+    failText.width(20); failText<<"N_p_1650"<<" = "<<nMother_N_p_1650<<endl;
+    failText.width(20); failText<<"N_p_1675"<<" = "<<nMother_N_p_1675<<endl;
+    failText.width(20); failText<<"N_p_1680"<<" = "<<nMother_N_p_1680<<endl;
+    failText.width(20); failText<<"pi_plus"<<" = "<<nMother_pi_plus<<endl;
+    failText.width(20); failText<<"pi_minus"<<" = "<<nMother_pi_minus<<endl;
+    failText.width(20); failText<<"No PDG"<<" = "<<nMother_NoPDG<<endl;
+    failText.width(20); failText<<"Other"<<" = "<<nMother_Other<<endl;
+
+    failText<<endl;
+    failText.width(20); failText<<"GrandMother"<<endl;
+    failText.width(20); failText<<"neutron"<<" = "<<nGrandMother_neutron<<endl;
+    failText.width(20); failText<<"proton"<<" = "<<nGrandMother_proton<<endl;
+    failText.width(20); failText<<"Delta_pp_1232"<<" = "<<nGrandMother_Delta_pp_1232<<endl;
+    failText.width(20); failText<<"Delta_pp_1620"<<" = "<<nGrandMother_Delta_pp_1620<<endl;
+    failText.width(20); failText<<"Delta_pp_1700"<<" = "<<nGrandMother_Delta_pp_1700<<endl;
+    failText.width(20); failText<<"No PDG"<<" = "<<nGrandMother_NoPDG<<endl;
+    failText.width(20); failText<<"Other"<<" = "<<nGrandMother_Other<<endl;
+    failText<<"-----------------------------------------------------------------"<<endl;
 }
 
 
@@ -350,22 +369,22 @@ void CCProtonPi0_Analyzer::writeFSParticle4P(Long64_t nEntry)
 {
     for (int t = 0; t < nTopologies; t++){
         // Particle NTuple Info after All Cuts
-        failText[t]<<"----------------------------------------------------------------------"<<endl;
-        failText[t]<<nEntry<<endl;
-        failText[t]<<"Muon 4-P = ( "
+        failText<<"----------------------------------------------------------------------"<<endl;
+        failText<<nEntry<<endl;
+        failText<<"Muon 4-P = ( "
                 <<CCProtonPi0_muon_px<<", "
                 <<CCProtonPi0_muon_py<<", "
                 <<CCProtonPi0_muon_pz<<", "
                 <<CCProtonPi0_muon_E<<" )"
                 <<endl;
-        failText[t]<<"Proton 4-P = ( "
+        failText<<"Proton 4-P = ( "
                 <<CCProtonPi0_proton_px<<", "
                 <<CCProtonPi0_proton_py<<", "
                 <<CCProtonPi0_proton_pz<<", "
                 <<CCProtonPi0_proton_E<<" )"
                 <<" Score = "<<CCProtonPi0_proton_LLRScore
                 <<endl;
-        failText[t]<<"Pi0 4-P = ( "
+        failText<<"Pi0 4-P = ( "
                 <<CCProtonPi0_pi0_px<<", "
                 <<CCProtonPi0_pi0_py<<", "
                 <<CCProtonPi0_pi0_pz<<", "
@@ -484,16 +503,18 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         // Apply Proton Score to All Proton Candidates
         for( unsigned int i = 0; i < 10 && CCProtonPi0_all_protons_LLRScore[i] != -9.9; i++){
             if ( applyProtonScore ){
-                // Use pID Difference for KE < pID_KE_Limit 
-                // Use LLR for KE > pID_KE_Limit
-                if (CCProtonPi0_all_protons_KE[i] < pID_KE_Limit ){
-                    double pIDDiff = CCProtonPi0_all_protons_protonScore[i] - CCProtonPi0_all_protons_pionScore[i];
-                    FillHistogram(cutList.hCut_protonScore_pIDDiff,pIDDiff);
-                    if ( pIDDiff < minPIDDiff ) return false;
-                }else{
                     FillHistogram(cutList.hCut_protonScore_LLR,CCProtonPi0_all_protons_LLRScore[i]);
                     if ( CCProtonPi0_all_protons_LLRScore[i] < minProtonScore_LLR ) return false;
-                }
+                // Use pID Difference for KE < pID_KE_Limit 
+                // Use LLR for KE > pID_KE_Limit
+           //     if (CCProtonPi0_all_protons_KE[i] < pID_KE_Limit ){
+           //         double pIDDiff = CCProtonPi0_all_protons_protonScore[i] - CCProtonPi0_all_protons_pionScore[i];
+           //         FillHistogram(cutList.hCut_protonScore_pIDDiff,pIDDiff);
+           //         if ( pIDDiff < minPIDDiff ) return false;
+           //     }else{
+           //         FillHistogram(cutList.hCut_protonScore_LLR,CCProtonPi0_all_protons_LLRScore[i]);
+           //         if ( CCProtonPi0_all_protons_LLRScore[i] < minProtonScore_LLR ) return false;
+           //     }
             }
         }
         cutList.nCut_2Prong_ProtonScore.increment(truth_isSignal, study1, study2);
@@ -534,26 +555,6 @@ void CCProtonPi0_Analyzer::fill_mc_w()
     if(mc_intType == 1) cutList.mc_w_CCQE->Fill(mc_w * HEP_Functions::MeV_to_GeV);
     if(mc_intType == 2) cutList.mc_w_RES->Fill(mc_w * HEP_Functions::MeV_to_GeV);
     if(mc_intType == 3) cutList.mc_w_DIS->Fill(mc_w * HEP_Functions::MeV_to_GeV);
-}
-
-/*
-    pre:
-        Event with detected Michel by the Tool
-    
-    Applies series of other selections to save some Events
-*/
-bool CCProtonPi0_Analyzer::KeepMichelEvent()
-{
-    // Apply Time Difference Cut - Save Events with Short time Difference
-     double maxTimeDiff = 300.0;
-     if(michelProng_time_diff < maxTimeDiff){ 
-        // Apply Energy Cut
-        if(michelProng_energy > 100) return true;  
-     }
-    
-    // Event did not satisfied any of the conditions - will not Keep the Event
-    return false;
-    
 }
 
 void CCProtonPi0_Analyzer::fillInteractionTrue()
@@ -621,7 +622,7 @@ void CCProtonPi0_Analyzer::closeTextFiles()
     }
     
     for (int i = 0; i < nTopologies; i++){
-        failText[i].close();
+        failText.close();
     }
 }
 
@@ -629,7 +630,7 @@ void CCProtonPi0_Analyzer::openTextFiles()
 {
     cout<<"Opening Text Files:"<<endl;
    
-    logFileName = Folder_List::output + Folder_List::textOut + "LogFile.txt";
+    logFileName = Folder_List::output + Folder_List::textOut + m_ana_folder + "LogFile.txt";
     logFile.open(logFileName.c_str());
     if( !logFile.is_open() ){
         cerr<<"Cannot open output text file: "<<logFileName<<endl;
@@ -638,23 +639,20 @@ void CCProtonPi0_Analyzer::openTextFiles()
         cout<<"\t"<<logFileName<<endl;
     }
     
-    // Open Fail-Check Files
-    failFile[0] = Folder_List::output + Folder_List::textOut + "FailChecks_1Prong.txt";
-    failFile[1] = Folder_List::output + Folder_List::textOut + "FailChecks_2Prong.txt";
-    
-    for (int i = 0; i < nTopologies; i++){
-        failText[i].open( failFile[i].c_str() );
-        if( !failText[i].is_open() ){
-            cerr<<"Cannot open output text file: "<<failFile[i]<<endl;
-            exit(1);
-        }else{
-            cout<<"\t"<<failFile[i]<<endl;
-        }
+    // Open Fail-Check File
+    failFile = Folder_List::output + Folder_List::textOut + m_ana_folder + "FailChecks.txt";
+
+    failText.open( failFile.c_str() );
+    if( !failText.is_open() ){
+        cerr<<"Cannot open output text file: "<<failFile<<endl;
+        exit(1);
+    }else{
+        cout<<"\t"<<failFile<<endl;
     }
-    
+
     if(isScanRun){
         // Open Roundup Text for Arachne Scanning
-        string roundupFile = Folder_List::output + Folder_List::textOut + "ArachneRoundup.txt";
+        string roundupFile = Folder_List::output + Folder_List::textOut + m_ana_folder + "ArachneRoundup.txt";
         roundupText.open(roundupFile.c_str() );
         if( !roundupText.is_open() ){
             cerr<<"Cannot open output text file: "<<roundupFile<<endl;
@@ -716,6 +714,8 @@ void CCProtonPi0_Analyzer::fillPi0True()
 
         pi0.gamma2_reco_P_true_P->Fill(g2_reco_P, g2_true_P);
         pi0.gamma2_P_error->Fill(g2_P_error);
+  
+        failText<<g1_reco_P<<" "<<g1_true_P<<" "<<g2_reco_P<<" "<<g2_true_P<<std::endl;
   }
 }
 

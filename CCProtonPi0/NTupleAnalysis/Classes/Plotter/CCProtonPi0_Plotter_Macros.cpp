@@ -289,6 +289,31 @@ void CCProtonPi0_Plotter::DrawDataMCRatio(rootDir& dir, std::string var_name, st
     delete c;
 }
 
+void CCProtonPi0_Plotter::DrawMCWithErrorBand(rootDir& dir, std::string var_name, std::string plotDir)
+{
+    std::string rootDir_mc = dir.mc;
+    
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+   
+    TH1D* mc = (TH1D*)f_mc->Get(var_name.c_str());
+
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    // Plot
+    plotter->DrawMCWithErrorBand(mc);
+
+    // Add Plot Labels
+    const double y_pos = 0.88;
+    const double y_diff = 0.033;
+    plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
+    
+    // Print Plot
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+
+    delete c;
+}
+
 void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir)
 {
     std::string rootDir_mc = dir.mc;
@@ -321,7 +346,6 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     // Now Plot the Ratio
     DrawDataMCRatio(dir, var_name, plotDir);
 }
-
 void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::string plotDir, bool isLogScale)
 {
     std::string root_dir = dir.mc;

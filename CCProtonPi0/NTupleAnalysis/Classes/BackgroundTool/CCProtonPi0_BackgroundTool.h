@@ -28,14 +28,13 @@ struct Background
 class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_BackgroundTool(bool isModeReduce);
+        CCProtonPi0_BackgroundTool(bool isModeReduce, std::string ana_folder);
         ~CCProtonPi0_BackgroundTool();
         
         void writeBackgroundTable();
-        void fillBackgroundWithPi0( int nProngs, bool NoPi0, bool SinglePi0, bool MultiPi0, bool withMichel);
+        void fillBackgroundWithPi0(bool NoPi0, bool SinglePi0, bool MultiPi0, bool withMichel);
         
-        void fillBackground(int nProngs,
-                            bool NC,
+        void fillBackground(bool NC,
                             bool AntiNeutrino,
                             bool QELike,
                             bool SinglePion,
@@ -44,38 +43,36 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
                             bool Other,
                             bool withMichel);
     private:
-        string fileName[nTopologies];
-        ofstream textFile[nTopologies];
+        string fileName;
+        ofstream textFile;
         
-        vector< vector<Background> > BackgroundWithPi0Vector;
-        vector< vector<Background> > BackgroundTypeVector;
+        vector< Background > BackgroundWithPi0Vector;
+        vector< Background > BackgroundTypeVector;
        
         // Background with Pi0
-        vector<Background> bckg_NoPi0;
-        vector<Background> bckg_SinglePi0;
-        vector<Background> bckg_MultiPi0;
-        vector<Background> bckg_Total_WithPi0;
+        Background bckg_NoPi0;
+        Background bckg_SinglePi0;
+        Background bckg_MultiPi0;
+        Background bckg_Total_WithPi0;
         
         // Background Types 
-        vector<Background> bckg_NC;
-        vector<Background> bckg_AntiNeutrino;
-        vector<Background> bckg_QELike;
-        vector<Background> bckg_SinglePion;
-        vector<Background> bckg_DoublePion;
-        vector<Background> bckg_MultiPion;
-        vector<Background> bckg_Other;
-        vector<Background> bckg_Total;
+        Background bckg_NC;
+        Background bckg_AntiNeutrino;
+        Background bckg_QELike;
+        Background bckg_SinglePion;
+        Background bckg_DoublePion;
+        Background bckg_MultiPion;
+        Background bckg_Other;
+        Background bckg_Total;
 
         void updateBackground(Background &b, bool withMichel);
-        int setArrayInd(int nProngs);
-        
         double calcPercent(double nEvents, double nBase);
         void formBackgroundVectors();
-        void initBackgroundVectors();
-        void initSingleBackgroundVector(vector<Background> &b, string name);
-        void writeBackgroundTableHeader(int nProngs);
-        void writeBackgroundTableRows(vector< vector<Background> > &bckgVector, int nProngs);
-        void OpenTextFiles();
+        void initBackgrounds();
+        void initSingleBackground(Background &b, string name);
+        void writeBackgroundTableHeader();
+        void writeBackgroundTableRows(vector< Background > &bckgVector);
+        void OpenTextFile(std::string ana_folder);
 
 };
 

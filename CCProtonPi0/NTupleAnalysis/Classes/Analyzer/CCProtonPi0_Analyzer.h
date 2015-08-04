@@ -34,7 +34,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
     
     public :
   
-        CCProtonPi0_Analyzer(bool isModeReduce, bool isMC);
+        CCProtonPi0_Analyzer(bool isModeReduce, bool isMC, std::string ana_folder = "");
         ~CCProtonPi0_Analyzer();
 
         // --------------------------------------------------------------------
@@ -46,8 +46,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
     
     private:
         //  Runtime and CCProtonPi0_Analyzer Functions
+        bool AnalyzeEvent();
         bool getCutStatistics();
-        bool KeepMichelEvent();
         void fillData();
         void specifyRunTime();
         void openTextFiles();
@@ -119,12 +119,13 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double nMaxEvents;
         vector<double> PDG_pi0_Mother;
         vector<double> PDG_pi0_GrandMother;
-
+        
         // Files
+        string m_ana_folder;
         string logFileName;
         string scanFileName;
-        string failFile[nTopologies];
-        ofstream failText[nTopologies];  
+        string failFile;
+        ofstream failText; 
         ofstream roundupText;
         ofstream logFile;
         ifstream DSTFileList;

@@ -16,7 +16,7 @@ Class: CCProtonPi0_Muon -> Derived Class from Particle Base Clas
 class CCProtonPi0_Muon : public CCProtonPi0_Particle
 {
     public:
-        CCProtonPi0_Muon(bool isModeReduce, bool isMC);
+        CCProtonPi0_Muon(bool isModeReduce, bool isMC, std::string ana_folder);
         void initHistograms();
         void writeHistograms();
 

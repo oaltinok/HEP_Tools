@@ -10,18 +10,22 @@
 
 echo "Setting Up Package"
 
+DefaultText="TextFiles"
 DefaultPlots="Plots"
 Main_Folder="Output"
 
-Folder_List=(TextFiles
+Folder_List=(${DefaultText}
         ${DefaultPlots})
-		
+
+AnaFolder_List=(1Track
+    2Track
+    All)
+
 PlotFolder_List=(Muon
 		Proton
 		Pion
 		Interaction
-        CutHists
-		Other)
+        CutHists)
 
 # Create Main Folder
 echo "... Creating ${Main_Folder}"
@@ -34,12 +38,29 @@ for folder in ${Folder_List[@]}; do
     mkdir ${folder}
 done
 
-# Create SubFolders for Plots in Each Branch
-cd ${DefaultPlots}
-for plotFolder in ${PlotFolder_List[@]}; do
-    echo "... Creating ${Main_Folder}/${DefaultPlots}/${plotFolder}"
-    mkdir ${plotFolder}
+# Create Analysis Folders inside DefaultText Folder
+cd ${DefaultText}
+for anaFolder in ${AnaFolder_List[@]}; do
+    echo "... Creating ${Main_Folder}/${DefaultText}/${anaFolder}"
+    mkdir ${anaFolder}
 done
-cd ..
-cd ..
+cd .. # Exit DefaultText
+
+# Create Analysis Folders inside DefaultPlots Folder
+cd ${DefaultPlots}
+for anaFolder in ${AnaFolder_List[@]}; do
+    echo "... Creating ${Main_Folder}/${DefaultPlots}/${anaFolder}"
+    mkdir ${anaFolder}
+    # Create SubFolders for Plots in Each AnaFolder
+    cd ${anaFolder}
+    for plotFolder in ${PlotFolder_List[@]}; do
+        echo "... Creating ${Main_Folder}/${DefaultPlots}/${anaFolder}/${plotFolder}"
+        mkdir ${plotFolder}
+    done
+    cd .. # exit anaFolder 
+done
+cd .. # exit DefaultPlots
+cd .. # exit Main_Folder
+
 echo "Setup Finished!"
+

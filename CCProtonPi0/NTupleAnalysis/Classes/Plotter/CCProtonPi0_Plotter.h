@@ -71,7 +71,7 @@ struct rootDir
 class CCProtonPi0_Plotter
 {
     public:
-        CCProtonPi0_Plotter();
+        CCProtonPi0_Plotter(std::string ana_folder);
         void plotHistograms();
         
     private:
@@ -94,8 +94,8 @@ class CCProtonPi0_Plotter
         std::string plotDir_Proton;
         std::string plotDir_Pion;
         
-        void setRootDirs();
-        void setPlotDirs();
+        void setRootDirs(std::string ana_folder);
+        void setPlotDirs(std::string ana_folder);
        
         // Default Plots
         void plotInteraction();
@@ -115,11 +115,12 @@ class CCProtonPi0_Plotter
         
         // Plottting Macros
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
+        void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir);
+        void DrawMCWithErrorBand(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
-        void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir);
 

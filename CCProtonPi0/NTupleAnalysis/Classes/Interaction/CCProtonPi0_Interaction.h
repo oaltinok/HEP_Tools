@@ -22,7 +22,7 @@ using namespace PlotUtils;
 class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_Interaction(bool isModeReduce, bool isMC);
+        CCProtonPi0_Interaction(bool isModeReduce, bool isMC, std::string ana_folder);
         void writeHistograms();
         
         //--------------------------------------------------------------------------

@@ -8,7 +8,7 @@
 
 using namespace PlotUtils;
 
-CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC) : CCProtonPi0_Particle()
+CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana_folder) : CCProtonPi0_Particle()
 {
     std::cout<<"Initializing CCProtonPi0_Pion"<<std::endl;    
     
@@ -16,8 +16,8 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC) : CCProtonPi0_P
         std::cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<std::endl;
     }else{
         // File Locations
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "Pion.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "Pion.root";      
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Pion.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Pion.root";      
         
         std::cout<<"\tRoot File: "<<rootDir<<std::endl;
         

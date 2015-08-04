@@ -100,14 +100,52 @@ void Reduce(string playlist)
 void Analyze(string playlist)
 {
     bool isModeReduce = false;
-    CCProtonPi0_Analyzer t(isModeReduce, isMC);
-    t.analyze(playlist);
+    // First Analyze 1Track Events
+    cout<<"======================================================================"<<endl;
+    cout<<"Analyzing 1 Track Events..."<<endl;
+    cout<<"======================================================================"<<endl;
+    CCProtonPi0_Analyzer analyzer_1Track(isModeReduce, isMC, "1Track/");
+    analyzer_1Track.analyze(playlist);
+
+    // Second Analyze 2Track Events 
+    cout<<"\n"<<endl;
+    cout<<"======================================================================"<<endl;
+    cout<<"Analyzing 2+ Track Events..."<<endl;
+    cout<<"======================================================================"<<endl;
+    CCProtonPi0_Analyzer analyzer_2Track(isModeReduce, isMC, "2Track/");
+    analyzer_2Track.analyze(playlist);
+
+    // Finally Analyze All Events 
+    cout<<"\n"<<endl;
+    cout<<"======================================================================"<<endl;
+    cout<<"Analyzing All Events..."<<endl;
+    cout<<"======================================================================"<<endl;
+    CCProtonPi0_Analyzer analyzer_All(isModeReduce, isMC, "All/");
+    analyzer_All.analyze(playlist);
 }
 
 void Plot()
 {
-    CCProtonPi0_Plotter p;
-    p.plotHistograms();
+    // First Plot 1Track Events
+    cout<<"======================================================================"<<endl;
+    cout<<"Plotting 1 Track Events..."<<endl;
+    cout<<"======================================================================"<<endl;
+    CCProtonPi0_Plotter plotter_1Track("1Track/");
+    plotter_1Track.plotHistograms();
+
+    // Second Plot 2+Track Events
+    cout<<"======================================================================"<<endl;
+    cout<<"Plotting 2+ Track Events..."<<endl;
+    cout<<"======================================================================"<<endl;
+    CCProtonPi0_Plotter plotter_2Track("2Track/");
+    plotter_2Track.plotHistograms();
+
+    // Finally Plot All Events
+    cout<<"======================================================================"<<endl;
+    cout<<"Plotting All Events..."<<endl;
+    cout<<"======================================================================"<<endl;
+    CCProtonPi0_Plotter plotter_all("All/");
+    plotter_all.plotHistograms();
 }
 
 int GetMode(int argc, char* argv[])
