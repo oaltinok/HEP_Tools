@@ -3,7 +3,7 @@
 |Statistical Data Analysis |MINERvA Operations| Other Algorithms|Setup|
 |----|-----|-----|-----|
 |CCProtonPi0|CAMAC_DataReader|dEdX Improvement|Setup Scripts for CCProtonPi0|
-
+|NTuple Analysis||True Reco Correction||
 
 * These packages are specialized for MINERvA Experiment data format.
 	* Experiment URL: http://minerva.fnal.gov/
@@ -36,6 +36,11 @@
 ### dEdX_pID
 
 * Improvement on pID Calculation: Algorithm improves the pID in case the particle trajectory overlaps with another trajectory.
+
+### True Reco Correction
+* In MC Analysis, most of the time the Reconstructed Parameter (Momentum, Energy, Angle, etc...) agrees with TRUE Parameter
+* Some cases, TRUE vs RECO plot does not create a good x = y distribution, in such cases we apply a correction factor
+* MATLAB Functions designed to find a linear correction factor for Reconstructed values
 
 ## Setup:
 
