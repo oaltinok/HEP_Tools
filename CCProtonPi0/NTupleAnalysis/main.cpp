@@ -34,17 +34,18 @@ main.cpp
 
 using namespace std;
 
-bool isMC = true;
-
 const string runOption_Run = "run";
 const string runOption_Plot = "plot";
 const string runOption_Reduce = "reduce";
 
+const string typeOption_mc = "mc";
+const string typeOption_data = "data";
+
 int GetMode(int argc, char* argv[]);
 void showInputError(char *argv[]);
 void Plot();
-void Reduce(string playlist);
-void Analyze(string playlist);
+void Reduce(string playlist, bool isMC);
+void Analyze(string playlist, bool isMC);
 
 int main(int argc, char *argv[] )
 {
@@ -55,6 +56,7 @@ int main(int argc, char *argv[] )
     int timeDiff_s;
     string pl_reduce;
     string pl_analyze;
+    bool isMC;
 
     // Check User Command
     int nMode = GetMode(argc,argv);
@@ -62,22 +64,24 @@ int main(int argc, char *argv[] )
         showInputError(argv);
         return 0;
     }
-    
-    if (isMC && nMode != 2){
-        cout<<"MC Playlists Selected!"<<endl;
+
+    if (nMode == 0 || nMode == 2) isMC = true;
+    else isMC = false;
+
+    if (isMC && nMode != 4){
+        cout<<"MC Playlists Selected!\n"<<endl;
         pl_reduce = "Input/Playlists/pl_MC_Merged.dat"; 
         pl_analyze = "Input/Playlists/pl_MC_Reduced.dat"; 
-    }else{
-        cout<<"Data Playlists Selected!"<<endl;
+    }else if (nMode != 4){
+        cout<<"Data Playlists Selected!\n"<<endl;
         pl_reduce = "Input/Playlists/pl_Data_Merged.dat"; 
         pl_analyze = "Input/Playlists/pl_Data_Reduced.dat"; 
     }
    
     ROOT::Cintex::Cintex::Enable();
 
-
-    if (nMode == 0) Reduce(pl_reduce);
-    else if (nMode == 1) Analyze(pl_analyze);
+    if (nMode == 0 || nMode == 1) Reduce(pl_reduce, isMC);
+    else if (nMode == 2 || nMode == 3) Analyze(pl_analyze, isMC);
     else Plot();
     
     time(&timeEnd);
@@ -90,14 +94,14 @@ int main(int argc, char *argv[] )
     return 0;
 }
 
-void Reduce(string playlist)
+void Reduce(string playlist, bool isMC)
 {
     bool isModeReduce = true;
     CCProtonPi0_Analyzer t(isModeReduce, isMC);
     t.reduce(playlist);
 }
 
-void Analyze(string playlist)
+void Analyze(string playlist, bool isMC)
 {
     bool isModeReduce = false;
     // First Analyze 1Track Events
@@ -148,17 +152,44 @@ void Plot()
     plotter_all.plotHistograms();
 }
 
+/*
+ *  -1   Error
+ *  0   Reduce MC
+ *  1   Reduce Data
+ *  2   Analyze MC
+ *  3   Analyze Data
+ *  4   Plot
+ */
 int GetMode(int argc, char* argv[])
 {
-    // argc can only be 2
-    if (argc != 2) return -1;
+    // argc can only be 2 or 3
+    if (argc != 2 && argc != 3) return -1;
 
     std::string runSelect = argv[1];
-    
-    if (runSelect.compare(runOption_Reduce) == 0) return 0;
-    else if (runSelect.compare(runOption_Run) == 0) return 1;
-    else if (runSelect.compare(runOption_Plot) == 0) return 2;
-    else return -1;
+    if (argc == 2){
+        if (runSelect.compare(runOption_Plot) == 0) return 4;
+        else return -1;
+    }
+     
+    std::string typeSelect = argv[2];
+    // First check for ERROR
+    if (runSelect.compare(runOption_Reduce) != 0 && runSelect.compare(runOption_Run) != 0) return -1;
+    if (typeSelect.compare(typeOption_mc) != 0 && typeSelect.compare(typeOption_data) != 0) return -1;
+
+    // Passed ERROR Check - Valid Input    
+    if (runSelect.compare(runOption_Reduce) == 0){
+        if (typeSelect.compare(typeOption_mc) == 0) return 0;
+        else if (typeSelect.compare(typeOption_data) == 0) return 1;
+        else return -1;
+    }
+
+    if (runSelect.compare(runOption_Run) == 0){
+        if (typeSelect.compare(typeOption_mc) == 0) return 2;
+        else if (typeSelect.compare(typeOption_data) == 0) return 3;
+        else return -1;
+    }
+
+    return -1;
 }
 
 void showInputError(char *argv[])
@@ -168,9 +199,11 @@ void showInputError(char *argv[])
     cout<<"Not a valid syntax!"<<endl;
     cout<<"----------------------------------------------------------------------"<<endl;
     cout<<"Correct Syntax for NTuple Reduce"<<endl;
-    cout<<"\t"<<argv[0]<<" "<<runOption_Reduce<<"\n"<<endl;
+    cout<<"\t"<<argv[0]<<" "<<runOption_Reduce<<" "<<typeOption_mc<<endl;
+    cout<<"\t"<<argv[0]<<" "<<runOption_Reduce<<" "<<typeOption_data<<"\n"<<endl;
     cout<<"Correct Syntax for NTuple Analysis"<<endl;
-    cout<<"\t"<<argv[0]<<" "<<runOption_Run<<"\n"<<endl;
+    cout<<"\t"<<argv[0]<<" "<<runOption_Run<<" "<<typeOption_mc<<endl;
+    cout<<"\t"<<argv[0]<<" "<<runOption_Run<<" "<<typeOption_data<<"\n"<<endl;
     cout<<"Correct Syntax for Plotting"<<endl;
     cout<<"\t"<<argv[0]<<" "<<runOption_Plot<<"\n"<<endl;
     cout<<"----------------------------------------------------------------------"<<endl;

@@ -136,7 +136,9 @@ void CCProtonPi0_Pion::initHistograms()
     gamma1_P_gamma2_P->GetXaxis()->SetTitle("Reconstructed P_{#gamma_{1}} [GeV]");
     gamma1_P_gamma2_P->GetYaxis()->SetTitle("Reconstructed P_{#gamma_{2}} [GeV]");
 
-
+    mgg = new TH1D( "mgg","Corrected Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
+    mgg->GetXaxis()->SetTitle("Corrected m_{#gamma#gamma} [MeV]");
+    mgg->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV]",bin_invMass.get_width()));   
 }
 
 void CCProtonPi0_Pion::writeHistograms()
@@ -168,6 +170,7 @@ void CCProtonPi0_Pion::writeHistograms()
     }
     
     // Photon Comparsion
+    mgg->Write();
     gamma1_reco_P_true_P->Write();
     gamma1_P_error->Write();
     gamma2_reco_P_true_P->Write();

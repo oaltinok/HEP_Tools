@@ -14,8 +14,9 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
     
     if(isModeReduce){
         nTrueSignal = 240237;
+        init_nCutVectors();
         SetCutNames();
-        OpenOutputFile();
+        OpenTextFiles(isMC);
         
         // File Locations
         if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms.root";
@@ -44,70 +45,106 @@ void CCProtonPi0_CutList::initHistograms()
     MnvH1D* temp = NULL;
 
     for (int i = 0; i < nHistograms; i++){
-        temp = new MnvH1D( Form("%s_%d","hCut_Michel",i),Form("%d",i),binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
+        // --------------------------------------------------------------------
+        // 1 Track
+        // --------------------------------------------------------------------
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_Michel",i),Form("%d",i),binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
         temp->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
         temp->GetYaxis()->SetTitle("N(Events)");
-        hCut_Michel.push_back(temp);
+        hCut_1Track_Michel.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_eVis_nuclearTarget",i),"Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_eVis_nuclearTarget",i),"Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
         temp->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
-        hCut_eVis_nuclearTarget.push_back(temp);
+        hCut_1Track_eVis_nuclearTarget.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_eVis_other",i),"Visible Energy in Tracker + ECAL + HCAL",binList.eVis_other.get_nBins(), binList.eVis_other.get_min(), binList.eVis_other.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_eVis_other",i),"Visible Energy in Tracker + ECAL + HCAL",binList.eVis_other.get_nBins(), binList.eVis_other.get_min(), binList.eVis_other.get_max() );
         temp->GetXaxis()->SetTitle("Visible Energy in Tracker + ECAL + HCAL [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_other.get_width()));
-        hCut_eVis_other.push_back(temp);
+        hCut_1Track_eVis_other.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_gamma1ConvDist",i),"Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_gamma1ConvDist",i),"Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
         temp->GetXaxis()->SetTitle("Leading Photon Conversion Distance");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [cm]",binList.bin_photonConvLength.get_width()));
-        hCut_gamma1ConvDist.push_back(temp);
+        hCut_1Track_gamma1ConvDist.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_gamma2ConvDist",i),"Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_gamma2ConvDist",i),"Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
         temp->GetXaxis()->SetTitle("Second Photon Conversion Distance");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [cm]",binList.bin_photonConvLength.get_width()));
-        hCut_gamma2ConvDist.push_back(temp);
+        hCut_1Track_gamma2ConvDist.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_pi0invMass",i),"Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_pi0invMass",i),"Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
-        hCut_pi0invMass.push_back(temp);
+        hCut_1Track_pi0invMass.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_1Prong_neutrinoE",i),"Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_neutrinoE",i),"Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
-        hCut_1Prong_neutrinoE.push_back(temp);
+        hCut_1Track_neutrinoE.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_1Prong_UnusedE",i),"Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_UnusedE",i),"Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
         temp->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
-        hCut_1Prong_UnusedE.push_back(temp);
+        hCut_1Track_UnusedE.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_2Prong_neutrinoE",i),"Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+        // --------------------------------------------------------------------
+        // 2 Track
+        // --------------------------------------------------------------------
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_Michel",i),Form("%d",i),binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
+        temp->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_2Track_Michel.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_eVis_nuclearTarget",i),"Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
+        temp->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
+        hCut_2Track_eVis_nuclearTarget.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_eVis_other",i),"Visible Energy in Tracker + ECAL + HCAL",binList.eVis_other.get_nBins(), binList.eVis_other.get_min(), binList.eVis_other.get_max() );
+        temp->GetXaxis()->SetTitle("Visible Energy in Tracker + ECAL + HCAL [MeV]");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_other.get_width()));
+        hCut_2Track_eVis_other.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_gamma1ConvDist",i),"Leading Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+        temp->GetXaxis()->SetTitle("Leading Photon Conversion Distance");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [cm]",binList.bin_photonConvLength.get_width()));
+        hCut_2Track_gamma1ConvDist.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_gamma2ConvDist",i),"Second Photon Conversion Distance",binList.bin_photonConvLength.get_nBins(), binList.bin_photonConvLength.get_min(), binList.bin_photonConvLength.get_max() );
+        temp->GetXaxis()->SetTitle("Second Photon Conversion Distance");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [cm]",binList.bin_photonConvLength.get_width()));
+        hCut_2Track_gamma2ConvDist.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_pi0invMass",i),"Reconstructed Pi0 Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+        hCut_2Track_pi0invMass.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_neutrinoE",i),"Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
-        hCut_2Prong_neutrinoE.push_back(temp);
+        hCut_2Track_neutrinoE.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_2Prong_UnusedE",i),"Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_UnusedE",i),"Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
         temp->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
-        hCut_2Prong_UnusedE.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","hCut_protonScore_pIDDiff",i),"Proton Score - Pion Score",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
+        hCut_2Track_UnusedE.push_back(temp);
+        
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_protonScore_pIDDiff",i),"Proton Score - Pion Score",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
         temp->GetXaxis()->SetTitle("Proton Score - Pion Score");
         temp->GetYaxis()->SetTitle("N(Events)");
-        hCut_protonScore_pIDDiff.push_back(temp);
+        hCut_2Track_protonScore_pIDDiff.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_protonScore_LLR",i),"proton_protonScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_protonScore_LLR",i),"proton_protonScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
         temp->GetXaxis()->SetTitle("proton_protonScore_LLR");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
-        hCut_protonScore_LLR.push_back(temp);
+        hCut_2Track_protonScore_LLR.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_deltaInvMass",i),"deltaInvMass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
-        temp->GetXaxis()->SetTitle("hCut_deltaInvMass");
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_deltaInvMass",i),"deltaInvMass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
+        temp->GetXaxis()->SetTitle("hCut_2Track_deltaInvMass");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.deltaInvMass.get_width()));
-        hCut_deltaInvMass.push_back(temp);
+        hCut_2Track_deltaInvMass.push_back(temp);
     }
 
     // MC Only Histograms
@@ -124,74 +161,101 @@ void CCProtonPi0_CutList::initHistograms()
     mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
 }
 
-void CCProtonPi0_CutList::SetCutNames()
+void CCProtonPi0_CutList::init_nCutVectors()
 {
-    // Common Cut Numbers
-    nCut_All.set_Name("All");
-    nCut_Vertex_None.set_Name("Vertex_None");
-    nCut_Vertex_Not_Reconstructable.set_Name("Vertex_Not_Reconstructable"); 
-    nCut_Vertex_Not_Fiducial.set_Name("Vertex_Not_Fiducial");
-    nCut_Muon_None.set_Name("Muon_None");              
-    nCut_Muon_Not_Plausible.set_Name("Muon_Not_Plausible");
-    nCut_Muon_Charge.set_Name("Muon_Charge");
-    nCut_Vertex_Michel_Exist.set_Name("Vertex_Michel_Exist"); 
-    nCut_EndPoint_Michel_Exist.set_Name("EndPoint_Michel_Exist");
-    nCut_secEndPoint_Michel_Exist.set_Name("secEndPoint_Michel_Exist");
-    nCut_PreFilter_Pi0.set_Name("PreFilter_Pi0");
-    nCut_ConeBlobs.set_Name("ConeBlobs");
-    nCut_BlobDirectionBad.set_Name("BlobDirectionBad");
-    nCut_BlobsBad.set_Name("BlobsBad");
-    nCut_Photon1DistanceLow.set_Name("Photon1DistanceLow");
-    nCut_Photon2DistanceLow.set_Name("Photon2DistanceLow");
-    nCut_Pi0_invMass.set_Name("Pi0_invMass");
-
-    // nProngs == 1 Cut Numbers (Muon + Pi0)
-    nCut_1Prong_Particle_None.set_Name("Particle_None");
-    nCut_1Prong_Proton_None.set_Name("Proton_None");            
-    nCut_1Prong_ProtonScore.set_Name("Proton_Score");
-    nCut_1Prong_DeltaInvMass.set_Name("Delta_invMass");
-    nCut_1Prong_beamEnergy.set_Name("beamEnergy");
-    nCut_1Prong_UnusedE.set_Name("UnusedE");
-
-    // nProngs >= 2 Cut Numbers (Muon + Pi0 + X(No Meson))
-    nCut_2Prong_Particle_None.set_Name("Particle_None");
-    nCut_2Prong_Proton_None.set_Name("Proton_None");            
-    nCut_2Prong_ProtonScore.set_Name("Proton_Score");
-    nCut_2Prong_DeltaInvMass.set_Name("Delta_invMass");
-    nCut_2Prong_beamEnergy.set_Name("beamEnergy");
-    nCut_2Prong_UnusedE.set_Name("UnusedE");
-
+    for (int i = 0; i < nTopologies; i++){
+        nCut_All.push_back(CCProtonPi0_Cut());
+        nCut_Vertex_None.push_back(CCProtonPi0_Cut());
+        nCut_Vertex_Not_Reconstructable.push_back(CCProtonPi0_Cut()); 
+        nCut_Vertex_Not_Fiducial.push_back(CCProtonPi0_Cut());
+        nCut_Muon_None.push_back(CCProtonPi0_Cut());              
+        nCut_Muon_Not_Plausible.push_back(CCProtonPi0_Cut());
+        nCut_Muon_Charge.push_back(CCProtonPi0_Cut());
+        nCut_Vertex_Michel_Exist.push_back(CCProtonPi0_Cut()); 
+        nCut_EndPoint_Michel_Exist.push_back(CCProtonPi0_Cut());
+        nCut_secEndPoint_Michel_Exist.push_back(CCProtonPi0_Cut());
+        nCut_PreFilter_Pi0.push_back(CCProtonPi0_Cut());
+        nCut_ConeBlobs.push_back(CCProtonPi0_Cut());
+        nCut_BlobDirectionBad.push_back(CCProtonPi0_Cut());
+        nCut_BlobsBad.push_back(CCProtonPi0_Cut());
+        nCut_Photon1DistanceLow.push_back(CCProtonPi0_Cut());
+        nCut_Photon2DistanceLow.push_back(CCProtonPi0_Cut());
+        nCut_Pi0_invMass.push_back(CCProtonPi0_Cut());
+        nCut_Particle_None.push_back(CCProtonPi0_Cut());
+        nCut_Proton_None.push_back(CCProtonPi0_Cut());            
+        nCut_ProtonScore.push_back(CCProtonPi0_Cut());
+        nCut_DeltaInvMass.push_back(CCProtonPi0_Cut());
+        nCut_beamEnergy.push_back(CCProtonPi0_Cut());
+        nCut_UnusedE.push_back(CCProtonPi0_Cut());
+    }
 }
 
-void CCProtonPi0_CutList::OpenOutputFile()
+void CCProtonPi0_CutList::SetCutNames()
 {
+    for (int i = 0; i < nTopologies; i++){
+        nCut_All[i].set_Name("All");
+        nCut_Vertex_None[i].set_Name("Vertex_None");
+        nCut_Vertex_Not_Reconstructable[i].set_Name("Vertex_Not_Reconstructable"); 
+        nCut_Vertex_Not_Fiducial[i].set_Name("Vertex_Not_Fiducial");
+        nCut_Muon_None[i].set_Name("Muon_None");              
+        nCut_Muon_Not_Plausible[i].set_Name("Muon_Not_Plausible");
+        nCut_Muon_Charge[i].set_Name("Muon_Charge");
+        nCut_Vertex_Michel_Exist[i].set_Name("Vertex_Michel_Exist"); 
+        nCut_EndPoint_Michel_Exist[i].set_Name("EndPoint_Michel_Exist");
+        nCut_secEndPoint_Michel_Exist[i].set_Name("secEndPoint_Michel_Exist");
+        nCut_PreFilter_Pi0[i].set_Name("PreFilter_Pi0");
+        nCut_ConeBlobs[i].set_Name("ConeBlobs");
+        nCut_BlobDirectionBad[i].set_Name("BlobDirectionBad");
+        nCut_BlobsBad[i].set_Name("BlobsBad");
+        nCut_Photon1DistanceLow[i].set_Name("Photon1DistanceLow");
+        nCut_Photon2DistanceLow[i].set_Name("Photon2DistanceLow");
+        nCut_Pi0_invMass[i].set_Name("Pi0_invMass");
+        nCut_Particle_None[i].set_Name("Particle_None");
+        nCut_Proton_None[i].set_Name("Proton_None");            
+        nCut_ProtonScore[i].set_Name("Proton_Score");
+        nCut_DeltaInvMass[i].set_Name("Delta_invMass");
+        nCut_beamEnergy[i].set_Name("beamEnergy");
+        nCut_UnusedE[i].set_Name("UnusedE");
+    }
+}
+
+void CCProtonPi0_CutList::OpenTextFiles(bool isMC)
+{
+    std::string type;
+
+    if (isMC) type = "CutTable_MC_";
+    else type = "CutTable_Data_";
+
     // Open Cut Files
-    cutFile = Folder_List::output + Folder_List::textOut + "CutTable.txt";
+    cutFile[0] = Folder_List::output + Folder_List::textOut + type + "1Track.txt";
+    cutFile[1] = Folder_List::output + Folder_List::textOut + type + "2Track.txt";
     
-    cutText.open( cutFile.c_str() );
-    if( !cutText.is_open() ){
-        cerr<<"Cannot open output text file: "<<cutFile<<endl;
-        exit(1);
-    }else{
-        cout<<"\t"<<cutFile<<endl;
+    for (int i = 0; i < nTopologies; i++){
+        cutText[i].open( cutFile[i].c_str() );
+        if( !cutText[i].is_open() ){
+            cerr<<"Cannot open output text file: "<<cutFile[i]<<endl;
+            exit(1);
+        }else{
+            cout<<"\t"<<cutFile[i]<<endl;
+        }
     }
      
 }
 
-void CCProtonPi0_CutList::writeCutTableHeader()
+void CCProtonPi0_CutList::writeCutTableHeader(int t)
 {
-    cutText<<std::left;
+    cutText[t]<<std::left;
     
-    cutText.width(35); cutText<<"Cut"<<" "; 
+    cutText[t].width(35); cutText[t]<<"Cut"<<" "; 
     
-    cutText.width(12); cutText<<"N(Events)"<<" ";    
-    cutText.width(12); cutText<<"N(Signal)"<<" ";      
-    cutText.width(12); cutText<<"Eff(AllSignal)"<<" ";      
-    cutText.width(12); cutText<<"Eff(MINOS)"<<" ";      
-    cutText.width(12); cutText<<"Purity"<<" ";
-    cutText.width(12); cutText<<"N(Study1)"<<" "; 
-    cutText.width(12); cutText<<"N(Study2)"<<" "; 
-    cutText<<endl;
+    cutText[t].width(12); cutText[t]<<"N(Events)"<<" ";    
+    cutText[t].width(12); cutText[t]<<"N(Signal)"<<" ";      
+    cutText[t].width(12); cutText[t]<<"Eff(All)"<<" ";      
+    cutText[t].width(12); cutText[t]<<"Eff(MINOS)"<<" ";      
+    cutText[t].width(12); cutText[t]<<"Purity"<<" ";
+    cutText[t].width(12); cutText[t]<<"N(Study1)"<<" "; 
+    cutText[t].width(12); cutText[t]<<"N(Study2)"<<" "; 
+    cutText[t]<<endl;
 }
 
 double CCProtonPi0_CutList::getCutEfficiency(CCProtonPi0_Cut& currentCut, CCProtonPi0_Cut& effBase) const
@@ -218,179 +282,102 @@ double CCProtonPi0_CutList::getCutPurity(CCProtonPi0_Cut& currentCut) const
     return purity;   
 }
 
-void CCProtonPi0_CutList::formCutVector()
+void CCProtonPi0_CutList::formCutVectors()
 {   
-    nCutVector.push_back(nCut_All);
-    nCutVector.push_back(nCut_Vertex_None);
-    nCutVector.push_back(nCut_Vertex_Not_Reconstructable); 
-    nCutVector.push_back(nCut_Vertex_Not_Fiducial);
-    nCutVector.push_back(nCut_Muon_None);              
-    nCutVector.push_back(nCut_Muon_Not_Plausible);
-    nCutVector.push_back(nCut_Muon_Charge);
-    nCutVector.push_back(nCut_Vertex_Michel_Exist); 
-    nCutVector.push_back(nCut_EndPoint_Michel_Exist);
-    nCutVector.push_back(nCut_secEndPoint_Michel_Exist);
-    nCutVector.push_back(nCut_PreFilter_Pi0);
-    nCutVector.push_back(nCut_ConeBlobs);
-    nCutVector.push_back(nCut_BlobDirectionBad);
-    nCutVector.push_back(nCut_BlobsBad);
-    nCutVector.push_back(nCut_Photon1DistanceLow);
-    nCutVector.push_back(nCut_Photon2DistanceLow);
-    nCutVector.push_back(nCut_Pi0_invMass);
-    
+
+    nCutVector_Common.push_back(nCut_All);
+    nCutVector_Common.push_back(nCut_Vertex_None);
+    nCutVector_Common.push_back(nCut_Vertex_Not_Reconstructable); 
+    nCutVector_Common.push_back(nCut_Vertex_Not_Fiducial);
+    nCutVector_Topology.push_back(nCut_Muon_None);              
+    nCutVector_Topology.push_back(nCut_Muon_Not_Plausible);
+    nCutVector_Topology.push_back(nCut_Muon_Charge);
+    nCutVector_Topology.push_back(nCut_Vertex_Michel_Exist); 
+    nCutVector_Topology.push_back(nCut_EndPoint_Michel_Exist);
+    nCutVector_Topology.push_back(nCut_secEndPoint_Michel_Exist);
+    nCutVector_Topology.push_back(nCut_PreFilter_Pi0);
+    nCutVector_Topology.push_back(nCut_ConeBlobs);
+    nCutVector_Topology.push_back(nCut_BlobDirectionBad);
+    nCutVector_Topology.push_back(nCut_BlobsBad);
+    nCutVector_Topology.push_back(nCut_Photon1DistanceLow);
+    nCutVector_Topology.push_back(nCut_Photon2DistanceLow);
+    nCutVector_Topology.push_back(nCut_Pi0_invMass);
+    nCutVector_Topology.push_back(nCut_Particle_None);
+    nCutVector_Topology.push_back(nCut_Proton_None);
+    nCutVector_Topology.push_back(nCut_ProtonScore);
+    nCutVector_Topology.push_back(nCut_DeltaInvMass);
+    nCutVector_Topology.push_back(nCut_beamEnergy);
+    nCutVector_Topology.push_back(nCut_UnusedE);
 }
 
 void CCProtonPi0_CutList::writeCutTable()
 {
-    formCutVector();
+    formCutVectors();
     
-    cout<<">> Writing "<<cutFile<<endl;
+    for (int t = 0; t < nTopologies; t++){
+        cout<<">> Writing "<<cutFile[t]<<endl;
     
-    writeCutTableHeader();
-    writeCutTableRows();
+        writeCutTableHeader(t);
+        writeCutTableRows(t,nCutVector_Common);
+        cutText[t]<<endl;
+        writeCutTableRows(t,nCutVector_Topology);
+    }
 }
 
-void CCProtonPi0_CutList::writeCutTableRows()
+void CCProtonPi0_CutList::writeCutTableRows(int t, vector< vector<CCProtonPi0_Cut> > &nCutVector)
 {
     // Write General Cuts upto Proton Reconstruction    
     for( unsigned int i = 0; i < nCutVector.size(); i++){
-        writeSingleRow(nCutVector[i]);    
+        writeSingleRow(t, nCutVector[i][t]);    
     }
 
-    cutText<<endl;
-
-    //Write Separate Cuts;
-    writeSingleRow(nCut_1Prong_Particle_None, nCut_2Prong_Particle_None);
-    writeSingleRow(nCut_1Prong_Proton_None, nCut_2Prong_Proton_None);
-    writeSingleRow(nCut_1Prong_ProtonScore, nCut_2Prong_ProtonScore);
-    writeSingleRow(nCut_1Prong_DeltaInvMass, nCut_2Prong_DeltaInvMass);
-    writeSingleRow(nCut_1Prong_beamEnergy, nCut_2Prong_beamEnergy);
-    writeSingleRow(nCut_1Prong_UnusedE, nCut_2Prong_UnusedE);
+    cutText[t]<<endl;
 }
 
-void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& currentCut)
+void CCProtonPi0_CutList::writeSingleRow(int t, CCProtonPi0_Cut& currentCut)
 {
     double eff_AllSignal;
     double eff_MINOS;
     double purity;    
 
-    eff_AllSignal = getCutEfficiency(currentCut,nTrueSignal);
-    eff_MINOS = getCutEfficiency(currentCut,nCut_Muon_None);
+    eff_AllSignal = getCutEfficiency(currentCut,nCut_All[t]);
+    eff_MINOS = getCutEfficiency(currentCut,nCut_Muon_None[t]);
     purity = getCutPurity(currentCut);
             
-    cutText.width(35); cutText<<currentCut.get_Name()<<" ";
-    cutText.width(12); cutText<<currentCut.nEvent.getCount()<<" ";
+    cutText[t].width(35); cutText[t]<<currentCut.get_Name()<<" ";
+    cutText[t].width(12); cutText[t]<<currentCut.nEvent.getCount()<<" ";
     
     // Total Signal
-    cutText.width(12); cutText<<currentCut.nSignal.getCount()<<" ";
+    cutText[t].width(12); cutText[t]<<currentCut.nSignal.getCount()<<" ";
 
     // Efficiency
     if ( eff_AllSignal <= 100){
-        cutText.width(12); cutText<<eff_AllSignal<<" ";
+        cutText[t].width(12); cutText[t]<<eff_AllSignal<<" ";
     }else{
-        cutText.width(12); cutText<<"N/A"<<" ";    
+        cutText[t].width(12); cutText[t]<<"N/A"<<" ";    
     }
 
     if ( eff_MINOS <= 100){
-        cutText.width(12); cutText<<eff_MINOS<<" ";
+        cutText[t].width(12); cutText[t]<<eff_MINOS<<" ";
     }else{
-        cutText.width(12); cutText<<"N/A"<<" ";    
+        cutText[t].width(12); cutText[t]<<"N/A"<<" ";    
     }    
     
     // Purity
-    cutText.width(12); cutText<<purity<<" ";
+    cutText[t].width(12); cutText[t]<<purity<<" ";
 
     // Number of Events which are studied
-    cutText.width(12); cutText<<currentCut.nStudy1.getCount()<<" ";
-    cutText.width(12); cutText<<currentCut.nStudy2.getCount()<<" ";
+    cutText[t].width(12); cutText[t]<<currentCut.nStudy1.getCount()<<" ";
+    cutText[t].width(12); cutText[t]<<currentCut.nStudy2.getCount()<<" ";
     
-    cutText<<endl;
-}
-
-
-
-void CCProtonPi0_CutList::writeSingleRow(CCProtonPi0_Cut& nCut_1Prong, CCProtonPi0_Cut& nCut_2Prong)
-{
-    double eff_AllSignal;
-    double eff_MINOS;
-    double purity;    
-
-    // ------------------------------------------------------------------------
-    // Write nCut_1Prong  Statistics
-    // ------------------------------------------------------------------------
-    eff_AllSignal = getCutEfficiency(nCut_1Prong,nTrueSignal);
-    eff_MINOS = getCutEfficiency(nCut_1Prong,nCut_Muon_None);
-    purity = getCutPurity(nCut_1Prong);
-            
-    cutText.unsetf( std::ios::floatfield ); 
-    cutText.width(35); cutText<<nCut_1Prong.get_Name()<<" ";
-    cutText.width(12); cutText<<nCut_1Prong.nEvent.getCount()<<" ";
-    
-    // Total Signal
-    cutText.width(12); cutText<<nCut_1Prong.nSignal.getCount()<<" ";
-
-    cutText.precision(4); 
-
-    // Efficiency
-    if ( eff_AllSignal <= 100){
-        cutText.width(12); cutText<<eff_AllSignal<<" ";
-    }else{
-        cutText.width(12); cutText<<"N/A"<<" ";    
-    }
-
-    if ( eff_MINOS <= 100){
-        cutText.width(12); cutText<<eff_MINOS<<" ";
-    }else{
-        cutText.width(12); cutText<<"N/A"<<" ";    
-    }    
-    
-    // Purity
-    cutText.width(12); cutText<<purity<<" ";
-
-    // Number of Events which are studied
-    cutText.width(12); cutText<<nCut_1Prong.nStudy1.getCount()<<" ";
-    cutText.width(12); cutText<<nCut_1Prong.nStudy2.getCount()<<" ";
-
-    // ------------------------------------------------------------------------
-    // Write nCut_2Prong Statistics
-    // ------------------------------------------------------------------------
-    eff_AllSignal = getCutEfficiency(nCut_2Prong,nCut_Vertex_Not_Fiducial);
-    eff_MINOS = getCutEfficiency(nCut_2Prong,nCut_Muon_None);
-    purity = getCutPurity(nCut_2Prong);
-            
-    cutText.width(12); cutText<<nCut_2Prong.nEvent.getCount()<<" ";
-    
-    // Total Signal
-    cutText.width(12); cutText<<nCut_2Prong.nSignal.getCount()<<" ";
-
-    cutText.precision(4); 
-
-    // Efficiency
-    if ( eff_AllSignal <= 100){
-        cutText.width(12); cutText<<eff_AllSignal<<" ";
-    }else{
-        cutText.width(12); cutText<<"N/A"<<" ";    
-    }
-
-    if ( eff_MINOS <= 100){
-        cutText.width(12); cutText<<eff_MINOS<<" ";
-    }else{
-        cutText.width(12); cutText<<"N/A"<<" ";    
-    }    
-    
-    // Purity
-    cutText.width(12); cutText<<purity<<" ";
-
-    // Number of Events which are studied
-    cutText.width(12); cutText<<nCut_2Prong.nStudy1.getCount()<<" ";
-    cutText.width(12); cutText<<nCut_2Prong.nStudy2.getCount()<<" ";
-
-    cutText<<endl;
+    cutText[t]<<endl;
 }
 
 CCProtonPi0_CutList::~CCProtonPi0_CutList()
 {
-    cutText.close(); 
+    for (int i = 0; i < nTopologies; i++){
+        cutText[i].close(); 
+    }
 }
 
 void CCProtonPi0_CutList::writeHistograms()
@@ -398,23 +385,28 @@ void CCProtonPi0_CutList::writeHistograms()
     std::cout<<">> Writing "<<rootDir<<std::endl;
     f->cd();
     for (int i = 0; i < nHistograms; i++){
-        // Common
-        hCut_Michel[i]->Write();
-        hCut_eVis_nuclearTarget[i]->Write();
-        hCut_eVis_other[i]->Write();
-        hCut_pi0invMass[i]->Write();
-        hCut_gamma1ConvDist[i]->Write();
-        hCut_gamma2ConvDist[i]->Write();
-        
-        hCut_1Prong_neutrinoE[i]->Write();
-        hCut_2Prong_neutrinoE[i]->Write();
-        hCut_1Prong_UnusedE[i]->Write();
-        hCut_2Prong_UnusedE[i]->Write();
-
-        // 2 Prong Specific
-        hCut_protonScore_pIDDiff[i]->Write();
-        hCut_protonScore_LLR[i]->Write();
-        hCut_deltaInvMass[i]->Write();
+        // 1 Track
+        hCut_1Track_Michel[i]->Write();
+        hCut_1Track_eVis_nuclearTarget[i]->Write();
+        hCut_1Track_eVis_other[i]->Write();
+        hCut_1Track_pi0invMass[i]->Write();
+        hCut_1Track_gamma1ConvDist[i]->Write();
+        hCut_1Track_gamma2ConvDist[i]->Write();
+        hCut_1Track_neutrinoE[i]->Write();
+        hCut_1Track_UnusedE[i]->Write();
+       
+        // 2 Track 
+        hCut_2Track_Michel[i]->Write();
+        hCut_2Track_eVis_nuclearTarget[i]->Write();
+        hCut_2Track_eVis_other[i]->Write();
+        hCut_2Track_pi0invMass[i]->Write();
+        hCut_2Track_gamma1ConvDist[i]->Write();
+        hCut_2Track_gamma2ConvDist[i]->Write();
+        hCut_2Track_neutrinoE[i]->Write();
+        hCut_2Track_UnusedE[i]->Write();
+        hCut_2Track_protonScore_pIDDiff[i]->Write();
+        hCut_2Track_protonScore_LLR[i]->Write();
+        hCut_2Track_deltaInvMass[i]->Write();
     }
 
     // MC Only

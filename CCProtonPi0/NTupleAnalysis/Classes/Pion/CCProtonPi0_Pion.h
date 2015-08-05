@@ -37,6 +37,7 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         TH2D* gamma2_reco_P_true_P;
         TH1D* gamma2_P_error;
         TH1D* gamma1_P_error;
+        TH1D* mgg;
 
         CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana_folder);
         void initHistograms();

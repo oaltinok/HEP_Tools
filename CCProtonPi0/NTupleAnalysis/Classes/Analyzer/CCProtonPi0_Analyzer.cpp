@@ -393,6 +393,17 @@ void CCProtonPi0_Analyzer::writeFSParticle4P(Long64_t nEntry)
     }
 }
 
+void CCProtonPi0_Analyzer::Increment_nCut(vector<CCProtonPi0_Cut> &nCut, bool study1, bool study2)
+{
+    int ind;
+
+    if (nTracks == 1) ind = 0;
+    else if (nTracks > 1) ind = 1;
+    else cout<<"WARNING No Topology while Inrementing nCut"<<endl;
+
+    nCut[ind].increment(truth_isSignal, study1, study2);
+}
+
 bool CCProtonPi0_Analyzer::getCutStatistics()
 {
     /*
@@ -400,7 +411,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         Assign the selection to parameters study1 and study2
         Cut Objects will count them and print them in the Cut Table
     */
-
     
     // Study 1 - Detected Michels
     // Study 2 - Missed Michels
@@ -415,139 +425,162 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     //
     //==========================================================================
 
-    cutList.nCut_All.increment(truth_isSignal, study1, study2); // Count All Events before Cuts
-
+    cutList.nCut_All[0].increment(truth_isSignal, study1, study2);
+    cutList.nCut_All[1].increment(truth_isSignal, study1, study2);
+    
+    // Vertex Cut -- If Cut_Vertex_None == 1 --> No Event Vertex
     if( Cut_Vertex_None == 1) return false;
-    cutList.nCut_Vertex_None.increment(truth_isSignal, study1, study2);
+    cutList.nCut_Vertex_None[0].increment(truth_isSignal, study1, study2);
+    cutList.nCut_Vertex_None[1].increment(truth_isSignal, study1, study2);
         
+    // Vertex Reconstructable Cut
     if( Cut_Vertex_Not_Reconstructable == 1) return false;
-    cutList.nCut_Vertex_Not_Reconstructable.increment(truth_isSignal, study1, study2);
+    cutList.nCut_Vertex_Not_Reconstructable[0].increment(truth_isSignal, study1, study2);
+    cutList.nCut_Vertex_Not_Reconstructable[1].increment(truth_isSignal, study1, study2);
     
+    // Vertex Fiducial Cut
     if( Cut_Vertex_Not_Fiducial == 1) return false;
-    cutList.nCut_Vertex_Not_Fiducial.increment(truth_isSignal, study1, study2);
+    cutList.nCut_Vertex_Not_Fiducial[0].increment(truth_isSignal, study1, study2);
+    cutList.nCut_Vertex_Not_Fiducial[1].increment(truth_isSignal, study1, study2);
     
+    // Muon Cut -- If Cut_Muon_None == 1 --> No MINOS Matched Muon
     if( Cut_Muon_None == 1) return false;
-    cutList.nCut_Muon_None.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_Muon_None, study1, study2);
 
     // Fill Truth_W for MINOS Matched Signal Events
     if (m_isMC && truth_isSignal) fill_mc_w(); 
-        
-    if( Cut_Muon_Not_Plausible == 1) return false;
-    cutList.nCut_Muon_Not_Plausible.increment(truth_isSignal, study1, study2);
     
+    // Muon is NOT Plausible Cut -- will revisit this
+    if( Cut_Muon_Not_Plausible == 1) return false;
+    Increment_nCut(cutList.nCut_Muon_Not_Plausible, study1, study2);
+    
+    // Anti-Muon Cut
     if( Cut_Muon_Charge == 1) return false;
-    cutList.nCut_Muon_Charge.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_Muon_Charge, study1, study2);
    
-    // Fill Michel Cut Hist
+    // Michel Cuts
     if( Cut_Vertex_Michel_Exist == 1 || Cut_EndPoint_Michel_Exist == 1 || Cut_secEndPoint_Michel_Exist == 1 ){
-        FillHistogram(cutList.hCut_Michel,1);
+        if (nTracks == 1) FillHistogram(cutList.hCut_1Track_Michel,1);
+        else FillHistogram(cutList.hCut_2Track_Michel,1);
     }else{
-        FillHistogram(cutList.hCut_Michel,0);
+        if (nTracks== 1) FillHistogram(cutList.hCut_1Track_Michel,0);
+        else FillHistogram(cutList.hCut_2Track_Michel,0);
     } 
     if( Cut_Vertex_Michel_Exist == 1) return false;
-    cutList.nCut_Vertex_Michel_Exist.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_Vertex_Michel_Exist, study1, study2);
     
     if( Cut_EndPoint_Michel_Exist == 1) return false;
-    cutList.nCut_EndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_EndPoint_Michel_Exist, study1, study2);
     
     if( Cut_secEndPoint_Michel_Exist == 1) return false;
-    cutList.nCut_secEndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_secEndPoint_Michel_Exist, study1, study2);
     
-    // Fill PreFilter Cut Hists
-    FillHistogram(cutList.hCut_eVis_nuclearTarget,evis_NuclearTarget);
-    FillHistogram(cutList.hCut_eVis_other,evis_TotalExceptNuclearTarget);
+    // PreFilter Cut
+    if(nTracks == 1){
+        FillHistogram(cutList.hCut_1Track_eVis_nuclearTarget,evis_NuclearTarget);
+        FillHistogram(cutList.hCut_1Track_eVis_other,evis_TotalExceptNuclearTarget);
+    }else{
+        FillHistogram(cutList.hCut_2Track_eVis_nuclearTarget,evis_NuclearTarget);
+        FillHistogram(cutList.hCut_2Track_eVis_other,evis_TotalExceptNuclearTarget);
+    }
     if( Cut_PreFilter_Pi0 == 1) return false;
-    cutList.nCut_PreFilter_Pi0.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_PreFilter_Pi0, study1, study2);
     
+    // ConeBlobs Cut -- If Cut_ConeBlobs == 1 --> Failed Pi0 Reconstruction
     if( Cut_ConeBlobs == 1) return false;
-    cutList.nCut_ConeBlobs.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_ConeBlobs, study1, study2);
 
+    // Blob Direction Bad Cut
     if ( Cut_BlobDirectionBad == 1 ) return false;
-    cutList.nCut_BlobDirectionBad.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_BlobDirectionBad, study1, study2);
     
+    // Blobs Bad Cut
     //if ( Cut_BlobsBad == 1 ) return false;
-    cutList.nCut_BlobsBad.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_BlobsBad, study1, study2);
 
-    // Fill Gamma1 Conv Length Cut Hist
-    FillHistogram(cutList.hCut_gamma1ConvDist,CCProtonPi0_gamma1_dist_vtx * 0.1);
+    // Gamma1 Conv Length Cut Hist
+    if (nProngs == 1) FillHistogram(cutList.hCut_1Track_gamma1ConvDist,CCProtonPi0_gamma1_dist_vtx * 0.1);
+    else FillHistogram(cutList.hCut_2Track_gamma1ConvDist,CCProtonPi0_gamma1_dist_vtx * 0.1);
+    
     if (applyPhotonDistance && CCProtonPi0_gamma1_dist_vtx * 0.1 < minPhotonDistance) return false;
-    cutList.nCut_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_Photon1DistanceLow, study1, study2);
 
-    // Fill Gamma2 Conv Length Cut Hist
-    FillHistogram(cutList.hCut_gamma2ConvDist,CCProtonPi0_gamma2_dist_vtx * 0.1);
+    // Gamma2 Conv Length Cut
+    if (nProngs == 1) FillHistogram(cutList.hCut_1Track_gamma2ConvDist,CCProtonPi0_gamma2_dist_vtx * 0.1);
+    else FillHistogram(cutList.hCut_2Track_gamma2ConvDist,CCProtonPi0_gamma2_dist_vtx * 0.1);
+    
     if (applyPhotonDistance && CCProtonPi0_gamma2_dist_vtx * 0.1 < minPhotonDistance) return false;
-    cutList.nCut_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_Photon2DistanceLow, study1, study2);
 
-    // Fill Pi0 Invariant Mass Cut Hist
-    FillHistogram(cutList.hCut_pi0invMass,CCProtonPi0_pi0_invMass);
+    // Pi0 Invariant Mass Cut
+    if (nProngs == 1) FillHistogram(cutList.hCut_1Track_pi0invMass,CCProtonPi0_pi0_invMass);
+    else FillHistogram(cutList.hCut_2Track_pi0invMass,CCProtonPi0_pi0_invMass);
+    
     if( CCProtonPi0_pi0_invMass < min_Pi0_invMass || CCProtonPi0_pi0_invMass > max_Pi0_invMass ) return false;
-    cutList.nCut_Pi0_invMass.increment(truth_isSignal, study1, study2);
+    Increment_nCut(cutList.nCut_Pi0_invMass, study1, study2);
    
     // ------------------------------------------------------------------------
     // Proton Candidate Related Cuts 
     // ------------------------------------------------------------------------
-    // 1 Prong Events Always Satisfies Proton Cuts - No Proton Candidate to apply Cut!
-    if (nProngs == 1) cutList.nCut_1Prong_Particle_None.increment(truth_isSignal, study1, study2);
-    if (nProngs == 1) cutList.nCut_1Prong_Proton_None.increment(truth_isSignal, study1, study2);
-    if (nProngs == 1) cutList.nCut_1Prong_ProtonScore.increment(truth_isSignal, study1, study2);
-    if (nProngs == 1) cutList.nCut_1Prong_DeltaInvMass.increment(truth_isSignal, study1, study2);
+    // 1 Track Events Always Satisfies Proton Cuts - No Proton Candidate to apply Cut!
+    if (nProngs == 1){
+        Increment_nCut(cutList.nCut_Particle_None, study1, study2);
+        Increment_nCut(cutList.nCut_Proton_None, study1, study2);
+        Increment_nCut(cutList.nCut_ProtonScore, study1, study2);
+        Increment_nCut(cutList.nCut_DeltaInvMass, study1, study2);
+    }
     
     // 2+ Prong Events Must pass the following Cuts
     if ( nProngs > 1 ){
         if( Cut_Particle_None == 1) return false;
-        cutList.nCut_2Prong_Particle_None.increment(truth_isSignal, study1, study2);
+        Increment_nCut(cutList.nCut_Particle_None, study1, study2);
         
         if( Cut_Proton_None == 1) return false;
-        cutList.nCut_2Prong_Proton_None.increment(truth_isSignal, study1, study2);
+        Increment_nCut(cutList.nCut_Proton_None, study1, study2);
        
         // Apply Proton Score to All Proton Candidates
         for( unsigned int i = 0; i < 10 && CCProtonPi0_all_protons_LLRScore[i] != -9.9; i++){
             if ( applyProtonScore ){
-                    FillHistogram(cutList.hCut_protonScore_LLR,CCProtonPi0_all_protons_LLRScore[i]);
-                    if ( CCProtonPi0_all_protons_LLRScore[i] < minProtonScore_LLR ) return false;
                 // Use pID Difference for KE < pID_KE_Limit 
                 // Use LLR for KE > pID_KE_Limit
-           //     if (CCProtonPi0_all_protons_KE[i] < pID_KE_Limit ){
-           //         double pIDDiff = CCProtonPi0_all_protons_protonScore[i] - CCProtonPi0_all_protons_pionScore[i];
-           //         FillHistogram(cutList.hCut_protonScore_pIDDiff,pIDDiff);
-           //         if ( pIDDiff < minPIDDiff ) return false;
-           //     }else{
-           //         FillHistogram(cutList.hCut_protonScore_LLR,CCProtonPi0_all_protons_LLRScore[i]);
-           //         if ( CCProtonPi0_all_protons_LLRScore[i] < minProtonScore_LLR ) return false;
-           //     }
+                if (CCProtonPi0_all_protons_KE[i] < pID_KE_Limit ){
+                    double pIDDiff = CCProtonPi0_all_protons_protonScore[i] - CCProtonPi0_all_protons_pionScore[i];
+                    FillHistogram(cutList.hCut_2Track_protonScore_pIDDiff,pIDDiff);
+                    if ( pIDDiff < minPIDDiff ) return false;
+                }else{
+                    FillHistogram(cutList.hCut_2Track_protonScore_LLR,CCProtonPi0_all_protons_LLRScore[i]);
+                    if ( CCProtonPi0_all_protons_LLRScore[i] < minProtonScore_LLR ) return false;
+                }
             }
         }
-        cutList.nCut_2Prong_ProtonScore.increment(truth_isSignal, study1, study2);
+        Increment_nCut(cutList.nCut_ProtonScore, study1, study2);
         
         double delta_invMass = calcDeltaInvariantMass();
-        FillHistogram(cutList.hCut_deltaInvMass,delta_invMass);
+        FillHistogram(cutList.hCut_2Track_deltaInvMass,delta_invMass);
         if (applyDeltaInvMass){
             if ( delta_invMass < min_Delta_invMass || delta_invMass > max_Delta_invMass) return false;  
         }
-        cutList.nCut_2Prong_DeltaInvMass.increment(truth_isSignal, study1, study2);
+        Increment_nCut(cutList.nCut_DeltaInvMass, study1, study2);
     }
 
-    //-------------------------------------------------------------------------
-    // Different Statistics for Different Topologies
-    //      Muon + Pi0
-    //      Muon + Pi0 + X (No Meson)
-    //-------------------------------------------------------------------------
-    // Fill Neutrino Energy Cut Hists
-    if(nProngs == 1) FillHistogram(cutList.hCut_1Prong_neutrinoE,CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
-    if(nProngs >= 2) FillHistogram(cutList.hCut_2Prong_neutrinoE,CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV); 
-    if( applyBeamEnergy && ((CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV) > max_beamEnergy)) return false;
-    if(nProngs == 1) cutList.nCut_1Prong_beamEnergy.increment(truth_isSignal, study1, study2);
-    if(nProngs >= 2) cutList.nCut_2Prong_beamEnergy.increment(truth_isSignal, study1, study2);
-   
-    // Fill Unused Energy Cut Hists 
-    if(nProngs == 1) FillHistogram(cutList.hCut_1Prong_UnusedE,energyUnused_afterReco);
-    if(nProngs >= 2) FillHistogram(cutList.hCut_2Prong_UnusedE,energyUnused_afterReco);
-    if( applyUnusedE && (energyUnused_afterReco > maxUnusedE)) return false;
-    if(nProngs == 1) cutList.nCut_1Prong_UnusedE.increment(truth_isSignal, study1, study2);
-    if(nProngs >= 2) cutList.nCut_2Prong_UnusedE.increment(truth_isSignal, study1, study2);
-        
-    return true;
+    // Neutrino Energy Cut
+    if (nProngs == 1) FillHistogram(cutList.hCut_1Track_neutrinoE,CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV);
+    else FillHistogram(cutList.hCut_2Track_neutrinoE,CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV); 
     
+    if ( applyBeamEnergy && ((CCProtonPi0_neutrino_E_Cal * HEP_Functions::MeV_to_GeV) > max_beamEnergy)) return false;
+    Increment_nCut(cutList.nCut_beamEnergy, study1, study2);
+   
+    // Unused Energy Cut  
+    if (nProngs == 1) FillHistogram(cutList.hCut_1Track_UnusedE,energyUnused_afterReco);
+    else FillHistogram(cutList.hCut_2Track_UnusedE,energyUnused_afterReco);
+    
+    if ( applyUnusedE && (energyUnused_afterReco > maxUnusedE)) return false;
+    Increment_nCut(cutList.nCut_UnusedE, study1, study2);
+       
+    //-------------------------------------------------------------------------
+    // Satisfied All Cuts
+    //-------------------------------------------------------------------------
+    return true;
 }
 
 void CCProtonPi0_Analyzer::fill_mc_w()
@@ -702,13 +735,16 @@ void CCProtonPi0_Analyzer::fillProtonReco()
 void CCProtonPi0_Analyzer::fillPi0True()
 {
   if (truth_isSignal){
-        double g1_reco_P = CCProtonPi0_gamma1_P * HEP_Functions::MeV_to_GeV;
+        double correction = 1.2;
+        double g1_reco_P = CCProtonPi0_gamma1_P * HEP_Functions::MeV_to_GeV * correction;
         double g1_true_P = HEP_Functions::calcMomentum(truth_gamma1_4P[0],truth_gamma1_4P[1],truth_gamma1_4P[2]) * HEP_Functions::MeV_to_GeV;
         double g1_P_error = Data_Functions::getError(g1_true_P, g1_reco_P);
         double g2_reco_P = CCProtonPi0_gamma2_P * HEP_Functions::MeV_to_GeV;
         double g2_true_P = HEP_Functions::calcMomentum(truth_gamma1_4P[0],truth_gamma1_4P[1],truth_gamma1_4P[2]) * HEP_Functions::MeV_to_GeV;
         double g2_P_error = Data_Functions::getError(g2_true_P, g2_reco_P);
-        
+        double mgg = sqrt(2*CCProtonPi0_gamma1_E * correction * CCProtonPi0_gamma2_E * (1-CCProtonPi0_pi0_cos_openingAngle));
+
+        pi0.mgg->Fill(mgg);
         pi0.gamma1_reco_P_true_P->Fill(g1_reco_P, g1_true_P);
         pi0.gamma1_P_error->Fill(g1_P_error);
 

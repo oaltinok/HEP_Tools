@@ -1,12 +1,12 @@
-cvs commit -m "v2_23
+cvs commit -m "v2_24
 CCProtonPi0 Updates:
 	No Major Change
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Analysis Completely Separated in 3 Topologies
-		Similar to All, Signal, Background but now it is for topologies
-		1 Track Events Analyzed and Saved under 1Track Folder
-		2+ Tracks Events Analyzed and Saved under 2Track Folder
-		All Events Analyzed and Saved under All Folder
-	Main.cpp  is designed to analyze or plot all Topologies every time
+	CutList Class is refactored for new analysis modes(1Track, 2Track)
+		Cut Statistics are calculated for different topologies right after MINOS Match Cut
+			and written in different Text Files
+		Cut Histograms are unique to Topology
+	main.cpp is improved
+		Now processing type (mc or data) is input argument
 " .
