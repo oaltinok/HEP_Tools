@@ -393,6 +393,32 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleTruthBranch("dispersed_unused_evis_neutron", -1.0);
     declareDoubleTruthBranch("dispersed_unused_evis_gamma", -1.0);
 
+    // Truth Match for Found Pi0 Blobs
+    declareIntTruthBranch("blob1_evis_most_pdg", -1);
+    declareDoubleTruthBranch("blob1_evis_total_norm", -1); 
+    declareDoubleTruthBranch("blob1_evis_total_truth", -1);
+    declareDoubleTruthBranch("blob1_evis_pizero", -1);
+    declareDoubleTruthBranch("blob1_evis_piplus", -1);
+    declareDoubleTruthBranch("blob1_evis_piminus", -1);
+    declareDoubleTruthBranch("blob1_evis_muon", -1);
+    declareDoubleTruthBranch("blob1_evis_proton", -1);
+    declareDoubleTruthBranch("blob1_evis_neutron", -1);
+    declareDoubleTruthBranch("blob1_evis_gamma", -1);
+    declareDoubleTruthBranch("blob1_evis_electron", -1);
+    declareDoubleTruthBranch("blob1_evis_positron", -1);
+
+    declareIntTruthBranch("blob2_evis_most_pdg", -1);
+    declareDoubleTruthBranch("blob2_evis_total_norm", -1); 
+    declareDoubleTruthBranch("blob2_evis_total_truth", -1);
+    declareDoubleTruthBranch("blob2_evis_pizero", -1);
+    declareDoubleTruthBranch("blob2_evis_piplus", -1);
+    declareDoubleTruthBranch("blob2_evis_piminus", -1);
+    declareDoubleTruthBranch("blob2_evis_muon", -1);
+    declareDoubleTruthBranch("blob2_evis_proton", -1);
+    declareDoubleTruthBranch("blob2_evis_neutron", -1);
+    declareDoubleTruthBranch("blob2_evis_gamma", -1);
+    declareDoubleTruthBranch("blob2_evis_electron", -1);
+    declareDoubleTruthBranch("blob2_evis_positron", -1);
 
     // ------------------------------------------------------------------------       
     // Event Branches
@@ -870,7 +896,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     }
   
     // Set Data for Blobs found in ConeBlobs()
-    setBlobData(event);
+    setBlobData(event, truthEvent);
 
     if ( !AreBlobsDirectionGood(event) ){
         event->setIntData("Cut_BlobDirectionBad",1);
@@ -3785,7 +3811,7 @@ bool CCProtonPi0::AreBlobsDirectionGood(Minerva::PhysicsEvent *event) const
     else return false;
 }
 
-void CCProtonPi0::setBlobData( Minerva::PhysicsEvent* event) const
+void CCProtonPi0::setBlobData(Minerva::PhysicsEvent* event, Minerva::GenMinInteraction *truthEvent) const
 {
     debug()<<"CCProtonPi0::setBlobData()"<<endmsg;
 
@@ -3812,6 +3838,9 @@ void CCProtonPi0::setBlobData( Minerva::PhysicsEvent* event) const
     event->setIntData("gamma2_blob_nclusters", m_Pi0Blob2->nclusters());
     event->setIntData("gamma2_blob_ndigits", m_Pi0Blob2->getAllDigits().size());
 
+    if (truthEvent){
+        SaveTruthClusterEnergy_FoundBlobs(truthEvent);
+    }
 }
 
 //==============================================================================
@@ -5532,6 +5561,49 @@ void CCProtonPi0::SaveTruthUnusedClusterEnergyInsideDetector(Minerva::GenMinInte
     truthEvent->setDoubleData("other_unused_evis_proton", otherInfo.GetEdepByPdg(PDG::proton));
     truthEvent->setDoubleData("other_unused_evis_neutron", otherInfo.GetEdepByPdg(PDG::neutron));
 }
+
+void CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs(Minerva::GenMinInteraction *truthEvent) const
+{
+    debug()<<"Enter CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs()"<<endmsg;
+    // Get Blob 1 Clusters
+    SmartRefVector<Minerva::IDCluster> blob1Clusters = m_Pi0Blob1->clusters();
+    DigitVectorTruthInfo blob1Info;
+    blob1Info.ParseTruth(blob1Clusters, fTrajectoryMap);
+
+    truthEvent->setIntData("blob1_evis_most_pdg", blob1Info.GetMostEvisPdg());
+    truthEvent->setDoubleData("blob1_evis_total_norm", blob1Info.GetTotalNormEnergy());
+    truthEvent->setDoubleData("blob1_evis_total_truth", blob1Info.GetTotalTruthEnergy());
+    truthEvent->setDoubleData("blob1_evis_pizero", blob1Info.GetEdepByPdg(PDG::pi0));
+    truthEvent->setDoubleData("blob1_evis_piplus", blob1Info.GetEdepByPdg(PDG::pi));
+    truthEvent->setDoubleData("blob1_evis_piminus", blob1Info.GetEdepByPdg(-(PDG::pi)));
+    truthEvent->setDoubleData("blob1_evis_muon", blob1Info.GetEdepByPdg(PDG::muon));
+    truthEvent->setDoubleData("blob1_evis_proton", blob1Info.GetEdepByPdg(PDG::proton));
+    truthEvent->setDoubleData("blob1_evis_neutron", blob1Info.GetEdepByPdg(PDG::neutron));
+    truthEvent->setDoubleData("blob1_evis_gamma", blob1Info.GetEdepByPdg(PDG::gamma));
+    truthEvent->setDoubleData("blob1_evis_electron", blob1Info.GetEdepByPdg(PDG::electron));
+    truthEvent->setDoubleData("blob1_evis_positron", blob1Info.GetEdepByPdg(-(PDG::electron)));
+
+    // Get Blob 2 Clusters
+    SmartRefVector<Minerva::IDCluster> blob2Clusters = m_Pi0Blob2->clusters();
+    DigitVectorTruthInfo blob2Info;
+    blob2Info.ParseTruth(blob2Clusters, fTrajectoryMap);
+
+    truthEvent->setIntData("blob2_evis_most_pdg", blob2Info.GetMostEvisPdg());
+    truthEvent->setDoubleData("blob2_evis_total_norm", blob2Info.GetTotalNormEnergy());
+    truthEvent->setDoubleData("blob2_evis_total_truth", blob2Info.GetTotalTruthEnergy());
+    truthEvent->setDoubleData("blob2_evis_pizero", blob2Info.GetEdepByPdg(PDG::pi0));
+    truthEvent->setDoubleData("blob2_evis_piplus", blob2Info.GetEdepByPdg(PDG::pi));
+    truthEvent->setDoubleData("blob2_evis_piminus", blob2Info.GetEdepByPdg(-(PDG::pi)));
+    truthEvent->setDoubleData("blob2_evis_muon", blob2Info.GetEdepByPdg(PDG::muon));
+    truthEvent->setDoubleData("blob2_evis_proton", blob2Info.GetEdepByPdg(PDG::proton));
+    truthEvent->setDoubleData("blob2_evis_neutron", blob2Info.GetEdepByPdg(PDG::neutron));
+    truthEvent->setDoubleData("blob2_evis_gamma", blob2Info.GetEdepByPdg(PDG::gamma));
+    truthEvent->setDoubleData("blob2_evis_electron", blob2Info.GetEdepByPdg(PDG::electron));
+    truthEvent->setDoubleData("blob2_evis_positron", blob2Info.GetEdepByPdg(-(PDG::electron)));
+
+    debug()<<"Exit CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs()"<<endmsg;
+}
+
 
 
 void CCProtonPi0::SaveTruthUnusedClusterEnergyNearVertex(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> vertexClusters) const

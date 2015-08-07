@@ -16,6 +16,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     plotPion();
     //plotInteraction();
     //plotCutHistograms();
+    plotOther();
 }
 
 CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
@@ -29,6 +30,21 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
     
     setRootDirs(ana_folder); 
     setPlotDirs(ana_folder);
+}
+
+void CCProtonPi0_Plotter::plotOther()
+{
+    std::cout<<"Plotting Other"<<std::endl;
+    std::string plotDir = plotDir_Other;
+    
+    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nVertices",plotDir);
+    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nProngs",plotDir);
+    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nProngs2",plotDir);
+    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks",plotDir);
+    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks2",plotDir);
+    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks_Close",plotDir);
+    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks_Far",plotDir);
+    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks_Discarded",plotDir);
 }
 
 void CCProtonPi0_Plotter::plotInteraction()
@@ -334,7 +350,7 @@ void CCProtonPi0_Plotter::setPlotDirs(std::string ana_folder)
     plotDir_Muon = Folder_List::output + Folder_List::plotOut + ana_folder + "Muon/";
     plotDir_Proton = Folder_List::output + Folder_List::plotOut + ana_folder + "Proton/";
     plotDir_Pion = Folder_List::output + Folder_List::plotOut + ana_folder + "Pion/";
-    otherDir = Folder_List::output + Folder_List::plotOut + ana_folder + Folder_List::other;
+    plotDir_Other = Folder_List::output + Folder_List::plotOut + ana_folder + "Other/";
 }
 
 #endif

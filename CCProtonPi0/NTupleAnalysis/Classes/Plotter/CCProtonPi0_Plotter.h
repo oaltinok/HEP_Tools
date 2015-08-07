@@ -80,8 +80,6 @@ class CCProtonPi0_Plotter
         double mc_POT;
         double POT_Ratio_data_mc;
         
-        std::string otherDir;
-
         rootDir rootDir_CutHists;
         rootDir rootDir_Interaction;
         rootDir rootDir_Muon;
@@ -93,11 +91,13 @@ class CCProtonPi0_Plotter
         std::string plotDir_Muon;
         std::string plotDir_Proton;
         std::string plotDir_Pion;
+        std::string plotDir_Other;
         
         void setRootDirs(std::string ana_folder);
         void setPlotDirs(std::string ana_folder);
        
         // Default Plots
+        void plotOther();
         void plotInteraction();
         void plotMuon();
         void plotProton();
@@ -117,6 +117,7 @@ class CCProtonPi0_Plotter
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
         void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawMCWithErrorBand(rootDir& dir, std::string var_name, std::string plotDir);
+        void DrawStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());

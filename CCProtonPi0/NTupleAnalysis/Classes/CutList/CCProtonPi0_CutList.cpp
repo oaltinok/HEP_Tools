@@ -46,6 +46,49 @@ void CCProtonPi0_CutList::initHistograms()
 
     for (int i = 0; i < nHistograms; i++){
         // --------------------------------------------------------------------
+        // Common
+        // --------------------------------------------------------------------
+        temp = new MnvH1D( Form("%s_%d","hCut_nVertices",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Vertex)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_nVertices.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_nTracks",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Tracks)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_nTracks.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_nTracks2",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Tracks_Close) + N(Tracks_Far) - should be same with nTracks");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_nTracks2.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Close",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Tracks_Close)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_nTracks_Close.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Far",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Tracks_Far)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_nTracks_Far.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Discarded",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Tracks_Discarded)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_nTracks_Discarded.push_back(temp);
+        
+        temp = new MnvH1D( Form("%s_%d","hCut_nProngs",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Prongs)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_nProngs.push_back(temp);
+        
+        temp = new MnvH1D( Form("%s_%d","hCut_nProngs2",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Prongs) - should be same with nTracks");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_nProngs2.push_back(temp);
+
+        // --------------------------------------------------------------------
         // 1 Track
         // --------------------------------------------------------------------
         temp = new MnvH1D( Form("%s_%d","hCut_1Track_Michel",i),Form("%d",i),binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
@@ -385,6 +428,16 @@ void CCProtonPi0_CutList::writeHistograms()
     std::cout<<">> Writing "<<rootDir<<std::endl;
     f->cd();
     for (int i = 0; i < nHistograms; i++){
+        // Common
+        hCut_nVertices[i]->Write();
+        hCut_nProngs[i]->Write();
+        hCut_nProngs2[i]->Write();
+        hCut_nTracks[i]->Write();
+        hCut_nTracks2[i]->Write();
+        hCut_nTracks_Close[i]->Write();
+        hCut_nTracks_Far[i]->Write();
+        hCut_nTracks_Discarded[i]->Write();
+        
         // 1 Track
         hCut_1Track_Michel[i]->Write();
         hCut_1Track_eVis_nuclearTarget[i]->Write();

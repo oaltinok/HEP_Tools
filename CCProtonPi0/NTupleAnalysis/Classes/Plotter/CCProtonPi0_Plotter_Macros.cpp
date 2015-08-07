@@ -422,7 +422,59 @@ void CCProtonPi0_Plotter::AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow)
     plotter->AddCutArrow(cut_location, ymin, ymax, arrow_length, arrow_direction); 
 }
 
+void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
+{
+    std::string rootDir_mc = dir.mc;
 
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+  
+    std::string var;
+    
+    // ------------------------------------------------------------------------
+    // Fill TObjArray - For MC Histograms
+    // ------------------------------------------------------------------------
+    TObjArray* mc_hists = new TObjArray;
+    MnvH1D* temp;
+   
+    // Get All Background
+    var = Form("%s_%d",var_name.c_str(),2);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Background");
+    mc_hists->Add(temp);
+    
+    // Get Signal
+    var = Form("%s_%d",var_name.c_str(),1);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Signal");
+    mc_hists->Add(temp);
+
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+    ApplyStyle(plotter);
+    plotter->DrawStackedMC(mc_hists,1,"TR");
+   
+    // Add Plot Labels
+    const double y_pos = 0.88;
+    const double y_diff = 0.033;
+    plotter->AddPlotLabel("v2_25",0.3,y_pos,y_diff,kBlue);
+    //plotter->AddPOTNormBox(data_POT,mc_POT,0.3,y_pos-y_diff);
+    
+    // If Cut Histogram - Add Cut Arrows
+    if (nCutArrows == 1){
+        AddCutArrow(plotter, cutArrow1);
+    }else if (nCutArrows == 2){
+        AddCutArrow(plotter,cutArrow1);
+        AddCutArrow(plotter,cutArrow2);
+    }
+
+    // Print Plot
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_all.png"), "png");
+
+    delete c;
+}
 
 #endif
 

@@ -60,6 +60,16 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         // -------------------------------------------------------------------------
         // Cut Histograms
         // -------------------------------------------------------------------------
+        // Common
+        vector<MnvH1D*> hCut_nVertices;
+        vector<MnvH1D*> hCut_nTracks;
+        vector<MnvH1D*> hCut_nTracks2;
+        vector<MnvH1D*> hCut_nTracks_Close;
+        vector<MnvH1D*> hCut_nTracks_Far;
+        vector<MnvH1D*> hCut_nTracks_Discarded;
+        vector<MnvH1D*> hCut_nProngs;
+        vector<MnvH1D*> hCut_nProngs2;
+        
         // 1Track
         vector<MnvH1D*> hCut_1Track_Michel;
         vector<MnvH1D*> hCut_1Track_eVis_nuclearTarget;
