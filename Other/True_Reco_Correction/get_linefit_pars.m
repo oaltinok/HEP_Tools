@@ -1,4 +1,4 @@
-function [ p ] = get_fit_pars( source_file )
+function [ p ] = get_linefit_pars( source_file )
 
 [x, y] = get_values(source_file);
 

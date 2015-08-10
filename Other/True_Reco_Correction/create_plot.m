@@ -11,25 +11,33 @@ ylim(axes1,[0 1]);
 box(axes1,'on');
 hold(axes1,'all');
 
-% Form x = y 
+% Add true vs reco Points
+plot (reco,true, 'k.','MarkerSize',10);
+
+% Form y = x 
 x = linspace(0,1,1000);
 y = x;
-
-% Plot x = y Line
+% Plot y = x Line
 plot (x,y,'b-','LineWidth',1.5);
 
 % Add true vs reco Fit Line
 yfit = polyval(p,x);
 plot (x,yfit, 'r-','LineWidth',1.5);
 
-% Add true vs reco Points
-plot (reco,true, 'k.','MarkerSize',10);
+% Form y = 1.2x -- Best Fit for Gamma Energy
+y_best = 1.2*x;
+% Plot y = x Line
+plot (x,y_best,'g-','LineWidth',1.5);
+
 
 xlabel('Reconstructed P_{\gamma} [GeV]','FontWeight','bold','FontSize',24);
 ylabel('True P_{\gamma} [GeV]','FontWeight','bold','FontSize',24);
 
-% Add Legend
-legend_text = sprintf('y = %fx + %f', p(1), p(2));
-legend('y = x',legend_text,'Location','northwest');
+% Add Legend'
+legend_points = sprintf('abs(y-x/y) < %2.1f',0.3);
+legend_y_x = sprintf('y = x');
+legend_fit = sprintf('y_{fit} = %4.3fx + %4.3f', p(1), p(2));
+legend_best = sprintf('y_{best} = %2.1fx',1.2);
+legend(legend_points, legend_y_x, legend_fit, legend_best, 'Location','northwest');
 
 end
