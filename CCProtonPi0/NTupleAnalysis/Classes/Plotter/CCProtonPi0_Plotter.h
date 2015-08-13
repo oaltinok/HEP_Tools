@@ -32,6 +32,7 @@ Class: CCProtonPi0_Plotter
 #include <TGraph.h>
 #include <TFile.h>
 #include <TCanvas.h>
+#include <TLatex.h>
 #include <PlotUtils/MnvPlotter.h>
 #include <PlotUtils/MnvH2D.h>
 #include <PlotUtils/MnvH1D.h>
@@ -85,6 +86,7 @@ class CCProtonPi0_Plotter
         rootDir rootDir_Muon;
         rootDir rootDir_Proton;
         rootDir rootDir_Pion;
+        rootDir rootDir_Pi0Blob;
         
         std::string plotDir_CutHists;
         std::string plotDir_Interaction;
@@ -97,6 +99,7 @@ class CCProtonPi0_Plotter
         void setPlotDirs(std::string ana_folder);
        
         // Default Plots
+        void plotPi0Blob();
         void plotOther();
         void plotInteraction();
         void plotMuon();

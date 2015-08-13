@@ -273,13 +273,20 @@ StatusCode CCProtonPi0::initialize()
     declareIntTruthBranch( "vertex_module", 500);
     declareIntTruthBranch( "vertex_plane", 0);
     declareIntTruthBranch( "target_material", -1); 
-    
+   
+    // Signal Kinematics
     declareContainerDoubleTruthBranch("muon_4P", 4, SENTINEL );
     declareContainerDoubleTruthBranch("proton_4P", 4, SENTINEL );
     declareContainerDoubleTruthBranch("pi0_4P", 4, SENTINEL );
     declareContainerDoubleTruthBranch("gamma1_4P", 4, SENTINEL );
     declareContainerDoubleTruthBranch("gamma2_4P", 4, SENTINEL );
-    
+    declareContainerDoubleTruthBranch("gamma1_init_pos", 3, SENTINEL );
+    declareContainerDoubleTruthBranch("gamma2_init_pos", 3, SENTINEL );
+    declareContainerDoubleTruthBranch("gamma1_final_pos", 3, SENTINEL );
+    declareContainerDoubleTruthBranch("gamma2_final_pos", 3, SENTINEL );
+    declareBoolTruthBranch("isGamma1_conv_inside");
+    declareBoolTruthBranch("isGamma2_conv_inside");
+
     declareIntTruthBranch("pi0_status", -9 );
     declareIntTruthBranch("pi0_Mother", -9 );
     declareIntTruthBranch("pi0_MotherStatus", -9 );   
@@ -403,9 +410,6 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleTruthBranch("blob1_evis_muon", -1);
     declareDoubleTruthBranch("blob1_evis_proton", -1);
     declareDoubleTruthBranch("blob1_evis_neutron", -1);
-    declareDoubleTruthBranch("blob1_evis_gamma", -1);
-    declareDoubleTruthBranch("blob1_evis_electron", -1);
-    declareDoubleTruthBranch("blob1_evis_positron", -1);
 
     declareIntTruthBranch("blob2_evis_most_pdg", -1);
     declareDoubleTruthBranch("blob2_evis_total_norm", -1); 
@@ -416,9 +420,11 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleTruthBranch("blob2_evis_muon", -1);
     declareDoubleTruthBranch("blob2_evis_proton", -1);
     declareDoubleTruthBranch("blob2_evis_neutron", -1);
-    declareDoubleTruthBranch("blob2_evis_gamma", -1);
-    declareDoubleTruthBranch("blob2_evis_electron", -1);
-    declareDoubleTruthBranch("blob2_evis_positron", -1);
+
+    declareDoubleTruthBranch("total_captured_evis_total_norm", -1);
+    declareDoubleTruthBranch("total_captured_evis_total_truth", -1);
+    declareDoubleTruthBranch("total_captured_evis_pizero", -1);
+    declareDoubleTruthBranch("allClusters_evis_pizero", -1);
 
     // ------------------------------------------------------------------------       
     // Event Branches
@@ -498,7 +504,11 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("RE_energy_HCAL", SENTINEL);
     declareIntEventBranch("anglescan_ncandx", -1);
     declareIntEventBranch("anglescan_ncand", -1);
-    
+    declareBoolEventBranch("is_anglescan");
+    declareBoolEventBranch("is_anglescan_applied");
+    declareBoolEventBranch("is_houghtransform");
+    declareBoolEventBranch("is_houghtransform_applied");
+
     // processBlobs() -- Called from ConeBlobs()
     declareIntEventBranch("g1blob_1ParFit_ndof", -1);
     declareIntEventBranch("g2blob_1ParFit_ndof", -1);
@@ -1832,9 +1842,20 @@ void CCProtonPi0::saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int
 void CCProtonPi0::SetSignalKinematics(Minerva::GenMinInteraction* truthEvent) const
 {
     debug()<<"Enter: CCProtonPi0::SetSignalKinematics"<<endmsg;
-   
+    
+    int Pi0_ID = -1; // Pi0_ID will be updated while setting primary trajectory kinematics
+
+    SetSignal_PrimaryTrajectoryKinematics(truthEvent, Pi0_ID);
+    SetSignal_SecondaryTrajectoryKinematics(truthEvent,Pi0_ID);
+
+    debug()<<"Exit: CCProtonPi0::SetSignalKinematics"<<endmsg;
+}
+
+void CCProtonPi0::SetSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const
+{
     const double SENTINEL = -9.9;
 
+    // Get MC Trajectories
     Minerva::TG4Trajectories* trajects = NULL;
     Minerva::TG4Trajectories::iterator it_mcpart;
     if( exist<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default ) ) {
@@ -1846,109 +1867,169 @@ void CCProtonPi0::SetSignalKinematics(Minerva::GenMinInteraction* truthEvent) co
 
     // just to make sure
     if( !trajects ) return;
-    
+   
+    // Information to be Saved
     std::vector<double> muon_4P(4,SENTINEL);
     std::vector<double> pi0_4P(4,SENTINEL);
     std::vector<double> proton_4P(4,SENTINEL);
-    std::vector<double> gamma1_4P(4,SENTINEL);
-    std::vector<double> gamma2_4P(4,SENTINEL);
-    
+
+    // Loop Vars
     Gaudi::LorentzVector temp_4P;
     int particle_PDG;
     int particle_ID;
-    int mother_ID;
-    int pi0_ID = -1;
     int max_protonE = 0.0;
-    bool isFirstGamma = true;
-    
-    // -------------------------------------------------------------------------
-    // Identify and Save Primary Trajectory Kinematics
-    // -------------------------------------------------------------------------
-    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
-        
-        if ( (*it_mcpart)->GetProcessName() == "Primary"){
-            
-            temp_4P = (*it_mcpart)->GetInitialMomentum();
-            particle_PDG = (*it_mcpart)->GetPDGCode();
-            particle_ID = (*it_mcpart)->GetTrackId();
-                        
-            if (particle_PDG == PDG::muon){
-                muon_4P[0] = temp_4P.px();  
-                muon_4P[1] = temp_4P.py(); 
-                muon_4P[2] = temp_4P.pz(); 
-                muon_4P[3] = temp_4P.E(); 
-            }else if (particle_PDG == PDG::pi0){
-                pi0_ID = particle_ID;
-                pi0_4P[0] = temp_4P.px();  
-                pi0_4P[1] = temp_4P.py(); 
-                pi0_4P[2] = temp_4P.pz(); 
-                pi0_4P[3] = temp_4P.E();  
-            }else if ((particle_PDG == PDG::proton) && (max_protonE < temp_4P.E()) ){
-                proton_4P[0] = temp_4P.px();  
-                proton_4P[1] = temp_4P.py(); 
-                proton_4P[2] = temp_4P.pz(); 
-                proton_4P[3] = temp_4P.E();  
-                // Update max_ProtonE
-                max_protonE = temp_4P.E();
-            }
-        }
-    }
-    
-    // -------------------------------------------------------------------------
-    // Save Pi0 Daughters: 2x Gamma
-    // -------------------------------------------------------------------------
-    isFirstGamma = true;
-    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
-    
-        if ( (*it_mcpart)->GetProcessName() != "Primary"){
-            temp_4P = (*it_mcpart)->GetInitialMomentum();
-            particle_PDG = (*it_mcpart)->GetPDGCode();
-            mother_ID = (*it_mcpart)->GetParentId();
 
-            if (mother_ID == pi0_ID && particle_PDG == PDG::gamma) {
-                if (isFirstGamma){
-                    gamma1_4P[0] = temp_4P.px();  
-                    gamma1_4P[1] = temp_4P.py(); 
-                    gamma1_4P[2] = temp_4P.pz(); 
-                    gamma1_4P[3] = temp_4P.E(); 
-                    isFirstGamma = false;
-                }else{
-                    gamma2_4P[0] = temp_4P.px();  
-                    gamma2_4P[1] = temp_4P.py(); 
-                    gamma2_4P[2] = temp_4P.pz(); 
-                    gamma2_4P[3] = temp_4P.E(); 
-                }
-            } 
-        }   
-    }
-    
-    // Make sure Gamma1 is the more energetic one
-    if (gamma1_4P[3] < gamma2_4P[3]){
-        for(unsigned int i = 0; i < gamma1_4P.size(); i++){
-            double temp = gamma1_4P[i];
-            gamma1_4P[i] = gamma2_4P[i];
-            gamma2_4P[i] = temp;
+    // Loop Over Primary Trajectories
+    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+
+        if ( (*it_mcpart)->GetProcessName() != "Primary") continue;
+
+        particle_ID = (*it_mcpart)->GetTrackId();
+        particle_PDG = (*it_mcpart)->GetPDGCode();
+        temp_4P = (*it_mcpart)->GetInitialMomentum();
+
+        if (particle_PDG == PDG::muon){
+            muon_4P[0] = temp_4P.px();  
+            muon_4P[1] = temp_4P.py(); 
+            muon_4P[2] = temp_4P.pz(); 
+            muon_4P[3] = temp_4P.E(); 
+            debug()<<"True Muon 4P = "<<temp_4P<<endmsg;
+        }else if (particle_PDG == PDG::pi0){
+            Pi0_ID = particle_ID; // Update Pi0_ID
+            pi0_4P[0] = temp_4P.px();  
+            pi0_4P[1] = temp_4P.py(); 
+            pi0_4P[2] = temp_4P.pz(); 
+            pi0_4P[3] = temp_4P.E();
+            debug()<<"True Pi0 4P = "<<temp_4P<<endmsg;
+        }else if ((particle_PDG == PDG::proton) && (max_protonE < temp_4P.E()) ){
+            proton_4P[0] = temp_4P.px();  
+            proton_4P[1] = temp_4P.py(); 
+            proton_4P[2] = temp_4P.pz(); 
+            proton_4P[3] = temp_4P.E();  
+            // Update max_ProtonE
+            max_protonE = temp_4P.E();
+            debug()<<"True Proton 4P = "<<temp_4P<<endmsg;
         }
     }
-    
-    // Check Values
-    debug()<<"True Muon 4P = ("<<muon_4P[0]<<", "<<muon_4P[1]<<", "<<muon_4P[2]<<", "<<muon_4P[3]<<")"<<endmsg;
-    debug()<<"True Proton 4P = ("<<proton_4P[0]<<", "<<proton_4P[1]<<", "<<proton_4P[2]<<", "<<proton_4P[3]<<")"<<endmsg;
-    debug()<<"True Pi0 4P = ("<<pi0_4P[0]<<","<<pi0_4P[1]<<", "<<pi0_4P[2]<<", "<<pi0_4P[3]<<")"<<endmsg;
-    debug()<<"True Gamma1 4P = ("<<gamma1_4P[0]<<", "<<gamma1_4P[1]<<", "<<gamma1_4P[2]<<", "<<gamma1_4P[3]<<")"<<endmsg;
-    debug()<<"True Gamma2 4P = ("<<gamma2_4P[0]<<", "<<gamma2_4P[1]<<", "<<gamma2_4P[2]<<", "<<gamma2_4P[3]<<")"<<endmsg;
-    
-    //--------------------------------------------------------------------------
-    // fill the truthEvent info for Signal Kinematics
-    //--------------------------------------------------------------------------
-    debug()<<"Filling ntuple for truth Signal Kinematics info!"<<endmsg;
-    
+ 
+    // Save to NTuples
     truthEvent->setContainerDoubleData("muon_4P", muon_4P);
     truthEvent->setContainerDoubleData("pi0_4P", pi0_4P);
     truthEvent->setContainerDoubleData("proton_4P", proton_4P);
+}
+
+void CCProtonPi0::SetSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const
+{
+    const double SENTINEL = -9.9;
+
+    // Get MC Trajectories
+    Minerva::TG4Trajectories* trajects = NULL;
+    Minerva::TG4Trajectories::iterator it_mcpart;
+    if( exist<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default ) ) {
+        trajects = get<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default );
+    } else {
+        warning() << "Could not get TG4Trajectories from " << Minerva::TG4TrajectoryLocation::Default << endmsg;
+        return;
+    }
+
+    // just to make sure
+    if( !trajects ) return;
+   
+    // Information to be Saved
+    std::vector<double> gamma1_4P(4,SENTINEL);
+    std::vector<double> gamma2_4P(4,SENTINEL);
+    std::vector<double> gamma1_init_pos(3,SENTINEL);
+    std::vector<double> gamma1_final_pos(3,SENTINEL);
+    std::vector<double> gamma2_init_pos(3,SENTINEL);
+    std::vector<double> gamma2_final_pos(3,SENTINEL);
+    bool isGamma1_conv_inside = false;
+    bool isGamma2_conv_inside = false;
+
+    // Loop Vars
+    Gaudi::LorentzVector temp_4P;
+    Gaudi::LorentzVector temp_init_pos;
+    Gaudi::LorentzVector temp_final_pos;
+    int particle_PDG;
+    int mother_ID;
+    int nGammas = 0;
+
+    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+
+        if ( nGammas == 2) break;
+        if ( (*it_mcpart)->GetProcessName() == "Primary") continue;
+
+        temp_4P = (*it_mcpart)->GetInitialMomentum();
+        temp_init_pos = (*it_mcpart)->GetInitialPosition();
+        temp_final_pos = (*it_mcpart)->GetFinalPosition();
+        particle_PDG = (*it_mcpart)->GetPDGCode();
+        mother_ID = (*it_mcpart)->GetParentId();
+
+        if (mother_ID == Pi0_ID && particle_PDG == PDG::gamma) {
+            if (nGammas == 0){
+                gamma1_4P[0] = temp_4P.px();  
+                gamma1_4P[1] = temp_4P.py(); 
+                gamma1_4P[2] = temp_4P.pz(); 
+                gamma1_4P[3] = temp_4P.E(); 
+
+                gamma1_init_pos[0] = temp_init_pos.px();  
+                gamma1_init_pos[1] = temp_init_pos.py(); 
+                gamma1_init_pos[2] = temp_init_pos.pz(); 
+                
+                gamma1_final_pos[0] = temp_final_pos.px();  
+                gamma1_final_pos[1] = temp_final_pos.py(); 
+                gamma1_final_pos[2] = temp_final_pos.pz(); 
+                isGamma1_conv_inside = FiducialPointTool->isFiducial(temp_final_pos.x(), temp_final_pos.y(), temp_final_pos.z(), m_recoHexApothem, m_recoUpStreamZ, m_recoDownStreamZ);
+    
+                nGammas++;
+            }else if (nGammas == 1){
+                gamma2_4P[0] = temp_4P.px();  
+                gamma2_4P[1] = temp_4P.py(); 
+                gamma2_4P[2] = temp_4P.pz(); 
+                gamma2_4P[3] = temp_4P.E(); 
+
+                gamma2_init_pos[0] = temp_init_pos.px();  
+                gamma2_init_pos[1] = temp_init_pos.py(); 
+                gamma2_init_pos[2] = temp_init_pos.pz(); 
+                
+                gamma2_final_pos[0] = temp_final_pos.px();  
+                gamma2_final_pos[1] = temp_final_pos.py(); 
+                gamma2_final_pos[2] = temp_final_pos.pz(); 
+                isGamma2_conv_inside = FiducialPointTool->isFiducial(temp_final_pos.x(), temp_final_pos.y(), temp_final_pos.z(), m_recoHexApothem, m_recoUpStreamZ, m_recoDownStreamZ);
+
+                nGammas++;
+            }
+        }   
+    }
+
+    // Make sure Gamma1 is the more energetic one
+    if (gamma1_4P[3] < gamma2_4P[3]){
+        gamma1_4P.swap(gamma2_4P);
+        gamma1_init_pos.swap(gamma2_init_pos);
+        gamma1_final_pos.swap(gamma2_final_pos);
+    }
+
+    
+    // Check Values
+    debug()<<"True Gamma1 4P = ("<<gamma1_4P[0]<<", "<<gamma1_4P[1]<<", "<<gamma1_4P[2]<<", "<<gamma1_4P[3]<<")"<<endmsg;
+    debug()<<"True Gamma2 4P = ("<<gamma2_4P[0]<<", "<<gamma2_4P[1]<<", "<<gamma2_4P[2]<<", "<<gamma2_4P[3]<<")"<<endmsg;
+    debug()<<"True Gamma1 init_pos = ("<<gamma1_init_pos[0]<<", "<<gamma1_init_pos[1]<<", "<<gamma1_init_pos[2]<<")"<<endmsg;
+    debug()<<"True Gamma2 init_pos = ("<<gamma2_init_pos[0]<<", "<<gamma2_init_pos[1]<<", "<<gamma2_init_pos[2]<<")"<<endmsg;
+    debug()<<"True Gamma1 final_pos = ("<<gamma1_final_pos[0]<<", "<<gamma1_final_pos[1]<<", "<<gamma1_final_pos[2]<<")"<<endmsg;
+    debug()<<"True Gamma2 final_pos = ("<<gamma2_final_pos[0]<<", "<<gamma2_final_pos[1]<<", "<<gamma2_final_pos[2]<<")"<<endmsg;
+    debug()<<"Gamma1 Converted Inside? = "<<isGamma1_conv_inside<<endmsg;
+    debug()<<"Gamma2 Converted Inside? = "<<isGamma2_conv_inside<<endmsg;
+
+    // Fill NTuples
     truthEvent->setContainerDoubleData("gamma1_4P",  gamma1_4P);
     truthEvent->setContainerDoubleData("gamma2_4P",  gamma2_4P);
+    truthEvent->setContainerDoubleData("gamma1_init_pos",  gamma1_init_pos);
+    truthEvent->setContainerDoubleData("gamma2_init_pos",  gamma2_init_pos);
+    truthEvent->setContainerDoubleData("gamma1_final_pos",  gamma1_final_pos);
+    truthEvent->setContainerDoubleData("gamma2_final_pos",  gamma2_final_pos);
+    truthEvent->filtertaglist()->setOrAddFilterTag("isGamma1_conv_inside", isGamma1_conv_inside );
+    truthEvent->filtertaglist()->setOrAddFilterTag("isGamma2_conv_inside", isGamma2_conv_inside );
 }
+
 
 //------------------------------------------------------------------------------
 // writeFSParticleTable() writes Final State Particle Table using truth information
@@ -3697,26 +3778,26 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
     // Analyze usableClusters using HoughBlob Function 
     //      If AngleScan cannot find exactly 2 Blobs
     //--------------------------------------------------------------------------
-  
+    unsigned int nblob_hough     = 0;  
+    
+    if ( !isAngleScan && !additional) { 
 
-   // if ( !isAngleScan && !additional) { 
-
-   //     /* 
-   //         Blobs found by the AngleScan are not managed, delete them here and
-   //         empty the container 
-   //     */
-   //     for (std::vector<Minerva::IDBlob*>::iterator b = foundBlobs.begin();
-   //          b != foundBlobs.end(); ++b) {
-   //         delete *b;
-   //     }
-   //     foundBlobs.clear();
-   //     
-   //     StatusCode sc = HoughBlob(event, usableClusters, foundBlobs );
-   //     nblob_hough = foundBlobs.size();
-   //     
-   //     if ( sc && foundBlobs.size() == 2) isHough = true;
-   //     isHoughApplied = true;   
-   // }
+        /* 
+            Blobs found by the AngleScan are not managed, delete them here and
+            empty the container 
+        */
+        for (std::vector<Minerva::IDBlob*>::iterator b = foundBlobs.begin();
+             b != foundBlobs.end(); ++b) {
+            delete *b;
+        }
+        foundBlobs.clear();
+        
+        StatusCode sc = HoughBlob(event, usableClusters, foundBlobs );
+        nblob_hough = foundBlobs.size();
+        
+        if ( sc && foundBlobs.size() == 2) isHough = true;
+        isHoughApplied = true;   
+    }
 
     event->filtertaglist()->setOrAddFilterTag( "is_anglescan", isAngleScan );
     event->filtertaglist()->setOrAddFilterTag( "is_anglescan_applied",isAngleScanApplied);
@@ -3838,8 +3919,11 @@ void CCProtonPi0::setBlobData(Minerva::PhysicsEvent* event, Minerva::GenMinInter
     event->setIntData("gamma2_blob_nclusters", m_Pi0Blob2->nclusters());
     event->setIntData("gamma2_blob_ndigits", m_Pi0Blob2->getAllDigits().size());
 
+    debug()<<"gamma1_nDigits_blob = "<<m_Pi0Blob1->getAllDigits().size()<<endmsg;
+    debug()<<"gamma2_nDigits_blob = "<<m_Pi0Blob2->getAllDigits().size()<<endmsg;
+
     if (truthEvent){
-        SaveTruthClusterEnergy_FoundBlobs(truthEvent);
+        SaveTruthClusterEnergy_FoundBlobs(event, truthEvent);
     }
 }
 
@@ -5562,7 +5646,7 @@ void CCProtonPi0::SaveTruthUnusedClusterEnergyInsideDetector(Minerva::GenMinInte
     truthEvent->setDoubleData("other_unused_evis_neutron", otherInfo.GetEdepByPdg(PDG::neutron));
 }
 
-void CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs(Minerva::GenMinInteraction *truthEvent) const
+void CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs(Minerva::PhysicsEvent* event, Minerva::GenMinInteraction *truthEvent) const
 {
     debug()<<"Enter CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs()"<<endmsg;
     // Get Blob 1 Clusters
@@ -5579,9 +5663,6 @@ void CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs(Minerva::GenMinInteraction *
     truthEvent->setDoubleData("blob1_evis_muon", blob1Info.GetEdepByPdg(PDG::muon));
     truthEvent->setDoubleData("blob1_evis_proton", blob1Info.GetEdepByPdg(PDG::proton));
     truthEvent->setDoubleData("blob1_evis_neutron", blob1Info.GetEdepByPdg(PDG::neutron));
-    truthEvent->setDoubleData("blob1_evis_gamma", blob1Info.GetEdepByPdg(PDG::gamma));
-    truthEvent->setDoubleData("blob1_evis_electron", blob1Info.GetEdepByPdg(PDG::electron));
-    truthEvent->setDoubleData("blob1_evis_positron", blob1Info.GetEdepByPdg(-(PDG::electron)));
 
     // Get Blob 2 Clusters
     SmartRefVector<Minerva::IDCluster> blob2Clusters = m_Pi0Blob2->clusters();
@@ -5597,9 +5678,27 @@ void CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs(Minerva::GenMinInteraction *
     truthEvent->setDoubleData("blob2_evis_muon", blob2Info.GetEdepByPdg(PDG::muon));
     truthEvent->setDoubleData("blob2_evis_proton", blob2Info.GetEdepByPdg(PDG::proton));
     truthEvent->setDoubleData("blob2_evis_neutron", blob2Info.GetEdepByPdg(PDG::neutron));
-    truthEvent->setDoubleData("blob2_evis_gamma", blob2Info.GetEdepByPdg(PDG::gamma));
-    truthEvent->setDoubleData("blob2_evis_electron", blob2Info.GetEdepByPdg(PDG::electron));
-    truthEvent->setDoubleData("blob2_evis_positron", blob2Info.GetEdepByPdg(-(PDG::electron)));
+
+    // Total Captured Visible Energy ==> Blob1 + Blob2
+    double total_captured_evis_total_norm = blob1Info.GetTotalNormEnergy() + blob2Info.GetTotalNormEnergy();
+    double total_captured_evis_total_truth = blob1Info.GetTotalTruthEnergy() + blob2Info.GetTotalTruthEnergy();
+    double total_captured_evis_pizero = blob1Info.GetEdepByPdg(PDG::pi0) + blob2Info.GetEdepByPdg(PDG::pi0);
+    
+    truthEvent->setDoubleData("total_captured_evis_total_norm", total_captured_evis_total_norm);
+    truthEvent->setDoubleData("total_captured_evis_total_truth", total_captured_evis_total_truth);
+    truthEvent->setDoubleData("total_captured_evis_pizero", total_captured_evis_pizero);
+    
+    // Total Visible Energy for Pi0 from ALL Clusters
+    SmartRefVector<Minerva::IDCluster> allClusters = event->select<Minerva::IDCluster>("All","!LowActivity&!XTalkCandidate");
+    DigitVectorTruthInfo allClustersInfo;
+    allClustersInfo.ParseTruth(allClusters, fTrajectoryMap);
+
+    truthEvent->setDoubleData("allClusters_evis_pizero", allClustersInfo.GetEdepByPdg(PDG::pi0));
+
+    debug()<<"total_captured_evis_total_norm = "<<total_captured_evis_total_norm<<endmsg;
+    debug()<<"total_captured_evis_total_truth = "<<total_captured_evis_total_truth<<endmsg;
+    debug()<<"total_captured_evis_pizero = "<<total_captured_evis_pizero<<endmsg;
+    debug()<<"allClusters_evis_pizero = "<<allClustersInfo.GetEdepByPdg(PDG::pi0)<<endmsg;
 
     debug()<<"Exit CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs()"<<endmsg;
 }

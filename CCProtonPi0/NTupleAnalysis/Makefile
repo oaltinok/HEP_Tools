@@ -28,7 +28,7 @@ MUONCPP = Classes/Muon/CCProtonPi0_Muon.cpp
 PROTONCPP = Classes/Proton/CCProtonPi0_Proton.cpp
 PIONCPP = Classes/Pion/CCProtonPi0_Pion.cpp
 PI0BLOBCPP = Classes/Pi0Blob/CCProtonPi0_Pi0Blob.cpp
-ALLPARTICLESCPP = $(INTERACTIONCPP) $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP) 
+ALLPARTICLESCPP = $(INTERACTIONCPP) $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIONCPP) $(PI0BLOBCPP)
 
 # Tools for Detailed Studies
 PIDTOOLCPP = Classes/PIDTool/CCProtonPi0_PIDTool.cpp
@@ -57,7 +57,7 @@ LDLIBS += -L$(PLOTUTILSROOT)/$(CMTCONFIG) -lplotutils -L$(UNFOLDUTILSROOT)/$(CMT
 CC = g++
 CFLAGS = -g -Wall -Wextra
 ROOTFLAGS = `root-config --glibs --cflags`
-RM = rm -f
+RM = rm -fv
 
 SOURCES = $(ALLCPP)
 OBJECTS = $(SOURCES:.cpp=.o)

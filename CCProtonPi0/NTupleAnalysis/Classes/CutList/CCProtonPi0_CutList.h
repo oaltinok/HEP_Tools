@@ -97,7 +97,11 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_w_DIS;
         TH1D* mc_w_RES;
         TH1D* mc_w_CCQE;
-              
+
+        // Pi0 Invariant Mass
+        TH1D* pi0_invMass_1Track;
+        TH1D* pi0_invMass_2Track;
+
     private:
         void initHistograms();
         void init_nCutVectors();

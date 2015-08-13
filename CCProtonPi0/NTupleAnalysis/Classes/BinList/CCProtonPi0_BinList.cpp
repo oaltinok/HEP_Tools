@@ -15,6 +15,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     //     Initialization
     //--------------------------------------------------------------------------
     // Standard Bins
+    true_false.setBin(2,0.0,2.0);
     error.setBin(40, -2.0, 2.0);
     angle.setBin(18, 0.0, 180.0);
     particleScore.setBin(100,0.0,1.0);
@@ -23,6 +24,8 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     particleScoreDiff.setBin(100,-1.0,1.0);
     particleStatus.setBin(17,-1,16);
     multiplicity.setBin(10,0.0,10.0);
+    fraction.setBin(20,0.0,1.0);
+    fraction2.setBin(200,-0.5,1.5);
     vertex_z.setBin(94,4300.0,9000.0);
     vertex_x_y.setBin(200,-1000.0,1000.0);
     deltaInvMass.setBin(20,800.0,2800.0);
@@ -41,7 +44,6 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     // Cut Histograms
     eVis_nuclearTarget.setBin(50,0.0,25.0);
     eVis_other.setBin(60,0.0,3000.0);
-    michelID.setBin(2,0.0,2.0);
     pi0_invMass.setBin(60,0.0,600.0);
     bin_photonConvLength.setBin(50,0.0,100.0);
     

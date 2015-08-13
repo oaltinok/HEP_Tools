@@ -14,7 +14,6 @@ Namespace: PDG_List
         > PDG_List::proton      // Returns proton PDG (2212)
             
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_05_07
 ================================================================================
 */
 
@@ -41,7 +40,6 @@ const int tau_plus = -tau_minus;
 const int neutrino_electron = 12;
 const int neutrino_muon = 14;
 const int neutrino_tau = 16;
-
 
 // -----------------------------------------------------------------------------
 //      Light Baryons

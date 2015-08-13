@@ -16,7 +16,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     plotPion();
     //plotInteraction();
     //plotCutHistograms();
-    plotOther();
+    //plotOther();
+    plotPi0Blob();
 }
 
 CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
@@ -32,6 +33,39 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
     setPlotDirs(ana_folder);
 }
 
+void CCProtonPi0_Plotter::plotPi0Blob()
+{
+    std::cout<<"Plotting Pi0Blob"<<std::endl;
+    std::string plotDir = plotDir_Pion; // Plots go under Pion
+    
+    // Plot Truth Match - gamma 1
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_most_pdg",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_total_truth",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_pizero",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_piplus",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_piminus",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_proton",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_neutron",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_muon",plotDir);
+
+    // Plot Truth Match - gamma 2
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_most_pdg",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_total_truth",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_pizero",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_piplus",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_piminus",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_proton",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_neutron",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_muon",plotDir);
+    
+    // Total Pi0 Evis
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"captured_evis_frac_all",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"captured_evis_frac_signal",plotDir);
+
+    std::cout<<"Plotting Pi0Blob Finished!"<<std::endl;
+}
+
+
 void CCProtonPi0_Plotter::plotOther()
 {
     std::cout<<"Plotting Other"<<std::endl;
@@ -45,6 +79,8 @@ void CCProtonPi0_Plotter::plotOther()
     DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks_Close",plotDir);
     DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks_Far",plotDir);
     DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks_Discarded",plotDir);
+    
+    std::cout<<"Plotting Other Finished!"<<std::endl;
 }
 
 void CCProtonPi0_Plotter::plotInteraction()
@@ -121,8 +157,8 @@ void CCProtonPi0_Plotter::plotPion()
     
     std::cout<<">> Plotting Unique Histograms"<<std::endl;
     // Unique Plots
-//    DrawDataMC(rootDir_Pion,"gamma1_P",plotDir);
-//    DrawDataMC(rootDir_Pion,"gamma2_P",plotDir);
+//    DrawDataMC(rootDir_Pion,"gamma1_E",plotDir);
+//    DrawDataMC(rootDir_Pion,"gamma2_E",plotDir);
 //    DrawDataMC(rootDir_Pion,"gamma1_theta",plotDir);
 //    DrawDataMC(rootDir_Pion,"gamma2_theta",plotDir);
 //    DrawDataMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
@@ -130,23 +166,32 @@ void CCProtonPi0_Plotter::plotPion()
 //    DrawDataMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
 //    DrawDataMC(rootDir_Pion,"invMass",plotDir);
 //
-//    DrawDataStackedMC(rootDir_Pion,"gamma1_P",plotDir);
-//    DrawDataStackedMC(rootDir_Pion,"gamma2_P",plotDir);
-//    DrawDataStackedMC(rootDir_Pion,"gamma1_theta",plotDir);
-//    DrawDataStackedMC(rootDir_Pion,"gamma2_theta",plotDir);
-//    DrawDataStackedMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
-//    DrawDataStackedMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
-//    DrawDataStackedMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
-//    DrawDataStackedMC(rootDir_Pion,"invMass",plotDir);
-//
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
     
-    Draw1DHist(rootDir_Pion,"mgg",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma1_P_error",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_reco_P_true_P",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma2_P_error",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma2_reco_P_true_P",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_P_gamma2_P",plotDir);
+    Draw1DHist(rootDir_Pion,"mgg_reco",plotDir);
+    Draw1DHist(rootDir_Pion,"mgg_true",plotDir);
+    Draw2DHist(rootDir_Pion,"mgg_reco_true",plotDir);
+    Draw1DHist(rootDir_Pion,"mgg_error",plotDir);
+    
+    Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma1_E_error",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
+    
+    Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma2_E_error",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_E_gamma2_E",plotDir);
     Draw2DHist(rootDir_Pion,"gamma1_convLength_gamma2_convLength",plotDir);
+    
+    Draw1DHist(rootDir_Pion,"isGamma1_conv_inside",plotDir);
+    Draw1DHist(rootDir_Pion,"isGamma2_conv_inside",plotDir);
     
     std::cout<<"Plotting Pion Finished!\n"<<std::endl;
 }
@@ -334,6 +379,7 @@ void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
     rootDir_Muon.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Muon.root";
     rootDir_Proton.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Proton.root";
     rootDir_Pion.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Pion.root";
+    rootDir_Pi0Blob.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Pi0Blob.root";
 
     // Set Data Root Dir
     rootDir_CutHists.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms.root";
@@ -341,6 +387,7 @@ void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
     rootDir_Muon.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Muon.root";
     rootDir_Proton.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Proton.root";
     rootDir_Pion.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Pion.root";
+    rootDir_Pi0Blob.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Pi0Blob.root";
 }
 
 void CCProtonPi0_Plotter::setPlotDirs(std::string ana_folder)

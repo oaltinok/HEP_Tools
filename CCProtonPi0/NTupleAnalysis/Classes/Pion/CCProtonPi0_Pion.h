@@ -22,23 +22,30 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         vector<MnvH1D*> photonEnergy_Asymmetry;
 
         // Leading Photon - Energetic Photon
-        vector<MnvH1D*> gamma1_P;
+        vector<MnvH1D*> gamma1_E;
         vector<MnvH1D*> gamma1_theta;
         vector<MnvH1D*> gamma1_ConvLength;
         // Secondary Photon
-        vector<MnvH1D*> gamma2_P;
+        vector<MnvH1D*> gamma2_E;
         vector<MnvH1D*> gamma2_theta;
         vector<MnvH1D*> gamma2_ConvLength;
 
         // Photon Comparison
-        TH2D* gamma1_P_gamma2_P;
+        TH1D* gamma1_true_E;
+        TH1D* gamma2_true_E;
+        TH2D* gamma1_E_gamma2_E;
         TH2D* gamma1_convLength_gamma2_convLength;
-        TH2D* gamma1_reco_P_true_P;
-        TH2D* gamma2_reco_P_true_P;
-        TH1D* gamma2_P_error;
-        TH1D* gamma1_P_error;
-        TH1D* mgg;
-
+        TH2D* gamma1_reco_E_true_E;
+        TH2D* gamma2_reco_E_true_E;
+        TH1D* gamma2_E_error;
+        TH1D* gamma1_E_error;
+        TH1D* mgg_reco;
+        TH1D* mgg_true;
+        TH1D* mgg_error;
+        TH2D* mgg_reco_true;
+        TH1D* isGamma1_conv_inside;
+        TH1D* isGamma2_conv_inside;
+        
         CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana_folder);
         void initHistograms();
         void writeHistograms();

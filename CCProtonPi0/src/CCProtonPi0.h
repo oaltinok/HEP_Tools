@@ -280,7 +280,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void SaveEventTime(Minerva::PhysicsEvent *event) const;
         void SaveEventVisibleEnergy(Minerva::PhysicsEvent *event) const;
         void SaveTruthUnusedClusterEnergyInsideDetector(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> ecalClusters, SmartRefVector<Minerva::IDCluster> hcalClusters, SmartRefVector<Minerva::IDCluster> otherClusters) const;
-        void SaveTruthClusterEnergy_FoundBlobs(Minerva::GenMinInteraction *truthEvent) const;
+        void SaveTruthClusterEnergy_FoundBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction *truthEvent) const;
         void SaveTruthUnusedClusterEnergyNearVertex(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> vertexClusters) const;
         void SaveTruthUnusedClusterEnergy_Dispersed(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const;
         void SaveTruthUnusedClusterEnergy_LowCharge(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const;
@@ -305,6 +305,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void writeBackgroundType(Minerva::GenMinInteraction* truthEvent) const;
         void writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
         void writeFSParticleTable(bool isSignal) const;
+        void SetSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
+        void SetSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
 
 };
 

@@ -20,6 +20,7 @@ Class: CCProtonPi0_Analyzer
 #define CCProtonPi0_Analyzer_h
 
 #include <TChain.h>
+#include <TVector3.h>
 
 // Classes
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
@@ -28,6 +29,7 @@ Class: CCProtonPi0_Analyzer
 #include "../Muon/CCProtonPi0_Muon.h"
 #include "../Proton/CCProtonPi0_Proton.h"
 #include "../Pion/CCProtonPi0_Pion.h"
+#include "../Pi0Blob/CCProtonPi0_Pi0Blob.h"
 #include "../BackgroundTool/CCProtonPi0_BackgroundTool.h"
 
 class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
@@ -60,7 +62,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         int GetBackgroundTypeInd();
         int GetBackgroundWithPi0Ind();
         void FillHistogram(vector<MnvH1D*> &hist, double par);
-        
+        void SavePi0InvMassPoints();
             
         //  Interaction Specific Functions
         void fillInteractionTrue();
@@ -80,6 +82,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fillPi0True();
         void fillPi0Reco();
         bool isPi0BlobBad();
+        void fillPi0BlobTrue();
+        void FillEvis_MostPDG();
+        void FillEvis_Fractions();
+        void FillEvis_Total(); 
 
         //  Default Functions
         void Init(string playlist, TChain* fChain);
@@ -91,6 +97,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         CCProtonPi0_Muon muon;
         CCProtonPi0_Proton proton;
         CCProtonPi0_Pion pi0;
+        CCProtonPi0_Pi0Blob pi0Blob;
         CCProtonPi0_BackgroundTool bckgTool;
         CCProtonPi0_CutList cutList;
         
@@ -106,6 +113,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool isPassedAllCuts;
         bool applyMaxEvents;
         bool applyDeltaInvMass;
+        bool savePi0InvMassPoints;
         double latest_ScanID;
         double pID_KE_Limit;
         double minProtonScore_LLR;
@@ -292,7 +300,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[69];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[81];   //[g2dedx_rev_cluster_energy_sz]
    Int_t           od_distanceBlobTower_sz;
    Double_t        od_distanceBlobTower[2];   //[od_distanceBlobTower_sz]
    Int_t           od_idBlobTime_sz;
@@ -308,6 +316,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           od_towerTimeBlobOD_sz;
    Double_t        od_towerTimeBlobOD[2];   //[od_towerTimeBlobOD_sz]
    Bool_t          truth_has_physics_event;
+   Bool_t          truth_isGamma1_conv_inside;
+   Bool_t          truth_isGamma2_conv_inside;
    Bool_t          truth_isSignal;
    Bool_t          truth_isFidVol;
    Bool_t          truth_isNC;
@@ -333,6 +343,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           truth_N_pi0;
    Int_t           truth_N_proton;
    Int_t           truth_N_trueMichelElectrons;
+   Int_t           truth_blob1_evis_most_pdg;
+   Int_t           truth_blob2_evis_most_pdg;
    Int_t           truth_dispersed_unused_evis_most_pdg;
    Int_t           truth_lowcharge_unused_evis_most_pdg;
    Int_t           truth_outTime_unused_evis_most_pdg;
@@ -345,6 +357,23 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           truth_vertex_module;
    Int_t           truth_vertex_plane;
    Int_t           truth_vertex_unused_evis_most_pdg;
+   Double_t        truth_allClusters_evis_pizero;
+   Double_t        truth_blob1_evis_muon;
+   Double_t        truth_blob1_evis_neutron;
+   Double_t        truth_blob1_evis_piminus;
+   Double_t        truth_blob1_evis_piplus;
+   Double_t        truth_blob1_evis_pizero;
+   Double_t        truth_blob1_evis_proton;
+   Double_t        truth_blob1_evis_total_norm;
+   Double_t        truth_blob1_evis_total_truth;
+   Double_t        truth_blob2_evis_muon;
+   Double_t        truth_blob2_evis_neutron;
+   Double_t        truth_blob2_evis_piminus;
+   Double_t        truth_blob2_evis_piplus;
+   Double_t        truth_blob2_evis_pizero;
+   Double_t        truth_blob2_evis_proton;
+   Double_t        truth_blob2_evis_total_norm;
+   Double_t        truth_blob2_evis_total_truth;
    Double_t        truth_dispersed_unused_evis_gamma;
    Double_t        truth_dispersed_unused_evis_muon;
    Double_t        truth_dispersed_unused_evis_neutron;
@@ -391,6 +420,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        truth_other_unused_evis_total_truth;
    Double_t        truth_outTime_unused_evis_total_norm;
    Double_t        truth_outTime_unused_evis_total_truth;
+   Double_t        truth_total_captured_evis_pizero;
+   Double_t        truth_total_captured_evis_total_norm;
+   Double_t        truth_total_captured_evis_total_truth;
    Double_t        truth_vertex_unused_evis_gamma;
    Double_t        truth_vertex_unused_evis_muon;
    Double_t        truth_vertex_unused_evis_neutron;
@@ -401,7 +433,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        truth_vertex_unused_evis_total_norm;
    Double_t        truth_vertex_unused_evis_total_truth;
    Double_t        truth_gamma1_4P[4];
+   Double_t        truth_gamma1_final_pos[3];
+   Double_t        truth_gamma1_init_pos[3];
    Double_t        truth_gamma2_4P[4];
+   Double_t        truth_gamma2_final_pos[3];
+   Double_t        truth_gamma2_init_pos[3];
    Int_t           genie_wgt_n_shifts;
    Double_t        truth_genie_wgt_AGKYxF1pi[7];   //[genie_wgt_n_shifts]
    Double_t        truth_genie_wgt_AhtBY[7];   //[genie_wgt_n_shifts]
@@ -926,6 +962,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_od_towerTimeBlobOD_sz;   //!
    TBranch        *b_od_towerTimeBlobOD;   //!
    TBranch        *b_truth_has_physics_event;   //!
+   TBranch        *b_truth_isGamma1_conv_inside;   //!
+   TBranch        *b_truth_isGamma2_conv_inside;   //!
    TBranch        *b_truth_isSignal;   //!
    TBranch        *b_truth_isFidVol;   //!
    TBranch        *b_truth_isNC;   //!
@@ -951,6 +989,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_truth_N_pi0;   //!
    TBranch        *b_truth_N_proton;   //!
    TBranch        *b_truth_N_trueMichelElectrons;   //!
+   TBranch        *b_truth_blob1_evis_most_pdg;   //!
+   TBranch        *b_truth_blob2_evis_most_pdg;   //!
    TBranch        *b_truth_dispersed_unused_evis_most_pdg;   //!
    TBranch        *b_truth_lowcharge_unused_evis_most_pdg;   //!
    TBranch        *b_truth_outTime_unused_evis_most_pdg;   //!
@@ -963,6 +1003,23 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_truth_vertex_module;   //!
    TBranch        *b_truth_vertex_plane;   //!
    TBranch        *b_truth_vertex_unused_evis_most_pdg;   //!
+   TBranch        *b_truth_allClusters_evis_pizero;   //!
+   TBranch        *b_truth_blob1_evis_muon;   //!
+   TBranch        *b_truth_blob1_evis_neutron;   //!
+   TBranch        *b_truth_blob1_evis_piminus;   //!
+   TBranch        *b_truth_blob1_evis_piplus;   //!
+   TBranch        *b_truth_blob1_evis_pizero;   //!
+   TBranch        *b_truth_blob1_evis_proton;   //!
+   TBranch        *b_truth_blob1_evis_total_norm;   //!
+   TBranch        *b_truth_blob1_evis_total_truth;   //!
+   TBranch        *b_truth_blob2_evis_muon;   //!
+   TBranch        *b_truth_blob2_evis_neutron;   //!
+   TBranch        *b_truth_blob2_evis_piminus;   //!
+   TBranch        *b_truth_blob2_evis_piplus;   //!
+   TBranch        *b_truth_blob2_evis_pizero;   //!
+   TBranch        *b_truth_blob2_evis_proton;   //!
+   TBranch        *b_truth_blob2_evis_total_norm;   //!
+   TBranch        *b_truth_blob2_evis_total_truth;   //!
    TBranch        *b_truth_dispersed_unused_evis_gamma;   //!
    TBranch        *b_truth_dispersed_unused_evis_muon;   //!
    TBranch        *b_truth_dispersed_unused_evis_neutron;   //!
@@ -1009,6 +1066,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_truth_other_unused_evis_total_truth;   //!
    TBranch        *b_truth_outTime_unused_evis_total_norm;   //!
    TBranch        *b_truth_outTime_unused_evis_total_truth;   //!
+   TBranch        *b_truth_total_captured_evis_pizero;   //!
+   TBranch        *b_truth_total_captured_evis_total_norm;   //!
+   TBranch        *b_truth_total_captured_evis_total_truth;   //!
    TBranch        *b_truth_vertex_unused_evis_gamma;   //!
    TBranch        *b_truth_vertex_unused_evis_muon;   //!
    TBranch        *b_truth_vertex_unused_evis_neutron;   //!
@@ -1019,7 +1079,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_truth_vertex_unused_evis_total_norm;   //!
    TBranch        *b_truth_vertex_unused_evis_total_truth;   //!
    TBranch        *b_truth_gamma1_4P;   //!
+   TBranch        *b_truth_gamma1_final_pos;   //!
+   TBranch        *b_truth_gamma1_init_pos;   //!
    TBranch        *b_truth_gamma2_4P;   //!
+   TBranch        *b_truth_gamma2_final_pos;   //!
+   TBranch        *b_truth_gamma2_init_pos;   //!
    TBranch        *b_genie_wgt_n_shifts;   //!
    TBranch        *b_truth_genie_wgt_AGKYxF1pi;   //!
    TBranch        *b_truth_genie_wgt_AhtBY;   //!
@@ -1372,6 +1436,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_prong_part_pid;   //!
    TBranch        *b_prong_part_E;   //!
    TBranch        *b_prong_part_pos;   //!
+
 
 };
 

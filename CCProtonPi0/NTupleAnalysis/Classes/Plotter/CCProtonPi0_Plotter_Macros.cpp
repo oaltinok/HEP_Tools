@@ -252,6 +252,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::strin
 
 void CCProtonPi0_Plotter::ApplyStyle(MnvPlotter* plotter)
 {
+    plotter->mc_line_width = 0;
     plotter->axis_title_size_x = 0.04;
     plotter->axis_title_size_y = 0.04;
     plotter->axis_label_size = 0.03;
@@ -363,13 +364,19 @@ void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::st
     hist1D->SetLineWidth(3);
     hist1D->SetFillColor(kRed);
     hist1D->SetFillStyle(3010);
-    
+   
     hist1D->Draw();
     gPad->Update();
     gStyle->SetOptStat("nemr"); 
     
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    int max_bin = hist1D->GetMaximumBin();
+    double max_bin_value = hist1D->GetBinCenter(max_bin);
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+    text.DrawLatex(0.78,0.7,Form("%s%3.2f", "Peak at ",max_bin_value));
     
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
     delete c;
     
 }
@@ -440,12 +447,14 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     var = Form("%s_%d",var_name.c_str(),2);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Background");
+    double nBckg = temp->GetEntries(); 
     mc_hists->Add(temp);
     
     // Get Signal
     var = Form("%s_%d",var_name.c_str(),1);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Signal");
+    double nSignal = temp->GetEntries(); 
     mc_hists->Add(temp);
 
     // ------------------------------------------------------------------------
@@ -459,7 +468,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     // Add Plot Labels
     const double y_pos = 0.88;
     const double y_diff = 0.033;
-    plotter->AddPlotLabel("v2_25",0.3,y_pos,y_diff,kBlue);
+    plotter->AddPlotLabel(Form("nSignal = %3.0f, nBckg = %3.0f",nSignal,nBckg),0.3,y_pos,y_diff,kBlue); 
     //plotter->AddPOTNormBox(data_POT,mc_POT,0.3,y_pos-y_diff);
     
     // If Cut Histogram - Add Cut Arrows

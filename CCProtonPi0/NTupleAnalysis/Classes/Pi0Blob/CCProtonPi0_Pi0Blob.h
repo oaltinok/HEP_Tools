@@ -10,69 +10,53 @@ Class: CCProtonPi0_Pi0Blob
 #ifndef CCProtonPi0_Pi0Blob_h
 #define CCProtonPi0_Pi0Blob_h
 
-#include <iostream>
-#include <string>
-#include <cstdlib>
-
-#include <TMath.h>
-#include <TH1.h>
-#include <TH2.h>
-#include <TFile.h>
-
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
-#include "../SingleBin/CCProtonPi0_SingleBin.h"
+#include "../BinList/CCProtonPi0_BinList.h"
 
-using namespace std;
+using namespace PlotUtils;
 
 class CCProtonPi0_Pi0Blob : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_Pi0Blob(int nMode, bool isMC);
+        CCProtonPi0_Pi0Blob(bool isModeReduce, bool isMC, std::string ana_folder);
 
-        void write_RootFile();
+        void writeHistograms();
 
         // Histograms
+       
+        // Truth Match
+        std::vector<MnvH1D*> g1_evis_most_pdg;
+        std::vector<MnvH1D*> g1_evis_total_truth;
+        std::vector<MnvH1D*> g1_evis_frac_pizero;
+        std::vector<MnvH1D*> g1_evis_frac_piplus;
+        std::vector<MnvH1D*> g1_evis_frac_piminus;
+        std::vector<MnvH1D*> g1_evis_frac_proton;
+        std::vector<MnvH1D*> g1_evis_frac_neutron;
+        std::vector<MnvH1D*> g1_evis_frac_muon;
+       
+        std::vector<MnvH1D*> g2_evis_most_pdg;
+        std::vector<MnvH1D*> g2_evis_total_truth;
+        std::vector<MnvH1D*> g2_evis_frac_pizero;
+        std::vector<MnvH1D*> g2_evis_frac_piplus;
+        std::vector<MnvH1D*> g2_evis_frac_piminus;
+        std::vector<MnvH1D*> g2_evis_frac_proton;
+        std::vector<MnvH1D*> g2_evis_frac_neutron;
+        std::vector<MnvH1D*> g2_evis_frac_muon;
         
-        // Standard Blob Variables
-        TH1D* g1_blob_ndigits;
-        TH1D* g1_blob_nclusters;
-        TH1D* g1_blob_energy;
-        TH1D* g1_blob_minsep;
-        TH1D* g2_blob_ndigits;
-        TH1D* g2_blob_nclusters;
-        TH1D* g2_blob_energy;
-        TH1D* g2_blob_minsep;
-
-
-        // Fit Results
-        TH1D* g1_blob_ndof;
-        TH1D* g1_blob_fval;
-
-        // dEdX 
-        TH1D* g1_blob_dEdx_doublet;
-        TH1D* g1_blob_dEdx_empty_plane;
-        TH1D* g1_blob_dEdx;
-        TH1D* g1_blob_dEdx1;
-        TH1D* g1_blob_dEdx_nplane;
-        TH1D* g1_blob_dEdx_cluster_energy;
+        std::vector<MnvH1D*> captured_evis_frac_all; 
+        std::vector<MnvH1D*> captured_evis_frac_signal; 
 
         private:
+        void initBins();
         void initHistograms();
 
         TFile* f;
         string rootDir;
         
+        CCProtonPi0_BinList binList;
+        
         // Histogram Binning
-        CCProtonPi0_SingleBin bin_blob_nclusters;
         CCProtonPi0_SingleBin bin_blob_energy;
-        CCProtonPi0_SingleBin bin_blob_ndigits;
-        CCProtonPi0_SingleBin bin_blob_minsep;
-        CCProtonPi0_SingleBin bin_blob_ndof;
-        CCProtonPi0_SingleBin bin_blob_fval;
-        CCProtonPi0_SingleBin bin_blob_dEdx_doublet;
-        CCProtonPi0_SingleBin bin_blob_dEdx;
-        CCProtonPi0_SingleBin bin_blob_dEdx_nplane;
-        CCProtonPi0_SingleBin bin_blob_dEdx_cluster_energy;
 
 };
 

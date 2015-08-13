@@ -91,7 +91,7 @@ void CCProtonPi0_CutList::initHistograms()
         // --------------------------------------------------------------------
         // 1 Track
         // --------------------------------------------------------------------
-        temp = new MnvH1D( Form("%s_%d","hCut_1Track_Michel",i),Form("%d",i),binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_Michel",i),Form("%d",i),binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
         temp->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_1Track_Michel.push_back(temp);
@@ -134,7 +134,7 @@ void CCProtonPi0_CutList::initHistograms()
         // --------------------------------------------------------------------
         // 2 Track
         // --------------------------------------------------------------------
-        temp = new MnvH1D( Form("%s_%d","hCut_2Track_Michel",i),Form("%d",i),binList.michelID.get_nBins(), binList.michelID.get_min(), binList.michelID.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_Michel",i),Form("%d",i),binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
         temp->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_2Track_Michel.push_back(temp);
@@ -202,6 +202,12 @@ void CCProtonPi0_CutList::initHistograms()
     mc_w_CCQE = new TH1D( "mc_w_CCQE","True W for CCQE",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
     mc_w_CCQE->GetXaxis()->SetTitle("True W for CCQE [GeV]");
     mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
+
+    // Pi0 Invariant Mass - Used for Correction Fit
+    pi0_invMass_1Track = new TH1D("pi0_invMass_1Track","#pi^{0} Invariant Mass 1 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    pi0_invMass_2Track = new TH1D("pi0_invMass_2Track","#pi^{0} Invariant Mass 2 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+
+
 }
 
 void CCProtonPi0_CutList::init_nCutVectors()
@@ -466,6 +472,9 @@ void CCProtonPi0_CutList::writeHistograms()
     mc_w_DIS->Write();
     mc_w_RES->Write();
     mc_w_CCQE->Write();
+    
+    pi0_invMass_1Track->Write();
+    pi0_invMass_2Track->Write();
 
     f->Close();
 }

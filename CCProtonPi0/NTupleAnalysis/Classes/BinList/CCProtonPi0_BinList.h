@@ -23,6 +23,7 @@ class CCProtonPi0_BinList
         CCProtonPi0_BinList();
         
         // Standard Bins
+        CCProtonPi0_SingleBin true_false;
         CCProtonPi0_SingleBin error;
         CCProtonPi0_SingleBin angle;
         CCProtonPi0_SingleBin particleScore;
@@ -31,6 +32,8 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin particleScoreDiff;
         CCProtonPi0_SingleBin particleStatus;
         CCProtonPi0_SingleBin multiplicity;
+        CCProtonPi0_SingleBin fraction;
+        CCProtonPi0_SingleBin fraction2;
         CCProtonPi0_SingleBin vertex_z;
         CCProtonPi0_SingleBin vertex_x_y;
         CCProtonPi0_SingleBin deltaInvMass;
@@ -49,7 +52,6 @@ class CCProtonPi0_BinList
         // Cut Histograms
         CCProtonPi0_SingleBin eVis_nuclearTarget;
         CCProtonPi0_SingleBin eVis_other;
-        CCProtonPi0_SingleBin michelID;
         CCProtonPi0_SingleBin pi0_invMass;
         CCProtonPi0_SingleBin bin_photonConvLength;
         

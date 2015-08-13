@@ -6,116 +6,165 @@
 
 #include "CCProtonPi0_Pi0Blob.h"
 
-using namespace std;
+using namespace PlotUtils;
 
-CCProtonPi0_Pi0Blob::CCProtonPi0_Pi0Blob(int nMode, bool isMC) : CCProtonPi0_NTupleAnalysis(nMode)
+CCProtonPi0_Pi0Blob::CCProtonPi0_Pi0Blob(bool isModeReduce, bool isMC, std::string ana_folder) : CCProtonPi0_NTupleAnalysis()
 {
-    cout<<"Initializing CCProtonPi0_Pi0Blob"<<endl;
+    std::cout<<"Initializing CCProtonPi0_Pi0Blob"<<std::endl;
 
-    if(nMode == 0){
-        cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<endl;
+    if(isModeReduce){
+        std::cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<std::endl;
     }else{
         // File Locations
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + branchDir + "Pi0Blob.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + branchDir + "Pi0Blob.root";      
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Pi0Blob.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Pi0Blob.root";      
 
-        cout<<"\tRoot File: "<<rootDir<<endl;
+        std::cout<<"\tRoot File: "<<rootDir<<std::endl;
      
         // Create Root File 
         f = new TFile(rootDir.c_str(),"RECREATE");
 
-        // Initialize Bins
-        bin_blob_nclusters.setBin(40,0.0,40.0);
-        bin_blob_minsep.setBin(200,0.0,2000.0);
-        bin_blob_energy.setBin(100,0.0,1000);
-        bin_blob_ndigits.setBin(100,0,100);
-        bin_blob_ndof.setBin(70,0,70);
-        bin_blob_fval.setBin(100,0,5000);
-        bin_blob_dEdx_doublet.setBin(2,0,2);
-        bin_blob_dEdx.setBin(50,0,100);
-        bin_blob_dEdx_nplane.setBin(40,0,40);
-        bin_blob_dEdx_cluster_energy.setBin(100,0,500);
-       
+        initBins();
         initHistograms();
     }  
-    cout<<"Done!"<<endl;
+    std::cout<<"Done!"<<std::endl;
 }
 
 void CCProtonPi0_Pi0Blob::initHistograms()
 {
-    // Gamma1 
-    g1_blob_ndigits = new TH1D( "g1_blob_ndigits","Photon N(Digits)",bin_blob_ndigits.get_nBins(), bin_blob_ndigits.get_min(), bin_blob_ndigits.get_max() );
-    g1_blob_ndigits->GetXaxis()->SetTitle("Photon N(Digits)");
-    g1_blob_ndigits->GetYaxis()->SetTitle("N(Events)");
-    
-    g1_blob_nclusters = new TH1D( "g1_blob_nclusters","Leading Photon N(Clusters)",bin_blob_nclusters.get_nBins(), bin_blob_nclusters.get_min(), bin_blob_nclusters.get_max() );
-    g1_blob_nclusters->GetXaxis()->SetTitle("Leading Photon N(Clusters)");
-    g1_blob_nclusters->GetYaxis()->SetTitle("N(Events)");
-    
-    g1_blob_energy = new TH1D( "g1_blob_energy","Leading Photon Energy",bin_blob_energy.get_nBins(), bin_blob_energy.get_min(), bin_blob_energy.get_max() );
-    g1_blob_energy->GetXaxis()->SetTitle("Blob Energy [MeV]");
-    g1_blob_energy->GetYaxis()->SetTitle("N(Events)");
+    MnvH1D* temp = NULL;
 
-    g1_blob_minsep = new TH1D( "g1_blob_minsep","Blob Min Separation from Vertex",bin_blob_minsep.get_nBins(), bin_blob_minsep.get_min(), bin_blob_minsep.get_max() );
-    g1_blob_minsep->GetXaxis()->SetTitle("Blob Min Separation from Vertex");
-    g1_blob_minsep->GetYaxis()->SetTitle("N(Events)");
+    for (int i = 0; i < nHistograms; i++){
+        temp = new MnvH1D(Form("%s_%d","g1_evis_most_pdg",i),Form("%s %d","Most Evis PDGi for Gamma", 1), binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max());
+        temp->GetXaxis()->SetTitle("0: #pi^{0}, 1: #pi^{+}, 2: #pi^{-}, 3: n, 4: p, 5: #mu^{-}, 6:Other");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_evis_most_pdg.push_back(temp);
 
+        temp = new MnvH1D(Form("%s_%d","g1_evis_total_truth",i),Form("%s %d","Total Visible Energy for Gamma",1),bin_blob_energy.get_nBins(), bin_blob_energy.get_min(), bin_blob_energy.get_max() );
+        temp->GetXaxis()->SetTitle("Total Visible Energy [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_evis_total_truth.push_back(temp);
 
-    g1_blob_ndof = new TH1D( "g1_blob_ndof","Blob Fit: ndof",bin_blob_ndof.get_nBins(), bin_blob_ndof.get_min(), bin_blob_ndof.get_max() );
-    g1_blob_ndof->GetXaxis()->SetTitle("Blob Fit: ndof");
-    g1_blob_ndof->GetYaxis()->SetTitle("N(Events)");
+        temp = new MnvH1D(Form("%s_%d","g1_evis_frac_pizero",i),Form("%s %d","pizero Visible Energy Fraction for Gamma",1),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis pizero / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_evis_frac_pizero.push_back(temp);
 
-    g1_blob_fval = new TH1D( "g1_blob_fval","Blob Fit: fval",bin_blob_fval.get_nBins(), bin_blob_fval.get_min(), bin_blob_fval.get_max() );
-    g1_blob_fval->GetXaxis()->SetTitle("Blob Fit: fval");
-    g1_blob_fval->GetYaxis()->SetTitle("N(Events)");
-    
-    g1_blob_dEdx_doublet = new TH1D( "g1_blob_dEdx_doublet","blob_dEdx_doublet",bin_blob_dEdx_doublet.get_nBins(), bin_blob_dEdx_doublet.get_min(), bin_blob_dEdx_doublet.get_max() );
-    g1_blob_dEdx_doublet->GetXaxis()->SetTitle("blob_dEdx_doublet");
-    g1_blob_dEdx_doublet->GetYaxis()->SetTitle("N(Events)");
+        temp = new MnvH1D(Form("%s_%d","g1_evis_frac_piplus",i),Form("%s %d","piplus Visible Energy Fraction for Gamma",1),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis piplus / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_evis_frac_piplus.push_back(temp);
 
-    g1_blob_dEdx_empty_plane = new TH1D( "g1_blob_dEdx_empty_plane","blob_dEdx_empty_plane",bin_blob_dEdx_doublet.get_nBins(), bin_blob_dEdx_doublet.get_min(), bin_blob_dEdx_doublet.get_max() );
-    g1_blob_dEdx_empty_plane->GetXaxis()->SetTitle("blob_dEdx_empty_plane");
-    g1_blob_dEdx_empty_plane->GetYaxis()->SetTitle("N(Events)");
+        temp = new MnvH1D(Form("%s_%d","g1_evis_frac_piminus",i),Form("%s %d","piminus Visible Energy Fraction for Gamma",1),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis piminus / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_evis_frac_piminus.push_back(temp);
 
-    g1_blob_dEdx = new TH1D( "g1_blob_dEdx","blob_dEdx",bin_blob_dEdx.get_nBins(), bin_blob_dEdx.get_min(), bin_blob_dEdx.get_max() );
-    g1_blob_dEdx->GetXaxis()->SetTitle("blob_dEdx");
-    g1_blob_dEdx->GetYaxis()->SetTitle("N(Events)");
- 
-    g1_blob_dEdx1 = new TH1D( "g1_blob_dEdx1","blob_dEdx1",bin_blob_dEdx.get_nBins(), bin_blob_dEdx.get_min(), bin_blob_dEdx.get_max() );
-    g1_blob_dEdx1->GetXaxis()->SetTitle("blob_dEdx1");
-    g1_blob_dEdx1->GetYaxis()->SetTitle("N(Events)");
+        temp = new MnvH1D(Form("%s_%d","g1_evis_frac_proton",i),Form("%s %d","proton Visible Energy Fraction for Gamma",1),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis proton / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_evis_frac_proton.push_back(temp);
 
-    g1_blob_dEdx_nplane = new TH1D( "g1_blob_dEdx_nplane","blob_dEdx_nplane",bin_blob_dEdx_nplane.get_nBins(), bin_blob_dEdx_nplane.get_min(), bin_blob_dEdx_nplane.get_max() );
-    g1_blob_dEdx_nplane->GetXaxis()->SetTitle("blob_dEdx_nplane");
-    g1_blob_dEdx_nplane->GetYaxis()->SetTitle("N(Events)");
+        temp = new MnvH1D(Form("%s_%d","g1_evis_frac_neutron",i),Form("%s %d","neutron Visible Energy Fraction for Gamma",1),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis neutron / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_evis_frac_neutron.push_back(temp);
 
-    g1_blob_dEdx_cluster_energy = new TH1D( "g1_blob_dEdx_cluster_energy","blob_dEdx_cluster_energy",bin_blob_dEdx_cluster_energy.get_nBins(), bin_blob_dEdx_cluster_energy.get_min(), bin_blob_dEdx_cluster_energy.get_max() );
-    g1_blob_dEdx_cluster_energy->GetXaxis()->SetTitle("blob_dEdx_cluster_energy");
-    g1_blob_dEdx_cluster_energy->GetYaxis()->SetTitle("N(Events)");
+        temp = new MnvH1D(Form("%s_%d","g1_evis_frac_muon",i),Form("%s %d","muon Visible Energy Fraction for Gamma",1),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis muon / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_evis_frac_muon.push_back(temp);
 
-    // Gamma 2
-    g2_blob_ndigits = new TH1D( "g2_blob_ndigits","Photon N(Digits)",bin_blob_ndigits.get_nBins(), bin_blob_ndigits.get_min(), bin_blob_ndigits.get_max() );
-    g2_blob_ndigits->GetXaxis()->SetTitle("Photon N(Digits)");
-    g2_blob_ndigits->GetYaxis()->SetTitle("N(Events)");
-    
-    g2_blob_nclusters = new TH1D( "g2_blob_nclusters","Second Photon N(Clusters)",bin_blob_nclusters.get_nBins(), bin_blob_nclusters.get_min(), bin_blob_nclusters.get_max() );
-    g2_blob_nclusters->GetXaxis()->SetTitle("Second Photon N(Clusters)");
-    g2_blob_nclusters->GetYaxis()->SetTitle("N(Events)");
-  
-    g2_blob_energy = new TH1D( "g2_blob_energy","Second Photon Energy",bin_blob_energy.get_nBins(), bin_blob_energy.get_min(), bin_blob_energy.get_max() );
-    g2_blob_energy->GetXaxis()->SetTitle("Blob Energy [MeV]");
-    g2_blob_energy->GetYaxis()->SetTitle("N(Events)");
+        // Gamma 2
+        temp = new MnvH1D(Form("%s_%d","g2_evis_most_pdg",i),Form("%s %d","Most Evis PDGi for Gamma", 2), binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max());
+        temp->GetXaxis()->SetTitle("0: #pi^{0}, 1: #pi^{+}, 2: #pi^{-}, 3: n, 4: p, 5: #mu^{-}, 6:Other");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_evis_most_pdg.push_back(temp);
 
-    g2_blob_minsep = new TH1D( "g2_blob_minsep","Blob Min Separation from Vertex",bin_blob_minsep.get_nBins(), bin_blob_minsep.get_min(), bin_blob_minsep.get_max() );
-    g2_blob_minsep->GetXaxis()->SetTitle("Blob Min Separation from Vertex");
-    g2_blob_minsep->GetYaxis()->SetTitle("N(Events)");
+        temp = new MnvH1D(Form("%s_%d","g2_evis_total_truth",i),Form("%s %d","Total Visible Energy for Gamma",2),bin_blob_energy.get_nBins(), bin_blob_energy.get_min(), bin_blob_energy.get_max() );
+        temp->GetXaxis()->SetTitle("Total Visible Energy [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_evis_total_truth.push_back(temp);
 
+        temp = new MnvH1D(Form("%s_%d","g2_evis_frac_pizero",i),Form("%s %d","pizero Visible Energy Fraction for Gamma",2),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis pizero / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_evis_frac_pizero.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_evis_frac_piplus",i),Form("%s %d","piplus Visible Energy Fraction for Gamma",2),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis piplus / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_evis_frac_piplus.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_evis_frac_piminus",i),Form("%s %d","piminus Visible Energy Fraction for Gamma",2),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis piminus / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_evis_frac_piminus.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_evis_frac_proton",i),Form("%s %d","proton Visible Energy Fraction for Gamma",2),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis proton / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_evis_frac_proton.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_evis_frac_neutron",i),Form("%s %d","neutron Visible Energy Fraction for Gamma",2),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis neutron / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_evis_frac_neutron.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_evis_frac_muon",i),Form("%s %d","muon Visible Energy Fraction for Gamma",2),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Evis muon / Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_evis_frac_muon.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","captured_evis_frac_all",i),"All Events: Pi0 Evis Capture Fraction",binList.fraction2.get_nBins(), binList.fraction2.get_min(), binList.fraction2.get_max() );
+        temp->GetXaxis()->SetTitle("Pi0 Evis Captured / Pi0 Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        captured_evis_frac_all.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","captured_evis_frac_signal",i),"Signal Events: Pi0 Evis Capture Fraction",binList.fraction2.get_nBins(), binList.fraction2.get_min(), binList.fraction2.get_max() );
+        temp->GetXaxis()->SetTitle("Pi0 Evis Captured / Pi0 Evis Total");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        captured_evis_frac_signal.push_back(temp);
+
+    } //end loop all Histograms 
 }
 
-void CCProtonPi0_Pi0Blob::write_RootFile()
+void CCProtonPi0_Pi0Blob::initBins()
 {
-    cout<<">> Writing "<<rootDir<<endl;
-    f->Write();
+    // Initialize Bins
+    bin_blob_energy.setBin(100,0.0,0.7);
+}
+
+void CCProtonPi0_Pi0Blob::writeHistograms()
+{
+    std::cout<<">> Writing "<<rootDir<<std::endl;
+    f->cd();
+    
+    // Write Truth Match Histograms
+    for (int i = 0; i < nHistograms; i++){
+        g1_evis_most_pdg[i]->Write();
+        g1_evis_total_truth[i]->Write();
+        g1_evis_frac_pizero[i]->Write();
+        g1_evis_frac_piplus[i]->Write();
+        g1_evis_frac_piminus[i]->Write();
+        g1_evis_frac_proton[i]->Write();
+        g1_evis_frac_neutron[i]->Write();
+        g1_evis_frac_muon[i]->Write();
+        
+        g2_evis_most_pdg[i]->Write();
+        g2_evis_total_truth[i]->Write();
+        g2_evis_frac_pizero[i]->Write();
+        g2_evis_frac_piplus[i]->Write();
+        g2_evis_frac_piminus[i]->Write();
+        g2_evis_frac_proton[i]->Write();
+        g2_evis_frac_neutron[i]->Write();
+        g2_evis_frac_muon[i]->Write();
+        
+        captured_evis_frac_all[i]->Write();
+        captured_evis_frac_signal[i]->Write();
+    }
+
+    f->Close();
 }
 
 

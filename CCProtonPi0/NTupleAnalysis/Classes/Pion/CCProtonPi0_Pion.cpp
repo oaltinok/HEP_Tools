@@ -46,14 +46,14 @@ void CCProtonPi0_Pion::initHistograms()
         // Unique Histograms
         // Leading Photon - Energetic Photon
         temp = new MnvH1D( Form("%s_%d","gamma1_ConvLength",i),"Leading Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
-        temp->GetXaxis()->SetTitle("Photon Conversion Length [cm]");
+        temp->GetXaxis()->SetTitle("#gamma_{1} Conversion Length [cm]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f [cm]",bin_photonConvLength.get_width()));
         gamma1_ConvLength.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","gamma1_P",i),"Leading Photon Momentum",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
-        temp->GetXaxis()->SetTitle("P_{#gamma_{1}} [GeV]");
+        temp = new MnvH1D( Form("%s_%d","gamma1_E",i),"Leading Photon Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
+        temp->GetXaxis()->SetTitle("E_{#gamma_{1}} [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f [GeV]",bin_photonP.get_width()));
-        gamma1_P.push_back(temp);
+        gamma1_E.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","gamma1_theta",i),"Reconstructed Leading Photon Theta",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed #theta_{#gamma_{1}} [Degree]");
@@ -61,22 +61,22 @@ void CCProtonPi0_Pion::initHistograms()
         gamma1_theta.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","gamma2_ConvLength",i),"Secondary Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
-        temp->GetXaxis()->SetTitle("Photon Conversion Length [cm]");
+        temp->GetXaxis()->SetTitle("#gamma_{2} Conversion Length [cm]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f [cm]",bin_photonConvLength.get_width()));
         gamma2_ConvLength.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","gamma2_P",i),"Secondary Photon Momentum",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
-        temp->GetXaxis()->SetTitle("P_{#gamma_{1}} [GeV]");
+        temp = new MnvH1D( Form("%s_%d","gamma2_E",i),"Secondary Photon Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
+        temp->GetXaxis()->SetTitle("E_{#gamma_{2}} [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f [GeV]",bin_photonP.get_width()));
-        gamma2_P.push_back(temp);
+        gamma2_E.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","gamma2_theta",i),"Reconstructed Secondary Photon Theta",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#gamma_{1}} [Degree]");
+        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#gamma_{2}} [Degree]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.1f [Degree]",binList.angle.get_width()));
         gamma2_theta.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","photonEnergy_Asymmetry",i),"Photon Energy Asymmetry",bin_photonEnergy_Asymmetry.get_nBins(), bin_photonEnergy_Asymmetry.get_min(), bin_photonEnergy_Asymmetry.get_max());
-        temp->GetXaxis()->SetTitle("Photon Energy Asymmetry - E(G2)/E(G1)");
+        temp->GetXaxis()->SetTitle("Photon Energy Asymmetry - E_{#gamma_{1}}/E_{$gamma_{2}}");
         temp->GetYaxis()->SetTitle("N(Events)");
         photonEnergy_Asymmetry.push_back(temp);
 
@@ -111,34 +111,66 @@ void CCProtonPi0_Pion::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [Degree]",binList.angle.get_width()));
         phi.push_back(temp);
     }
-    // Other
-    gamma1_reco_P_true_P = new TH2D( "gamma1_reco_P_true_P","Leading Photon True vs Reconstructed Momentum",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
-    gamma1_reco_P_true_P->GetXaxis()->SetTitle("Reco P_{#gamma_{1}} [GeV]");
-    gamma1_reco_P_true_P->GetYaxis()->SetTitle("True P_{#gamma_{1}} [GeV]");
 
-    gamma1_P_error = new TH1D( "gamma1_P_error","Error on Leading Photon Momentum",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
-    gamma1_P_error->GetXaxis()->SetTitle("(P_{Reco}-P_{True})/P_{True}");
-    gamma1_P_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+    // Truth Energy - Gamma 1
+    gamma1_true_E = new TH1D( "gamma1_true_E","Leading Photon True Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
+    gamma1_true_E->GetXaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
+    gamma1_true_E->GetYaxis()->SetTitle("N(Events)");
+    
+    gamma1_reco_E_true_E = new TH2D( "gamma1_reco_E_true_E","Leading Photon True vs Reconstructed Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
+    gamma1_reco_E_true_E->GetXaxis()->SetTitle("Reco E_{#gamma_{1}} [GeV]");
+    gamma1_reco_E_true_E->GetYaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
 
-    gamma2_reco_P_true_P = new TH2D( "gamma2_reco_P_true_P","Secondary Photon True vs Reconstructed Momentum",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
-    gamma2_reco_P_true_P->GetXaxis()->SetTitle("Reco P_{#gamma_{1}} [GeV]");
-    gamma2_reco_P_true_P->GetYaxis()->SetTitle("True P_{#gamma_{1}} [GeV]");
+    gamma1_E_error = new TH1D( "gamma1_E_error","Error on Leading Photon Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    gamma1_E_error->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
+    gamma1_E_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+
+    // Truth Energy - Gamma 2
+    gamma2_true_E = new TH1D( "gamma2_true_E","Secondary Photon True Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
+    gamma2_true_E->GetXaxis()->SetTitle("True E_{#gamma_{2}} [GeV]");
+    gamma2_true_E->GetYaxis()->SetTitle("N(Events)");
+
+    gamma2_reco_E_true_E = new TH2D( "gamma2_reco_E_true_E","Secondary Photon True vs Reconstructed Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
+    gamma2_reco_E_true_E->GetXaxis()->SetTitle("Reco E_{#gamma_{2}} [GeV]");
+    gamma2_reco_E_true_E->GetYaxis()->SetTitle("True E_{#gamma_{2}} [GeV]");
  
-    gamma2_P_error = new TH1D( "gamma2_P_error","Error on Secondary Photon Momentum",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
-    gamma2_P_error->GetXaxis()->SetTitle("(P_{Reco}-P_{True})/P_{True}");
-    gamma2_P_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+    gamma2_E_error = new TH1D( "gamma2_E_error","Error on Secondary Photon Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    gamma2_E_error->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
+    gamma2_E_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
    
+    // Other
     gamma1_convLength_gamma2_convLength= new TH2D( "gamma1_convLength_gamma2_convLength","Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
     gamma1_convLength_gamma2_convLength->GetXaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
     gamma1_convLength_gamma2_convLength->GetYaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
      
-    gamma1_P_gamma2_P = new TH2D( "gamma1_P_gamma2_P","Leading Photon vs Secondary Photon Momentum",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
-    gamma1_P_gamma2_P->GetXaxis()->SetTitle("Reconstructed P_{#gamma_{1}} [GeV]");
-    gamma1_P_gamma2_P->GetYaxis()->SetTitle("Reconstructed P_{#gamma_{2}} [GeV]");
+    gamma1_E_gamma2_E = new TH2D( "gamma1_E_gamma2_E","Leading Photon vs Secondary Photon Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
+    gamma1_E_gamma2_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [GeV]");
+    gamma1_E_gamma2_E->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [GeV]");
 
-    mgg = new TH1D( "mgg","Corrected Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
-    mgg->GetXaxis()->SetTitle("Corrected m_{#gamma#gamma} [MeV]");
-    mgg->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV]",bin_invMass.get_width()));   
+    mgg_reco = new TH1D( "mgg_reco","Reconstructed Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
+    mgg_reco->GetXaxis()->SetTitle("Reconstructed m_{#gamma#gamma} [MeV]");
+    mgg_reco->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV]",bin_invMass.get_width()));   
+
+    mgg_true = new TH1D( "mgg_true","True Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
+    mgg_true->GetXaxis()->SetTitle("True m_{#gamma#gamma} [MeV]");
+    mgg_true->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV]",bin_invMass.get_width()));   
+
+    mgg_reco_true = new TH2D( "mgg_reco_true","True vs Reconstructed Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max(),bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
+    mgg_reco_true->GetXaxis()->SetTitle("Reconstructed m_{#gamma#gamma} [MeV]");
+    mgg_reco_true->GetYaxis()->SetTitle("True m_{#gamma#gamma} [MeV]");
+
+    mgg_error = new TH1D( "mgg_error","Error on Pi0 Invariant Mass",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    mgg_error->GetXaxis()->SetTitle("(m_{#gamma#gamma}^Reco - m_{#gamma#gamma}^Reco)/m_{#gamma#gamma}^True");
+    mgg_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+ 
+    isGamma1_conv_inside = new TH1D( "isGamma1_conv_inside","Is Gamma 1 Converted Inside?",binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
+    isGamma1_conv_inside->GetXaxis()->SetTitle("0 = False, 1 = True");
+    isGamma1_conv_inside->GetYaxis()->SetTitle("N(Events)");
+  
+    isGamma2_conv_inside = new TH1D( "isGamma2_conv_inside","Is Gamma 2 Converted Inside?",binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
+    isGamma2_conv_inside->GetXaxis()->SetTitle("0 = False, 1 = True");
+    isGamma2_conv_inside->GetYaxis()->SetTitle("N(Events)");
+
 }
 
 void CCProtonPi0_Pion::writeHistograms()
@@ -153,11 +185,11 @@ void CCProtonPi0_Pion::writeHistograms()
         
         // Leading Photon
         gamma1_ConvLength[i]->Write();
-        gamma1_P[i]->Write();
+        gamma1_E[i]->Write();
         gamma1_theta[i]->Write();
         // Secondary Photon
         gamma2_ConvLength[i]->Write();
-        gamma2_P[i]->Write();
+        gamma2_E[i]->Write();
         gamma2_theta[i]->Write();
 
 
@@ -170,13 +202,22 @@ void CCProtonPi0_Pion::writeHistograms()
     }
     
     // Photon Comparsion
-    mgg->Write();
-    gamma1_reco_P_true_P->Write();
-    gamma1_P_error->Write();
-    gamma2_reco_P_true_P->Write();
-    gamma2_P_error->Write();
+    isGamma1_conv_inside->Write();
+    isGamma2_conv_inside->Write();
+    
+    mgg_reco->Write();
+    mgg_true->Write();
+    mgg_error->Write();
+    mgg_reco_true->Write();
+    
+    gamma1_true_E->Write();
+    gamma1_reco_E_true_E->Write();
+    gamma1_E_error->Write();
+    gamma2_true_E->Write();
+    gamma2_reco_E_true_E->Write();
+    gamma2_E_error->Write();
  
-    gamma1_P_gamma2_P->Write();
+    gamma1_E_gamma2_E->Write();
     gamma1_convLength_gamma2_convLength->Write();
 
     f->Close();
