@@ -167,6 +167,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Bool_t          minos_track_inside_partial_plane;
    Bool_t          prim_vtx_has_misassigned_track_direction;
    Bool_t          prim_vtx_has_broken_track;
+   Bool_t          is_anglescan;
+   Bool_t          is_anglescan_applied;
+   Bool_t          is_houghtransform;
+   Bool_t          is_houghtransform_applied;
    Int_t           Cut_BlobDirectionBad;
    Int_t           Cut_BlobsBad;
    Int_t           Cut_ConeBlobs;
@@ -813,6 +817,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_minos_track_inside_partial_plane;   //!
    TBranch        *b_prim_vtx_has_misassigned_track_direction;   //!
    TBranch        *b_prim_vtx_has_broken_track;   //!
+   TBranch        *b_is_anglescan;   //!
+   TBranch        *b_is_anglescan_applied;   //!
+   TBranch        *b_is_houghtransform;   //!
+   TBranch        *b_is_houghtransform_applied;   //!
    TBranch        *b_Cut_BlobDirectionBad;   //!
    TBranch        *b_Cut_BlobsBad;   //!
    TBranch        *b_Cut_ConeBlobs;   //!
@@ -1436,7 +1444,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_prong_part_pid;   //!
    TBranch        *b_prong_part_E;   //!
    TBranch        *b_prong_part_pos;   //!
-
 
 };
 

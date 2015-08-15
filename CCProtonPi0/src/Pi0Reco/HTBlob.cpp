@@ -12,28 +12,33 @@
 #include "TH2D.h"
 #include "TF1.h"
 
-
 DECLARE_TOOL_FACTORY( HTBlob );
 
 //=============================================================================
 // Standard constructor, initializes variables
 //=============================================================================
 HTBlob::HTBlob( const std::string& type, const std::string& name, const IInterface* parent ) : 
-  MinervaHistoTool( type, name, parent ) 
+    MinervaHistoTool( type, name, parent ) 
 {
     debug() << "Instantiating HTBlob..." << endmsg;
     declareInterface<IHoughBlob>(this);
-        
-	//dEdx
+
+    //dEdx
     declareProperty( "NumberPlanesdEdX",              m_planesdEdx = 4 );
-  
-        // Blob vertex and Event vertex
+
+    // Blob vertex and Event vertex
     declareProperty( "MinDistanceStripPhoton",        m_minDistanceStripPhoton = 75* CLHEP::mm );
     declareProperty( "MaxDisntaceModulePhoton",       m_minDistanceModulePhoton = 50* CLHEP::mm );
-    declareProperty( "EnergyCalibrationScaleFactor",  m_scalefactor = 1.213 );
+    declareProperty( "EnergyCalibrationScaleFactor",  m_scalefactor = 1.326 );
     declareProperty( "EnergyCalibrationTracker",      m_calibrationTracker = 1.0 );
-    declareProperty( "EnergyCalibrationECal",         m_calibrationECal = 2.274 );
-    declareProperty( "EnergyCalibrationHCal",         m_calibrationHCal = 10.55 );
+    declareProperty( "EnergyCalibrationECal",         m_calibrationECal = 2.341 );
+    declareProperty( "EnergyCalibrationHCal",         m_calibrationHCal = 9.54 );
+
+    // Obsolete Constants as 08/15/2015  
+    //    declareProperty( "EnergyCalibrationScaleFactor",  m_scalefactor = 1.213 );
+    //    declareProperty( "EnergyCalibrationTracker",      m_calibrationTracker = 1.0 );
+    //    declareProperty( "EnergyCalibrationECal",         m_calibrationECal = 2.274 );
+    //    declareProperty( "EnergyCalibrationHCal",         m_calibrationHCal = 10.55 );
 
 }
 
@@ -48,11 +53,11 @@ HTBlob::~HTBlob() {}
 //=============================================================================
 StatusCode HTBlob::initialize() 
 {
- 
+
     debug() << "Initializing HTBlob..." << endmsg;
     StatusCode sc = this->MinervaHistoTool::initialize();
     if( sc.isFailure() ) { return Error( "Failed to initialize!", sc ); }
-    
+
     try {
         m_mathTool = tool<IMinervaMathTool>("MinervaMathTool");
     }
@@ -60,7 +65,7 @@ StatusCode HTBlob::initialize()
         error() << "Could not obtain tool: MinervaMathTool!" << endmsg;
         return StatusCode::FAILURE;
     }
-    
+
     return sc;
 }
 
@@ -68,26 +73,26 @@ StatusCode HTBlob::initialize()
 // GetClusters
 //=============================================================================
 StatusCode HTBlob::GetViewClustersAboveThreshold( SmartRefVector<Minerva::IDCluster> &idClusterVec,
-                                                  SmartRefVector<Minerva::IDCluster> &idClusterView,
-                                                  Minerva::IDCluster::View view, double pecut ) const
+        SmartRefVector<Minerva::IDCluster> &idClusterView,
+        Minerva::IDCluster::View view, double pecut ) const
 {
-	
+
     if( !idClusterVec.size() ) { 
         debug() << " ALERT: Input Vector of Clusters to the Get_Clusters tool is empty " << endmsg;
         return StatusCode::FAILURE;
     }
-	
+
     SmartRefVector<Minerva::IDCluster> ClusTemp = idClusterVec;
     SmartRefVector<Minerva::IDCluster>::iterator itClus = ClusTemp.begin();
     idClusterVec.clear();
-    
+
     for ( ; itClus != ClusTemp.end(); itClus++ ){
-        
+
         if ( (*itClus)->view()==view && (*itClus)->pe()/(*itClus)->iddigs()>3 && (*itClus)->pe()>pecut  ) {
             idClusterView.push_back(*itClus);
         }
         else idClusterVec.push_back(*itClus);
-        
+
     }
 
     return StatusCode::SUCCESS;
@@ -100,7 +105,7 @@ StatusCode HTBlob::GetViewClustersAboveThreshold( SmartRefVector<Minerva::IDClus
 //  XUVMatch
 //=======================================================================
 StatusCode HTBlob::XUVMatch(SmartRefVector<Minerva::IDCluster> &Seed, SmartRefVector<Minerva::IDCluster> &ClusVectorU,
-                            SmartRefVector<Minerva::IDCluster> &ClusVectorV, double match) const
+        SmartRefVector<Minerva::IDCluster> &ClusVectorV, double match) const
 {
     debug() << " == HTBlob::XUVMatch " << endmsg;
 
@@ -109,22 +114,22 @@ StatusCode HTBlob::XUVMatch(SmartRefVector<Minerva::IDCluster> &Seed, SmartRefVe
     double zmin = 10000, zmax = 0;
 
     debug() << " Seed size = " << Seed.size()  << endmsg;
-    
+
     for ( itClusX = ClusTemp.begin(); itClusX != ClusTemp.end(); itClusX++ ){
         double z  = (*itClusX)->z();
         if ( z < zmin ) zmin = z;
         if ( z > zmax ) zmax = z;
     }
     debug() << " Finding clusters with macth and zmin " << zmin << "; zmax " << zmax << endmsg;
-    
+
     for ( itClusX = ClusTemp.begin(); itClusX != ClusTemp.end(); itClusX++ ) {
         if ( (*itClusX)->view() != Minerva::IDCluster::X ) continue;
         XUVMatch( *itClusX, Seed, ClusVectorU, ClusVectorV, zmin, zmax, match );
     }
-    
+
     debug() << " == HTBlob::XUVMatch - NO MORE SEED CLUSTERS to Match, leaving seed with size: " << Seed.size()
-            << endmsg << endmsg;
-	
+        << endmsg << endmsg;
+
     return StatusCode::SUCCESS;
 
 }
@@ -133,47 +138,47 @@ StatusCode HTBlob::XUVMatch(SmartRefVector<Minerva::IDCluster> &Seed, SmartRefVe
 //  XUVMatch overload
 //=======================================================================
 StatusCode HTBlob::XUVMatch( SmartRef<Minerva::IDCluster> Cluster, SmartRefVector<Minerva::IDCluster> &Seed,
-                             SmartRefVector<Minerva::IDCluster> &ClusVectorU,
-                             SmartRefVector<Minerva::IDCluster> &ClusVectorV,
-                             double zmin, double zmax, double match) const
+        SmartRefVector<Minerva::IDCluster> &ClusVectorU,
+        SmartRefVector<Minerva::IDCluster> &ClusVectorV,
+        double zmin, double zmax, double match) const
 {
     debug() << " HTBlob::XUVMatch  - Overload with match = " << match <<endmsg;
-    
+
     SmartRefVector<Minerva::IDCluster>::iterator itClusU, itClusV;
     SmartRef<Minerva::IDCluster> U, V;
     double dmin = 1000, distance;
-    
+
     debug() << " MATCH, X cluster, pe " << Cluster->pe() << "; z " << Cluster->z() << "; position " << Cluster->position()
-            << "; sum pos " << Cluster->position()+Cluster->tpos1()+Cluster->tpos2() << endmsg;
+        << "; sum pos " << Cluster->position()+Cluster->tpos1()+Cluster->tpos2() << endmsg;
 
     for ( itClusU = ClusVectorU.begin(); itClusU != ClusVectorU.end(); itClusU++ ){
-        
+
         if ( fabs( Cluster->z() - (*itClusU)->z() ) > 50 ) continue;
-        
+
         for ( itClusV = ClusVectorV.begin(); itClusV != ClusVectorV.end(); itClusV++ ) {
-            
+
             if ( fabs( Cluster->z() - (*itClusV)->z() ) > 50 ) continue;
-            
+
             distance =  Cluster->position()+Cluster->tpos1()+Cluster->tpos2();
             distance -= ((*itClusU)->position()+(*itClusU)->tpos1()+(*itClusU)->tpos2());
             distance -= ((*itClusV)->position()+(*itClusV)->tpos1()+(*itClusV)->tpos2());
             distance = fabs(distance);
-            
+
             if ( distance < dmin) {
                 debug() << " MATCH Cand. " << " U, pe " << (*itClusU)->pe() << "; z " << (*itClusU)->z()
-                        << "; position " << (*itClusU)->position()
-                        << "; sum pos " << (*itClusU)->position()+(*itClusU)->tpos1()+(*itClusU)->tpos2() << endmsg;
+                    << "; position " << (*itClusU)->position()
+                    << "; sum pos " << (*itClusU)->position()+(*itClusU)->tpos1()+(*itClusU)->tpos2() << endmsg;
 
                 debug() << " V, pe " << (*itClusV)->pe() << "; z " << (*itClusV)->z()
-                        << "; position " << (*itClusV)->position()
-                        << "; sum pos " << (*itClusV)->position()+(*itClusV)->tpos1()+(*itClusV)->tpos2()
-                        << endmsg;
-                
+                    << "; position " << (*itClusV)->position()
+                    << "; sum pos " << (*itClusV)->position()+(*itClusV)->tpos1()+(*itClusV)->tpos2()
+                    << endmsg;
+
                 dmin = distance;
                 U = *itClusU;
                 V = *itClusV;
             }
-            
+
         }
     }
 
@@ -182,7 +187,7 @@ StatusCode HTBlob::XUVMatch( SmartRef<Minerva::IDCluster> Cluster, SmartRefVecto
     if ( dmin <= efmatch && Cluster->z() >= zmin && Cluster->z() <= zmax ) {
         debug() << " FOUND MATCH " << U << " " << V << " Match " << efmatch << endmsg;
         SmartRefVector<Minerva::IDCluster>::iterator itU, itV;
-        
+
         itU = remove(ClusVectorU.begin(),ClusVectorU.end(),U); // move elements to the end to can erase
         itV = remove(ClusVectorV.begin(),ClusVectorV.end(),V);
         ClusVectorU.erase(itU,ClusVectorU.end()); // found it in doxygen
@@ -192,26 +197,26 @@ StatusCode HTBlob::XUVMatch( SmartRef<Minerva::IDCluster> Cluster, SmartRefVecto
     }
 
     return StatusCode::SUCCESS;
-    
+
 }
 
 //======================================================================
 //  AddClustersInsideCone
 //=======================================================================
 StatusCode HTBlob::AddClusterInsideCone(SmartRef<Minerva::IDCluster> UnuCluster, std::vector<Minerva::IDBlob*> &idBlobs, 
-                                        Gaudi::XYZPoint vert ) const
+        Gaudi::XYZPoint vert ) const
 {
     debug() << " HTBlob::AddClusterInsideCone " << endmsg;
     debug() << " Cluster view = " << UnuCluster->view() << "; z = " << UnuCluster->z()
-            << "; position = " << UnuCluster->position() << "; pe = " << UnuCluster->pe() << endmsg;
-    
+        << "; position = " << UnuCluster->position() << "; pe = " << UnuCluster->pe() << endmsg;
+
     std::vector<Minerva::IDBlob*> BlobsTemp = idBlobs; idBlobs.clear();
     std::vector<Minerva::IDBlob*>::iterator itBlob;
     double amin = 1000, angle;
     int count = -1, marker = 0;
-    
+
     for (itBlob = BlobsTemp.begin(); itBlob != BlobsTemp.end(); itBlob++ ){
-        
+
         count++; 
         if ( (*itBlob)->direction().z() > 0 && ((*itBlob)->startPoint().z() - 25) > UnuCluster->z() ) continue;
         if ( (*itBlob)->direction().z() < 0 && ((*itBlob)->startPoint().z() + 25) < UnuCluster->z() ) continue;
@@ -221,21 +226,21 @@ StatusCode HTBlob::AddClusterInsideCone(SmartRef<Minerva::IDCluster> UnuCluster,
             amin = angle;
             marker = count;
         }
-        
+
     }
-    
+
     debug() << " amin = " << amin << " marker = " << marker  << endmsg;
-    
+
     if ( amin < 0.174) { //10 degrees
-        
+
         itBlob = BlobsTemp.begin();
         itBlob = itBlob + marker;
         (*itBlob)->add(UnuCluster);
-        
+
     }
-    
+
     idBlobs = BlobsTemp;
-    
+
     return StatusCode::SUCCESS;
 }
 
@@ -243,14 +248,14 @@ StatusCode HTBlob::AddClusterInsideCone(SmartRef<Minerva::IDCluster> UnuCluster,
 //  PseudoCone
 //=======================================================================
 StatusCode HTBlob::PseudoCone(SmartRefVector<Minerva::IDCluster> &Seed, SmartRefVector<Minerva::IDCluster> &ClusVectorX,
-                              Gaudi::XYZVector direction, Gaudi::XYZPoint vert ) const
+        Gaudi::XYZVector direction, Gaudi::XYZPoint vert ) const
 {
-    
+
     debug() << " HTBlob::PseudoCone, clusters with Angles < 0.06 will be include in the seed " << endmsg;
 
     SmartRefVector<Minerva::IDCluster> ClusTemp = ClusVectorX; ClusVectorX.clear();
     SmartRefVector<Minerva::IDCluster>::iterator itClusX;
-    
+
     double angle;
 
     for ( itClusX = ClusTemp.begin(); itClusX != ClusTemp.end(); itClusX++ ){
@@ -271,46 +276,46 @@ StatusCode HTBlob::PseudoCone(SmartRefVector<Minerva::IDCluster> &Seed, SmartRef
 //=======================================================================
 StatusCode HTBlob::Angle( SmartRef<Minerva::IDCluster> Cluster, Gaudi::XYZVector direction, Gaudi::XYZPoint vert, double &angle ) const
 {
-    
+
     if ( direction.x() == -9999 || vert.x() == -9999 ) return StatusCode::FAILURE;
     double dx, dz, Dx, Dz;
-    
+
     switch(Cluster->view())
     {
         case Minerva::IDCluster::X:
             dx = Cluster->position() - vert.x();
             Dx = direction.x();
             break;
-            
+
         case Minerva::IDCluster::U:
             dx = Cluster->position() - m_mathTool->calcUfromXY(vert.x(),vert.y());
             Dx = m_mathTool->calcUfromXY(direction.x(),direction.y());
             break;
-            
+
         case Minerva::IDCluster::V:
             dx = Cluster->position() - m_mathTool->calcVfromXY(vert.x(),vert.y());
             Dx = m_mathTool->calcVfromXY(direction.x(),direction.y());
             break;
-            
+
         default:
             throw MinervaException("Unknown cluster view");
-            
+
     }
 
     dz = Cluster->z() - vert.z();
     Dz = direction.z();
-    
+
     double moduled = sqrt( pow(dx,2) + pow(dz,2) );
     double moduleD = sqrt( pow(Dx,2) + pow(Dz,2) );
-    
+
     dx = dx/moduled; dz = dz/moduled;
     Dx = Dx/moduleD; Dz = Dz/moduleD;
-    
+
     angle = acos(fabs(dx*Dx+dz*Dz));
 
     debug() << " pe = " << Cluster->pe() << "; z = " << Cluster->z() << "; pos = "  << Cluster->position()
-            << " Angle " << angle << endmsg;
-    
+        << " Angle " << angle << endmsg;
+
     return StatusCode::SUCCESS;
 
 }
@@ -319,28 +324,28 @@ StatusCode HTBlob::Angle( SmartRef<Minerva::IDCluster> Cluster, Gaudi::XYZVector
 // Create2dHTBlob
 //=============================================================================
 StatusCode HTBlob::Create2dHTSeed( SmartRefVector<Minerva::IDCluster> &idClusterView,
-                                   SmartRefVector<Minerva::IDCluster> &HT2dClusters, 
-                                   double r, double theta, Gaudi::XYZPoint ref, double &spX, double &spZ ) const
+        SmartRefVector<Minerva::IDCluster> &HT2dClusters, 
+        double r, double theta, Gaudi::XYZPoint ref, double &spX, double &spZ ) const
 {
-    
+
     debug() << " HTtool::Create2dHTSeed " << endmsg;
-    
+
     double rmin, rmax, x, z, zmin = 10000, Total_e = 0;
     SmartRefVector<Minerva::IDCluster> ClusTemp = idClusterView;
     SmartRefVector<Minerva::IDCluster>::iterator itClus = ClusTemp.begin();
     idClusterView.clear();
-    
+
     debug() << " Will study " << ClusTemp.size() << " clusters " << endmsg;
-    
+
     debug() << " Seed with, r: " << r << ", theta = " << theta << ";contains these clusters: " << endmsg;
-    
+
     for ( ; itClus != ClusTemp.end(); itClus++ ){
         z = (*itClus)->z() - ref.z();
         x = (*itClus)->tpos1() - ref.x();
         rmin = x*sin(theta*CLHEP::pi/180) + z*cos(theta*CLHEP::pi/180);
         x = (*itClus)->tpos2() - ref.x();
         rmax = x*sin(theta*CLHEP::pi/180) + z*cos(theta*CLHEP::pi/180);
-        
+
         if ( fabs ( 2*r - rmin - rmax ) <= 90 ){
             if ( (*itClus)->z()< zmin ) {
                 zmin = (*itClus)->z();
@@ -348,7 +353,7 @@ StatusCode HTBlob::Create2dHTSeed( SmartRefVector<Minerva::IDCluster> &idCluster
                 spX  = (*itClus)->position();
             }
             debug() << " pe = " << (*itClus)->pe() << "; z = " << (*itClus)->z() << "; pos = "  << (*itClus)->position()
-                    << endmsg;
+                << endmsg;
             HT2dClusters.push_back(*itClus);
             Total_e += (*itClus)->energy();
 
@@ -360,7 +365,7 @@ StatusCode HTBlob::Create2dHTSeed( SmartRefVector<Minerva::IDCluster> &idCluster
     }
 
     debug() << " Total energy comming from seed = " << Total_e << "; this energy must be bigger than 19"
-            << endmsg << endmsg;
+        << endmsg << endmsg;
 
     if ( Total_e < 19 ) {
         idClusterView.insert(idClusterView.end(),HT2dClusters.begin(),HT2dClusters.end());
@@ -376,11 +381,11 @@ StatusCode HTBlob::Create2dHTSeed( SmartRefVector<Minerva::IDCluster> &idCluster
 StatusCode HTBlob::GetDirection( Minerva::IDBlob *idBlob ) const
 {
     debug() << " HTtool::GetDirection " << endmsg;
-    
+
     Gaudi::XYZPoint vertex = idBlob->startPoint();
     GetDirection( idBlob, vertex );
     return StatusCode::SUCCESS;
-    
+
 }
 
 //=============================================================================
@@ -390,12 +395,12 @@ StatusCode HTBlob::GetDirection( Minerva::IDBlob *idBlob ) const
 //=============================================================================
 bool HTBlob::GetDirection( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert ) const
 {
-    
+
     debug() << " HTBlob::GetDirection " << endmsg;
-    
+
     SmartRefVector<Minerva::IDCluster> idClusters = idBlob->clusters();
     SmartRefVector<Minerva::IDCluster>::iterator itClus = idClusters.begin();
-    
+
     double Xx = 0.0;
     double Zx = 0.0;
     double Xu = 0.0;
@@ -407,11 +412,11 @@ bool HTBlob::GetDirection( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert ) const
     double dy = 0.0;
     double dz = 0.0;
     double distance = 0.0;
-    
+
     for ( ; itClus != idClusters.end(); itClus++ ){
-        
+
         dz = (*itClus)->z() - vert.z();
-	
+
         switch((*itClus)->view())
         {
             case Minerva::IDCluster::X:
@@ -422,7 +427,7 @@ bool HTBlob::GetDirection( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert ) const
                 Zx += dz*(*itClus)->energy()/distance;
                 totalX += (*itClus)->energy()/distance;
                 break;
-		
+
             case Minerva::IDCluster::U:
                 dx = (*itClus)->position() - m_mathTool->calcUfromXY(vert.x(), vert.y());
                 distance = sqrt(pow(dx,2)+pow(dz,2));
@@ -430,7 +435,7 @@ bool HTBlob::GetDirection( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert ) const
                 Xu += dx*(*itClus)->energy()/distance;
                 totalU += (*itClus)->energy()/distance;
                 break;
-		
+
             case Minerva::IDCluster::V:
                 dx = (*itClus)->position() - m_mathTool->calcVfromXY(vert.x(), vert.y());
                 distance = sqrt(pow(dx,2)+pow(dz,2));
@@ -438,7 +443,7 @@ bool HTBlob::GetDirection( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert ) const
                 Xv += dx*(*itClus)->energy()/distance;
                 totalV += (*itClus)->energy()/distance;
                 break;
-                
+
             default:
                 throw MinervaException("Unknown cluster view");
         }
@@ -446,7 +451,7 @@ bool HTBlob::GetDirection( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert ) const
     }
 
     Gaudi::XYZVector direction;
-    
+
     dx = Xx/totalX;
     dz = Zx/totalX;
     dy = -9999;
@@ -464,25 +469,25 @@ bool HTBlob::GetDirection( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert ) const
         dy = (Xv/totalV - dx*.5)*2/sqrt(3); 	//calcYfromXV?
         valid_dY = true;
     }
-    
+
     if  ( !valid_dY ){
         debug() << " Bad direction" << endmsg;
         idBlob->setDirection(Gaudi::XYZVector(-9999,-9999,-9999));
         return false;
     }
     else {
-        
+
         double mod = sqrt( pow(dx,2)+pow(dy,2)+pow(dz,2) );
 
         direction.SetX(dx/mod);
         direction.SetY(dy/mod);
         direction.SetZ(dz/mod);
-        
+
     }
 
     debug() << " Setting direction " << direction << " Blob" << idBlob << endmsg;
     idBlob->setDirection(direction);
-    
+
     return true;
 }
 
@@ -495,19 +500,19 @@ bool HTBlob::GetStartPosition( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert, bo
 {
 
     debug() << " HTBlob::GetStartPosition " << endmsg;
-    
+
     TH2D *hU = new TH2D ( "hU", "hU", 480,4510,9990,127,-1075,1075);
     TH2D *hV = new TH2D ( "hV", "hV", 480,4510,9990,127,-1075,1075);
-    
+
     if ( is_vertex ){	
         hU->Fill( vert.z(), m_mathTool->calcUfromXY(vert.x(), vert.y()), 20 );
         hV->Fill( vert.z(), m_mathTool->calcVfromXY(vert.x(), vert.y()), 20);
     }
-    
+
     SmartRefVector<Minerva::IDCluster> idClusters = idBlob->clusters();
     SmartRefVector<Minerva::IDCluster>::iterator itClus = idClusters.begin();
     Gaudi::XYZPoint pos;
-    
+
     double Dx = 0.0;
     double Dz = 0.0;
     double distance = 0.0;
@@ -530,12 +535,12 @@ bool HTBlob::GetStartPosition( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert, bo
 
     int countu = 0;
     int countv = 0; // to NC Pi0 events, there is no muon vertex
-    
+
     for ( ; itClus != idClusters.end(); itClus++ ){
-        
+
         Dx = (*itClus)->position() - vert.x(); 
         Dz = (*itClus)->z() - vert.z();// to avoid 0
-	
+
         if( (*itClus)->view()== Minerva::IDCluster::X ) {
             distance = sqrt( pow(Dx,2) + pow(Dz,2) );
             if (distance <= dis_min_x  ) {
@@ -544,10 +549,10 @@ bool HTBlob::GetStartPosition( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert, bo
                 vt_z = (*itClus)->z();
             }
         }
-	
+
         if( (*itClus)->view()== Minerva::IDCluster::U ){
             debug() <<  " StartPoint U view, pe " << (*itClus)->pe() << "; z = " << (*itClus)->z()
-                    << "; coord " << (*itClus)->position() << endmsg;
+                << "; coord " << (*itClus)->position() << endmsg;
             Dx = (*itClus)->position() - m_mathTool->calcUfromXY(vert.x(),vert.y());
             distance = sqrt( pow(Dx,2) + pow(Dz,2) );
             if ( is_vertex ) {
@@ -561,10 +566,10 @@ bool HTBlob::GetStartPosition( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert, bo
                 countu++;
             }
         }
-	
+
         if( (*itClus)->view()== Minerva::IDCluster::V ){
             debug() <<  " StartPoint V view, pe " << (*itClus)->pe() << "; z = " << (*itClus)->z()
-                    << "; coord " << (*itClus)->position() << endmsg;
+                << "; coord " << (*itClus)->position() << endmsg;
             Dx = (*itClus)->position() -  m_mathTool->calcVfromXY(vert.x(),vert.y());
             distance = sqrt( pow(Dx,2) + pow(Dz,2) );
             if ( is_vertex ){
@@ -579,7 +584,7 @@ bool HTBlob::GetStartPosition( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert, bo
             }
         }
     }
-    
+
     TF1 *fU, *fV;
 
     double slopeu = -9999;
@@ -595,7 +600,7 @@ bool HTBlob::GetStartPosition( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert, bo
         bu = fU->GetParameter(0);
         slopeu = fU->GetParameter(1);
         goodFit_U = true;
-        
+
         delete fU;
     }
     else if ( hU->GetEntries() == 2 ){ // to deal with 2 clusters on NCPi0
@@ -610,14 +615,14 @@ bool HTBlob::GetStartPosition( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert, bo
             goodFit_U = true;
         }
     }
-    
+
     if ( hV->GetEntries() > 3 ){
         hV->Fit("pol1","Q0");
         fV = hV->GetFunction("pol1");
         bv = fV->GetParameter(0);
         slopev = fV->GetParameter(1);
         goodFit_V = true;
-        
+
         delete fV;
     }
     else if ( hV->GetEntries() == 2 ){ // to deal with 2 clusters on NCPi0
@@ -632,7 +637,7 @@ bool HTBlob::GetStartPosition( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert, bo
             goodFit_V = true;
         }
     }
-    
+
     vtX = vt_x;
     vtZ = vt_z;
     debug() << " Startpoint, slope u " << slopeu << " slope v" << slopev << endmsg;
@@ -649,9 +654,9 @@ bool HTBlob::GetStartPosition( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert, bo
         vt_v = slopev*vt_z + bv;
         vtY = (vt_v - vt_x*.5)*2/sqrt(3);    //calcYfromXV?
     }
-		
+
     pos.SetX(vtX); pos.SetY(vtY); pos.SetZ(vtZ);
-	
+
     idBlob->setStartPoint(pos);
 
     debug() << " Setting StarPoint " << pos << " Blob" << idBlob << endmsg;
@@ -660,7 +665,7 @@ bool HTBlob::GetStartPosition( Minerva::IDBlob *idBlob, Gaudi::XYZPoint vert, bo
     delete hV;
 
     if (goodFit_U || goodFit_V) return true;
-	
+
     return false;
 
 }
@@ -676,53 +681,53 @@ StatusCode HTBlob::idBlobdEdx( Minerva::IDBlob *idblob, double &dEdx ) const
     SmartRefVector< Minerva::IDCluster >::iterator it_clus = idClusters.begin();
     TH1D *h = new TH1D ("h","h", 100,0,4500); // bin size 45mm <> 1 module
     dEdx = 0;
-    
+
     Gaudi::XYZPoint vert = idblob->startPoint();
     double x, z, distance, vt_x, vt_u, vt_v, vt_z;
-    
-	// event vertex per view
+
+    // event vertex per view
     vt_x =  vert.x();
     vt_u = -vert.y()*sqrt(3)/2 + vert.x()*.5; //  -ycos30 + xsin30
     vt_v =  vert.y()*sqrt(3)/2 + vert.x()*.5; //   ycos30 + xsin30
     vt_z =  vert.z();
-    
-    
+
+
     for ( ; it_clus != idClusters.end(); it_clus++ ){
-        
+
         x = vt_x - (*it_clus)->position();
         z = vt_z - (*it_clus)->z();
-        
+
         if ( (*it_clus)->view() ==  Minerva::IDCluster::U ){
             x = vt_u - (*it_clus)->position();
             z = vt_z - (*it_clus)->z();
         }
-        
+
         if ( (*it_clus)->view() ==  Minerva::IDCluster::V ){
             x = vt_v - (*it_clus)->position();
             z = vt_z - (*it_clus)->z();
         }
-        
+
         distance = sqrt( pow(x,2) + pow(z,2) );
         h->Fill(distance, (*it_clus)->energy());
     }
-    
-	// dEdx calculation, maybe not clear
+
+    // dEdx calculation, maybe not clear
     int binmin = h->FindFirstBinAbove();
     int binmax = (h->FindLastBinAbove()-m_planesdEdx/2);
-    
+
     for ( int i = binmin; i <= binmax; i++ ){
         if ( FinddEdxPlanes(h, i, dEdx) ) break;
         dEdx = 0;
     }
     if ( dEdx == 0 ) dEdx = -999;
     else dEdx = dEdx/m_planesdEdx;
-    
+
     info () << " dEdx = " << dEdx << " number planes " << m_planesdEdx << endmsg;
-    
+
     delete h;
-    
+
     return StatusCode::SUCCESS;
-    
+
 }
 
 //=======================================================================
@@ -730,10 +735,10 @@ StatusCode HTBlob::idBlobdEdx( Minerva::IDBlob *idblob, double &dEdx ) const
 //=======================================================================
 StatusCode HTBlob::FinddEdxPlanes(TH1D *h, int &index, double &dEdx) const
 {
-    
+
     dEdx = 0;
     int count = 0;
-    
+
     for ( int i = index; i <= m_planesdEdx/2; i++){
         if ( h->GetBinContent(i) > 0 ) {
             count++;
@@ -743,7 +748,7 @@ StatusCode HTBlob::FinddEdxPlanes(TH1D *h, int &index, double &dEdx) const
     }
     if ( count == m_planesdEdx/2 ) 	return StatusCode::SUCCESS;
     else 	return StatusCode::FAILURE;
-    
+
 }
 
 //=======================================================================
@@ -756,15 +761,15 @@ StatusCode HTBlob::isPhoton( SmartRefVector<Minerva::IDCluster> Seed, Gaudi::XYZ
 {
 
     debug() << " HTBlob::isPhoton, asking vtx_z = " << vtX.z()  << "; vtx_x " << vtX.x() << endmsg;
-    
+
     SmartRefVector<Minerva::IDCluster>::iterator itClus = Seed.begin();
     double min_radius = 10000.0;
     Gaudi::XYZPoint upstream;
-    
+
     for ( ; itClus != Seed.end(); ++itClus ) {
-        
+
         if ( (*itClus)->view() != Minerva::IDCluster::X ) continue;
-        
+
         double radius =sqrt( pow(vtX.x()-(*itClus)->position(),2) + pow(vtX.z() - (*itClus)->z(),2) );
         if ( radius < min_radius ){
             min_radius = radius;
@@ -773,14 +778,14 @@ StatusCode HTBlob::isPhoton( SmartRefVector<Minerva::IDCluster> Seed, Gaudi::XYZ
             upstream.SetZ( (*itClus)->z() );
         }
     }
-    
+
     if ( fabs(upstream.x()-vtX.x()) > m_minDistanceStripPhoton ||
-         fabs(upstream.z()-vtX.z()) > m_minDistanceModulePhoton ) 
-            return StatusCode::SUCCESS;
-    
+            fabs(upstream.z()-vtX.z()) > m_minDistanceModulePhoton ) 
+        return StatusCode::SUCCESS;
+
     else 
-            return StatusCode::FAILURE;
-    
+        return StatusCode::FAILURE;
+
 }
 
 //=======================================================================
@@ -789,17 +794,17 @@ StatusCode HTBlob::isPhoton( SmartRefVector<Minerva::IDCluster> Seed, Gaudi::XYZ
 //  Cesar Sotelo docdb 7561
 //=======================================================================
 StatusCode HTBlob::getBlobEnergyTime( Minerva::IDBlob *idblob, double &energy,
-                                      double& tracker_evis,
-                                      double& ecal_evis,
-                                      double& hcal_evis,
-                                      double& scal_evis) const
+        double& tracker_evis,
+        double& ecal_evis,
+        double& hcal_evis,
+        double& scal_evis) const
 {
-	
+
     debug() << "HTBlob::getBlobEnergy"  << endmsg;
     SmartRefVector< Minerva::IDCluster > idClusters = idblob->clusters();
     SmartRefVector< Minerva::IDCluster >::iterator it_clus = idClusters.begin();
     SmartRefVector< Minerva::IDDigit >::iterator it_dig;
-    
+
     energy = 0;
     double time = 0, total_pe = 0, factor = 2;
 
@@ -807,34 +812,34 @@ StatusCode HTBlob::getBlobEnergyTime( Minerva::IDBlob *idblob, double &energy,
     ecal_evis    = 0.0;
     hcal_evis    = 0.0;
     scal_evis    = 0.0;
-    
+
     for ( ; it_clus != idClusters.end(); it_clus++ ){
         time += (*it_clus)->time()*(*it_clus)->pe();
         total_pe += (*it_clus)->pe();
-	const double cluster_energy = (*it_clus)->energy();
+        const double cluster_energy = (*it_clus)->energy();
         if ( (*it_clus)->subdet() ==  Minerva::IDCluster::ECAL ) {
             energy    += cluster_energy*m_scalefactor*m_calibrationECal;
             ecal_evis += cluster_energy;
         }
-        
+
         if ( (*it_clus)->subdet() ==  Minerva::IDCluster::HCAL ) {
             energy += cluster_energy*m_scalefactor*m_calibrationHCal;
             hcal_evis   += cluster_energy;
         }
-            
+
         if ( (*it_clus)->subdet() ==  Minerva::IDCluster::Tracker ) {
-            
+
             if ( (*it_clus)->view() == Minerva::IDCluster::X ) factor = 2;
             else factor = 4;
-            
+
             SmartRefVector< Minerva::IDDigit > idDigits = (*it_clus)->centralDigits();
             SmartRefVector< Minerva::IDDigit > sideDigits = (*it_clus)->sideEcalDigits();
-            
+
             for ( it_dig = idDigits.begin(); it_dig != idDigits.end(); it_dig++ ){
                 energy += (*it_dig)->normEnergy()*m_scalefactor*m_calibrationTracker;
                 tracker_evis += (*it_dig)->normEnergy();
             }
-            
+
             for ( it_dig = sideDigits.begin(); it_dig != sideDigits.end(); it_dig++ ){ //Jaewon formula DocDB 7950
                 energy += (*it_dig)->normEnergy()*m_scalefactor*(factor*m_calibrationECal-1);
                 scal_evis += (*it_dig)->normEnergy();
@@ -842,13 +847,13 @@ StatusCode HTBlob::getBlobEnergyTime( Minerva::IDBlob *idblob, double &energy,
 
         }
     }
-    
+
     if ( total_pe > 0 )  time = time/total_pe;
     else time = 0;
 
     idblob->setTime(time);
     debug() << " Setting time " << time << " Id blob " << *idblob << endmsg;
-    
+
     return StatusCode::SUCCESS;
 
 }

@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Aug 12 08:52:38 2015 by ROOT version 5.34/05
+// Thu Aug 13 10:17:12 2015 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -43,6 +43,10 @@ public :
    Bool_t          minos_track_inside_partial_plane;
    Bool_t          prim_vtx_has_misassigned_track_direction;
    Bool_t          prim_vtx_has_broken_track;
+   Bool_t          is_anglescan;
+   Bool_t          is_anglescan_applied;
+   Bool_t          is_houghtransform;
+   Bool_t          is_houghtransform_applied;
    Int_t           Cut_BlobDirectionBad;
    Int_t           Cut_BlobsBad;
    Int_t           Cut_ConeBlobs;
@@ -689,6 +693,10 @@ public :
    TBranch        *b_minos_track_inside_partial_plane;   //!
    TBranch        *b_prim_vtx_has_misassigned_track_direction;   //!
    TBranch        *b_prim_vtx_has_broken_track;   //!
+   TBranch        *b_is_anglescan;   //!
+   TBranch        *b_is_anglescan_applied;   //!
+   TBranch        *b_is_houghtransform;   //!
+   TBranch        *b_is_houghtransform_applied;   //!
    TBranch        *b_Cut_BlobDirectionBad;   //!
    TBranch        *b_Cut_BlobsBad;   //!
    TBranch        *b_Cut_ConeBlobs;   //!
@@ -1347,7 +1355,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/pnfs/minerva/persistent/users/oaltinok/Merged/MC/mc_run_v2_27a.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_run_v2_27.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1420,6 +1428,10 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("minos_track_inside_partial_plane", &minos_track_inside_partial_plane, &b_minos_track_inside_partial_plane);
    fChain->SetBranchAddress("prim_vtx_has_misassigned_track_direction", &prim_vtx_has_misassigned_track_direction, &b_prim_vtx_has_misassigned_track_direction);
    fChain->SetBranchAddress("prim_vtx_has_broken_track", &prim_vtx_has_broken_track, &b_prim_vtx_has_broken_track);
+   fChain->SetBranchAddress("is_anglescan", &is_anglescan, &b_is_anglescan);
+   fChain->SetBranchAddress("is_anglescan_applied", &is_anglescan_applied, &b_is_anglescan_applied);
+   fChain->SetBranchAddress("is_houghtransform", &is_houghtransform, &b_is_houghtransform);
+   fChain->SetBranchAddress("is_houghtransform_applied", &is_houghtransform_applied, &b_is_houghtransform_applied);
    fChain->SetBranchAddress("Cut_BlobDirectionBad", &Cut_BlobDirectionBad, &b_Cut_BlobDirectionBad);
    fChain->SetBranchAddress("Cut_BlobsBad", &Cut_BlobsBad, &b_Cut_BlobsBad);
    fChain->SetBranchAddress("Cut_ConeBlobs", &Cut_ConeBlobs, &b_Cut_ConeBlobs);
