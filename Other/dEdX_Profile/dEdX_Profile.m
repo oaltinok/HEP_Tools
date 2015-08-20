@@ -7,10 +7,88 @@ normalized = NormalizeAllProfiles(profiles);
 
 % Test1(profiles,normalized,5);
 
-PlotAllProfiles(normalized);
+% PlotAllProfiles(normalized);
+
+PlotSurface(normalized);
 
 
 end
+
+function [] = PlotSurface(all_profiles)
+
+% % Create figure
+figure1 = figure('Position', [100, 100, 1049, 895]);
+
+% Create axes
+axes1 = axes('Parent',figure1,'FontSize',24);
+% view(axes1,[-37.5 30]);
+grid(axes1,'on');
+hold(axes1,'all');
+
+% Create Title
+title('dEdX Profile for Normalized Shower Energy','FontWeight','bold','FontSize',24);
+% Create ylabel
+xlabel('Planes','FontWeight','bold','FontSize',24);
+% Create xlabel
+ylabel('Shower Length (nPlanes)','FontWeight','bold','FontSize',24);
+% Create ylabel
+zlabel('Normalized Plane Energy','FontWeight','bold','FontSize',24);
+
+Z = GetSurfaceMatrix(all_profiles);
+
+surf(Z','Parent',axes1);
+
+xlim([1 60]);
+ylim([1 60]);
+
+% Create colorbar
+colorbar('peer',axes1,'FontSize',24);
+
+end
+
+function [Z] = GetSurfaceMatrix(all_profiles)
+%% SurfaceMatrix = (nPlanes,nGroups)
+
+Z = zeros(100,100);
+
+for shower_size = 1:100
+    % Get Group
+    profile_group = all_profiles{shower_size};
+    % Get Number of Profiles in the Group
+    nProfiles = length(profile_group);
+    
+    % If There are Profiles in the group: 
+    if nProfiles > 0
+        % Find the Most Energetic Profile
+        best_profile = GetMostEnergeticProfile(profile_group);
+    
+        % Save best profile's normalized Energy to Z
+        for plane = 1:length(best_profile) 
+            Z(plane,shower_size) = best_profile(plane);
+        end
+    end
+end
+
+end
+
+function [best_profile] = GetMostEnergeticProfile(profile_group)
+%% Finds the Most Energetic Profile in a given Profile Group
+
+% Empty Array to Hold Maximum Values
+max_array = zeros(1, length(profile_group));
+
+% Loop over all the Profiles in the Group and save their Maximum Value
+for profile = 1:length(profile_group)
+    profile_max = max(profile_group{profile});
+    max_array(profile) = profile_max; 
+end
+
+% Get Maximum Indice and return the profile with that Indice
+[M,I] = max (max_array);
+best_profile = profile_group{I};
+
+end
+
 
 function [] = PlotAllProfiles(all_profiles)
 %% Plots All Profiles
@@ -173,7 +251,7 @@ function [ all_profiles ] = ReadFile()
 %% Reads File and returns a cell array
 
 % Define File and an empty Cell Array
-file_source = '../Source/dEdX_Profile_All.txt';
+file_source = '../Source/dEdX_Profile.txt';
 fid = fopen(file_source);
 all_profiles = {};
 
