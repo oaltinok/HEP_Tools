@@ -2,8 +2,9 @@
 
 |Statistical Data Analysis |MINERvA Operations| Other Algorithms|Setup|
 |----|-----|-----|-----|
-|CCProtonPi0|CAMAC_DataReader|dEdX Improvement|Setup Scripts for CCProtonPi0|
-|NTuple Analysis||True Reco Correction||
+|CCProtonPi0	|CAMAC_DataReader	|dEdX Improvement	|Setup Scripts for CCProtonPi0	|
+|NTuple Analysis|			|True Reco Correction	|				|
+|		|			|dEdX Profile		|				|
 
 * These packages are specialized for MINERvA Experiment data format.
 	* Experiment URL: http://minerva.fnal.gov/
@@ -33,7 +34,7 @@
 	
 ## Other Algorithms:
 
-### dEdX_pID
+### dEdX pID
 
 * Improvement on pID Calculation: Algorithm improves the pID in case the particle trajectory overlaps with another trajectory.
 
@@ -41,6 +42,26 @@
 * In MC Analysis, most of the time the Reconstructed Parameter (Momentum, Energy, Angle, etc...) agrees with TRUE Parameter
 * Some cases, TRUE vs RECO plot does not create a good x = y distribution, in such cases we apply a correction factor
 * MATLAB Functions designed to find a linear correction factor for Reconstructed values
+
+### dEdX Profile
+* EM Shower Profile for Different Shower Lengths
+* Input File:
+	* Each row is unique to a single EM Shower
+	* Each column is total cluster energy in a plane
+* Output:
+	* EM Shower Profile Plots for different Number of Planes
+* Algorithm:
+	1. Read Input File
+	2. Group EM Showers by Plane Numbers 
+		* 4-Plane Showers
+		* 5-Plane Showers
+		* ..
+		* 30-Plane Showers
+		* etc..
+	3. Normalize EM Showers to the MAX Cluster energy in each Group
+		* Each group is normalized uniquely
+	4. Plot Each Group Separately
+		* Prints out plot for each group
 
 ## Setup:
 
