@@ -17,7 +17,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotInteraction();
     //plotCutHistograms();
     //plotOther();
-    plotPi0Blob();
+    //plotPi0Blob();
 }
 
 CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
@@ -38,29 +38,47 @@ void CCProtonPi0_Plotter::plotPi0Blob()
     std::cout<<"Plotting Pi0Blob"<<std::endl;
     std::string plotDir = plotDir_Pion; // Plots go under Pion
     
-    // Plot Truth Match - gamma 1
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_most_pdg",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_total_truth",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_pizero",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_piplus",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_piminus",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_proton",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_neutron",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_muon",plotDir);
+//    // Plot Truth Match - gamma 1
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_most_pdg",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_total_truth",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_pizero",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_piplus",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_piminus",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_proton",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_neutron",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_evis_frac_muon",plotDir);
+//
+//    // Plot Truth Match - gamma 2
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_most_pdg",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_total_truth",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_pizero",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_piplus",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_piminus",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_proton",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_neutron",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_muon",plotDir);
+//    
+//    // Total Pi0 Evis
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"captured_evis_frac_all",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"captured_evis_frac_signal",plotDir);
 
-    // Plot Truth Match - gamma 2
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_most_pdg",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_total_truth",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_pizero",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_piplus",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_piminus",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_proton",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_neutron",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_evis_frac_muon",plotDir);
-    
-    // Total Pi0 Evis
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"captured_evis_frac_all",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"captured_evis_frac_signal",plotDir);
+
+//    // Blob 1 Cluster Z and Strip Numbers
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_cluster_Z",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_max_cluster_Z",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_min_cluster_Z",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_strips",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_max_strip",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_min_strip",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g1_nPlanes",plotDir);
+//    // Blob 2 Cluster Z and Strip Numbers
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_cluster_Z",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_max_cluster_Z",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_min_cluster_Z",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_strips",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_max_strip",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_min_strip",plotDir);
+//    DrawStackedMC_BckgAll(rootDir_Pi0Blob,"g2_nPlanes",plotDir);
 
     std::cout<<"Plotting Pi0Blob Finished!"<<std::endl;
 }
@@ -175,27 +193,61 @@ void CCProtonPi0_Plotter::plotPion()
     //DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
     //DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
     
-    Draw1DHist(rootDir_Pion,"mgg_reco",plotDir);
-    Draw1DHist(rootDir_Pion,"mgg_true",plotDir);
-    Draw2DHist(rootDir_Pion,"mgg_reco_true",plotDir);
-    Draw1DHist(rootDir_Pion,"mgg_error",plotDir);
-    
-    Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma1_E_error",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
-    
-    Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma2_E_error",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_E_gamma2_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_convLength_gamma2_convLength",plotDir);
-    
-    Draw1DHist(rootDir_Pion,"isGamma1_conv_inside",plotDir);
-    Draw1DHist(rootDir_Pion,"isGamma2_conv_inside",plotDir);
-    
+   // Draw1DHist(rootDir_Pion,"mgg_reco",plotDir);
+   // Draw1DHist(rootDir_Pion,"mgg_true",plotDir);
+   // Draw2DHist(rootDir_Pion,"mgg_reco_true",plotDir);
+   // Draw1DHist(rootDir_Pion,"mgg_error",plotDir);
+   // 
+   // Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
+   // Draw1DHist(rootDir_Pion,"gamma1_E_error",plotDir);
+   // Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
+   // 
+   // Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
+   // Draw1DHist(rootDir_Pion,"gamma2_E_error",plotDir);
+   // Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
+   // Draw2DHist(rootDir_Pion,"gamma1_E_gamma2_E",plotDir);
+   // Draw2DHist(rootDir_Pion,"gamma1_convLength_gamma2_convLength",plotDir);
+   // 
+   // Draw1DHist(rootDir_Pion,"isGamma1_conv_inside",plotDir);
+   // Draw1DHist(rootDir_Pion,"isGamma2_conv_inside",plotDir);
+
+   // plotGammaEvis();
+    plotPi0TruthMatch();
+
     std::cout<<"Plotting Pion Finished!\n"<<std::endl;
 }
 
+void CCProtonPi0_Plotter::plotPi0TruthMatch()
+{
+    std::cout<<"Plotting Pi0 Truth Match"<<std::endl;
+    std::string plotDir = plotDir_Pion;
+  //  
+  //  // Evis Fraction 
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"evis_frac_reco_pi0_true_pi0",plotDir);
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"evis_frac_true_pi0_reco_all",plotDir);
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"evis_frac_reco_pi0_reco_all",plotDir);
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"evis_frac_reco_nonpi0_reco_all",plotDir);
+    
+    // Evis By Particle
+    DrawStackedMC_GammaEvisByPDG(rootDir_Pion,1,plotDir);
+    DrawStackedMC_GammaEvisByPDG(rootDir_Pion,2,plotDir);
+    DrawStackedMC_GammaEvisByPDG(rootDir_Pion,3,plotDir);
+
+    std::cout<<"Plotting Pi0 Truth Match Finished!\n"<<std::endl;
+}
+
+void CCProtonPi0_Plotter::plotGammaEvis()
+{
+    std::cout<<"Plotting Gamma Evis"<<std::endl;
+    std::string plotDir = plotDir_Pion;
+
+    DrawStackedMC_BckgAll(rootDir_Pion,"g2_evis_frac_scal_trkr",plotDir);
+    
+    DrawStackedMC_GammaEvis(rootDir_Pion,1,plotDir);
+    DrawStackedMC_GammaEvis(rootDir_Pion,2,plotDir);
+
+    std::cout<<"Plotting Gamma Evis Finished!\n"<<std::endl;
+}
 void CCProtonPi0_Plotter::plotStandardHistograms(rootDir &dir, std::string plotDir)
 {
     std::cout<<">> Plotting Standard Histograms"<<std::endl;

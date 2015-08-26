@@ -225,8 +225,8 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::strin
     // ------------------------------------------------------------------------
     // Plot 
     // ------------------------------------------------------------------------
-    MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
+    MnvPlotter* plotter = new MnvPlotter();
     ApplyStyle(plotter);
     plotter->DrawDataStackedMC(data,mc_hists,POT_Ratio_data_mc ,"TR","Data",3,2);
 
@@ -252,6 +252,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::strin
 
 void CCProtonPi0_Plotter::ApplyStyle(MnvPlotter* plotter)
 {
+    plotter->hist_min_zero = false;
     plotter->mc_line_width = 0;
     plotter->axis_title_size_x = 0.04;
     plotter->axis_title_size_y = 0.04;
@@ -458,11 +459,14 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     mc_hists->Add(temp);
 
     // ------------------------------------------------------------------------
-    // Plot 
+    // Plot  - If you want A Log Plot, axis_minimum = 0.1
     // ------------------------------------------------------------------------
+    TCanvas* c = new TCanvas(var_name.c_str(),var_name.c_str(),1280,800);
+    //gPad->SetLogy(); 
+    //gPad->Update(); 
     MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
     ApplyStyle(plotter);
+    //plotter->axis_minimum = 0.1;
     plotter->DrawStackedMC(mc_hists,1,"TR");
    
     // Add Plot Labels
@@ -482,6 +486,151 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     // Print Plot
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_all.png"), "png");
 
+    delete c;
+}
+
+
+void CCProtonPi0_Plotter::DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir)
+{
+    std::string rootDir_mc = dir.mc;
+
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+  
+    // Use All MC Events -- Indice = 0
+    std::string trkr = Form("g%d_evis_trkr_0",gammaID);
+    std::string scal = Form("g%d_evis_scal_0",gammaID);
+    std::string ecal = Form("g%d_evis_ecal_0",gammaID);
+    std::string hcal = Form("g%d_evis_hcal_0",gammaID);
+    
+    // ------------------------------------------------------------------------
+    // Fill TObjArray - For MC Histograms
+    // ------------------------------------------------------------------------
+    TObjArray* mc_hists = new TObjArray;
+    MnvH1D* temp;
+   
+    // Get Tracker Evis
+    temp = (MnvH1D*)f_mc->Get(trkr.c_str());
+    temp->SetTitle("Tracker");
+    double nTrkr = temp->GetEntries(); 
+    mc_hists->Add(temp);
+    
+    // Get SideECAL Evis
+    temp = (MnvH1D*)f_mc->Get(scal.c_str());
+    temp->SetTitle("SideECAL");
+    mc_hists->Add(temp);
+
+    // Get ECAL Evis
+    temp = (MnvH1D*)f_mc->Get(ecal.c_str());
+    temp->SetTitle("ECAL");
+    mc_hists->Add(temp);
+
+    // Get HCAL Evis
+    temp = (MnvH1D*)f_mc->Get(hcal.c_str());
+    temp->SetTitle("HCAL");
+    mc_hists->Add(temp);
+    
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+    ApplyStyle(plotter);
+    plotter->DrawStackedMC(mc_hists,1,"TR");
+    
+
+    // Add Plot Labels
+    const double y_pos = 0.88;
+    const double y_diff = 0.033;
+    plotter->AddPlotLabel(Form("nEvents = %3.0f",nTrkr),0.3,y_pos,y_diff,kBlue); 
+    plotter->AddHistoTitle(Form("Visible Energy for Gamma %d",gammaID));
+
+
+    // Print Plot
+    c->Print(Form("%s%s%d%s",plotDir.c_str(),"gamma_",gammaID,"_mc_evis_stacked.png"), "png");
+
+    delete c;
+}
+
+void CCProtonPi0_Plotter::DrawStackedMC_GammaEvisByPDG(rootDir &dir, int gammaID, std::string plotDir)
+{
+    // ------------------------------------------------------------------------- 
+    // Get Histograms from File 
+    // ------------------------------------------------------------------------- 
+    std::string rootDir_mc = dir.mc;
+
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+  
+    std::string pi0 = Form("g%d_evis_pi0",gammaID);
+    std::string pi = Form("g%d_evis_pi",gammaID);
+    std::string proton = Form("g%d_evis_proton",gammaID);
+    std::string neutron = Form("g%d_evis_neutron",gammaID);
+    std::string muon = Form("g%d_evis_muon",gammaID);
+   
+    TH1D* h_pi0 = new TH1D;   
+    TH1D* h_pi = new TH1D;   
+    TH1D* h_proton = new TH1D;   
+    TH1D* h_neutron = new TH1D;   
+    TH1D* h_muon = new TH1D;   
+
+    h_pi0 = (TH1D*)f_mc->Get(pi0.c_str());
+    h_pi = (TH1D*)f_mc->Get(pi.c_str());
+    h_proton = (TH1D*)f_mc->Get(proton.c_str());
+    h_neutron = (TH1D*)f_mc->Get(neutron.c_str());
+    h_muon = (TH1D*)f_mc->Get(muon.c_str());
+
+    // Set Histogram Style
+    h_pi0->SetFillColor(kGreen);
+    h_pi0->SetLineColor(kGreen);
+    h_pi0->SetMarkerStyle(21);
+    h_pi0->SetMarkerColor(kGreen);
+    
+    h_pi->SetFillColor(kRed);
+    h_pi->SetLineColor(kRed);
+    h_pi->SetMarkerStyle(21);
+    h_pi->SetMarkerColor(kRed);
+   
+    h_proton->SetFillColor(kBlue);
+    h_proton->SetLineColor(kBlue);
+    h_proton->SetMarkerStyle(21);
+    h_proton->SetMarkerColor(kBlue);
+
+    h_neutron->SetFillColor(kCyan);
+    h_neutron->SetLineColor(kCyan);
+    h_neutron->SetMarkerStyle(21);
+    h_neutron->SetMarkerColor(kCyan);
+
+    h_muon->SetFillColor(kMagenta);
+    h_muon->SetLineColor(kMagenta);
+    h_muon->SetMarkerStyle(21);
+    h_muon->SetMarkerColor(kMagenta);
+
+    // Create Canvas and Form THStack
+    TCanvas* c = new TCanvas("c","c",1280,800);
+    THStack* hs = new THStack("hs",Form("Visible Energy by Particle for Gamma %d",gammaID));
+    TLegend* legend = new TLegend(0.7,0.8,0.9,0.9);
+   
+    //c->SetLogy();
+    // Legend
+    legend->AddEntry(h_pi0, "#pi^{0}", "f");
+    legend->AddEntry(h_pi, "#pi^{#pm}", "f");
+    legend->AddEntry(h_proton, "proton", "f");
+    legend->AddEntry(h_neutron, "neutron", "f");
+    legend->AddEntry(h_muon, "#mu^{-}", "f");
+    
+    hs->Add(h_pi0);
+    hs->Add(h_pi);
+    hs->Add(h_proton);
+    hs->Add(h_neutron);
+    hs->Add(h_muon);
+    hs->Draw();
+    hs->GetXaxis()->SetTitle(Form("Visible Energy by Particle for Gamma %d",gammaID));
+    hs->GetYaxis()->SetTitle("N(Events)");
+    
+    legend->Draw();
+    
+    c->Print(Form("%s%s%d%s",plotDir.c_str(),"gamma_",gammaID,"_mc_evis_by_particle.png"), "png");
+
+    delete hs;
     delete c;
 }
 

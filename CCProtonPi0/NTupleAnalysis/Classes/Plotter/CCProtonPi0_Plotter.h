@@ -107,6 +107,8 @@ class CCProtonPi0_Plotter
         void plotPion();
         
         // Other Plots 
+        void plotGammaEvis();
+        void plotPi0TruthMatch();
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
         void plotCutHistograms();
@@ -127,7 +129,8 @@ class CCProtonPi0_Plotter
         void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir);
-
+        void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);
+        void DrawStackedMC_GammaEvisByPDG(rootDir &dir, int gammaID, std::string plotDir);
 };
 
 

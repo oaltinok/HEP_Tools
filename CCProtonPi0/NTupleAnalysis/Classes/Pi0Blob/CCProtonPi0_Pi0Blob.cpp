@@ -126,6 +126,79 @@ void CCProtonPi0_Pi0Blob::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         captured_evis_frac_signal.push_back(temp);
 
+        // Reco Values
+        temp = new MnvH1D(Form("%s_%d","g1_cluster_Z",i),Form("%s %d","ALL Cluster Z Positions for Gamma ",1),binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+        temp->GetXaxis()->SetTitle("z = 4293 Target, z = 5810 Interaction Region, z = 8614 ECAL, z = 9088 HCAL");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_cluster_Z.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g1_max_cluster_Z",i),Form("%s %d","Max Cluster Z Positions for Gamma ",1),binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+        temp->GetXaxis()->SetTitle("z = 4293 Target, z = 5810 Interaction Region, z = 8614 ECAL, z = 9088 HCAL");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_max_cluster_Z.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g1_min_cluster_Z",i),Form("%s %d","Min Cluster Z Positions for Gamma ",1),binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+        temp->GetXaxis()->SetTitle("z = 4293 Target, z = 5810 Interaction Region, z = 8614 ECAL, z = 9088 HCAL");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_min_cluster_Z.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g1_strips",i),Form("%s %d","ALL Strip Numbers for Gamma ",1),binList.strip_numbers.get_nBins(), binList.strip_numbers.get_min(), binList.strip_numbers.get_max() );
+        temp->GetXaxis()->SetTitle("All Strip Numbers");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_strips.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g1_max_strip",i),Form("%s %d","Max Strip Numbers for Gamma ",1),binList.strip_numbers.get_nBins(), binList.strip_numbers.get_min(), binList.strip_numbers.get_max() );
+        temp->GetXaxis()->SetTitle("Max Strip Numbers");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_max_strip.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g1_min_strip",i),Form("%s %d","Min Strip Numbers for Gamma ",1),binList.strip_numbers.get_nBins(), binList.strip_numbers.get_min(), binList.strip_numbers.get_max() );
+        temp->GetXaxis()->SetTitle("Min Strip Numbers");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_min_strip.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g1_nPlanes",i),Form("%s %d","N(Planes) for Gamma ",1),binList.shower_length.get_nBins(), binList.shower_length.get_min(), binList.shower_length.get_max() );
+        temp->GetXaxis()->SetTitle("N(Planes)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g1_nPlanes.push_back(temp);
+
+        // --------------------------------------------------------------------
+        // Gamma 2 
+        // --------------------------------------------------------------------
+        temp = new MnvH1D(Form("%s_%d","g2_cluster_Z",i),Form("%s %d","ALL Cluster Z Positions for Gamma ",2),binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+        temp->GetXaxis()->SetTitle("z = 4293 Target, z = 5810 Interaction Region, z = 8614 ECAL, z = 9088 HCAL");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_cluster_Z.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_max_cluster_Z",i),Form("%s %d","Max Cluster Z Positions for Gamma ",2),binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+        temp->GetXaxis()->SetTitle("z = 4293 Target, z = 5810 Interaction Region, z = 8614 ECAL, z = 9088 HCAL");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_max_cluster_Z.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_min_cluster_Z",i),Form("%s %d","Min Cluster Z Positions for Gamma ",2),binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+        temp->GetXaxis()->SetTitle("z = 4293 Target, z = 5810 Interaction Region, z = 8614 ECAL, z = 9088 HCAL");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_min_cluster_Z.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_strips",i),Form("%s %d","ALL Strip Numbers for Gamma ",2),binList.strip_numbers.get_nBins(), binList.strip_numbers.get_min(), binList.strip_numbers.get_max() );
+        temp->GetXaxis()->SetTitle("ALL Strip Numbers");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_strips.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_max_strip",i),Form("%s %d","Max Strip Numbers for Gamma ",2),binList.strip_numbers.get_nBins(), binList.strip_numbers.get_min(), binList.strip_numbers.get_max() );
+        temp->GetXaxis()->SetTitle("Max Strip Numbers");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_max_strip.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_min_strip",i),Form("%s %d","Min Strip Numbers for Gamma ",2),binList.strip_numbers.get_nBins(), binList.strip_numbers.get_min(), binList.strip_numbers.get_max() );
+        temp->GetXaxis()->SetTitle("Min Strip Numbers");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_min_strip.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","g2_nPlanes",i),Form("%s %d","N(Planes) for Gamma ",2),binList.shower_length.get_nBins(), binList.shower_length.get_min(), binList.shower_length.get_max() );
+        temp->GetXaxis()->SetTitle("N(Planes)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        g2_nPlanes.push_back(temp);
     } //end loop all Histograms 
 }
 
@@ -162,6 +235,22 @@ void CCProtonPi0_Pi0Blob::writeHistograms()
         
         captured_evis_frac_all[i]->Write();
         captured_evis_frac_signal[i]->Write();
+
+        g1_cluster_Z[i]->Write();
+        g1_max_cluster_Z[i]->Write();
+        g1_min_cluster_Z[i]->Write();
+        g1_strips[i]->Write();
+        g1_max_strip[i]->Write();
+        g1_min_strip[i]->Write();
+        g1_nPlanes[i]->Write();
+
+        g2_cluster_Z[i]->Write();
+        g2_max_cluster_Z[i]->Write();
+        g2_min_cluster_Z[i]->Write();
+        g2_strips[i]->Write();
+        g2_max_strip[i]->Write();
+        g2_min_strip[i]->Write();
+        g2_nPlanes[i]->Write();
     }
 
     f->Close();

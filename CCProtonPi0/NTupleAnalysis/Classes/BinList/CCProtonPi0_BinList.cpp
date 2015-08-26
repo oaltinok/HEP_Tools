@@ -24,13 +24,18 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     particleScoreDiff.setBin(100,-1.0,1.0);
     particleStatus.setBin(17,-1,16);
     multiplicity.setBin(10,0.0,10.0);
-    fraction.setBin(20,0.0,1.0);
+    fraction.setBin(30,0,1.5);
     fraction2.setBin(200,-0.5,1.5);
-    vertex_z.setBin(94,4300.0,9000.0);
+    vertex_z.setBin(114,4300.0,10000.0);
     vertex_x_y.setBin(200,-1000.0,1000.0);
     deltaInvMass.setBin(20,800.0,2800.0);
     preFilter_Status.setBin(4,0,4);
     preFilter_RejectedEnergy.setBin(50,0.0,5000.0);
+    strip_numbers.setBin(127,1,127);
+    shower_length.setBin(100,1,100);
+    gamma_evis.setBin(50,1,500);
+    gamma_evis_pdg.setBin(30,0,300);
+    pi0_evis_pdg.setBin(50,0,500);
 
     // Neutrino Specific Bins
     beamE.setBin(20,0,20.0);

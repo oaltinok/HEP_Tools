@@ -38,7 +38,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<CCProtonPi0_Cut> nCut_Vertex_Not_Reconstructable; 
         vector<CCProtonPi0_Cut> nCut_Vertex_Not_Fiducial;
         vector<CCProtonPi0_Cut> nCut_Muon_None;              
-        vector<CCProtonPi0_Cut> nCut_Muon_Not_Plausible;
         vector<CCProtonPi0_Cut> nCut_Muon_Charge;
         vector<CCProtonPi0_Cut> nCut_Vertex_Michel_Exist; 
         vector<CCProtonPi0_Cut> nCut_EndPoint_Michel_Exist;

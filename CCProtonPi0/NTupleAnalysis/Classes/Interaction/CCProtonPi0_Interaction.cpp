@@ -85,6 +85,12 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.UsedE.get_width()));
         E_Used_afterReco.push_back(temp);
 
+        // Vertex
+        temp = new MnvH1D( Form("%s_%d","vertex_z",i),"Reconstructed Interaction Vertex",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
+        temp->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
+        temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.vertex_z.get_width()));
+        vertex_z.push_back(temp);
+
     }
     
     // MC Only Histograms

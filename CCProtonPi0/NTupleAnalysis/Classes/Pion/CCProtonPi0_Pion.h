@@ -21,14 +21,48 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         vector<MnvH1D*> invMass;
         vector<MnvH1D*> photonEnergy_Asymmetry;
 
+        // Truth Match
+        vector<MnvH1D*> evis_frac_true_pi0_reco_all;
+        vector<MnvH1D*> evis_frac_reco_pi0_true_pi0;
+        vector<MnvH1D*> evis_frac_reco_pi0_reco_all;
+        vector<MnvH1D*> evis_frac_reco_nonpi0_reco_all;
+
+        TH1D* g1_evis_proton;
+        TH1D* g1_evis_neutron;
+        TH1D* g1_evis_pi;
+        TH1D* g1_evis_pi0;
+        TH1D* g1_evis_muon;
+
+        TH1D* g2_evis_proton;
+        TH1D* g2_evis_neutron;
+        TH1D* g2_evis_pi;
+        TH1D* g2_evis_pi0;
+        TH1D* g2_evis_muon;
+
+        TH1D* g3_evis_proton;
+        TH1D* g3_evis_neutron;
+        TH1D* g3_evis_pi;
+        TH1D* g3_evis_pi0;
+        TH1D* g3_evis_muon;
+
         // Leading Photon - Energetic Photon
         vector<MnvH1D*> gamma1_E;
         vector<MnvH1D*> gamma1_theta;
         vector<MnvH1D*> gamma1_ConvLength;
+        vector<MnvH1D*> g1_evis_trkr;
+        vector<MnvH1D*> g1_evis_scal;
+        vector<MnvH1D*> g1_evis_ecal;
+        vector<MnvH1D*> g1_evis_hcal;
+
         // Secondary Photon
         vector<MnvH1D*> gamma2_E;
         vector<MnvH1D*> gamma2_theta;
         vector<MnvH1D*> gamma2_ConvLength;
+        vector<MnvH1D*> g2_evis_trkr;
+        vector<MnvH1D*> g2_evis_scal;
+        vector<MnvH1D*> g2_evis_ecal;
+        vector<MnvH1D*> g2_evis_hcal;
+        vector<MnvH1D*> g2_evis_frac_scal_trkr;
 
         // Photon Comparison
         TH1D* gamma1_true_E;

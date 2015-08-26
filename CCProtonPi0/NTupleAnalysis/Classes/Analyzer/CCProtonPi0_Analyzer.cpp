@@ -43,14 +43,17 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 
     latest_ScanID = 0.0;
 
+    counter1 = 0;
+    counter2 = 0;
+
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
 {
 
     string rootDir;
-    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_run_v2_28_NoHT.root";
-    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_run_v2_28_NoHT.root";
+    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_run_v2_29_NoHT.root";
+    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_run_v2_29_NoHT.root";
 
     cout<<"Reducing NTuple Files to a single file"<<endl;
     cout<<"\tRoot File: "<<rootDir<<endl;
@@ -97,7 +100,6 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
 
         tree->Fill();
     }
-
     cutList.writeCutTable();
     cutList.writeHistograms();
 
@@ -189,6 +191,13 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     proton.writeHistograms();
     pi0.writeHistograms();
     pi0Blob.writeHistograms();
+
+    //--------------------------------------------------------------------------
+    // Counters
+    //--------------------------------------------------------------------------
+    cout<<"counter1 = "<<counter1<<endl;
+    cout<<"counter2 = "<<counter2<<endl;
+
 }
 
 
@@ -358,6 +367,7 @@ void CCProtonPi0_Analyzer::fillData()
     fillInteractionReco();
     fillMuonReco();
     fillPi0Reco();
+    fillPi0BlobReco();
     if(nProngs > 1) fillProtonReco();
 
     // Fill Truth Information if Exist and Set Errors
@@ -368,6 +378,37 @@ void CCProtonPi0_Analyzer::fillData()
         fillPi0True();
         fillPi0BlobTrue();
     }
+}
+
+void CCProtonPi0_Analyzer::fillPi0BlobReco()
+{
+    // Cluster Z Positions for Pi0Blob 1
+    for(int i = 0; i < gamma1_blob_z_positions_sz; i++){
+        FillHistogram(pi0Blob.g1_cluster_Z, gamma1_blob_z_positions[i]);
+    }
+    FillHistogram(pi0Blob.g1_max_cluster_Z, gamma1_blob_max_z);
+    FillHistogram(pi0Blob.g1_min_cluster_Z, gamma1_blob_min_z);
+
+    // Strip Number for Pi0Blob 1
+    for(int i = 0; i < gamma1_blob_strip_numbers_sz; i++){
+        FillHistogram(pi0Blob.g1_strips, gamma1_blob_strip_numbers[i]);
+    }
+    FillHistogram(pi0Blob.g1_max_strip, gamma1_blob_max_strip_number);
+    FillHistogram(pi0Blob.g1_min_strip, gamma1_blob_min_strip_number);
+
+    // Cluster Z Positions for Pi0Blob 2
+    for(int i = 0; i < gamma2_blob_z_positions_sz; i++){
+        FillHistogram(pi0Blob.g2_cluster_Z, gamma2_blob_z_positions[i]);
+    }
+    FillHistogram(pi0Blob.g2_max_cluster_Z, gamma2_blob_max_z);
+    FillHistogram(pi0Blob.g2_min_cluster_Z, gamma2_blob_min_z);
+
+    // Strip Number for Pi0Blob 2
+    for(int i = 0; i < gamma2_blob_strip_numbers_sz; i++){
+        FillHistogram(pi0Blob.g2_strips, gamma2_blob_strip_numbers[i]);
+    }
+    FillHistogram(pi0Blob.g2_max_strip, gamma2_blob_max_strip_number);
+    FillHistogram(pi0Blob.g2_min_strip, gamma2_blob_min_strip_number);
 }
 
 void CCProtonPi0_Analyzer::fillPi0BlobTrue()
@@ -383,7 +424,7 @@ void CCProtonPi0_Analyzer::FillEvis_Total()
     double captured_fraction;
     if (truth_allClusters_evis_pizero == 0) captured_fraction = -0.5;
     else captured_fraction = truth_total_captured_evis_pizero / truth_allClusters_evis_pizero;
-    
+
     FillHistogram(pi0Blob.captured_evis_frac_all, captured_fraction);
     if (truth_isSignal) FillHistogram(pi0Blob.captured_evis_frac_signal, captured_fraction);
 }
@@ -554,10 +595,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // Fill Truth_W for MINOS Matched Signal Events
     if (m_isMC && truth_isSignal) fill_mc_w(); 
 
-    // Muon is NOT Plausible Cut -- will revisit this
-    if( Cut_Muon_Not_Plausible == 1) return false;
-    Increment_nCut(cutList.nCut_Muon_Not_Plausible, study1, study2);
-
     // Anti-Muon Cut
     if( Cut_Muon_Charge == 1) return false;
     Increment_nCut(cutList.nCut_Muon_Charge, study1, study2);
@@ -578,7 +615,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
 
     if( Cut_secEndPoint_Michel_Exist == 1) return false;
     Increment_nCut(cutList.nCut_secEndPoint_Michel_Exist, study1, study2);
-    
+
     // Check nTracks After Michel
     FillHistogram(cutList.hCut_nProngs2, n_prongs);
     FillHistogram(cutList.hCut_nTracks, nTracks);
@@ -849,26 +886,118 @@ void CCProtonPi0_Analyzer::fillProtonReco()
     FillHistogram(proton.phi, CCProtonPi0_proton_phi * TMath::RadToDeg());
 }
 
+void CCProtonPi0_Analyzer::fillPi0TruthMatch()
+{
+    EvisRatio();
+    EvisStacked();
+}
+
+void CCProtonPi0_Analyzer::EvisStacked()
+{   
+    const double min_evis = 10;
+    
+    // Gamma 1
+    double g1_pi0 = truth_blob1_evis_pizero;
+    double g1_pi = truth_blob1_evis_piplus + truth_blob1_evis_piminus;
+    double g1_proton = truth_blob1_evis_proton;
+    double g1_neutron = truth_blob1_evis_neutron;
+    double g1_muon = truth_blob1_evis_muon;
+        
+    if (g1_pi0 > min_evis) pi0.g1_evis_pi0->Fill(g1_pi0);
+    if (g1_pi > min_evis) pi0.g1_evis_pi->Fill(g1_pi);
+    if (g1_proton > min_evis) pi0.g1_evis_proton->Fill(g1_proton);
+    if (g1_neutron > min_evis) pi0.g1_evis_neutron->Fill(g1_neutron);
+    if (g1_muon > min_evis) pi0.g1_evis_muon->Fill(g1_muon);
+
+    // Gamma 2
+    double g2_pi0 = truth_blob2_evis_pizero;
+    double g2_pi = truth_blob2_evis_piplus + truth_blob2_evis_piminus;
+    double g2_proton = truth_blob2_evis_proton;
+    double g2_neutron = truth_blob2_evis_neutron;
+    double g2_muon = truth_blob2_evis_muon;
+        
+    if (g2_pi0 > min_evis) pi0.g2_evis_pi0->Fill(g2_pi0);
+    if (g2_pi > min_evis) pi0.g2_evis_pi->Fill(g2_pi);
+    if (g2_proton > min_evis) pi0.g2_evis_proton->Fill(g2_proton);
+    if (g2_neutron > min_evis) pi0.g2_evis_neutron->Fill(g2_neutron);
+    if (g2_muon > min_evis) pi0.g2_evis_muon->Fill(g2_muon);
+
+    // Gamma 1 + Gamma 2 (Pi0) written as Gamma 3
+    double g3_pi0 = g1_pi0 + g2_pi0;
+    double g3_pi = g1_pi + g2_pi;
+    double g3_proton = g1_proton + g2_proton;
+    double g3_neutron = g1_neutron + g2_neutron;
+    double g3_muon = g1_muon + g2_muon;
+        
+    if (g3_pi0 > min_evis) pi0.g3_evis_pi0->Fill(g3_pi0);
+    if (g3_pi > min_evis) pi0.g3_evis_pi->Fill(g3_pi);
+    if (g3_proton > min_evis) pi0.g3_evis_proton->Fill(g3_proton);
+    if (g3_neutron > min_evis) pi0.g3_evis_neutron->Fill(g3_neutron);
+    if (g3_muon > min_evis) pi0.g3_evis_muon->Fill(g3_muon);
+
+
+}
+
+
+
+void CCProtonPi0_Analyzer::EvisRatio()
+{
+    double reco_pi0_true_pi0;
+    double true_pi0_reco_all;
+    double reco_pi0_reco_all;
+
+    /*
+     *  true_pi0 = True Pi0 Visible Energy Inside Detector
+     *  reco_pi0 = Reco Pi0 Visible Energy Coming from Pi0
+     *  reco_all = Reco Total Visible Energy 
+     */
+    if (truth_allClusters_evis_pizero == 0){
+        reco_pi0_true_pi0 = 0;
+    }else{
+        reco_pi0_true_pi0 = truth_total_captured_evis_pizero / truth_allClusters_evis_pizero;   
+    }
+
+    if ( truth_total_captured_evis_total_truth == 0){
+        reco_pi0_reco_all = 0;
+        true_pi0_reco_all = 0;
+    }else{
+        reco_pi0_reco_all = truth_total_captured_evis_pizero / truth_total_captured_evis_total_truth;
+        true_pi0_reco_all = truth_allClusters_evis_pizero / truth_total_captured_evis_total_truth;
+    }
+
+    FillHistogram(pi0.evis_frac_reco_pi0_true_pi0, reco_pi0_true_pi0);
+    FillHistogram(pi0.evis_frac_true_pi0_reco_all, true_pi0_reco_all);
+    FillHistogram(pi0.evis_frac_reco_pi0_reco_all, reco_pi0_reco_all);
+    FillHistogram(pi0.evis_frac_reco_nonpi0_reco_all, 1-reco_pi0_reco_all);
+
+}
+
+
 void CCProtonPi0_Analyzer::fillPi0True()
 {
+
     double captured_fraction;
     if (truth_allClusters_evis_pizero == 0) captured_fraction = 0;
     else captured_fraction = truth_total_captured_evis_pizero / truth_allClusters_evis_pizero;
 
-    if (captured_fraction > 1.0) cout<<captured_fraction<<endl; 
+    bool isg1_contained = (gamma1_blob_max_strip_number < 117 ) && (gamma1_blob_min_strip_number > 10);
+    bool isg2_contained = (gamma2_blob_max_strip_number < 117 ) && (gamma2_blob_min_strip_number > 10);
 
-    if (truth_isSignal && captured_fraction > 0.95 && truth_isGamma1_conv_inside && truth_isGamma2_conv_inside){
+    if ( truth_isSignal ){
+    //if ( truth_isSignal && captured_fraction > 0.95){
+    //if ( truth_isSignal && captured_fraction >= 1 && truth_isGamma1_conv_inside && truth_isGamma2_conv_inside ){
+    //if ( truth_isSignal && captured_fraction > 0.95 && truth_isGamma1_conv_inside && truth_isGamma2_conv_inside && isg1_contained && isg2_contained){
         double correction = 1.0;
 
         // Gamma 1 Momentum
         double g1_reco_E = CCProtonPi0_gamma1_E * HEP_Functions::MeV_to_GeV * correction;
         double g1_true_E = truth_gamma1_4P[3] * HEP_Functions::MeV_to_GeV;
         double g1_E_error = Data_Functions::getError(g1_true_E, g1_reco_E);
-        
+
         pi0.gamma1_true_E->Fill(g1_true_E);
         pi0.gamma1_reco_E_true_E->Fill(g1_reco_E, g1_true_E);
         pi0.gamma1_E_error->Fill(g1_E_error);
-   
+
         // Gamma 2 Momentum
         double g2_reco_E = CCProtonPi0_gamma2_E * HEP_Functions::MeV_to_GeV * correction;
         double g2_true_E = truth_gamma2_4P[3] * HEP_Functions::MeV_to_GeV;
@@ -879,7 +1008,7 @@ void CCProtonPi0_Analyzer::fillPi0True()
         pi0.gamma2_E_error->Fill(g2_E_error);
 
         // Find Correction using MATLAB
-        failText<<g1_reco_E<<" "<<g1_true_E<<endl;
+        //failText<<g1_reco_E<<" "<<g1_true_E<<endl;
 
         // 2 Gamma Invariant Mass
         TVector3 g1_true(truth_gamma1_4P[0], truth_gamma1_4P[1], truth_gamma1_4P[2]);
@@ -895,6 +1024,37 @@ void CCProtonPi0_Analyzer::fillPi0True()
 
         pi0.isGamma1_conv_inside->Fill(truth_isGamma1_conv_inside);
         pi0.isGamma2_conv_inside->Fill(truth_isGamma2_conv_inside);
+
+        // Blob dEdX Profile
+        for(int i = 0; i < g1dedx_rev_cluster_energy_sz; i++ ){
+            failText<<g1dedx_rev_cluster_energy[i]<<" ";
+        }
+        failText<<std::endl;
+
+        FillHistogram(pi0Blob.g1_nPlanes,g1dedx_nplane);
+        FillHistogram(pi0Blob.g2_nPlanes,g2dedx_nplane);
+
+        if (g2_E_error >= 1){
+
+            fillPi0TruthMatch();
+
+            FillHistogram(pi0.g1_evis_trkr, CCProtonPi0_gamma1_evis_trkr);
+            FillHistogram(pi0.g1_evis_scal, CCProtonPi0_gamma1_evis_scal);
+            FillHistogram(pi0.g1_evis_ecal, CCProtonPi0_gamma1_evis_ecal);
+            FillHistogram(pi0.g1_evis_hcal, CCProtonPi0_gamma1_evis_hcal);
+
+            FillHistogram(pi0.g2_evis_trkr, CCProtonPi0_gamma2_evis_trkr);
+            FillHistogram(pi0.g2_evis_scal, CCProtonPi0_gamma2_evis_scal);
+            FillHistogram(pi0.g2_evis_ecal, CCProtonPi0_gamma2_evis_ecal);
+            FillHistogram(pi0.g2_evis_hcal, CCProtonPi0_gamma2_evis_hcal);
+
+            FillHistogram(pi0.g2_evis_frac_scal_trkr, CCProtonPi0_gamma2_evis_ecal/CCProtonPi0_gamma2_evis_trkr);
+        
+        }
+
+        // Counters
+        if (g1_E_error >= 1.0) counter1++;
+        if (g2_E_error >= 1.0) counter2++;
     }
 
 }
@@ -1013,7 +1173,7 @@ int CCProtonPi0_Analyzer::GetBackgroundTypeInd()
 void CCProtonPi0_Analyzer::SavePi0InvMassPoints()
 {
     cout<<"Saving Pi0 Invariant Mass Points"<<endl;
-    
+
     // Open Pi0 Inv Mass Output Text File
     std::string dir_mc = Folder_List::output + Folder_List::textOut + "Pi0InvMass_MC.txt";
     ofstream text_mc;
@@ -1033,7 +1193,7 @@ void CCProtonPi0_Analyzer::SavePi0InvMassPoints()
     TFile* f_mc = new TFile(rootDir_mc.c_str());
     TH1D* mc_1Track = (TH1D*)f_mc->Get("pi0_invMass_1Track");
     //TH1D* mc_2Track = (TH1D*)f_mc->Get("pi0_invMass_2Track");
-    
+
     double nBins;
     double bin_center;
     double bin_content;

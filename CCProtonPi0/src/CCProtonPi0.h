@@ -307,6 +307,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void writeFSParticleTable(bool isSignal) const;
         void SetSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
         void SetSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
+        void SaveBlobStripInfo(Minerva::PhysicsEvent * event, Minerva::IDBlob* blob, int blobID) const;
 
 };
 

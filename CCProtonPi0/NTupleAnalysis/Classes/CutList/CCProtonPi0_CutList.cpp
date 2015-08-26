@@ -218,7 +218,6 @@ void CCProtonPi0_CutList::init_nCutVectors()
         nCut_Vertex_Not_Reconstructable.push_back(CCProtonPi0_Cut()); 
         nCut_Vertex_Not_Fiducial.push_back(CCProtonPi0_Cut());
         nCut_Muon_None.push_back(CCProtonPi0_Cut());              
-        nCut_Muon_Not_Plausible.push_back(CCProtonPi0_Cut());
         nCut_Muon_Charge.push_back(CCProtonPi0_Cut());
         nCut_Vertex_Michel_Exist.push_back(CCProtonPi0_Cut()); 
         nCut_EndPoint_Michel_Exist.push_back(CCProtonPi0_Cut());
@@ -247,7 +246,6 @@ void CCProtonPi0_CutList::SetCutNames()
         nCut_Vertex_Not_Reconstructable[i].set_Name("Vertex_Not_Reconstructable"); 
         nCut_Vertex_Not_Fiducial[i].set_Name("Vertex_Not_Fiducial");
         nCut_Muon_None[i].set_Name("Muon_None");              
-        nCut_Muon_Not_Plausible[i].set_Name("Muon_Not_Plausible");
         nCut_Muon_Charge[i].set_Name("Muon_Charge");
         nCut_Vertex_Michel_Exist[i].set_Name("Vertex_Michel_Exist"); 
         nCut_EndPoint_Michel_Exist[i].set_Name("EndPoint_Michel_Exist");
@@ -339,7 +337,6 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_Common.push_back(nCut_Vertex_Not_Reconstructable); 
     nCutVector_Common.push_back(nCut_Vertex_Not_Fiducial);
     nCutVector_Topology.push_back(nCut_Muon_None);              
-    nCutVector_Topology.push_back(nCut_Muon_Not_Plausible);
     nCutVector_Topology.push_back(nCut_Muon_Charge);
     nCutVector_Topology.push_back(nCut_Vertex_Michel_Exist); 
     nCutVector_Topology.push_back(nCut_EndPoint_Michel_Exist);

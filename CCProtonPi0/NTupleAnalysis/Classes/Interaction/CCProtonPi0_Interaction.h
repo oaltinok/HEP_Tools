@@ -35,7 +35,10 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> q2;
         std::vector<MnvH1D*> w;
         std::vector<MnvH1D*> wSq;
-       
+
+        // Vertex
+        std::vector<MnvH1D*> vertex_z;
+
         // Reconstruction 
         std::vector<MnvH1D*> E_Unused_afterReco;
         std::vector<MnvH1D*> E_Used_afterReco;

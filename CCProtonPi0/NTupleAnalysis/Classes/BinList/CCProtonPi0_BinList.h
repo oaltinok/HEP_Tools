@@ -39,6 +39,11 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin deltaInvMass;
         CCProtonPi0_SingleBin preFilter_Status;
         CCProtonPi0_SingleBin preFilter_RejectedEnergy;
+        CCProtonPi0_SingleBin strip_numbers;
+        CCProtonPi0_SingleBin shower_length; // nPlanes in Shower
+        CCProtonPi0_SingleBin gamma_evis;
+        CCProtonPi0_SingleBin gamma_evis_pdg;
+        CCProtonPi0_SingleBin pi0_evis_pdg;
         
         // Analysis
         CCProtonPi0_SingleBin beamE;

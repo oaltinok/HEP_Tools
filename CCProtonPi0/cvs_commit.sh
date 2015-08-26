@@ -1,15 +1,14 @@
-cvs commit -m "v2_28
+cvs commit -m "v2_29
 CCProtonPi0 Updates:
-	EM Energy Calibration Constants Updated with Jaewon Park;s Technote (DocDB: 9407)
-		Scale Factor
-			OLD: 1.213 --- NEW: 1.326
-		kECAL
-			OLD: 2.274 --- NEW: 2.341
-		kHCAL
-			OLD: 10.55 --- NEW:9.54
-	EM Energy Calculation is same, only constants are updated
+	truthIsPlausible() implemented correctly
+		Moved muonIsPlausible() check from reconstructEvent() to truthIsPlausible()
+	SaveBlobDigitInfo()
+		Planning to use detecting showers very close to Edge of the Detector
+		Saving strip information for each digit inside a found Pi0Blob
+			all strips, max strip, min strip
+		Saving Z position for each cluster inside a found Pi0Blob
+			all Zs, max Z, minZ
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Collected ROOT Default Classes for CCProtonPi0_Analyzer Class under
-		CCProtonPi0_Analyzer_Default.cpp file
+	Many New Histograms and Plotting Functions for studying EM Shower Energy
 " .

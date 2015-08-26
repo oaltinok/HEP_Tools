@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Aug 13 10:17:12 2015 by ROOT version 5.34/05
+// Wed Aug 19 09:51:48 2015 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -53,7 +53,6 @@ public :
    Int_t           Cut_EndPoint_Michel_Exist;
    Int_t           Cut_Muon_Charge;
    Int_t           Cut_Muon_None;
-   Int_t           Cut_Muon_Not_Plausible;
    Int_t           Cut_Particle_None;
    Int_t           Cut_PreFilter_Pi0;
    Int_t           Cut_Proton_None;
@@ -73,8 +72,12 @@ public :
    Int_t           g2dedx_doublet;
    Int_t           g2dedx_empty_plane;
    Int_t           g2dedx_nplane;
+   Int_t           gamma1_blob_max_strip_number;
+   Int_t           gamma1_blob_min_strip_number;
    Int_t           gamma1_blob_nclusters;
    Int_t           gamma1_blob_ndigits;
+   Int_t           gamma2_blob_max_strip_number;
+   Int_t           gamma2_blob_min_strip_number;
    Int_t           gamma2_blob_nclusters;
    Int_t           gamma2_blob_ndigits;
    Int_t           nProngs;
@@ -129,8 +132,12 @@ public :
    Double_t        g2dedx_total;
    Double_t        g2dedx_total1;
    Double_t        gamma1_blob_energy;
+   Double_t        gamma1_blob_max_z;
+   Double_t        gamma1_blob_min_z;
    Double_t        gamma1_blob_minsep;
    Double_t        gamma2_blob_energy;
+   Double_t        gamma2_blob_max_z;
+   Double_t        gamma2_blob_min_z;
    Double_t        gamma2_blob_minsep;
    Double_t        hadronVisibleE;
    Double_t        michelProng_begin_Z;
@@ -168,6 +175,10 @@ public :
    Int_t           g1dedx_cluster_occupancy[6];   //[g1dedx_cluster_occupancy_sz]
    Int_t           g2dedx_cluster_occupancy_sz;
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
+   Int_t           gamma1_blob_strip_numbers_sz;
+   Int_t           gamma1_blob_strip_numbers[388];   //[gamma1_blob_strip_numbers_sz]
+   Int_t           gamma2_blob_strip_numbers_sz;
+   Int_t           gamma2_blob_strip_numbers[310];   //[gamma2_blob_strip_numbers_sz]
    Int_t           nTracks_Secondary_Vtx_sz;
    Int_t           nTracks_Secondary_Vtx[8];   //[nTracks_Secondary_Vtx_sz]
    Int_t           Vertex_energy_radii_sz;
@@ -181,6 +192,10 @@ public :
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
    Double_t        g2dedx_rev_cluster_energy[81];   //[g2dedx_rev_cluster_energy_sz]
+   Int_t           gamma1_blob_z_positions_sz;
+   Double_t        gamma1_blob_z_positions[213];   //[gamma1_blob_z_positions_sz]
+   Int_t           gamma2_blob_z_positions_sz;
+   Double_t        gamma2_blob_z_positions[139];   //[gamma2_blob_z_positions_sz]
    Int_t           od_distanceBlobTower_sz;
    Double_t        od_distanceBlobTower[2];   //[od_distanceBlobTower_sz]
    Int_t           od_idBlobTime_sz;
@@ -703,7 +718,6 @@ public :
    TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
    TBranch        *b_Cut_Muon_Charge;   //!
    TBranch        *b_Cut_Muon_None;   //!
-   TBranch        *b_Cut_Muon_Not_Plausible;   //!
    TBranch        *b_Cut_Particle_None;   //!
    TBranch        *b_Cut_PreFilter_Pi0;   //!
    TBranch        *b_Cut_Proton_None;   //!
@@ -723,8 +737,12 @@ public :
    TBranch        *b_g2dedx_doublet;   //!
    TBranch        *b_g2dedx_empty_plane;   //!
    TBranch        *b_g2dedx_nplane;   //!
+   TBranch        *b_gamma1_blob_max_strip_number;   //!
+   TBranch        *b_gamma1_blob_min_strip_number;   //!
    TBranch        *b_gamma1_blob_nclusters;   //!
    TBranch        *b_gamma1_blob_ndigits;   //!
+   TBranch        *b_gamma2_blob_max_strip_number;   //!
+   TBranch        *b_gamma2_blob_min_strip_number;   //!
    TBranch        *b_gamma2_blob_nclusters;   //!
    TBranch        *b_gamma2_blob_ndigits;   //!
    TBranch        *b_nProngs;   //!
@@ -779,8 +797,12 @@ public :
    TBranch        *b_g2dedx_total;   //!
    TBranch        *b_g2dedx_total1;   //!
    TBranch        *b_gamma1_blob_energy;   //!
+   TBranch        *b_gamma1_blob_max_z;   //!
+   TBranch        *b_gamma1_blob_min_z;   //!
    TBranch        *b_gamma1_blob_minsep;   //!
    TBranch        *b_gamma2_blob_energy;   //!
+   TBranch        *b_gamma2_blob_max_z;   //!
+   TBranch        *b_gamma2_blob_min_z;   //!
    TBranch        *b_gamma2_blob_minsep;   //!
    TBranch        *b_hadronVisibleE;   //!
    TBranch        *b_michelProng_begin_Z;   //!
@@ -818,6 +840,10 @@ public :
    TBranch        *b_g1dedx_cluster_occupancy;   //!
    TBranch        *b_g2dedx_cluster_occupancy_sz;   //!
    TBranch        *b_g2dedx_cluster_occupancy;   //!
+   TBranch        *b_gamma1_blob_strip_numbers_sz;   //!
+   TBranch        *b_gamma1_blob_strip_numbers;   //!
+   TBranch        *b_gamma2_blob_strip_numbers_sz;   //!
+   TBranch        *b_gamma2_blob_strip_numbers;   //!
    TBranch        *b_nTracks_Secondary_Vtx_sz;   //!
    TBranch        *b_nTracks_Secondary_Vtx;   //!
    TBranch        *b_Vertex_energy_radii_sz;   //!
@@ -831,6 +857,10 @@ public :
    TBranch        *b_g2dedx_cluster_energy;   //!
    TBranch        *b_g2dedx_rev_cluster_energy_sz;   //!
    TBranch        *b_g2dedx_rev_cluster_energy;   //!
+   TBranch        *b_gamma1_blob_z_positions_sz;   //!
+   TBranch        *b_gamma1_blob_z_positions;   //!
+   TBranch        *b_gamma2_blob_z_positions_sz;   //!
+   TBranch        *b_gamma2_blob_z_positions;   //!
    TBranch        *b_od_distanceBlobTower_sz;   //!
    TBranch        *b_od_distanceBlobTower;   //!
    TBranch        *b_od_idBlobTime_sz;   //!
@@ -1355,7 +1385,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_run_v2_27.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_run_v2_29.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1438,7 +1468,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("Cut_EndPoint_Michel_Exist", &Cut_EndPoint_Michel_Exist, &b_Cut_EndPoint_Michel_Exist);
    fChain->SetBranchAddress("Cut_Muon_Charge", &Cut_Muon_Charge, &b_Cut_Muon_Charge);
    fChain->SetBranchAddress("Cut_Muon_None", &Cut_Muon_None, &b_Cut_Muon_None);
-   fChain->SetBranchAddress("Cut_Muon_Not_Plausible", &Cut_Muon_Not_Plausible, &b_Cut_Muon_Not_Plausible);
    fChain->SetBranchAddress("Cut_Particle_None", &Cut_Particle_None, &b_Cut_Particle_None);
    fChain->SetBranchAddress("Cut_PreFilter_Pi0", &Cut_PreFilter_Pi0, &b_Cut_PreFilter_Pi0);
    fChain->SetBranchAddress("Cut_Proton_None", &Cut_Proton_None, &b_Cut_Proton_None);
@@ -1458,8 +1487,12 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("g2dedx_doublet", &g2dedx_doublet, &b_g2dedx_doublet);
    fChain->SetBranchAddress("g2dedx_empty_plane", &g2dedx_empty_plane, &b_g2dedx_empty_plane);
    fChain->SetBranchAddress("g2dedx_nplane", &g2dedx_nplane, &b_g2dedx_nplane);
+   fChain->SetBranchAddress("gamma1_blob_max_strip_number", &gamma1_blob_max_strip_number, &b_gamma1_blob_max_strip_number);
+   fChain->SetBranchAddress("gamma1_blob_min_strip_number", &gamma1_blob_min_strip_number, &b_gamma1_blob_min_strip_number);
    fChain->SetBranchAddress("gamma1_blob_nclusters", &gamma1_blob_nclusters, &b_gamma1_blob_nclusters);
    fChain->SetBranchAddress("gamma1_blob_ndigits", &gamma1_blob_ndigits, &b_gamma1_blob_ndigits);
+   fChain->SetBranchAddress("gamma2_blob_max_strip_number", &gamma2_blob_max_strip_number, &b_gamma2_blob_max_strip_number);
+   fChain->SetBranchAddress("gamma2_blob_min_strip_number", &gamma2_blob_min_strip_number, &b_gamma2_blob_min_strip_number);
    fChain->SetBranchAddress("gamma2_blob_nclusters", &gamma2_blob_nclusters, &b_gamma2_blob_nclusters);
    fChain->SetBranchAddress("gamma2_blob_ndigits", &gamma2_blob_ndigits, &b_gamma2_blob_ndigits);
    fChain->SetBranchAddress("nProngs", &nProngs, &b_nProngs);
@@ -1514,8 +1547,12 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("g2dedx_total", &g2dedx_total, &b_g2dedx_total);
    fChain->SetBranchAddress("g2dedx_total1", &g2dedx_total1, &b_g2dedx_total1);
    fChain->SetBranchAddress("gamma1_blob_energy", &gamma1_blob_energy, &b_gamma1_blob_energy);
+   fChain->SetBranchAddress("gamma1_blob_max_z", &gamma1_blob_max_z, &b_gamma1_blob_max_z);
+   fChain->SetBranchAddress("gamma1_blob_min_z", &gamma1_blob_min_z, &b_gamma1_blob_min_z);
    fChain->SetBranchAddress("gamma1_blob_minsep", &gamma1_blob_minsep, &b_gamma1_blob_minsep);
    fChain->SetBranchAddress("gamma2_blob_energy", &gamma2_blob_energy, &b_gamma2_blob_energy);
+   fChain->SetBranchAddress("gamma2_blob_max_z", &gamma2_blob_max_z, &b_gamma2_blob_max_z);
+   fChain->SetBranchAddress("gamma2_blob_min_z", &gamma2_blob_min_z, &b_gamma2_blob_min_z);
    fChain->SetBranchAddress("gamma2_blob_minsep", &gamma2_blob_minsep, &b_gamma2_blob_minsep);
    fChain->SetBranchAddress("hadronVisibleE", &hadronVisibleE, &b_hadronVisibleE);
    fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);
@@ -1553,6 +1590,10 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("g1dedx_cluster_occupancy", g1dedx_cluster_occupancy, &b_g1dedx_cluster_occupancy);
    fChain->SetBranchAddress("g2dedx_cluster_occupancy_sz", &g2dedx_cluster_occupancy_sz, &b_g2dedx_cluster_occupancy_sz);
    fChain->SetBranchAddress("g2dedx_cluster_occupancy", g2dedx_cluster_occupancy, &b_g2dedx_cluster_occupancy);
+   fChain->SetBranchAddress("gamma1_blob_strip_numbers_sz", &gamma1_blob_strip_numbers_sz, &b_gamma1_blob_strip_numbers_sz);
+   fChain->SetBranchAddress("gamma1_blob_strip_numbers", gamma1_blob_strip_numbers, &b_gamma1_blob_strip_numbers);
+   fChain->SetBranchAddress("gamma2_blob_strip_numbers_sz", &gamma2_blob_strip_numbers_sz, &b_gamma2_blob_strip_numbers_sz);
+   fChain->SetBranchAddress("gamma2_blob_strip_numbers", gamma2_blob_strip_numbers, &b_gamma2_blob_strip_numbers);
    fChain->SetBranchAddress("nTracks_Secondary_Vtx_sz", &nTracks_Secondary_Vtx_sz, &b_nTracks_Secondary_Vtx_sz);
    fChain->SetBranchAddress("nTracks_Secondary_Vtx", nTracks_Secondary_Vtx, &b_nTracks_Secondary_Vtx);
    fChain->SetBranchAddress("Vertex_energy_radii_sz", &Vertex_energy_radii_sz, &b_Vertex_energy_radii_sz);
@@ -1566,6 +1607,10 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("g2dedx_cluster_energy", g2dedx_cluster_energy, &b_g2dedx_cluster_energy);
    fChain->SetBranchAddress("g2dedx_rev_cluster_energy_sz", &g2dedx_rev_cluster_energy_sz, &b_g2dedx_rev_cluster_energy_sz);
    fChain->SetBranchAddress("g2dedx_rev_cluster_energy", g2dedx_rev_cluster_energy, &b_g2dedx_rev_cluster_energy);
+   fChain->SetBranchAddress("gamma1_blob_z_positions_sz", &gamma1_blob_z_positions_sz, &b_gamma1_blob_z_positions_sz);
+   fChain->SetBranchAddress("gamma1_blob_z_positions", gamma1_blob_z_positions, &b_gamma1_blob_z_positions);
+   fChain->SetBranchAddress("gamma2_blob_z_positions_sz", &gamma2_blob_z_positions_sz, &b_gamma2_blob_z_positions_sz);
+   fChain->SetBranchAddress("gamma2_blob_z_positions", gamma2_blob_z_positions, &b_gamma2_blob_z_positions);
    fChain->SetBranchAddress("od_distanceBlobTower_sz", &od_distanceBlobTower_sz, &b_od_distanceBlobTower_sz);
    fChain->SetBranchAddress("od_distanceBlobTower", od_distanceBlobTower, &b_od_distanceBlobTower);
    fChain->SetBranchAddress("od_idBlobTime_sz", &od_idBlobTime_sz, &b_od_idBlobTime_sz);
