@@ -551,7 +551,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std
     delete c;
 }
 
-void CCProtonPi0_Plotter::DrawStackedMC_GammaEvisByPDG(rootDir &dir, int gammaID, std::string plotDir)
+void CCProtonPi0_Plotter::DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir)
 {
     // ------------------------------------------------------------------------- 
     // Get Histograms from File 
@@ -560,11 +560,11 @@ void CCProtonPi0_Plotter::DrawStackedMC_GammaEvisByPDG(rootDir &dir, int gammaID
 
     TFile* f_mc = new TFile(rootDir_mc.c_str());
   
-    std::string pi0 = Form("g%d_evis_pi0",gammaID);
-    std::string pi = Form("g%d_evis_pi",gammaID);
-    std::string proton = Form("g%d_evis_proton",gammaID);
-    std::string neutron = Form("g%d_evis_neutron",gammaID);
-    std::string muon = Form("g%d_evis_muon",gammaID);
+    std::string pi0 = Form("g%d_%s_pi0",gammaID,var_name.c_str());
+    std::string pi = Form("g%d_%s_pi",gammaID,var_name.c_str());
+    std::string proton = Form("g%d_%s_proton",gammaID,var_name.c_str());
+    std::string neutron = Form("g%d_%s_neutron",gammaID,var_name.c_str());
+    std::string muon = Form("g%d_%s_muon",gammaID,var_name.c_str());
    
     TH1D* h_pi0 = new TH1D;   
     TH1D* h_pi = new TH1D;   
@@ -606,9 +606,9 @@ void CCProtonPi0_Plotter::DrawStackedMC_GammaEvisByPDG(rootDir &dir, int gammaID
 
     // Create Canvas and Form THStack
     TCanvas* c = new TCanvas("c","c",1280,800);
-    THStack* hs = new THStack("hs",Form("Visible Energy by Particle for Gamma %d",gammaID));
+    THStack* hs = new THStack("hs",Form("%s by Particle for Gamma %d",var_name.c_str(),gammaID));
     TLegend* legend = new TLegend(0.7,0.8,0.9,0.9);
-   
+
     //c->SetLogy();
     // Legend
     legend->AddEntry(h_pi0, "#pi^{0}", "f");
@@ -623,12 +623,12 @@ void CCProtonPi0_Plotter::DrawStackedMC_GammaEvisByPDG(rootDir &dir, int gammaID
     hs->Add(h_neutron);
     hs->Add(h_muon);
     hs->Draw();
-    hs->GetXaxis()->SetTitle(Form("Visible Energy by Particle for Gamma %d",gammaID));
+    hs->GetXaxis()->SetTitle(Form("%s by Particle for Gamma %d",var_name.c_str(),gammaID));
     hs->GetYaxis()->SetTitle("N(Events)");
     
     legend->Draw();
     
-    c->Print(Form("%s%s%d%s",plotDir.c_str(),"gamma_",gammaID,"_mc_evis_by_particle.png"), "png");
+    c->Print(Form("%s%s%d%s%s%s",plotDir.c_str(),"gamma_",gammaID,"_mc_",var_name.c_str(),"_by_particle.png"), "png");
 
     delete hs;
     delete c;

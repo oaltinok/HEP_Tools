@@ -1,6 +1,6 @@
-CCPROTONPI0_V="v2_29"
+CCPROTONPI0_V="v2_30"
 OUTPUTFOLDER="run"
-OTHEROPTIONS="--dst"
+OTHEROPTIONS=""
 
 echo "Submitting Jobs ..."
 echo "... CCProtonPi0 Version: ${CCPROTONPI0_V}" 

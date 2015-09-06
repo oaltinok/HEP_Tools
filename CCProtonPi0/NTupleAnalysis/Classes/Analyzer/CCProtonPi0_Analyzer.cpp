@@ -52,8 +52,8 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
 {
 
     string rootDir;
-    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_run_v2_29_NoHT.root";
-    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_run_v2_29_NoHT.root";
+    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_minerva1_v2_30_NoHT.root";
+    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_minerva1_v2_30_NoHT.root";
 
     cout<<"Reducing NTuple Files to a single file"<<endl;
     cout<<"\tRoot File: "<<rootDir<<endl;
@@ -890,7 +890,33 @@ void CCProtonPi0_Analyzer::fillPi0TruthMatch()
 {
     EvisRatio();
     EvisStacked();
+    fillMCHitEnergy();
 }
+
+void CCProtonPi0_Analyzer::fillMCHitEnergy()
+{
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_all, gamma1_blob_all_mchit_E, gamma1_blob_all_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_pi0, gamma1_blob_pi0_mchit_E, gamma1_blob_pi0_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_pi, gamma1_blob_pi_mchit_E, gamma1_blob_pi_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_proton, gamma1_blob_proton_mchit_E, gamma1_blob_proton_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_neutron, gamma1_blob_neutron_mchit_E, gamma1_blob_neutron_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_muon, gamma1_blob_muon_mchit_E, gamma1_blob_muon_mchit_E_sz); 
+
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_all, gamma2_blob_all_mchit_E, gamma2_blob_all_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_pi0, gamma2_blob_pi0_mchit_E, gamma2_blob_pi0_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_pi, gamma2_blob_pi_mchit_E, gamma2_blob_pi_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_proton, gamma2_blob_proton_mchit_E, gamma2_blob_proton_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_neutron, gamma2_blob_neutron_mchit_E, gamma2_blob_neutron_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_muon, gamma2_blob_muon_mchit_E, gamma2_blob_muon_mchit_E_sz); 
+}
+
+void CCProtonPi0_Analyzer::fillSingleRunMCHitEnergy(TH1D* hist, double hit_array[], int size)
+{
+    for (int i = 0; i < size; i++){
+        hist->Fill(hit_array[i]);
+    }
+}
+
 
 void CCProtonPi0_Analyzer::EvisStacked()
 {   
@@ -983,6 +1009,7 @@ void CCProtonPi0_Analyzer::fillPi0True()
     bool isg1_contained = (gamma1_blob_max_strip_number < 117 ) && (gamma1_blob_min_strip_number > 10);
     bool isg2_contained = (gamma2_blob_max_strip_number < 117 ) && (gamma2_blob_min_strip_number > 10);
 
+    
     if ( truth_isSignal ){
     //if ( truth_isSignal && captured_fraction > 0.95){
     //if ( truth_isSignal && captured_fraction >= 1 && truth_isGamma1_conv_inside && truth_isGamma2_conv_inside ){
@@ -1034,10 +1061,11 @@ void CCProtonPi0_Analyzer::fillPi0True()
         FillHistogram(pi0Blob.g1_nPlanes,g1dedx_nplane);
         FillHistogram(pi0Blob.g2_nPlanes,g2dedx_nplane);
 
-        if (g2_E_error >= 1){
-
+        
+        if (g2_E_error < 1){
+            
             fillPi0TruthMatch();
-
+            
             FillHistogram(pi0.g1_evis_trkr, CCProtonPi0_gamma1_evis_trkr);
             FillHistogram(pi0.g1_evis_scal, CCProtonPi0_gamma1_evis_scal);
             FillHistogram(pi0.g1_evis_ecal, CCProtonPi0_gamma1_evis_ecal);
@@ -1087,7 +1115,6 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
     // Photon Comparison
     pi0.gamma1_E_gamma2_E->Fill(CCProtonPi0_gamma1_E * HEP_Functions::MeV_to_GeV, CCProtonPi0_gamma2_E * HEP_Functions::MeV_to_GeV);
     pi0.gamma1_convLength_gamma2_convLength->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1, CCProtonPi0_gamma2_dist_vtx * 0.1);
-
 
 }
 

@@ -269,7 +269,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int getMichelPion(std::vector<int>& piList, int ID ) const;
         std::pair<int,double> OneParLineFitBlob(const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
         void ApplyAttenuationCorrection(Minerva::IDBlob* blob) const;
-        void Calculate_dEdx( const Minerva::IDBlob* blob, Minerva::PhysicsEvent* event, unsigned int blob_number) const;
+        void Calculate_dEdx( Minerva::PhysicsEvent* event, const Minerva::IDBlob* blob, unsigned int blob_number) const;
         void ColorUnusedIDClusters(Minerva::PhysicsEvent *event) const;
         void DiscardFarTracks(Minerva::PhysicsEvent *event) const;
         void DispersedBlob( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction *truthEvent ) const; 
@@ -308,7 +308,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void SetSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
         void SetSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
         void SaveBlobStripInfo(Minerva::PhysicsEvent * event, Minerva::IDBlob* blob, int blobID) const;
-
+        void SaveBlobMCHitEnergy(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
+        int GetMCHitPDG(const SmartRef<Minerva::MCHit> mc_hit) const;
 };
 
 #endif // CCPROTONPI0_H 

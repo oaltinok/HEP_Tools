@@ -44,6 +44,7 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin gamma_evis;
         CCProtonPi0_SingleBin gamma_evis_pdg;
         CCProtonPi0_SingleBin pi0_evis_pdg;
+        CCProtonPi0_SingleBin mchit_E;
         
         // Analysis
         CCProtonPi0_SingleBin beamE;

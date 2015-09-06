@@ -36,6 +36,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     gamma_evis.setBin(50,1,500);
     gamma_evis_pdg.setBin(30,0,300);
     pi0_evis_pdg.setBin(50,0,500);
+    mchit_E.setBin(50,0,5);
 
     // Neutrino Specific Bins
     beamE.setBin(20,0,20.0);

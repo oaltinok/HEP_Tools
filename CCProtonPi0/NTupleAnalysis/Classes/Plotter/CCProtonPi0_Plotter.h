@@ -130,7 +130,7 @@ class CCProtonPi0_Plotter
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);
-        void DrawStackedMC_GammaEvisByPDG(rootDir &dir, int gammaID, std::string plotDir);
+        void DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir);
 };
 
 
