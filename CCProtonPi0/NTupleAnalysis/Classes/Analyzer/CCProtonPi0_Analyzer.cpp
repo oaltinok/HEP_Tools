@@ -52,8 +52,8 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
 {
 
     string rootDir;
-    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_minerva1_v2_30_NoHT.root";
-    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_minerva1_v2_30_NoHT.root";
+    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_run_v2_31_NoHT.root";
+    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_run_v2_31_NoHT.root";
 
     cout<<"Reducing NTuple Files to a single file"<<endl;
     cout<<"\tRoot File: "<<rootDir<<endl;
@@ -890,24 +890,24 @@ void CCProtonPi0_Analyzer::fillPi0TruthMatch()
 {
     EvisRatio();
     EvisStacked();
-    fillMCHitEnergy();
+    //fillMCHitEnergy();
 }
 
 void CCProtonPi0_Analyzer::fillMCHitEnergy()
 {
-    fillSingleRunMCHitEnergy(pi0.g1_hit_E_all, gamma1_blob_all_mchit_E, gamma1_blob_all_mchit_E_sz); 
-    fillSingleRunMCHitEnergy(pi0.g1_hit_E_pi0, gamma1_blob_pi0_mchit_E, gamma1_blob_pi0_mchit_E_sz); 
-    fillSingleRunMCHitEnergy(pi0.g1_hit_E_pi, gamma1_blob_pi_mchit_E, gamma1_blob_pi_mchit_E_sz); 
-    fillSingleRunMCHitEnergy(pi0.g1_hit_E_proton, gamma1_blob_proton_mchit_E, gamma1_blob_proton_mchit_E_sz); 
-    fillSingleRunMCHitEnergy(pi0.g1_hit_E_neutron, gamma1_blob_neutron_mchit_E, gamma1_blob_neutron_mchit_E_sz); 
-    fillSingleRunMCHitEnergy(pi0.g1_hit_E_muon, gamma1_blob_muon_mchit_E, gamma1_blob_muon_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_all, gamma1_blob_all_digit_E, gamma1_blob_all_digit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_pi0, gamma1_blob_pi0_digit_E, gamma1_blob_pi0_digit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_pi, gamma1_blob_pi_digit_E, gamma1_blob_pi_digit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_proton, gamma1_blob_proton_digit_E, gamma1_blob_proton_digit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_neutron, gamma1_blob_neutron_digit_E, gamma1_blob_neutron_digit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g1_hit_E_muon, gamma1_blob_muon_digit_E, gamma1_blob_muon_digit_E_sz); 
 
-    fillSingleRunMCHitEnergy(pi0.g2_hit_E_all, gamma2_blob_all_mchit_E, gamma2_blob_all_mchit_E_sz); 
-    fillSingleRunMCHitEnergy(pi0.g2_hit_E_pi0, gamma2_blob_pi0_mchit_E, gamma2_blob_pi0_mchit_E_sz); 
-    fillSingleRunMCHitEnergy(pi0.g2_hit_E_pi, gamma2_blob_pi_mchit_E, gamma2_blob_pi_mchit_E_sz); 
-    fillSingleRunMCHitEnergy(pi0.g2_hit_E_proton, gamma2_blob_proton_mchit_E, gamma2_blob_proton_mchit_E_sz); 
-    fillSingleRunMCHitEnergy(pi0.g2_hit_E_neutron, gamma2_blob_neutron_mchit_E, gamma2_blob_neutron_mchit_E_sz); 
-    fillSingleRunMCHitEnergy(pi0.g2_hit_E_muon, gamma2_blob_muon_mchit_E, gamma2_blob_muon_mchit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_all, gamma2_blob_all_digit_E, gamma2_blob_all_digit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_pi0, gamma2_blob_pi0_digit_E, gamma2_blob_pi0_digit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_pi, gamma2_blob_pi_digit_E, gamma2_blob_pi_digit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_proton, gamma2_blob_proton_digit_E, gamma2_blob_proton_digit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_neutron, gamma2_blob_neutron_digit_E, gamma2_blob_neutron_digit_E_sz); 
+    fillSingleRunMCHitEnergy(pi0.g2_hit_E_muon, gamma2_blob_muon_digit_E, gamma2_blob_muon_digit_E_sz); 
 }
 
 void CCProtonPi0_Analyzer::fillSingleRunMCHitEnergy(TH1D* hist, double hit_array[], int size)
@@ -1002,6 +1002,7 @@ void CCProtonPi0_Analyzer::EvisRatio()
 void CCProtonPi0_Analyzer::fillPi0True()
 {
 
+    fillMCHitEnergy();
     double captured_fraction;
     if (truth_allClusters_evis_pizero == 0) captured_fraction = 0;
     else captured_fraction = truth_total_captured_evis_pizero / truth_allClusters_evis_pizero;
@@ -1062,7 +1063,7 @@ void CCProtonPi0_Analyzer::fillPi0True()
         FillHistogram(pi0Blob.g2_nPlanes,g2dedx_nplane);
 
         
-        if (g2_E_error < 1){
+       if (g2_E_error < 1){
             
             fillPi0TruthMatch();
             

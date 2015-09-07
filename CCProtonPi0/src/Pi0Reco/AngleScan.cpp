@@ -48,7 +48,9 @@ AngleScan::AngleScan(const SmartRefVector<Minerva::IDCluster>& clusters,
                      const Gaudi::XYZPoint& vertex)
     : fUVMatchTolerance(10.0),
       fUVMatchMoreTolerance(100.0),
-      fAllowUVMatchWithMoreTolerance(true)
+      fAllowUVMatchWithMoreTolerance(true),
+      m_ApplyMaxDigitEnergyCut(false),
+      m_MaxDigitEnergy(1000.0)
 {
     std::copy(clusters.begin(), clusters.end(), std::back_inserter(fAllClusters));
     
@@ -297,6 +299,10 @@ void AngleScan::DoReco()
     FindPeaks();
     FormXShowerCand();
     FormXUVShowerCand();
+    if (m_ApplyMaxDigitEnergyCut){
+        std::cout<<"Cleaning Shower Candidates by applying MaxDigitEnergyCut with "<<m_MaxDigitEnergy<<std::endl;
+        CleanAllShowerCand();
+    }
 }
 
 int AngleScan::GetLimitBin(const TH1F *hMax, int n_bin )const
@@ -506,6 +512,7 @@ std::vector<Minerva::IDBlob*> AngleScan::GetShowers() const {
 
     return finalBlobs;
 }
+
 void AngleScan::SetUVMatchTolerance(double epsilon) {
     fUVMatchTolerance = epsilon;
 }
@@ -517,3 +524,47 @@ void AngleScan::SetUVMatchMoreTolerance(double big_epsilon) {
 void AngleScan::AllowUVMatchWithMoreTolerance(bool b) {
     fAllowUVMatchWithMoreTolerance = b;
 }
+
+bool AngleScan::IsDigitEnergyLow(double energy)
+{
+    if (energy < m_MaxDigitEnergy) return true;
+    else return false;
+}
+
+void AngleScan::AllowMaxDigitEnergyCut(bool allowCut)
+{    
+    m_ApplyMaxDigitEnergyCut = allowCut;
+}
+
+void AngleScan::SetMaxDigitEnergy(double maxEnergy)
+{    
+    m_MaxDigitEnergy = maxEnergy;
+}
+
+void AngleScan::CleanAllShowerCand()
+{
+    std::vector<SmartRefVector<Minerva::IDCluster> >::const_iterator s;
+    
+    for (s = fShowerCandidates.begin(); s != fShowerCandidates.end(); ++s){
+        CleanSingleShowerCand(*s);        
+    }
+}
+
+void AngleScan::CleanSingleShowerCand(SmartRefVector<Minerva::IDCluster> clusters)
+{
+    SmartRefVector<Minerva::IDCluster>::iterator c;
+
+    for (c = clusters.begin(); c != clusters.end(); ++c ){
+        const SmartRefVector< Minerva::IDDigit> digits = (*c)->digits();
+        SmartRefVector<Minerva::IDDigit>::const_iterator d;
+        for ( d = digits.begin(); d != digits.end(); ++d){
+            double digitE = (*d)->normEnergy();
+            if (digitE >= m_MaxDigitEnergy){
+                (*c)->remove(*d);
+            }
+        }
+        const SmartRefVector< Minerva::IDDigit> digits2 = (*c)->digits();
+    }
+}
+
+

@@ -48,11 +48,15 @@ class AngleScan {
     void SetUVMatchTolerance(double epsilon);
     void SetUVMatchMoreTolerance(double big_epsilon);
     void AllowUVMatchWithMoreTolerance(bool b);
-    
+    void AllowMaxDigitEnergyCut(bool allowCut);
+    void SetMaxDigitEnergy(double maxEnergy);
+  
   private:
     void FormXShowerCand();
     void FormXUVShowerCand();
-    
+    void CleanAllShowerCand();
+    void CleanSingleShowerCand(SmartRefVector<Minerva::IDCluster> clusters);
+
     int GetLimitBin(const TH1F *hMax, int n_bin )const;
 
     void addClustersToBlob(SmartRefVector<Minerva::IDCluster>& xshowerCand,
@@ -81,6 +85,8 @@ class AngleScan {
     SmartRefVector<Minerva::IDCluster> fRemainingUClusters;
     SmartRefVector<Minerva::IDCluster> fRemainingVClusters;
     
+    bool IsDigitEnergyLow(double energy);
+    
     double fX;
     double fY;
     double fZ;
@@ -102,6 +108,8 @@ class AngleScan {
     double fUVMatchTolerance;
     double fUVMatchMoreTolerance;
     bool   fAllowUVMatchWithMoreTolerance;
+    bool   m_ApplyMaxDigitEnergyCut;
+    double m_MaxDigitEnergy;
 };
 
 #endif 

@@ -609,7 +609,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_GammaByPDG(rootDir &dir, std::string var
     THStack* hs = new THStack("hs",Form("%s by Particle for Gamma %d",var_name.c_str(),gammaID));
     TLegend* legend = new TLegend(0.7,0.8,0.9,0.9);
 
-    //c->SetLogy();
+    c->SetLogy();
     // Legend
     legend->AddEntry(h_pi0, "#pi^{0}", "f");
     legend->AddEntry(h_pi, "#pi^{#pm}", "f");

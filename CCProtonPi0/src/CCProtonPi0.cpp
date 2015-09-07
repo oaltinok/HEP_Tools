@@ -556,6 +556,21 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("gamma2_blob_max_z");
     declareDoubleEventBranch("gamma2_blob_min_z");
 
+    // Blob Digit Energy -- Filled in SaveBlobDigitEnergy 
+    declareContainerDoubleEventBranch("gamma1_blob_all_digit_E");
+    declareContainerDoubleEventBranch("gamma1_blob_pi0_digit_E");
+    declareContainerDoubleEventBranch("gamma1_blob_pi_digit_E");
+    declareContainerDoubleEventBranch("gamma1_blob_proton_digit_E");
+    declareContainerDoubleEventBranch("gamma1_blob_neutron_digit_E");
+    declareContainerDoubleEventBranch("gamma1_blob_muon_digit_E");
+
+    declareContainerDoubleEventBranch("gamma2_blob_all_digit_E");
+    declareContainerDoubleEventBranch("gamma2_blob_pi0_digit_E");
+    declareContainerDoubleEventBranch("gamma2_blob_pi_digit_E");
+    declareContainerDoubleEventBranch("gamma2_blob_proton_digit_E");
+    declareContainerDoubleEventBranch("gamma2_blob_neutron_digit_E");
+    declareContainerDoubleEventBranch("gamma2_blob_muon_digit_E");
+ 
     // Blob MCHit Energy -- Filled in SaveBlobMCHitEnergy 
     declareContainerDoubleEventBranch("gamma1_blob_all_mchit_E");
     declareContainerDoubleEventBranch("gamma1_blob_pi0_mchit_E");
@@ -3563,6 +3578,8 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
     AngleScan angleScanAlg(usableClusters,vtx_position);
     angleScanAlg.AllowUVMatchWithMoreTolerance(m_AllowUVMatchWithMoreTolerance);
     angleScanAlg.SetUVMatchTolerance(m_UVMatchTolerance);
+    angleScanAlg.AllowMaxDigitEnergyCut(true);
+    angleScanAlg.SetMaxDigitEnergy(30.0);
     angleScanAlg.DoReco();
 
     event->setIntData("anglescan_ncandx", angleScanAlg.GetNxCandidate());   // Number of Shower Candidates in X
@@ -3803,6 +3820,8 @@ void CCProtonPi0::setBlobData(Minerva::PhysicsEvent* event, Minerva::GenMinInter
 
     if (truthEvent){
         SaveTruthClusterEnergy_FoundBlobs(event, truthEvent);
+        SaveBlobDigitEnergy(event, m_Pi0Blob1, 1);
+        SaveBlobDigitEnergy(event, m_Pi0Blob2, 2);
         SaveBlobMCHitEnergy(event, m_Pi0Blob1, 1);
         SaveBlobMCHitEnergy(event, m_Pi0Blob2, 2);
     }
@@ -5692,6 +5711,56 @@ int CCProtonPi0::GetMCHitPDG(const SmartRef<Minerva::MCHit> mc_hit) const
     return pdg;
 }
 
+int CCProtonPi0::GetDigitPDG(const Minerva::MCIDDigit* mcdigit) const
+{
+    const SmartRefVector<Minerva::MCHit>& hits = mcdigit->hits();
+    std::vector<int> all_pdg;
+
+    if (hits.empty()){
+        debug()<<"No Hits in Digit"<<endmsg;
+        return -1;
+    }
+
+    // Save PDG of each Hit in Digit
+    SmartRefVector<Minerva::MCHit>::const_iterator h;
+    for ( h = hits.begin(); h != hits.end(); ++h){
+        int hit_pdg = GetMCHitPDG(*h);             
+        all_pdg.push_back(hit_pdg);
+    }
+
+    // Get Digit From Vector
+    int digit_pdg;
+    if (all_pdg.size() > 1) digit_pdg = GetPDGfromVector(all_pdg);
+    else digit_pdg = all_pdg[0];
+
+    return digit_pdg;
+}
+
+int CCProtonPi0::GetPDGfromVector(std::vector<int> &all_pdg) const
+{
+    // First Check whether all PDGs are Same
+    bool isAllSame = true;
+    
+    debug()<<"PDG Vector Content"<<endmsg; 
+    
+    // Check whether all PDGs are Same
+    int prev_pdg = all_pdg[0];
+    debug()<<prev_pdg<<endmsg;
+    for (unsigned int i = 1; i < all_pdg.size(); i++){
+        debug()<<all_pdg[i]<<endmsg;
+        if (prev_pdg != all_pdg[i]) isAllSame = false;
+        prev_pdg = all_pdg[i];
+    }
+
+    if (isAllSame){
+        debug()<<"All PDGs are same - returning unique PDG!"<<endmsg;
+        return prev_pdg;
+    }else{
+        debug()<<"All PDGs are NOT same - returning -1"<<endmsg;
+        return -1;
+    }
+}
+
 void CCProtonPi0::SaveBlobMCHitEnergy(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const
 {
     const SmartRefVector<Minerva::IDCluster>& clusters = blob->clusters();
@@ -5725,7 +5794,6 @@ void CCProtonPi0::SaveBlobMCHitEnergy(Minerva::PhysicsEvent *event, Minerva::IDB
             // Loop Over all MCHits
             for ( h = hits.begin(); h != hits.end(); ++h){
                 int pdg = GetMCHitPDG(*h);             
-                
                 double hit_E = (*h)->energy();                
                 all_hit_E.push_back(hit_E);
                 
@@ -5754,6 +5822,77 @@ void CCProtonPi0::SaveBlobMCHitEnergy(Minerva::PhysicsEvent *event, Minerva::IDB
        event->setContainerDoubleData("gamma2_blob_muon_mchit_E", muon_hit_E);
     }
 }
+
+void CCProtonPi0::SaveBlobDigitEnergy(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const
+{
+    const SmartRefVector<Minerva::IDCluster>& clusters = blob->clusters();
+    SmartRefVector<Minerva::IDCluster>::const_iterator c;
+   
+    std::vector<double> all_digit_E;
+    std::vector<double> pi0_digit_E;
+    std::vector<double> pi_digit_E;
+    std::vector<double> proton_digit_E;
+    std::vector<double> neutron_digit_E;
+    std::vector<double> muon_digit_E;
+
+    // Loop over all Clusters
+    for (c = clusters.begin(); c != clusters.end(); ++c) {
+        
+        // Loop Over all Digits
+        const SmartRefVector<Minerva::IDDigit>& digits = (*c)->digits();
+        SmartRefVector<Minerva::IDDigit>::const_iterator d;
+        for(d = digits.begin(); d != digits.end(); ++d){
+            // Get mcdigit
+            const Minerva::IDDigit* digit = *d;
+            const Minerva::MCIDDigit* mcdigit = dynamic_cast<const Minerva::MCIDDigit*>(digit);
+            
+            // Check mcdigit
+            if (!mcdigit) continue;
+
+            int pdg = GetDigitPDG(mcdigit);
+            
+            double mcdigit_E = 0;
+            // Get Hits from mcdigit
+            const SmartRefVector<Minerva::MCHit>& hits = mcdigit->hits();
+            if (hits.empty()) continue;
+            SmartRefVector<Minerva::MCHit>::const_iterator h;
+            // Loop Over all MCHits
+            for ( h = hits.begin(); h != hits.end(); ++h){
+                double hit_E = (*h)->energy();                
+                mcdigit_E = mcdigit_E + hit_E;
+            } 
+            
+            double digit_E = digit->normEnergy();
+
+            debug()<<"MCDigit Energy = "<<mcdigit_E<<endmsg;
+            debug()<<"Digit Energy = "<<digit_E<<endmsg;
+            
+            all_digit_E.push_back(digit_E);
+            if (pdg == PDG::pi0) pi0_digit_E.push_back(digit_E);
+            else if (std::abs(pdg) == PDG::pi) pi_digit_E.push_back(digit_E);
+            else if (pdg == PDG::proton) proton_digit_E.push_back(digit_E);
+            else if (pdg == PDG::neutron) neutron_digit_E.push_back(digit_E);
+            else if (pdg == PDG::muon) muon_digit_E.push_back(digit_E);
+        }
+    }
+    
+    if (blobID == 1){
+       event->setContainerDoubleData("gamma1_blob_all_digit_E", all_digit_E);
+       event->setContainerDoubleData("gamma1_blob_pi0_digit_E", pi0_digit_E);
+       event->setContainerDoubleData("gamma1_blob_pi_digit_E", pi_digit_E);
+       event->setContainerDoubleData("gamma1_blob_proton_digit_E", proton_digit_E);
+       event->setContainerDoubleData("gamma1_blob_neutron_digit_E", neutron_digit_E);
+       event->setContainerDoubleData("gamma1_blob_muon_digit_E", muon_digit_E);
+    }else{
+       event->setContainerDoubleData("gamma2_blob_all_digit_E", all_digit_E);
+       event->setContainerDoubleData("gamma2_blob_pi0_digit_E", pi0_digit_E);
+       event->setContainerDoubleData("gamma2_blob_pi_digit_E", pi_digit_E);
+       event->setContainerDoubleData("gamma2_blob_proton_digit_E", proton_digit_E);
+       event->setContainerDoubleData("gamma2_blob_neutron_digit_E", neutron_digit_E);
+       event->setContainerDoubleData("gamma2_blob_muon_digit_E", muon_digit_E);
+    }
+}
+
 
 #endif
 

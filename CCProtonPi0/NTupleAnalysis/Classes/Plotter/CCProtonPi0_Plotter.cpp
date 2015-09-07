@@ -221,8 +221,8 @@ void CCProtonPi0_Plotter::plotPi0TruthMatch()
 {
     std::cout<<"Plotting Pi0 Truth Match"<<std::endl;
     std::string plotDir = plotDir_Pion;
-  //  
-  //  // Evis Fraction 
+    
+    // Evis Fraction 
     DrawStackedMC_BckgAll(rootDir_Pion,"evis_frac_reco_pi0_true_pi0",plotDir);
     DrawStackedMC_BckgAll(rootDir_Pion,"evis_frac_true_pi0_reco_all",plotDir);
     DrawStackedMC_BckgAll(rootDir_Pion,"evis_frac_reco_pi0_reco_all",plotDir);
