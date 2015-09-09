@@ -500,16 +500,23 @@ const SmartRefVector<Minerva::IDCluster>& AngleScan::GetUnusedVClusters() const 
     return fRemainingVClusters;
 }
 
-std::vector<Minerva::IDBlob*> AngleScan::GetShowers() const {
+std::vector<Minerva::IDBlob*> AngleScan::GetShowers() 
+{
     std::vector<Minerva::IDBlob*> finalBlobs;
-    for (std::vector<SmartRefVector<Minerva::IDCluster> >::const_iterator
-             s = fShowerCandidates.begin();
-         s != fShowerCandidates.end(); ++s) {
+    std::vector<SmartRefVector<Minerva::IDCluster> >::const_iterator s;
+    
+    for ( s = fShowerCandidates.begin(); s != fShowerCandidates.end(); ++s) {
         Minerva::IDBlob* newBlob = new Minerva::IDBlob;
         newBlob->add(*s);
-        finalBlobs.push_back(newBlob);
+        // If we applied Digit Energy Cut we MUST remove empty Clusters
+        if (m_ApplyMaxDigitEnergyCut){
+            RemoveEmptyClusters(newBlob);
+        }
+        // Add Blob if it is NOT empty
+        int nClusters = newBlob->nclusters();
+        if(nClusters != 0) finalBlobs.push_back(newBlob);
     }
-
+    
     return finalBlobs;
 }
 
@@ -525,9 +532,9 @@ void AngleScan::AllowUVMatchWithMoreTolerance(bool b) {
     fAllowUVMatchWithMoreTolerance = b;
 }
 
-bool AngleScan::IsDigitEnergyLow(double energy)
+bool AngleScan::isDigitEnergyHigh(double energy)
 {
-    if (energy < m_MaxDigitEnergy) return true;
+    if (energy > m_MaxDigitEnergy) return true;
     else return false;
 }
 
@@ -555,16 +562,40 @@ void AngleScan::CleanSingleShowerCand(SmartRefVector<Minerva::IDCluster> cluster
     SmartRefVector<Minerva::IDCluster>::iterator c;
 
     for (c = clusters.begin(); c != clusters.end(); ++c ){
+        // Loop Over all Digits inside Cluster
         const SmartRefVector< Minerva::IDDigit> digits = (*c)->digits();
         SmartRefVector<Minerva::IDDigit>::const_iterator d;
         for ( d = digits.begin(); d != digits.end(); ++d){
             double digitE = (*d)->normEnergy();
-            if (digitE >= m_MaxDigitEnergy){
+            if (isDigitEnergyHigh(digitE)){
                 (*c)->remove(*d);
             }
         }
-        const SmartRefVector< Minerva::IDDigit> digits2 = (*c)->digits();
     }
+}
+
+/*
+ * When we clean the digits from clusters, some clusters might end up empty
+ *  We must remove them from the shower
+ */
+void AngleScan::RemoveEmptyClusters(Minerva::IDBlob* blob)
+{
+    SmartRefVector<Minerva::IDCluster>::const_iterator c;
+
+    std::cout<<"Initial NClusters in Blob = "<<blob->nclusters()<<std::endl;
+
+    // Loop Over all Clusters in Blob to find Empty Clusters
+    const SmartRefVector<Minerva::IDCluster> clusters = blob->clusters();
+    for(c = clusters.begin(); c != clusters.end(); ++c){
+        int ndigits = (*c)->iddigs();
+        std::cout<<"NDigits = "<<ndigits<<std::endl;
+        if (ndigits == 0){
+            std::cout<<"Removing Cluster!"<<std::endl;
+            blob->remove(*c);
+        }
+    }
+
+    std::cout<<"Final NClusters in Blob = "<<blob->nclusters()<<std::endl;
 }
 
 

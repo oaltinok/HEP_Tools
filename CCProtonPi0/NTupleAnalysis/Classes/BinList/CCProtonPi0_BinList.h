@@ -9,7 +9,6 @@ Class: CCProtonPi0_BinList
     
             
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision: 2015_05_07
 ================================================================================
 */
 #ifndef CCProtonPi0_BinList_h
@@ -44,7 +43,7 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin gamma_evis;
         CCProtonPi0_SingleBin gamma_evis_pdg;
         CCProtonPi0_SingleBin pi0_evis_pdg;
-        CCProtonPi0_SingleBin mchit_E;
+        CCProtonPi0_SingleBin digit_E;
         
         // Analysis
         CCProtonPi0_SingleBin beamE;

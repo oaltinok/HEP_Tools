@@ -308,7 +308,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void SetSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
         void SetSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
         void SaveBlobStripInfo(Minerva::PhysicsEvent * event, Minerva::IDBlob* blob, int blobID) const;
-        void SaveBlobMCHitEnergy(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
         void SaveBlobDigitEnergy(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
         int GetMCHitPDG(const SmartRef<Minerva::MCHit> mc_hit) const;
         int GetDigitPDG(const Minerva::MCIDDigit* mcdigit) const;

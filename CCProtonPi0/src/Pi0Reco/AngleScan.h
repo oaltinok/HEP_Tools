@@ -34,7 +34,7 @@ class AngleScan {
 
     const std::vector<SmartRefVector<Minerva::IDCluster> >& GetXShowerCandVector() const;
     const std::vector<SmartRefVector<Minerva::IDCluster> >& GetShowerCandVector() const;
-    std::vector<Minerva::IDBlob*>  GetShowers() const;
+    std::vector<Minerva::IDBlob*>  GetShowers();
 
     const SmartRefVector<Minerva::IDCluster>& GetXClusters() const;
     const SmartRefVector<Minerva::IDCluster>& GetUClusters() const;
@@ -56,7 +56,8 @@ class AngleScan {
     void FormXUVShowerCand();
     void CleanAllShowerCand();
     void CleanSingleShowerCand(SmartRefVector<Minerva::IDCluster> clusters);
-
+    void RemoveEmptyClusters(Minerva::IDBlob* blob);
+    
     int GetLimitBin(const TH1F *hMax, int n_bin )const;
 
     void addClustersToBlob(SmartRefVector<Minerva::IDCluster>& xshowerCand,
@@ -85,7 +86,7 @@ class AngleScan {
     SmartRefVector<Minerva::IDCluster> fRemainingUClusters;
     SmartRefVector<Minerva::IDCluster> fRemainingVClusters;
     
-    bool IsDigitEnergyLow(double energy);
+    bool isDigitEnergyHigh(double energy);
     
     double fX;
     double fY;

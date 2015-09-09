@@ -90,7 +90,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillEvis_MostPDG();
         void FillEvis_Fractions();
         void FillEvis_Total(); 
-        void fillMCHitEnergy();
+        void fillDigitEnergy();
         void fillSingleRunMCHitEnergy(TH1D* hist, double hit_array[], int size);
         
         //  Default Functions

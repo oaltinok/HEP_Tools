@@ -175,38 +175,38 @@ void CCProtonPi0_Plotter::plotPion()
     
     std::cout<<">> Plotting Unique Histograms"<<std::endl;
     // Unique Plots
-//    DrawDataMC(rootDir_Pion,"gamma1_E",plotDir);
-//    DrawDataMC(rootDir_Pion,"gamma2_E",plotDir);
-//    DrawDataMC(rootDir_Pion,"gamma1_theta",plotDir);
-//    DrawDataMC(rootDir_Pion,"gamma2_theta",plotDir);
-//    DrawDataMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
-//    DrawDataMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
-//    DrawDataMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
-//    DrawDataMC(rootDir_Pion,"invMass",plotDir);
-//
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
-   // 
-   // Draw1DHist(rootDir_Pion,"mgg_reco",plotDir);
-   // Draw1DHist(rootDir_Pion,"mgg_true",plotDir);
-   // Draw2DHist(rootDir_Pion,"mgg_reco_true",plotDir);
-   // Draw1DHist(rootDir_Pion,"mgg_error",plotDir);
-   // 
-    //Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
-    //Draw1DHist(rootDir_Pion,"gamma1_E_error",plotDir);
-   // Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
-   // 
-   // Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
-    //Draw1DHist(rootDir_Pion,"gamma2_E_error",plotDir);
-   // Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
-   // Draw2DHist(rootDir_Pion,"gamma1_E_gamma2_E",plotDir);
-   // Draw2DHist(rootDir_Pion,"gamma1_convLength_gamma2_convLength",plotDir);
+    //DrawDataMC(rootDir_Pion,"gamma1_E",plotDir);
+    //DrawDataMC(rootDir_Pion,"gamma2_E",plotDir);
+    //DrawDataMC(rootDir_Pion,"gamma1_theta",plotDir);
+    //DrawDataMC(rootDir_Pion,"gamma2_theta",plotDir);
+    //DrawDataMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
+    //DrawDataMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
+    //DrawDataMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+    //DrawDataMC(rootDir_Pion,"invMass",plotDir);
+
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
+    
+    Draw1DHist(rootDir_Pion,"mgg_reco",plotDir);
+    Draw1DHist(rootDir_Pion,"mgg_true",plotDir);
+    Draw2DHist(rootDir_Pion,"mgg_reco_true",plotDir);
+    Draw1DHist(rootDir_Pion,"mgg_error",plotDir);
+    
+    Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma1_E_error",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
+    
+    Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma2_E_error",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_E_gamma2_E",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_convLength_gamma2_convLength",plotDir);
    // 
    // Draw1DHist(rootDir_Pion,"isGamma1_conv_inside",plotDir);
    // Draw1DHist(rootDir_Pion,"isGamma2_conv_inside",plotDir);
@@ -234,22 +234,22 @@ void CCProtonPi0_Plotter::plotPi0TruthMatch()
     DrawStackedMC_GammaByPDG(rootDir_Pion,"evis",3,plotDir);
 
     // MC Hit Energy by PDG
-    Draw1DHist(rootDir_Pion,"g1_hit_E_all",plotDir);
-    Draw1DHist(rootDir_Pion,"g1_hit_E_pi0",plotDir);
-    Draw1DHist(rootDir_Pion,"g1_hit_E_pi",plotDir);
-    Draw1DHist(rootDir_Pion,"g1_hit_E_proton",plotDir);
-    Draw1DHist(rootDir_Pion,"g1_hit_E_neutron",plotDir);
-    Draw1DHist(rootDir_Pion,"g1_hit_E_muon",plotDir);
+    Draw1DHist(rootDir_Pion,"g1_digit_E_all",plotDir);
+    Draw1DHist(rootDir_Pion,"g1_digit_E_pi0",plotDir);
+    Draw1DHist(rootDir_Pion,"g1_digit_E_pi",plotDir);
+    Draw1DHist(rootDir_Pion,"g1_digit_E_proton",plotDir);
+    Draw1DHist(rootDir_Pion,"g1_digit_E_neutron",plotDir);
+    Draw1DHist(rootDir_Pion,"g1_digit_E_muon",plotDir);
  
-    Draw1DHist(rootDir_Pion,"g2_hit_E_all",plotDir);
-    Draw1DHist(rootDir_Pion,"g2_hit_E_pi0",plotDir);
-    Draw1DHist(rootDir_Pion,"g2_hit_E_pi",plotDir);
-    Draw1DHist(rootDir_Pion,"g2_hit_E_proton",plotDir);
-    Draw1DHist(rootDir_Pion,"g2_hit_E_neutron",plotDir);
-    Draw1DHist(rootDir_Pion,"g2_hit_E_muon",plotDir);
+    Draw1DHist(rootDir_Pion,"g2_digit_E_all",plotDir);
+    Draw1DHist(rootDir_Pion,"g2_digit_E_pi0",plotDir);
+    Draw1DHist(rootDir_Pion,"g2_digit_E_pi",plotDir);
+    Draw1DHist(rootDir_Pion,"g2_digit_E_proton",plotDir);
+    Draw1DHist(rootDir_Pion,"g2_digit_E_neutron",plotDir);
+    Draw1DHist(rootDir_Pion,"g2_digit_E_muon",plotDir);
    
-    DrawStackedMC_GammaByPDG(rootDir_Pion,"hit_E",1,plotDir);
-    DrawStackedMC_GammaByPDG(rootDir_Pion,"hit_E",2,plotDir);
+    DrawStackedMC_GammaByPDG(rootDir_Pion,"digit_E",1,plotDir);
+    DrawStackedMC_GammaByPDG(rootDir_Pion,"digit_E",2,plotDir);
 
     std::cout<<"Plotting Pi0 Truth Match Finished!\n"<<std::endl;
 }

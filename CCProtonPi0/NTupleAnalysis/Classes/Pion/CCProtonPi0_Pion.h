@@ -45,19 +45,19 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         TH1D* g3_evis_pi0;
         TH1D* g3_evis_muon;
 
-        TH1D* g1_hit_E_all;
-        TH1D* g1_hit_E_proton;
-        TH1D* g1_hit_E_neutron;
-        TH1D* g1_hit_E_pi;
-        TH1D* g1_hit_E_pi0;
-        TH1D* g1_hit_E_muon;
+        TH1D* g1_digit_E_all;
+        TH1D* g1_digit_E_proton;
+        TH1D* g1_digit_E_neutron;
+        TH1D* g1_digit_E_pi;
+        TH1D* g1_digit_E_pi0;
+        TH1D* g1_digit_E_muon;
 
-        TH1D* g2_hit_E_all;
-        TH1D* g2_hit_E_proton;
-        TH1D* g2_hit_E_neutron;
-        TH1D* g2_hit_E_pi;
-        TH1D* g2_hit_E_pi0;
-        TH1D* g2_hit_E_muon;
+        TH1D* g2_digit_E_all;
+        TH1D* g2_digit_E_proton;
+        TH1D* g2_digit_E_neutron;
+        TH1D* g2_digit_E_pi;
+        TH1D* g2_digit_E_pi0;
+        TH1D* g2_digit_E_muon;
 
         // Leading Photon - Energetic Photon
         vector<MnvH1D*> gamma1_E;
