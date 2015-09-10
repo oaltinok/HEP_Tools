@@ -310,7 +310,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           gamma1_blob_strip_numbers_sz;
    Int_t           gamma1_blob_strip_numbers[388];   //[gamma1_blob_strip_numbers_sz]
    Int_t           gamma2_blob_strip_numbers_sz;
-   Int_t           gamma2_blob_strip_numbers[310];   //[gamma2_blob_strip_numbers_sz]
+   Int_t           gamma2_blob_strip_numbers[304];   //[gamma2_blob_strip_numbers_sz]
    Int_t           nTracks_Secondary_Vtx_sz;
    Int_t           nTracks_Secondary_Vtx[11];   //[nTracks_Secondary_Vtx_sz]
    Int_t           Vertex_energy_radii_sz;
@@ -323,59 +323,35 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[81];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[82];   //[g2dedx_rev_cluster_energy_sz]
    Int_t           gamma1_blob_all_digit_E_sz;
    Double_t        gamma1_blob_all_digit_E[388];   //[gamma1_blob_all_digit_E_sz]
-   Int_t           gamma1_blob_all_mchit_E_sz;
-   Double_t        gamma1_blob_all_mchit_E[1609];   //[gamma1_blob_all_mchit_E_sz]
    Int_t           gamma1_blob_muon_digit_E_sz;
-   Double_t        gamma1_blob_muon_digit_E[179];   //[gamma1_blob_muon_digit_E_sz]
-   Int_t           gamma1_blob_muon_mchit_E_sz;
-   Double_t        gamma1_blob_muon_mchit_E[1070];   //[gamma1_blob_muon_mchit_E_sz]
+   Double_t        gamma1_blob_muon_digit_E[215];   //[gamma1_blob_muon_digit_E_sz]
    Int_t           gamma1_blob_neutron_digit_E_sz;
-   Double_t        gamma1_blob_neutron_digit_E[184];   //[gamma1_blob_neutron_digit_E_sz]
-   Int_t           gamma1_blob_neutron_mchit_E_sz;
-   Double_t        gamma1_blob_neutron_mchit_E[643];   //[gamma1_blob_neutron_mchit_E_sz]
+   Double_t        gamma1_blob_neutron_digit_E[218];   //[gamma1_blob_neutron_digit_E_sz]
    Int_t           gamma1_blob_pi0_digit_E_sz;
-   Double_t        gamma1_blob_pi0_digit_E[330];   //[gamma1_blob_pi0_digit_E_sz]
-   Int_t           gamma1_blob_pi0_mchit_E_sz;
-   Double_t        gamma1_blob_pi0_mchit_E[1589];   //[gamma1_blob_pi0_mchit_E_sz]
+   Double_t        gamma1_blob_pi0_digit_E[351];   //[gamma1_blob_pi0_digit_E_sz]
    Int_t           gamma1_blob_pi_digit_E_sz;
    Double_t        gamma1_blob_pi_digit_E[381];   //[gamma1_blob_pi_digit_E_sz]
-   Int_t           gamma1_blob_pi_mchit_E_sz;
-   Double_t        gamma1_blob_pi_mchit_E[882];   //[gamma1_blob_pi_mchit_E_sz]
    Int_t           gamma1_blob_proton_digit_E_sz;
-   Double_t        gamma1_blob_proton_digit_E[225];   //[gamma1_blob_proton_digit_E_sz]
-   Int_t           gamma1_blob_proton_mchit_E_sz;
-   Double_t        gamma1_blob_proton_mchit_E[564];   //[gamma1_blob_proton_mchit_E_sz]
+   Double_t        gamma1_blob_proton_digit_E[237];   //[gamma1_blob_proton_digit_E_sz]
    Int_t           gamma1_blob_z_positions_sz;
    Double_t        gamma1_blob_z_positions[213];   //[gamma1_blob_z_positions_sz]
    Int_t           gamma2_blob_all_digit_E_sz;
-   Double_t        gamma2_blob_all_digit_E[310];   //[gamma2_blob_all_digit_E_sz]
-   Int_t           gamma2_blob_all_mchit_E_sz;
-   Double_t        gamma2_blob_all_mchit_E[1013];   //[gamma2_blob_all_mchit_E_sz]
+   Double_t        gamma2_blob_all_digit_E[304];   //[gamma2_blob_all_digit_E_sz]
    Int_t           gamma2_blob_muon_digit_E_sz;
    Double_t        gamma2_blob_muon_digit_E[111];   //[gamma2_blob_muon_digit_E_sz]
-   Int_t           gamma2_blob_muon_mchit_E_sz;
-   Double_t        gamma2_blob_muon_mchit_E[337];   //[gamma2_blob_muon_mchit_E_sz]
    Int_t           gamma2_blob_neutron_digit_E_sz;
-   Double_t        gamma2_blob_neutron_digit_E[89];   //[gamma2_blob_neutron_digit_E_sz]
-   Int_t           gamma2_blob_neutron_mchit_E_sz;
-   Double_t        gamma2_blob_neutron_mchit_E[291];   //[gamma2_blob_neutron_mchit_E_sz]
+   Double_t        gamma2_blob_neutron_digit_E[88];   //[gamma2_blob_neutron_digit_E_sz]
    Int_t           gamma2_blob_pi0_digit_E_sz;
    Double_t        gamma2_blob_pi0_digit_E[182];   //[gamma2_blob_pi0_digit_E_sz]
-   Int_t           gamma2_blob_pi0_mchit_E_sz;
-   Double_t        gamma2_blob_pi0_mchit_E[912];   //[gamma2_blob_pi0_mchit_E_sz]
    Int_t           gamma2_blob_pi_digit_E_sz;
-   Double_t        gamma2_blob_pi_digit_E[256];   //[gamma2_blob_pi_digit_E_sz]
-   Int_t           gamma2_blob_pi_mchit_E_sz;
-   Double_t        gamma2_blob_pi_mchit_E[622];   //[gamma2_blob_pi_mchit_E_sz]
+   Double_t        gamma2_blob_pi_digit_E[251];   //[gamma2_blob_pi_digit_E_sz]
    Int_t           gamma2_blob_proton_digit_E_sz;
-   Double_t        gamma2_blob_proton_digit_E[121];   //[gamma2_blob_proton_digit_E_sz]
-   Int_t           gamma2_blob_proton_mchit_E_sz;
-   Double_t        gamma2_blob_proton_mchit_E[270];   //[gamma2_blob_proton_mchit_E_sz]
+   Double_t        gamma2_blob_proton_digit_E[122];   //[gamma2_blob_proton_digit_E_sz]
    Int_t           gamma2_blob_z_positions_sz;
-   Double_t        gamma2_blob_z_positions[139];   //[gamma2_blob_z_positions_sz]
+   Double_t        gamma2_blob_z_positions[138];   //[gamma2_blob_z_positions_sz]
    Int_t           od_distanceBlobTower_sz;
    Double_t        od_distanceBlobTower[2];   //[od_distanceBlobTower_sz]
    Int_t           od_idBlobTime_sz;
@@ -817,11 +793,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[50];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[50];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[50];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[50];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[50];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[51];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[51];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[51];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[51];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[51];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
    Int_t           mc_er_ID[77];   //[mc_er_nPart]
    Int_t           mc_er_status[77];   //[mc_er_nPart]
@@ -858,11 +834,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           mc_wgt_Flux_NA49_sz;
    Double_t        mc_wgt_Flux_NA49[100];   //[mc_wgt_Flux_NA49_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[10];   //[n_prongs]
-   Double_t        prong_part_score[10];   //[n_prongs]
-   Double_t        prong_part_mass[10];   //[n_prongs]
-   Int_t           prong_part_charge[10];   //[n_prongs]
-   Int_t           prong_part_pid[10];   //[n_prongs]
+   Int_t           prong_nParticles[11];   //[n_prongs]
+   Double_t        prong_part_score[11];   //[n_prongs]
+   Double_t        prong_part_mass[11];   //[n_prongs]
+   Int_t           prong_part_charge[11];   //[n_prongs]
+   Int_t           prong_part_pid[11];   //[n_prongs]
    vector<vector<double> > *prong_part_E;
    vector<vector<double> > *prong_part_pos;
 
@@ -1039,54 +1015,30 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_g2dedx_rev_cluster_energy;   //!
    TBranch        *b_gamma1_blob_all_digit_E_sz;   //!
    TBranch        *b_gamma1_blob_all_digit_E;   //!
-   TBranch        *b_gamma1_blob_all_mchit_E_sz;   //!
-   TBranch        *b_gamma1_blob_all_mchit_E;   //!
    TBranch        *b_gamma1_blob_muon_digit_E_sz;   //!
    TBranch        *b_gamma1_blob_muon_digit_E;   //!
-   TBranch        *b_gamma1_blob_muon_mchit_E_sz;   //!
-   TBranch        *b_gamma1_blob_muon_mchit_E;   //!
    TBranch        *b_gamma1_blob_neutron_digit_E_sz;   //!
    TBranch        *b_gamma1_blob_neutron_digit_E;   //!
-   TBranch        *b_gamma1_blob_neutron_mchit_E_sz;   //!
-   TBranch        *b_gamma1_blob_neutron_mchit_E;   //!
    TBranch        *b_gamma1_blob_pi0_digit_E_sz;   //!
    TBranch        *b_gamma1_blob_pi0_digit_E;   //!
-   TBranch        *b_gamma1_blob_pi0_mchit_E_sz;   //!
-   TBranch        *b_gamma1_blob_pi0_mchit_E;   //!
    TBranch        *b_gamma1_blob_pi_digit_E_sz;   //!
    TBranch        *b_gamma1_blob_pi_digit_E;   //!
-   TBranch        *b_gamma1_blob_pi_mchit_E_sz;   //!
-   TBranch        *b_gamma1_blob_pi_mchit_E;   //!
    TBranch        *b_gamma1_blob_proton_digit_E_sz;   //!
    TBranch        *b_gamma1_blob_proton_digit_E;   //!
-   TBranch        *b_gamma1_blob_proton_mchit_E_sz;   //!
-   TBranch        *b_gamma1_blob_proton_mchit_E;   //!
    TBranch        *b_gamma1_blob_z_positions_sz;   //!
    TBranch        *b_gamma1_blob_z_positions;   //!
    TBranch        *b_gamma2_blob_all_digit_E_sz;   //!
    TBranch        *b_gamma2_blob_all_digit_E;   //!
-   TBranch        *b_gamma2_blob_all_mchit_E_sz;   //!
-   TBranch        *b_gamma2_blob_all_mchit_E;   //!
    TBranch        *b_gamma2_blob_muon_digit_E_sz;   //!
    TBranch        *b_gamma2_blob_muon_digit_E;   //!
-   TBranch        *b_gamma2_blob_muon_mchit_E_sz;   //!
-   TBranch        *b_gamma2_blob_muon_mchit_E;   //!
    TBranch        *b_gamma2_blob_neutron_digit_E_sz;   //!
    TBranch        *b_gamma2_blob_neutron_digit_E;   //!
-   TBranch        *b_gamma2_blob_neutron_mchit_E_sz;   //!
-   TBranch        *b_gamma2_blob_neutron_mchit_E;   //!
    TBranch        *b_gamma2_blob_pi0_digit_E_sz;   //!
    TBranch        *b_gamma2_blob_pi0_digit_E;   //!
-   TBranch        *b_gamma2_blob_pi0_mchit_E_sz;   //!
-   TBranch        *b_gamma2_blob_pi0_mchit_E;   //!
    TBranch        *b_gamma2_blob_pi_digit_E_sz;   //!
    TBranch        *b_gamma2_blob_pi_digit_E;   //!
-   TBranch        *b_gamma2_blob_pi_mchit_E_sz;   //!
-   TBranch        *b_gamma2_blob_pi_mchit_E;   //!
    TBranch        *b_gamma2_blob_proton_digit_E_sz;   //!
    TBranch        *b_gamma2_blob_proton_digit_E;   //!
-   TBranch        *b_gamma2_blob_proton_mchit_E_sz;   //!
-   TBranch        *b_gamma2_blob_proton_mchit_E;   //!
    TBranch        *b_gamma2_blob_z_positions_sz;   //!
    TBranch        *b_gamma2_blob_z_positions;   //!
    TBranch        *b_od_distanceBlobTower_sz;   //!

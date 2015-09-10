@@ -538,23 +538,11 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch("gamma1_blob_nclusters",-1);
     declareDoubleEventBranch("gamma1_blob_energy",-1);
     declareDoubleEventBranch("gamma1_blob_minsep", -1.0);
-    declareContainerDoubleEventBranch("gamma1_blob_z_positions");
-    declareContainerIntEventBranch("gamma1_blob_strip_numbers");
-    declareIntEventBranch("gamma1_blob_max_strip_number");
-    declareIntEventBranch("gamma1_blob_min_strip_number");
-    declareDoubleEventBranch("gamma1_blob_max_z");
-    declareDoubleEventBranch("gamma1_blob_min_z");
 
     declareIntEventBranch("gamma2_blob_ndigits",-1);
     declareIntEventBranch("gamma2_blob_nclusters",-1);
     declareDoubleEventBranch("gamma2_blob_energy",-1);
     declareDoubleEventBranch("gamma2_blob_minsep", -1.0);
-    declareContainerDoubleEventBranch("gamma2_blob_z_positions");
-    declareContainerIntEventBranch("gamma2_blob_strip_numbers");
-    declareIntEventBranch("gamma2_blob_max_strip_number");
-    declareIntEventBranch("gamma2_blob_min_strip_number");
-    declareDoubleEventBranch("gamma2_blob_max_z");
-    declareDoubleEventBranch("gamma2_blob_min_z");
 
     // Blob Digit Energy -- Filled in SaveBlobDigitEnergy 
     declareContainerDoubleEventBranch("gamma1_blob_all_digit_E");
@@ -3787,11 +3775,6 @@ void CCProtonPi0::setBlobData(Minerva::PhysicsEvent* event, Minerva::GenMinInter
     // Calculate Min Separation from Vertex
     double blob1_minsep = CalcMinBlobSeparation(m_Pi0Blob1, event);
     double blob2_minsep = CalcMinBlobSeparation(m_Pi0Blob2, event);
-
-    // Calculate Distance from Blob Vertex to Exiting
-    SaveBlobStripInfo(event, m_Pi0Blob1, 1);
-    SaveBlobStripInfo(event, m_Pi0Blob2, 2);
-
    
     event->setIntData("gamma1_blob_nclusters", m_Pi0Blob1->nclusters());
     event->setIntData("gamma1_blob_ndigits", m_Pi0Blob1->getAllDigits().size());
@@ -5637,55 +5620,6 @@ int CCProtonPi0::GetNPrimaryProngs(Minerva::PhysicsEvent *event) const
 
     return nPrimaryProngs;
 }
-
-void CCProtonPi0::SaveBlobStripInfo(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const
-{
-    const SmartRefVector<Minerva::IDCluster>& clusters = blob->clusters();
-    SmartRefVector<Minerva::IDCluster>::const_iterator c;
-
-    std::vector<double> z_positions;
-    std::vector<int> strip_numbers;         // All Strip Numbers
-    
-    // Loop over all Clusters
-    for (c = clusters.begin(); c != clusters.end(); ++c) {
-        const double energy = (*c)->energy();
-        
-        // Skip low-energy clusters, normal MIP cluster has 1.7*2 MeV = 3.4 MeV
-        if (energy < 1.0) continue;
-
-        z_positions.push_back((*c)->z());    
-        // Loop Over all Digits
-        const SmartRefVector<Minerva::IDDigit>& digits = (*c)->digits();
-        SmartRefVector<Minerva::IDDigit>::const_iterator d;
-        for(d = digits.begin(); d != digits.end(); ++d){
-            strip_numbers.push_back((*d)->strip()); 
-        }
-    }
-    // Get Maximum and Minimum Values
-    std::vector<double>::iterator max_z = std::max_element(z_positions.begin(),z_positions.end()); 
-    std::vector<double>::iterator min_z = std::min_element(z_positions.begin(),z_positions.end()); 
-    
-    std::vector<int>::iterator max_strip = std::max_element(strip_numbers.begin(),strip_numbers.end()); 
-    std::vector<int>::iterator min_strip = std::min_element(strip_numbers.begin(),strip_numbers.end()); 
-
-    // Write vectors to NTuples
-    if (blobID == 1){
-        event->setContainerDoubleData("gamma1_blob_z_positions", z_positions);
-        event->setContainerIntData("gamma1_blob_strip_numbers", strip_numbers);
-        event->setIntData("gamma1_blob_max_strip_number", *max_strip);
-        event->setIntData("gamma1_blob_min_strip_number", *min_strip);
-        event->setDoubleData("gamma1_blob_max_z", *max_z);
-        event->setDoubleData("gamma1_blob_min_z", *min_z);
-    }else{
-        event->setContainerDoubleData("gamma2_blob_z_positions", z_positions);
-        event->setContainerIntData("gamma2_blob_strip_numbers", strip_numbers);
-        event->setIntData("gamma2_blob_max_strip_number", *max_strip);
-        event->setIntData("gamma2_blob_min_strip_number", *min_strip);
-        event->setDoubleData("gamma2_blob_max_z", *max_z);
-        event->setDoubleData("gamma2_blob_min_z", *min_z);
-    }
-} 
-
 int CCProtonPi0::GetMCHitPDG(const SmartRef<Minerva::MCHit> mc_hit) const
 {
     TraverseHistory history(mc_hit->GetTrackId());

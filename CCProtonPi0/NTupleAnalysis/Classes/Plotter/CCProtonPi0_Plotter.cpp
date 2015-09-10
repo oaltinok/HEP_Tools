@@ -11,19 +11,19 @@ using namespace PlotUtils;
 
 void CCProtonPi0_Plotter::plotHistograms()
 {
-    //plotMuon();
-    //plotProton();
+    plotMuon();
+    plotProton();
     plotPion();
-    //plotInteraction();
-    //plotCutHistograms();
+    plotInteraction();
+    plotCutHistograms();
     //plotOther();
     //plotPi0Blob();
 }
 
 CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
 {
-    data_POT = 9.57E19;
-    mc_POT = 9.90E20;
+    data_POT = 8.42E19;
+    mc_POT = 8.94E20;
     POT_Ratio_data_mc = data_POT / mc_POT;
     std::cout<<"POT Data = "<<data_POT<<std::endl;
     std::cout<<"POT MC = "<<mc_POT<<std::endl;
@@ -175,44 +175,44 @@ void CCProtonPi0_Plotter::plotPion()
     
     std::cout<<">> Plotting Unique Histograms"<<std::endl;
     // Unique Plots
-    //DrawDataMC(rootDir_Pion,"gamma1_E",plotDir);
-    //DrawDataMC(rootDir_Pion,"gamma2_E",plotDir);
-    //DrawDataMC(rootDir_Pion,"gamma1_theta",plotDir);
-    //DrawDataMC(rootDir_Pion,"gamma2_theta",plotDir);
-    //DrawDataMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
-    //DrawDataMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
-    //DrawDataMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
-    //DrawDataMC(rootDir_Pion,"invMass",plotDir);
+    DrawDataMC(rootDir_Pion,"gamma1_E",plotDir);
+    DrawDataMC(rootDir_Pion,"gamma2_E",plotDir);
+    DrawDataMC(rootDir_Pion,"gamma1_theta",plotDir);
+    DrawDataMC(rootDir_Pion,"gamma2_theta",plotDir);
+    DrawDataMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
+    DrawDataMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
+    DrawDataMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+    DrawDataMC(rootDir_Pion,"invMass",plotDir);
 
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
-    
-    Draw1DHist(rootDir_Pion,"mgg_reco",plotDir);
-    Draw1DHist(rootDir_Pion,"mgg_true",plotDir);
-    Draw2DHist(rootDir_Pion,"mgg_reco_true",plotDir);
-    Draw1DHist(rootDir_Pion,"mgg_error",plotDir);
-    
-    Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma1_E_error",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
-    
-    Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma2_E_error",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_E_gamma2_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_convLength_gamma2_convLength",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
+    //
+    //Draw1DHist(rootDir_Pion,"mgg_reco",plotDir);
+    //Draw1DHist(rootDir_Pion,"mgg_true",plotDir);
+    //Draw2DHist(rootDir_Pion,"mgg_reco_true",plotDir);
+    //Draw1DHist(rootDir_Pion,"mgg_error",plotDir);
+    //
+    //Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
+    //Draw1DHist(rootDir_Pion,"gamma1_E_error",plotDir);
+    //Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
+    //
+    //Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
+    //Draw1DHist(rootDir_Pion,"gamma2_E_error",plotDir);
+    //Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
+    //Draw2DHist(rootDir_Pion,"gamma1_E_gamma2_E",plotDir);
+    //Draw2DHist(rootDir_Pion,"gamma1_convLength_gamma2_convLength",plotDir);
    // 
    // Draw1DHist(rootDir_Pion,"isGamma1_conv_inside",plotDir);
    // Draw1DHist(rootDir_Pion,"isGamma2_conv_inside",plotDir);
 
    // plotGammaEvis();
-    plotPi0TruthMatch();
+    //plotPi0TruthMatch();
 
     std::cout<<"Plotting Pion Finished!\n"<<std::endl;
 }

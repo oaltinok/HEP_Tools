@@ -214,54 +214,30 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("g2dedx_rev_cluster_energy", g2dedx_rev_cluster_energy, &b_g2dedx_rev_cluster_energy);
    fChain->SetBranchAddress("gamma1_blob_all_digit_E_sz", &gamma1_blob_all_digit_E_sz, &b_gamma1_blob_all_digit_E_sz);
    fChain->SetBranchAddress("gamma1_blob_all_digit_E", gamma1_blob_all_digit_E, &b_gamma1_blob_all_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_all_mchit_E_sz", &gamma1_blob_all_mchit_E_sz, &b_gamma1_blob_all_mchit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_all_mchit_E", gamma1_blob_all_mchit_E, &b_gamma1_blob_all_mchit_E);
    fChain->SetBranchAddress("gamma1_blob_muon_digit_E_sz", &gamma1_blob_muon_digit_E_sz, &b_gamma1_blob_muon_digit_E_sz);
    fChain->SetBranchAddress("gamma1_blob_muon_digit_E", gamma1_blob_muon_digit_E, &b_gamma1_blob_muon_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_muon_mchit_E_sz", &gamma1_blob_muon_mchit_E_sz, &b_gamma1_blob_muon_mchit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_muon_mchit_E", gamma1_blob_muon_mchit_E, &b_gamma1_blob_muon_mchit_E);
    fChain->SetBranchAddress("gamma1_blob_neutron_digit_E_sz", &gamma1_blob_neutron_digit_E_sz, &b_gamma1_blob_neutron_digit_E_sz);
    fChain->SetBranchAddress("gamma1_blob_neutron_digit_E", gamma1_blob_neutron_digit_E, &b_gamma1_blob_neutron_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_neutron_mchit_E_sz", &gamma1_blob_neutron_mchit_E_sz, &b_gamma1_blob_neutron_mchit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_neutron_mchit_E", gamma1_blob_neutron_mchit_E, &b_gamma1_blob_neutron_mchit_E);
    fChain->SetBranchAddress("gamma1_blob_pi0_digit_E_sz", &gamma1_blob_pi0_digit_E_sz, &b_gamma1_blob_pi0_digit_E_sz);
    fChain->SetBranchAddress("gamma1_blob_pi0_digit_E", gamma1_blob_pi0_digit_E, &b_gamma1_blob_pi0_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_pi0_mchit_E_sz", &gamma1_blob_pi0_mchit_E_sz, &b_gamma1_blob_pi0_mchit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_pi0_mchit_E", gamma1_blob_pi0_mchit_E, &b_gamma1_blob_pi0_mchit_E);
    fChain->SetBranchAddress("gamma1_blob_pi_digit_E_sz", &gamma1_blob_pi_digit_E_sz, &b_gamma1_blob_pi_digit_E_sz);
    fChain->SetBranchAddress("gamma1_blob_pi_digit_E", gamma1_blob_pi_digit_E, &b_gamma1_blob_pi_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_pi_mchit_E_sz", &gamma1_blob_pi_mchit_E_sz, &b_gamma1_blob_pi_mchit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_pi_mchit_E", gamma1_blob_pi_mchit_E, &b_gamma1_blob_pi_mchit_E);
    fChain->SetBranchAddress("gamma1_blob_proton_digit_E_sz", &gamma1_blob_proton_digit_E_sz, &b_gamma1_blob_proton_digit_E_sz);
    fChain->SetBranchAddress("gamma1_blob_proton_digit_E", gamma1_blob_proton_digit_E, &b_gamma1_blob_proton_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_proton_mchit_E_sz", &gamma1_blob_proton_mchit_E_sz, &b_gamma1_blob_proton_mchit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_proton_mchit_E", gamma1_blob_proton_mchit_E, &b_gamma1_blob_proton_mchit_E);
    fChain->SetBranchAddress("gamma1_blob_z_positions_sz", &gamma1_blob_z_positions_sz, &b_gamma1_blob_z_positions_sz);
    fChain->SetBranchAddress("gamma1_blob_z_positions", gamma1_blob_z_positions, &b_gamma1_blob_z_positions);
    fChain->SetBranchAddress("gamma2_blob_all_digit_E_sz", &gamma2_blob_all_digit_E_sz, &b_gamma2_blob_all_digit_E_sz);
    fChain->SetBranchAddress("gamma2_blob_all_digit_E", gamma2_blob_all_digit_E, &b_gamma2_blob_all_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_all_mchit_E_sz", &gamma2_blob_all_mchit_E_sz, &b_gamma2_blob_all_mchit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_all_mchit_E", gamma2_blob_all_mchit_E, &b_gamma2_blob_all_mchit_E);
    fChain->SetBranchAddress("gamma2_blob_muon_digit_E_sz", &gamma2_blob_muon_digit_E_sz, &b_gamma2_blob_muon_digit_E_sz);
    fChain->SetBranchAddress("gamma2_blob_muon_digit_E", gamma2_blob_muon_digit_E, &b_gamma2_blob_muon_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_muon_mchit_E_sz", &gamma2_blob_muon_mchit_E_sz, &b_gamma2_blob_muon_mchit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_muon_mchit_E", gamma2_blob_muon_mchit_E, &b_gamma2_blob_muon_mchit_E);
    fChain->SetBranchAddress("gamma2_blob_neutron_digit_E_sz", &gamma2_blob_neutron_digit_E_sz, &b_gamma2_blob_neutron_digit_E_sz);
    fChain->SetBranchAddress("gamma2_blob_neutron_digit_E", gamma2_blob_neutron_digit_E, &b_gamma2_blob_neutron_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_neutron_mchit_E_sz", &gamma2_blob_neutron_mchit_E_sz, &b_gamma2_blob_neutron_mchit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_neutron_mchit_E", gamma2_blob_neutron_mchit_E, &b_gamma2_blob_neutron_mchit_E);
    fChain->SetBranchAddress("gamma2_blob_pi0_digit_E_sz", &gamma2_blob_pi0_digit_E_sz, &b_gamma2_blob_pi0_digit_E_sz);
    fChain->SetBranchAddress("gamma2_blob_pi0_digit_E", gamma2_blob_pi0_digit_E, &b_gamma2_blob_pi0_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_pi0_mchit_E_sz", &gamma2_blob_pi0_mchit_E_sz, &b_gamma2_blob_pi0_mchit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_pi0_mchit_E", gamma2_blob_pi0_mchit_E, &b_gamma2_blob_pi0_mchit_E);
    fChain->SetBranchAddress("gamma2_blob_pi_digit_E_sz", &gamma2_blob_pi_digit_E_sz, &b_gamma2_blob_pi_digit_E_sz);
    fChain->SetBranchAddress("gamma2_blob_pi_digit_E", gamma2_blob_pi_digit_E, &b_gamma2_blob_pi_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_pi_mchit_E_sz", &gamma2_blob_pi_mchit_E_sz, &b_gamma2_blob_pi_mchit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_pi_mchit_E", gamma2_blob_pi_mchit_E, &b_gamma2_blob_pi_mchit_E);
    fChain->SetBranchAddress("gamma2_blob_proton_digit_E_sz", &gamma2_blob_proton_digit_E_sz, &b_gamma2_blob_proton_digit_E_sz);
    fChain->SetBranchAddress("gamma2_blob_proton_digit_E", gamma2_blob_proton_digit_E, &b_gamma2_blob_proton_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_proton_mchit_E_sz", &gamma2_blob_proton_mchit_E_sz, &b_gamma2_blob_proton_mchit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_proton_mchit_E", gamma2_blob_proton_mchit_E, &b_gamma2_blob_proton_mchit_E);
    fChain->SetBranchAddress("gamma2_blob_z_positions_sz", &gamma2_blob_z_positions_sz, &b_gamma2_blob_z_positions_sz);
    fChain->SetBranchAddress("gamma2_blob_z_positions", gamma2_blob_z_positions, &b_gamma2_blob_z_positions);
    fChain->SetBranchAddress("od_distanceBlobTower_sz", &od_distanceBlobTower_sz, &b_od_distanceBlobTower_sz);
@@ -753,7 +729,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
    fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
    fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
-
 
 }
 
