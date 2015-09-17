@@ -5,6 +5,7 @@
 |CCProtonPi0	|CAMAC_DataReader	|dEdX Improvement	|Setup Scripts for CCProtonPi0	|
 |NTuple Analysis|			|True Reco Correction	|				|
 |		|			|dEdX Profile		|				|
+|		|			|Pi0InvMass_Correction	|				|
 
 * These packages are specialized for MINERvA Experiment data format.
 	* Experiment URL: http://minerva.fnal.gov/
@@ -42,6 +43,11 @@
 * In MC Analysis, most of the time the Reconstructed Parameter (Momentum, Energy, Angle, etc...) agrees with TRUE Parameter
 * Some cases, TRUE vs RECO plot does not create a good x = y distribution, in such cases we apply a correction factor
 * MATLAB Functions designed to find a linear correction factor for Reconstructed values
+
+### Pi0InvMass_Correction
+* We need a Correction Factor which can be calculated from the known Pi0 Invariant Mass Peak
+* Package to find a correction factor using reconstructed Pi0 Invariant Mass Peak.
+	* That correction factor is later used in NTupleAnalysis Package to correct EM Shower Energies
 
 ### dEdX Profile
 * EM Shower Profile for Different Shower Lengths
