@@ -1,3 +1,13 @@
+##############################
+#==========================
+# N Good Files: 2650
+# POT Used: 1.311900E+21
+#--------------------------
+# Time Created: 2015-09-16_16:44:08 
+# Command Used: /minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p6/Tools/ProductionScripts/pot_scripts/FindAnaFilesWithoutMeta.py --dir /pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_33/minerva13/grid/central_value/minerva/ana --batch --ana_tool CCProtonPi0 --output merge_files13.sh --remove
+#==========================
+##############################
+
 /pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_33/minerva13/grid/central_value/minerva/ana/v10r8p6/00/01/22/10/SIM_minerva_00012210_Subruns_0001-0002-0005-0006_CCProtonPi0_Ana_Tuple_v10r8p6-oaltinok.root
 /pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_33/minerva13/grid/central_value/minerva/ana/v10r8p6/00/01/22/10/SIM_minerva_00012210_Subruns_0007-0008-0009-0010_CCProtonPi0_Ana_Tuple_v10r8p6-oaltinok.root
 /pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_33/minerva13/grid/central_value/minerva/ana/v10r8p6/00/01/22/10/SIM_minerva_00012210_Subruns_0011-0012-0013-0014-0015_CCProtonPi0_Ana_Tuple_v10r8p6-oaltinok.root
@@ -2647,4 +2657,4 @@
 /pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_33/minerva13/grid/central_value/minerva/ana/v10r8p6/00/01/32/60/SIM_minerva_00013260_Subruns_0180-0181-0183-0184-0185_CCProtonPi0_Ana_Tuple_v10r8p6-oaltinok.root
 /pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_33/minerva13/grid/central_value/minerva/ana/v10r8p6/00/01/32/60/SIM_minerva_00013260_Subruns_0186-0187-0188-0189-0190_CCProtonPi0_Ana_Tuple_v10r8p6-oaltinok.root
 /pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_33/minerva13/grid/central_value/minerva/ana/v10r8p6/00/01/32/60/SIM_minerva_00013260_Subruns_0191-0192-0193-0194-0195_CCProtonPi0_Ana_Tuple_v10r8p6-oaltinok.root
-/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_33.root
+/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_33/minerva13/grid/central_value/minerva/ana/v10r8p6/00/01/32/60/SIM_minerva_00013260_Subruns_0196-0197-0198-0199-0200_CCProtonPi0_Ana_Tuple_v10r8p6-oaltinok.root

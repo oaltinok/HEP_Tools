@@ -11,19 +11,20 @@ using namespace PlotUtils;
 
 void CCProtonPi0_Plotter::plotHistograms()
 {
-    plotMuon();
-    plotProton();
+    //plotInteraction();
+    //plotMuon();
+    //plotProton();
     plotPion();
-    plotInteraction();
-    plotCutHistograms();
+    //plotCutHistograms();
     //plotOther();
     //plotPi0Blob();
+    //SavePi0InvMassPoints();
 }
 
 CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
 {
-    data_POT = 8.42E19;
-    mc_POT = 8.94E20;
+    data_POT = 9.61E19 + 2.28E20;
+    mc_POT = 9.89E20 + 1.31E21;
     POT_Ratio_data_mc = data_POT / mc_POT;
     std::cout<<"POT Data = "<<data_POT<<std::endl;
     std::cout<<"POT MC = "<<mc_POT<<std::endl;
@@ -120,6 +121,7 @@ void CCProtonPi0_Plotter::plotInteraction()
     DrawDataMC(rootDir_Interaction,"deltaInvMass",plotDir);
     DrawDataMC(rootDir_Interaction,"nProngs_hist",plotDir);
 
+    DrawStackedMC_BckgAll(rootDir_Interaction,"Enu_True",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"Enu_1Track",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"Enu_2Track",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"Enu_Cal",plotDir);
@@ -130,7 +132,11 @@ void CCProtonPi0_Plotter::plotInteraction()
     DrawDataStackedMC(rootDir_Interaction,"E_Used_afterReco",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"deltaInvMass",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"nProngs_hist",plotDir);
-    
+ 
+    Draw1DHist(rootDir_Interaction,"Enu_1Track_Error",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_2Track_Error",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_Cal_Error",plotDir);
+   
     std::cout<<"Plotting Interaction Finished!"<<std::endl;
 }
 
@@ -171,7 +177,7 @@ void CCProtonPi0_Plotter::plotPion()
     std::string plotDir = plotDir_Pion;
     
     // Standard Plots
-    //plotStandardHistograms(rootDir_Pion, plotDir);
+    plotStandardHistograms(rootDir_Pion, plotDir);
     
     std::cout<<">> Plotting Unique Histograms"<<std::endl;
     // Unique Plots
@@ -184,29 +190,37 @@ void CCProtonPi0_Plotter::plotPion()
     DrawDataMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
     DrawDataMC(rootDir_Pion,"invMass",plotDir);
 
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
-    //DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
-    //
-    //Draw1DHist(rootDir_Pion,"mgg_reco",plotDir);
-    //Draw1DHist(rootDir_Pion,"mgg_true",plotDir);
-    //Draw2DHist(rootDir_Pion,"mgg_reco_true",plotDir);
-    //Draw1DHist(rootDir_Pion,"mgg_error",plotDir);
-    //
-    //Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
-    //Draw1DHist(rootDir_Pion,"gamma1_E_error",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
-    //
-    //Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
-    //Draw1DHist(rootDir_Pion,"gamma2_E_error",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma1_E_gamma2_E",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma1_convLength_gamma2_convLength",plotDir);
+    DrawDataStackedMC(rootDir_Pion,"gamma1_E",plotDir);
+    DrawDataStackedMC(rootDir_Pion,"gamma2_E",plotDir);
+    DrawDataStackedMC(rootDir_Pion,"gamma1_theta",plotDir);
+    DrawDataStackedMC(rootDir_Pion,"gamma2_theta",plotDir);
+
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+  //  DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
+    
+    // ------------------------------------------------------------------------
+    // Other Studies
+    // ------------------------------------------------------------------------
+    Draw1DHist(rootDir_Pion,"mgg_reco",plotDir);
+    Draw1DHist(rootDir_Pion,"mgg_true",plotDir);
+    Draw2DHist(rootDir_Pion,"mgg_reco_true",plotDir);
+    Draw1DHist(rootDir_Pion,"mgg_error",plotDir);
+    
+    Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma1_E_error",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
+    
+    Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma2_E_error",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_E_gamma2_E",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_convLength_gamma2_convLength",plotDir);
    // 
    // Draw1DHist(rootDir_Pion,"isGamma1_conv_inside",plotDir);
    // Draw1DHist(rootDir_Pion,"isGamma2_conv_inside",plotDir);
@@ -270,15 +284,15 @@ void CCProtonPi0_Plotter::plotStandardHistograms(rootDir &dir, std::string plotD
 {
     std::cout<<">> Plotting Standard Histograms"<<std::endl;
     
-    DrawDataMC(dir, "E", plotDir);
+    //DrawDataMC(dir, "E", plotDir);
     DrawDataMC(dir, "P", plotDir);
-    DrawDataMC(dir, "KE", plotDir);
+    //DrawDataMC(dir, "KE", plotDir);
     DrawDataMC(dir, "theta", plotDir);
     DrawDataMC(dir, "phi", plotDir);
 
-    DrawDataStackedMC(dir, "E", plotDir);
+    //DrawDataStackedMC(dir, "E", plotDir);
     DrawDataStackedMC(dir, "P", plotDir);
-    DrawDataStackedMC(dir, "KE", plotDir);
+    //DrawDataStackedMC(dir, "KE", plotDir);
     DrawDataStackedMC(dir, "theta", plotDir);
     DrawDataStackedMC(dir, "phi", plotDir);
 }
@@ -468,6 +482,84 @@ void CCProtonPi0_Plotter::setPlotDirs(std::string ana_folder)
     plotDir_Proton = Folder_List::output + Folder_List::plotOut + ana_folder + "Proton/";
     plotDir_Pion = Folder_List::output + Folder_List::plotOut + ana_folder + "Pion/";
     plotDir_Other = Folder_List::output + Folder_List::plotOut + ana_folder + "Other/";
+}
+
+void CCProtonPi0_Plotter::SavePi0InvMassPoints()
+{
+    std::cout<<"Saving Pi0 Invariant Mass Points"<<std::endl;
+
+    std::string rootDir[2];
+    std::string textDir[2];
+    std::ofstream text[2];
+
+    // Set Dirs
+    textDir[0] = Folder_List::output + Folder_List::textOut + "Pi0InvMass_MC_minerva13.txt";
+    rootDir[0] = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms.root";
+
+    textDir[1] = Folder_List::output + Folder_List::textOut + "Pi0InvMass_Data_minerva13.txt";
+    rootDir[1] = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms.root";
+    
+    // Open Output Text Files
+    for (int i = 0; i < 2; i++){
+        text[i].open( textDir[i].c_str() );
+        if( !text[i].is_open() ){
+            std::cerr<<"Cannot open output text file: "<<textDir[i]<<std::endl;
+            exit(1);
+        }else{
+            std::cout<<"\t"<<textDir[i]<<std::endl;
+        }
+    }
+   
+    // Open Input ROOT Files and Initialize Histograms
+    TFile* f_mc = new TFile(rootDir[0].c_str());
+    MnvH1D* h_1Track_MC_Signal = (MnvH1D*)f_mc->Get("hCut_1Track_pi0invMass_1");
+    MnvH1D* h_2Track_MC_Signal = (MnvH1D*)f_mc->Get("hCut_2Track_pi0invMass_1");
+    MnvH1D* h_1Track_MC_Background = (MnvH1D*)f_mc->Get("hCut_1Track_pi0invMass_2");
+    MnvH1D* h_2Track_MC_Background = (MnvH1D*)f_mc->Get("hCut_2Track_pi0invMass_2");
+    
+    TFile* f_data = new TFile(rootDir[1].c_str());
+    MnvH1D* h_1Track_Data_All = (MnvH1D*)f_data->Get("hCut_1Track_pi0invMass_0");
+    MnvH1D* h_2Track_Data_All = (MnvH1D*)f_data->Get("hCut_2Track_pi0invMass_0");
+    
+    
+    // ------------------------------------------------------------------------
+    // Save Histogram Information to Output Text
+    // ------------------------------------------------------------------------
+    double nBins = h_1Track_MC_Signal->GetNbinsX(); // nBins Are Same for All
+       
+    // Write MC File
+    for (int i = 1; i <= nBins; i++){
+        double bin_center = h_1Track_MC_Signal->GetBinCenter(i);
+        
+        double bin_content_1Track_Signal = h_1Track_MC_Signal->GetBinContent(i);
+        double bin_content_1Track_Bckg = h_1Track_MC_Background->GetBinContent(i);
+        
+        double bin_content_2Track_Signal = h_2Track_MC_Signal->GetBinContent(i);
+        double bin_content_2Track_Bckg = h_2Track_MC_Background->GetBinContent(i);
+
+        text[0] <<bin_center<<" "
+                <<bin_content_1Track_Signal<<" "
+                <<bin_content_1Track_Bckg<<" "
+                <<bin_content_2Track_Signal<<" "
+                <<bin_content_2Track_Bckg<<std::endl;
+    }
+    
+    // Write Data File
+    for (int i = 1; i <= nBins; i++){
+        double bin_center = h_1Track_Data_All->GetBinCenter(i);
+        
+        double bin_content_1Track = h_1Track_Data_All->GetBinContent(i);
+        double bin_content_2Track = h_2Track_Data_All->GetBinContent(i);
+        
+        text[1] <<bin_center<<" "
+                <<bin_content_1Track<<" "
+                <<bin_content_2Track<<std::endl;
+    }
+
+    for (int i = 0; i < 2; i++){
+        text[0].close();
+    }
+    std::cout<<"Done!"<<std::endl;
 }
 
 #endif

@@ -19,6 +19,7 @@ Class: CCProtonPi0_Plotter
 #ifndef CCProtonPi0_Plotter_H
 #define CCProtonPi0_Plotter_h
 
+#include <fstream>
 #include <TVectorD.h>
 #include <TStyle.h>
 #include <TROOT.h>
@@ -117,6 +118,7 @@ class CCProtonPi0_Plotter
         // Helper Functions
         void ApplyStyle(MnvPlotter* plotter);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow);
+        void SavePi0InvMassPoints();
         
         // Plottting Macros
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);

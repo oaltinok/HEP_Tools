@@ -62,7 +62,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         int GetBackgroundTypeInd();
         int GetBackgroundWithPi0Ind();
         void FillHistogram(vector<MnvH1D*> &hist, double par);
-        void SavePi0InvMassPoints();
 
         //  Interaction Specific Functions
         void fillInteractionTrue();
@@ -78,6 +77,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fillProtonReco();
 
         //  Pion Specific Functions
+        double ApplyEMEnergyCorrection(double var);
         void getPi0Family();
         void fillPi0True();
         void fillPi0TruthMatch();
@@ -90,8 +90,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillEvis_MostPDG();
         void FillEvis_Fractions();
         void FillEvis_Total(); 
-        void fillDigitEnergy();
-        void fillSingleRunMCHitEnergy(TH1D* hist, double hit_array[], int size);
         
         //  Default Functions
         void Init(string playlist, TChain* fChain);
@@ -119,7 +117,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool isPassedAllCuts;
         bool applyMaxEvents;
         bool applyDeltaInvMass;
-        bool savePi0InvMassPoints;
         double latest_ScanID;
         double pID_KE_Limit;
         double minProtonScore_LLR;
@@ -136,6 +133,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         vector<double> PDG_pi0_GrandMother;
         double counter1;
         double counter2;
+
+        // Pi0InvariantMass Correction
+        double mean_MC_1Track;
+        double mean_MC_2Track;
+        double mean_Data_1Track;
+        double mean_Data_2Track;
 
         // Files
         string m_ana_folder;
@@ -204,12 +207,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           g2dedx_doublet;
    Int_t           g2dedx_empty_plane;
    Int_t           g2dedx_nplane;
-   Int_t           gamma1_blob_max_strip_number;
-   Int_t           gamma1_blob_min_strip_number;
    Int_t           gamma1_blob_nclusters;
    Int_t           gamma1_blob_ndigits;
-   Int_t           gamma2_blob_max_strip_number;
-   Int_t           gamma2_blob_min_strip_number;
    Int_t           gamma2_blob_nclusters;
    Int_t           gamma2_blob_ndigits;
    Int_t           nProngs;
@@ -264,12 +263,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        g2dedx_total;
    Double_t        g2dedx_total1;
    Double_t        gamma1_blob_energy;
-   Double_t        gamma1_blob_max_z;
-   Double_t        gamma1_blob_min_z;
    Double_t        gamma1_blob_minsep;
    Double_t        gamma2_blob_energy;
-   Double_t        gamma2_blob_max_z;
-   Double_t        gamma2_blob_min_z;
    Double_t        gamma2_blob_minsep;
    Double_t        hadronVisibleE;
    Double_t        michelProng_begin_Z;
@@ -307,10 +302,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           g1dedx_cluster_occupancy[6];   //[g1dedx_cluster_occupancy_sz]
    Int_t           g2dedx_cluster_occupancy_sz;
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
-   Int_t           gamma1_blob_strip_numbers_sz;
-   Int_t           gamma1_blob_strip_numbers[388];   //[gamma1_blob_strip_numbers_sz]
-   Int_t           gamma2_blob_strip_numbers_sz;
-   Int_t           gamma2_blob_strip_numbers[304];   //[gamma2_blob_strip_numbers_sz]
    Int_t           nTracks_Secondary_Vtx_sz;
    Int_t           nTracks_Secondary_Vtx[11];   //[nTracks_Secondary_Vtx_sz]
    Int_t           Vertex_energy_radii_sz;
@@ -323,35 +314,31 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[82];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[93];   //[g2dedx_rev_cluster_energy_sz]
    Int_t           gamma1_blob_all_digit_E_sz;
-   Double_t        gamma1_blob_all_digit_E[388];   //[gamma1_blob_all_digit_E_sz]
+   Double_t        gamma1_blob_all_digit_E[636];   //[gamma1_blob_all_digit_E_sz]
    Int_t           gamma1_blob_muon_digit_E_sz;
-   Double_t        gamma1_blob_muon_digit_E[215];   //[gamma1_blob_muon_digit_E_sz]
+   Double_t        gamma1_blob_muon_digit_E[223];   //[gamma1_blob_muon_digit_E_sz]
    Int_t           gamma1_blob_neutron_digit_E_sz;
-   Double_t        gamma1_blob_neutron_digit_E[218];   //[gamma1_blob_neutron_digit_E_sz]
+   Double_t        gamma1_blob_neutron_digit_E[203];   //[gamma1_blob_neutron_digit_E_sz]
    Int_t           gamma1_blob_pi0_digit_E_sz;
-   Double_t        gamma1_blob_pi0_digit_E[351];   //[gamma1_blob_pi0_digit_E_sz]
+   Double_t        gamma1_blob_pi0_digit_E[357];   //[gamma1_blob_pi0_digit_E_sz]
    Int_t           gamma1_blob_pi_digit_E_sz;
-   Double_t        gamma1_blob_pi_digit_E[381];   //[gamma1_blob_pi_digit_E_sz]
+   Double_t        gamma1_blob_pi_digit_E[309];   //[gamma1_blob_pi_digit_E_sz]
    Int_t           gamma1_blob_proton_digit_E_sz;
-   Double_t        gamma1_blob_proton_digit_E[237];   //[gamma1_blob_proton_digit_E_sz]
-   Int_t           gamma1_blob_z_positions_sz;
-   Double_t        gamma1_blob_z_positions[213];   //[gamma1_blob_z_positions_sz]
+   Double_t        gamma1_blob_proton_digit_E[234];   //[gamma1_blob_proton_digit_E_sz]
    Int_t           gamma2_blob_all_digit_E_sz;
-   Double_t        gamma2_blob_all_digit_E[304];   //[gamma2_blob_all_digit_E_sz]
+   Double_t        gamma2_blob_all_digit_E[473];   //[gamma2_blob_all_digit_E_sz]
    Int_t           gamma2_blob_muon_digit_E_sz;
-   Double_t        gamma2_blob_muon_digit_E[111];   //[gamma2_blob_muon_digit_E_sz]
+   Double_t        gamma2_blob_muon_digit_E[141];   //[gamma2_blob_muon_digit_E_sz]
    Int_t           gamma2_blob_neutron_digit_E_sz;
-   Double_t        gamma2_blob_neutron_digit_E[88];   //[gamma2_blob_neutron_digit_E_sz]
+   Double_t        gamma2_blob_neutron_digit_E[104];   //[gamma2_blob_neutron_digit_E_sz]
    Int_t           gamma2_blob_pi0_digit_E_sz;
-   Double_t        gamma2_blob_pi0_digit_E[182];   //[gamma2_blob_pi0_digit_E_sz]
+   Double_t        gamma2_blob_pi0_digit_E[165];   //[gamma2_blob_pi0_digit_E_sz]
    Int_t           gamma2_blob_pi_digit_E_sz;
-   Double_t        gamma2_blob_pi_digit_E[251];   //[gamma2_blob_pi_digit_E_sz]
+   Double_t        gamma2_blob_pi_digit_E[148];   //[gamma2_blob_pi_digit_E_sz]
    Int_t           gamma2_blob_proton_digit_E_sz;
-   Double_t        gamma2_blob_proton_digit_E[122];   //[gamma2_blob_proton_digit_E_sz]
-   Int_t           gamma2_blob_z_positions_sz;
-   Double_t        gamma2_blob_z_positions[138];   //[gamma2_blob_z_positions_sz]
+   Double_t        gamma2_blob_proton_digit_E[141];   //[gamma2_blob_proton_digit_E_sz]
    Int_t           od_distanceBlobTower_sz;
    Double_t        od_distanceBlobTower[2];   //[od_distanceBlobTower_sz]
    Int_t           od_idBlobTime_sz;
@@ -793,26 +780,26 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[51];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[51];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[51];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[51];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[51];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[58];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[58];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[58];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[58];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[58];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[77];   //[mc_er_nPart]
-   Int_t           mc_er_status[77];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[77];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[77];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[77];   //[mc_er_nPart]
-   Double_t        mc_er_Px[77];   //[mc_er_nPart]
-   Double_t        mc_er_Py[77];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[77];   //[mc_er_nPart]
-   Double_t        mc_er_E[77];   //[mc_er_nPart]
-   Int_t           mc_er_FD[77];   //[mc_er_nPart]
-   Int_t           mc_er_LD[77];   //[mc_er_nPart]
-   Int_t           mc_er_mother[77];   //[mc_er_nPart]
+   Int_t           mc_er_ID[94];   //[mc_er_nPart]
+   Int_t           mc_er_status[94];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[94];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[94];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[94];   //[mc_er_nPart]
+   Double_t        mc_er_Px[94];   //[mc_er_nPart]
+   Double_t        mc_er_Py[94];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[94];   //[mc_er_nPart]
+   Double_t        mc_er_E[94];   //[mc_er_nPart]
+   Int_t           mc_er_FD[94];   //[mc_er_nPart]
+   Int_t           mc_er_LD[94];   //[mc_er_nPart]
+   Int_t           mc_er_mother[94];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[12];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -834,11 +821,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    Int_t           mc_wgt_Flux_NA49_sz;
    Double_t        mc_wgt_Flux_NA49[100];   //[mc_wgt_Flux_NA49_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[11];   //[n_prongs]
-   Double_t        prong_part_score[11];   //[n_prongs]
-   Double_t        prong_part_mass[11];   //[n_prongs]
-   Int_t           prong_part_charge[11];   //[n_prongs]
-   Int_t           prong_part_pid[11];   //[n_prongs]
+   Int_t           prong_nParticles[15];   //[n_prongs]
+   Double_t        prong_part_score[15];   //[n_prongs]
+   Double_t        prong_part_mass[15];   //[n_prongs]
+   Int_t           prong_part_charge[15];   //[n_prongs]
+   Int_t           prong_part_pid[15];   //[n_prongs]
    vector<vector<double> > *prong_part_E;
    vector<vector<double> > *prong_part_pos;
 
@@ -893,12 +880,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_g2dedx_doublet;   //!
    TBranch        *b_g2dedx_empty_plane;   //!
    TBranch        *b_g2dedx_nplane;   //!
-   TBranch        *b_gamma1_blob_max_strip_number;   //!
-   TBranch        *b_gamma1_blob_min_strip_number;   //!
    TBranch        *b_gamma1_blob_nclusters;   //!
    TBranch        *b_gamma1_blob_ndigits;   //!
-   TBranch        *b_gamma2_blob_max_strip_number;   //!
-   TBranch        *b_gamma2_blob_min_strip_number;   //!
    TBranch        *b_gamma2_blob_nclusters;   //!
    TBranch        *b_gamma2_blob_ndigits;   //!
    TBranch        *b_nProngs;   //!
@@ -953,12 +936,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_g2dedx_total;   //!
    TBranch        *b_g2dedx_total1;   //!
    TBranch        *b_gamma1_blob_energy;   //!
-   TBranch        *b_gamma1_blob_max_z;   //!
-   TBranch        *b_gamma1_blob_min_z;   //!
    TBranch        *b_gamma1_blob_minsep;   //!
    TBranch        *b_gamma2_blob_energy;   //!
-   TBranch        *b_gamma2_blob_max_z;   //!
-   TBranch        *b_gamma2_blob_min_z;   //!
    TBranch        *b_gamma2_blob_minsep;   //!
    TBranch        *b_hadronVisibleE;   //!
    TBranch        *b_michelProng_begin_Z;   //!
@@ -996,10 +975,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_g1dedx_cluster_occupancy;   //!
    TBranch        *b_g2dedx_cluster_occupancy_sz;   //!
    TBranch        *b_g2dedx_cluster_occupancy;   //!
-   TBranch        *b_gamma1_blob_strip_numbers_sz;   //!
-   TBranch        *b_gamma1_blob_strip_numbers;   //!
-   TBranch        *b_gamma2_blob_strip_numbers_sz;   //!
-   TBranch        *b_gamma2_blob_strip_numbers;   //!
    TBranch        *b_nTracks_Secondary_Vtx_sz;   //!
    TBranch        *b_nTracks_Secondary_Vtx;   //!
    TBranch        *b_Vertex_energy_radii_sz;   //!
@@ -1025,8 +1000,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_gamma1_blob_pi_digit_E;   //!
    TBranch        *b_gamma1_blob_proton_digit_E_sz;   //!
    TBranch        *b_gamma1_blob_proton_digit_E;   //!
-   TBranch        *b_gamma1_blob_z_positions_sz;   //!
-   TBranch        *b_gamma1_blob_z_positions;   //!
    TBranch        *b_gamma2_blob_all_digit_E_sz;   //!
    TBranch        *b_gamma2_blob_all_digit_E;   //!
    TBranch        *b_gamma2_blob_muon_digit_E_sz;   //!
@@ -1039,8 +1012,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
    TBranch        *b_gamma2_blob_pi_digit_E;   //!
    TBranch        *b_gamma2_blob_proton_digit_E_sz;   //!
    TBranch        *b_gamma2_blob_proton_digit_E;   //!
-   TBranch        *b_gamma2_blob_z_positions_sz;   //!
-   TBranch        *b_gamma2_blob_z_positions;   //!
    TBranch        *b_od_distanceBlobTower_sz;   //!
    TBranch        *b_od_distanceBlobTower;   //!
    TBranch        *b_od_idBlobTime_sz;   //!

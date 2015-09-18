@@ -35,6 +35,11 @@ void CCProtonPi0_Interaction::initHistograms()
     MnvH1D* temp = NULL;
 
     for (int i = 0; i < nHistograms; i++){
+        temp = new MnvH1D( Form("%s_%d","Enu_True",i),"True Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+        temp->GetXaxis()->SetTitle("True E_{#nu}[GeV]");
+        temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
+        Enu_True.push_back(temp);
+        
         temp = new MnvH1D( Form("%s_%d","Enu_1Track",i),"Reconstructed Beam Energy - 1 Track",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - 1Track [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
@@ -94,17 +99,30 @@ void CCProtonPi0_Interaction::initHistograms()
     }
     
     // MC Only Histograms
-    final_mc_w_DIS = new TH1D( "final_mc_w_DIS","True W for DIS",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    final_mc_w_DIS = new TH1D( "final_mc_w_DIS","True W for DIS",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
     final_mc_w_DIS->GetXaxis()->SetTitle("True W for DIS [GeV]");
-    final_mc_w_DIS->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
+    final_mc_w_DIS->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_w.get_width()));
     
-    final_mc_w_RES = new TH1D( "final_mc_w_RES","True W for RES",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    final_mc_w_RES = new TH1D( "final_mc_w_RES","True W for RES",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
     final_mc_w_RES->GetXaxis()->SetTitle("True W for RES [GeV]");
-    final_mc_w_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
+    final_mc_w_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_w.get_width()));
     
-    final_mc_w_CCQE = new TH1D( "final_mc_w_CCQE","True W for CCQE",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    final_mc_w_CCQE = new TH1D( "final_mc_w_CCQE","True W for CCQE",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
     final_mc_w_CCQE->GetXaxis()->SetTitle("True W for CCQE [GeV]");
-    final_mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.w.get_width()));
+    final_mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_w.get_width()));
+
+    // Neutrino Energy Error
+    Enu_1Track_Error = new TH1D("Enu_1Track_Error","Neutrino Energy Error - 1 Track",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    Enu_1Track_Error->GetXaxis()->SetTitle("(E_{#nu}^{Reco}-E_{#nu}^{True})/E_{#nu}^{True}");
+    Enu_1Track_Error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+
+    Enu_2Track_Error = new TH1D("Enu_2Track_Error","Neutrino Energy Error - 2 Track",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    Enu_2Track_Error->GetXaxis()->SetTitle("(E_{#nu}^{Reco}-E_{#nu}^{True})/E_{#nu}^{True}");
+    Enu_2Track_Error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+
+    Enu_Cal_Error = new TH1D("Enu_Cal_Error","Neutrino Energy Error - Cal",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    Enu_Cal_Error->GetXaxis()->SetTitle("(E_{#nu}^{Reco}-E_{#nu}^{True})/E_{#nu}^{True}");
+    Enu_Cal_Error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
 
 }
 
@@ -116,6 +134,7 @@ void CCProtonPi0_Interaction::writeHistograms()
 
     for (int i = 0; i < nHistograms; i++){
         // Event Kinematics
+        Enu_True[i]->Write();
         Enu_1Track[i]->Write();
         Enu_2Track[i]->Write();
         Enu_Cal[i]->Write();
@@ -136,6 +155,10 @@ void CCProtonPi0_Interaction::writeHistograms()
     final_mc_w_RES->Write();
     final_mc_w_CCQE->Write();
     
+    Enu_1Track_Error->Write();
+    Enu_2Track_Error->Write();
+    Enu_Cal_Error->Write();
+
     f->Close();
 }
 

@@ -130,19 +130,19 @@ void Analyze(string playlist, bool isMC)
 
 void Plot()
 {
-    // First Plot 1Track Events
-    cout<<"======================================================================"<<endl;
-    cout<<"Plotting 1 Track Events..."<<endl;
-    cout<<"======================================================================"<<endl;
-    CCProtonPi0_Plotter plotter_1Track("1Track/");
-    plotter_1Track.plotHistograms();
+    //// First Plot 1Track Events
+    //cout<<"======================================================================"<<endl;
+    //cout<<"Plotting 1 Track Events..."<<endl;
+    //cout<<"======================================================================"<<endl;
+    //CCProtonPi0_Plotter plotter_1Track("1Track/");
+    //plotter_1Track.plotHistograms();
 
-    // Second Plot 2+Track Events
-    cout<<"======================================================================"<<endl;
-    cout<<"Plotting 2+ Track Events..."<<endl;
-    cout<<"======================================================================"<<endl;
-    CCProtonPi0_Plotter plotter_2Track("2Track/");
-    plotter_2Track.plotHistograms();
+    //// Second Plot 2+Track Events
+    //cout<<"======================================================================"<<endl;
+    //cout<<"Plotting 2+ Track Events..."<<endl;
+    //cout<<"======================================================================"<<endl;
+    //CCProtonPi0_Plotter plotter_2Track("2Track/");
+    //plotter_2Track.plotHistograms();
 
     // Finally Plot All Events
     cout<<"======================================================================"<<endl;

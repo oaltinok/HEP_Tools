@@ -55,6 +55,7 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin UnusedE;
         
         // Cut Histograms
+        CCProtonPi0_SingleBin mc_w;
         CCProtonPi0_SingleBin eVis_nuclearTarget;
         CCProtonPi0_SingleBin eVis_other;
         CCProtonPi0_SingleBin pi0_invMass;

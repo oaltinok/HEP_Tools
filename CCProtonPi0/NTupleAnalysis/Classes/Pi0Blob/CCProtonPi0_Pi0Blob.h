@@ -48,21 +48,8 @@ class CCProtonPi0_Pi0Blob : public CCProtonPi0_NTupleAnalysis
 
         // Reco Values
         std::vector<MnvH1D*> g1_nPlanes; 
-        std::vector<MnvH1D*> g1_cluster_Z; 
-        std::vector<MnvH1D*> g1_max_cluster_Z; 
-        std::vector<MnvH1D*> g1_min_cluster_Z; 
-        std::vector<MnvH1D*> g1_strips; 
-        std::vector<MnvH1D*> g1_max_strip; 
-        std::vector<MnvH1D*> g1_min_strip; 
-        
         std::vector<MnvH1D*> g2_nPlanes; 
-        std::vector<MnvH1D*> g2_cluster_Z; 
-        std::vector<MnvH1D*> g2_max_cluster_Z; 
-        std::vector<MnvH1D*> g2_min_cluster_Z; 
-        std::vector<MnvH1D*> g2_strips; 
-        std::vector<MnvH1D*> g2_max_strip; 
-        std::vector<MnvH1D*> g2_min_strip; 
-    
+            
     private:
         void initBins();
         void initHistograms();

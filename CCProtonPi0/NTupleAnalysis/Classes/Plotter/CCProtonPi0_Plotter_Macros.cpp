@@ -12,8 +12,8 @@ using namespace PlotUtils;
 void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
 {
    DrawDataStackedMC_BckgAll(dir,var_name,plotDir, nCutArrows, cutArrow1, cutArrow2);
-   DrawDataStackedMC_BckgWithPi0(dir,var_name,plotDir, nCutArrows, cutArrow1, cutArrow2);
-   DrawDataStackedMC_BckgType(dir,var_name,plotDir, nCutArrows, cutArrow1, cutArrow2);
+   //DrawDataStackedMC_BckgWithPi0(dir,var_name,plotDir, nCutArrows, cutArrow1, cutArrow2);
+   //DrawDataStackedMC_BckgType(dir,var_name,plotDir, nCutArrows, cutArrow1, cutArrow2);
 }
 
 void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
@@ -72,6 +72,12 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
         AddCutArrow(plotter,cutArrow2);
     }
 
+    if (var_name.compare("hCut_1Track_pi0invMass") == 0 || var_name.compare("hCut_2Track_pi0invMass") == 0 ){
+        TLine pi0Mass;
+        pi0Mass.SetLineWidth(2);
+        pi0Mass.SetLineColor(kBlue);
+        pi0Mass.DrawLine(134.98,0,134.98,300);
+    }
     // Print Plot
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all.png"), "png");
 

@@ -29,13 +29,18 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         //     Histograms
         //--------------------------------------------------------------------------
         // Event Kinematics
+        std::vector<MnvH1D*> Enu_True;
         std::vector<MnvH1D*> Enu_1Track;
         std::vector<MnvH1D*> Enu_2Track;
         std::vector<MnvH1D*> Enu_Cal;
         std::vector<MnvH1D*> q2;
         std::vector<MnvH1D*> w;
         std::vector<MnvH1D*> wSq;
-
+        
+        TH1D* Enu_1Track_Error;
+        TH1D* Enu_2Track_Error;
+        TH1D* Enu_Cal_Error;
+       
         // Vertex
         std::vector<MnvH1D*> vertex_z;
 

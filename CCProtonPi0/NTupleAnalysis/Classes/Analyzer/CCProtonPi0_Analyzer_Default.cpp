@@ -92,12 +92,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("g2dedx_doublet", &g2dedx_doublet, &b_g2dedx_doublet);
    fChain->SetBranchAddress("g2dedx_empty_plane", &g2dedx_empty_plane, &b_g2dedx_empty_plane);
    fChain->SetBranchAddress("g2dedx_nplane", &g2dedx_nplane, &b_g2dedx_nplane);
-   fChain->SetBranchAddress("gamma1_blob_max_strip_number", &gamma1_blob_max_strip_number, &b_gamma1_blob_max_strip_number);
-   fChain->SetBranchAddress("gamma1_blob_min_strip_number", &gamma1_blob_min_strip_number, &b_gamma1_blob_min_strip_number);
    fChain->SetBranchAddress("gamma1_blob_nclusters", &gamma1_blob_nclusters, &b_gamma1_blob_nclusters);
    fChain->SetBranchAddress("gamma1_blob_ndigits", &gamma1_blob_ndigits, &b_gamma1_blob_ndigits);
-   fChain->SetBranchAddress("gamma2_blob_max_strip_number", &gamma2_blob_max_strip_number, &b_gamma2_blob_max_strip_number);
-   fChain->SetBranchAddress("gamma2_blob_min_strip_number", &gamma2_blob_min_strip_number, &b_gamma2_blob_min_strip_number);
    fChain->SetBranchAddress("gamma2_blob_nclusters", &gamma2_blob_nclusters, &b_gamma2_blob_nclusters);
    fChain->SetBranchAddress("gamma2_blob_ndigits", &gamma2_blob_ndigits, &b_gamma2_blob_ndigits);
    fChain->SetBranchAddress("nProngs", &nProngs, &b_nProngs);
@@ -152,12 +148,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("g2dedx_total", &g2dedx_total, &b_g2dedx_total);
    fChain->SetBranchAddress("g2dedx_total1", &g2dedx_total1, &b_g2dedx_total1);
    fChain->SetBranchAddress("gamma1_blob_energy", &gamma1_blob_energy, &b_gamma1_blob_energy);
-   fChain->SetBranchAddress("gamma1_blob_max_z", &gamma1_blob_max_z, &b_gamma1_blob_max_z);
-   fChain->SetBranchAddress("gamma1_blob_min_z", &gamma1_blob_min_z, &b_gamma1_blob_min_z);
    fChain->SetBranchAddress("gamma1_blob_minsep", &gamma1_blob_minsep, &b_gamma1_blob_minsep);
    fChain->SetBranchAddress("gamma2_blob_energy", &gamma2_blob_energy, &b_gamma2_blob_energy);
-   fChain->SetBranchAddress("gamma2_blob_max_z", &gamma2_blob_max_z, &b_gamma2_blob_max_z);
-   fChain->SetBranchAddress("gamma2_blob_min_z", &gamma2_blob_min_z, &b_gamma2_blob_min_z);
    fChain->SetBranchAddress("gamma2_blob_minsep", &gamma2_blob_minsep, &b_gamma2_blob_minsep);
    fChain->SetBranchAddress("hadronVisibleE", &hadronVisibleE, &b_hadronVisibleE);
    fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);
@@ -195,10 +187,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("g1dedx_cluster_occupancy", g1dedx_cluster_occupancy, &b_g1dedx_cluster_occupancy);
    fChain->SetBranchAddress("g2dedx_cluster_occupancy_sz", &g2dedx_cluster_occupancy_sz, &b_g2dedx_cluster_occupancy_sz);
    fChain->SetBranchAddress("g2dedx_cluster_occupancy", g2dedx_cluster_occupancy, &b_g2dedx_cluster_occupancy);
-   fChain->SetBranchAddress("gamma1_blob_strip_numbers_sz", &gamma1_blob_strip_numbers_sz, &b_gamma1_blob_strip_numbers_sz);
-   fChain->SetBranchAddress("gamma1_blob_strip_numbers", gamma1_blob_strip_numbers, &b_gamma1_blob_strip_numbers);
-   fChain->SetBranchAddress("gamma2_blob_strip_numbers_sz", &gamma2_blob_strip_numbers_sz, &b_gamma2_blob_strip_numbers_sz);
-   fChain->SetBranchAddress("gamma2_blob_strip_numbers", gamma2_blob_strip_numbers, &b_gamma2_blob_strip_numbers);
    fChain->SetBranchAddress("nTracks_Secondary_Vtx_sz", &nTracks_Secondary_Vtx_sz, &b_nTracks_Secondary_Vtx_sz);
    fChain->SetBranchAddress("nTracks_Secondary_Vtx", nTracks_Secondary_Vtx, &b_nTracks_Secondary_Vtx);
    fChain->SetBranchAddress("Vertex_energy_radii_sz", &Vertex_energy_radii_sz, &b_Vertex_energy_radii_sz);
@@ -224,8 +212,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("gamma1_blob_pi_digit_E", gamma1_blob_pi_digit_E, &b_gamma1_blob_pi_digit_E);
    fChain->SetBranchAddress("gamma1_blob_proton_digit_E_sz", &gamma1_blob_proton_digit_E_sz, &b_gamma1_blob_proton_digit_E_sz);
    fChain->SetBranchAddress("gamma1_blob_proton_digit_E", gamma1_blob_proton_digit_E, &b_gamma1_blob_proton_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_z_positions_sz", &gamma1_blob_z_positions_sz, &b_gamma1_blob_z_positions_sz);
-   fChain->SetBranchAddress("gamma1_blob_z_positions", gamma1_blob_z_positions, &b_gamma1_blob_z_positions);
    fChain->SetBranchAddress("gamma2_blob_all_digit_E_sz", &gamma2_blob_all_digit_E_sz, &b_gamma2_blob_all_digit_E_sz);
    fChain->SetBranchAddress("gamma2_blob_all_digit_E", gamma2_blob_all_digit_E, &b_gamma2_blob_all_digit_E);
    fChain->SetBranchAddress("gamma2_blob_muon_digit_E_sz", &gamma2_blob_muon_digit_E_sz, &b_gamma2_blob_muon_digit_E_sz);
@@ -238,8 +224,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
    fChain->SetBranchAddress("gamma2_blob_pi_digit_E", gamma2_blob_pi_digit_E, &b_gamma2_blob_pi_digit_E);
    fChain->SetBranchAddress("gamma2_blob_proton_digit_E_sz", &gamma2_blob_proton_digit_E_sz, &b_gamma2_blob_proton_digit_E_sz);
    fChain->SetBranchAddress("gamma2_blob_proton_digit_E", gamma2_blob_proton_digit_E, &b_gamma2_blob_proton_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_z_positions_sz", &gamma2_blob_z_positions_sz, &b_gamma2_blob_z_positions_sz);
-   fChain->SetBranchAddress("gamma2_blob_z_positions", gamma2_blob_z_positions, &b_gamma2_blob_z_positions);
    fChain->SetBranchAddress("od_distanceBlobTower_sz", &od_distanceBlobTower_sz, &b_od_distanceBlobTower_sz);
    fChain->SetBranchAddress("od_distanceBlobTower", od_distanceBlobTower, &b_od_distanceBlobTower);
    fChain->SetBranchAddress("od_idBlobTime_sz", &od_idBlobTime_sz, &b_od_idBlobTime_sz);

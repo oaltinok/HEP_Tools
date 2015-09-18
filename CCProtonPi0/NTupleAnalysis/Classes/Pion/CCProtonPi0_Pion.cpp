@@ -175,11 +175,6 @@ void CCProtonPi0_Pion::initHistograms()
         temp->GetXaxis()->SetTitle("Visible Energy");
         temp->GetYaxis()->SetTitle("N(Events)");
         g2_evis_hcal.push_back(temp);
-  
-        temp = new MnvH1D(Form("%s_%d","g2_evis_frac_scal_trkr",i),Form("%s %d","Evis Fraction for Gamma ",2),binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
-        temp->GetXaxis()->SetTitle("Evis SideECAL / Evis Tracker");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        g2_evis_frac_scal_trkr.push_back(temp);
     }
 
     // Truth Energy - Gamma 1
@@ -232,14 +227,6 @@ void CCProtonPi0_Pion::initHistograms()
     mgg_error = new TH1D( "mgg_error","Error on Pi0 Invariant Mass",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     mgg_error->GetXaxis()->SetTitle("(m_{#gamma#gamma}^{Reco} - m_{#gamma#gamma}^{True})/m_{#gamma#gamma}^{True}");
     mgg_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
- 
-    isGamma1_conv_inside = new TH1D( "isGamma1_conv_inside","Is Gamma 1 Converted Inside?",binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
-    isGamma1_conv_inside->GetXaxis()->SetTitle("0 = False, 1 = True");
-    isGamma1_conv_inside->GetYaxis()->SetTitle("N(Events)");
-  
-    isGamma2_conv_inside = new TH1D( "isGamma2_conv_inside","Is Gamma 2 Converted Inside?",binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
-    isGamma2_conv_inside->GetXaxis()->SetTitle("0 = False, 1 = True");
-    isGamma2_conv_inside->GetYaxis()->SetTitle("N(Events)");
 
     g1_evis_proton = new TH1D("g1_evis_proton","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
     g1_evis_proton->GetXaxis()->SetTitle("Evis");
@@ -300,56 +287,6 @@ void CCProtonPi0_Pion::initHistograms()
     g3_evis_muon = new TH1D("g3_evis_muon","Visible Energy",binList.pi0_evis_pdg.get_nBins(), binList.pi0_evis_pdg.get_min(), binList.pi0_evis_pdg.get_max() );
     g3_evis_muon->GetXaxis()->SetTitle("Evis");
     g3_evis_muon->GetYaxis()->SetTitle("N(Events)");
-  
-    // Hit Energy by PDG
-    g1_digit_E_all = new TH1D("g1_digit_E_all","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g1_digit_E_all->GetXaxis()->SetTitle("MC digit_E_all");
-    g1_digit_E_all->GetYaxis()->SetTitle("N(Events)");
-
-    g1_digit_E_pi0 = new TH1D("g1_digit_E_pi0","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g1_digit_E_pi0->GetXaxis()->SetTitle("MC digit_E_pi0");
-    g1_digit_E_pi0->GetYaxis()->SetTitle("N(Events)");
-
-    g1_digit_E_pi = new TH1D("g1_digit_E_pi","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g1_digit_E_pi->GetXaxis()->SetTitle("MC digit_E_pi");
-    g1_digit_E_pi->GetYaxis()->SetTitle("N(Events)");
-
-    g1_digit_E_proton = new TH1D("g1_digit_E_proton","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g1_digit_E_proton->GetXaxis()->SetTitle("MC digit_E_proton");
-    g1_digit_E_proton->GetYaxis()->SetTitle("N(Events)");
-
-    g1_digit_E_neutron = new TH1D("g1_digit_E_neutron","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g1_digit_E_neutron->GetXaxis()->SetTitle("MC digit_E_neutron");
-    g1_digit_E_neutron->GetYaxis()->SetTitle("N(Events)");
-
-    g1_digit_E_muon = new TH1D("g1_digit_E_muon","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g1_digit_E_muon->GetXaxis()->SetTitle("MC digit_E_muon");
-    g1_digit_E_muon->GetYaxis()->SetTitle("N(Events)");
-
-    g2_digit_E_all = new TH1D("g2_digit_E_all","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g2_digit_E_all->GetXaxis()->SetTitle("MC digit_E_all");
-    g2_digit_E_all->GetYaxis()->SetTitle("N(Events)");
-
-    g2_digit_E_pi0 = new TH1D("g2_digit_E_pi0","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g2_digit_E_pi0->GetXaxis()->SetTitle("MC digit_E_pi0");
-    g2_digit_E_pi0->GetYaxis()->SetTitle("N(Events)");
-
-    g2_digit_E_pi = new TH1D("g2_digit_E_pi","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g2_digit_E_pi->GetXaxis()->SetTitle("MC digit_E_pi");
-    g2_digit_E_pi->GetYaxis()->SetTitle("N(Events)");
-
-    g2_digit_E_proton = new TH1D("g2_digit_E_proton","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g2_digit_E_proton->GetXaxis()->SetTitle("MC digit_E_proton");
-    g2_digit_E_proton->GetYaxis()->SetTitle("N(Events)");
-
-    g2_digit_E_neutron = new TH1D("g2_digit_E_neutron","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g2_digit_E_neutron->GetXaxis()->SetTitle("MC digit_E_neutron");
-    g2_digit_E_neutron->GetYaxis()->SetTitle("N(Events)");
-
-    g2_digit_E_muon = new TH1D("g2_digit_E_muon","Digit Energy",binList.digit_E.get_nBins(), binList.digit_E.get_min(), binList.digit_E.get_max() );
-    g2_digit_E_muon->GetXaxis()->SetTitle("MC digit_E_muon");
-    g2_digit_E_muon->GetYaxis()->SetTitle("N(Events)");
-
 
 }
 
@@ -385,7 +322,6 @@ void CCProtonPi0_Pion::writeHistograms()
         g2_evis_scal[i]->Write();
         g2_evis_ecal[i]->Write();
         g2_evis_hcal[i]->Write();
-        g2_evis_frac_scal_trkr[i]->Write();
         
         // Standard Histograms
         E[i]->Write();
@@ -394,7 +330,7 @@ void CCProtonPi0_Pion::writeHistograms()
         theta[i]->Write();
         phi[i]->Write();
     }
-   
+  
     g1_evis_proton->Write();
     g1_evis_neutron->Write();
     g1_evis_pi->Write();
@@ -413,24 +349,7 @@ void CCProtonPi0_Pion::writeHistograms()
     g3_evis_pi0->Write();
     g3_evis_muon->Write();
 
-    g1_digit_E_all->Write();
-    g1_digit_E_proton->Write();
-    g1_digit_E_neutron->Write();
-    g1_digit_E_pi->Write();
-    g1_digit_E_pi0->Write();
-    g1_digit_E_muon->Write();
-
-    g2_digit_E_all->Write();
-    g2_digit_E_proton->Write();
-    g2_digit_E_neutron->Write();
-    g2_digit_E_pi->Write();
-    g2_digit_E_pi0->Write();
-    g2_digit_E_muon->Write();
-
     // Photon Comparison
-    isGamma1_conv_inside->Write();
-    isGamma2_conv_inside->Write();
-    
     mgg_reco->Write();
     mgg_true->Write();
     mgg_error->Write();
