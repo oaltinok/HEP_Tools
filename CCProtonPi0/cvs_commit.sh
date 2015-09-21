@@ -1,14 +1,14 @@
-cvs commit -m "v2_34
+cvs commit -m "v2_35
 CCProtonPi0 Updates:
 	No Major Changes
-		I will keep Analysis Variables used for EM Shower Energy Problem
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Removed Variables used for testing EM Shower Energy Problem
-		No need in NTupleAnalysis - Variables still exist in Reconstruction Stage
-	Keeping Variables for Truth Match 
-	New Function: double ApplyEMEnergyCorrection(double var)
-		Applies the correction factor to related variables
-			Input: Variable
-			Output: Corrected Variable
-" .
+	Added a new class for analyzing Particle Cannon DST Output
+		Class located under makeClass Folder
+			makeClass function is used for converting DST Output to a class header
+		Standard Class Variables written for the package
+			Will add more variables in time
+		Input: Standard Minerva DST File
+		Output: ROOT file with Histograms
+			A new folder special to PS_DST Class is created under 
+				/minerva/data/users/oaltinok/NTupleAnalysis" .

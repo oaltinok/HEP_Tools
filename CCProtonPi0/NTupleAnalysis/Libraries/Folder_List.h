@@ -29,6 +29,7 @@ namespace Folder_List
     const std::string rootOut = "/minerva/data/users/oaltinok/NTupleAnalysis/";
     const std::string MC = "MC/";
     const std::string Data = "Data/";
+    const std::string ParticleCannon = "ParticleCannon/";
     
     const std::string analyzed = "Analyzed/";
     const std::string reduced = "Reduced/"; 
