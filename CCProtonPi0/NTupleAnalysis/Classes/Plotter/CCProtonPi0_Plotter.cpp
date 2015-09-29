@@ -11,25 +11,43 @@ using namespace PlotUtils;
 
 void CCProtonPi0_Plotter::plotHistograms()
 {
+    /*
+     *  Plot Functions for CCProtonPi0 Package
+     */
     //plotInteraction();
     //plotMuon();
     //plotProton();
-    plotPion();
+    //plotPion();
     //plotCutHistograms();
-    //plotOther();
     //plotPi0Blob();
     //SavePi0InvMassPoints();
+
+    /*
+     *  Plot Function Reserved for Other Studies
+     */
+    plotOtherStudies();
 }
 
-CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
+// Todo - will revise function
+void CCProtonPi0_Plotter::getPOT()
 {
+    std::string playlist = "Input/Playlists/pl_Data_All.dat"; 
+    POTCounter pot_counter;
+    double total_pot = pot_counter.getPOTfromPlaylist(playlist);
+
+    std::cout<<"Total POT = "<<total_pot<<std::endl;
+
     data_POT = 9.61E19 + 2.28E20;
     mc_POT = 9.89E20 + 1.31E21;
     POT_Ratio_data_mc = data_POT / mc_POT;
     std::cout<<"POT Data = "<<data_POT<<std::endl;
     std::cout<<"POT MC = "<<mc_POT<<std::endl;
     std::cout<<"POT_Data / POT_MC = "<<POT_Ratio_data_mc<<std::endl;
-    
+ 
+}
+
+CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
+{
     setRootDirs(ana_folder); 
     setPlotDirs(ana_folder);
 }
@@ -85,21 +103,19 @@ void CCProtonPi0_Plotter::plotPi0Blob()
 }
 
 
-void CCProtonPi0_Plotter::plotOther()
+void CCProtonPi0_Plotter::plotOtherStudies()
 {
-    std::cout<<"Plotting Other"<<std::endl;
-    std::string plotDir = plotDir_Other;
+    std::cout<<"Plotting Other Studies..."<<std::endl;
     
-    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nVertices",plotDir);
-    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nProngs",plotDir);
-    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nProngs2",plotDir);
-    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks",plotDir);
-    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks2",plotDir);
-    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks_Close",plotDir);
-    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks_Far",plotDir);
-    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_nTracks_Discarded",plotDir);
+    std::string plotDir = plotDir_OtherStudies;
+
+    Draw1DHist(rootDir_OtherStudies,"error",plotDir);
+    Draw1DHist(rootDir_OtherStudies,"reco_energy",plotDir);
+    Draw1DHist(rootDir_OtherStudies,"true_energy",plotDir);
+    Draw2DHist(rootDir_OtherStudies,"reco_true_energy",plotDir);
+    Draw2DHist(rootDir_OtherStudies,"true_recotrue_energy",plotDir);
     
-    std::cout<<"Plotting Other Finished!"<<std::endl;
+    std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
 
 void CCProtonPi0_Plotter::plotInteraction()
@@ -457,6 +473,10 @@ void CCProtonPi0_Plotter::plot_final_mc_w_Stacked()
 
 void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
 {
+    // Set Other Studies ROOT Dir
+    rootDir_OtherStudies.mc = "/minerva/data/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Test.root"; 
+    rootDir_OtherStudies.data = "";
+    
     // Set MC Root Dir
     rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms.root";
     rootDir_Interaction.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Interaction.root";
@@ -476,6 +496,7 @@ void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
 
 void CCProtonPi0_Plotter::setPlotDirs(std::string ana_folder)
 {
+    plotDir_OtherStudies = Folder_List::output + Folder_List::plotOut + "OtherStudies/";
     plotDir_CutHists = Folder_List::output + Folder_List::plotOut + "CutHists/";
     plotDir_Interaction = Folder_List::output + Folder_List::plotOut + ana_folder + "Interaction/";
     plotDir_Muon = Folder_List::output + Folder_List::plotOut + ana_folder + "Muon/";

@@ -13,6 +13,7 @@ echo "Setting Up Package"
 DefaultText="TextFiles"
 DefaultPlots="Plots"
 DefaultCutHists="CutHists"
+Other="OtherStudies"
 Main_Folder="Output"
 
 Folder_List=(${DefaultText}
@@ -52,6 +53,10 @@ cd ${DefaultPlots}
 echo "... Creating ${Main_Folder}/${DefaultPlots}/${DefaultCutHists}"
 mkdir ${DefaultCutHists}
 
+# Create Other Folder inside DefaultPlots Folder
+echo "... Creating ${Main_Folder}/${DefaultPlots}/${Other}"
+mkdir ${Other}
+
 # Create Analysis Folders inside DefaultPlots Folder
 for anaFolder in ${AnaFolder_List[@]}; do
     echo "... Creating ${Main_Folder}/${DefaultPlots}/${anaFolder}"
@@ -64,6 +69,7 @@ for anaFolder in ${AnaFolder_List[@]}; do
     done
     cd .. # exit anaFolder 
 done
+
 cd .. # exit DefaultPlots
 cd .. # exit Main_Folder
 

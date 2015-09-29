@@ -1,14 +1,13 @@
-cvs commit -m "v2_35
+cvs commit -m "v2_36
 CCProtonPi0 Updates:
 	No Major Changes
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Added a new class for analyzing Particle Cannon DST Output
-		Class located under makeClass Folder
-			makeClass function is used for converting DST Output to a class header
-		Standard Class Variables written for the package
-			Will add more variables in time
-		Input: Standard Minerva DST File
-		Output: ROOT file with Histograms
-			A new folder special to PS_DST Class is created under 
-				/minerva/data/users/oaltinok/NTupleAnalysis" .
+	Added new PlotUtils Class -- POTCounter
+		Using this class to count POT of Data and MC
+	Reorganized ParticleCannon Package
+		Moved ParticleCannon Folder to the top folder of NTupleAnalysis
+		Generate:
+			Created a script for submitting Particle Cannon Jobs
+		Analyze:
+			Collected ParticleCannon Analysis code inside a folder" .

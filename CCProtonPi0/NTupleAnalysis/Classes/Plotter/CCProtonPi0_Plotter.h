@@ -38,6 +38,7 @@ Class: CCProtonPi0_Plotter
 #include <PlotUtils/MnvH2D.h>
 #include <PlotUtils/MnvH1D.h>
 #include <PlotUtils/MnvFluxConstraint.h>
+#include <PlotUtils/POTCounter.h>
 #include "Cintex/Cintex.h"
 
 #include "../../Libraries/Folder_List.h"
@@ -82,6 +83,7 @@ class CCProtonPi0_Plotter
         double mc_POT;
         double POT_Ratio_data_mc;
         
+        rootDir rootDir_OtherStudies;
         rootDir rootDir_CutHists;
         rootDir rootDir_Interaction;
         rootDir rootDir_Muon;
@@ -89,6 +91,7 @@ class CCProtonPi0_Plotter
         rootDir rootDir_Pion;
         rootDir rootDir_Pi0Blob;
         
+        std::string plotDir_OtherStudies;
         std::string plotDir_CutHists;
         std::string plotDir_Interaction;
         std::string plotDir_Muon;
@@ -98,10 +101,11 @@ class CCProtonPi0_Plotter
         
         void setRootDirs(std::string ana_folder);
         void setPlotDirs(std::string ana_folder);
-       
+        void getPOT();
+
         // Default Plots
         void plotPi0Blob();
-        void plotOther();
+        void plotOtherStudies();
         void plotInteraction();
         void plotMuon();
         void plotProton();
