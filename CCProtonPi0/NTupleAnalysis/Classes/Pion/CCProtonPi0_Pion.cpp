@@ -29,7 +29,7 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana
         bin_KE.setBin(30, 0.0, 3.0);
         bin_invMass.setBin(60,0.0,600.0);
         bin_photonConvLength.setBin(50,0.0,100.0);
-        bin_photonP.setBin(20,0.0,1.0);
+        bin_photonP.setBin(80,0.0,1.0);
         bin_photonEnergy_Asymmetry.setBin(100,0.0,1.0);
         
         initHistograms();   
@@ -87,28 +87,6 @@ void CCProtonPi0_Pion::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f [cm]",bin_photonConvLength.get_width()));
         gamma2_ConvLength.push_back(temp);
 
-        temp = new MnvH1D(Form("%s_%d","g1_evis_trkr",i),Form("%s %d","Tracker Visible Energy for Gamma ",1),binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max() );
-        temp->GetXaxis()->SetTitle("Visible Energy");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        g1_evis_trkr.push_back(temp);
-
-        temp = new MnvH1D(Form("%s_%d","g1_evis_scal",i),Form("%s %d","Side ECAL Visible Energy for Gamma ",1),binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max() );
-        temp->GetXaxis()->SetTitle("Visible Energy");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        g1_evis_scal.push_back(temp);
-
-        temp = new MnvH1D(Form("%s_%d","g1_evis_ecal",i),Form("%s %d","Downstream ECAL Visible Energy for Gamma ",1),binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max() );
-        temp->GetXaxis()->SetTitle("Visible Energy");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        g1_evis_ecal.push_back(temp);
-
-        temp = new MnvH1D(Form("%s_%d","g1_evis_hcal",i),Form("%s %d","Downstream HCAL Visible Energy for Gamma ",1),binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max() );
-        temp->GetXaxis()->SetTitle("Visible Energy");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        g1_evis_hcal.push_back(temp);
-
-
-
         // Secondary Photon
         temp = new MnvH1D( Form("%s_%d","gamma2_E",i),"Secondary Photon Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
         temp->GetXaxis()->SetTitle("E_{#gamma_{2}} [GeV]");
@@ -155,54 +133,99 @@ void CCProtonPi0_Pion::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed #phi_{#pi^{0}} [Degree]");
         temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [Degree]",binList.angle.get_width()));
         phi.push_back(temp);
-    
-        temp = new MnvH1D(Form("%s_%d","g2_evis_trkr",i),Form("%s %d","Tracker Visible Energy for Gamma ",2),binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max() );
-        temp->GetXaxis()->SetTitle("Visible Energy");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        g2_evis_trkr.push_back(temp);
-
-        temp = new MnvH1D(Form("%s_%d","g2_evis_scal",i),Form("%s %d","Side ECAL Visible Energy for Gamma ",2),binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max() );
-        temp->GetXaxis()->SetTitle("Visible Energy");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        g2_evis_scal.push_back(temp);
-
-        temp = new MnvH1D(Form("%s_%d","g2_evis_ecal",i),Form("%s %d","Downstream ECAL Visible Energy for Gamma ",2),binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max() );
-        temp->GetXaxis()->SetTitle("Visible Energy");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        g2_evis_ecal.push_back(temp);
-
-        temp = new MnvH1D(Form("%s_%d","g2_evis_hcal",i),Form("%s %d","Downstream HCAL Visible Energy for Gamma ",2),binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max() );
-        temp->GetXaxis()->SetTitle("Visible Energy");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        g2_evis_hcal.push_back(temp);
     }
 
     // Truth Energy - Gamma 1
     gamma1_true_E = new TH1D( "gamma1_true_E","Leading Photon True Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
     gamma1_true_E->GetXaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
     gamma1_true_E->GetYaxis()->SetTitle("N(Events)");
-    
+  
+    gamma1_evis_hcal = new TH1D( "gamma1_evis_hcal","Leading Photon Visible Energy inside HCAL",binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max());
+    gamma1_evis_hcal->GetXaxis()->SetTitle("HCAL E_{Visible} [MeV]");
+    gamma1_evis_hcal->GetYaxis()->SetTitle("N(Events)");
+
+    gamma1_evis_scal = new TH1D( "gamma1_evis_scal","Leading Photon Visible Energy inside Side ECAL",binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max());
+    gamma1_evis_scal->GetXaxis()->SetTitle("Side ECAL E_{Visible} [MeV]");
+    gamma1_evis_scal->GetYaxis()->SetTitle("N(Events)");
+
+    gamma1_reco_error_E = new TH1D( "gamma1_reco_error_E","Error on Reconstructed Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    gamma1_reco_error_E->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
+    gamma1_reco_error_E->GetYaxis()->SetTitle("N(Events)");
+ 
+    gamma1_calc_error_E = new TH1D( "gamma1_calc_error_E","Error on Calculated Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    gamma1_calc_error_E->GetXaxis()->SetTitle("(E_{Calc}-E_{True})/E_{True}");
+    gamma1_calc_error_E->GetYaxis()->SetTitle("N(Events)");
+   
     gamma1_reco_E_true_E = new TH2D( "gamma1_reco_E_true_E","Leading Photon True vs Reconstructed Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
     gamma1_reco_E_true_E->GetXaxis()->SetTitle("Reco E_{#gamma_{1}} [GeV]");
     gamma1_reco_E_true_E->GetYaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
 
-    gamma1_E_error = new TH1D( "gamma1_E_error","Error on Leading Photon Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
-    gamma1_E_error->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
-    gamma1_E_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+    gamma1_reco_E_calc_E = new TH2D( "gamma1_reco_E_calc_E","Leading Photon Calculated vs Reconstructed Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
+    gamma1_reco_E_calc_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [GeV]");
+    gamma1_reco_E_calc_E->GetYaxis()->SetTitle("Calculated E_{#gamma_{1}} [GeV]");
+
+    gamma1_calc_E_true_E = new TH2D( "gamma1_calc_E_true_E","Leading Photon True vs Calculated Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
+    gamma1_calc_E_true_E->GetXaxis()->SetTitle("Calculated E_{#gamma_{1}} [GeV]");
+    gamma1_calc_E_true_E->GetYaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
+
+    gamma1_true_E_reco_E_ratio = new TH2D( "gamma1_true_E_reco_E_ratio","E_{Reco}/E_{True} vs E_{True}",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),binList.ratio.get_nBins(), binList.ratio.get_min(), binList.ratio.get_max() );
+    gamma1_true_E_reco_E_ratio->GetXaxis()->SetTitle("E_{True}");
+    gamma1_true_E_reco_E_ratio->GetYaxis()->SetTitle("E_{Reco}/E_{True}");
+
+    gamma1_true_E_calc_E_ratio = new TH2D( "gamma1_true_E_calc_E_ratio","E_{Calc}/E_{True} vs E_{True}",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),binList.ratio.get_nBins(), binList.ratio.get_min(), binList.ratio.get_max() );
+    gamma1_true_E_calc_E_ratio->GetXaxis()->SetTitle("E_{True}");
+    gamma1_true_E_calc_E_ratio->GetYaxis()->SetTitle("E_{Calc}/E_{True}");
+
+    gamma1_calc_E_calc_E_ratio = new TH2D( "gamma1_calc_E_calc_E_ratio","E_{Calc}/E_{True} vs E_{Calc}",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),binList.ratio.get_nBins(), binList.ratio.get_min(), binList.ratio.get_max() );
+    gamma1_calc_E_calc_E_ratio->GetXaxis()->SetTitle("E_{Calc}");
+    gamma1_calc_E_calc_E_ratio->GetYaxis()->SetTitle("E_{Calc}/E_{True}");
+
+    gamma1_evis_calc_E_ratio = new TH2D( "gamma1_evis_calc_E_ratio","E_{Calc}/E_{True} vs Visible Energy",binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max(),binList.ratio.get_nBins(), binList.ratio.get_min(), binList.ratio.get_max() );
+    gamma1_evis_calc_E_ratio->GetXaxis()->SetTitle("Visible Energy");
+    gamma1_evis_calc_E_ratio->GetYaxis()->SetTitle("E_{Calc}/E_{True}");
+
+    gamma1_evis_evis_ratio = new TH2D( "gamma1_evis_evis_ratio","E_{True}/E_{Visible} vs E_{Visible}",binList.gamma_evis.get_nBins(), binList.gamma_evis.get_min(), binList.gamma_evis.get_max(),binList.kE.get_nBins(), binList.kE.get_min(), binList.kE.get_max() );
+    gamma1_evis_evis_ratio->GetXaxis()->SetTitle("E_{Visible}");
+    gamma1_evis_evis_ratio->GetYaxis()->SetTitle("E_{True}/E_{Visible}");
 
     // Truth Energy - Gamma 2
     gamma2_true_E = new TH1D( "gamma2_true_E","Secondary Photon True Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
-    gamma2_true_E->GetXaxis()->SetTitle("True E_{#gamma_{2}} [GeV]");
+    gamma2_true_E->GetXaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
     gamma2_true_E->GetYaxis()->SetTitle("N(Events)");
-
-    gamma2_reco_E_true_E = new TH2D( "gamma2_reco_E_true_E","Secondary Photon True vs Reconstructed Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
-    gamma2_reco_E_true_E->GetXaxis()->SetTitle("Reco E_{#gamma_{2}} [GeV]");
-    gamma2_reco_E_true_E->GetYaxis()->SetTitle("True E_{#gamma_{2}} [GeV]");
  
-    gamma2_E_error = new TH1D( "gamma2_E_error","Error on Secondary Photon Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
-    gamma2_E_error->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
-    gamma2_E_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+    gamma2_reco_error_E = new TH1D( "gamma2_reco_error_E","Error on Reconstructed Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    gamma2_reco_error_E->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
+    gamma2_reco_error_E->GetYaxis()->SetTitle("N(Events)");
+ 
+    gamma2_calc_error_E = new TH1D( "gamma2_calc_error_E","Error on Calculated Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    gamma2_calc_error_E->GetXaxis()->SetTitle("(E_{Calc}-E_{True})/E_{True}");
+    gamma2_calc_error_E->GetYaxis()->SetTitle("N(Events)");
    
+    gamma2_reco_E_true_E = new TH2D( "gamma2_reco_E_true_E","Secondary Photon True vs Reconstructed Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
+    gamma2_reco_E_true_E->GetXaxis()->SetTitle("Reco E_{#gamma_{1}} [GeV]");
+    gamma2_reco_E_true_E->GetYaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
+
+    gamma2_reco_E_calc_E = new TH2D( "gamma2_reco_E_calc_E","Secondary Photon Calculated vs Reconstructed Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
+    gamma2_reco_E_calc_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [GeV]");
+    gamma2_reco_E_calc_E->GetYaxis()->SetTitle("Calculated E_{#gamma_{1}} [GeV]");
+
+    gamma2_calc_E_true_E = new TH2D( "gamma2_calc_E_true_E","Secondary Photon True vs Calculated Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
+    gamma2_calc_E_true_E->GetXaxis()->SetTitle("Calculated E_{#gamma_{1}} [GeV]");
+    gamma2_calc_E_true_E->GetYaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
+
+    gamma2_true_E_reco_E_ratio = new TH2D( "gamma2_true_E_reco_E_ratio","E_{Reco}/E_{True} vs E_{True}",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),binList.ratio.get_nBins(), binList.ratio.get_min(), binList.ratio.get_max() );
+    gamma2_true_E_reco_E_ratio->GetXaxis()->SetTitle("E_{True}");
+    gamma2_true_E_reco_E_ratio->GetYaxis()->SetTitle("E_{Reco}/E_{True}");
+
+    gamma2_true_E_calc_E_ratio = new TH2D( "gamma2_true_E_calc_E_ratio","E_{Calc}/E_{True} vs E_{True}",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),binList.ratio.get_nBins(), binList.ratio.get_min(), binList.ratio.get_max() );
+    gamma2_true_E_calc_E_ratio->GetXaxis()->SetTitle("E_{True}");
+    gamma2_true_E_calc_E_ratio->GetYaxis()->SetTitle("E_{Calc}/E_{True}");
+
+    gamma2_calc_E_calc_E_ratio = new TH2D( "gamma2_calc_E_calc_E_ratio","E_{Calc}/E_{True} vs E_{Calc}",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),binList.ratio.get_nBins(), binList.ratio.get_min(), binList.ratio.get_max() );
+    gamma2_calc_E_calc_E_ratio->GetXaxis()->SetTitle("E_{Calc}");
+    gamma2_calc_E_calc_E_ratio->GetYaxis()->SetTitle("E_{Calc}/E_{True}");
+
+  
     // Other
     gamma1_convLength_gamma2_convLength= new TH2D( "gamma1_convLength_gamma2_convLength","Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
     gamma1_convLength_gamma2_convLength->GetXaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
@@ -216,17 +239,17 @@ void CCProtonPi0_Pion::initHistograms()
     mgg_reco->GetXaxis()->SetTitle("Reconstructed m_{#gamma#gamma} [MeV]");
     mgg_reco->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV]",bin_invMass.get_width()));   
 
-    mgg_true = new TH1D( "mgg_true","True Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
-    mgg_true->GetXaxis()->SetTitle("True m_{#gamma#gamma} [MeV]");
-    mgg_true->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV]",bin_invMass.get_width()));   
+    mgg_calc = new TH1D( "mgg_calc","Calculated Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
+    mgg_calc->GetXaxis()->SetTitle("Calculated m_{#gamma#gamma} [MeV]");
+    mgg_calc->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV]",bin_invMass.get_width()));   
 
-    mgg_reco_true = new TH2D( "mgg_reco_true","True vs Reconstructed Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max(),bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
-    mgg_reco_true->GetXaxis()->SetTitle("Reconstructed m_{#gamma#gamma} [MeV]");
-    mgg_reco_true->GetYaxis()->SetTitle("True m_{#gamma#gamma} [MeV]");
+    mgg_reco_error = new TH1D( "mgg_reco_error","Error on Reconstructed Pi0 Invariant Mass",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    mgg_reco_error->GetXaxis()->SetTitle("(m_{#gamma#gamma}^{Reco} - m_{#gamma#gamma}^{True})/m_{#gamma#gamma}^{True}");
+    mgg_reco_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
 
-    mgg_error = new TH1D( "mgg_error","Error on Pi0 Invariant Mass",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
-    mgg_error->GetXaxis()->SetTitle("(m_{#gamma#gamma}^{Reco} - m_{#gamma#gamma}^{True})/m_{#gamma#gamma}^{True}");
-    mgg_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+    mgg_calc_error = new TH1D( "mgg_calc_error","Error on Calculated Pi0 Invariant Mass",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    mgg_calc_error->GetXaxis()->SetTitle("(m_{#gamma#gamma}^{Calc} - m_{#gamma#gamma}^{True})/m_{#gamma#gamma}^{True}");
+    mgg_calc_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
 
     g1_evis_proton = new TH1D("g1_evis_proton","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
     g1_evis_proton->GetXaxis()->SetTitle("Evis");
@@ -309,20 +332,12 @@ void CCProtonPi0_Pion::writeHistograms()
         gamma1_ConvLength[i]->Write();
         gamma1_E[i]->Write();
         gamma1_theta[i]->Write();
-        g1_evis_trkr[i]->Write();
-        g1_evis_scal[i]->Write();
-        g1_evis_ecal[i]->Write();
-        g1_evis_hcal[i]->Write();
-        
+       
         // Secondary Photon
         gamma2_ConvLength[i]->Write();
         gamma2_E[i]->Write();
         gamma2_theta[i]->Write();
-        g2_evis_trkr[i]->Write();
-        g2_evis_scal[i]->Write();
-        g2_evis_ecal[i]->Write();
-        g2_evis_hcal[i]->Write();
-        
+       
         // Standard Histograms
         E[i]->Write();
         P[i]->Write();
@@ -351,17 +366,34 @@ void CCProtonPi0_Pion::writeHistograms()
 
     // Photon Comparison
     mgg_reco->Write();
-    mgg_true->Write();
-    mgg_error->Write();
-    mgg_reco_true->Write();
-    
+    mgg_calc->Write();
+    mgg_reco_error->Write();
+    mgg_calc_error->Write();
+
     gamma1_true_E->Write();
+    gamma1_evis_hcal->Write();
+    gamma1_evis_scal->Write();
+    gamma1_reco_error_E->Write();
+    gamma1_calc_error_E->Write();
+    gamma1_true_E_reco_E_ratio->Write();
+    gamma1_true_E_calc_E_ratio->Write();
+    gamma1_calc_E_calc_E_ratio->Write();
+    gamma1_evis_calc_E_ratio->Write();
+    gamma1_evis_evis_ratio->Write();
     gamma1_reco_E_true_E->Write();
-    gamma1_E_error->Write();
+    gamma1_reco_E_calc_E->Write();
+    gamma1_calc_E_true_E->Write();
+
     gamma2_true_E->Write();
+    gamma2_reco_error_E->Write();
+    gamma2_calc_error_E->Write();
+    gamma2_true_E_reco_E_ratio->Write();
+    gamma2_true_E_calc_E_ratio->Write();
+    gamma2_calc_E_calc_E_ratio->Write();
     gamma2_reco_E_true_E->Write();
-    gamma2_E_error->Write();
- 
+    gamma2_reco_E_calc_E->Write();
+    gamma2_calc_E_true_E->Write();
+
     gamma1_E_gamma2_E->Write();
     gamma1_convLength_gamma2_convLength->Write();
 

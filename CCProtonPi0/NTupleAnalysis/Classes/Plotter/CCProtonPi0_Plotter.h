@@ -126,7 +126,7 @@ class CCProtonPi0_Plotter
         
         // Plottting Macros
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
-        void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir);
+        void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir, double threshold = 0);
         void DrawMCWithErrorBand(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());

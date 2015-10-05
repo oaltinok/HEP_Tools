@@ -1,5 +1,5 @@
 /*
-   ================================================================================
+================================================================================
 Class: CCProtonPi0_Analyzer
 Core Class for NTupleAnalysis Package
 Includes all data variables for CCProtonPi0 Analysis
@@ -90,6 +90,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillEvis_MostPDG();
         void FillEvis_Fractions();
         void FillEvis_Total(); 
+        void calcCalorimetricEnergy();
+        double calcGamma1_E();
+        double calcGamma2_E();
+        double get_kT(double evis);
+        double get_kE();
+        double get_kH();
         
         //  Default Functions
         void Init(string playlist, TChain* fChain);
@@ -107,6 +113,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
 
         // Other Variables
         bool m_isMC;
+        bool isCalorimetricEnergyStudy;
         bool isScanRun;
         bool isDataAnalysis;
         bool applyProtonScore;

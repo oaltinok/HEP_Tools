@@ -110,6 +110,11 @@ double PC_DST::calcCalorimetricEnergy()
     if (evis_target > 0) return -1;
     if (getODEvis() > 0) return -1;
 
+    if (evis_trkr_central < 0.1 && evis_trkr_side_X < 0.1 && evis_trkr_side_UV < 0.1 && evis_hcal < 0.1){
+        evis_evis_ratio->Fill(evis_ecal, mc_int_FSParticlesE[0][0]/evis_ecal);
+        true_evis_ratio->Fill(mc_int_FSParticlesE[0][0], mc_int_FSParticlesE[0][0]/evis_ecal);
+        evis_true->Fill(evis_ecal, mc_int_FSParticlesE[0][0]);
+    }
     /*
      *  If Shower Contained in ID without Target Region
      *      Calculate Energy
@@ -153,6 +158,9 @@ void PC_DST::writeHistograms()
     true_energy->Write();
     reco_true_energy->Write();
     true_recotrue_energy->Write();
+    evis_evis_ratio->Write();
+    true_evis_ratio->Write();
+    evis_true->Write();
 
     f->Close();
 }
@@ -189,6 +197,18 @@ void PC_DST::InitHistograms()
     true_recotrue_energy = new TH2D("true_recotrue_energy","True vs Reco/True Energy",75,0,1000,75,0,2);
     true_recotrue_energy->GetXaxis()->SetTitle("E_{True}");
     true_recotrue_energy->GetYaxis()->SetTitle("E_{Reco}/E_{True}");
+
+    evis_evis_ratio = new TH2D("evis_evis_ratio","E_{True}/E_{Visible} vs E_{Visible}",80,0,400,80,1.0,5.0);
+    evis_evis_ratio->GetXaxis()->SetTitle("E_{Visible}");
+    evis_evis_ratio->GetYaxis()->SetTitle("E_{True}/E_{Visible}");
+
+    true_evis_ratio = new TH2D("true_evis_ratio","E_{True}/E_{Visible} vs E_{True}",80,0,600,80,1.0,5.0);
+    true_evis_ratio->GetXaxis()->SetTitle("E_{True}");
+    true_evis_ratio->GetYaxis()->SetTitle("E_{True}/E_{Visible}");
+
+    evis_true = new TH2D("evis_true","E_{True} vs E_{Visible}",80,0,1000,80,0,1000);
+    evis_true->GetXaxis()->SetTitle("E_{Visible}");
+    evis_true->GetYaxis()->SetTitle("E_{True}");
 
 }
 

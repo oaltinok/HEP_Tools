@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!-- Edited By POOL -->
+<!DOCTYPE POOLFILECATALOG SYSTEM "InMemory">
+<POOLFILECATALOG>
+  <File ID="6A6DEA4B-5C68-E511-A4DD-00163E2E59D4">
+    <physical>
+      <pfn filetype="ROOT_All" name="/minerva/data/users/oaltinok/MC_Production/ParticleCannon/test/nogrid/central_value/minerva/cal/v10r8p7/00/02/00/00//SIM_minerva_00020000_0001_IDODDigits_v10r8p4_v10r8p7.root"/>
+    </physical>
+    <logical/>
+  </File>
+
+  <File ID="4EB8D896-5D68-E511-A4DD-00163E2E59D4">
+    <physical>
+      <pfn filetype="ROOT_All" name="/minerva/data/users/oaltinok/MC_Production/ParticleCannon/test/nogrid/central_value/minerva/cal/v10r8p7/00/02/00/00//SIM_minerva_00020000_0002_IDODDigits_v10r8p4_v10r8p7.root"/>
+    </physical>
+    <logical/>
+  </File>
+
+</POOLFILECATALOG>

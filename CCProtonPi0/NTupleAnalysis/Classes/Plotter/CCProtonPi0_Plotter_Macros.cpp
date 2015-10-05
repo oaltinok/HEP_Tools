@@ -388,7 +388,7 @@ void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::st
     
 }
 
-void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir)
+void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir, double threshold)
 {
     std::string root_dir = dir.mc;
    
@@ -401,7 +401,19 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
     Double_t h = 800;
     TCanvas* c = new TCanvas("c","c",w,h);
     c->SetWindowSize(w,h);
-    
+   
+    // Reset Bins below the threshold
+    int nBinsX = hist2D->GetNbinsX();
+    int nBinsY = hist2D->GetNbinsY();
+    for (int xBin = 1; xBin <= nBinsX; xBin++ ){
+        for (int yBin = 1; yBin <=nBinsY; yBin++){
+            int nEvents = hist2D->GetBinContent(xBin,yBin);
+            if (nEvents <= threshold){
+                hist2D->SetBinContent(xBin,yBin,0);
+            }
+        }
+    }
+
     // Pad
     TPad *p = new TPad("p","p",0.05,0.05,0.95,0.95);
     p->Draw();
@@ -410,14 +422,6 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
     hist2D->GetYaxis()->SetTitleOffset(1.8);
     hist2D->Draw("colz");
     gPad->Update();
-    
-    // Statistics Box
-    //TPaveStats *ps = (TPaveStats*)se->GetPrimitive("stats");    
-    //st->SetOptStat(1000000110);
-    //st->SetX1NDC(0.1); 
-    //st->SetX2NDC(0.3); 
-    //st->SetY1NDC(0.8); 
-    //st->SetY2NDC(0.9); 
    
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
     

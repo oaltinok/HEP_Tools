@@ -24,6 +24,7 @@ class CCProtonPi0_BinList
         // Standard Bins
         CCProtonPi0_SingleBin true_false;
         CCProtonPi0_SingleBin error;
+        CCProtonPi0_SingleBin ratio;
         CCProtonPi0_SingleBin angle;
         CCProtonPi0_SingleBin particleScore;
         CCProtonPi0_SingleBin particleScore_LLR;
@@ -44,6 +45,7 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin gamma_evis_pdg;
         CCProtonPi0_SingleBin pi0_evis_pdg;
         CCProtonPi0_SingleBin digit_E;
+        CCProtonPi0_SingleBin kE;
         
         // Analysis
         CCProtonPi0_SingleBin beamE;

@@ -39,6 +39,9 @@ class PC_DST {
         TH1D* true_energy;
         TH2D* reco_true_energy;
         TH2D* true_recotrue_energy;
+        TH2D* evis_evis_ratio;
+        TH2D* true_evis_ratio;
+        TH2D* evis_true;
 
         // Custom Variables
         static const double low_activity_E = 1;
