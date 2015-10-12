@@ -18,7 +18,7 @@ void TraverseHistory::DoTraverse(const std::map<int,TG4Trajectory*>& trajectoryM
         TG4Trajectory* traj = trajectoryMap.at(trackId);
         
         if (!traj) break;
-        
+            
         trackId = traj->GetParentId();
         fHistoryTrackId.push_back(trackId);
     }

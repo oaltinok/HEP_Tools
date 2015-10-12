@@ -13,19 +13,23 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
     cout<<"Initializing CCProtonPi0_CutList"<<endl;
     
     if(isModeReduce){
-        nTrueSignal = 240237;
-        init_nCutVectors();
-        SetCutNames();
-        OpenTextFiles(isMC);
-        
         // File Locations
         if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms.root";
         else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms.root";
         
         cout<<"\tRoot File: "<<rootDir<<endl;
- 
+
         // Create Root File 
-        f = new TFile(rootDir.c_str(),"RECREATE");
+        f = new TFile(rootDir.c_str(),"CREATE");
+        if (!f->IsOpen()){
+            cout<<"File already exists! Exiting!..."<<endl;
+            exit(1);
+        }
+        
+        nTrueSignal = 240237;
+        init_nCutVectors();
+        SetCutNames();
+        OpenTextFiles(isMC);
         
         initHistograms();
     }else{

@@ -49,42 +49,20 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         vector<MnvH1D*> gamma1_E;
         vector<MnvH1D*> gamma1_theta;
         vector<MnvH1D*> gamma1_ConvLength;
-
+        TH1D* gamma1_true_E;
+        TH1D* gamma1_reco_error_E;
+        TH2D* gamma1_reco_E_true_E;
+        TH2D* gamma1_true_E_reco_E_ratio;
+        
         // Secondary Photon
         vector<MnvH1D*> gamma2_E;
         vector<MnvH1D*> gamma2_theta;
         vector<MnvH1D*> gamma2_ConvLength;
-
-        // EM Shower Energy 
-        TH1D* gamma1_true_E;
-        TH1D* gamma1_evis_hcal;
-        TH1D* gamma1_evis_scal;
-        TH1D* gamma1_reco_error_E;
-        TH1D* gamma1_calc_error_E;
-        TH2D* gamma1_true_E_reco_E_ratio;
-        TH2D* gamma1_true_E_calc_E_ratio;
-        TH2D* gamma1_calc_E_calc_E_ratio;
-        TH2D* gamma1_evis_calc_E_ratio;
-        TH2D* gamma1_evis_evis_ratio;
-        TH2D* gamma1_reco_E_true_E;
-        TH2D* gamma1_reco_E_calc_E;
-        TH2D* gamma1_calc_E_true_E;
-       
         TH1D* gamma2_true_E;
         TH1D* gamma2_reco_error_E;
-        TH1D* gamma2_calc_error_E;
-        TH2D* gamma2_true_E_reco_E_ratio;
-        TH2D* gamma2_true_E_calc_E_ratio;
-        TH2D* gamma2_calc_E_calc_E_ratio;
         TH2D* gamma2_reco_E_true_E;
-        TH2D* gamma2_reco_E_calc_E;
-        TH2D* gamma2_calc_E_true_E;
-           
-        TH1D* mgg_reco;
-        TH1D* mgg_reco_error;
-        TH1D* mgg_calc;
-        TH1D* mgg_calc_error;
-
+        TH2D* gamma2_true_E_reco_E_ratio;
+                
         TH2D* gamma1_E_gamma2_E;
         TH2D* gamma1_convLength_gamma2_convLength;
                 

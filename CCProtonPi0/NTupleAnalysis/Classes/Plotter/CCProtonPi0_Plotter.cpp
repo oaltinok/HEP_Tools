@@ -11,43 +11,58 @@ using namespace PlotUtils;
 
 void CCProtonPi0_Plotter::plotHistograms()
 {
-    /*
-     *  Plot Functions for CCProtonPi0 Package
-     */
+    //--------------------------------------------------------------------------
+    // Run only once to get the POT
+    //--------------------------------------------------------------------------
+    //getPOT_MC();
+    //getPOT_Data();
+    
+    //--------------------------------------------------------------------------
+    //  Plot Functions for CCProtonPi0 Package
+    //--------------------------------------------------------------------------
     //plotInteraction();
     //plotMuon();
     //plotProton();
-    plotPion();
-    //plotCutHistograms();
+    //plotPion();
+    plotCutHistograms();
     //plotPi0Blob();
     //SavePi0InvMassPoints();
 
-    /*
-     *  Plot Function Reserved for Other Studies
-     */
+    //--------------------------------------------------------------------------
+    //  Plot Function Reserved for Other Studies
+    //--------------------------------------------------------------------------
     //plotOtherStudies();
 }
 
-// Todo - will revise function
-void CCProtonPi0_Plotter::getPOT()
+void CCProtonPi0_Plotter::getPOT_MC()
 {
-    std::string playlist = "Input/Playlists/pl_Data_All.dat"; 
+    std::string playlist = "Input/Playlists/pl_MC_Merged.dat"; 
     POTCounter pot_counter;
     double total_pot = pot_counter.getPOTfromPlaylist(playlist);
 
-    std::cout<<"Total POT = "<<total_pot<<std::endl;
+    std::cout<<"Total MC POT = "<<total_pot<<std::endl;
+}
 
-    data_POT = 9.61E19 + 2.28E20;
-    mc_POT = 9.89E20 + 1.31E21;
-    POT_Ratio_data_mc = data_POT / mc_POT;
-    std::cout<<"POT Data = "<<data_POT<<std::endl;
-    std::cout<<"POT MC = "<<mc_POT<<std::endl;
-    std::cout<<"POT_Data / POT_MC = "<<POT_Ratio_data_mc<<std::endl;
- 
+void CCProtonPi0_Plotter::getPOT_Data()
+{
+    std::string playlist = "Input/Playlists/pl_Data_minerva1_v2_38.dat"; 
+    POTCounter pot_counter;
+    double total_pot = pot_counter.getPOTfromPlaylist(playlist);
+
+    std::cout<<"Total Data POT = "<<total_pot<<std::endl;
 }
 
 CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
 {
+    //--------------------------------------------------------------------------
+    // Set POT -- Run getPOT_MC() and getPOT_Data() Functions once to get POT
+    //--------------------------------------------------------------------------
+    data_POT = 9.55946e+19; 
+    mc_POT = 9.15286e+20;
+    POT_Ratio_data_mc = data_POT / mc_POT;
+    std::cout<<"POT Data = "<<data_POT<<std::endl;
+    std::cout<<"POT MC = "<<mc_POT<<std::endl;
+    
     setRootDirs(ana_folder); 
     setPlotDirs(ana_folder);
 }
@@ -196,9 +211,9 @@ void CCProtonPi0_Plotter::plotPion()
     std::string plotDir = plotDir_Pion;
     
     // Standard Plots
-    //plotStandardHistograms(rootDir_Pion, plotDir);
+    plotStandardHistograms(rootDir_Pion, plotDir);
     
-    //std::cout<<">> Plotting Unique Histograms"<<std::endl;
+    std::cout<<">> Plotting Unique Histograms"<<std::endl;
     // Unique Plots
     //DrawDataMC(rootDir_Pion,"gamma1_E",plotDir);
     //DrawDataMC(rootDir_Pion,"gamma2_E",plotDir);
@@ -214,87 +229,33 @@ void CCProtonPi0_Plotter::plotPion()
     //DrawDataStackedMC(rootDir_Pion,"gamma1_theta",plotDir);
     //DrawDataStackedMC(rootDir_Pion,"gamma2_theta",plotDir);
 
-  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
-  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
-  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
-  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
-  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
-  //  DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
-  //  DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
-  //  DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
     
     // ------------------------------------------------------------------------
-    // Other Studies
+    // Truth Information
     // ------------------------------------------------------------------------
-    Draw1DHist(rootDir_Pion,"mgg_reco",plotDir);
-    Draw1DHist(rootDir_Pion,"mgg_reco_error",plotDir);
-    Draw1DHist(rootDir_Pion,"mgg_calc",plotDir);
-    Draw1DHist(rootDir_Pion,"mgg_calc_error",plotDir);
-    //
     Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
-    //Draw1DHist(rootDir_Pion,"gamma1_evis_hcal",plotDir);
-    //Draw1DHist(rootDir_Pion,"gamma1_evis_scal",plotDir);
     Draw1DHist(rootDir_Pion,"gamma1_reco_error_E",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma1_calc_error_E",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma1_true_E_reco_E_ratio",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma1_true_E_calc_E_ratio",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma1_calc_E_calc_E_ratio",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma1_evis_calc_E_ratio",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_evis_evis_ratio",plotDir,1);
-   // Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
-   // Draw2DHist(rootDir_Pion,"gamma1_reco_E_calc_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_calc_E_true_E",plotDir);
- 
-    ofstream text;
-    std::string textFile = plotDir_Pion + "evis.txt";
-    text.open(textFile.c_str());
-
-    // Get Histogram
-    std::string root_dir = rootDir_Pion.mc;
-    TFile* f = new TFile(root_dir.c_str());
-    TH2D* hist2D = (TH2D*)f->Get("gamma1_evis_evis_ratio");
-
-    // Reset Bins below the threshold
-    int nBinsX = hist2D->GetNbinsX();
-    int nBinsY = hist2D->GetNbinsY();
-
-    for (int xBin = 1; xBin <= nBinsX; xBin++ ){
-        double sum = 0;
-        double n = 0;
-        for (int yBin = 1; yBin <=nBinsY; yBin++){
-            double nEvents = hist2D->GetBinContent(xBin,yBin);
-            double y = hist2D->GetYaxis()->GetBinCenter(yBin);
-            if ( y <= 2.5 && nEvents > 1){
-                sum = sum + y*nEvents;
-                n = n + nEvents;
-            }
-        }
-    
-        if (n > 0){
-            double avg = sum / n;
-            double x = hist2D->GetXaxis()->GetBinCenter(xBin);
-            text<<x<<" "<<avg<<std::endl;
-        }
-    }
-    
-    text.close();
+    Draw2DHist(rootDir_Pion,"gamma1_true_E_reco_E_ratio",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
     
     Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
     Draw1DHist(rootDir_Pion,"gamma2_reco_error_E",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma2_calc_error_E",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma2_true_E_reco_E_ratio",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma2_true_E_calc_E_ratio",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma2_reco_E_calc_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma2_calc_E_true_E",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma2_true_E_reco_E_ratio",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
 
-    //Draw2DHist(rootDir_Pion,"gamma1_E_gamma2_E",plotDir);
-    //Draw2DHist(rootDir_Pion,"gamma1_convLength_gamma2_convLength",plotDir);
-   // 
-   // Draw1DHist(rootDir_Pion,"isGamma1_conv_inside",plotDir);
-   // Draw1DHist(rootDir_Pion,"isGamma2_conv_inside",plotDir);
+    // ------------------------------------------------------------------------
+    // Other Studies
+    // ------------------------------------------------------------------------
 
-   // plotGammaEvis();
+    //plotGammaEvis();
     //plotPi0TruthMatch();
 
     std::cout<<"Plotting Pion Finished!\n"<<std::endl;
@@ -394,6 +355,7 @@ void CCProtonPi0_Plotter::plotCutHistograms()
     CutArrow pi0invMass_min_1Track(75,0,300,20,"R"); 
     CutArrow pi0invMass_max_1Track(195,0,300,20,"L"); 
     DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min_1Track, pi0invMass_max_1Track);
+    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min_1Track, pi0invMass_max_1Track);
     
     CutArrow neutrinoE_1Track(20,0,190,2,"L"); 
     DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_neutrinoE",plotDir, 1, neutrinoE_1Track);
@@ -423,6 +385,7 @@ void CCProtonPi0_Plotter::plotCutHistograms()
     CutArrow pi0invMass_min_2Track(75,0,300,20,"R"); 
     CutArrow pi0invMass_max_2Track(195,0,300,20,"L"); 
     DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min_2Track, pi0invMass_max_2Track);
+    DrawStackedMC_BckgAll(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min_2Track, pi0invMass_max_2Track);
 
     CutArrow neutrinoE_2Track(20,0,170,2,"L"); 
     DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_neutrinoE",plotDir, 1, neutrinoE_2Track);
@@ -567,10 +530,10 @@ void CCProtonPi0_Plotter::SavePi0InvMassPoints()
     std::ofstream text[2];
 
     // Set Dirs
-    textDir[0] = Folder_List::output + Folder_List::textOut + "Pi0InvMass_MC_minerva13.txt";
+    textDir[0] = Folder_List::output + Folder_List::textOut + "Pi0InvMass_MC_minerva1_v2_38.txt";
     rootDir[0] = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms.root";
 
-    textDir[1] = Folder_List::output + Folder_List::textOut + "Pi0InvMass_Data_minerva13.txt";
+    textDir[1] = Folder_List::output + Folder_List::textOut + "Pi0InvMass_Data_minerva1_v2_38.txt";
     rootDir[1] = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms.root";
     
     // Open Output Text Files
@@ -636,5 +599,43 @@ void CCProtonPi0_Plotter::SavePi0InvMassPoints()
     std::cout<<"Done!"<<std::endl;
 }
 
+
+void CCProtonPi0_Plotter::SaveGammaEvisPoints()
+{
+    ofstream text;
+    std::string textFile = plotDir_Pion + "evis.txt";
+    text.open(textFile.c_str());
+
+    // Get Histogram
+    std::string root_dir = rootDir_Pion.mc;
+    TFile* f = new TFile(root_dir.c_str());
+    TH2D* hist2D = (TH2D*)f->Get("gamma1_evis_evis_ratio");
+
+    // Reset Bins below the threshold
+    int nBinsX = hist2D->GetNbinsX();
+    int nBinsY = hist2D->GetNbinsY();
+
+    for (int xBin = 1; xBin <= nBinsX; xBin++ ){
+        double sum = 0;
+        double n = 0;
+        for (int yBin = 1; yBin <=nBinsY; yBin++){
+            double nEvents = hist2D->GetBinContent(xBin,yBin);
+            double y = hist2D->GetYaxis()->GetBinCenter(yBin);
+            if ( y <= 2.5 && nEvents > 1){
+                sum = sum + y*nEvents;
+                n = n + nEvents;
+            }
+        }
+    
+        if (n > 0){
+            double avg = sum / n;
+            double x = hist2D->GetXaxis()->GetBinCenter(xBin);
+            text<<x<<" "<<avg<<std::endl;
+        }
+    }
+    
+    text.close();
+ 
+}
 #endif
 

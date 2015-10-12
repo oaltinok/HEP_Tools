@@ -72,12 +72,16 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
         AddCutArrow(plotter,cutArrow2);
     }
 
-    if (var_name.compare("hCut_1Track_pi0invMass") == 0 || var_name.compare("hCut_2Track_pi0invMass") == 0 ){
+    // Add Pi0 InvMass Line
+    if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
+            var_name.compare("hCut_2Track_pi0invMass") == 0 ||
+            var_name.compare("invMass") == 0 ) {
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
         pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,300);
+        pi0Mass.DrawLine(134.98,0,134.98,1000);
     }
+
     // Print Plot
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all.png"), "png");
 
@@ -491,6 +495,16 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     }else if (nCutArrows == 2){
         AddCutArrow(plotter,cutArrow1);
         AddCutArrow(plotter,cutArrow2);
+    }
+
+    // Add Pi0 InvMass Line
+    if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
+            var_name.compare("hCut_2Track_pi0invMass") == 0 ||
+            var_name.compare("invMass") == 0 ) {
+        TLine pi0Mass;
+        pi0Mass.SetLineWidth(2);
+        pi0Mass.SetLineColor(kBlue);
+        pi0Mass.DrawLine(134.98,0,134.98,1000);
     }
 
     // Print Plot

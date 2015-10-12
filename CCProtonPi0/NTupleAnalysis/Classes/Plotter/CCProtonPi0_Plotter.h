@@ -101,7 +101,8 @@ class CCProtonPi0_Plotter
         
         void setRootDirs(std::string ana_folder);
         void setPlotDirs(std::string ana_folder);
-        void getPOT();
+        void getPOT_MC();
+        void getPOT_Data();
 
         // Default Plots
         void plotPi0Blob();
@@ -123,6 +124,7 @@ class CCProtonPi0_Plotter
         void ApplyStyle(MnvPlotter* plotter);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow);
         void SavePi0InvMassPoints();
+        void SaveGammaEvisPoints();
         
         // Plottting Macros
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);

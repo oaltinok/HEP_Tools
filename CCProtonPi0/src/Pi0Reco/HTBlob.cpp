@@ -34,6 +34,12 @@ HTBlob::HTBlob( const std::string& type, const std::string& name, const IInterfa
     declareProperty( "EnergyCalibrationECal",         m_calibrationECal = 2.341 );
     declareProperty( "EnergyCalibrationHCal",         m_calibrationHCal = 9.54 );
 
+    // Calibration Constants - Latest Update 10/05/2015
+    //  kT depends on Visible Energy
+    m_kE = 3.352;
+    m_kE_Side = m_kE*1.75;
+    m_kH = 12.650;
+
     // Obsolete Constants as 08/15/2015  
     //    declareProperty( "EnergyCalibrationScaleFactor",  m_scalefactor = 1.213 );
     //    declareProperty( "EnergyCalibrationTracker",      m_calibrationTracker = 1.0 );
@@ -793,7 +799,7 @@ StatusCode HTBlob::isPhoton( SmartRefVector<Minerva::IDCluster> Seed, Gaudi::XYZ
 //  Values coming from calibration studies:
 //  Cesar Sotelo docdb 7561
 //=======================================================================
-StatusCode HTBlob::getBlobEnergyTime( Minerva::IDBlob *idblob, double &energy,
+void HTBlob::getBlobEnergyTime_Old( Minerva::IDBlob *idblob, double &energy,
         double& tracker_evis,
         double& ecal_evis,
         double& hcal_evis,
@@ -853,9 +859,115 @@ StatusCode HTBlob::getBlobEnergyTime( Minerva::IDBlob *idblob, double &energy,
 
     idblob->setTime(time);
     debug() << " Setting time " << time << " Id blob " << *idblob << endmsg;
+}
 
-    return StatusCode::SUCCESS;
+//=======================================================================
+//  getBlobEnergy -- New Method 
+//=======================================================================
+void HTBlob::getBlobEnergyTime_New( Minerva::IDBlob *idblob, double &energy,
+        double& tracker_evis,
+        double& ecal_evis,
+        double& hcal_evis,
+        double& scal_evis) const
+{
+    debug()<<"Enter HTBlob::getBlobEnergy() -- New Method"<<endmsg;
+    SmartRefVector< Minerva::IDCluster > idClusters = idblob->clusters();
+    SmartRefVector< Minerva::IDCluster >::iterator it_clus = idClusters.begin();
+    SmartRefVector< Minerva::IDDigit >::iterator it_dig;
 
+    double time = 0;
+    double total_pe = 0;
+
+    energy = 0;
+    tracker_evis = 0.0;
+    ecal_evis    = 0.0;
+    hcal_evis    = 0.0;
+    scal_evis    = 0.0;
+
+    // Loop Over all Clusters and Collect all Visible Energy
+    for ( ; it_clus != idClusters.end(); it_clus++ ){
+        time += (*it_clus)->time()*(*it_clus)->pe();
+        total_pe += (*it_clus)->pe();
+
+        const double cluster_energy = (*it_clus)->energy();
+ 
+        // Tracker: Central and SideECAL
+        if ( (*it_clus)->subdet() ==  Minerva::IDCluster::Tracker ) {
+
+            SmartRefVector< Minerva::IDDigit > idDigits = (*it_clus)->centralDigits();
+            SmartRefVector< Minerva::IDDigit > sideDigits = (*it_clus)->sideEcalDigits();
+
+            for ( it_dig = idDigits.begin(); it_dig != idDigits.end(); it_dig++ ){
+                tracker_evis += (*it_dig)->normEnergy();
+            }
+
+            for ( it_dig = sideDigits.begin(); it_dig != sideDigits.end(); it_dig++ ){
+                scal_evis += (*it_dig)->normEnergy();
+            }
+        }
+       
+        // Downstream ECAL
+        if ( (*it_clus)->subdet() ==  Minerva::IDCluster::ECAL ) {
+            ecal_evis += cluster_energy;
+        }
+
+        // Downstream HCAL
+        if ( (*it_clus)->subdet() ==  Minerva::IDCluster::HCAL ) {
+            hcal_evis   += cluster_energy;
+        }
+    }
+
+    // Get Calorimetric Energy from Visible Energy
+    energy = getCalorimetricEnergy(tracker_evis, scal_evis, ecal_evis, hcal_evis);
+   
+    debug()<<"tracker_evis = "<<tracker_evis<<" scal_evis = "<<scal_evis<<endmsg;
+    debug()<<"ecal_evis = "<<ecal_evis<<" hcal_evis = "<<hcal_evis<<endmsg;
+    debug()<<"cal_energy = "<<energy<<endmsg;
+    
+    // Get Time
+    if ( total_pe > 0 )  time = time/total_pe;
+    else time = 0;
+
+    idblob->setTime(time);
+    debug() << " Setting time " << time << " Id blob " << *idblob << endmsg;
+    
+    debug()<<"Exit HTBlob::getBlobEnergy() -- New Method"<<endmsg;
+}
+
+/*
+ *  Get Calorimetric Energy from Visible Energy
+ *      Constants and Caluculation Method is based on
+ *          
+ */
+double HTBlob::getCalorimetricEnergy(double evis_tracker, double evis_scal, double evis_ecal, double evis_hcal) const
+{
+    double cal_energy = evis_tracker * get_kT(evis_tracker) + 
+                        evis_scal * m_kE_Side +
+                        evis_ecal * m_kE + 
+                        evis_hcal * m_kH;
+
+    return cal_energy;
+}
+
+double HTBlob::get_kT(double evis) const
+{
+    double m;
+    double c;
+
+    if (evis <= 200){
+        m = -0.0012;
+        c = 1.6370;
+    }else if (evis <= 500){
+        m = -1.7705e-04;
+        c = 1.4145;
+    }else{
+        m = 0;
+        c = 1.326;
+    }
+
+    double kT = m*evis + c;
+    
+    return kT;
 }
 
 //=======================================================================
@@ -868,7 +980,4 @@ StatusCode HTBlob::finalize()
     if( sc.isFailure() ) { return Error( "Failed to finalize!", sc ); }
     return sc;
 }
-
-
-
 

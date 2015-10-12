@@ -95,7 +95,6 @@ const std::map<int,double>& DigitVectorTruthInfo::GetNextToPrimaryIdEdepMap() co
     return fNextToPrimaryIdEdepMap;
 }
 
-
 // Modified version to work with clusters instead of digits
 void DigitVectorTruthInfo::ParseTruth(const SmartRefVector<Minerva::IDCluster>& clusters,
                                       const std::map<int, TG4Trajectory*>& trajectories)

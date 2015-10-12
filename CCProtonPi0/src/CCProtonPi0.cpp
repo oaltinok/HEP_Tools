@@ -2972,8 +2972,8 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     double g2hcalevis = 0.0;
     double g2scalevis = 0.0;
 
-    m_idHoughBlob->getBlobEnergyTime( m_Pi0Blob1, g1energy, g1trkrevis, g1ecalevis, g1hcalevis, g1scalevis );
-    m_idHoughBlob->getBlobEnergyTime( m_Pi0Blob2, g2energy, g2trkrevis, g2ecalevis, g2hcalevis, g2scalevis );
+    m_idHoughBlob->getBlobEnergyTime_Old( m_Pi0Blob1, g1energy, g1trkrevis, g1ecalevis, g1hcalevis, g1scalevis );
+    m_idHoughBlob->getBlobEnergyTime_Old( m_Pi0Blob2, g2energy, g2trkrevis, g2ecalevis, g2hcalevis, g2scalevis );
 
     // Make sure Gamma1 is the more energetic one 
     if (g2energy > g1energy) {
@@ -3377,7 +3377,7 @@ void CCProtonPi0::VertexBlob(Minerva::PhysicsEvent *event, Minerva::GenMinIntera
         double dummy_ecalevis = 0.0;
         double dummy_hcalevis = 0.0;
         double dummy_scalevis = 0.0;
-        m_idHoughBlob->getBlobEnergyTime(vtxSphereBlob,vertex_energy, dummy_trkrevis, dummy_ecalevis, dummy_hcalevis, dummy_scalevis);
+        m_idHoughBlob->getBlobEnergyTime_Old(vtxSphereBlob,vertex_energy, dummy_trkrevis, dummy_ecalevis, dummy_hcalevis, dummy_scalevis);
 
         debug()<<"Adding Sphere vertex "<<vtxSphereBlob->nclusters()<<" clusters; energy = "  <<vertex_energy << endmsg;
         addObject( event, vtxSphereBlob );
@@ -3595,7 +3595,7 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
             double dummy2 = 0.0;
             double dummy3 = 0.0;
             double dummy4 = 0.0;
-            m_idHoughBlob->getBlobEnergyTime((*b1),e1,dummy1,dummy2,dummy3,dummy4);
+            m_idHoughBlob->getBlobEnergyTime_Old((*b1),e1,dummy1,dummy2,dummy3,dummy4);
             // double t1 = (*b1)->time();
 
             bool goodPosition1  = m_idHoughBlob->GetStartPosition((*b1),vtx_position,true);
@@ -3610,7 +3610,8 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
                 if (clusterInfo2.GetNx() < 2) continue;
 
                 double e2 = 0.0;
-                m_idHoughBlob->getBlobEnergyTime((*b2),e2,dummy1,dummy2,dummy3,dummy4);
+                m_idHoughBlob->getBlobEnergyTime_Old((*b2),e2,dummy1,dummy2,dummy3,dummy4);
+                
                 // double t2 = (*b2)->time();
 
                 bool goodPosition2  = m_idHoughBlob->GetStartPosition((*b2),vtx_position,true);
@@ -5272,7 +5273,7 @@ void CCProtonPi0::GetMuonExtraEnergy(Minerva::PhysicsEvent *event) const
         double dummy_ecalevis = 0.0;
         double dummy_hcalevis = 0.0;
         double dummy_scalevis = 0.0;
-        m_idHoughBlob->getBlobEnergyTime( muonBlob, muon_blob_energy,
+        m_idHoughBlob->getBlobEnergyTime_Old( muonBlob, muon_blob_energy,
                 dummy_trkrevis, dummy_ecalevis, dummy_hcalevis, dummy_scalevis);
 
         debug()<< "Adding Muon blob with " << muonBlob->nclusters() << " clusters; energy = "  << muon_blob_energy
@@ -5451,6 +5452,7 @@ void CCProtonPi0::SaveTruthUnusedClusterEnergyInsideDetector(Minerva::GenMinInte
 
 void CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs(Minerva::PhysicsEvent* event, Minerva::GenMinInteraction *truthEvent) const
 {
+    debug()<<"Gamma 1 ProcessName"<<endmsg;
     // Get Blob 1 Clusters
     SmartRefVector<Minerva::IDCluster> blob1Clusters = m_Pi0Blob1->clusters();
     DigitVectorTruthInfo blob1Info;
@@ -5467,6 +5469,7 @@ void CCProtonPi0::SaveTruthClusterEnergy_FoundBlobs(Minerva::PhysicsEvent* event
     truthEvent->setDoubleData("blob1_evis_neutron", blob1Info.GetEdepByPdg(PDG::neutron));
 
     // Get Blob 2 Clusters
+    debug()<<"Gamma 2 ProcessName"<<endmsg;
     SmartRefVector<Minerva::IDCluster> blob2Clusters = m_Pi0Blob2->clusters();
     DigitVectorTruthInfo blob2Info;
     blob2Info.ParseTruth(blob2Clusters, fTrajectoryMap);
@@ -5597,7 +5600,7 @@ void CCProtonPi0::DispersedBlob( Minerva::PhysicsEvent *event, Minerva::GenMinIn
         double dummy2 = 0.0;
         double dummy3 = 0.0;
         double dummy4 = 0.0;
-        m_idHoughBlob->getBlobEnergyTime(dispersedBlob,dispersed_energy,dummy1,dummy2,dummy3,dummy4);
+        m_idHoughBlob->getBlobEnergyTime_Old(dispersedBlob,dispersed_energy,dummy1,dummy2,dummy3,dummy4);
         debug()<< "Adding dispersed blob with " << dispersedBlob->nclusters()
             << " clusters; Dispersed energy = "  << dispersed_energy << endmsg;
         addObject( event, dispersedBlob );
