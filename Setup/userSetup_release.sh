@@ -3,7 +3,7 @@
 #-------------------------------------------------------------------------------
 # Tag & Setup Script for a Release (SLF6)
 #-------------------------------------------------------------------------------
-tag="v10r8p6"
+tag="v10r8p7"
 setupscript="/grid/fermiapp/minerva/software_releases/${tag}/setup.sh"  
 debug=""            #set to -d if you want the debug build
 
