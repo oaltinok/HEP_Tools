@@ -686,6 +686,8 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch(m_hypMeths,"pi0_P",SENTINEL);
     declareDoubleBranch(m_hypMeths,"pi0_KE",SENTINEL);
     declareDoubleBranch(m_hypMeths,"pi0_invMass", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_invMass_New", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_invMass_New2", SENTINEL);
     declareDoubleBranch(m_hypMeths,"pi0_theta", SENTINEL);
     declareDoubleBranch(m_hypMeths,"pi0_phi",   SENTINEL);
     declareDoubleBranch(m_hypMeths,"pi0_thetaX", SENTINEL);
@@ -697,6 +699,8 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch(m_hypMeths,"gamma1_py",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_pz",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_E",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_E_New",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_E_New2",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_P",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_theta",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_phi",SENTINEL);
@@ -714,6 +718,8 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch(m_hypMeths,"gamma2_py",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_pz",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_E",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_E_New",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_E_New2",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_P",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_theta",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_phi",SENTINEL);
@@ -2972,13 +2978,43 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     double g2hcalevis = 0.0;
     double g2scalevis = 0.0;
 
+    double g1energy_New = 0.0;
+    double g2energy_New = 0.0;
+    double g1energy_New2 = 0.0;
+    double g2energy_New2 = 0.0;
+    double dummy_trkr = 0.0;
+    double dummy_ecal = 0.0;
+    double dummy_hcal = 0.0;
+    double dummy_scal = 0.0;
+
+    // Get Energy Using Old Method
     m_idHoughBlob->getBlobEnergyTime_Old( m_Pi0Blob1, g1energy, g1trkrevis, g1ecalevis, g1hcalevis, g1scalevis );
     m_idHoughBlob->getBlobEnergyTime_Old( m_Pi0Blob2, g2energy, g2trkrevis, g2ecalevis, g2hcalevis, g2scalevis );
+
+    // Get Energy Using New Method 1
+    m_idHoughBlob->getBlobEnergyTime_New( m_Pi0Blob1, g1energy_New, dummy_trkr, dummy_ecal, dummy_hcal, dummy_scal );
+    m_idHoughBlob->getBlobEnergyTime_New( m_Pi0Blob2, g2energy_New, dummy_trkr, dummy_ecal, dummy_hcal, dummy_scal );
+
+    // Get Energy Using New Method 1
+    m_idHoughBlob->getBlobEnergyTime_New2( m_Pi0Blob1, g1energy_New2, dummy_trkr, dummy_ecal, dummy_hcal, dummy_scal );
+    m_idHoughBlob->getBlobEnergyTime_New2( m_Pi0Blob2, g2energy_New2, dummy_trkr, dummy_ecal, dummy_hcal, dummy_scal );
 
     // Make sure Gamma1 is the more energetic one 
     if (g2energy > g1energy) {
         warning()<<" Gamma2 Energy is Higher than Gamma1"<<endmsg;
     }
+
+    debug()<<" ------------------------------------ "<<endmsg;
+    debug()<<"Gamma 1 Energy:"<<endmsg;
+    debug()<<"  Old = "<<g1energy<<endmsg; 
+    debug()<<"  New = "<<g1energy_New<<endmsg; 
+    debug()<<"  New2 = "<<g1energy_New2<<endmsg; 
+
+    debug()<<"Gamma 2 Energy:"<<endmsg;
+    debug()<<"  Old = "<<g2energy<<endmsg; 
+    debug()<<"  New = "<<g2energy_New<<endmsg; 
+    debug()<<"  New2 = "<<g2energy_New2<<endmsg; 
+    debug()<<" ------------------------------------ "<<endmsg;
 
     // Get Blob Time
     double time1 = m_Pi0Blob1->time();
@@ -3054,6 +3090,8 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
 
     // Calculate invariant Mass of Pi0
     const double invMass = std::sqrt(2*g1energy*g2energy*(1-cos_openingAngle));
+    const double invMass_New = std::sqrt(2*g1energy_New*g2energy_New*(1-cos_openingAngle));
+    const double invMass_New2 = std::sqrt(2*g1energy_New2*g2energy_New2*(1-cos_openingAngle));
 
     // Set Pi0 4 - Momentum
     m_pi0_4P.SetPxPyPzE(pimom.x(),pimom.y(),pimom.z(),pi0_E);
@@ -3070,6 +3108,8 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     nuInt->setDoubleData("pi0_openingAngle", openingAngle);
     nuInt->setDoubleData("pi0_cos_openingAngle", cos_openingAngle );
     nuInt->setDoubleData("pi0_invMass", invMass);
+    nuInt->setDoubleData("pi0_invMass_New", invMass_New);
+    nuInt->setDoubleData("pi0_invMass_New2", invMass_New2);
     nuInt->setDoubleData("pi0_px" ,pimom.Px());
     nuInt->setDoubleData("pi0_py", pimom.Py());
     nuInt->setDoubleData("pi0_pz", pimom.Pz());
@@ -3086,6 +3126,8 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     nuInt->setDoubleData("gamma1_py", g1mom.Py());
     nuInt->setDoubleData("gamma1_pz", g1mom.Pz());
     nuInt->setDoubleData("gamma1_E", g1energy);
+    nuInt->setDoubleData("gamma1_E_New", g1energy_New);
+    nuInt->setDoubleData("gamma1_E_New2", g1energy_New2);
     nuInt->setDoubleData("gamma1_P", g1mom.Mag());
     nuInt->setDoubleData("gamma1_theta", gamma1_theta);
     nuInt->setDoubleData("gamma1_phi",  gamma1_phi);
@@ -3104,6 +3146,8 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     nuInt->setDoubleData("gamma2_py", g2mom.Py());
     nuInt->setDoubleData("gamma2_pz", g2mom.Pz());
     nuInt->setDoubleData("gamma2_E", g2energy);
+    nuInt->setDoubleData("gamma2_E_New", g2energy_New);
+    nuInt->setDoubleData("gamma2_E_New2", g2energy_New2);
     nuInt->setDoubleData("gamma2_P", g2mom.Mag());
     nuInt->setDoubleData("gamma2_theta", gamma2_theta);
     nuInt->setDoubleData("gamma2_phi",  gamma2_phi);

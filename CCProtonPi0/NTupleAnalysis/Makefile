@@ -57,7 +57,7 @@ LDLIBS += -L$(PLOTUTILSROOT)/$(CMTCONFIG) -lplotutils -L$(UNFOLDUTILSROOT)/$(CMT
 # Commands and Flags
 # ------------------------------------------------------------------------------
 CC = g++
-CFLAGS = -g -Wall -Wextra
+CFLAGS = -g -Wall -Wextra -std=c++0x
 ROOTFLAGS = `root-config --glibs --cflags`
 RM = rm -fv
 

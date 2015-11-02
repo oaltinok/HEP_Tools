@@ -75,11 +75,13 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     // Add Pi0 InvMass Line
     if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
             var_name.compare("hCut_2Track_pi0invMass") == 0 ||
-            var_name.compare("invMass") == 0 ) {
+            var_name.compare("invMass") == 0 ||
+            var_name.compare("invMass2") == 0 ||
+            var_name.compare("invMass3") == 0) {
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
         pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,1000);
+        pi0Mass.DrawLine(134.98,0,134.98,3200);
     }
 
     // Print Plot
@@ -358,6 +360,7 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     // Now Plot the Ratio
     DrawDataMCRatio(dir, var_name, plotDir);
 }
+
 void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::string plotDir, bool isLogScale)
 {
     std::string root_dir = dir.mc;
@@ -365,6 +368,49 @@ void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::st
     // Get Histogram
     TFile* f = new TFile(root_dir.c_str());
     TH1D* hist1D = (TH1D*)f->Get(var_name.c_str());
+
+    // Create Canvas
+    TCanvas* c = new TCanvas("c","c",1280,800);
+    if(isLogScale) c->SetLogy();
+
+    // Plot Options
+    hist1D->SetLineColor(kRed);
+    hist1D->SetLineWidth(3);
+    hist1D->SetFillColor(kRed);
+    hist1D->SetFillStyle(3010);
+   
+    hist1D->Draw();
+    gPad->Update();
+    gStyle->SetOptStat("nemr"); 
+    
+    int max_bin = hist1D->GetMaximumBin();
+    double max_bin_value = hist1D->GetBinCenter(max_bin);
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+    text.DrawLatex(0.78,0.7,Form("%s%3.2f", "Peak at ",max_bin_value));
+    
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    delete c;
+    
+}
+
+void CCProtonPi0_Plotter::Draw1DHist_Threshold(rootDir& dir, std::string var_name, std::string plotDir, double threshold, bool isLogScale)
+{
+    std::string root_dir = dir.mc;
+   
+    // Get Histogram
+    TFile* f = new TFile(root_dir.c_str());
+    TH1D* hist1D = (TH1D*)f->Get(var_name.c_str());
+ 
+    // Reset Bins below the threshold
+    int nBinsX = hist1D->GetNbinsX();
+    for (int xBin = 1; xBin <= nBinsX; xBin++ ){
+        int nEvents = hist1D->GetBinContent(xBin);
+        if (nEvents <= threshold){
+            hist1D->SetBinContent(xBin,0);
+        }
+    }
 
     // Create Canvas
     TCanvas* c = new TCanvas("c","c",1280,800);
@@ -500,11 +546,13 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     // Add Pi0 InvMass Line
     if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
             var_name.compare("hCut_2Track_pi0invMass") == 0 ||
-            var_name.compare("invMass") == 0 ) {
+            var_name.compare("invMass") == 0 || 
+            var_name.compare("invMass2") == 0 ||
+            var_name.compare("invMass3") == 0 ) {
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
         pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,1000);
+        pi0Mass.DrawLine(134.98,0,134.98,3200);
     }
 
     // Print Plot
@@ -656,6 +704,31 @@ void CCProtonPi0_Plotter::DrawStackedMC_GammaByPDG(rootDir &dir, std::string var
 
     delete hs;
     delete c;
+}
+
+double CCProtonPi0_Plotter::CalcExpectedValue(rootDir& dir, std::string var_name)
+{
+    // Get Histogram
+    std::string root_dir = dir.mc;
+    TFile* f = new TFile(root_dir.c_str());
+    TH1D* hist = (TH1D*)f->Get(var_name.c_str());
+    
+    int nBinsX = hist->GetNbinsX();
+    double totalEvents = 0;
+    double totalValue = 0;
+
+    for (int xBin = 1; xBin <= nBinsX; xBin++ ){
+        double value = hist->GetBinLowEdge(xBin);
+        double nEvents = hist->GetBinContent(xBin);
+        totalEvents = totalEvents + nEvents;  
+        totalValue = totalValue + (value*nEvents);
+    }
+
+    double expectedValue = totalValue / totalEvents;
+    
+    std::cout<<var_name<<" Expected Value = "<<expectedValue<<std::endl;
+
+    return expectedValue;
 }
 
 #endif

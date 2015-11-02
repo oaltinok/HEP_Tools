@@ -74,6 +74,8 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_1Track_eVis_nuclearTarget;
         vector<MnvH1D*> hCut_1Track_eVis_other;
         vector<MnvH1D*> hCut_1Track_pi0invMass;
+        vector<MnvH1D*> hCut_1Track_pi0invMass_1;
+        vector<MnvH1D*> hCut_1Track_pi0invMass_2;
         vector<MnvH1D*> hCut_1Track_gamma1ConvDist;
         vector<MnvH1D*> hCut_1Track_gamma2ConvDist;
         vector<MnvH1D*> hCut_1Track_neutrinoE;
@@ -84,6 +86,8 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_2Track_eVis_nuclearTarget;
         vector<MnvH1D*> hCut_2Track_eVis_other;
         vector<MnvH1D*> hCut_2Track_pi0invMass;
+        vector<MnvH1D*> hCut_2Track_pi0invMass_1;
+        vector<MnvH1D*> hCut_2Track_pi0invMass_2;
         vector<MnvH1D*> hCut_2Track_gamma1ConvDist;
         vector<MnvH1D*> hCut_2Track_gamma2ConvDist;
         vector<MnvH1D*> hCut_2Track_UnusedE;

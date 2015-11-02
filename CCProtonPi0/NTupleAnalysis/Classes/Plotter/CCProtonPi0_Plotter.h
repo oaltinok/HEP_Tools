@@ -20,6 +20,8 @@ Class: CCProtonPi0_Plotter
 #define CCProtonPi0_Plotter_h
 
 #include <fstream>
+#include <string>
+#include <iostream>
 #include <TVectorD.h>
 #include <TStyle.h>
 #include <TROOT.h>
@@ -114,6 +116,7 @@ class CCProtonPi0_Plotter
         
         // Other Plots 
         void plotGammaEvis();
+        void plotPi0True();
         void plotPi0TruthMatch();
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
@@ -125,9 +128,11 @@ class CCProtonPi0_Plotter
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow);
         void SavePi0InvMassPoints();
         void SaveGammaEvisPoints();
+        void SaveGammaEvisPoints(int xBin);
         
         // Plottting Macros
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
+        void Draw1DHist_Threshold(rootDir &dir, std::string var_name, std::string plotDir, double threshold = 0, bool isLogScale = false);
         void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir, double threshold = 0);
         void DrawMCWithErrorBand(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
@@ -139,6 +144,7 @@ class CCProtonPi0_Plotter
         void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);
         void DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir);
+        double CalcExpectedValue(rootDir& dir, std::string var_name);
 };
 
 

@@ -67,6 +67,7 @@ class HTBlob: public MinervaHistoTool, virtual public IHoughBlob {
     
     void getBlobEnergyTime_Old( Minerva::IDBlob *idblob, double &energy, double& tracker_evis,double& ecal_evis, double& hcal_evis, double& scal_evis) const;
     void getBlobEnergyTime_New( Minerva::IDBlob *idblob, double &energy, double& tracker_evis,double& ecal_evis, double& hcal_evis, double& scal_evis) const;
+    void getBlobEnergyTime_New2( Minerva::IDBlob *idblob, double &energy, double& tracker_evis,double& ecal_evis, double& hcal_evis, double& scal_evis) const;
     
     StatusCode invariantMass( Minerva::IDBlob* idblob1, Minerva::IDBlob* idblob2, double &mass, Gaudi::XYZPoint vert ) const;
 
@@ -94,6 +95,7 @@ class HTBlob: public MinervaHistoTool, virtual public IHoughBlob {
 
     StatusCode FinddEdxPlanes(TH1D *h, int &index, double &dEdx) const;
     double get_kT(double evis) const;
+    double getCalorimetricEnergy(double evis_tracker, double evis_scal_X, double evis_scal_UV, double evis_ecal, double evis_hcal) const;
     double getCalorimetricEnergy(double evis_tracker, double evis_scal, double evis_ecal, double evis_hcal) const;
    
 };

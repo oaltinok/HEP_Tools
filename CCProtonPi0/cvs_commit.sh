@@ -1,18 +1,23 @@
-cvs commit -m "v2_38
+cvs commit -m "v2_39
 CCProtonPi0 Updates:
-	HTBlob updated for Calorimetric Energy
-		New Constants and Method to calculate Calorimetric Energy from Visible Energy
-		getBlobEnergyTime()
-			function return type changed to void 
-				function never returns FAILURE, no need for returning StatusCode
-			Make two different functions for OLD and NEW method
-				NEW Method will be revised -- It is not finalized
-	
+	Pi0 Shower Energy Study
+		In addition to old energy calculation implemented 2 new ones
+		Method 1:
+			new kT: from fit
+			new kE: from fit
+			same kS andkH
+		Method 2:
+			new kT: from fit
+			new kE: from fit
+			new kS: 
+				Sort Clusters in Increasing Z position
+				After the first SideECAL Hit, assume all other Tracker hits are in Side ECAL
+				Use actual kE to calculate Calorimetric Energy
+			same kH
+			
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Removed EM Shower Energy Study Histograms and Functions
-	Removed unused playlists from Input/Playlist Folder
-	Revised getPOT() Function
-	Reduce mode no longer overwrites the ReducedNTuple.root and CutHistograms.root
-		Protection against trying to reduce by mistake
-		Now user needs to keep track of ROOT file names" .
+	Pi0 Shower Energy Study
+		New Functions & Histograms for the study
+		Will remove these functions & histograms after the study
+	New script to submit <<All LE Data>> at once" .

@@ -23,8 +23,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotInteraction();
     //plotMuon();
     //plotProton();
-    //plotPion();
-    plotCutHistograms();
+    plotPion();
+    //plotCutHistograms();
     //plotPi0Blob();
     //SavePi0InvMassPoints();
 
@@ -211,10 +211,13 @@ void CCProtonPi0_Plotter::plotPion()
     std::string plotDir = plotDir_Pion;
     
     // Standard Plots
-    plotStandardHistograms(rootDir_Pion, plotDir);
+    //plotStandardHistograms(rootDir_Pion, plotDir);
     
-    std::cout<<">> Plotting Unique Histograms"<<std::endl;
+    // True Plots
+     //plotPi0True();
+
     // Unique Plots
+    std::cout<<">> Plotting Unique Histograms"<<std::endl;
     //DrawDataMC(rootDir_Pion,"gamma1_E",plotDir);
     //DrawDataMC(rootDir_Pion,"gamma2_E",plotDir);
     //DrawDataMC(rootDir_Pion,"gamma1_theta",plotDir);
@@ -229,36 +232,82 @@ void CCProtonPi0_Plotter::plotPion()
     //DrawDataStackedMC(rootDir_Pion,"gamma1_theta",plotDir);
     //DrawDataStackedMC(rootDir_Pion,"gamma2_theta",plotDir);
 
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
-    DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_E",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_E",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_theta",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_theta",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma1_ConvLength",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"gamma2_ConvLength",plotDir);
+    //DrawStackedMC_BckgAll(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
     DrawStackedMC_BckgAll(rootDir_Pion,"invMass",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"invMass2",plotDir);
+    DrawStackedMC_BckgAll(rootDir_Pion,"invMass3",plotDir);
     
-    // ------------------------------------------------------------------------
-    // Truth Information
-    // ------------------------------------------------------------------------
-    Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma1_reco_error_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_true_E_reco_E_ratio",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
-    
-    Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma2_reco_error_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma2_true_E_reco_E_ratio",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
-
     // ------------------------------------------------------------------------
     // Other Studies
     // ------------------------------------------------------------------------
 
+    Draw1DHist(rootDir_Pion,"reco_error_trkr",plotDir);
+    Draw1DHist(rootDir_Pion,"calc_error_trkr",plotDir);
+    //Draw1DHist(rootDir_Pion,"reco_error_ecal",plotDir);
+    //Draw1DHist(rootDir_Pion,"calc_error_ecal",plotDir);
+    //Draw2DHist(rootDir_Pion,"true_E_evis_trkr_ratio",plotDir);
+    //Draw2DHist(rootDir_Pion,"evis_evis_trkr_ratio",plotDir,4);
+    //Draw2DHist(rootDir_Pion,"evis_evis_ecal_ratio",plotDir,2);
+    //
+    //Draw2DHist(rootDir_Pion,"reco_E_true_E",plotDir,18);
+    //
+    //Draw1DHist(rootDir_Pion,"gamma1_calc_error",plotDir);
+    //Draw1DHist(rootDir_Pion,"gamma2_calc_error",plotDir);
+    //Draw1DHist(rootDir_Pion,"mgg_calc",plotDir);
+    //Draw1DHist(rootDir_Pion,"gamma_nPlanes",plotDir);
+    //Draw1DHist(rootDir_Pion,"evis_trkr_ratio_1",plotDir);
+    //Draw1DHist(rootDir_Pion,"evis_trkr_ratio_2",plotDir);
+    //Draw1DHist(rootDir_Pion,"evis_trkr_ratio_3",plotDir);
+    //Draw1DHist(rootDir_Pion,"evis_trkr_ratio_4",plotDir);
+    //Draw1DHist(rootDir_Pion,"evis_trkr_ratio_5",plotDir);
+    //
+    //Draw1DHist(rootDir_Pion,"evis_ecal_ratio_1",plotDir);
+    //Draw1DHist(rootDir_Pion,"evis_ecal_ratio_2",plotDir);
+    //Draw1DHist(rootDir_Pion,"evis_ecal_ratio_3",plotDir);
+    //Draw1DHist(rootDir_Pion,"evis_ecal_ratio_4",plotDir);
+    //Draw1DHist(rootDir_Pion,"evis_ecal_ratio_5",plotDir);
+
+    //CalcExpectedValue(rootDir_Pion,"gamma_nPlanes"); 
+    //SaveGammaEvisPoints(1);
+    //SaveGammaEvisPoints(2);
+    //SaveGammaEvisPoints(3);
+    //SaveGammaEvisPoints(4);
+    //SaveGammaEvisPoints(5);
+    //SaveGammaEvisPoints(6);
+
     //plotGammaEvis();
     //plotPi0TruthMatch();
 
+
     std::cout<<"Plotting Pion Finished!\n"<<std::endl;
+}
+
+void CCProtonPi0_Plotter::plotPi0True()
+{
+    std::cout<<"Plotting Pion True"<<std::endl;
+    std::string plotDir = plotDir_Pion;
+ 
+    Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma1_reco_error_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma1_reco2_error_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma1_reco3_error_E",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_true_E_reco_E_error",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
+    
+    Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma2_reco_error_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma2_reco2_error_E",plotDir);
+    Draw1DHist(rootDir_Pion,"gamma2_reco3_error_E",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma2_true_E_reco_E_error",plotDir);
+    Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
+
+    std::cout<<"Plotting Pion True Finished!\n"<<std::endl;
 }
 
 void CCProtonPi0_Plotter::plotPi0TruthMatch()
@@ -599,6 +648,30 @@ void CCProtonPi0_Plotter::SavePi0InvMassPoints()
     std::cout<<"Done!"<<std::endl;
 }
 
+void CCProtonPi0_Plotter::SaveGammaEvisPoints(int xBin)
+{
+    ofstream text;
+    std::string textFile = plotDir_Pion + "evis" + std::to_string((long long int)xBin) + ".txt";
+    text.open(textFile.c_str());
+
+    // Get Histogram
+    std::string root_dir = rootDir_Pion.mc;
+    TFile* f = new TFile(root_dir.c_str());
+    TH2D* hist2D = (TH2D*)f->Get("evis_evis_trkr_ratio");
+
+    // Reset Bins below the threshold
+    int nBinsY = hist2D->GetNbinsY();
+
+    for (int yBin = 1; yBin <=nBinsY; yBin++){
+        double nEvents = hist2D->GetBinContent(xBin,yBin);
+        double y = hist2D->GetYaxis()->GetBinCenter(yBin);
+        if ( nEvents > 1){
+            text<<y<<" "<<nEvents<<std::endl; 
+        }
+    }
+
+    text.close();
+}
 
 void CCProtonPi0_Plotter::SaveGammaEvisPoints()
 {
@@ -609,7 +682,7 @@ void CCProtonPi0_Plotter::SaveGammaEvisPoints()
     // Get Histogram
     std::string root_dir = rootDir_Pion.mc;
     TFile* f = new TFile(root_dir.c_str());
-    TH2D* hist2D = (TH2D*)f->Get("gamma1_evis_evis_ratio");
+    TH2D* hist2D = (TH2D*)f->Get("evis_evis_trkr_ratio");
 
     // Reset Bins below the threshold
     int nBinsX = hist2D->GetNbinsX();
@@ -621,21 +694,23 @@ void CCProtonPi0_Plotter::SaveGammaEvisPoints()
         for (int yBin = 1; yBin <=nBinsY; yBin++){
             double nEvents = hist2D->GetBinContent(xBin,yBin);
             double y = hist2D->GetYaxis()->GetBinCenter(yBin);
-            if ( y <= 2.5 && nEvents > 1){
+            if ( nEvents > 1){
                 sum = sum + y*nEvents;
                 n = n + nEvents;
             }
         }
+        text<<std::endl;
     
         if (n > 0){
             double avg = sum / n;
             double x = hist2D->GetXaxis()->GetBinCenter(xBin);
-            text<<x<<" "<<avg<<std::endl;
+            text<<x<<" "<<avg<<" "<<n<<std::endl;
         }
     }
     
     text.close();
  
 }
+
 #endif
 

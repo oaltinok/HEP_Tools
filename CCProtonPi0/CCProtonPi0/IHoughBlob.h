@@ -55,6 +55,7 @@ class IHoughBlob : virtual public IAlgTool {
     
     virtual void getBlobEnergyTime_Old( Minerva::IDBlob *idblob, double &energy, double& tracker_evis, double& ecal_evis, double& hcal_evis, double& scal_evis) const = 0;
     virtual void getBlobEnergyTime_New( Minerva::IDBlob *idblob, double &energy, double& tracker_evis, double& ecal_evis, double& hcal_evis, double& scal_evis) const = 0;
+    virtual void getBlobEnergyTime_New2( Minerva::IDBlob *idblob, double &energy, double& tracker_evis, double& ecal_evis, double& hcal_evis, double& scal_evis) const = 0;
     
 };
 #endif

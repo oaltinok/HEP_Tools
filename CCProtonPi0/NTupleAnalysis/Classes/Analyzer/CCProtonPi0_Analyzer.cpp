@@ -10,9 +10,9 @@ using namespace std;
 
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
-    applyMaxEvents = true;
+    applyMaxEvents = false;
     nMaxEvents = 100000;
-    
+
     // Means for EM Energy Correction
     mean_MC_1Track = 118.93;
     mean_MC_2Track = 116.29;
@@ -54,8 +54,8 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 void CCProtonPi0_Analyzer::reduce(string playlist)
 {
     string rootDir;
-    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_Test.root";
-    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_Test.root";
+    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_v2_39b_3.root";
+    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_v2_39b_3.root";
 
     cout<<"Reducing NTuple Files to a single file"<<endl;
     cout<<"\tRoot File: "<<rootDir<<endl;
@@ -173,6 +173,16 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         //----------------------------------------------------------------------
         if (isDataAnalysis) fillData();
         if (writeFSParticleMomentum) writeFSParticle4P(jentry);
+
+        // EM Shower Energy Study
+        if (truth_isSignal){
+            double pi0_match = truth_total_captured_evis_pizero / truth_allClusters_evis_pizero;
+            if (pi0_match >= 0.9){ 
+                //fillPi0True();
+                fill_EMEnergy_StudyPlots(); 
+            }
+        }
+
 
     } // end for-loop
 
@@ -642,9 +652,13 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (n_prongs == 1){
         cutList.pi0_invMass_1Track->Fill( ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass));
         FillHistogram(cutList.hCut_1Track_pi0invMass,ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass) );
+        FillHistogram(cutList.hCut_1Track_pi0invMass_1,ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass_New) );
+        FillHistogram(cutList.hCut_1Track_pi0invMass_2,ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass_New2) );
     }else{ 
         cutList.pi0_invMass_2Track->Fill( ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass) );
         FillHistogram(cutList.hCut_2Track_pi0invMass, ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass) );
+        FillHistogram(cutList.hCut_2Track_pi0invMass_1, ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass_New) );
+        FillHistogram(cutList.hCut_2Track_pi0invMass_2, ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass_New2) );
     }
 
     if( ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass) < min_Pi0_invMass ||  
@@ -973,26 +987,40 @@ void CCProtonPi0_Analyzer::fillPi0True()
 
     // EM Shower Energy Variables
     if ( truth_isSignal ){
-        // Gamma 1 Momentum
+        // Gamma 1
         double g1_reco_E = ApplyEMEnergyCorrection(CCProtonPi0_gamma1_E) * HEP_Functions::MeV_to_GeV;
+        double g1_reco_E_1 = CCProtonPi0_gamma1_E_New * HEP_Functions::MeV_to_GeV;
+        double g1_reco_E_2 = CCProtonPi0_gamma1_E_New2 * HEP_Functions::MeV_to_GeV;
         double g1_true_E = truth_gamma1_4P[3] * HEP_Functions::MeV_to_GeV;
         double g1_E_error = Data_Functions::getError(g1_true_E, g1_reco_E);
+        double g1_E_error_1 = Data_Functions::getError(g1_true_E, g1_reco_E_1);
+        double g1_E_error_2 = Data_Functions::getError(g1_true_E, g1_reco_E_2);
 
         pi0.gamma1_true_E->Fill(g1_true_E);
         pi0.gamma1_reco_error_E->Fill(g1_E_error);
+        pi0.gamma1_reco2_error_E->Fill(g1_E_error_1);
+        pi0.gamma1_reco3_error_E->Fill(g1_E_error_2);
         pi0.gamma1_reco_E_true_E->Fill(g1_reco_E, g1_true_E);
-        pi0.gamma1_true_E_reco_E_ratio->Fill(g1_true_E,g1_true_E/g1_reco_E);
+        pi0.gamma1_true_E_reco_E_error->Fill(g1_true_E,g1_E_error);
 
-        // Gamma 2 Momentum
+        // Gamma 2 
         double g2_reco_E = ApplyEMEnergyCorrection(CCProtonPi0_gamma2_E) * HEP_Functions::MeV_to_GeV;
+        double g2_reco_E_1 = CCProtonPi0_gamma2_E_New * HEP_Functions::MeV_to_GeV;
+        double g2_reco_E_2 = CCProtonPi0_gamma2_E_New2 * HEP_Functions::MeV_to_GeV;
         double g2_true_E = truth_gamma2_4P[3] * HEP_Functions::MeV_to_GeV;
         double g2_E_error = Data_Functions::getError(g2_true_E, g2_reco_E);
+        double g2_E_error_1 = Data_Functions::getError(g2_true_E, g2_reco_E_1);
+        double g2_E_error_2 = Data_Functions::getError(g2_true_E, g2_reco_E_2);
 
         pi0.gamma2_true_E->Fill(g2_true_E);
         pi0.gamma2_reco_error_E->Fill(g2_E_error);
+        pi0.gamma2_reco2_error_E->Fill(g2_E_error_1);
+        pi0.gamma2_reco3_error_E->Fill(g2_E_error_2);
         pi0.gamma2_reco_E_true_E->Fill(g2_reco_E, g2_true_E);
-        pi0.gamma2_true_E_reco_E_ratio->Fill(g2_true_E, g2_true_E/g2_reco_E);
-
+        pi0.gamma2_true_E_reco_E_error->Fill(g2_true_E, g2_E_error);
+    
+        pi0.reco_E_true_E->Fill(g1_reco_E,g1_true_E);
+        pi0.reco_E_true_E->Fill(g2_reco_E,g2_true_E);
     }
 
 }
@@ -1001,6 +1029,8 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
 {
     // Unique Histograms
     FillHistogram(pi0.invMass, ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass));
+    FillHistogram(pi0.invMass2, ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass_New));
+    FillHistogram(pi0.invMass3, ApplyEMEnergyCorrection(CCProtonPi0_pi0_invMass_New2));
 
     // Leading Photon - Energetic Photon
     FillHistogram(pi0.gamma1_ConvLength, CCProtonPi0_gamma1_dist_vtx * 0.1);
@@ -1121,6 +1151,172 @@ double CCProtonPi0_Analyzer::ApplyEMEnergyCorrection(double var)
 
     correction = 1;
     return (var * correction);
+}
+
+
+void CCProtonPi0_Analyzer::fill_EMEnergy_StudyPlots()
+{
+    // Fill Gamma 1
+    if (CCProtonPi0_gamma1_evis_hcal < 0.1 && CCProtonPi0_gamma1_evis_scal < 0.1){
+        // Contained in Tracker
+        if (CCProtonPi0_gamma1_evis_ecal < 0.1){
+            double evis = CCProtonPi0_gamma1_evis_trkr;
+            double true_E = truth_gamma1_4P[3];
+            double reco_E = CCProtonPi0_gamma1_E;
+            double reco_error = Data_Functions::getError(true_E, reco_E);
+
+            double evis_ratio = true_E/CCProtonPi0_gamma1_evis_trkr;
+
+            // Calculate Energy with New Method
+            double calc_E = get_kT(CCProtonPi0_gamma1_evis_trkr) * CCProtonPi0_gamma1_evis_trkr;
+            double calc_error = Data_Functions::getError(true_E, calc_E);
+
+            // Fill Histograms
+            //pi0.reco_error_trkr->Fill(reco_error);
+            //pi0.calc_error_trkr->Fill(calc_error);
+            pi0.true_E_evis_trkr_ratio->Fill(true_E,evis_ratio);
+            pi0.evis_evis_trkr_ratio->Fill(CCProtonPi0_gamma1_evis_trkr,evis_ratio);
+          
+            if (evis >= 50 && evis < 100){ 
+                pi0.reco_error_trkr->Fill(reco_error);
+                pi0.calc_error_trkr->Fill(calc_error);
+            }
+
+            if ( evis < 50) pi0.evis_trkr_ratio_1->Fill(evis_ratio);
+            else if ( evis < 100) pi0.evis_trkr_ratio_2->Fill(evis_ratio);
+            else if ( evis < 150) pi0.evis_trkr_ratio_3->Fill(evis_ratio);
+            else if ( evis < 200) pi0.evis_trkr_ratio_4->Fill(evis_ratio);
+            else if ( evis < 300) pi0.evis_trkr_ratio_5->Fill(evis_ratio);
+        }
+
+        // Contained in ECAL
+        if (CCProtonPi0_gamma1_evis_trkr < 0.1){
+            double evis = CCProtonPi0_gamma1_evis_ecal;
+            double true_E = truth_gamma1_4P[3];
+            double reco_E = CCProtonPi0_gamma1_E;
+            double reco_error = Data_Functions::getError(true_E,reco_E);
+
+            double evis_ratio = true_E/CCProtonPi0_gamma1_evis_ecal;
+
+            // Calculate Energy with New Method
+            double calc_E = CCProtonPi0_gamma1_evis_ecal * 3.2367;
+            double calc_error = Data_Functions::getError(true_E, calc_E);
+
+            // Fill Histograms
+            pi0.reco_error_ecal->Fill(reco_error);
+            pi0.calc_error_ecal->Fill(calc_error);
+            pi0.evis_evis_ecal_ratio->Fill(CCProtonPi0_gamma1_evis_ecal,evis_ratio);
+            pi0.gamma_nPlanes->Fill(g1dedx_nplane);
+         
+            
+            if ( evis < 50) pi0.evis_ecal_ratio_1->Fill(evis_ratio);
+            else if ( evis < 100) pi0.evis_ecal_ratio_2->Fill(evis_ratio);
+            else if ( evis < 150) pi0.evis_ecal_ratio_3->Fill(evis_ratio);
+            else if ( evis < 200) pi0.evis_ecal_ratio_4->Fill(evis_ratio);
+            else if ( evis < 300) pi0.evis_ecal_ratio_5->Fill(evis_ratio);
+        
+        }       
+    }
+
+    // Fill Gamma 2
+    if (CCProtonPi0_gamma2_evis_hcal < 0.1 && CCProtonPi0_gamma2_evis_scal < 0.1){
+        // Contained in Tracker
+        if (CCProtonPi0_gamma2_evis_ecal < 0.1){
+            double evis = CCProtonPi0_gamma2_evis_trkr;
+            double true_E = truth_gamma2_4P[3];
+            double reco_E = CCProtonPi0_gamma2_E;
+            double reco_error = Data_Functions::getError(true_E, reco_E);
+
+            double evis_ratio = true_E/CCProtonPi0_gamma2_evis_trkr;
+
+            // Calculate Energy with New Method
+            double calc_E = get_kT(CCProtonPi0_gamma2_evis_trkr) * CCProtonPi0_gamma2_evis_trkr;
+            double calc_error = Data_Functions::getError(true_E, calc_E);
+
+            // Fill Histograms
+            //pi0.reco_error_trkr->Fill(reco_error);
+            //pi0.calc_error_trkr->Fill(calc_error);
+            pi0.true_E_evis_trkr_ratio->Fill(true_E,evis_ratio);
+            pi0.evis_evis_trkr_ratio->Fill(CCProtonPi0_gamma2_evis_trkr,evis_ratio);
+
+            if (evis >= 50 && evis < 100){ 
+                pi0.reco_error_trkr->Fill(reco_error);
+                pi0.calc_error_trkr->Fill(calc_error);
+            }
+            if ( evis < 50) pi0.evis_trkr_ratio_1->Fill(evis_ratio);
+            else if ( evis < 100) pi0.evis_trkr_ratio_2->Fill(evis_ratio);
+            else if ( evis < 150) pi0.evis_trkr_ratio_3->Fill(evis_ratio);
+            else if ( evis < 200) pi0.evis_trkr_ratio_4->Fill(evis_ratio);
+            else if ( evis < 300) pi0.evis_trkr_ratio_5->Fill(evis_ratio);
+        }
+
+        // Contained in ECAL
+        if (CCProtonPi0_gamma2_evis_trkr < 0.1){
+            double evis = CCProtonPi0_gamma2_evis_ecal;
+            double true_E = truth_gamma2_4P[3];
+            double reco_E = CCProtonPi0_gamma2_E;
+            double reco_error = Data_Functions::getError(true_E,reco_E);
+
+            double evis_ratio = true_E/CCProtonPi0_gamma2_evis_ecal;
+
+            // Calculate Energy with New Method
+            double calc_E = CCProtonPi0_gamma2_evis_ecal * 3.2367;
+            double calc_error = Data_Functions::getError(true_E, calc_E);
+
+            // Fill Histograms
+            pi0.reco_error_ecal->Fill(reco_error);
+            pi0.calc_error_ecal->Fill(calc_error);
+            pi0.evis_evis_ecal_ratio->Fill(CCProtonPi0_gamma2_evis_ecal,evis_ratio);
+            pi0.gamma_nPlanes->Fill(g2dedx_nplane);
+        
+            if ( evis < 50) pi0.evis_ecal_ratio_1->Fill(evis_ratio);
+            else if ( evis < 100) pi0.evis_ecal_ratio_2->Fill(evis_ratio);
+            else if ( evis < 150) pi0.evis_ecal_ratio_3->Fill(evis_ratio);
+            else if ( evis < 200) pi0.evis_ecal_ratio_4->Fill(evis_ratio);
+            else if ( evis < 300) pi0.evis_ecal_ratio_5->Fill(evis_ratio);
+        }       
+    }
+
+    // Total Energy
+    double gamma1_true_E = truth_gamma1_4P[3];
+    double gamma1_calc_E = Calc_Gamma_Energy(CCProtonPi0_gamma1_evis_trkr, CCProtonPi0_gamma1_evis_ecal, CCProtonPi0_gamma1_evis_hcal, CCProtonPi0_gamma1_evis_scal);
+    double g1_error = Data_Functions::getError(gamma1_true_E, gamma1_calc_E);
+
+    double gamma2_true_E = truth_gamma2_4P[3];
+    double gamma2_calc_E = Calc_Gamma_Energy(CCProtonPi0_gamma2_evis_trkr, CCProtonPi0_gamma2_evis_ecal, CCProtonPi0_gamma2_evis_hcal, CCProtonPi0_gamma2_evis_scal);
+    double g2_error = Data_Functions::getError(gamma2_true_E, gamma2_calc_E);
+
+    double mgg_calc = sqrt(2 * gamma1_calc_E * gamma2_calc_E * (1 - CCProtonPi0_pi0_cos_openingAngle) ); 
+    // Fill Histograms
+    pi0.gamma1_calc_error->Fill(g1_error);
+    pi0.gamma2_calc_error->Fill(g2_error);
+    pi0.mgg_calc->Fill(mgg_calc);
+
+}
+
+double CCProtonPi0_Analyzer::get_kT(double evis)
+{
+    const double evis_limit = 697.77; // MeV
+    const double kT_default = 1.326;
+    double kT;
+
+    if ( evis < evis_limit){
+        const double m = -0.0002336;
+        const double c = 1.489;
+        kT = m*evis + c;
+    }else{ 
+        kT = kT_default; 
+    }
+
+    return kT;
+}
+
+
+double CCProtonPi0_Analyzer::Calc_Gamma_Energy(double evis_trkr, double evis_ecal, double evis_hcal, double evis_scal)
+{
+    double energy = evis_trkr * get_kT(evis_trkr) + evis_ecal * 3.2367 + evis_hcal * 12.65 + evis_scal * 3.26 * 1.75;
+
+    return energy;
 }
 
 #endif //CCProtonPi0_Analyzer_cpp

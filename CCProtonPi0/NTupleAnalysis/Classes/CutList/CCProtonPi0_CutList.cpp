@@ -14,8 +14,8 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
     
     if(isModeReduce){
         // File Locations
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms.root";
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_39b_3.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms_v2_39b_3.root";
         
         cout<<"\tRoot File: "<<rootDir<<endl;
 
@@ -125,6 +125,16 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
         hCut_1Track_pi0invMass.push_back(temp);
 
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_pi0invMass_1",i),"Reconstructed Pi0 Invariant Mass New 1",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+        hCut_1Track_pi0invMass_1.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_pi0invMass_2",i),"Reconstructed Pi0 Invariant Mass New 2",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+        hCut_1Track_pi0invMass_2.push_back(temp);
+        
         temp = new MnvH1D( Form("%s_%d","hCut_1Track_neutrinoE",i),"Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
@@ -167,6 +177,16 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
         hCut_2Track_pi0invMass.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_pi0invMass_1",i),"Reconstructed Pi0 Invariant Mass New 1",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+        hCut_2Track_pi0invMass_1.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_pi0invMass_2",i),"Reconstructed Pi0 Invariant Mass New 2",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+        hCut_2Track_pi0invMass_2.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_2Track_neutrinoE",i),"Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
@@ -450,6 +470,8 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_1Track_eVis_nuclearTarget[i]->Write();
         hCut_1Track_eVis_other[i]->Write();
         hCut_1Track_pi0invMass[i]->Write();
+        hCut_1Track_pi0invMass_1[i]->Write();
+        hCut_1Track_pi0invMass_2[i]->Write();
         hCut_1Track_gamma1ConvDist[i]->Write();
         hCut_1Track_gamma2ConvDist[i]->Write();
         hCut_1Track_neutrinoE[i]->Write();
@@ -460,6 +482,8 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_2Track_eVis_nuclearTarget[i]->Write();
         hCut_2Track_eVis_other[i]->Write();
         hCut_2Track_pi0invMass[i]->Write();
+        hCut_2Track_pi0invMass_1[i]->Write();
+        hCut_2Track_pi0invMass_2[i]->Write();
         hCut_2Track_gamma1ConvDist[i]->Write();
         hCut_2Track_gamma2ConvDist[i]->Write();
         hCut_2Track_neutrinoE[i]->Write();
