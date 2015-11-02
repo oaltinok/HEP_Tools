@@ -6,6 +6,7 @@
 |NTuple Analysis|			|True Reco Correction	|				|
 |		|			|dEdX Profile		|				|
 |		|			|Pi0InvMass_Correction	|				|
+|		|			|Pi0Shower_Energy_Study	|				|
 
 * These packages are specialized for MINERvA Experiment data format.
 	* Experiment URL: http://minerva.fnal.gov/
@@ -48,6 +49,9 @@
 * We need a Correction Factor which can be calculated from the known Pi0 Invariant Mass Peak
 * Package to find a correction factor using reconstructed Pi0 Invariant Mass Peak.
 	* That correction factor is later used in NTupleAnalysis Package to correct EM Shower Energies
+	
+### Pi0Shower_Energy_Study
+* CCProtonPi0 Analysis Study to calculate Pi0 Shower Energy correctly inside MINERvA Detector
 
 ### dEdX Profile
 * EM Shower Profile for Different Shower Lengths
