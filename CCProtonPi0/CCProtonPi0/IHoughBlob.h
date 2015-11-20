@@ -54,8 +54,7 @@ class IHoughBlob : virtual public IAlgTool {
     virtual StatusCode isPhoton( SmartRefVector<Minerva::IDCluster> Seed, Gaudi::XYZPoint vtX ) const = 0;
     
     virtual void getBlobEnergyTime_Old( Minerva::IDBlob *idblob, double &energy, double& tracker_evis, double& ecal_evis, double& hcal_evis, double& scal_evis) const = 0;
-    virtual void getBlobEnergyTime_New( Minerva::IDBlob *idblob, double &energy, double& tracker_evis, double& ecal_evis, double& hcal_evis, double& scal_evis) const = 0;
-    virtual void getBlobEnergyTime_New2( Minerva::IDBlob *idblob, double &energy, double& tracker_evis, double& ecal_evis, double& hcal_evis, double& scal_evis) const = 0;
+    virtual double getBlobEnergyTime_New( Minerva::IDBlob *idblob, std::vector<double>& evis_v, std::vector<double>& energy_v) const = 0;
     
 };
 #endif

@@ -104,20 +104,20 @@ void Reduce(string playlist, bool isMC)
 void Analyze(string playlist, bool isMC)
 {
     bool isModeReduce = false;
-//    // First Analyze 1Track Events
-//    cout<<"======================================================================"<<endl;
-//    cout<<"Analyzing 1 Track Events..."<<endl;
-//    cout<<"======================================================================"<<endl;
-//    CCProtonPi0_Analyzer analyzer_1Track(isModeReduce, isMC, "1Track/");
-//    analyzer_1Track.analyze(playlist);
-//
-//    // Second Analyze 2Track Events 
-//    cout<<"\n"<<endl;
-//    cout<<"======================================================================"<<endl;
-//    cout<<"Analyzing 2+ Track Events..."<<endl;
-//    cout<<"======================================================================"<<endl;
-//    CCProtonPi0_Analyzer analyzer_2Track(isModeReduce, isMC, "2Track/");
-//    analyzer_2Track.analyze(playlist);
+    //// First Analyze 1Track Events
+    //cout<<"======================================================================"<<endl;
+    //cout<<"Analyzing 1 Track Events..."<<endl;
+    //cout<<"======================================================================"<<endl;
+    //CCProtonPi0_Analyzer analyzer_1Track(isModeReduce, isMC, "1Track/");
+    //analyzer_1Track.analyze(playlist);
+
+    //// Second Analyze 2Track Events 
+    //cout<<"\n"<<endl;
+    //cout<<"======================================================================"<<endl;
+    //cout<<"Analyzing 2+ Track Events..."<<endl;
+    //cout<<"======================================================================"<<endl;
+    //CCProtonPi0_Analyzer analyzer_2Track(isModeReduce, isMC, "2Track/");
+    //analyzer_2Track.analyze(playlist);
 
     // Finally Analyze All Events 
     cout<<"\n"<<endl;

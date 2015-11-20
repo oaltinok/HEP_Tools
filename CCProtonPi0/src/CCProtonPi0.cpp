@@ -117,7 +117,7 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
 
     // Private Properties
     declareProperty("WriteFSParticleTable", m_writeFSParticle_Table =   false);
-    declareProperty("StoreAllEvents",       m_store_all_events      =   true);
+    declareProperty("StoreAllEvents",       m_store_all_events      =   false);
     declareProperty("DoPlausibilityCuts",   m_DoPlausibilityCuts    =   true);
     declareProperty("DoTruthMatch",         m_DoTruthMatch          =   true);
     declareProperty("ApplyExtraMichelCuts", m_applyExtraMichelCuts = false);
@@ -558,7 +558,32 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleEventBranch("gamma2_blob_proton_digit_E");
     declareContainerDoubleEventBranch("gamma2_blob_neutron_digit_E");
     declareContainerDoubleEventBranch("gamma2_blob_muon_digit_E");
-    
+   
+    // Blob True Evis by SubDetector -- Filled in Save BlobTrueEvisBySubDetector()
+    declareDoubleEventBranch("gamma1_trkr_true_evis",-1);
+    declareDoubleEventBranch("gamma1_scal_true_evis",-1);
+    declareDoubleEventBranch("gamma1_ecal_true_evis",-1);
+    declareDoubleEventBranch("gamma1_hcal_true_evis",-1);
+
+    declareDoubleEventBranch("gamma2_trkr_true_evis",-1);
+    declareDoubleEventBranch("gamma2_scal_true_evis",-1);
+    declareDoubleEventBranch("gamma2_ecal_true_evis",-1);
+    declareDoubleEventBranch("gamma2_hcal_true_evis",-1);
+ 
+    declareDoubleEventBranch("gamma1_center_nHits_all",-1);
+    declareDoubleEventBranch("gamma1_center_nHits_scal",-1);
+    declareDoubleEventBranch("gamma1_center_nHits_trkr",-1);
+    declareDoubleEventBranch("gamma1_side_nHits_all",-1);
+    declareDoubleEventBranch("gamma1_side_nHits_scal",-1);
+    declareDoubleEventBranch("gamma1_side_nHits_trkr",-1);
+
+    declareDoubleEventBranch("gamma2_center_nHits_all",-1);
+    declareDoubleEventBranch("gamma2_center_nHits_scal",-1);
+    declareDoubleEventBranch("gamma2_center_nHits_trkr",-1);
+    declareDoubleEventBranch("gamma2_side_nHits_all",-1);
+    declareDoubleEventBranch("gamma2_side_nHits_scal",-1);
+    declareDoubleEventBranch("gamma2_side_nHits_trkr",-1);
+  
     // Calculate_dEdx() -- Called from setBlobData()
     declareIntEventBranch("g1dedx_nplane", -1);
     declareIntEventBranch("g1dedx_doublet", -1);
@@ -686,8 +711,7 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch(m_hypMeths,"pi0_P",SENTINEL);
     declareDoubleBranch(m_hypMeths,"pi0_KE",SENTINEL);
     declareDoubleBranch(m_hypMeths,"pi0_invMass", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_invMass_New", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_invMass_New2", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"pi0_invMass_Old", SENTINEL);
     declareDoubleBranch(m_hypMeths,"pi0_theta", SENTINEL);
     declareDoubleBranch(m_hypMeths,"pi0_phi",   SENTINEL);
     declareDoubleBranch(m_hypMeths,"pi0_thetaX", SENTINEL);
@@ -699,8 +723,7 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch(m_hypMeths,"gamma1_py",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_pz",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_E",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_E_New",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_E_New2",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_E_Old",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_P",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_theta",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_phi",SENTINEL);
@@ -709,8 +732,14 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch(m_hypMeths,"gamma1_dist_vtx",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_evis_trkr", SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_evis_ecal", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_evis_scal_X", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_evis_scal_UV", SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma1_evis_hcal", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_evis_scal", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_energy_trkr", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_energy_ecal", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_energy_scal_X", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_energy_scal_UV", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma1_energy_hcal", SENTINEL);
     declareContainerDoubleBranch(m_hypMeths,"gamma1_direction",3,SENTINEL);
     declareContainerDoubleBranch(m_hypMeths,"gamma1_vertex",3,SENTINEL);
 
@@ -718,8 +747,7 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch(m_hypMeths,"gamma2_py",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_pz",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_E",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_E_New",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_E_New2",SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_E_Old",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_P",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_theta",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_phi",SENTINEL);
@@ -728,8 +756,14 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch(m_hypMeths,"gamma2_dist_vtx",SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_evis_trkr", SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_evis_ecal", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_evis_scal_X", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_evis_scal_UV", SENTINEL);
     declareDoubleBranch(m_hypMeths,"gamma2_evis_hcal", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_evis_scal", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_energy_trkr", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_energy_ecal", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_energy_scal_X", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_energy_scal_UV", SENTINEL);
+    declareDoubleBranch(m_hypMeths,"gamma2_energy_hcal", SENTINEL);
     declareContainerDoubleBranch(m_hypMeths,"gamma2_direction",3,SENTINEL);
     declareContainerDoubleBranch(m_hypMeths,"gamma2_vertex",3,SENTINEL); 
 
@@ -2965,39 +2999,30 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
         ApplyAttenuationCorrection(m_Pi0Blob2);
     }
 
-    // Get Blob Energy and Time
-    double g1energy   = 0.0;
-    double g1trkrevis = 0.0;
-    double g1ecalevis = 0.0;
-    double g1hcalevis = 0.0;
-    double g1scalevis = 0.0;
+    // ------------------------------------------------------------------------
+    // Get Shower Energy Using New Method
+    const double SENTINEL = -9.9;
+    std::vector<double> gamma1_evis_v(5,SENTINEL); 
+    std::vector<double> gamma1_energy_v(5,SENTINEL); 
+    std::vector<double> gamma2_evis_v(5,SENTINEL); 
+    std::vector<double> gamma2_energy_v(5,SENTINEL); 
+    double g1energy = m_idHoughBlob->getBlobEnergyTime_New(m_Pi0Blob1, gamma1_evis_v, gamma1_energy_v);
+    double g2energy = m_idHoughBlob->getBlobEnergyTime_New(m_Pi0Blob2, gamma2_evis_v, gamma2_energy_v);
+    // ------------------------------------------------------------------------
 
-    double g2energy   = 0.0;
-    double g2trkrevis = 0.0;
-    double g2ecalevis = 0.0;
-    double g2hcalevis = 0.0;
-    double g2scalevis = 0.0;
-
-    double g1energy_New = 0.0;
-    double g2energy_New = 0.0;
-    double g1energy_New2 = 0.0;
-    double g2energy_New2 = 0.0;
+    
+    // ------------------------------------------------------------------------
+    // Get Energy Using Old Method
+    double g1energy_Old = 0.0;
+    double g2energy_Old = 0.0;
     double dummy_trkr = 0.0;
     double dummy_ecal = 0.0;
     double dummy_hcal = 0.0;
     double dummy_scal = 0.0;
-
-    // Get Energy Using Old Method
-    m_idHoughBlob->getBlobEnergyTime_Old( m_Pi0Blob1, g1energy, g1trkrevis, g1ecalevis, g1hcalevis, g1scalevis );
-    m_idHoughBlob->getBlobEnergyTime_Old( m_Pi0Blob2, g2energy, g2trkrevis, g2ecalevis, g2hcalevis, g2scalevis );
-
-    // Get Energy Using New Method 1
-    m_idHoughBlob->getBlobEnergyTime_New( m_Pi0Blob1, g1energy_New, dummy_trkr, dummy_ecal, dummy_hcal, dummy_scal );
-    m_idHoughBlob->getBlobEnergyTime_New( m_Pi0Blob2, g2energy_New, dummy_trkr, dummy_ecal, dummy_hcal, dummy_scal );
-
-    // Get Energy Using New Method 1
-    m_idHoughBlob->getBlobEnergyTime_New2( m_Pi0Blob1, g1energy_New2, dummy_trkr, dummy_ecal, dummy_hcal, dummy_scal );
-    m_idHoughBlob->getBlobEnergyTime_New2( m_Pi0Blob2, g2energy_New2, dummy_trkr, dummy_ecal, dummy_hcal, dummy_scal );
+    m_idHoughBlob->getBlobEnergyTime_Old( m_Pi0Blob1, g1energy_Old, dummy_trkr, dummy_ecal, dummy_hcal, dummy_scal );
+    m_idHoughBlob->getBlobEnergyTime_Old( m_Pi0Blob2, g2energy_Old, dummy_trkr, dummy_ecal, dummy_hcal, dummy_scal );
+    // ------------------------------------------------------------------------
+    
 
     // Make sure Gamma1 is the more energetic one 
     if (g2energy > g1energy) {
@@ -3006,14 +3031,12 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
 
     debug()<<" ------------------------------------ "<<endmsg;
     debug()<<"Gamma 1 Energy:"<<endmsg;
-    debug()<<"  Old = "<<g1energy<<endmsg; 
-    debug()<<"  New = "<<g1energy_New<<endmsg; 
-    debug()<<"  New2 = "<<g1energy_New2<<endmsg; 
+    debug()<<"  New = "<<g1energy<<endmsg; 
+    debug()<<"  Old = "<<g1energy_Old<<endmsg; 
 
     debug()<<"Gamma 2 Energy:"<<endmsg;
-    debug()<<"  Old = "<<g2energy<<endmsg; 
-    debug()<<"  New = "<<g2energy_New<<endmsg; 
-    debug()<<"  New2 = "<<g2energy_New2<<endmsg; 
+    debug()<<"  New = "<<g2energy<<endmsg; 
+    debug()<<"  Old = "<<g2energy_Old<<endmsg; 
     debug()<<" ------------------------------------ "<<endmsg;
 
     // Get Blob Time
@@ -3090,8 +3113,7 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
 
     // Calculate invariant Mass of Pi0
     const double invMass = std::sqrt(2*g1energy*g2energy*(1-cos_openingAngle));
-    const double invMass_New = std::sqrt(2*g1energy_New*g2energy_New*(1-cos_openingAngle));
-    const double invMass_New2 = std::sqrt(2*g1energy_New2*g2energy_New2*(1-cos_openingAngle));
+    const double invMass_Old = std::sqrt(2*g1energy_Old*g2energy_Old*(1-cos_openingAngle));
 
     // Set Pi0 4 - Momentum
     m_pi0_4P.SetPxPyPzE(pimom.x(),pimom.y(),pimom.z(),pi0_E);
@@ -3108,8 +3130,7 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     nuInt->setDoubleData("pi0_openingAngle", openingAngle);
     nuInt->setDoubleData("pi0_cos_openingAngle", cos_openingAngle );
     nuInt->setDoubleData("pi0_invMass", invMass);
-    nuInt->setDoubleData("pi0_invMass_New", invMass_New);
-    nuInt->setDoubleData("pi0_invMass_New2", invMass_New2);
+    nuInt->setDoubleData("pi0_invMass_Old", invMass_Old);
     nuInt->setDoubleData("pi0_px" ,pimom.Px());
     nuInt->setDoubleData("pi0_py", pimom.Py());
     nuInt->setDoubleData("pi0_pz", pimom.Pz());
@@ -3126,8 +3147,7 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     nuInt->setDoubleData("gamma1_py", g1mom.Py());
     nuInt->setDoubleData("gamma1_pz", g1mom.Pz());
     nuInt->setDoubleData("gamma1_E", g1energy);
-    nuInt->setDoubleData("gamma1_E_New", g1energy_New);
-    nuInt->setDoubleData("gamma1_E_New2", g1energy_New2);
+    nuInt->setDoubleData("gamma1_E_Old", g1energy_Old);
     nuInt->setDoubleData("gamma1_P", g1mom.Mag());
     nuInt->setDoubleData("gamma1_theta", gamma1_theta);
     nuInt->setDoubleData("gamma1_phi",  gamma1_phi);
@@ -3136,18 +3156,23 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     nuInt->setDoubleData("gamma1_dist_vtx",gamma1_dist_vtx);
     nuInt->setContainerDoubleData("gamma1_direction", direc_1 );
     nuInt->setContainerDoubleData("gamma1_vertex", position1 );
-    nuInt->setDoubleData("gamma1_evis_trkr", g1trkrevis);
-    nuInt->setDoubleData("gamma1_evis_ecal", g1ecalevis);
-    nuInt->setDoubleData("gamma1_evis_hcal", g1hcalevis);
-    nuInt->setDoubleData("gamma1_evis_scal", g1scalevis);
+    nuInt->setDoubleData("gamma1_evis_trkr", gamma1_evis_v[0]);
+    nuInt->setDoubleData("gamma1_evis_ecal", gamma1_evis_v[1]);
+    nuInt->setDoubleData("gamma1_evis_scal_X", gamma1_evis_v[2]);
+    nuInt->setDoubleData("gamma1_evis_scal_UV", gamma1_evis_v[3]);
+    nuInt->setDoubleData("gamma1_evis_hcal", gamma1_evis_v[4]);
+    nuInt->setDoubleData("gamma1_energy_trkr", gamma1_energy_v[0]);
+    nuInt->setDoubleData("gamma1_energy_ecal", gamma1_energy_v[1]);
+    nuInt->setDoubleData("gamma1_energy_scal_X", gamma1_energy_v[2]);
+    nuInt->setDoubleData("gamma1_energy_scal_UV", gamma1_energy_v[3]);
+    nuInt->setDoubleData("gamma1_energy_hcal", gamma1_energy_v[4]);
 
     // Gamma2 Information
     nuInt->setDoubleData("gamma2_px", g2mom.Px());
     nuInt->setDoubleData("gamma2_py", g2mom.Py());
     nuInt->setDoubleData("gamma2_pz", g2mom.Pz());
     nuInt->setDoubleData("gamma2_E", g2energy);
-    nuInt->setDoubleData("gamma2_E_New", g2energy_New);
-    nuInt->setDoubleData("gamma2_E_New2", g2energy_New2);
+    nuInt->setDoubleData("gamma2_E_Old", g2energy_Old);
     nuInt->setDoubleData("gamma2_P", g2mom.Mag());
     nuInt->setDoubleData("gamma2_theta", gamma2_theta);
     nuInt->setDoubleData("gamma2_phi",  gamma2_phi);
@@ -3156,10 +3181,16 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     nuInt->setDoubleData("gamma2_dist_vtx", gamma2_dist_vtx);
     nuInt->setContainerDoubleData("gamma2_direction", direc_2 );
     nuInt->setContainerDoubleData("gamma2_vertex", position2 );
-    nuInt->setDoubleData("gamma2_evis_trkr", g2trkrevis);
-    nuInt->setDoubleData("gamma2_evis_ecal", g2ecalevis);
-    nuInt->setDoubleData("gamma2_evis_hcal", g2hcalevis);
-    nuInt->setDoubleData("gamma2_evis_scal", g2scalevis);
+    nuInt->setDoubleData("gamma2_evis_trkr", gamma2_evis_v[0]);
+    nuInt->setDoubleData("gamma2_evis_ecal", gamma2_evis_v[1]);
+    nuInt->setDoubleData("gamma2_evis_scal_X", gamma2_evis_v[2]);
+    nuInt->setDoubleData("gamma2_evis_scal_UV", gamma2_evis_v[3]);
+    nuInt->setDoubleData("gamma2_evis_hcal", gamma2_evis_v[4]);
+    nuInt->setDoubleData("gamma2_energy_trkr", gamma2_energy_v[0]);
+    nuInt->setDoubleData("gamma2_energy_ecal", gamma2_energy_v[1]);
+    nuInt->setDoubleData("gamma2_energy_scal_X", gamma2_energy_v[2]);
+    nuInt->setDoubleData("gamma2_energy_scal_UV", gamma2_energy_v[3]);
+    nuInt->setDoubleData("gamma2_energy_hcal", gamma2_energy_v[4]);
 
     return true;
 }
@@ -3835,6 +3866,8 @@ void CCProtonPi0::setBlobData(Minerva::PhysicsEvent* event, Minerva::GenMinInter
         SaveTruthClusterEnergy_FoundBlobs(event, truthEvent);
         SaveBlobDigitEnergy(event, m_Pi0Blob1, 1);
         SaveBlobDigitEnergy(event, m_Pi0Blob2, 2);
+        SaveBlobTrueEvisBySubDetector(event, m_Pi0Blob1, 1);
+        SaveBlobTrueEvisBySubDetector(event, m_Pi0Blob2, 2);
     }
 }
 
@@ -5795,6 +5828,180 @@ void CCProtonPi0::SaveBlobDigitEnergy(Minerva::PhysicsEvent *event, Minerva::IDB
     }
 }
 
+bool CCProtonPi0::isHitInsideSCAL(double x, double y, double z) const
+{
+    // All distances in mm
+    double trkr_zMin = 5810.0; 
+    double trkr_zMax = 8590.0; 
+    double trkr_ApothemMax = 920.0;
+    double scal_ApothemMax = 1070.0;
+
+    bool isInsideTracker = FiducialPointTool->isFiducial(x,y,z, trkr_ApothemMax, trkr_zMin, trkr_zMax); 
+    if (isInsideTracker){ 
+        return false;
+    }else{
+        return FiducialPointTool->isFiducial(x,y,z, scal_ApothemMax, trkr_zMin, trkr_zMax); 
+    }
+}
+
+void CCProtonPi0::SaveBlobTrueEvisBySubDetector(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const
+{
+    const SmartRefVector<Minerva::IDCluster>& clusters = blob->clusters();
+    SmartRefVector<Minerva::IDCluster>::const_iterator c;
+    SmartRefVector<Minerva::IDDigit>::const_iterator d;
+
+    // True Evis by Subdetector
+    double trkr_true_evis = 0;
+    double scal_true_evis = 0;
+    double ecal_true_evis = 0;
+    double hcal_true_evis = 0;
+
+    // nHits on Tracker or Side ECAL
+    double center_nHits_all = 0;
+    double center_nHits_trkr = 0;
+    double center_nHits_scal = 0;
+
+    double side_nHits_all = 0;
+    double side_nHits_trkr = 0;
+    double side_nHits_scal = 0;
+
+    // Loop over all Clusters
+    for (c = clusters.begin(); c != clusters.end(); ++c) {
+
+        const double cluster_energy = (*c)->energy();
+
+        // Tracker & Side ECAL
+        if ( (*c)->subdet() == Minerva::IDCluster::Tracker ){
+
+            //const SmartRefVector<Minerva::IDDigit>& allDigits = (*c)->digits();
+            const SmartRefVector<Minerva::IDDigit>& centerDigits = (*c)->centralDigits();
+            const SmartRefVector<Minerva::IDDigit>& sideDigits = (*c)->sideEcalDigits();
+
+            // Loop over ID Digits
+            for(d = centerDigits.begin(); d != centerDigits.end(); ++d){
+
+                // Get mcdigit
+                const Minerva::IDDigit* digit = *d;
+                const Minerva::MCIDDigit* mcdigit = dynamic_cast<const Minerva::MCIDDigit*>(digit);
+
+                // Check mcdigit
+                if (!mcdigit) continue;
+
+                // Get Hits from mcdigit
+                const SmartRefVector<Minerva::MCHit>& hits = mcdigit->hits();
+                if (hits.empty()) continue;
+                SmartRefVector<Minerva::MCHit>::const_iterator h;
+                // Loop Over all MCHits
+                for ( h = hits.begin(); h != hits.end(); ++h){
+                    // Get Hit Position (x,y,z)
+                    double x = (*h)->StopX();    
+                    double y = (*h)->StopY();    
+                    double z = (*h)->StopZ(); 
+
+                    // Get Hit Visible Energy
+                    double hit_E = (*h)->energy();
+                    
+                    center_nHits_all++;
+                    if ( isHitInsideSCAL(x,y,z) ) {
+                        center_nHits_scal++;
+                        scal_true_evis += hit_E;
+                    }else{ 
+                        center_nHits_trkr++;
+                        trkr_true_evis += hit_E;
+                    }
+                }
+            }
+
+            // Loop over Side Digits
+            for(d = sideDigits.begin(); d != sideDigits.end(); ++d){
+
+                // Get mcdigit
+                const Minerva::IDDigit* digit = *d;
+                const Minerva::MCIDDigit* mcdigit = dynamic_cast<const Minerva::MCIDDigit*>(digit);
+
+                // Check mcdigit
+                if (!mcdigit) continue;
+
+                // Get Hits from mcdigit
+                const SmartRefVector<Minerva::MCHit>& hits = mcdigit->hits();
+                if (hits.empty()) continue;
+                SmartRefVector<Minerva::MCHit>::const_iterator h;
+                // Loop Over all MCHits
+                for ( h = hits.begin(); h != hits.end(); ++h){
+                    // Get Hit Position (x,y,z)
+                    double x = (*h)->StopX();    
+                    double y = (*h)->StopY();    
+                    double z = (*h)->StopZ(); 
+
+                    // Get Hit Visible Energy
+                    double hit_E = (*h)->energy();
+
+                    side_nHits_all++;
+                    if ( isHitInsideSCAL(x,y,z) ) {
+                        side_nHits_scal++;
+                        scal_true_evis += hit_E;
+                    }else{ 
+                        side_nHits_trkr++;
+                        trkr_true_evis += hit_E;
+                    }
+                }
+            } 
+        }
+
+        // Downstream ECAL
+        if ( (*c)->subdet() == Minerva::IDCluster::ECAL ){ 
+            ecal_true_evis += cluster_energy;
+        }
+        
+        // HCAL
+        if ( (*c)->subdet() == Minerva::IDCluster::HCAL ){ 
+            hcal_true_evis += cluster_energy;
+        }
+    
+    } 
+    
+    debug()<<"Blob True Evis by SubDetector"<<endmsg;
+    debug()<<"trkr_true_evis = "<<trkr_true_evis<<endmsg;
+    debug()<<"scal_true_evis = "<<scal_true_evis<<endmsg;
+    debug()<<"ecal_true_evis = "<<ecal_true_evis<<endmsg;
+    debug()<<"hcal_true_evis = "<<hcal_true_evis<<endmsg;
+
+    debug()<<"Tracker Hit Distribution"<<endmsg;
+    debug()<<"center_nHits_all = "<<center_nHits_all<<endmsg;
+    debug()<<"center_nHits_trkr = "<<center_nHits_trkr<<endmsg;
+    debug()<<"center_nHits_scal = "<<center_nHits_scal<<endmsg;
+    debug()<<"side_nHits_all = "<<side_nHits_all<<endmsg;
+    debug()<<"side_nHits_trkr = "<<side_nHits_trkr<<endmsg;
+    debug()<<"side_nHits_scal = "<<side_nHits_scal<<endmsg;
+
+    if (blobID == 1){
+        event->setDoubleData("gamma1_trkr_true_evis", trkr_true_evis);
+        event->setDoubleData("gamma1_scal_true_evis", scal_true_evis);
+        event->setDoubleData("gamma1_ecal_true_evis", ecal_true_evis);
+        event->setDoubleData("gamma1_hcal_true_evis", hcal_true_evis);
+        
+        event->setDoubleData("gamma1_center_nHits_all", center_nHits_all);
+        event->setDoubleData("gamma1_center_nHits_trkr", center_nHits_trkr);
+        event->setDoubleData("gamma1_center_nHits_scal", center_nHits_scal);
+        event->setDoubleData("gamma1_side_nHits_all", side_nHits_all);
+        event->setDoubleData("gamma1_side_nHits_trkr", side_nHits_trkr);
+        event->setDoubleData("gamma1_side_nHits_scal", side_nHits_scal);
+    }else{
+        event->setDoubleData("gamma2_trkr_true_evis", trkr_true_evis);
+        event->setDoubleData("gamma2_scal_true_evis", scal_true_evis);
+        event->setDoubleData("gamma2_ecal_true_evis", ecal_true_evis);
+        event->setDoubleData("gamma2_hcal_true_evis", hcal_true_evis);
+        
+        event->setDoubleData("gamma2_center_nHits_all", center_nHits_all);
+        event->setDoubleData("gamma2_center_nHits_trkr", center_nHits_trkr);
+        event->setDoubleData("gamma2_center_nHits_scal", center_nHits_scal);
+        event->setDoubleData("gamma2_side_nHits_all", side_nHits_all);
+        event->setDoubleData("gamma2_side_nHits_trkr", side_nHits_trkr);
+        event->setDoubleData("gamma2_side_nHits_scal", side_nHits_scal);
+    }
+
+}
 
 #endif
+
 

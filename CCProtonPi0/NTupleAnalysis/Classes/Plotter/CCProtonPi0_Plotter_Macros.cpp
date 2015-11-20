@@ -25,13 +25,17 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     TFile* f_mc = new TFile(rootDir_mc.c_str());
   
     std::string var;
-    
+
     // ------------------------------------------------------------------------
     // Get Data Histogram
     // ------------------------------------------------------------------------
     var = Form("%s_%d",var_name.c_str(),0);
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
 
+    // Area Normalization according to ALL MC Events
+    MnvH1D* mc_all = (MnvH1D*)f_mc->Get(var.c_str()); 
+    double ratio_all = mc_all->GetAreaNormFactor(data);
+    
     // ------------------------------------------------------------------------
     // Fill TObjArray - For MC Histograms
     // ------------------------------------------------------------------------
@@ -43,7 +47,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Background");
     mc_hists->Add(temp);
-    
+
     // Get Signal
     var = Form("%s_%d",var_name.c_str(),1);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
@@ -56,13 +60,13 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
     ApplyStyle(plotter);
-    plotter->DrawDataStackedMC(data,mc_hists,POT_Ratio_data_mc ,"TR","Data",2,1);
+    plotter->DrawDataStackedMC(data,mc_hists,ratio_all,"TR","Data",2,1);
    
     // Add Plot Labels
     const double y_pos = 0.88;
     const double y_diff = 0.033;
-    plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
-    plotter->AddPOTNormBox(data_POT,mc_POT,0.3,y_pos-y_diff);
+    //plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
+    plotter->AddAreaNormBox(1.0,ratio_all,0.3,y_pos-y_diff);
     
     // If Cut Histogram - Add Cut Arrows
     if (nCutArrows == 1){
@@ -76,8 +80,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
             var_name.compare("hCut_2Track_pi0invMass") == 0 ||
             var_name.compare("invMass") == 0 ||
-            var_name.compare("invMass2") == 0 ||
-            var_name.compare("invMass3") == 0) {
+            var_name.compare("invMass_Old") == 0) {
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
         pi0Mass.SetLineColor(kBlue);
@@ -340,18 +343,32 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
 
+    // Area Normalization Factor
+    double ratio = mc->GetAreaNormFactor(data);
+
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
 
     // Plot
-    plotter->DrawDataMC(data, mc, POT_Ratio_data_mc, "TR", false);
+    plotter->DrawDataMC(data, mc, ratio, "TR", false);
 
     // Add Plot Labels
     const double y_pos = 0.88;
     const double y_diff = 0.033;
-    plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
-    plotter->AddPOTNormBox(data_POT,mc_POT,0.3,y_pos-y_diff);
-    
+    //plotter->AddPlotLabel("Playlist: All LE",0.3,y_pos,y_diff,kBlue);
+    plotter->AddAreaNormBox(1.0,ratio,0.3,y_pos-y_diff);
+   
+    // Add Pi0 InvMass Line
+    if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
+            var_name.compare("hCut_2Track_pi0invMass") == 0 ||
+            var_name.compare("invMass") == 0 ||
+            var_name.compare("invMass_Old") == 0) {
+        TLine pi0Mass;
+        pi0Mass.SetLineWidth(2);
+        pi0Mass.SetLineColor(kBlue);
+        pi0Mass.DrawLine(134.98,0,134.98,3200);
+    }
+
     // Print Plot
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
 
@@ -463,7 +480,7 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
             }
         }
     }
-
+  
     // Pad
     TPad *p = new TPad("p","p",0.05,0.05,0.95,0.95);
     p->Draw();
@@ -472,7 +489,15 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
     hist2D->GetYaxis()->SetTitleOffset(1.8);
     hist2D->Draw("colz");
     gPad->Update();
-   
+  
+    double line_min = hist2D->GetXaxis()->GetBinLowEdge(1);
+    double line_max = hist2D->GetXaxis()->GetBinLowEdge(nBinsX);
+    TLine xy;
+    xy.SetLineWidth(2);
+    xy.SetLineColor(kMagenta);
+    xy.DrawLine(line_min,line_min,line_max,line_max);
+
+
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
     
     delete p;
@@ -547,8 +572,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
             var_name.compare("hCut_2Track_pi0invMass") == 0 ||
             var_name.compare("invMass") == 0 || 
-            var_name.compare("invMass2") == 0 ||
-            var_name.compare("invMass3") == 0 ) {
+            var_name.compare("invMass_Old") == 0 ) {
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
         pi0Mass.SetLineColor(kBlue);
@@ -729,6 +753,17 @@ double CCProtonPi0_Plotter::CalcExpectedValue(rootDir& dir, std::string var_name
     std::cout<<var_name<<" Expected Value = "<<expectedValue<<std::endl;
 
     return expectedValue;
+}
+
+
+double CCProtonPi0_Plotter::GetAreaNormalizeRatio(TH1* h_mc, TH1* h_data)
+{
+    double mc_area = h_mc->ComputeIntegral();
+    double data_area = h_data->ComputeIntegral();
+    
+    double ratio = data_area / mc_area;
+
+    return ratio;
 }
 
 #endif

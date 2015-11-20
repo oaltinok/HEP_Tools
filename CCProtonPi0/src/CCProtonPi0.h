@@ -311,6 +311,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int GetMCHitPDG(const SmartRef<Minerva::MCHit> mc_hit) const;
         int GetDigitPDG(const Minerva::MCIDDigit* mcdigit) const;
         int GetPDGfromVector(std::vector<int> &all_pdg) const;
+        bool isHitInsideSCAL(double x, double y, double z) const;
+        void SaveBlobTrueEvisBySubDetector(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
 };
 
 #endif // CCPROTONPI0_H 

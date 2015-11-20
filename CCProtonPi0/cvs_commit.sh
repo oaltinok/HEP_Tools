@@ -1,23 +1,15 @@
-cvs commit -m "v2_39
+cvs commit -m "v2_40
 CCProtonPi0 Updates:
-	Pi0 Shower Energy Study
-		In addition to old energy calculation implemented 2 new ones
-		Method 1:
-			new kT: from fit
-			new kE: from fit
-			same kS andkH
-		Method 2:
-			new kT: from fit
-			new kE: from fit
-			new kS: 
-				Sort Clusters in Increasing Z position
-				After the first SideECAL Hit, assume all other Tracker hits are in Side ECAL
-				Use actual kE to calculate Calorimetric Energy
-			same kH
-			
+	m_store_all_events is FALSE by default --  (FALSE in options file also)	
+	Gamma Energy is calculated with New Method
+		Saving Gamma Energy for each sub detector
+		Saving Gamma Visible Energy for each sub detectors
+	Study for EM Shower Energy Improved
+		Checking many more parameters
+		These parameters will be removed
+ 
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Pi0 Shower Energy Study
-		New Functions & Histograms for the study
-		Will remove these functions & histograms after the study
-	New script to submit <<All LE Data>> at once" .
+	Area Normalized Plots for Data vs MC
+	New Histograms and Functions for EM Shower Energy Study
+		These are temporary" .

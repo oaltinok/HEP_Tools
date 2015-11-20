@@ -25,7 +25,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     particleScoreDiff.setBin(100,-1.0,1.0);
     particleStatus.setBin(17,-1,16);
     multiplicity.setBin(10,0.0,10.0);
-    fraction.setBin(30,0,1.5);
+    fraction.setBin(11,0,1.1);
     fraction2.setBin(200,-0.5,1.5);
     vertex_z.setBin(114,4300.0,10000.0);
     vertex_x_y.setBin(200,-1000.0,1000.0);

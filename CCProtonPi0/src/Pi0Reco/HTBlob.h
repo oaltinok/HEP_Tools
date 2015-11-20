@@ -66,8 +66,7 @@ class HTBlob: public MinervaHistoTool, virtual public IHoughBlob {
     StatusCode isPhoton( SmartRefVector<Minerva::IDCluster> Seed, Gaudi::XYZPoint vtX ) const;
     
     void getBlobEnergyTime_Old( Minerva::IDBlob *idblob, double &energy, double& tracker_evis,double& ecal_evis, double& hcal_evis, double& scal_evis) const;
-    void getBlobEnergyTime_New( Minerva::IDBlob *idblob, double &energy, double& tracker_evis,double& ecal_evis, double& hcal_evis, double& scal_evis) const;
-    void getBlobEnergyTime_New2( Minerva::IDBlob *idblob, double &energy, double& tracker_evis,double& ecal_evis, double& hcal_evis, double& scal_evis) const;
+    double getBlobEnergyTime_New( Minerva::IDBlob *idblob, std::vector<double>& evis_v, std::vector<double>& energy_v) const;
     
     StatusCode invariantMass( Minerva::IDBlob* idblob1, Minerva::IDBlob* idblob2, double &mass, Gaudi::XYZPoint vert ) const;
 
@@ -84,19 +83,15 @@ class HTBlob: public MinervaHistoTool, virtual public IHoughBlob {
     double m_minDistanceModulePhoton;
     
     // calibration constants
-    double m_scalefactor;
-    double m_calibrationTracker;
-    double m_calibrationECal;
-    double m_calibrationHCal;
+    double m_kT;
     double m_kE;
-    double m_kE_Side;
+    double m_kS_X;
+    double m_kS_UV;
     double m_kH;
-
-
+    
     StatusCode FinddEdxPlanes(TH1D *h, int &index, double &dEdx) const;
     double get_kT(double evis) const;
-    double getCalorimetricEnergy(double evis_tracker, double evis_scal_X, double evis_scal_UV, double evis_ecal, double evis_hcal) const;
-    double getCalorimetricEnergy(double evis_tracker, double evis_scal, double evis_ecal, double evis_hcal) const;
+    double getShowerEnergy(std::vector<double>& evis_v, std::vector<double>& energy_v) const;
    
 };
 

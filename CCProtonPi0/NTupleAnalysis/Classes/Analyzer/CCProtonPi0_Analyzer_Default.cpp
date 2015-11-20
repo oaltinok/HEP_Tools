@@ -42,7 +42,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
 
     // Set branch addresses and branch pointers
     fChain->SetMakeClass(1);
-
     fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
     fChain->SetBranchAddress("physEvtNum", &physEvtNum, &b_physEvtNum);
     fChain->SetBranchAddress("n_hyps", &n_hyps, &b_n_hyps);
@@ -150,8 +149,28 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("g2dedx_total1", &g2dedx_total1, &b_g2dedx_total1);
     fChain->SetBranchAddress("gamma1_blob_energy", &gamma1_blob_energy, &b_gamma1_blob_energy);
     fChain->SetBranchAddress("gamma1_blob_minsep", &gamma1_blob_minsep, &b_gamma1_blob_minsep);
+    fChain->SetBranchAddress("gamma1_center_nHits_all", &gamma1_center_nHits_all, &b_gamma1_center_nHits_all);
+    fChain->SetBranchAddress("gamma1_center_nHits_scal", &gamma1_center_nHits_scal, &b_gamma1_center_nHits_scal);
+    fChain->SetBranchAddress("gamma1_center_nHits_trkr", &gamma1_center_nHits_trkr, &b_gamma1_center_nHits_trkr);
+    fChain->SetBranchAddress("gamma1_ecal_true_evis", &gamma1_ecal_true_evis, &b_gamma1_ecal_true_evis);
+    fChain->SetBranchAddress("gamma1_hcal_true_evis", &gamma1_hcal_true_evis, &b_gamma1_hcal_true_evis);
+    fChain->SetBranchAddress("gamma1_scal_true_evis", &gamma1_scal_true_evis, &b_gamma1_scal_true_evis);
+    fChain->SetBranchAddress("gamma1_side_nHits_all", &gamma1_side_nHits_all, &b_gamma1_side_nHits_all);
+    fChain->SetBranchAddress("gamma1_side_nHits_scal", &gamma1_side_nHits_scal, &b_gamma1_side_nHits_scal);
+    fChain->SetBranchAddress("gamma1_side_nHits_trkr", &gamma1_side_nHits_trkr, &b_gamma1_side_nHits_trkr);
+    fChain->SetBranchAddress("gamma1_trkr_true_evis", &gamma1_trkr_true_evis, &b_gamma1_trkr_true_evis);
     fChain->SetBranchAddress("gamma2_blob_energy", &gamma2_blob_energy, &b_gamma2_blob_energy);
     fChain->SetBranchAddress("gamma2_blob_minsep", &gamma2_blob_minsep, &b_gamma2_blob_minsep);
+    fChain->SetBranchAddress("gamma2_center_nHits_all", &gamma2_center_nHits_all, &b_gamma2_center_nHits_all);
+    fChain->SetBranchAddress("gamma2_center_nHits_scal", &gamma2_center_nHits_scal, &b_gamma2_center_nHits_scal);
+    fChain->SetBranchAddress("gamma2_center_nHits_trkr", &gamma2_center_nHits_trkr, &b_gamma2_center_nHits_trkr);
+    fChain->SetBranchAddress("gamma2_ecal_true_evis", &gamma2_ecal_true_evis, &b_gamma2_ecal_true_evis);
+    fChain->SetBranchAddress("gamma2_hcal_true_evis", &gamma2_hcal_true_evis, &b_gamma2_hcal_true_evis);
+    fChain->SetBranchAddress("gamma2_scal_true_evis", &gamma2_scal_true_evis, &b_gamma2_scal_true_evis);
+    fChain->SetBranchAddress("gamma2_side_nHits_all", &gamma2_side_nHits_all, &b_gamma2_side_nHits_all);
+    fChain->SetBranchAddress("gamma2_side_nHits_scal", &gamma2_side_nHits_scal, &b_gamma2_side_nHits_scal);
+    fChain->SetBranchAddress("gamma2_side_nHits_trkr", &gamma2_side_nHits_trkr, &b_gamma2_side_nHits_trkr);
+    fChain->SetBranchAddress("gamma2_trkr_true_evis", &gamma2_trkr_true_evis, &b_gamma2_trkr_true_evis);
     fChain->SetBranchAddress("hadronVisibleE", &hadronVisibleE, &b_hadronVisibleE);
     fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);
     fChain->SetBranchAddress("michelProng_distance", &michelProng_distance, &b_michelProng_distance);
@@ -450,14 +469,19 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("CCProtonPi0_endMuonTrajYPosition", &CCProtonPi0_endMuonTrajYPosition, &b_CCProtonPi0_endMuonTrajYPosition);
     fChain->SetBranchAddress("CCProtonPi0_endMuonTrajZPosition", &CCProtonPi0_endMuonTrajZPosition, &b_CCProtonPi0_endMuonTrajZPosition);
     fChain->SetBranchAddress("CCProtonPi0_gamma1_E", &CCProtonPi0_gamma1_E, &b_CCProtonPi0_gamma1_E);
-    fChain->SetBranchAddress("CCProtonPi0_gamma1_E_New", &CCProtonPi0_gamma1_E_New, &b_CCProtonPi0_gamma1_E_New);
-    fChain->SetBranchAddress("CCProtonPi0_gamma1_E_New2", &CCProtonPi0_gamma1_E_New2, &b_CCProtonPi0_gamma1_E_New2);
+    fChain->SetBranchAddress("CCProtonPi0_gamma1_E_Old", &CCProtonPi0_gamma1_E_Old, &b_CCProtonPi0_gamma1_E_Old);
     fChain->SetBranchAddress("CCProtonPi0_gamma1_P", &CCProtonPi0_gamma1_P, &b_CCProtonPi0_gamma1_P);
     fChain->SetBranchAddress("CCProtonPi0_gamma1_dEdx", &CCProtonPi0_gamma1_dEdx, &b_CCProtonPi0_gamma1_dEdx);
     fChain->SetBranchAddress("CCProtonPi0_gamma1_dist_vtx", &CCProtonPi0_gamma1_dist_vtx, &b_CCProtonPi0_gamma1_dist_vtx);
+    fChain->SetBranchAddress("CCProtonPi0_gamma1_energy_ecal", &CCProtonPi0_gamma1_energy_ecal, &b_CCProtonPi0_gamma1_energy_ecal);
+    fChain->SetBranchAddress("CCProtonPi0_gamma1_energy_hcal", &CCProtonPi0_gamma1_energy_hcal, &b_CCProtonPi0_gamma1_energy_hcal);
+    fChain->SetBranchAddress("CCProtonPi0_gamma1_energy_scal_UV", &CCProtonPi0_gamma1_energy_scal_UV, &b_CCProtonPi0_gamma1_energy_scal_UV);
+    fChain->SetBranchAddress("CCProtonPi0_gamma1_energy_scal_X", &CCProtonPi0_gamma1_energy_scal_X, &b_CCProtonPi0_gamma1_energy_scal_X);
+    fChain->SetBranchAddress("CCProtonPi0_gamma1_energy_trkr", &CCProtonPi0_gamma1_energy_trkr, &b_CCProtonPi0_gamma1_energy_trkr);
     fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_ecal", &CCProtonPi0_gamma1_evis_ecal, &b_CCProtonPi0_gamma1_evis_ecal);
     fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_hcal", &CCProtonPi0_gamma1_evis_hcal, &b_CCProtonPi0_gamma1_evis_hcal);
-    fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_scal", &CCProtonPi0_gamma1_evis_scal, &b_CCProtonPi0_gamma1_evis_scal);
+    fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_scal_UV", &CCProtonPi0_gamma1_evis_scal_UV, &b_CCProtonPi0_gamma1_evis_scal_UV);
+    fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_scal_X", &CCProtonPi0_gamma1_evis_scal_X, &b_CCProtonPi0_gamma1_evis_scal_X);
     fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_trkr", &CCProtonPi0_gamma1_evis_trkr, &b_CCProtonPi0_gamma1_evis_trkr);
     fChain->SetBranchAddress("CCProtonPi0_gamma1_phi", &CCProtonPi0_gamma1_phi, &b_CCProtonPi0_gamma1_phi);
     fChain->SetBranchAddress("CCProtonPi0_gamma1_px", &CCProtonPi0_gamma1_px, &b_CCProtonPi0_gamma1_px);
@@ -466,14 +490,19 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("CCProtonPi0_gamma1_theta", &CCProtonPi0_gamma1_theta, &b_CCProtonPi0_gamma1_theta);
     fChain->SetBranchAddress("CCProtonPi0_gamma1_time", &CCProtonPi0_gamma1_time, &b_CCProtonPi0_gamma1_time);
     fChain->SetBranchAddress("CCProtonPi0_gamma2_E", &CCProtonPi0_gamma2_E, &b_CCProtonPi0_gamma2_E);
-    fChain->SetBranchAddress("CCProtonPi0_gamma2_E_New", &CCProtonPi0_gamma2_E_New, &b_CCProtonPi0_gamma2_E_New);
-    fChain->SetBranchAddress("CCProtonPi0_gamma2_E_New2", &CCProtonPi0_gamma2_E_New2, &b_CCProtonPi0_gamma2_E_New2);
+    fChain->SetBranchAddress("CCProtonPi0_gamma2_E_Old", &CCProtonPi0_gamma2_E_Old, &b_CCProtonPi0_gamma2_E_Old);
     fChain->SetBranchAddress("CCProtonPi0_gamma2_P", &CCProtonPi0_gamma2_P, &b_CCProtonPi0_gamma2_P);
     fChain->SetBranchAddress("CCProtonPi0_gamma2_dEdx", &CCProtonPi0_gamma2_dEdx, &b_CCProtonPi0_gamma2_dEdx);
     fChain->SetBranchAddress("CCProtonPi0_gamma2_dist_vtx", &CCProtonPi0_gamma2_dist_vtx, &b_CCProtonPi0_gamma2_dist_vtx);
+    fChain->SetBranchAddress("CCProtonPi0_gamma2_energy_ecal", &CCProtonPi0_gamma2_energy_ecal, &b_CCProtonPi0_gamma2_energy_ecal);
+    fChain->SetBranchAddress("CCProtonPi0_gamma2_energy_hcal", &CCProtonPi0_gamma2_energy_hcal, &b_CCProtonPi0_gamma2_energy_hcal);
+    fChain->SetBranchAddress("CCProtonPi0_gamma2_energy_scal_UV", &CCProtonPi0_gamma2_energy_scal_UV, &b_CCProtonPi0_gamma2_energy_scal_UV);
+    fChain->SetBranchAddress("CCProtonPi0_gamma2_energy_scal_X", &CCProtonPi0_gamma2_energy_scal_X, &b_CCProtonPi0_gamma2_energy_scal_X);
+    fChain->SetBranchAddress("CCProtonPi0_gamma2_energy_trkr", &CCProtonPi0_gamma2_energy_trkr, &b_CCProtonPi0_gamma2_energy_trkr);
     fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_ecal", &CCProtonPi0_gamma2_evis_ecal, &b_CCProtonPi0_gamma2_evis_ecal);
     fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_hcal", &CCProtonPi0_gamma2_evis_hcal, &b_CCProtonPi0_gamma2_evis_hcal);
-    fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_scal", &CCProtonPi0_gamma2_evis_scal, &b_CCProtonPi0_gamma2_evis_scal);
+    fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_scal_UV", &CCProtonPi0_gamma2_evis_scal_UV, &b_CCProtonPi0_gamma2_evis_scal_UV);
+    fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_scal_X", &CCProtonPi0_gamma2_evis_scal_X, &b_CCProtonPi0_gamma2_evis_scal_X);
     fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_trkr", &CCProtonPi0_gamma2_evis_trkr, &b_CCProtonPi0_gamma2_evis_trkr);
     fChain->SetBranchAddress("CCProtonPi0_gamma2_phi", &CCProtonPi0_gamma2_phi, &b_CCProtonPi0_gamma2_phi);
     fChain->SetBranchAddress("CCProtonPi0_gamma2_px", &CCProtonPi0_gamma2_px, &b_CCProtonPi0_gamma2_px);
@@ -522,8 +551,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("CCProtonPi0_pi0_P", &CCProtonPi0_pi0_P, &b_CCProtonPi0_pi0_P);
     fChain->SetBranchAddress("CCProtonPi0_pi0_cos_openingAngle", &CCProtonPi0_pi0_cos_openingAngle, &b_CCProtonPi0_pi0_cos_openingAngle);
     fChain->SetBranchAddress("CCProtonPi0_pi0_invMass", &CCProtonPi0_pi0_invMass, &b_CCProtonPi0_pi0_invMass);
-    fChain->SetBranchAddress("CCProtonPi0_pi0_invMass_New", &CCProtonPi0_pi0_invMass_New, &b_CCProtonPi0_pi0_invMass_New);
-    fChain->SetBranchAddress("CCProtonPi0_pi0_invMass_New2", &CCProtonPi0_pi0_invMass_New2, &b_CCProtonPi0_pi0_invMass_New2);
+    fChain->SetBranchAddress("CCProtonPi0_pi0_invMass_Old", &CCProtonPi0_pi0_invMass_Old, &b_CCProtonPi0_pi0_invMass_Old);
     fChain->SetBranchAddress("CCProtonPi0_pi0_openingAngle", &CCProtonPi0_pi0_openingAngle, &b_CCProtonPi0_pi0_openingAngle);
     fChain->SetBranchAddress("CCProtonPi0_pi0_phi", &CCProtonPi0_pi0_phi, &b_CCProtonPi0_pi0_phi);
     fChain->SetBranchAddress("CCProtonPi0_pi0_px", &CCProtonPi0_pi0_px, &b_CCProtonPi0_pi0_px);
@@ -726,7 +754,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
     fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
     fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
-
 
 }
 

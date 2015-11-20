@@ -124,6 +124,7 @@ class CCProtonPi0_Plotter
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
 
         // Helper Functions
+        double GetAreaNormalizeRatio(TH1* h_mc, TH1* h_data);
         void ApplyStyle(MnvPlotter* plotter);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow);
         void SavePi0InvMassPoints();

@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Nov  2 09:55:53 2015 by ROOT version 5.34/05
+// Fri Nov 20 08:04:35 2015 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -129,8 +129,28 @@ public :
    Double_t        g2dedx_total1;
    Double_t        gamma1_blob_energy;
    Double_t        gamma1_blob_minsep;
+   Double_t        gamma1_center_nHits_all;
+   Double_t        gamma1_center_nHits_scal;
+   Double_t        gamma1_center_nHits_trkr;
+   Double_t        gamma1_ecal_true_evis;
+   Double_t        gamma1_hcal_true_evis;
+   Double_t        gamma1_scal_true_evis;
+   Double_t        gamma1_side_nHits_all;
+   Double_t        gamma1_side_nHits_scal;
+   Double_t        gamma1_side_nHits_trkr;
+   Double_t        gamma1_trkr_true_evis;
    Double_t        gamma2_blob_energy;
    Double_t        gamma2_blob_minsep;
+   Double_t        gamma2_center_nHits_all;
+   Double_t        gamma2_center_nHits_scal;
+   Double_t        gamma2_center_nHits_trkr;
+   Double_t        gamma2_ecal_true_evis;
+   Double_t        gamma2_hcal_true_evis;
+   Double_t        gamma2_scal_true_evis;
+   Double_t        gamma2_side_nHits_all;
+   Double_t        gamma2_side_nHits_scal;
+   Double_t        gamma2_side_nHits_trkr;
+   Double_t        gamma2_trkr_true_evis;
    Double_t        hadronVisibleE;
    Double_t        michelProng_begin_Z;
    Double_t        michelProng_distance;
@@ -168,7 +188,7 @@ public :
    Int_t           g2dedx_cluster_occupancy_sz;
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
    Int_t           nTracks_Secondary_Vtx_sz;
-   Int_t           nTracks_Secondary_Vtx[11];   //[nTracks_Secondary_Vtx_sz]
+   Int_t           nTracks_Secondary_Vtx[4];   //[nTracks_Secondary_Vtx_sz]
    Int_t           Vertex_energy_radii_sz;
    Double_t        Vertex_energy_radii[7];   //[Vertex_energy_radii_sz]
    Double_t        fit_vtx[3];
@@ -185,11 +205,11 @@ public :
    Int_t           gamma1_blob_muon_digit_E_sz;
    Double_t        gamma1_blob_muon_digit_E[215];   //[gamma1_blob_muon_digit_E_sz]
    Int_t           gamma1_blob_neutron_digit_E_sz;
-   Double_t        gamma1_blob_neutron_digit_E[218];   //[gamma1_blob_neutron_digit_E_sz]
+   Double_t        gamma1_blob_neutron_digit_E[184];   //[gamma1_blob_neutron_digit_E_sz]
    Int_t           gamma1_blob_pi0_digit_E_sz;
-   Double_t        gamma1_blob_pi0_digit_E[351];   //[gamma1_blob_pi0_digit_E_sz]
+   Double_t        gamma1_blob_pi0_digit_E[344];   //[gamma1_blob_pi0_digit_E_sz]
    Int_t           gamma1_blob_pi_digit_E_sz;
-   Double_t        gamma1_blob_pi_digit_E[290];   //[gamma1_blob_pi_digit_E_sz]
+   Double_t        gamma1_blob_pi_digit_E[282];   //[gamma1_blob_pi_digit_E_sz]
    Int_t           gamma1_blob_proton_digit_E_sz;
    Double_t        gamma1_blob_proton_digit_E[241];   //[gamma1_blob_proton_digit_E_sz]
    Int_t           gamma2_blob_all_digit_E_sz;
@@ -429,14 +449,19 @@ public :
    Double_t        CCProtonPi0_endMuonTrajYPosition;
    Double_t        CCProtonPi0_endMuonTrajZPosition;
    Double_t        CCProtonPi0_gamma1_E;
-   Double_t        CCProtonPi0_gamma1_E_New;
-   Double_t        CCProtonPi0_gamma1_E_New2;
+   Double_t        CCProtonPi0_gamma1_E_Old;
    Double_t        CCProtonPi0_gamma1_P;
    Double_t        CCProtonPi0_gamma1_dEdx;
    Double_t        CCProtonPi0_gamma1_dist_vtx;
+   Double_t        CCProtonPi0_gamma1_energy_ecal;
+   Double_t        CCProtonPi0_gamma1_energy_hcal;
+   Double_t        CCProtonPi0_gamma1_energy_scal_UV;
+   Double_t        CCProtonPi0_gamma1_energy_scal_X;
+   Double_t        CCProtonPi0_gamma1_energy_trkr;
    Double_t        CCProtonPi0_gamma1_evis_ecal;
    Double_t        CCProtonPi0_gamma1_evis_hcal;
-   Double_t        CCProtonPi0_gamma1_evis_scal;
+   Double_t        CCProtonPi0_gamma1_evis_scal_UV;
+   Double_t        CCProtonPi0_gamma1_evis_scal_X;
    Double_t        CCProtonPi0_gamma1_evis_trkr;
    Double_t        CCProtonPi0_gamma1_phi;
    Double_t        CCProtonPi0_gamma1_px;
@@ -445,14 +470,19 @@ public :
    Double_t        CCProtonPi0_gamma1_theta;
    Double_t        CCProtonPi0_gamma1_time;
    Double_t        CCProtonPi0_gamma2_E;
-   Double_t        CCProtonPi0_gamma2_E_New;
-   Double_t        CCProtonPi0_gamma2_E_New2;
+   Double_t        CCProtonPi0_gamma2_E_Old;
    Double_t        CCProtonPi0_gamma2_P;
    Double_t        CCProtonPi0_gamma2_dEdx;
    Double_t        CCProtonPi0_gamma2_dist_vtx;
+   Double_t        CCProtonPi0_gamma2_energy_ecal;
+   Double_t        CCProtonPi0_gamma2_energy_hcal;
+   Double_t        CCProtonPi0_gamma2_energy_scal_UV;
+   Double_t        CCProtonPi0_gamma2_energy_scal_X;
+   Double_t        CCProtonPi0_gamma2_energy_trkr;
    Double_t        CCProtonPi0_gamma2_evis_ecal;
    Double_t        CCProtonPi0_gamma2_evis_hcal;
-   Double_t        CCProtonPi0_gamma2_evis_scal;
+   Double_t        CCProtonPi0_gamma2_evis_scal_UV;
+   Double_t        CCProtonPi0_gamma2_evis_scal_X;
    Double_t        CCProtonPi0_gamma2_evis_trkr;
    Double_t        CCProtonPi0_gamma2_phi;
    Double_t        CCProtonPi0_gamma2_px;
@@ -501,8 +531,7 @@ public :
    Double_t        CCProtonPi0_pi0_P;
    Double_t        CCProtonPi0_pi0_cos_openingAngle;
    Double_t        CCProtonPi0_pi0_invMass;
-   Double_t        CCProtonPi0_pi0_invMass_New;
-   Double_t        CCProtonPi0_pi0_invMass_New2;
+   Double_t        CCProtonPi0_pi0_invMass_Old;
    Double_t        CCProtonPi0_pi0_openingAngle;
    Double_t        CCProtonPi0_pi0_phi;
    Double_t        CCProtonPi0_pi0_px;
@@ -651,26 +680,26 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[51];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[51];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[51];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[51];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[51];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[33];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[33];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[33];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[33];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[33];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[77];   //[mc_er_nPart]
-   Int_t           mc_er_status[77];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[77];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[77];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[77];   //[mc_er_nPart]
-   Double_t        mc_er_Px[77];   //[mc_er_nPart]
-   Double_t        mc_er_Py[77];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[77];   //[mc_er_nPart]
-   Double_t        mc_er_E[77];   //[mc_er_nPart]
-   Int_t           mc_er_FD[77];   //[mc_er_nPart]
-   Int_t           mc_er_LD[77];   //[mc_er_nPart]
-   Int_t           mc_er_mother[77];   //[mc_er_nPart]
+   Int_t           mc_er_ID[46];   //[mc_er_nPart]
+   Int_t           mc_er_status[46];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[46];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[46];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[46];   //[mc_er_nPart]
+   Double_t        mc_er_Px[46];   //[mc_er_nPart]
+   Double_t        mc_er_Py[46];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[46];   //[mc_er_nPart]
+   Double_t        mc_er_E[46];   //[mc_er_nPart]
+   Int_t           mc_er_FD[46];   //[mc_er_nPart]
+   Int_t           mc_er_LD[46];   //[mc_er_nPart]
+   Int_t           mc_er_mother[46];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[9];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -698,11 +727,11 @@ public :
    Int_t           mc_wgt_ppfx1_Total_sz;
    Double_t        mc_wgt_ppfx1_Total[100];   //[mc_wgt_ppfx1_Total_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[11];   //[n_prongs]
-   Double_t        prong_part_score[11];   //[n_prongs]
-   Double_t        prong_part_mass[11];   //[n_prongs]
-   Int_t           prong_part_charge[11];   //[n_prongs]
-   Int_t           prong_part_pid[11];   //[n_prongs]
+   Int_t           prong_nParticles[7];   //[n_prongs]
+   Double_t        prong_part_score[7];   //[n_prongs]
+   Double_t        prong_part_mass[7];   //[n_prongs]
+   Int_t           prong_part_charge[7];   //[n_prongs]
+   Int_t           prong_part_pid[7];   //[n_prongs]
    vector<vector<double> > *prong_part_E;
    vector<vector<double> > *prong_part_pos;
 
@@ -814,8 +843,28 @@ public :
    TBranch        *b_g2dedx_total1;   //!
    TBranch        *b_gamma1_blob_energy;   //!
    TBranch        *b_gamma1_blob_minsep;   //!
+   TBranch        *b_gamma1_center_nHits_all;   //!
+   TBranch        *b_gamma1_center_nHits_scal;   //!
+   TBranch        *b_gamma1_center_nHits_trkr;   //!
+   TBranch        *b_gamma1_ecal_true_evis;   //!
+   TBranch        *b_gamma1_hcal_true_evis;   //!
+   TBranch        *b_gamma1_scal_true_evis;   //!
+   TBranch        *b_gamma1_side_nHits_all;   //!
+   TBranch        *b_gamma1_side_nHits_scal;   //!
+   TBranch        *b_gamma1_side_nHits_trkr;   //!
+   TBranch        *b_gamma1_trkr_true_evis;   //!
    TBranch        *b_gamma2_blob_energy;   //!
    TBranch        *b_gamma2_blob_minsep;   //!
+   TBranch        *b_gamma2_center_nHits_all;   //!
+   TBranch        *b_gamma2_center_nHits_scal;   //!
+   TBranch        *b_gamma2_center_nHits_trkr;   //!
+   TBranch        *b_gamma2_ecal_true_evis;   //!
+   TBranch        *b_gamma2_hcal_true_evis;   //!
+   TBranch        *b_gamma2_scal_true_evis;   //!
+   TBranch        *b_gamma2_side_nHits_all;   //!
+   TBranch        *b_gamma2_side_nHits_scal;   //!
+   TBranch        *b_gamma2_side_nHits_trkr;   //!
+   TBranch        *b_gamma2_trkr_true_evis;   //!
    TBranch        *b_hadronVisibleE;   //!
    TBranch        *b_michelProng_begin_Z;   //!
    TBranch        *b_michelProng_distance;   //!
@@ -1114,14 +1163,19 @@ public :
    TBranch        *b_CCProtonPi0_endMuonTrajYPosition;   //!
    TBranch        *b_CCProtonPi0_endMuonTrajZPosition;   //!
    TBranch        *b_CCProtonPi0_gamma1_E;   //!
-   TBranch        *b_CCProtonPi0_gamma1_E_New;   //!
-   TBranch        *b_CCProtonPi0_gamma1_E_New2;   //!
+   TBranch        *b_CCProtonPi0_gamma1_E_Old;   //!
    TBranch        *b_CCProtonPi0_gamma1_P;   //!
    TBranch        *b_CCProtonPi0_gamma1_dEdx;   //!
    TBranch        *b_CCProtonPi0_gamma1_dist_vtx;   //!
+   TBranch        *b_CCProtonPi0_gamma1_energy_ecal;   //!
+   TBranch        *b_CCProtonPi0_gamma1_energy_hcal;   //!
+   TBranch        *b_CCProtonPi0_gamma1_energy_scal_UV;   //!
+   TBranch        *b_CCProtonPi0_gamma1_energy_scal_X;   //!
+   TBranch        *b_CCProtonPi0_gamma1_energy_trkr;   //!
    TBranch        *b_CCProtonPi0_gamma1_evis_ecal;   //!
    TBranch        *b_CCProtonPi0_gamma1_evis_hcal;   //!
-   TBranch        *b_CCProtonPi0_gamma1_evis_scal;   //!
+   TBranch        *b_CCProtonPi0_gamma1_evis_scal_UV;   //!
+   TBranch        *b_CCProtonPi0_gamma1_evis_scal_X;   //!
    TBranch        *b_CCProtonPi0_gamma1_evis_trkr;   //!
    TBranch        *b_CCProtonPi0_gamma1_phi;   //!
    TBranch        *b_CCProtonPi0_gamma1_px;   //!
@@ -1130,14 +1184,19 @@ public :
    TBranch        *b_CCProtonPi0_gamma1_theta;   //!
    TBranch        *b_CCProtonPi0_gamma1_time;   //!
    TBranch        *b_CCProtonPi0_gamma2_E;   //!
-   TBranch        *b_CCProtonPi0_gamma2_E_New;   //!
-   TBranch        *b_CCProtonPi0_gamma2_E_New2;   //!
+   TBranch        *b_CCProtonPi0_gamma2_E_Old;   //!
    TBranch        *b_CCProtonPi0_gamma2_P;   //!
    TBranch        *b_CCProtonPi0_gamma2_dEdx;   //!
    TBranch        *b_CCProtonPi0_gamma2_dist_vtx;   //!
+   TBranch        *b_CCProtonPi0_gamma2_energy_ecal;   //!
+   TBranch        *b_CCProtonPi0_gamma2_energy_hcal;   //!
+   TBranch        *b_CCProtonPi0_gamma2_energy_scal_UV;   //!
+   TBranch        *b_CCProtonPi0_gamma2_energy_scal_X;   //!
+   TBranch        *b_CCProtonPi0_gamma2_energy_trkr;   //!
    TBranch        *b_CCProtonPi0_gamma2_evis_ecal;   //!
    TBranch        *b_CCProtonPi0_gamma2_evis_hcal;   //!
-   TBranch        *b_CCProtonPi0_gamma2_evis_scal;   //!
+   TBranch        *b_CCProtonPi0_gamma2_evis_scal_UV;   //!
+   TBranch        *b_CCProtonPi0_gamma2_evis_scal_X;   //!
    TBranch        *b_CCProtonPi0_gamma2_evis_trkr;   //!
    TBranch        *b_CCProtonPi0_gamma2_phi;   //!
    TBranch        *b_CCProtonPi0_gamma2_px;   //!
@@ -1186,8 +1245,7 @@ public :
    TBranch        *b_CCProtonPi0_pi0_P;   //!
    TBranch        *b_CCProtonPi0_pi0_cos_openingAngle;   //!
    TBranch        *b_CCProtonPi0_pi0_invMass;   //!
-   TBranch        *b_CCProtonPi0_pi0_invMass_New;   //!
-   TBranch        *b_CCProtonPi0_pi0_invMass_New2;   //!
+   TBranch        *b_CCProtonPi0_pi0_invMass_Old;   //!
    TBranch        *b_CCProtonPi0_pi0_openingAngle;   //!
    TBranch        *b_CCProtonPi0_pi0_phi;   //!
    TBranch        *b_CCProtonPi0_pi0_px;   //!
@@ -1425,13 +1483,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_39b.root/CCProtonPi0");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva7_v2_39b.root/CCProtonPi0");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva9_v2_39b.root/CCProtonPi0");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva13B_v2_39b.root/CCProtonPi0");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva13C_1_v2_39b.root/CCProtonPi0");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva13C_2_v2_39b.root/CCProtonPi0");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva13E_v2_39b.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_40.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1590,8 +1642,28 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("g2dedx_total1", &g2dedx_total1, &b_g2dedx_total1);
    fChain->SetBranchAddress("gamma1_blob_energy", &gamma1_blob_energy, &b_gamma1_blob_energy);
    fChain->SetBranchAddress("gamma1_blob_minsep", &gamma1_blob_minsep, &b_gamma1_blob_minsep);
+   fChain->SetBranchAddress("gamma1_center_nHits_all", &gamma1_center_nHits_all, &b_gamma1_center_nHits_all);
+   fChain->SetBranchAddress("gamma1_center_nHits_scal", &gamma1_center_nHits_scal, &b_gamma1_center_nHits_scal);
+   fChain->SetBranchAddress("gamma1_center_nHits_trkr", &gamma1_center_nHits_trkr, &b_gamma1_center_nHits_trkr);
+   fChain->SetBranchAddress("gamma1_ecal_true_evis", &gamma1_ecal_true_evis, &b_gamma1_ecal_true_evis);
+   fChain->SetBranchAddress("gamma1_hcal_true_evis", &gamma1_hcal_true_evis, &b_gamma1_hcal_true_evis);
+   fChain->SetBranchAddress("gamma1_scal_true_evis", &gamma1_scal_true_evis, &b_gamma1_scal_true_evis);
+   fChain->SetBranchAddress("gamma1_side_nHits_all", &gamma1_side_nHits_all, &b_gamma1_side_nHits_all);
+   fChain->SetBranchAddress("gamma1_side_nHits_scal", &gamma1_side_nHits_scal, &b_gamma1_side_nHits_scal);
+   fChain->SetBranchAddress("gamma1_side_nHits_trkr", &gamma1_side_nHits_trkr, &b_gamma1_side_nHits_trkr);
+   fChain->SetBranchAddress("gamma1_trkr_true_evis", &gamma1_trkr_true_evis, &b_gamma1_trkr_true_evis);
    fChain->SetBranchAddress("gamma2_blob_energy", &gamma2_blob_energy, &b_gamma2_blob_energy);
    fChain->SetBranchAddress("gamma2_blob_minsep", &gamma2_blob_minsep, &b_gamma2_blob_minsep);
+   fChain->SetBranchAddress("gamma2_center_nHits_all", &gamma2_center_nHits_all, &b_gamma2_center_nHits_all);
+   fChain->SetBranchAddress("gamma2_center_nHits_scal", &gamma2_center_nHits_scal, &b_gamma2_center_nHits_scal);
+   fChain->SetBranchAddress("gamma2_center_nHits_trkr", &gamma2_center_nHits_trkr, &b_gamma2_center_nHits_trkr);
+   fChain->SetBranchAddress("gamma2_ecal_true_evis", &gamma2_ecal_true_evis, &b_gamma2_ecal_true_evis);
+   fChain->SetBranchAddress("gamma2_hcal_true_evis", &gamma2_hcal_true_evis, &b_gamma2_hcal_true_evis);
+   fChain->SetBranchAddress("gamma2_scal_true_evis", &gamma2_scal_true_evis, &b_gamma2_scal_true_evis);
+   fChain->SetBranchAddress("gamma2_side_nHits_all", &gamma2_side_nHits_all, &b_gamma2_side_nHits_all);
+   fChain->SetBranchAddress("gamma2_side_nHits_scal", &gamma2_side_nHits_scal, &b_gamma2_side_nHits_scal);
+   fChain->SetBranchAddress("gamma2_side_nHits_trkr", &gamma2_side_nHits_trkr, &b_gamma2_side_nHits_trkr);
+   fChain->SetBranchAddress("gamma2_trkr_true_evis", &gamma2_trkr_true_evis, &b_gamma2_trkr_true_evis);
    fChain->SetBranchAddress("hadronVisibleE", &hadronVisibleE, &b_hadronVisibleE);
    fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);
    fChain->SetBranchAddress("michelProng_distance", &michelProng_distance, &b_michelProng_distance);
@@ -1890,14 +1962,19 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajYPosition", &CCProtonPi0_endMuonTrajYPosition, &b_CCProtonPi0_endMuonTrajYPosition);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajZPosition", &CCProtonPi0_endMuonTrajZPosition, &b_CCProtonPi0_endMuonTrajZPosition);
    fChain->SetBranchAddress("CCProtonPi0_gamma1_E", &CCProtonPi0_gamma1_E, &b_CCProtonPi0_gamma1_E);
-   fChain->SetBranchAddress("CCProtonPi0_gamma1_E_New", &CCProtonPi0_gamma1_E_New, &b_CCProtonPi0_gamma1_E_New);
-   fChain->SetBranchAddress("CCProtonPi0_gamma1_E_New2", &CCProtonPi0_gamma1_E_New2, &b_CCProtonPi0_gamma1_E_New2);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_E_Old", &CCProtonPi0_gamma1_E_Old, &b_CCProtonPi0_gamma1_E_Old);
    fChain->SetBranchAddress("CCProtonPi0_gamma1_P", &CCProtonPi0_gamma1_P, &b_CCProtonPi0_gamma1_P);
    fChain->SetBranchAddress("CCProtonPi0_gamma1_dEdx", &CCProtonPi0_gamma1_dEdx, &b_CCProtonPi0_gamma1_dEdx);
    fChain->SetBranchAddress("CCProtonPi0_gamma1_dist_vtx", &CCProtonPi0_gamma1_dist_vtx, &b_CCProtonPi0_gamma1_dist_vtx);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_energy_ecal", &CCProtonPi0_gamma1_energy_ecal, &b_CCProtonPi0_gamma1_energy_ecal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_energy_hcal", &CCProtonPi0_gamma1_energy_hcal, &b_CCProtonPi0_gamma1_energy_hcal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_energy_scal_UV", &CCProtonPi0_gamma1_energy_scal_UV, &b_CCProtonPi0_gamma1_energy_scal_UV);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_energy_scal_X", &CCProtonPi0_gamma1_energy_scal_X, &b_CCProtonPi0_gamma1_energy_scal_X);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_energy_trkr", &CCProtonPi0_gamma1_energy_trkr, &b_CCProtonPi0_gamma1_energy_trkr);
    fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_ecal", &CCProtonPi0_gamma1_evis_ecal, &b_CCProtonPi0_gamma1_evis_ecal);
    fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_hcal", &CCProtonPi0_gamma1_evis_hcal, &b_CCProtonPi0_gamma1_evis_hcal);
-   fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_scal", &CCProtonPi0_gamma1_evis_scal, &b_CCProtonPi0_gamma1_evis_scal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_scal_UV", &CCProtonPi0_gamma1_evis_scal_UV, &b_CCProtonPi0_gamma1_evis_scal_UV);
+   fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_scal_X", &CCProtonPi0_gamma1_evis_scal_X, &b_CCProtonPi0_gamma1_evis_scal_X);
    fChain->SetBranchAddress("CCProtonPi0_gamma1_evis_trkr", &CCProtonPi0_gamma1_evis_trkr, &b_CCProtonPi0_gamma1_evis_trkr);
    fChain->SetBranchAddress("CCProtonPi0_gamma1_phi", &CCProtonPi0_gamma1_phi, &b_CCProtonPi0_gamma1_phi);
    fChain->SetBranchAddress("CCProtonPi0_gamma1_px", &CCProtonPi0_gamma1_px, &b_CCProtonPi0_gamma1_px);
@@ -1906,14 +1983,19 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_gamma1_theta", &CCProtonPi0_gamma1_theta, &b_CCProtonPi0_gamma1_theta);
    fChain->SetBranchAddress("CCProtonPi0_gamma1_time", &CCProtonPi0_gamma1_time, &b_CCProtonPi0_gamma1_time);
    fChain->SetBranchAddress("CCProtonPi0_gamma2_E", &CCProtonPi0_gamma2_E, &b_CCProtonPi0_gamma2_E);
-   fChain->SetBranchAddress("CCProtonPi0_gamma2_E_New", &CCProtonPi0_gamma2_E_New, &b_CCProtonPi0_gamma2_E_New);
-   fChain->SetBranchAddress("CCProtonPi0_gamma2_E_New2", &CCProtonPi0_gamma2_E_New2, &b_CCProtonPi0_gamma2_E_New2);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_E_Old", &CCProtonPi0_gamma2_E_Old, &b_CCProtonPi0_gamma2_E_Old);
    fChain->SetBranchAddress("CCProtonPi0_gamma2_P", &CCProtonPi0_gamma2_P, &b_CCProtonPi0_gamma2_P);
    fChain->SetBranchAddress("CCProtonPi0_gamma2_dEdx", &CCProtonPi0_gamma2_dEdx, &b_CCProtonPi0_gamma2_dEdx);
    fChain->SetBranchAddress("CCProtonPi0_gamma2_dist_vtx", &CCProtonPi0_gamma2_dist_vtx, &b_CCProtonPi0_gamma2_dist_vtx);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_energy_ecal", &CCProtonPi0_gamma2_energy_ecal, &b_CCProtonPi0_gamma2_energy_ecal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_energy_hcal", &CCProtonPi0_gamma2_energy_hcal, &b_CCProtonPi0_gamma2_energy_hcal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_energy_scal_UV", &CCProtonPi0_gamma2_energy_scal_UV, &b_CCProtonPi0_gamma2_energy_scal_UV);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_energy_scal_X", &CCProtonPi0_gamma2_energy_scal_X, &b_CCProtonPi0_gamma2_energy_scal_X);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_energy_trkr", &CCProtonPi0_gamma2_energy_trkr, &b_CCProtonPi0_gamma2_energy_trkr);
    fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_ecal", &CCProtonPi0_gamma2_evis_ecal, &b_CCProtonPi0_gamma2_evis_ecal);
    fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_hcal", &CCProtonPi0_gamma2_evis_hcal, &b_CCProtonPi0_gamma2_evis_hcal);
-   fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_scal", &CCProtonPi0_gamma2_evis_scal, &b_CCProtonPi0_gamma2_evis_scal);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_scal_UV", &CCProtonPi0_gamma2_evis_scal_UV, &b_CCProtonPi0_gamma2_evis_scal_UV);
+   fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_scal_X", &CCProtonPi0_gamma2_evis_scal_X, &b_CCProtonPi0_gamma2_evis_scal_X);
    fChain->SetBranchAddress("CCProtonPi0_gamma2_evis_trkr", &CCProtonPi0_gamma2_evis_trkr, &b_CCProtonPi0_gamma2_evis_trkr);
    fChain->SetBranchAddress("CCProtonPi0_gamma2_phi", &CCProtonPi0_gamma2_phi, &b_CCProtonPi0_gamma2_phi);
    fChain->SetBranchAddress("CCProtonPi0_gamma2_px", &CCProtonPi0_gamma2_px, &b_CCProtonPi0_gamma2_px);
@@ -1962,8 +2044,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_pi0_P", &CCProtonPi0_pi0_P, &b_CCProtonPi0_pi0_P);
    fChain->SetBranchAddress("CCProtonPi0_pi0_cos_openingAngle", &CCProtonPi0_pi0_cos_openingAngle, &b_CCProtonPi0_pi0_cos_openingAngle);
    fChain->SetBranchAddress("CCProtonPi0_pi0_invMass", &CCProtonPi0_pi0_invMass, &b_CCProtonPi0_pi0_invMass);
-   fChain->SetBranchAddress("CCProtonPi0_pi0_invMass_New", &CCProtonPi0_pi0_invMass_New, &b_CCProtonPi0_pi0_invMass_New);
-   fChain->SetBranchAddress("CCProtonPi0_pi0_invMass_New2", &CCProtonPi0_pi0_invMass_New2, &b_CCProtonPi0_pi0_invMass_New2);
+   fChain->SetBranchAddress("CCProtonPi0_pi0_invMass_Old", &CCProtonPi0_pi0_invMass_Old, &b_CCProtonPi0_pi0_invMass_Old);
    fChain->SetBranchAddress("CCProtonPi0_pi0_openingAngle", &CCProtonPi0_pi0_openingAngle, &b_CCProtonPi0_pi0_openingAngle);
    fChain->SetBranchAddress("CCProtonPi0_pi0_phi", &CCProtonPi0_pi0_phi, &b_CCProtonPi0_pi0_phi);
    fChain->SetBranchAddress("CCProtonPi0_pi0_px", &CCProtonPi0_pi0_px, &b_CCProtonPi0_pi0_px);
@@ -2166,7 +2247,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
    fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
    fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
-
    Notify();
 }
 
