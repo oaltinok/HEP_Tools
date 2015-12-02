@@ -2,16 +2,20 @@ function [  ] = CompareSCALModels( )
 
 model_1 = load('model1.dat'); 
 model_2 = load('model2.dat'); 
+model_3 = load('model3.dat');
 
 error = Inf;
 
-plot_comparison(model_1,model_2,error);
+plot_comparison(model_1,model_2,model_3,error);
 
 disp('Old Model');
 get_table(model_1,error);
 disp(' ');
 disp('New Model');
 get_table(model_2,error);
+disp(' ');
+disp('Improved Model');
+get_table(model_3,error);
 
 
 end
@@ -86,51 +90,58 @@ ylabel(sprintf('%s%s',label,' True N(Hits)'),'FontWeight','bold','FontSize',16);
 
 end
 
-function [] = plot_comparison(model_1,model_2,error)
+function [] = plot_comparison(model_1,model_2,model_3,error)
 
 [m1_trkr_t, m1_trkr_r, m1_scal_t, m1_scal_r] = getCols(model_1);
 [m2_trkr_t, m2_trkr_r, m2_scal_t, m2_scal_r] = getCols(model_2);
+[m3_trkr_t, m3_trkr_r, m3_scal_t, m3_scal_r] = getCols(model_3);
 
-% Create figure
+% Create figure -- All Hit Ranges
 figure1 = figure;
 
-subplot1 = subplot(2,2,1,'Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+subplot1 = subplot(2,3,1,'Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
 plot_reco_true(subplot1, m1_trkr_t,m1_trkr_r, 1200,'Old Model Tracker',error);
 
-subplot2 = subplot(2,2,2,'Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+subplot2 = subplot(2,3,2,'Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
 plot_reco_true(subplot2, m2_trkr_t,m2_trkr_r, 1200,'New Model Tracker',error);
 
-subplot3 = subplot(2,2,3,'Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
-plot_reco_true(subplot3, m1_scal_t,m1_scal_r, 500,'Old Model Side ECAL',error);
+subplot3 = subplot(2,3,3,'Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+plot_reco_true(subplot3, m3_trkr_t,m3_trkr_r, 1200,'Improved Model Tracker',error);
 
-subplot4 = subplot(2,2,4,'Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
-plot_reco_true(subplot4, m2_scal_t,m2_scal_r, 500,'New Model Side ECAL',error);
+subplot4 = subplot(2,3,4,'Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+plot_reco_true(subplot4, m1_scal_t,m1_scal_r, 500,'Old Model Side ECAL',error);
 
-% Create figure
+subplot5 = subplot(2,3,5,'Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+plot_reco_true(subplot5, m2_scal_t,m2_scal_r, 500,'New Model Side ECAL',error);
+
+subplot6 = subplot(2,3,6,'Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+plot_reco_true(subplot6, m3_scal_t,m3_scal_r, 500,'Improved Model Side ECAL',error);
+
+% Create figure -- Focused Hit Range 
 figure2 = figure;
 
-subplot1 = subplot(2,2,1,'Parent',figure2,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+subplot1 = subplot(2,3,1,'Parent',figure2,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
 plot_reco_true(subplot1, m1_trkr_t,m1_trkr_r, 200,'Old Model Tracker',error);
 
-subplot2 = subplot(2,2,2,'Parent',figure2,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+subplot2 = subplot(2,3,2,'Parent',figure2,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
 plot_reco_true(subplot2, m2_trkr_t,m2_trkr_r, 200,'New Model Tracker',error);
 
-subplot3 = subplot(2,2,3,'Parent',figure2,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
-plot_reco_true(subplot3, m1_scal_t,m1_scal_r, 100,'Old Model Side ECAL',error);
+subplot3 = subplot(2,3,3,'Parent',figure2,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+plot_reco_true(subplot3, m3_trkr_t,m3_trkr_r, 200,'Improved Model Tracker',error);
 
-subplot4 = subplot(2,2,4,'Parent',figure2,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
-plot_reco_true(subplot4, m2_scal_t,m2_scal_r, 100,'New Model Side ECAL',error);
+subplot4 = subplot(2,3,4,'Parent',figure2,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+plot_reco_true(subplot4, m1_scal_t,m1_scal_r, 100,'Old Model Side ECAL',error);
+
+subplot5 = subplot(2,3,5,'Parent',figure2,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+plot_reco_true(subplot5, m2_scal_t,m2_scal_r, 100,'New Model Side ECAL',error);
+
+subplot6 = subplot(2,3,6,'Parent',figure2,'PlotBoxAspectRatio',[1 1 1],'FontSize',16,'FontWeight','bold');
+plot_reco_true(subplot6, m3_scal_t,m3_scal_r, 100,'Improved Model Side ECAL',error);
+
 end
-
 
 function [y_err] = get_y_err(x,error)
 
 y_err = x.*(1+error);
-
-end
-
-function [y_dev] = get_y_dev(x,deviation)
-
-y_dev = x + deviation;
 
 end
