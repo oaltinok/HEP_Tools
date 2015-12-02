@@ -450,6 +450,47 @@ void CCProtonPi0_Pion::initHistograms()
     scal_nHits_reco_true->GetXaxis()->SetTitle("SCAL N(Hits) based on Strip Number");
     scal_nHits_reco_true->GetYaxis()->SetTitle("SCAL N(Hits) based on TRUE Hit Position");
  
+    trkr_nHits_2_reco_true = new TH2D( "trkr_nHits_2_reco_true","True vs Reco Tracker N(Hits) with Geometrical Method",100,0,100,100,0,100);
+    trkr_nHits_2_reco_true->GetXaxis()->SetTitle("Tracker N(Hits) based Geometrical Assumption");
+    trkr_nHits_2_reco_true->GetYaxis()->SetTitle("True Tracker N(Hits)");
+  
+    scal_nHits_2_reco_true = new TH2D( "scal_nHits_2_reco_true","True vs Reco SCAL N(Hits) with Geometrical Method",100,0,100,100,0,100);
+    scal_nHits_2_reco_true->GetXaxis()->SetTitle("SCAL N(Hits) based Geometrical Assumption");
+    scal_nHits_2_reco_true->GetYaxis()->SetTitle("True SCAL N(Hits)");
+ 
+    old_model_trkr_nHits_error = new TH1D( "old_model_trkr_nHits_error","Old Model Tracker nHits Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    old_model_trkr_nHits_error->GetXaxis()->SetTitle("(N_{Reco}-N_{True})/N_{True}");
+    old_model_trkr_nHits_error->GetYaxis()->SetTitle("N(Events)");
+ 
+    new_model_trkr_nHits_error = new TH1D( "new_model_trkr_nHits_error","New Model Tracker nHits Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    new_model_trkr_nHits_error->GetXaxis()->SetTitle("(N_{Reco}-N_{True})/N_{True}");
+    new_model_trkr_nHits_error->GetYaxis()->SetTitle("N(Events)");
+
+    improved_model_trkr_nHits_error = new TH1D( "improved_model_trkr_nHits_error","Improved Model Tracker nHits Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    improved_model_trkr_nHits_error->GetXaxis()->SetTitle("(N_{Reco}-N_{True})/N_{True}");
+    improved_model_trkr_nHits_error->GetYaxis()->SetTitle("N(Events)");
+
+    old_model_scal_nHits_error = new TH1D( "old_model_scal_nHits_error","Old Model Side ECAL nHits Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    old_model_scal_nHits_error->GetXaxis()->SetTitle("(N_{Reco}-N_{True})/N_{True}");
+    old_model_scal_nHits_error->GetYaxis()->SetTitle("N(Events)");
+ 
+    new_model_scal_nHits_error = new TH1D( "new_model_scal_nHits_error","New Model Side ECAL nHits Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    new_model_scal_nHits_error->GetXaxis()->SetTitle("(N_{Reco}-N_{True})/N_{True}");
+    new_model_scal_nHits_error->GetYaxis()->SetTitle("N(Events)");
+ 
+    improved_model_scal_nHits_error = new TH1D( "improved_model_scal_nHits_error","Improved Model Side ECAL nHits Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    improved_model_scal_nHits_error->GetXaxis()->SetTitle("(N_{Reco}-N_{True})/N_{True}");
+    improved_model_scal_nHits_error->GetYaxis()->SetTitle("N(Events)");
+
+    scal_minZ_evis = new TH1D( "scal_minZ_evis","Visible Cluster Energy at min Z",30, 0, 30 );
+    scal_minZ_evis->GetXaxis()->SetTitle("E_{Visible} [MeV]");
+    scal_minZ_evis->GetYaxis()->SetTitle("N(Events)");
+
+    scal_minZ_nDigits = new TH1D( "scal_minZ_nDigits","N(Digits) at min Z",10, 0, 10 );
+    scal_minZ_nDigits->GetXaxis()->SetTitle("N(Digits)");
+    scal_minZ_nDigits->GetYaxis()->SetTitle("N(Events)");
+
+
 }
 
 void CCProtonPi0_Pion::writeHistograms()
@@ -581,6 +622,20 @@ void CCProtonPi0_Pion::writeHistograms()
     trkr_nHits_reco_true->Write();
     scal_nHits_reco_correct->Write();
     scal_nHits_reco_true->Write();
+
+    trkr_nHits_2_reco_true->Write();
+    scal_nHits_2_reco_true->Write();
+
+    old_model_trkr_nHits_error->Write();
+    new_model_trkr_nHits_error->Write();
+    improved_model_trkr_nHits_error->Write();
+
+    old_model_scal_nHits_error->Write();
+    new_model_scal_nHits_error->Write();
+    improved_model_scal_nHits_error->Write();
+
+    scal_minZ_evis->Write();
+    scal_minZ_nDigits->Write();
 
     f->Close();
 }

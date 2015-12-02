@@ -1,5 +1,5 @@
 /*
-================================================================================
+   ================================================================================
 Class: CCProtonPi0_Analyzer
 Core Class for NTupleAnalysis Package
 Includes all data variables for CCProtonPi0 Analysis
@@ -162,6 +162,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         ofstream roundupText;
         ofstream logFile;
         ifstream DSTFileList;
+        // Temporary
+        ofstream model1;
+        ofstream model2;
+        ofstream model3;
 
         // -------------------------------------------------------------------------
         //  CCProtonPi0 Data - use makeClass() to get the NTuple Data
@@ -282,10 +286,20 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        gamma1_center_nHits_trkr;
         Double_t        gamma1_ecal_true_evis;
         Double_t        gamma1_hcal_true_evis;
+        Double_t        gamma1_improved_scal_nHits_reco;
+        Double_t        gamma1_improved_scal_nHits_true;
+        Double_t        gamma1_improved_trkr_nHits_reco;
+        Double_t        gamma1_improved_trkr_nHits_true;
+        Double_t        gamma1_scal_minZ_evis;
+        Double_t        gamma1_scal_minZ_nDigits;
+        Double_t        gamma1_scal_nHits_reco;
+        Double_t        gamma1_scal_nHits_true;
         Double_t        gamma1_scal_true_evis;
         Double_t        gamma1_side_nHits_all;
         Double_t        gamma1_side_nHits_scal;
         Double_t        gamma1_side_nHits_trkr;
+        Double_t        gamma1_trkr_nHits_reco;
+        Double_t        gamma1_trkr_nHits_true;
         Double_t        gamma1_trkr_true_evis;
         Double_t        gamma2_blob_energy;
         Double_t        gamma2_blob_minsep;
@@ -294,10 +308,20 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        gamma2_center_nHits_trkr;
         Double_t        gamma2_ecal_true_evis;
         Double_t        gamma2_hcal_true_evis;
+        Double_t        gamma2_improved_scal_nHits_reco;
+        Double_t        gamma2_improved_scal_nHits_true;
+        Double_t        gamma2_improved_trkr_nHits_reco;
+        Double_t        gamma2_improved_trkr_nHits_true;
+        Double_t        gamma2_scal_minZ_evis;
+        Double_t        gamma2_scal_minZ_nDigits;
+        Double_t        gamma2_scal_nHits_reco;
+        Double_t        gamma2_scal_nHits_true;
         Double_t        gamma2_scal_true_evis;
         Double_t        gamma2_side_nHits_all;
         Double_t        gamma2_side_nHits_scal;
         Double_t        gamma2_side_nHits_trkr;
+        Double_t        gamma2_trkr_nHits_reco;
+        Double_t        gamma2_trkr_nHits_true;
         Double_t        gamma2_trkr_true_evis;
         Double_t        hadronVisibleE;
         Double_t        michelProng_begin_Z;
@@ -996,10 +1020,20 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_gamma1_center_nHits_trkr;   //!
         TBranch        *b_gamma1_ecal_true_evis;   //!
         TBranch        *b_gamma1_hcal_true_evis;   //!
+        TBranch        *b_gamma1_improved_scal_nHits_reco;   //!
+        TBranch        *b_gamma1_improved_scal_nHits_true;   //!
+        TBranch        *b_gamma1_improved_trkr_nHits_reco;   //!
+        TBranch        *b_gamma1_improved_trkr_nHits_true;   //!
+        TBranch        *b_gamma1_scal_minZ_evis;   //!
+        TBranch        *b_gamma1_scal_minZ_nDigits;   //!
+        TBranch        *b_gamma1_scal_nHits_reco;   //!
+        TBranch        *b_gamma1_scal_nHits_true;   //!
         TBranch        *b_gamma1_scal_true_evis;   //!
         TBranch        *b_gamma1_side_nHits_all;   //!
         TBranch        *b_gamma1_side_nHits_scal;   //!
         TBranch        *b_gamma1_side_nHits_trkr;   //!
+        TBranch        *b_gamma1_trkr_nHits_reco;   //!
+        TBranch        *b_gamma1_trkr_nHits_true;   //!
         TBranch        *b_gamma1_trkr_true_evis;   //!
         TBranch        *b_gamma2_blob_energy;   //!
         TBranch        *b_gamma2_blob_minsep;   //!
@@ -1008,10 +1042,20 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_gamma2_center_nHits_trkr;   //!
         TBranch        *b_gamma2_ecal_true_evis;   //!
         TBranch        *b_gamma2_hcal_true_evis;   //!
+        TBranch        *b_gamma2_improved_scal_nHits_reco;   //!
+        TBranch        *b_gamma2_improved_scal_nHits_true;   //!
+        TBranch        *b_gamma2_improved_trkr_nHits_reco;   //!
+        TBranch        *b_gamma2_improved_trkr_nHits_true;   //!
+        TBranch        *b_gamma2_scal_minZ_evis;   //!
+        TBranch        *b_gamma2_scal_minZ_nDigits;   //!
+        TBranch        *b_gamma2_scal_nHits_reco;   //!
+        TBranch        *b_gamma2_scal_nHits_true;   //!
         TBranch        *b_gamma2_scal_true_evis;   //!
         TBranch        *b_gamma2_side_nHits_all;   //!
         TBranch        *b_gamma2_side_nHits_scal;   //!
         TBranch        *b_gamma2_side_nHits_trkr;   //!
+        TBranch        *b_gamma2_trkr_nHits_reco;   //!
+        TBranch        *b_gamma2_trkr_nHits_true;   //!
         TBranch        *b_gamma2_trkr_true_evis;   //!
         TBranch        *b_hadronVisibleE;   //!
         TBranch        *b_michelProng_begin_Z;   //!

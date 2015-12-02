@@ -398,18 +398,30 @@ void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::st
    
     hist1D->Draw();
     gPad->Update();
-    gStyle->SetOptStat("nemr"); 
-    
+    gStyle->SetOptStat(111111); 
+   
+    // Find Peak
     int max_bin = hist1D->GetMaximumBin();
-    double max_bin_value = hist1D->GetBinCenter(max_bin);
+    double max_bin_location = hist1D->GetBinCenter(max_bin);
+    double max_bin_value = hist1D->GetBinContent(max_bin);
     TLatex text;
     text.SetNDC();
     text.SetTextSize(0.03);
-    text.DrawLatex(0.78,0.7,Form("%s%3.2f", "Peak at ",max_bin_value));
-    
+    text.DrawLatex(0.15,0.85,Form("%s%3.2f", "Peak at ",max_bin_location));
+  
+    // Error Ranges
+    double error = 0.66;
+    TLine err;
+    err.SetLineWidth(2);
+    err.SetLineColor(kBlack);
+    err.DrawLine(error,0,error,max_bin_value);
+    err.DrawLine(-error,0,-error,max_bin_value);
+
+  
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
     delete c;
-    
+    delete hist1D;
+    delete f;
 }
 
 void CCProtonPi0_Plotter::Draw1DHist_Threshold(rootDir& dir, std::string var_name, std::string plotDir, double threshold, bool isLogScale)

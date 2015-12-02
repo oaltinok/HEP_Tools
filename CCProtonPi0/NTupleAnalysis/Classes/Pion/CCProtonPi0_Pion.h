@@ -130,6 +130,21 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         TH2D* scal_nHits_reco_correct;
         TH2D* scal_nHits_reco_true;
         
+        TH2D* trkr_nHits_2_reco_true;
+        TH2D* scal_nHits_2_reco_true;
+
+        TH1D* old_model_trkr_nHits_error;
+        TH1D* new_model_trkr_nHits_error;
+        TH1D* improved_model_trkr_nHits_error;
+        
+        TH1D* old_model_scal_nHits_error;
+        TH1D* new_model_scal_nHits_error;
+        TH1D* improved_model_scal_nHits_error;
+       
+        TH1D* scal_minZ_evis;
+        TH1D* scal_minZ_nDigits;
+
+        
         CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana_folder);
         void initHistograms();
         void writeHistograms();

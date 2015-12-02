@@ -313,6 +313,11 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int GetPDGfromVector(std::vector<int> &all_pdg) const;
         bool isHitInsideSCAL(double x, double y, double z) const;
         void SaveBlobTrueEvisBySubDetector(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
+        void SaveSCALHits(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
+        void SaveSCALHits_Improved(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
+        double Find_SCAL_MinZ(Minerva::IDBlob* blob) const;
+        void SaveSCAL_minZ_Info(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
+        bool Use_SCAL_minZ(Minerva::IDBlob* blob, double minZ) const;
 };
 
 #endif // CCPROTONPI0_H 

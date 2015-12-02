@@ -323,6 +323,19 @@ void CCProtonPi0_Plotter::plotPion()
     Draw2DHist(rootDir_Pion,"trkr_nHits_reco_true",plotDir);
     Draw2DHist(rootDir_Pion,"scal_nHits_reco_correct",plotDir);
     Draw2DHist(rootDir_Pion,"scal_nHits_reco_true",plotDir);
+    Draw2DHist(rootDir_Pion,"trkr_nHits_2_reco_true",plotDir);
+    Draw2DHist(rootDir_Pion,"scal_nHits_2_reco_true",plotDir);
+    
+    Draw1DHist(rootDir_Pion,"old_model_trkr_nHits_error",plotDir,true);
+    Draw1DHist(rootDir_Pion,"new_model_trkr_nHits_error",plotDir,true);
+    Draw1DHist(rootDir_Pion,"improved_model_trkr_nHits_error",plotDir,true);
+
+    Draw1DHist(rootDir_Pion,"old_model_scal_nHits_error",plotDir,true);
+    Draw1DHist(rootDir_Pion,"new_model_scal_nHits_error",plotDir,true);
+    Draw1DHist(rootDir_Pion,"improved_model_scal_nHits_error",plotDir,true);
+
+    Draw1DHist(rootDir_Pion,"scal_minZ_evis",plotDir);
+    Draw1DHist(rootDir_Pion,"scal_minZ_nDigits",plotDir);
 
     std::cout<<"Plotting Pion Finished!\n"<<std::endl;
 }

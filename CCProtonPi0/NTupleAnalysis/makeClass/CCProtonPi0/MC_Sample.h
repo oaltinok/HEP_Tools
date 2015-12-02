@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Nov 20 08:04:35 2015 by ROOT version 5.34/05
+// Wed Dec  2 08:30:16 2015 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -134,10 +134,20 @@ public :
    Double_t        gamma1_center_nHits_trkr;
    Double_t        gamma1_ecal_true_evis;
    Double_t        gamma1_hcal_true_evis;
+   Double_t        gamma1_improved_scal_nHits_reco;
+   Double_t        gamma1_improved_scal_nHits_true;
+   Double_t        gamma1_improved_trkr_nHits_reco;
+   Double_t        gamma1_improved_trkr_nHits_true;
+   Double_t        gamma1_scal_minZ_evis;
+   Double_t        gamma1_scal_minZ_nDigits;
+   Double_t        gamma1_scal_nHits_reco;
+   Double_t        gamma1_scal_nHits_true;
    Double_t        gamma1_scal_true_evis;
    Double_t        gamma1_side_nHits_all;
    Double_t        gamma1_side_nHits_scal;
    Double_t        gamma1_side_nHits_trkr;
+   Double_t        gamma1_trkr_nHits_reco;
+   Double_t        gamma1_trkr_nHits_true;
    Double_t        gamma1_trkr_true_evis;
    Double_t        gamma2_blob_energy;
    Double_t        gamma2_blob_minsep;
@@ -146,10 +156,20 @@ public :
    Double_t        gamma2_center_nHits_trkr;
    Double_t        gamma2_ecal_true_evis;
    Double_t        gamma2_hcal_true_evis;
+   Double_t        gamma2_improved_scal_nHits_reco;
+   Double_t        gamma2_improved_scal_nHits_true;
+   Double_t        gamma2_improved_trkr_nHits_reco;
+   Double_t        gamma2_improved_trkr_nHits_true;
+   Double_t        gamma2_scal_minZ_evis;
+   Double_t        gamma2_scal_minZ_nDigits;
+   Double_t        gamma2_scal_nHits_reco;
+   Double_t        gamma2_scal_nHits_true;
    Double_t        gamma2_scal_true_evis;
    Double_t        gamma2_side_nHits_all;
    Double_t        gamma2_side_nHits_scal;
    Double_t        gamma2_side_nHits_trkr;
+   Double_t        gamma2_trkr_nHits_reco;
+   Double_t        gamma2_trkr_nHits_true;
    Double_t        gamma2_trkr_true_evis;
    Double_t        hadronVisibleE;
    Double_t        michelProng_begin_Z;
@@ -848,10 +868,20 @@ public :
    TBranch        *b_gamma1_center_nHits_trkr;   //!
    TBranch        *b_gamma1_ecal_true_evis;   //!
    TBranch        *b_gamma1_hcal_true_evis;   //!
+   TBranch        *b_gamma1_improved_scal_nHits_reco;   //!
+   TBranch        *b_gamma1_improved_scal_nHits_true;   //!
+   TBranch        *b_gamma1_improved_trkr_nHits_reco;   //!
+   TBranch        *b_gamma1_improved_trkr_nHits_true;   //!
+   TBranch        *b_gamma1_scal_minZ_evis;   //!
+   TBranch        *b_gamma1_scal_minZ_nDigits;   //!
+   TBranch        *b_gamma1_scal_nHits_reco;   //!
+   TBranch        *b_gamma1_scal_nHits_true;   //!
    TBranch        *b_gamma1_scal_true_evis;   //!
    TBranch        *b_gamma1_side_nHits_all;   //!
    TBranch        *b_gamma1_side_nHits_scal;   //!
    TBranch        *b_gamma1_side_nHits_trkr;   //!
+   TBranch        *b_gamma1_trkr_nHits_reco;   //!
+   TBranch        *b_gamma1_trkr_nHits_true;   //!
    TBranch        *b_gamma1_trkr_true_evis;   //!
    TBranch        *b_gamma2_blob_energy;   //!
    TBranch        *b_gamma2_blob_minsep;   //!
@@ -860,10 +890,20 @@ public :
    TBranch        *b_gamma2_center_nHits_trkr;   //!
    TBranch        *b_gamma2_ecal_true_evis;   //!
    TBranch        *b_gamma2_hcal_true_evis;   //!
+   TBranch        *b_gamma2_improved_scal_nHits_reco;   //!
+   TBranch        *b_gamma2_improved_scal_nHits_true;   //!
+   TBranch        *b_gamma2_improved_trkr_nHits_reco;   //!
+   TBranch        *b_gamma2_improved_trkr_nHits_true;   //!
+   TBranch        *b_gamma2_scal_minZ_evis;   //!
+   TBranch        *b_gamma2_scal_minZ_nDigits;   //!
+   TBranch        *b_gamma2_scal_nHits_reco;   //!
+   TBranch        *b_gamma2_scal_nHits_true;   //!
    TBranch        *b_gamma2_scal_true_evis;   //!
    TBranch        *b_gamma2_side_nHits_all;   //!
    TBranch        *b_gamma2_side_nHits_scal;   //!
    TBranch        *b_gamma2_side_nHits_trkr;   //!
+   TBranch        *b_gamma2_trkr_nHits_reco;   //!
+   TBranch        *b_gamma2_trkr_nHits_true;   //!
    TBranch        *b_gamma2_trkr_true_evis;   //!
    TBranch        *b_hadronVisibleE;   //!
    TBranch        *b_michelProng_begin_Z;   //!
@@ -1483,7 +1523,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_40.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_40d.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1647,10 +1687,20 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("gamma1_center_nHits_trkr", &gamma1_center_nHits_trkr, &b_gamma1_center_nHits_trkr);
    fChain->SetBranchAddress("gamma1_ecal_true_evis", &gamma1_ecal_true_evis, &b_gamma1_ecal_true_evis);
    fChain->SetBranchAddress("gamma1_hcal_true_evis", &gamma1_hcal_true_evis, &b_gamma1_hcal_true_evis);
+   fChain->SetBranchAddress("gamma1_improved_scal_nHits_reco", &gamma1_improved_scal_nHits_reco, &b_gamma1_improved_scal_nHits_reco);
+   fChain->SetBranchAddress("gamma1_improved_scal_nHits_true", &gamma1_improved_scal_nHits_true, &b_gamma1_improved_scal_nHits_true);
+   fChain->SetBranchAddress("gamma1_improved_trkr_nHits_reco", &gamma1_improved_trkr_nHits_reco, &b_gamma1_improved_trkr_nHits_reco);
+   fChain->SetBranchAddress("gamma1_improved_trkr_nHits_true", &gamma1_improved_trkr_nHits_true, &b_gamma1_improved_trkr_nHits_true);
+   fChain->SetBranchAddress("gamma1_scal_minZ_evis", &gamma1_scal_minZ_evis, &b_gamma1_scal_minZ_evis);
+   fChain->SetBranchAddress("gamma1_scal_minZ_nDigits", &gamma1_scal_minZ_nDigits, &b_gamma1_scal_minZ_nDigits);
+   fChain->SetBranchAddress("gamma1_scal_nHits_reco", &gamma1_scal_nHits_reco, &b_gamma1_scal_nHits_reco);
+   fChain->SetBranchAddress("gamma1_scal_nHits_true", &gamma1_scal_nHits_true, &b_gamma1_scal_nHits_true);
    fChain->SetBranchAddress("gamma1_scal_true_evis", &gamma1_scal_true_evis, &b_gamma1_scal_true_evis);
    fChain->SetBranchAddress("gamma1_side_nHits_all", &gamma1_side_nHits_all, &b_gamma1_side_nHits_all);
    fChain->SetBranchAddress("gamma1_side_nHits_scal", &gamma1_side_nHits_scal, &b_gamma1_side_nHits_scal);
    fChain->SetBranchAddress("gamma1_side_nHits_trkr", &gamma1_side_nHits_trkr, &b_gamma1_side_nHits_trkr);
+   fChain->SetBranchAddress("gamma1_trkr_nHits_reco", &gamma1_trkr_nHits_reco, &b_gamma1_trkr_nHits_reco);
+   fChain->SetBranchAddress("gamma1_trkr_nHits_true", &gamma1_trkr_nHits_true, &b_gamma1_trkr_nHits_true);
    fChain->SetBranchAddress("gamma1_trkr_true_evis", &gamma1_trkr_true_evis, &b_gamma1_trkr_true_evis);
    fChain->SetBranchAddress("gamma2_blob_energy", &gamma2_blob_energy, &b_gamma2_blob_energy);
    fChain->SetBranchAddress("gamma2_blob_minsep", &gamma2_blob_minsep, &b_gamma2_blob_minsep);
@@ -1659,10 +1709,20 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("gamma2_center_nHits_trkr", &gamma2_center_nHits_trkr, &b_gamma2_center_nHits_trkr);
    fChain->SetBranchAddress("gamma2_ecal_true_evis", &gamma2_ecal_true_evis, &b_gamma2_ecal_true_evis);
    fChain->SetBranchAddress("gamma2_hcal_true_evis", &gamma2_hcal_true_evis, &b_gamma2_hcal_true_evis);
+   fChain->SetBranchAddress("gamma2_improved_scal_nHits_reco", &gamma2_improved_scal_nHits_reco, &b_gamma2_improved_scal_nHits_reco);
+   fChain->SetBranchAddress("gamma2_improved_scal_nHits_true", &gamma2_improved_scal_nHits_true, &b_gamma2_improved_scal_nHits_true);
+   fChain->SetBranchAddress("gamma2_improved_trkr_nHits_reco", &gamma2_improved_trkr_nHits_reco, &b_gamma2_improved_trkr_nHits_reco);
+   fChain->SetBranchAddress("gamma2_improved_trkr_nHits_true", &gamma2_improved_trkr_nHits_true, &b_gamma2_improved_trkr_nHits_true);
+   fChain->SetBranchAddress("gamma2_scal_minZ_evis", &gamma2_scal_minZ_evis, &b_gamma2_scal_minZ_evis);
+   fChain->SetBranchAddress("gamma2_scal_minZ_nDigits", &gamma2_scal_minZ_nDigits, &b_gamma2_scal_minZ_nDigits);
+   fChain->SetBranchAddress("gamma2_scal_nHits_reco", &gamma2_scal_nHits_reco, &b_gamma2_scal_nHits_reco);
+   fChain->SetBranchAddress("gamma2_scal_nHits_true", &gamma2_scal_nHits_true, &b_gamma2_scal_nHits_true);
    fChain->SetBranchAddress("gamma2_scal_true_evis", &gamma2_scal_true_evis, &b_gamma2_scal_true_evis);
    fChain->SetBranchAddress("gamma2_side_nHits_all", &gamma2_side_nHits_all, &b_gamma2_side_nHits_all);
    fChain->SetBranchAddress("gamma2_side_nHits_scal", &gamma2_side_nHits_scal, &b_gamma2_side_nHits_scal);
    fChain->SetBranchAddress("gamma2_side_nHits_trkr", &gamma2_side_nHits_trkr, &b_gamma2_side_nHits_trkr);
+   fChain->SetBranchAddress("gamma2_trkr_nHits_reco", &gamma2_trkr_nHits_reco, &b_gamma2_trkr_nHits_reco);
+   fChain->SetBranchAddress("gamma2_trkr_nHits_true", &gamma2_trkr_nHits_true, &b_gamma2_trkr_nHits_true);
    fChain->SetBranchAddress("gamma2_trkr_true_evis", &gamma2_trkr_true_evis, &b_gamma2_trkr_true_evis);
    fChain->SetBranchAddress("hadronVisibleE", &hadronVisibleE, &b_hadronVisibleE);
    fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);

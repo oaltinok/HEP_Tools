@@ -14,8 +14,8 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
     
     if(isModeReduce){
         // File Locations
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_40.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms_v2_40.root";
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_40d.root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms_v2_40d.root";
         
         cout<<"\tRoot File: "<<rootDir<<endl;
 

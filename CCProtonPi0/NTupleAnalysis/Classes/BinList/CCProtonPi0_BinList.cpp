@@ -16,7 +16,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     //--------------------------------------------------------------------------
     // Standard Bins
     true_false.setBin(2,0.0,2.0);
-    error.setBin(80, -2.0, 2.0);
+    error.setBin(80, -1.0, 1.0);
     ratio.setBin(50, 0.0, 4.0);
     angle.setBin(18, 0.0, 180.0);
     particleScore.setBin(100,0.0,1.0);

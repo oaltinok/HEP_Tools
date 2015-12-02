@@ -62,8 +62,8 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 void CCProtonPi0_Analyzer::reduce(string playlist)
 {
     string rootDir;
-    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_v2_40.root";
-    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_v2_40.root";
+    if (m_isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::reduced + "ReducedNTuple_v2_40d.root";
+    else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::reduced + "ReducedNTuple_v2_40d.root";
 
     cout<<"Reducing NTuple Files to a single file"<<endl;
     cout<<"\tRoot File: "<<rootDir<<endl;
@@ -233,6 +233,13 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     cout<<"nTrkrECAL = "<<nTrkrECAL<<endl;
     cout<<"nECALSCAL = "<<nECALSCAL<<endl;
     cout<<"nOther = "<<nOther<<endl;
+
+
+    model1.close();
+    model2.close();
+    model3.close();
+
+
 }
 
 
@@ -847,6 +854,14 @@ void CCProtonPi0_Analyzer::closeTextFiles()
 void CCProtonPi0_Analyzer::openTextFiles()
 {
     cout<<"Opening Text Files:"<<endl;
+
+    string model1_text = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p7/Ana/CCProtonPi0/NTupleAnalysis/Output/TextFiles/model1.dat"; 
+    string model2_text = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p7/Ana/CCProtonPi0/NTupleAnalysis/Output/TextFiles/model2.dat"; 
+    string model3_text = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p7/Ana/CCProtonPi0/NTupleAnalysis/Output/TextFiles/model3.dat"; 
+
+    model1.open(model1_text.c_str());
+    model2.open(model2_text.c_str());
+    model3.open(model3_text.c_str());
 
     logFileName = Folder_List::output + Folder_List::textOut + m_ana_folder + "LogFile.txt";
     logFile.open(logFileName.c_str());
@@ -1509,6 +1524,9 @@ void CCProtonPi0_Analyzer::Fill_SCAL_nHits()
     pi0.scal_nHits_reco_correct->Fill(gamma1_side_nHits_all,gamma1_side_nHits_scal); 
     pi0.scal_nHits_reco_true->Fill(gamma1_side_nHits_all,gamma1_scal_nHits_true); 
 
+    pi0.trkr_nHits_2_reco_true->Fill(gamma1_trkr_nHits_reco,gamma1_trkr_nHits_true);
+    pi0.scal_nHits_2_reco_true->Fill(gamma1_scal_nHits_reco,gamma1_scal_nHits_true);
+    
     // Fill gamma2
     double gamma2_trkr_nHits_true = gamma2_center_nHits_trkr + gamma2_side_nHits_trkr;
     double gamma2_scal_nHits_true = gamma2_center_nHits_scal + gamma2_side_nHits_scal;
@@ -1518,6 +1536,79 @@ void CCProtonPi0_Analyzer::Fill_SCAL_nHits()
     pi0.scal_nHits_reco_correct->Fill(gamma2_side_nHits_all,gamma2_side_nHits_scal); 
     pi0.scal_nHits_reco_true->Fill(gamma2_side_nHits_all,gamma2_scal_nHits_true); 
 
+    pi0.trkr_nHits_2_reco_true->Fill(gamma2_trkr_nHits_reco,gamma2_trkr_nHits_true);
+    pi0.scal_nHits_2_reco_true->Fill(gamma2_scal_nHits_reco,gamma2_scal_nHits_true);
+   
+    // model1 = Old Model    
+    model1<<gamma1_trkr_nHits_true<<" "<<gamma1_center_nHits_all<<" "<<gamma1_scal_nHits_true<<" "<<gamma1_side_nHits_all<<endl;
+    model1<<gamma2_trkr_nHits_true<<" "<<gamma2_center_nHits_all<<" "<<gamma2_scal_nHits_true<<" "<<gamma2_side_nHits_all<<endl;
+
+    // model2 = Geometrical Model
+    model2<<gamma1_trkr_nHits_true<<" "<<gamma1_trkr_nHits_reco<<" "<<gamma1_scal_nHits_true<<" "<<gamma1_scal_nHits_reco<<endl;
+    model2<<gamma2_trkr_nHits_true<<" "<<gamma2_trkr_nHits_reco<<" "<<gamma2_scal_nHits_true<<" "<<gamma2_scal_nHits_reco<<endl;
+
+    // model3 = Improved Geometrical Model
+    model3<<gamma1_improved_trkr_nHits_true<<" "<<gamma1_improved_trkr_nHits_reco<<" "<<gamma1_improved_scal_nHits_true<<" "<<gamma1_improved_scal_nHits_reco<<endl;
+    model3<<gamma2_improved_trkr_nHits_true<<" "<<gamma2_improved_trkr_nHits_reco<<" "<<gamma2_improved_scal_nHits_true<<" "<<gamma2_improved_scal_nHits_reco<<endl;
+
+
+    // Fill Error Histograms
+    double trkr_nHits_true;
+    double scal_nHits_true;
+
+    if (gamma1_trkr_nHits_true == 0) trkr_nHits_true = 0.01;
+    else trkr_nHits_true = gamma1_trkr_nHits_true;
+
+    double gamma1_old_model_trkr_error = Data_Functions::getError(trkr_nHits_true,gamma1_center_nHits_all);
+    double gamma1_new_model_trkr_error = Data_Functions::getError(trkr_nHits_true,gamma1_trkr_nHits_reco);
+    double gamma1_improved_model_trkr_error = Data_Functions::getError(trkr_nHits_true,gamma1_improved_trkr_nHits_reco);
+    pi0.old_model_trkr_nHits_error->Fill(gamma1_old_model_trkr_error);
+    pi0.new_model_trkr_nHits_error->Fill(gamma1_new_model_trkr_error);
+    pi0.improved_model_trkr_nHits_error->Fill(gamma1_improved_model_trkr_error);
+ 
+    if (gamma1_scal_nHits_true == 0) scal_nHits_true = 0.01;
+    else scal_nHits_true = gamma1_scal_nHits_true;
+
+    double gamma1_old_model_scal_error = Data_Functions::getError(scal_nHits_true,gamma1_center_nHits_all);
+    double gamma1_new_model_scal_error = Data_Functions::getError(scal_nHits_true,gamma1_scal_nHits_reco);
+    double gamma1_improved_model_scal_error = Data_Functions::getError(scal_nHits_true,gamma1_improved_scal_nHits_reco);
+    pi0.old_model_scal_nHits_error->Fill(gamma1_old_model_scal_error);
+    pi0.new_model_scal_nHits_error->Fill(gamma1_new_model_scal_error);
+    pi0.improved_model_scal_nHits_error->Fill(gamma1_improved_model_scal_error);
+
+
+    // gamma2
+    if (gamma2_trkr_nHits_true == 0) trkr_nHits_true = 0.01;
+    else trkr_nHits_true = gamma2_trkr_nHits_true;
+
+    double gamma2_old_model_trkr_error = Data_Functions::getError(trkr_nHits_true,gamma2_center_nHits_all);
+    double gamma2_new_model_trkr_error = Data_Functions::getError(trkr_nHits_true,gamma2_trkr_nHits_reco);
+    double gamma2_improved_model_trkr_error = Data_Functions::getError(trkr_nHits_true,gamma2_improved_trkr_nHits_reco);
+    pi0.old_model_trkr_nHits_error->Fill(gamma2_old_model_trkr_error);
+    pi0.new_model_trkr_nHits_error->Fill(gamma2_new_model_trkr_error);
+    pi0.improved_model_trkr_nHits_error->Fill(gamma2_improved_model_trkr_error);
+ 
+    if (gamma2_scal_nHits_true == 0) scal_nHits_true = 0.01;
+    else scal_nHits_true = gamma2_scal_nHits_true;
+
+    double gamma2_old_model_scal_error = Data_Functions::getError(scal_nHits_true,gamma2_center_nHits_all);
+    double gamma2_new_model_scal_error = Data_Functions::getError(scal_nHits_true,gamma2_scal_nHits_reco);
+    double gamma2_improved_model_scal_error = Data_Functions::getError(scal_nHits_true,gamma2_improved_scal_nHits_reco);
+    pi0.old_model_scal_nHits_error->Fill(gamma2_old_model_scal_error);
+    pi0.new_model_scal_nHits_error->Fill(gamma2_new_model_scal_error);
+    pi0.improved_model_scal_nHits_error->Fill(gamma2_improved_model_scal_error);
+
+
+    // Fill minZ Information
+    
+    if ( std::abs(gamma1_new_model_trkr_error) < 0.33 ){
+        pi0.scal_minZ_evis->Fill(gamma1_scal_minZ_evis);
+        pi0.scal_minZ_nDigits->Fill(gamma1_scal_minZ_nDigits);
+    }
+    if ( std::abs(gamma2_new_model_trkr_error) < 0.33){
+        pi0.scal_minZ_evis->Fill(gamma2_scal_minZ_evis);
+        pi0.scal_minZ_nDigits->Fill(gamma2_scal_minZ_nDigits);
+    }
 }
 
 #endif //CCProtonPi0_Analyzer_cpp
