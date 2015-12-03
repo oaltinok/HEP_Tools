@@ -28,7 +28,7 @@ CCProtonPi0
 #include <utility>
 #include <fstream>
 
-// ineritance
+// Inheritance
 #include "AnaUtils/MinervaAnalysisTool.h"
 
 //-- Forward Declarations
@@ -142,7 +142,10 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool m_DoPlausibilityCuts;
         bool m_DoTruthMatch;
         bool m_applyExtraMichelCuts;
-            
+        
+        // Optional Studies
+        bool m_study_shower_energy;
+
         // Prong and Cluster Colors
         int m_Color_muonProng;
         int m_Color_protonProng;
@@ -311,13 +314,18 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int GetMCHitPDG(const SmartRef<Minerva::MCHit> mc_hit) const;
         int GetDigitPDG(const Minerva::MCIDDigit* mcdigit) const;
         int GetPDGfromVector(std::vector<int> &all_pdg) const;
+
+        // --------------------------------------------------------------------
+        // Study: Shower Energy Functions
+        //      See Studies/CCProtonPi0_Study_ShowerEnergy.cpp
+        // --------------------------------------------------------------------
+        bool Use_SCAL_minZ(Minerva::IDBlob* blob, double minZ) const;
         bool isHitInsideSCAL(double x, double y, double z) const;
+        double Find_SCAL_MinZ(Minerva::IDBlob* blob) const;
         void SaveBlobTrueEvisBySubDetector(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
         void SaveSCALHits(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
         void SaveSCALHits_Improved(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
-        double Find_SCAL_MinZ(Minerva::IDBlob* blob) const;
         void SaveSCAL_minZ_Info(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const;
-        bool Use_SCAL_minZ(Minerva::IDBlob* blob, double minZ) const;
 };
 
 #endif // CCPROTONPI0_H 

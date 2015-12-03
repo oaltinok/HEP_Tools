@@ -1,4 +1,37 @@
 ===============================================================================
+v2_42a
+CCProtonPi0 Updates:
+	Added Studies/CCProtonPi0_Study_ShowerEnergy.cpp File to repository
+
+===============================================================================
+v2_42
+CCProtonPi0 Updates:
+	Study Concept
+		A Study can be activated using the options file (Ana_CCProtonPi0.opts)
+		NTuple variables will be activated only if the study is active
+			Decreases Output File size if the study is not active
+		Functions for a specific study is collected under another implementation file
+			Decreases compile time for the CCProtonPi0.cpp
+
+	Current Studies Included in the Package
+		Pi0 Shower Energy Study: Latest study I have been working on
+			Ana_CCProtonPi0.opts Variable: 
+				ToolSvc.CCProtonPi0.StudyShowerEnergy
+			Implementation File: 
+				Studies/CCProtonPi0_Study_ShowerEnergy.cpp
+			
+--------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	Removed several Histograms and Functions related with Shower Energy Study
+		I can always find them on CVS (v2_41), they are no longer needed
+	Reorganized Pion and Pi0Blob Classes
+		Moved all blob related histograms from Pion to Pi0Blob 
+			I should have done this before!!
+	New Script FindPlaylistFiles.sh
+		Output a list of files for playlists.
+		These files are used to merge separate files to a single one
+
+===============================================================================
 v2_41
 CCProtonPi0 Updates:
 	Final versions of 

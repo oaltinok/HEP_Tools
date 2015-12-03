@@ -136,7 +136,93 @@ void CCProtonPi0_Pi0Blob::initHistograms()
         temp->GetXaxis()->SetTitle("N(Planes)");
         temp->GetYaxis()->SetTitle("N(Events)");
         g2_nPlanes.push_back(temp);
+
+        // Capture Performance
+        temp = new MnvH1D( Form("%s_%d","evis_frac_true_pi0_reco_all",i),"Visible Energy #pi^0 Fraction",binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("True E_{vis}^{#pi^{0}} / Reco E_{vis}^{Total}");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        evis_frac_true_pi0_reco_all.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","evis_frac_reco_pi0_true_pi0",i),"Visible Energy #pi^0 Fraction",binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Reco E_{vis}^{#pi^{0}} / True E_{vis}^{#pi^{0}}");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        evis_frac_reco_pi0_true_pi0.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","evis_frac_reco_pi0_reco_all",i),"Visible Energy #pi^0 Fraction",binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Reco E_{vis}^{#pi^{0}} / Reco E_{vis}^{Total}");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        evis_frac_reco_pi0_reco_all.push_back(temp);
+ 
+        temp = new MnvH1D( Form("%s_%d","evis_frac_reco_nonpi0_reco_all",i),"Visible Energy Non-#pi^0 Fraction",binList.fraction.get_nBins(), binList.fraction.get_min(), binList.fraction.get_max() );
+        temp->GetXaxis()->SetTitle("Reco E_{vis}^{Non-#pi^{0}} / Reco E_{vis}^{Total}");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        evis_frac_reco_nonpi0_reco_all.push_back(temp);
     } //end loop all Histograms 
+
+    // ------------------------------------------------------------------------
+    // Truth Match - Particle Info
+    //      Evis Plotted as stacked
+    // ------------------------------------------------------------------------
+    g1_evis_proton = new TH1D("g1_evis_proton","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
+    g1_evis_proton->GetXaxis()->SetTitle("Evis");
+    g1_evis_proton->GetYaxis()->SetTitle("N(Events)");
+
+    g1_evis_neutron = new TH1D("g1_evis_neutron","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
+    g1_evis_neutron->GetXaxis()->SetTitle("Evis");
+    g1_evis_neutron->GetYaxis()->SetTitle("N(Events)");
+
+    g1_evis_pi = new TH1D("g1_evis_pi","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
+    g1_evis_pi->GetXaxis()->SetTitle("Evis");
+    g1_evis_pi->GetYaxis()->SetTitle("N(Events)");
+
+    g1_evis_pi0 = new TH1D("g1_evis_pi0","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
+    g1_evis_pi0->GetXaxis()->SetTitle("Evis");
+    g1_evis_pi0->GetYaxis()->SetTitle("N(Events)");
+
+    g1_evis_muon = new TH1D("g1_evis_muon","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
+    g1_evis_muon->GetXaxis()->SetTitle("Evis");
+    g1_evis_muon->GetYaxis()->SetTitle("N(Events)");
+
+    g2_evis_proton = new TH1D("g2_evis_proton","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
+    g2_evis_proton->GetXaxis()->SetTitle("Evis");
+    g2_evis_proton->GetYaxis()->SetTitle("N(Events)");
+
+    g2_evis_neutron = new TH1D("g2_evis_neutron","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
+    g2_evis_neutron->GetXaxis()->SetTitle("Evis");
+    g2_evis_neutron->GetYaxis()->SetTitle("N(Events)");
+
+    g2_evis_pi = new TH1D("g2_evis_pi","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
+    g2_evis_pi->GetXaxis()->SetTitle("Evis");
+    g2_evis_pi->GetYaxis()->SetTitle("N(Events)");
+
+    g2_evis_pi0 = new TH1D("g2_evis_pi0","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
+    g2_evis_pi0->GetXaxis()->SetTitle("Evis");
+    g2_evis_pi0->GetYaxis()->SetTitle("N(Events)");
+
+    g2_evis_muon = new TH1D("g2_evis_muon","Visible Energy",binList.gamma_evis_pdg.get_nBins(), binList.gamma_evis_pdg.get_min(), binList.gamma_evis_pdg.get_max() );
+    g2_evis_muon->GetXaxis()->SetTitle("Evis");
+    g2_evis_muon->GetYaxis()->SetTitle("N(Events)");
+   
+    g3_evis_proton = new TH1D("g3_evis_proton","Visible Energy",binList.pi0_evis_pdg.get_nBins(), binList.pi0_evis_pdg.get_min(), binList.pi0_evis_pdg.get_max() );
+    g3_evis_proton->GetXaxis()->SetTitle("Evis");
+    g3_evis_proton->GetYaxis()->SetTitle("N(Events)");
+
+    g3_evis_neutron = new TH1D("g3_evis_neutron","Visible Energy",binList.pi0_evis_pdg.get_nBins(), binList.pi0_evis_pdg.get_min(), binList.pi0_evis_pdg.get_max() );
+    g3_evis_neutron->GetXaxis()->SetTitle("Evis");
+    g3_evis_neutron->GetYaxis()->SetTitle("N(Events)");
+
+    g3_evis_pi = new TH1D("g3_evis_pi","Visible Energy",binList.pi0_evis_pdg.get_nBins(), binList.pi0_evis_pdg.get_min(), binList.pi0_evis_pdg.get_max() );
+    g3_evis_pi->GetXaxis()->SetTitle("Evis");
+    g3_evis_pi->GetYaxis()->SetTitle("N(Events)");
+
+    g3_evis_pi0 = new TH1D("g3_evis_pi0","Visible Energy",binList.pi0_evis_pdg.get_nBins(), binList.pi0_evis_pdg.get_min(), binList.pi0_evis_pdg.get_max() );
+    g3_evis_pi0->GetXaxis()->SetTitle("Evis");
+    g3_evis_pi0->GetYaxis()->SetTitle("N(Events)");
+
+    g3_evis_muon = new TH1D("g3_evis_muon","Visible Energy",binList.pi0_evis_pdg.get_nBins(), binList.pi0_evis_pdg.get_min(), binList.pi0_evis_pdg.get_max() );
+    g3_evis_muon->GetXaxis()->SetTitle("Evis");
+    g3_evis_muon->GetYaxis()->SetTitle("N(Events)");
+
 }
 
 void CCProtonPi0_Pi0Blob::initBins()
@@ -152,6 +238,11 @@ void CCProtonPi0_Pi0Blob::writeHistograms()
     
     // Write Truth Match Histograms
     for (int i = 0; i < nHistograms; i++){
+        evis_frac_reco_pi0_true_pi0[i]->Write();
+        evis_frac_true_pi0_reco_all[i]->Write();
+        evis_frac_reco_pi0_reco_all[i]->Write();
+        evis_frac_reco_nonpi0_reco_all[i]->Write();
+        
         g1_evis_most_pdg[i]->Write();
         g1_evis_total_truth[i]->Write();
         g1_evis_frac_pizero[i]->Write();
@@ -176,6 +267,24 @@ void CCProtonPi0_Pi0Blob::writeHistograms()
         g1_nPlanes[i]->Write();
         g2_nPlanes[i]->Write();
     }
+
+    g1_evis_proton->Write();
+    g1_evis_neutron->Write();
+    g1_evis_pi->Write();
+    g1_evis_pi0->Write();
+    g1_evis_muon->Write();
+
+    g2_evis_proton->Write();
+    g2_evis_neutron->Write();
+    g2_evis_pi->Write();
+    g2_evis_pi0->Write();
+    g2_evis_muon->Write();
+
+    g3_evis_proton->Write();
+    g3_evis_neutron->Write();
+    g3_evis_pi->Write();
+    g3_evis_pi0->Write();
+    g3_evis_muon->Write();
 
     f->Close();
 }

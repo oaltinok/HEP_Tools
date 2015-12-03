@@ -30,7 +30,7 @@ macro_append ROOT_linkopts " -lPhysics -lHist -lGeom -lEG -lGpad -lGraf -lMinuit
 #===============================================================================
 include_dirs ${CCPROTONPI0ROOT}
 
-library CCProtonPi0Lib      *.cpp Pi0Reco/*.cpp TruthMatch/*.cpp
+library CCProtonPi0Lib      *.cpp Pi0Reco/*.cpp TruthMatch/*.cpp Studies/*.cpp
 apply_pattern component_library library=CCProtonPi0Lib
 
 private

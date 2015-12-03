@@ -597,68 +597,6 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     delete c;
 }
 
-
-void CCProtonPi0_Plotter::DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir)
-{
-    std::string rootDir_mc = dir.mc;
-
-    TFile* f_mc = new TFile(rootDir_mc.c_str());
-  
-    // Use All MC Events -- Indice = 0
-    std::string trkr = Form("g%d_evis_trkr_0",gammaID);
-    std::string scal = Form("g%d_evis_scal_0",gammaID);
-    std::string ecal = Form("g%d_evis_ecal_0",gammaID);
-    std::string hcal = Form("g%d_evis_hcal_0",gammaID);
-    
-    // ------------------------------------------------------------------------
-    // Fill TObjArray - For MC Histograms
-    // ------------------------------------------------------------------------
-    TObjArray* mc_hists = new TObjArray;
-    MnvH1D* temp;
-   
-    // Get Tracker Evis
-    temp = (MnvH1D*)f_mc->Get(trkr.c_str());
-    temp->SetTitle("Tracker");
-    double nTrkr = temp->GetEntries(); 
-    mc_hists->Add(temp);
-    
-    // Get SideECAL Evis
-    temp = (MnvH1D*)f_mc->Get(scal.c_str());
-    temp->SetTitle("SideECAL");
-    mc_hists->Add(temp);
-
-    // Get ECAL Evis
-    temp = (MnvH1D*)f_mc->Get(ecal.c_str());
-    temp->SetTitle("ECAL");
-    mc_hists->Add(temp);
-
-    // Get HCAL Evis
-    temp = (MnvH1D*)f_mc->Get(hcal.c_str());
-    temp->SetTitle("HCAL");
-    mc_hists->Add(temp);
-    
-    // ------------------------------------------------------------------------
-    // Plot 
-    // ------------------------------------------------------------------------
-    MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
-    ApplyStyle(plotter);
-    plotter->DrawStackedMC(mc_hists,1,"TR");
-    
-
-    // Add Plot Labels
-    const double y_pos = 0.88;
-    const double y_diff = 0.033;
-    plotter->AddPlotLabel(Form("nEvents = %3.0f",nTrkr),0.3,y_pos,y_diff,kBlue); 
-    plotter->AddHistoTitle(Form("Visible Energy for Gamma %d",gammaID));
-
-
-    // Print Plot
-    c->Print(Form("%s%s%d%s",plotDir.c_str(),"gamma_",gammaID,"_mc_evis_stacked.png"), "png");
-
-    delete c;
-}
-
 void CCProtonPi0_Plotter::DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir)
 {
     // ------------------------------------------------------------------------- 

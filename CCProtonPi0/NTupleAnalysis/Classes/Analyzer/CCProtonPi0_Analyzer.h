@@ -77,33 +77,19 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fillProtonReco();
 
         //  Pion Specific Functions
-        double ApplyEMEnergyCorrection(double var);
         void getPi0Family();
         void fillPi0True();
-        void fillPi0TruthMatch();
-        void EvisRatio();
-        void EvisStacked();
         void fillPi0Reco();
-        bool isPi0BlobBad();
+        
+        // Pi0Blob Specific Functions
         void fillPi0BlobTrue();
         void fillPi0BlobReco();
-        void FillEvis_MostPDG();
-        void FillEvis_Fractions();
-        void FillEvis_Total(); 
-        void fill_EMEnergy_StudyPlots();
-        void Study_EMShowerTopology();
-        void Fill_ShowerTopology(double trkr, double ecal, double hcal, double scal);
-        void Fill_SCAL_nHits();
-        double get_kT(double evis);
-        double Calc_Gamma_Energy(double evis_trkr, double evis_ecal, double evis_hcal, double evis_scal);
-        int nTrkrDominate;
-        int nECALDominate;
-        int nSCALDominate;
-        int nTrkrSCAL;
-        int nTrkrECAL;
-        int nECALSCAL;
-        int nOther;
-
+        void fillPi0Blob_Evis_MostPDG();
+        void fillPi0Blob_Pi0EvisRatio();
+        void fillPi0Blob_EvisStacked();
+        void fillPi0Blob_Evis_Fractions();
+        void fillPi0Blob_Evis_Total(); 
+        
         //  Default Functions
         void Init(string playlist, TChain* fChain);
         Int_t GetEntry(Long64_t entry);
@@ -162,11 +148,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         ofstream roundupText;
         ofstream logFile;
         ifstream DSTFileList;
-        // Temporary
-        ofstream model1;
-        ofstream model2;
-        ofstream model3;
-
+        
         // -------------------------------------------------------------------------
         //  CCProtonPi0 Data - use makeClass() to get the NTuple Data
         //--------------------------------------------------------------------------

@@ -1,11 +1,7 @@
-cvs commit -m "v2_41
+CCPROTONPI0_V="v2_42a"
+cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Final versions of 
-		Pi0 Shower Energy Study
-		SideECAL Hit Study
- 
---------------------------------------------------------------------------------
-NTupleAnalysis Updates:
-	Final versions of 
-		Pi0 Shower Energy Study
-		SideECAL Hit Study" .
+	Added Studies/CCProtonPi0_Study_ShowerEnergy.cpp File to repository
+" .
+
+cvs tag -F ${CCPROTONPI0_V} .

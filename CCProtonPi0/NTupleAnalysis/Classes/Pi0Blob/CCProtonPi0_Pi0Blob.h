@@ -25,6 +25,13 @@ class CCProtonPi0_Pi0Blob : public CCProtonPi0_NTupleAnalysis
         // Histograms
        
         // Truth Match
+        // Pi0 Capture Performance
+        std::vector<MnvH1D*> evis_frac_true_pi0_reco_all;
+        std::vector<MnvH1D*> evis_frac_reco_pi0_true_pi0;
+        std::vector<MnvH1D*> evis_frac_reco_pi0_reco_all;
+        std::vector<MnvH1D*> evis_frac_reco_nonpi0_reco_all;
+         
+        // Evis Fractions and PDG of Particle with most Evis
         std::vector<MnvH1D*> g1_evis_most_pdg;
         std::vector<MnvH1D*> g1_evis_total_truth;
         std::vector<MnvH1D*> g1_evis_frac_pizero;
@@ -46,6 +53,25 @@ class CCProtonPi0_Pi0Blob : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> captured_evis_frac_all; 
         std::vector<MnvH1D*> captured_evis_frac_signal; 
 
+        // Evis from each Particle for Stacked Plot
+        TH1D* g1_evis_proton;
+        TH1D* g1_evis_neutron;
+        TH1D* g1_evis_pi;
+        TH1D* g1_evis_pi0;
+        TH1D* g1_evis_muon;
+
+        TH1D* g2_evis_proton;
+        TH1D* g2_evis_neutron;
+        TH1D* g2_evis_pi;
+        TH1D* g2_evis_pi0;
+        TH1D* g2_evis_muon;
+
+        TH1D* g3_evis_proton;
+        TH1D* g3_evis_neutron;
+        TH1D* g3_evis_pi;
+        TH1D* g3_evis_pi0;
+        TH1D* g3_evis_muon;
+       
         // Reco Values
         std::vector<MnvH1D*> g1_nPlanes; 
         std::vector<MnvH1D*> g2_nPlanes; 

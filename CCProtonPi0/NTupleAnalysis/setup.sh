@@ -26,6 +26,7 @@ AnaFolder_List=(1Track
 PlotFolder_List=(Muon
 		Proton
 		Pion
+		Pi0Blob
 		Interaction
         Other)
 

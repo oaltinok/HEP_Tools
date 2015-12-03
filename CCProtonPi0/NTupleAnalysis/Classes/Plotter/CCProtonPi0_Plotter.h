@@ -99,6 +99,7 @@ class CCProtonPi0_Plotter
         std::string plotDir_Muon;
         std::string plotDir_Proton;
         std::string plotDir_Pion;
+        std::string plotDir_Pi0Blob;
         std::string plotDir_Other;
         
         void setRootDirs(std::string ana_folder);
@@ -115,9 +116,7 @@ class CCProtonPi0_Plotter
         void plotPion();
         
         // Other Plots 
-        void plotGammaEvis();
         void plotPi0True();
-        void plotPi0TruthMatch();
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
         void plotCutHistograms();
@@ -128,8 +127,6 @@ class CCProtonPi0_Plotter
         void ApplyStyle(MnvPlotter* plotter);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow);
         void SavePi0InvMassPoints();
-        void SaveGammaEvisPoints();
-        void SaveGammaEvisPoints(int xBin);
         
         // Plottting Macros
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
