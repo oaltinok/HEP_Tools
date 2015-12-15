@@ -45,7 +45,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<CCProtonPi0_Cut> nCut_PreFilter_Pi0;
         vector<CCProtonPi0_Cut> nCut_ConeBlobs;
         vector<CCProtonPi0_Cut> nCut_BlobDirectionBad;
-        vector<CCProtonPi0_Cut> nCut_BlobsBad;
         vector<CCProtonPi0_Cut> nCut_Photon1DistanceLow;
         vector<CCProtonPi0_Cut> nCut_Photon2DistanceLow;
         vector<CCProtonPi0_Cut> nCut_Pi0_invMass;
@@ -66,11 +65,9 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_nTracks_Close;
         vector<MnvH1D*> hCut_nTracks_Far;
         vector<MnvH1D*> hCut_nTracks_Discarded;
-        vector<MnvH1D*> hCut_nProngs;
-        vector<MnvH1D*> hCut_nProngs2;
+        vector<MnvH1D*> hCut_Michel;
         
         // 1Track
-        vector<MnvH1D*> hCut_1Track_Michel;
         vector<MnvH1D*> hCut_1Track_eVis_nuclearTarget;
         vector<MnvH1D*> hCut_1Track_eVis_other;
         vector<MnvH1D*> hCut_1Track_pi0invMass;
@@ -82,7 +79,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_1Track_UnusedE;
 
         // 2Track
-        vector<MnvH1D*> hCut_2Track_Michel;
         vector<MnvH1D*> hCut_2Track_eVis_nuclearTarget;
         vector<MnvH1D*> hCut_2Track_eVis_other;
         vector<MnvH1D*> hCut_2Track_pi0invMass;

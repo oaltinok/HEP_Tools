@@ -38,13 +38,18 @@ class CCProtonPi0_NTupleAnalysis
 {
     public:
         CCProtonPi0_NTupleAnalysis();
-        
+       
         string ana_folder;
         // Constants 
         static const int nHistograms = 13;
         static const int nTopologies = 2;
-        static const double SENTINEL = -9.9;
         
+        static const string version;
+        static const double SENTINEL;
+        static const double MeV_to_GeV; 
+        static const double MeVSq_to_GeVSq;
+        static const double mm_to_cm;
+
     private:
 };
 

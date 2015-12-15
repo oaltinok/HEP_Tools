@@ -38,18 +38,20 @@ void PC_DST::Loop(string playlist)
 void PC_DST::getEnergy()
 {
     double reco_E = calcCalorimetricEnergy();
-    double true_E = mc_int_FSParticlesE[0][0]; 
+    double m_proton = 938.27; //MeV
+    double true_E = mc_int_FSParticlesE[0][0];
+    double true_KE = true_E - m_proton;
 
     if (reco_E != -1){
         // Calculate Error
-        double error_E = Data_Functions::getError(true_E, reco_E);
+        double error_E = Data_Functions::getError(true_KE, reco_E);
 
         // Fill Histograms
         error->Fill(error_E);
         reco_energy->Fill(reco_E);
-        true_energy->Fill(true_E);
-        reco_true_energy->Fill(reco_E,true_E);
-        true_recotrue_energy->Fill(true_E,reco_E/true_E);
+        true_energy->Fill(true_KE);
+        reco_true_energy->Fill(reco_E,true_KE);
+        true_recotrue_energy->Fill(true_KE,reco_E/true_KE);
     }
 }
 
@@ -110,26 +112,49 @@ double PC_DST::calcCalorimetricEnergy()
     if (evis_target > 0) return -1;
     if (getODEvis() > 0) return -1;
 
-    if (evis_trkr_central < 0.1 && evis_trkr_side_X < 0.1 && evis_trkr_side_UV < 0.1 && evis_hcal < 0.1){
-        evis_evis_ratio->Fill(evis_ecal, mc_int_FSParticlesE[0][0]/evis_ecal);
-        true_evis_ratio->Fill(mc_int_FSParticlesE[0][0], mc_int_FSParticlesE[0][0]/evis_ecal);
-        evis_true->Fill(evis_ecal, mc_int_FSParticlesE[0][0]);
+    // Save Evis and True
+    if (evis_ecal < 0.1 && evis_trkr_side_X < 0.1 && evis_trkr_side_UV < 0.1 && evis_hcal < 0.1){
+        double visible_E = evis_trkr_central;
+        double m_proton = 938.27; //MeV
+        double true_E = mc_int_FSParticlesE[0][0];
+        double true_KE = true_E - m_proton;
+        
+        evis->Fill(visible_E); 
+        evis_evis_ratio->Fill(visible_E, true_KE/visible_E);
+        true_evis_ratio->Fill(true_KE, true_KE/visible_E);
+        evis_true->Fill(visible_E, true_KE);
     }
-    /*
-     *  If Shower Contained in ID without Target Region
-     *      Calculate Energy
-     */
-    const double alpha = 1.326;
-    const double kE = 2.341;
-    const double kH = 9.54;
-
-    // Energy inside Central Tracker
-    double energy_central = alpha*(evis_trkr_central + kE*evis_ecal + kH*evis_hcal);
-   
-    // Energy inside Side ECAL
-    double energy_side = alpha*( (2*kE-1)*evis_trkr_side_X + (4*kE-1)*evis_trkr_side_UV);
     
-    return energy_central + energy_side;
+    // ------------------------------------------------------------------------
+    // Energy Calculation for Tracker Contained Protons
+    // ------------------------------------------------------------------------
+    if (evis_trkr_central > 0.1 && evis_ecal < 0.1 && evis_trkr_side_X < 0.1 && evis_trkr_side_UV < 0.1 && evis_hcal < 0.1){
+        double cal_const = 1.50; // Found with weighted averages from evis vs true/evis ratio
+        double reco_E = evis_trkr_central * cal_const;
+        return reco_E;
+    }else{
+        return -1;
+    }
+    
+    
+    // ------------------------------------------------------------------------
+    // Energy Calculation for EM Showers
+    // ------------------------------------------------------------------------
+    ///*
+    // *  If Shower Contained in ID without Target Region
+    // *      Calculate Energy
+    // */
+    //const double alpha = 1.326;
+    //const double kE = 2.341;
+    //const double kH = 9.54;
+
+    //// Energy inside Central Tracker
+    //double energy_central = alpha*(evis_trkr_central + kE*evis_ecal + kH*evis_hcal);
+   
+    //// Energy inside Side ECAL
+    //double energy_side = alpha*( (2*kE-1)*evis_trkr_side_X + (4*kE-1)*evis_trkr_side_UV);
+    //
+    //return energy_central + energy_side;
 }
 
 
@@ -154,6 +179,7 @@ void PC_DST::writeHistograms()
     f->cd();
 
     error->Write();
+    evis->Write();
     reco_energy->Write();
     true_energy->Write();
     reco_true_energy->Write();
@@ -178,17 +204,34 @@ PC_DST::PC_DST()
 
 void PC_DST::InitHistograms()
 {
-    error = new TH1D("error","Energy Resolution",100,-2,2);
+    evis = new TH1D("evis","Visible Energy",40,0,850);
+    evis->GetXaxis()->SetTitle("E_{Visible}");
+    evis->GetYaxis()->SetTitle("N(Events)");
+
+    true_energy = new TH1D("true_energy","True Kinetic Energy",40,0,850);
+    true_energy->GetXaxis()->SetTitle("T_{True}");
+    true_energy->GetYaxis()->SetTitle("N(Events)");
+
+    evis_evis_ratio = new TH2D("evis_evis_ratio","T_{True}/E_{Visible} vs E_{Visible}",40,0,850,40,0.0,3.0);
+    evis_evis_ratio->GetXaxis()->SetTitle("E_{Visible}");
+    evis_evis_ratio->GetYaxis()->SetTitle("T_{True}/E_{Visible}");
+
+    true_evis_ratio = new TH2D("true_evis_ratio","T_{True}/E_{Visible} vs T_{True}",40,0,850,40,0.0,3.0);
+    true_evis_ratio->GetXaxis()->SetTitle("T_{True}");
+    true_evis_ratio->GetYaxis()->SetTitle("T_{True}/E_{Visible}");
+
+    evis_true = new TH2D("evis_true","T_{True} vs E_{Visible}",40,0,850,40,0,850);
+    evis_true->GetXaxis()->SetTitle("E_{Visible}");
+    evis_true->GetYaxis()->SetTitle("T_{True}");
+
+    // Reco Energy 
+    error = new TH1D("error","Energy Resolution",100,-1,1);
     error->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
     error->GetYaxis()->SetTitle("N(Events)");
 
     reco_energy = new TH1D("reco_energy","Reconstructed Energy",75,0,1500);
     reco_energy->GetXaxis()->SetTitle("E_{Reco}");
     reco_energy->GetYaxis()->SetTitle("N(Events)");
-
-    true_energy = new TH1D("true_energy","True Energy",75,0,1500);
-    true_energy->GetXaxis()->SetTitle("E_{True}");
-    true_energy->GetYaxis()->SetTitle("N(Events)");
 
     reco_true_energy = new TH2D("reco_true_energy","True vs Reconstructed Energy",75,0,1500,75,0,1500);
     reco_true_energy->GetXaxis()->SetTitle("E_{Reco}");
@@ -197,19 +240,6 @@ void PC_DST::InitHistograms()
     true_recotrue_energy = new TH2D("true_recotrue_energy","True vs Reco/True Energy",75,0,1000,75,0,2);
     true_recotrue_energy->GetXaxis()->SetTitle("E_{True}");
     true_recotrue_energy->GetYaxis()->SetTitle("E_{Reco}/E_{True}");
-
-    evis_evis_ratio = new TH2D("evis_evis_ratio","E_{True}/E_{Visible} vs E_{Visible}",80,0,400,80,1.0,5.0);
-    evis_evis_ratio->GetXaxis()->SetTitle("E_{Visible}");
-    evis_evis_ratio->GetYaxis()->SetTitle("E_{True}/E_{Visible}");
-
-    true_evis_ratio = new TH2D("true_evis_ratio","E_{True}/E_{Visible} vs E_{True}",80,0,600,80,1.0,5.0);
-    true_evis_ratio->GetXaxis()->SetTitle("E_{True}");
-    true_evis_ratio->GetYaxis()->SetTitle("E_{True}/E_{Visible}");
-
-    evis_true = new TH2D("evis_true","E_{True} vs E_{Visible}",80,0,1000,80,0,1000);
-    evis_true->GetXaxis()->SetTitle("E_{Visible}");
-    evis_true->GetYaxis()->SetTitle("E_{True}");
-
 }
 
 

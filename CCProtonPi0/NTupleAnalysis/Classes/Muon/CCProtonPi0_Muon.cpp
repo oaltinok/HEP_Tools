@@ -66,6 +66,17 @@ void CCProtonPi0_Muon::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Muons / %3.1f [Degree]",binList.angle.get_width()));
         phi.push_back(temp);
     }
+
+        
+    reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(), bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
+    reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{p} [GeV]");
+    reco_P_true_P->GetYaxis()->SetTitle("True P_{p} [GeV]");
+
+    P_error = new TH1D( "P_error","Error on Muon Momentum",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    P_error->GetXaxis()->SetTitle("(P_{Reco}-P_{True})/P_{True}");
+    P_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+ 
+
 }
 
 void CCProtonPi0_Muon::writeHistograms()
@@ -80,6 +91,9 @@ void CCProtonPi0_Muon::writeHistograms()
         theta[i]->Write();
         phi[i]->Write();
     }
+
+    P_error->Write();
+    reco_P_true_P->Write();
 
     f->Close();
 }

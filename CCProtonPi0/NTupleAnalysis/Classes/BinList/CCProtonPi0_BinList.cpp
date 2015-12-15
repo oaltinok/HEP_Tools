@@ -40,11 +40,16 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     pi0_evis_pdg.setBin(80,0,300);
     digit_E.setBin(50,0,50);
 
-    // Neutrino Specific Bins
+    // Event Kinematics Bins
     beamE.setBin(20,0,20.0);
     q2.setBin(40,0.0,4.0);
     w.setBin(22,0.8,3.0);
     wSq.setBin(50,0.0,5.0);
+    vertex_energy.setBin(50,0.0,500.0);
+    vertex_evis.setBin(50,0.0,500.0);
+    extra_energy.setBin(50,0.0,20.0);
+    short_proton_P.setBin(50,0.0,1000.0);
+    short_proton_KE.setBin(50,0.0,500.0);
     
     UsedE.setBin(40,0.0,2000.0);
     UnusedE.setBin(20,0.0,1000.0);

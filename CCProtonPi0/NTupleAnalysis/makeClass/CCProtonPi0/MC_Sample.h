@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Dec  2 08:30:16 2015 by ROOT version 5.34/05
+// Mon Dec 14 08:43:32 2015 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -48,7 +48,6 @@ public :
    Bool_t          is_houghtransform;
    Bool_t          is_houghtransform_applied;
    Int_t           Cut_BlobDirectionBad;
-   Int_t           Cut_BlobsBad;
    Int_t           Cut_ConeBlobs;
    Int_t           Cut_EndPoint_Michel_Exist;
    Int_t           Cut_Muon_Charge;
@@ -76,7 +75,7 @@ public :
    Int_t           gamma1_blob_ndigits;
    Int_t           gamma2_blob_nclusters;
    Int_t           gamma2_blob_ndigits;
-   Int_t           nProngs;
+   Int_t           nProtonCandidates;
    Int_t           nTracks;
    Int_t           nTracks_Close;
    Int_t           nTracks_Discarded;
@@ -102,19 +101,33 @@ public :
    Double_t        RE_energy_HCAL;
    Double_t        RE_energy_Tracker;
    Double_t        Rejected_blob_vis_energy;
-   Double_t        Vertex_blob_energy;
-   Double_t        energyUnused_afterReco;
-   Double_t        energyUsed_afterReco;
    Double_t        energy_from_mc;
    Double_t        energy_from_mc_fraction;
    Double_t        energy_from_mc_fraction_of_highest;
-   Double_t        evis_ECAL;
-   Double_t        evis_HCAL;
-   Double_t        evis_NuclearTarget;
-   Double_t        evis_TotalExceptNuclearTarget;
-   Double_t        evis_Tracker;
-   Double_t        evis_nearvtx;
+   Double_t        evis_ID;
+   Double_t        evis_OD;
+   Double_t        evis_Unused_afterReco;
+   Double_t        evis_Used_afterReco;
+   Double_t        evis_extra;
+   Double_t        evis_gamma1;
+   Double_t        evis_gamma2;
+   Double_t        evis_muon;
+   Double_t        evis_pi0;
+   Double_t        evis_proton;
    Double_t        evis_total;
+   Double_t        extra_energy;
+   Double_t        extra_energy_100;
+   Double_t        extra_energy_150;
+   Double_t        extra_energy_200;
+   Double_t        extra_energy_300;
+   Double_t        extra_energy_50;
+   Double_t        extra_energy_500;
+   Double_t        extra_evis_100;
+   Double_t        extra_evis_150;
+   Double_t        extra_evis_200;
+   Double_t        extra_evis_300;
+   Double_t        extra_evis_50;
+   Double_t        extra_evis_500;
    Double_t        g1blob_1ParFit_fval;
    Double_t        g1blob_2ParFit_vtx_distance;
    Double_t        g1dedx;
@@ -129,55 +142,13 @@ public :
    Double_t        g2dedx_total1;
    Double_t        gamma1_blob_energy;
    Double_t        gamma1_blob_minsep;
-   Double_t        gamma1_center_nHits_all;
-   Double_t        gamma1_center_nHits_scal;
-   Double_t        gamma1_center_nHits_trkr;
-   Double_t        gamma1_ecal_true_evis;
-   Double_t        gamma1_hcal_true_evis;
-   Double_t        gamma1_improved_scal_nHits_reco;
-   Double_t        gamma1_improved_scal_nHits_true;
-   Double_t        gamma1_improved_trkr_nHits_reco;
-   Double_t        gamma1_improved_trkr_nHits_true;
-   Double_t        gamma1_scal_minZ_evis;
-   Double_t        gamma1_scal_minZ_nDigits;
-   Double_t        gamma1_scal_nHits_reco;
-   Double_t        gamma1_scal_nHits_true;
-   Double_t        gamma1_scal_true_evis;
-   Double_t        gamma1_side_nHits_all;
-   Double_t        gamma1_side_nHits_scal;
-   Double_t        gamma1_side_nHits_trkr;
-   Double_t        gamma1_trkr_nHits_reco;
-   Double_t        gamma1_trkr_nHits_true;
-   Double_t        gamma1_trkr_true_evis;
    Double_t        gamma2_blob_energy;
    Double_t        gamma2_blob_minsep;
-   Double_t        gamma2_center_nHits_all;
-   Double_t        gamma2_center_nHits_scal;
-   Double_t        gamma2_center_nHits_trkr;
-   Double_t        gamma2_ecal_true_evis;
-   Double_t        gamma2_hcal_true_evis;
-   Double_t        gamma2_improved_scal_nHits_reco;
-   Double_t        gamma2_improved_scal_nHits_true;
-   Double_t        gamma2_improved_trkr_nHits_reco;
-   Double_t        gamma2_improved_trkr_nHits_true;
-   Double_t        gamma2_scal_minZ_evis;
-   Double_t        gamma2_scal_minZ_nDigits;
-   Double_t        gamma2_scal_nHits_reco;
-   Double_t        gamma2_scal_nHits_true;
-   Double_t        gamma2_scal_true_evis;
-   Double_t        gamma2_side_nHits_all;
-   Double_t        gamma2_side_nHits_scal;
-   Double_t        gamma2_side_nHits_trkr;
-   Double_t        gamma2_trkr_nHits_reco;
-   Double_t        gamma2_trkr_nHits_true;
-   Double_t        gamma2_trkr_true_evis;
-   Double_t        hadronVisibleE;
    Double_t        michelProng_begin_Z;
    Double_t        michelProng_distance;
    Double_t        michelProng_end_Z;
    Double_t        michelProng_energy;
    Double_t        michelProng_time_diff;
-   Double_t        muonVisibleE;
    Double_t        muon_phi;
    Double_t        muon_theta;
    Double_t        muon_thetaX;
@@ -195,13 +166,19 @@ public :
    Double_t        phys_energy_in_road_downstream;
    Double_t        phys_energy_in_road_upstream;
    Double_t        phys_energy_unattached;
+   Double_t        preFilter_evis_ECAL;
+   Double_t        preFilter_evis_HCAL;
+   Double_t        preFilter_evis_NuclearTarget;
+   Double_t        preFilter_evis_TotalExceptNuclearTarget;
+   Double_t        preFilter_evis_Tracker;
+   Double_t        preFilter_evis_nearvtx;
+   Double_t        preFilter_evis_total;
    Double_t        preFilter_rejectedEnergy;
    Double_t        prim_vtx_smallest_opening_angle;
    Double_t        reco_eventID;
    Double_t        time;
-   Double_t        totalIDVisibleE;
-   Double_t        totalODVisibleE;
-   Double_t        totalVisibleE;
+   Double_t        vertex_blob_energy;
+   Double_t        vertex_blob_evis;
    Double_t        vtx_fit_chi2;
    Int_t           g1dedx_cluster_occupancy_sz;
    Int_t           g1dedx_cluster_occupancy[6];   //[g1dedx_cluster_occupancy_sz]
@@ -209,8 +186,6 @@ public :
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
    Int_t           nTracks_Secondary_Vtx_sz;
    Int_t           nTracks_Secondary_Vtx[4];   //[nTracks_Secondary_Vtx_sz]
-   Int_t           Vertex_energy_radii_sz;
-   Double_t        Vertex_energy_radii[7];   //[Vertex_energy_radii_sz]
    Double_t        fit_vtx[3];
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
@@ -220,30 +195,6 @@ public :
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
    Double_t        g2dedx_rev_cluster_energy[86];   //[g2dedx_rev_cluster_energy_sz]
-   Int_t           gamma1_blob_all_digit_E_sz;
-   Double_t        gamma1_blob_all_digit_E[352];   //[gamma1_blob_all_digit_E_sz]
-   Int_t           gamma1_blob_muon_digit_E_sz;
-   Double_t        gamma1_blob_muon_digit_E[215];   //[gamma1_blob_muon_digit_E_sz]
-   Int_t           gamma1_blob_neutron_digit_E_sz;
-   Double_t        gamma1_blob_neutron_digit_E[184];   //[gamma1_blob_neutron_digit_E_sz]
-   Int_t           gamma1_blob_pi0_digit_E_sz;
-   Double_t        gamma1_blob_pi0_digit_E[344];   //[gamma1_blob_pi0_digit_E_sz]
-   Int_t           gamma1_blob_pi_digit_E_sz;
-   Double_t        gamma1_blob_pi_digit_E[282];   //[gamma1_blob_pi_digit_E_sz]
-   Int_t           gamma1_blob_proton_digit_E_sz;
-   Double_t        gamma1_blob_proton_digit_E[241];   //[gamma1_blob_proton_digit_E_sz]
-   Int_t           gamma2_blob_all_digit_E_sz;
-   Double_t        gamma2_blob_all_digit_E[304];   //[gamma2_blob_all_digit_E_sz]
-   Int_t           gamma2_blob_muon_digit_E_sz;
-   Double_t        gamma2_blob_muon_digit_E[111];   //[gamma2_blob_muon_digit_E_sz]
-   Int_t           gamma2_blob_neutron_digit_E_sz;
-   Double_t        gamma2_blob_neutron_digit_E[88];   //[gamma2_blob_neutron_digit_E_sz]
-   Int_t           gamma2_blob_pi0_digit_E_sz;
-   Double_t        gamma2_blob_pi0_digit_E[182];   //[gamma2_blob_pi0_digit_E_sz]
-   Int_t           gamma2_blob_pi_digit_E_sz;
-   Double_t        gamma2_blob_pi_digit_E[251];   //[gamma2_blob_pi_digit_E_sz]
-   Int_t           gamma2_blob_proton_digit_E_sz;
-   Double_t        gamma2_blob_proton_digit_E[122];   //[gamma2_blob_proton_digit_E_sz]
    Int_t           od_distanceBlobTower_sz;
    Double_t        od_distanceBlobTower[2];   //[od_distanceBlobTower_sz]
    Int_t           od_idBlobTime_sz;
@@ -458,12 +409,10 @@ public :
    Int_t           CCProtonPi0_trajMuonProngPrimary;
    Int_t           CCProtonPi0_vtx_module;
    Int_t           CCProtonPi0_vtx_plane;
-   Double_t        CCProtonPi0_QSq_1Track;
-   Double_t        CCProtonPi0_QSq_Cal;
-   Double_t        CCProtonPi0_WSq_1Track;
-   Double_t        CCProtonPi0_WSq_Cal;
-   Double_t        CCProtonPi0_W_1Track;
-   Double_t        CCProtonPi0_W_Cal;
+   Double_t        CCProtonPi0_QSq;
+   Double_t        CCProtonPi0_QSq_1Track_Alt;
+   Double_t        CCProtonPi0_WSq;
+   Double_t        CCProtonPi0_WSq_1Track_Alt;
    Double_t        CCProtonPi0_endMuonTrajMomentum;
    Double_t        CCProtonPi0_endMuonTrajXPosition;
    Double_t        CCProtonPi0_endMuonTrajYPosition;
@@ -543,9 +492,8 @@ public :
    Double_t        CCProtonPi0_muon_theta;
    Double_t        CCProtonPi0_muon_theta_biasDown;
    Double_t        CCProtonPi0_muon_theta_biasUp;
-   Double_t        CCProtonPi0_neutrino_E_1Track;
-   Double_t        CCProtonPi0_neutrino_E_2Track;
-   Double_t        CCProtonPi0_neutrino_E_Cal;
+   Double_t        CCProtonPi0_neutrino_E;
+   Double_t        CCProtonPi0_neutrino_E_1Track_Alt;
    Double_t        CCProtonPi0_pi0_E;
    Double_t        CCProtonPi0_pi0_KE;
    Double_t        CCProtonPi0_pi0_P;
@@ -782,7 +730,6 @@ public :
    TBranch        *b_is_houghtransform;   //!
    TBranch        *b_is_houghtransform_applied;   //!
    TBranch        *b_Cut_BlobDirectionBad;   //!
-   TBranch        *b_Cut_BlobsBad;   //!
    TBranch        *b_Cut_ConeBlobs;   //!
    TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
    TBranch        *b_Cut_Muon_Charge;   //!
@@ -810,7 +757,7 @@ public :
    TBranch        *b_gamma1_blob_ndigits;   //!
    TBranch        *b_gamma2_blob_nclusters;   //!
    TBranch        *b_gamma2_blob_ndigits;   //!
-   TBranch        *b_nProngs;   //!
+   TBranch        *b_nProtonCandidates;   //!
    TBranch        *b_nTracks;   //!
    TBranch        *b_nTracks_Close;   //!
    TBranch        *b_nTracks_Discarded;   //!
@@ -836,19 +783,33 @@ public :
    TBranch        *b_RE_energy_HCAL;   //!
    TBranch        *b_RE_energy_Tracker;   //!
    TBranch        *b_Rejected_blob_vis_energy;   //!
-   TBranch        *b_Vertex_blob_energy;   //!
-   TBranch        *b_energyUnused_afterReco;   //!
-   TBranch        *b_energyUsed_afterReco;   //!
    TBranch        *b_energy_from_mc;   //!
    TBranch        *b_energy_from_mc_fraction;   //!
    TBranch        *b_energy_from_mc_fraction_of_highest;   //!
-   TBranch        *b_evis_ECAL;   //!
-   TBranch        *b_evis_HCAL;   //!
-   TBranch        *b_evis_NuclearTarget;   //!
-   TBranch        *b_evis_TotalExceptNuclearTarget;   //!
-   TBranch        *b_evis_Tracker;   //!
-   TBranch        *b_evis_nearvtx;   //!
+   TBranch        *b_evis_ID;   //!
+   TBranch        *b_evis_OD;   //!
+   TBranch        *b_evis_Unused_afterReco;   //!
+   TBranch        *b_evis_Used_afterReco;   //!
+   TBranch        *b_evis_extra;   //!
+   TBranch        *b_evis_gamma1;   //!
+   TBranch        *b_evis_gamma2;   //!
+   TBranch        *b_evis_muon;   //!
+   TBranch        *b_evis_pi0;   //!
+   TBranch        *b_evis_proton;   //!
    TBranch        *b_evis_total;   //!
+   TBranch        *b_extra_energy;   //!
+   TBranch        *b_extra_energy_100;   //!
+   TBranch        *b_extra_energy_150;   //!
+   TBranch        *b_extra_energy_200;   //!
+   TBranch        *b_extra_energy_300;   //!
+   TBranch        *b_extra_energy_50;   //!
+   TBranch        *b_extra_energy_500;   //!
+   TBranch        *b_extra_evis_100;   //!
+   TBranch        *b_extra_evis_150;   //!
+   TBranch        *b_extra_evis_200;   //!
+   TBranch        *b_extra_evis_300;   //!
+   TBranch        *b_extra_evis_50;   //!
+   TBranch        *b_extra_evis_500;   //!
    TBranch        *b_g1blob_1ParFit_fval;   //!
    TBranch        *b_g1blob_2ParFit_vtx_distance;   //!
    TBranch        *b_g1dedx;   //!
@@ -863,55 +824,13 @@ public :
    TBranch        *b_g2dedx_total1;   //!
    TBranch        *b_gamma1_blob_energy;   //!
    TBranch        *b_gamma1_blob_minsep;   //!
-   TBranch        *b_gamma1_center_nHits_all;   //!
-   TBranch        *b_gamma1_center_nHits_scal;   //!
-   TBranch        *b_gamma1_center_nHits_trkr;   //!
-   TBranch        *b_gamma1_ecal_true_evis;   //!
-   TBranch        *b_gamma1_hcal_true_evis;   //!
-   TBranch        *b_gamma1_improved_scal_nHits_reco;   //!
-   TBranch        *b_gamma1_improved_scal_nHits_true;   //!
-   TBranch        *b_gamma1_improved_trkr_nHits_reco;   //!
-   TBranch        *b_gamma1_improved_trkr_nHits_true;   //!
-   TBranch        *b_gamma1_scal_minZ_evis;   //!
-   TBranch        *b_gamma1_scal_minZ_nDigits;   //!
-   TBranch        *b_gamma1_scal_nHits_reco;   //!
-   TBranch        *b_gamma1_scal_nHits_true;   //!
-   TBranch        *b_gamma1_scal_true_evis;   //!
-   TBranch        *b_gamma1_side_nHits_all;   //!
-   TBranch        *b_gamma1_side_nHits_scal;   //!
-   TBranch        *b_gamma1_side_nHits_trkr;   //!
-   TBranch        *b_gamma1_trkr_nHits_reco;   //!
-   TBranch        *b_gamma1_trkr_nHits_true;   //!
-   TBranch        *b_gamma1_trkr_true_evis;   //!
    TBranch        *b_gamma2_blob_energy;   //!
    TBranch        *b_gamma2_blob_minsep;   //!
-   TBranch        *b_gamma2_center_nHits_all;   //!
-   TBranch        *b_gamma2_center_nHits_scal;   //!
-   TBranch        *b_gamma2_center_nHits_trkr;   //!
-   TBranch        *b_gamma2_ecal_true_evis;   //!
-   TBranch        *b_gamma2_hcal_true_evis;   //!
-   TBranch        *b_gamma2_improved_scal_nHits_reco;   //!
-   TBranch        *b_gamma2_improved_scal_nHits_true;   //!
-   TBranch        *b_gamma2_improved_trkr_nHits_reco;   //!
-   TBranch        *b_gamma2_improved_trkr_nHits_true;   //!
-   TBranch        *b_gamma2_scal_minZ_evis;   //!
-   TBranch        *b_gamma2_scal_minZ_nDigits;   //!
-   TBranch        *b_gamma2_scal_nHits_reco;   //!
-   TBranch        *b_gamma2_scal_nHits_true;   //!
-   TBranch        *b_gamma2_scal_true_evis;   //!
-   TBranch        *b_gamma2_side_nHits_all;   //!
-   TBranch        *b_gamma2_side_nHits_scal;   //!
-   TBranch        *b_gamma2_side_nHits_trkr;   //!
-   TBranch        *b_gamma2_trkr_nHits_reco;   //!
-   TBranch        *b_gamma2_trkr_nHits_true;   //!
-   TBranch        *b_gamma2_trkr_true_evis;   //!
-   TBranch        *b_hadronVisibleE;   //!
    TBranch        *b_michelProng_begin_Z;   //!
    TBranch        *b_michelProng_distance;   //!
    TBranch        *b_michelProng_end_Z;   //!
    TBranch        *b_michelProng_energy;   //!
    TBranch        *b_michelProng_time_diff;   //!
-   TBranch        *b_muonVisibleE;   //!
    TBranch        *b_muon_phi;   //!
    TBranch        *b_muon_theta;   //!
    TBranch        *b_muon_thetaX;   //!
@@ -929,13 +848,19 @@ public :
    TBranch        *b_phys_energy_in_road_downstream;   //!
    TBranch        *b_phys_energy_in_road_upstream;   //!
    TBranch        *b_phys_energy_unattached;   //!
+   TBranch        *b_preFilter_evis_ECAL;   //!
+   TBranch        *b_preFilter_evis_HCAL;   //!
+   TBranch        *b_preFilter_evis_NuclearTarget;   //!
+   TBranch        *b_preFilter_evis_TotalExceptNuclearTarget;   //!
+   TBranch        *b_preFilter_evis_Tracker;   //!
+   TBranch        *b_preFilter_evis_nearvtx;   //!
+   TBranch        *b_preFilter_evis_total;   //!
    TBranch        *b_preFilter_rejectedEnergy;   //!
    TBranch        *b_prim_vtx_smallest_opening_angle;   //!
    TBranch        *b_reco_eventID;   //!
    TBranch        *b_time;   //!
-   TBranch        *b_totalIDVisibleE;   //!
-   TBranch        *b_totalODVisibleE;   //!
-   TBranch        *b_totalVisibleE;   //!
+   TBranch        *b_vertex_blob_energy;   //!
+   TBranch        *b_vertex_blob_evis;   //!
    TBranch        *b_vtx_fit_chi2;   //!
    TBranch        *b_g1dedx_cluster_occupancy_sz;   //!
    TBranch        *b_g1dedx_cluster_occupancy;   //!
@@ -943,8 +868,6 @@ public :
    TBranch        *b_g2dedx_cluster_occupancy;   //!
    TBranch        *b_nTracks_Secondary_Vtx_sz;   //!
    TBranch        *b_nTracks_Secondary_Vtx;   //!
-   TBranch        *b_Vertex_energy_radii_sz;   //!
-   TBranch        *b_Vertex_energy_radii;   //!
    TBranch        *b_fit_vtx;   //!
    TBranch        *b_g1dedx_cluster_energy_sz;   //!
    TBranch        *b_g1dedx_cluster_energy;   //!
@@ -954,30 +877,6 @@ public :
    TBranch        *b_g2dedx_cluster_energy;   //!
    TBranch        *b_g2dedx_rev_cluster_energy_sz;   //!
    TBranch        *b_g2dedx_rev_cluster_energy;   //!
-   TBranch        *b_gamma1_blob_all_digit_E_sz;   //!
-   TBranch        *b_gamma1_blob_all_digit_E;   //!
-   TBranch        *b_gamma1_blob_muon_digit_E_sz;   //!
-   TBranch        *b_gamma1_blob_muon_digit_E;   //!
-   TBranch        *b_gamma1_blob_neutron_digit_E_sz;   //!
-   TBranch        *b_gamma1_blob_neutron_digit_E;   //!
-   TBranch        *b_gamma1_blob_pi0_digit_E_sz;   //!
-   TBranch        *b_gamma1_blob_pi0_digit_E;   //!
-   TBranch        *b_gamma1_blob_pi_digit_E_sz;   //!
-   TBranch        *b_gamma1_blob_pi_digit_E;   //!
-   TBranch        *b_gamma1_blob_proton_digit_E_sz;   //!
-   TBranch        *b_gamma1_blob_proton_digit_E;   //!
-   TBranch        *b_gamma2_blob_all_digit_E_sz;   //!
-   TBranch        *b_gamma2_blob_all_digit_E;   //!
-   TBranch        *b_gamma2_blob_muon_digit_E_sz;   //!
-   TBranch        *b_gamma2_blob_muon_digit_E;   //!
-   TBranch        *b_gamma2_blob_neutron_digit_E_sz;   //!
-   TBranch        *b_gamma2_blob_neutron_digit_E;   //!
-   TBranch        *b_gamma2_blob_pi0_digit_E_sz;   //!
-   TBranch        *b_gamma2_blob_pi0_digit_E;   //!
-   TBranch        *b_gamma2_blob_pi_digit_E_sz;   //!
-   TBranch        *b_gamma2_blob_pi_digit_E;   //!
-   TBranch        *b_gamma2_blob_proton_digit_E_sz;   //!
-   TBranch        *b_gamma2_blob_proton_digit_E;   //!
    TBranch        *b_od_distanceBlobTower_sz;   //!
    TBranch        *b_od_distanceBlobTower;   //!
    TBranch        *b_od_idBlobTime_sz;   //!
@@ -1192,12 +1091,10 @@ public :
    TBranch        *b_CCProtonPi0_trajMuonProngPrimary;   //!
    TBranch        *b_CCProtonPi0_vtx_module;   //!
    TBranch        *b_CCProtonPi0_vtx_plane;   //!
-   TBranch        *b_CCProtonPi0_QSq_1Track;   //!
-   TBranch        *b_CCProtonPi0_QSq_Cal;   //!
-   TBranch        *b_CCProtonPi0_WSq_1Track;   //!
-   TBranch        *b_CCProtonPi0_WSq_Cal;   //!
-   TBranch        *b_CCProtonPi0_W_1Track;   //!
-   TBranch        *b_CCProtonPi0_W_Cal;   //!
+   TBranch        *b_CCProtonPi0_QSq;   //!
+   TBranch        *b_CCProtonPi0_QSq_1Track_Alt;   //!
+   TBranch        *b_CCProtonPi0_WSq;   //!
+   TBranch        *b_CCProtonPi0_WSq_1Track_Alt;   //!
    TBranch        *b_CCProtonPi0_endMuonTrajMomentum;   //!
    TBranch        *b_CCProtonPi0_endMuonTrajXPosition;   //!
    TBranch        *b_CCProtonPi0_endMuonTrajYPosition;   //!
@@ -1277,9 +1174,8 @@ public :
    TBranch        *b_CCProtonPi0_muon_theta;   //!
    TBranch        *b_CCProtonPi0_muon_theta_biasDown;   //!
    TBranch        *b_CCProtonPi0_muon_theta_biasUp;   //!
-   TBranch        *b_CCProtonPi0_neutrino_E_1Track;   //!
-   TBranch        *b_CCProtonPi0_neutrino_E_2Track;   //!
-   TBranch        *b_CCProtonPi0_neutrino_E_Cal;   //!
+   TBranch        *b_CCProtonPi0_neutrino_E;   //!
+   TBranch        *b_CCProtonPi0_neutrino_E_1Track_Alt;   //!
    TBranch        *b_CCProtonPi0_pi0_E;   //!
    TBranch        *b_CCProtonPi0_pi0_KE;   //!
    TBranch        *b_CCProtonPi0_pi0_P;   //!
@@ -1523,7 +1419,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_40d.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_43c.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1601,7 +1497,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("is_houghtransform", &is_houghtransform, &b_is_houghtransform);
    fChain->SetBranchAddress("is_houghtransform_applied", &is_houghtransform_applied, &b_is_houghtransform_applied);
    fChain->SetBranchAddress("Cut_BlobDirectionBad", &Cut_BlobDirectionBad, &b_Cut_BlobDirectionBad);
-   fChain->SetBranchAddress("Cut_BlobsBad", &Cut_BlobsBad, &b_Cut_BlobsBad);
    fChain->SetBranchAddress("Cut_ConeBlobs", &Cut_ConeBlobs, &b_Cut_ConeBlobs);
    fChain->SetBranchAddress("Cut_EndPoint_Michel_Exist", &Cut_EndPoint_Michel_Exist, &b_Cut_EndPoint_Michel_Exist);
    fChain->SetBranchAddress("Cut_Muon_Charge", &Cut_Muon_Charge, &b_Cut_Muon_Charge);
@@ -1629,7 +1524,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("gamma1_blob_ndigits", &gamma1_blob_ndigits, &b_gamma1_blob_ndigits);
    fChain->SetBranchAddress("gamma2_blob_nclusters", &gamma2_blob_nclusters, &b_gamma2_blob_nclusters);
    fChain->SetBranchAddress("gamma2_blob_ndigits", &gamma2_blob_ndigits, &b_gamma2_blob_ndigits);
-   fChain->SetBranchAddress("nProngs", &nProngs, &b_nProngs);
+   fChain->SetBranchAddress("nProtonCandidates", &nProtonCandidates, &b_nProtonCandidates);
    fChain->SetBranchAddress("nTracks", &nTracks, &b_nTracks);
    fChain->SetBranchAddress("nTracks_Close", &nTracks_Close, &b_nTracks_Close);
    fChain->SetBranchAddress("nTracks_Discarded", &nTracks_Discarded, &b_nTracks_Discarded);
@@ -1655,19 +1550,33 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("RE_energy_HCAL", &RE_energy_HCAL, &b_RE_energy_HCAL);
    fChain->SetBranchAddress("RE_energy_Tracker", &RE_energy_Tracker, &b_RE_energy_Tracker);
    fChain->SetBranchAddress("Rejected_blob_vis_energy", &Rejected_blob_vis_energy, &b_Rejected_blob_vis_energy);
-   fChain->SetBranchAddress("Vertex_blob_energy", &Vertex_blob_energy, &b_Vertex_blob_energy);
-   fChain->SetBranchAddress("energyUnused_afterReco", &energyUnused_afterReco, &b_energyUnused_afterReco);
-   fChain->SetBranchAddress("energyUsed_afterReco", &energyUsed_afterReco, &b_energyUsed_afterReco);
    fChain->SetBranchAddress("energy_from_mc", &energy_from_mc, &b_energy_from_mc);
    fChain->SetBranchAddress("energy_from_mc_fraction", &energy_from_mc_fraction, &b_energy_from_mc_fraction);
    fChain->SetBranchAddress("energy_from_mc_fraction_of_highest", &energy_from_mc_fraction_of_highest, &b_energy_from_mc_fraction_of_highest);
-   fChain->SetBranchAddress("evis_ECAL", &evis_ECAL, &b_evis_ECAL);
-   fChain->SetBranchAddress("evis_HCAL", &evis_HCAL, &b_evis_HCAL);
-   fChain->SetBranchAddress("evis_NuclearTarget", &evis_NuclearTarget, &b_evis_NuclearTarget);
-   fChain->SetBranchAddress("evis_TotalExceptNuclearTarget", &evis_TotalExceptNuclearTarget, &b_evis_TotalExceptNuclearTarget);
-   fChain->SetBranchAddress("evis_Tracker", &evis_Tracker, &b_evis_Tracker);
-   fChain->SetBranchAddress("evis_nearvtx", &evis_nearvtx, &b_evis_nearvtx);
+   fChain->SetBranchAddress("evis_ID", &evis_ID, &b_evis_ID);
+   fChain->SetBranchAddress("evis_OD", &evis_OD, &b_evis_OD);
+   fChain->SetBranchAddress("evis_Unused_afterReco", &evis_Unused_afterReco, &b_evis_Unused_afterReco);
+   fChain->SetBranchAddress("evis_Used_afterReco", &evis_Used_afterReco, &b_evis_Used_afterReco);
+   fChain->SetBranchAddress("evis_extra", &evis_extra, &b_evis_extra);
+   fChain->SetBranchAddress("evis_gamma1", &evis_gamma1, &b_evis_gamma1);
+   fChain->SetBranchAddress("evis_gamma2", &evis_gamma2, &b_evis_gamma2);
+   fChain->SetBranchAddress("evis_muon", &evis_muon, &b_evis_muon);
+   fChain->SetBranchAddress("evis_pi0", &evis_pi0, &b_evis_pi0);
+   fChain->SetBranchAddress("evis_proton", &evis_proton, &b_evis_proton);
    fChain->SetBranchAddress("evis_total", &evis_total, &b_evis_total);
+   fChain->SetBranchAddress("extra_energy", &extra_energy, &b_extra_energy);
+   fChain->SetBranchAddress("extra_energy_100", &extra_energy_100, &b_extra_energy_100);
+   fChain->SetBranchAddress("extra_energy_150", &extra_energy_150, &b_extra_energy_150);
+   fChain->SetBranchAddress("extra_energy_200", &extra_energy_200, &b_extra_energy_200);
+   fChain->SetBranchAddress("extra_energy_300", &extra_energy_300, &b_extra_energy_300);
+   fChain->SetBranchAddress("extra_energy_50", &extra_energy_50, &b_extra_energy_50);
+   fChain->SetBranchAddress("extra_energy_500", &extra_energy_500, &b_extra_energy_500);
+   fChain->SetBranchAddress("extra_evis_100", &extra_evis_100, &b_extra_evis_100);
+   fChain->SetBranchAddress("extra_evis_150", &extra_evis_150, &b_extra_evis_150);
+   fChain->SetBranchAddress("extra_evis_200", &extra_evis_200, &b_extra_evis_200);
+   fChain->SetBranchAddress("extra_evis_300", &extra_evis_300, &b_extra_evis_300);
+   fChain->SetBranchAddress("extra_evis_50", &extra_evis_50, &b_extra_evis_50);
+   fChain->SetBranchAddress("extra_evis_500", &extra_evis_500, &b_extra_evis_500);
    fChain->SetBranchAddress("g1blob_1ParFit_fval", &g1blob_1ParFit_fval, &b_g1blob_1ParFit_fval);
    fChain->SetBranchAddress("g1blob_2ParFit_vtx_distance", &g1blob_2ParFit_vtx_distance, &b_g1blob_2ParFit_vtx_distance);
    fChain->SetBranchAddress("g1dedx", &g1dedx, &b_g1dedx);
@@ -1682,55 +1591,13 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("g2dedx_total1", &g2dedx_total1, &b_g2dedx_total1);
    fChain->SetBranchAddress("gamma1_blob_energy", &gamma1_blob_energy, &b_gamma1_blob_energy);
    fChain->SetBranchAddress("gamma1_blob_minsep", &gamma1_blob_minsep, &b_gamma1_blob_minsep);
-   fChain->SetBranchAddress("gamma1_center_nHits_all", &gamma1_center_nHits_all, &b_gamma1_center_nHits_all);
-   fChain->SetBranchAddress("gamma1_center_nHits_scal", &gamma1_center_nHits_scal, &b_gamma1_center_nHits_scal);
-   fChain->SetBranchAddress("gamma1_center_nHits_trkr", &gamma1_center_nHits_trkr, &b_gamma1_center_nHits_trkr);
-   fChain->SetBranchAddress("gamma1_ecal_true_evis", &gamma1_ecal_true_evis, &b_gamma1_ecal_true_evis);
-   fChain->SetBranchAddress("gamma1_hcal_true_evis", &gamma1_hcal_true_evis, &b_gamma1_hcal_true_evis);
-   fChain->SetBranchAddress("gamma1_improved_scal_nHits_reco", &gamma1_improved_scal_nHits_reco, &b_gamma1_improved_scal_nHits_reco);
-   fChain->SetBranchAddress("gamma1_improved_scal_nHits_true", &gamma1_improved_scal_nHits_true, &b_gamma1_improved_scal_nHits_true);
-   fChain->SetBranchAddress("gamma1_improved_trkr_nHits_reco", &gamma1_improved_trkr_nHits_reco, &b_gamma1_improved_trkr_nHits_reco);
-   fChain->SetBranchAddress("gamma1_improved_trkr_nHits_true", &gamma1_improved_trkr_nHits_true, &b_gamma1_improved_trkr_nHits_true);
-   fChain->SetBranchAddress("gamma1_scal_minZ_evis", &gamma1_scal_minZ_evis, &b_gamma1_scal_minZ_evis);
-   fChain->SetBranchAddress("gamma1_scal_minZ_nDigits", &gamma1_scal_minZ_nDigits, &b_gamma1_scal_minZ_nDigits);
-   fChain->SetBranchAddress("gamma1_scal_nHits_reco", &gamma1_scal_nHits_reco, &b_gamma1_scal_nHits_reco);
-   fChain->SetBranchAddress("gamma1_scal_nHits_true", &gamma1_scal_nHits_true, &b_gamma1_scal_nHits_true);
-   fChain->SetBranchAddress("gamma1_scal_true_evis", &gamma1_scal_true_evis, &b_gamma1_scal_true_evis);
-   fChain->SetBranchAddress("gamma1_side_nHits_all", &gamma1_side_nHits_all, &b_gamma1_side_nHits_all);
-   fChain->SetBranchAddress("gamma1_side_nHits_scal", &gamma1_side_nHits_scal, &b_gamma1_side_nHits_scal);
-   fChain->SetBranchAddress("gamma1_side_nHits_trkr", &gamma1_side_nHits_trkr, &b_gamma1_side_nHits_trkr);
-   fChain->SetBranchAddress("gamma1_trkr_nHits_reco", &gamma1_trkr_nHits_reco, &b_gamma1_trkr_nHits_reco);
-   fChain->SetBranchAddress("gamma1_trkr_nHits_true", &gamma1_trkr_nHits_true, &b_gamma1_trkr_nHits_true);
-   fChain->SetBranchAddress("gamma1_trkr_true_evis", &gamma1_trkr_true_evis, &b_gamma1_trkr_true_evis);
    fChain->SetBranchAddress("gamma2_blob_energy", &gamma2_blob_energy, &b_gamma2_blob_energy);
    fChain->SetBranchAddress("gamma2_blob_minsep", &gamma2_blob_minsep, &b_gamma2_blob_minsep);
-   fChain->SetBranchAddress("gamma2_center_nHits_all", &gamma2_center_nHits_all, &b_gamma2_center_nHits_all);
-   fChain->SetBranchAddress("gamma2_center_nHits_scal", &gamma2_center_nHits_scal, &b_gamma2_center_nHits_scal);
-   fChain->SetBranchAddress("gamma2_center_nHits_trkr", &gamma2_center_nHits_trkr, &b_gamma2_center_nHits_trkr);
-   fChain->SetBranchAddress("gamma2_ecal_true_evis", &gamma2_ecal_true_evis, &b_gamma2_ecal_true_evis);
-   fChain->SetBranchAddress("gamma2_hcal_true_evis", &gamma2_hcal_true_evis, &b_gamma2_hcal_true_evis);
-   fChain->SetBranchAddress("gamma2_improved_scal_nHits_reco", &gamma2_improved_scal_nHits_reco, &b_gamma2_improved_scal_nHits_reco);
-   fChain->SetBranchAddress("gamma2_improved_scal_nHits_true", &gamma2_improved_scal_nHits_true, &b_gamma2_improved_scal_nHits_true);
-   fChain->SetBranchAddress("gamma2_improved_trkr_nHits_reco", &gamma2_improved_trkr_nHits_reco, &b_gamma2_improved_trkr_nHits_reco);
-   fChain->SetBranchAddress("gamma2_improved_trkr_nHits_true", &gamma2_improved_trkr_nHits_true, &b_gamma2_improved_trkr_nHits_true);
-   fChain->SetBranchAddress("gamma2_scal_minZ_evis", &gamma2_scal_minZ_evis, &b_gamma2_scal_minZ_evis);
-   fChain->SetBranchAddress("gamma2_scal_minZ_nDigits", &gamma2_scal_minZ_nDigits, &b_gamma2_scal_minZ_nDigits);
-   fChain->SetBranchAddress("gamma2_scal_nHits_reco", &gamma2_scal_nHits_reco, &b_gamma2_scal_nHits_reco);
-   fChain->SetBranchAddress("gamma2_scal_nHits_true", &gamma2_scal_nHits_true, &b_gamma2_scal_nHits_true);
-   fChain->SetBranchAddress("gamma2_scal_true_evis", &gamma2_scal_true_evis, &b_gamma2_scal_true_evis);
-   fChain->SetBranchAddress("gamma2_side_nHits_all", &gamma2_side_nHits_all, &b_gamma2_side_nHits_all);
-   fChain->SetBranchAddress("gamma2_side_nHits_scal", &gamma2_side_nHits_scal, &b_gamma2_side_nHits_scal);
-   fChain->SetBranchAddress("gamma2_side_nHits_trkr", &gamma2_side_nHits_trkr, &b_gamma2_side_nHits_trkr);
-   fChain->SetBranchAddress("gamma2_trkr_nHits_reco", &gamma2_trkr_nHits_reco, &b_gamma2_trkr_nHits_reco);
-   fChain->SetBranchAddress("gamma2_trkr_nHits_true", &gamma2_trkr_nHits_true, &b_gamma2_trkr_nHits_true);
-   fChain->SetBranchAddress("gamma2_trkr_true_evis", &gamma2_trkr_true_evis, &b_gamma2_trkr_true_evis);
-   fChain->SetBranchAddress("hadronVisibleE", &hadronVisibleE, &b_hadronVisibleE);
    fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);
    fChain->SetBranchAddress("michelProng_distance", &michelProng_distance, &b_michelProng_distance);
    fChain->SetBranchAddress("michelProng_end_Z", &michelProng_end_Z, &b_michelProng_end_Z);
    fChain->SetBranchAddress("michelProng_energy", &michelProng_energy, &b_michelProng_energy);
    fChain->SetBranchAddress("michelProng_time_diff", &michelProng_time_diff, &b_michelProng_time_diff);
-   fChain->SetBranchAddress("muonVisibleE", &muonVisibleE, &b_muonVisibleE);
    fChain->SetBranchAddress("muon_phi", &muon_phi, &b_muon_phi);
    fChain->SetBranchAddress("muon_theta", &muon_theta, &b_muon_theta);
    fChain->SetBranchAddress("muon_thetaX", &muon_thetaX, &b_muon_thetaX);
@@ -1748,13 +1615,19 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("phys_energy_in_road_downstream", &phys_energy_in_road_downstream, &b_phys_energy_in_road_downstream);
    fChain->SetBranchAddress("phys_energy_in_road_upstream", &phys_energy_in_road_upstream, &b_phys_energy_in_road_upstream);
    fChain->SetBranchAddress("phys_energy_unattached", &phys_energy_unattached, &b_phys_energy_unattached);
+   fChain->SetBranchAddress("preFilter_evis_ECAL", &preFilter_evis_ECAL, &b_preFilter_evis_ECAL);
+   fChain->SetBranchAddress("preFilter_evis_HCAL", &preFilter_evis_HCAL, &b_preFilter_evis_HCAL);
+   fChain->SetBranchAddress("preFilter_evis_NuclearTarget", &preFilter_evis_NuclearTarget, &b_preFilter_evis_NuclearTarget);
+   fChain->SetBranchAddress("preFilter_evis_TotalExceptNuclearTarget", &preFilter_evis_TotalExceptNuclearTarget, &b_preFilter_evis_TotalExceptNuclearTarget);
+   fChain->SetBranchAddress("preFilter_evis_Tracker", &preFilter_evis_Tracker, &b_preFilter_evis_Tracker);
+   fChain->SetBranchAddress("preFilter_evis_nearvtx", &preFilter_evis_nearvtx, &b_preFilter_evis_nearvtx);
+   fChain->SetBranchAddress("preFilter_evis_total", &preFilter_evis_total, &b_preFilter_evis_total);
    fChain->SetBranchAddress("preFilter_rejectedEnergy", &preFilter_rejectedEnergy, &b_preFilter_rejectedEnergy);
    fChain->SetBranchAddress("prim_vtx_smallest_opening_angle", &prim_vtx_smallest_opening_angle, &b_prim_vtx_smallest_opening_angle);
    fChain->SetBranchAddress("reco_eventID", &reco_eventID, &b_reco_eventID);
    fChain->SetBranchAddress("time", &time, &b_time);
-   fChain->SetBranchAddress("totalIDVisibleE", &totalIDVisibleE, &b_totalIDVisibleE);
-   fChain->SetBranchAddress("totalODVisibleE", &totalODVisibleE, &b_totalODVisibleE);
-   fChain->SetBranchAddress("totalVisibleE", &totalVisibleE, &b_totalVisibleE);
+   fChain->SetBranchAddress("vertex_blob_energy", &vertex_blob_energy, &b_vertex_blob_energy);
+   fChain->SetBranchAddress("vertex_blob_evis", &vertex_blob_evis, &b_vertex_blob_evis);
    fChain->SetBranchAddress("vtx_fit_chi2", &vtx_fit_chi2, &b_vtx_fit_chi2);
    fChain->SetBranchAddress("g1dedx_cluster_occupancy_sz", &g1dedx_cluster_occupancy_sz, &b_g1dedx_cluster_occupancy_sz);
    fChain->SetBranchAddress("g1dedx_cluster_occupancy", g1dedx_cluster_occupancy, &b_g1dedx_cluster_occupancy);
@@ -1762,8 +1635,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("g2dedx_cluster_occupancy", g2dedx_cluster_occupancy, &b_g2dedx_cluster_occupancy);
    fChain->SetBranchAddress("nTracks_Secondary_Vtx_sz", &nTracks_Secondary_Vtx_sz, &b_nTracks_Secondary_Vtx_sz);
    fChain->SetBranchAddress("nTracks_Secondary_Vtx", nTracks_Secondary_Vtx, &b_nTracks_Secondary_Vtx);
-   fChain->SetBranchAddress("Vertex_energy_radii_sz", &Vertex_energy_radii_sz, &b_Vertex_energy_radii_sz);
-   fChain->SetBranchAddress("Vertex_energy_radii", Vertex_energy_radii, &b_Vertex_energy_radii);
    fChain->SetBranchAddress("fit_vtx", fit_vtx, &b_fit_vtx);
    fChain->SetBranchAddress("g1dedx_cluster_energy_sz", &g1dedx_cluster_energy_sz, &b_g1dedx_cluster_energy_sz);
    fChain->SetBranchAddress("g1dedx_cluster_energy", g1dedx_cluster_energy, &b_g1dedx_cluster_energy);
@@ -1773,30 +1644,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("g2dedx_cluster_energy", g2dedx_cluster_energy, &b_g2dedx_cluster_energy);
    fChain->SetBranchAddress("g2dedx_rev_cluster_energy_sz", &g2dedx_rev_cluster_energy_sz, &b_g2dedx_rev_cluster_energy_sz);
    fChain->SetBranchAddress("g2dedx_rev_cluster_energy", g2dedx_rev_cluster_energy, &b_g2dedx_rev_cluster_energy);
-   fChain->SetBranchAddress("gamma1_blob_all_digit_E_sz", &gamma1_blob_all_digit_E_sz, &b_gamma1_blob_all_digit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_all_digit_E", gamma1_blob_all_digit_E, &b_gamma1_blob_all_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_muon_digit_E_sz", &gamma1_blob_muon_digit_E_sz, &b_gamma1_blob_muon_digit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_muon_digit_E", gamma1_blob_muon_digit_E, &b_gamma1_blob_muon_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_neutron_digit_E_sz", &gamma1_blob_neutron_digit_E_sz, &b_gamma1_blob_neutron_digit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_neutron_digit_E", gamma1_blob_neutron_digit_E, &b_gamma1_blob_neutron_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_pi0_digit_E_sz", &gamma1_blob_pi0_digit_E_sz, &b_gamma1_blob_pi0_digit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_pi0_digit_E", gamma1_blob_pi0_digit_E, &b_gamma1_blob_pi0_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_pi_digit_E_sz", &gamma1_blob_pi_digit_E_sz, &b_gamma1_blob_pi_digit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_pi_digit_E", gamma1_blob_pi_digit_E, &b_gamma1_blob_pi_digit_E);
-   fChain->SetBranchAddress("gamma1_blob_proton_digit_E_sz", &gamma1_blob_proton_digit_E_sz, &b_gamma1_blob_proton_digit_E_sz);
-   fChain->SetBranchAddress("gamma1_blob_proton_digit_E", gamma1_blob_proton_digit_E, &b_gamma1_blob_proton_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_all_digit_E_sz", &gamma2_blob_all_digit_E_sz, &b_gamma2_blob_all_digit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_all_digit_E", gamma2_blob_all_digit_E, &b_gamma2_blob_all_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_muon_digit_E_sz", &gamma2_blob_muon_digit_E_sz, &b_gamma2_blob_muon_digit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_muon_digit_E", gamma2_blob_muon_digit_E, &b_gamma2_blob_muon_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_neutron_digit_E_sz", &gamma2_blob_neutron_digit_E_sz, &b_gamma2_blob_neutron_digit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_neutron_digit_E", gamma2_blob_neutron_digit_E, &b_gamma2_blob_neutron_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_pi0_digit_E_sz", &gamma2_blob_pi0_digit_E_sz, &b_gamma2_blob_pi0_digit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_pi0_digit_E", gamma2_blob_pi0_digit_E, &b_gamma2_blob_pi0_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_pi_digit_E_sz", &gamma2_blob_pi_digit_E_sz, &b_gamma2_blob_pi_digit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_pi_digit_E", gamma2_blob_pi_digit_E, &b_gamma2_blob_pi_digit_E);
-   fChain->SetBranchAddress("gamma2_blob_proton_digit_E_sz", &gamma2_blob_proton_digit_E_sz, &b_gamma2_blob_proton_digit_E_sz);
-   fChain->SetBranchAddress("gamma2_blob_proton_digit_E", gamma2_blob_proton_digit_E, &b_gamma2_blob_proton_digit_E);
    fChain->SetBranchAddress("od_distanceBlobTower_sz", &od_distanceBlobTower_sz, &b_od_distanceBlobTower_sz);
    fChain->SetBranchAddress("od_distanceBlobTower", od_distanceBlobTower, &b_od_distanceBlobTower);
    fChain->SetBranchAddress("od_idBlobTime_sz", &od_idBlobTime_sz, &b_od_idBlobTime_sz);
@@ -2011,12 +1858,10 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_trajMuonProngPrimary", &CCProtonPi0_trajMuonProngPrimary, &b_CCProtonPi0_trajMuonProngPrimary);
    fChain->SetBranchAddress("CCProtonPi0_vtx_module", &CCProtonPi0_vtx_module, &b_CCProtonPi0_vtx_module);
    fChain->SetBranchAddress("CCProtonPi0_vtx_plane", &CCProtonPi0_vtx_plane, &b_CCProtonPi0_vtx_plane);
-   fChain->SetBranchAddress("CCProtonPi0_QSq_1Track", &CCProtonPi0_QSq_1Track, &b_CCProtonPi0_QSq_1Track);
-   fChain->SetBranchAddress("CCProtonPi0_QSq_Cal", &CCProtonPi0_QSq_Cal, &b_CCProtonPi0_QSq_Cal);
-   fChain->SetBranchAddress("CCProtonPi0_WSq_1Track", &CCProtonPi0_WSq_1Track, &b_CCProtonPi0_WSq_1Track);
-   fChain->SetBranchAddress("CCProtonPi0_WSq_Cal", &CCProtonPi0_WSq_Cal, &b_CCProtonPi0_WSq_Cal);
-   fChain->SetBranchAddress("CCProtonPi0_W_1Track", &CCProtonPi0_W_1Track, &b_CCProtonPi0_W_1Track);
-   fChain->SetBranchAddress("CCProtonPi0_W_Cal", &CCProtonPi0_W_Cal, &b_CCProtonPi0_W_Cal);
+   fChain->SetBranchAddress("CCProtonPi0_QSq", &CCProtonPi0_QSq, &b_CCProtonPi0_QSq);
+   fChain->SetBranchAddress("CCProtonPi0_QSq_1Track_Alt", &CCProtonPi0_QSq_1Track_Alt, &b_CCProtonPi0_QSq_1Track_Alt);
+   fChain->SetBranchAddress("CCProtonPi0_WSq", &CCProtonPi0_WSq, &b_CCProtonPi0_WSq);
+   fChain->SetBranchAddress("CCProtonPi0_WSq_1Track_Alt", &CCProtonPi0_WSq_1Track_Alt, &b_CCProtonPi0_WSq_1Track_Alt);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajMomentum", &CCProtonPi0_endMuonTrajMomentum, &b_CCProtonPi0_endMuonTrajMomentum);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajXPosition", &CCProtonPi0_endMuonTrajXPosition, &b_CCProtonPi0_endMuonTrajXPosition);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajYPosition", &CCProtonPi0_endMuonTrajYPosition, &b_CCProtonPi0_endMuonTrajYPosition);
@@ -2096,9 +1941,8 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_muon_theta", &CCProtonPi0_muon_theta, &b_CCProtonPi0_muon_theta);
    fChain->SetBranchAddress("CCProtonPi0_muon_theta_biasDown", &CCProtonPi0_muon_theta_biasDown, &b_CCProtonPi0_muon_theta_biasDown);
    fChain->SetBranchAddress("CCProtonPi0_muon_theta_biasUp", &CCProtonPi0_muon_theta_biasUp, &b_CCProtonPi0_muon_theta_biasUp);
-   fChain->SetBranchAddress("CCProtonPi0_neutrino_E_1Track", &CCProtonPi0_neutrino_E_1Track, &b_CCProtonPi0_neutrino_E_1Track);
-   fChain->SetBranchAddress("CCProtonPi0_neutrino_E_2Track", &CCProtonPi0_neutrino_E_2Track, &b_CCProtonPi0_neutrino_E_2Track);
-   fChain->SetBranchAddress("CCProtonPi0_neutrino_E_Cal", &CCProtonPi0_neutrino_E_Cal, &b_CCProtonPi0_neutrino_E_Cal);
+   fChain->SetBranchAddress("CCProtonPi0_neutrino_E", &CCProtonPi0_neutrino_E, &b_CCProtonPi0_neutrino_E);
+   fChain->SetBranchAddress("CCProtonPi0_neutrino_E_1Track_Alt", &CCProtonPi0_neutrino_E_1Track_Alt, &b_CCProtonPi0_neutrino_E_1Track_Alt);
    fChain->SetBranchAddress("CCProtonPi0_pi0_E", &CCProtonPi0_pi0_E, &b_CCProtonPi0_pi0_E);
    fChain->SetBranchAddress("CCProtonPi0_pi0_KE", &CCProtonPi0_pi0_KE, &b_CCProtonPi0_pi0_KE);
    fChain->SetBranchAddress("CCProtonPi0_pi0_P", &CCProtonPi0_pi0_P, &b_CCProtonPi0_pi0_P);

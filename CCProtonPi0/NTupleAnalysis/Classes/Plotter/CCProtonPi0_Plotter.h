@@ -120,6 +120,7 @@ class CCProtonPi0_Plotter
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
         void plotCutHistograms();
+        void plotCutHistograms_MCOnly();
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
 
         // Helper Functions
@@ -127,6 +128,7 @@ class CCProtonPi0_Plotter
         void ApplyStyle(MnvPlotter* plotter);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow);
         void SavePi0InvMassPoints();
+        void SaveEvisPoints();
         
         // Plottting Macros
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);

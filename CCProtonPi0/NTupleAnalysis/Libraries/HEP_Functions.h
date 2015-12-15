@@ -22,10 +22,6 @@ Namespace: HEP_Functions
 namespace HEP_Functions
 {
 
-const double MeV_to_GeV = pow(10,-3); 
-const double MeVSq_to_GeVSq = pow(10,-6);
-const double mm_to_cm = pow(10,-1);
-
 inline double calcEnergy(double P, double restMass)
 {
     double energy;

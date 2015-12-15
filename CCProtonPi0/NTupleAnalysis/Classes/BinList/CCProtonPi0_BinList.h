@@ -52,7 +52,13 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin q2;
         CCProtonPi0_SingleBin wSq;
         CCProtonPi0_SingleBin w;
+        CCProtonPi0_SingleBin vertex_energy;
+        CCProtonPi0_SingleBin vertex_evis;
+        CCProtonPi0_SingleBin extra_energy;
+        CCProtonPi0_SingleBin short_proton_P;
+        CCProtonPi0_SingleBin short_proton_KE;
         
+
         CCProtonPi0_SingleBin UsedE;
         CCProtonPi0_SingleBin UnusedE;
         

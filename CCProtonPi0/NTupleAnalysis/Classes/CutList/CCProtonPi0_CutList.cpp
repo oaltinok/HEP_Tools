@@ -14,8 +14,8 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
     
     if(isModeReduce){
         // File Locations
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_40d.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms_v2_40d.root";
+        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_" + version + ".root";
+        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms_" + version + ".root";
         
         cout<<"\tRoot File: "<<rootDir<<endl;
 
@@ -81,24 +81,15 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetXaxis()->SetTitle("N(Tracks_Discarded)");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_nTracks_Discarded.push_back(temp);
-        
-        temp = new MnvH1D( Form("%s_%d","hCut_nProngs",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
-        temp->GetXaxis()->SetTitle("N(Prongs)");
+
+        temp = new MnvH1D( Form("%s_%d","hCut_Michel",i),Form("%d",i),binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
+        temp->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
         temp->GetYaxis()->SetTitle("N(Events)");
-        hCut_nProngs.push_back(temp);
-        
-        temp = new MnvH1D( Form("%s_%d","hCut_nProngs2",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
-        temp->GetXaxis()->SetTitle("N(Prongs) - should be same with nTracks");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        hCut_nProngs2.push_back(temp);
+        hCut_Michel.push_back(temp);
 
         // --------------------------------------------------------------------
         // 1 Track
         // --------------------------------------------------------------------
-        temp = new MnvH1D( Form("%s_%d","hCut_1Track_Michel",i),Form("%d",i),binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
-        temp->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        hCut_1Track_Michel.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_1Track_eVis_nuclearTarget",i),"Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
         temp->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
@@ -148,11 +139,6 @@ void CCProtonPi0_CutList::initHistograms()
         // --------------------------------------------------------------------
         // 2 Track
         // --------------------------------------------------------------------
-        temp = new MnvH1D( Form("%s_%d","hCut_2Track_Michel",i),Form("%d",i),binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
-        temp->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        hCut_2Track_Michel.push_back(temp);
-
         temp = new MnvH1D( Form("%s_%d","hCut_2Track_eVis_nuclearTarget",i),"Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
         temp->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
@@ -249,7 +235,6 @@ void CCProtonPi0_CutList::init_nCutVectors()
         nCut_PreFilter_Pi0.push_back(CCProtonPi0_Cut());
         nCut_ConeBlobs.push_back(CCProtonPi0_Cut());
         nCut_BlobDirectionBad.push_back(CCProtonPi0_Cut());
-        nCut_BlobsBad.push_back(CCProtonPi0_Cut());
         nCut_Photon1DistanceLow.push_back(CCProtonPi0_Cut());
         nCut_Photon2DistanceLow.push_back(CCProtonPi0_Cut());
         nCut_Pi0_invMass.push_back(CCProtonPi0_Cut());
@@ -277,7 +262,6 @@ void CCProtonPi0_CutList::SetCutNames()
         nCut_PreFilter_Pi0[i].set_Name("PreFilter_Pi0");
         nCut_ConeBlobs[i].set_Name("ConeBlobs");
         nCut_BlobDirectionBad[i].set_Name("BlobDirectionBad");
-        nCut_BlobsBad[i].set_Name("BlobsBad");
         nCut_Photon1DistanceLow[i].set_Name("Photon1DistanceLow");
         nCut_Photon2DistanceLow[i].set_Name("Photon2DistanceLow");
         nCut_Pi0_invMass[i].set_Name("Pi0_invMass");
@@ -298,8 +282,8 @@ void CCProtonPi0_CutList::OpenTextFiles(bool isMC)
     else type = "CutTable_Data_";
 
     // Open Cut Files
-    cutFile[0] = Folder_List::output + Folder_List::textOut + type + "1Track.txt";
-    cutFile[1] = Folder_List::output + Folder_List::textOut + type + "2Track.txt";
+    cutFile[0] = Folder_List::output + Folder_List::textOut + type + "1Track_" + version + ".txt";
+    cutFile[1] = Folder_List::output + Folder_List::textOut + type + "2Track_" + version + ".txt";
     
     for (int i = 0; i < nTopologies; i++){
         cutText[i].open( cutFile[i].c_str() );
@@ -355,27 +339,25 @@ double CCProtonPi0_CutList::getCutPurity(CCProtonPi0_Cut& currentCut) const
 
 void CCProtonPi0_CutList::formCutVectors()
 {   
-
     nCutVector_Common.push_back(nCut_All);
     nCutVector_Common.push_back(nCut_Vertex_None);
     nCutVector_Common.push_back(nCut_Vertex_Not_Reconstructable); 
     nCutVector_Common.push_back(nCut_Vertex_Not_Fiducial);
-    nCutVector_Topology.push_back(nCut_Muon_None);              
-    nCutVector_Topology.push_back(nCut_Muon_Charge);
-    nCutVector_Topology.push_back(nCut_Vertex_Michel_Exist); 
-    nCutVector_Topology.push_back(nCut_EndPoint_Michel_Exist);
-    nCutVector_Topology.push_back(nCut_secEndPoint_Michel_Exist);
-    nCutVector_Topology.push_back(nCut_PreFilter_Pi0);
-    nCutVector_Topology.push_back(nCut_ConeBlobs);
-    nCutVector_Topology.push_back(nCut_BlobDirectionBad);
-    nCutVector_Topology.push_back(nCut_BlobsBad);
-    nCutVector_Topology.push_back(nCut_Photon1DistanceLow);
-    nCutVector_Topology.push_back(nCut_Photon2DistanceLow);
-    nCutVector_Topology.push_back(nCut_Pi0_invMass);
+    nCutVector_Common.push_back(nCut_Muon_None);              
+    nCutVector_Common.push_back(nCut_Muon_Charge);
+    nCutVector_Common.push_back(nCut_Vertex_Michel_Exist); 
+    nCutVector_Common.push_back(nCut_EndPoint_Michel_Exist);
+    nCutVector_Common.push_back(nCut_secEndPoint_Michel_Exist);
     nCutVector_Topology.push_back(nCut_Particle_None);
     nCutVector_Topology.push_back(nCut_Proton_None);
     nCutVector_Topology.push_back(nCut_ProtonScore);
     nCutVector_Topology.push_back(nCut_DeltaInvMass);
+    nCutVector_Topology.push_back(nCut_PreFilter_Pi0);
+    nCutVector_Topology.push_back(nCut_ConeBlobs);
+    nCutVector_Topology.push_back(nCut_BlobDirectionBad);
+    nCutVector_Topology.push_back(nCut_Photon1DistanceLow);
+    nCutVector_Topology.push_back(nCut_Photon2DistanceLow);
+    nCutVector_Topology.push_back(nCut_Pi0_invMass);
     nCutVector_Topology.push_back(nCut_beamEnergy);
     nCutVector_Topology.push_back(nCut_UnusedE);
 }
@@ -457,16 +439,14 @@ void CCProtonPi0_CutList::writeHistograms()
     for (int i = 0; i < nHistograms; i++){
         // Common
         hCut_nVertices[i]->Write();
-        hCut_nProngs[i]->Write();
-        hCut_nProngs2[i]->Write();
         hCut_nTracks[i]->Write();
         hCut_nTracks2[i]->Write();
         hCut_nTracks_Close[i]->Write();
         hCut_nTracks_Far[i]->Write();
         hCut_nTracks_Discarded[i]->Write();
+        hCut_Michel[i]->Write();
         
         // 1 Track
-        hCut_1Track_Michel[i]->Write();
         hCut_1Track_eVis_nuclearTarget[i]->Write();
         hCut_1Track_eVis_other[i]->Write();
         hCut_1Track_pi0invMass[i]->Write();
@@ -478,7 +458,6 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_1Track_UnusedE[i]->Write();
        
         // 2 Track 
-        hCut_2Track_Michel[i]->Write();
         hCut_2Track_eVis_nuclearTarget[i]->Write();
         hCut_2Track_eVis_other[i]->Write();
         hCut_2Track_pi0invMass[i]->Write();

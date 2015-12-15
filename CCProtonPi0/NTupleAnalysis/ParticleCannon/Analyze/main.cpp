@@ -21,7 +21,7 @@ int main()
     double timeDiff;
     int timeDiff_m;
     int timeDiff_s;
-    string playlist = "Playlists/pl_PC_DST_All.dat";
+    string playlist = "Playlists/pl_PC_short_protons.dat";
 
     PC_DST pc;
     pc.Loop(playlist);

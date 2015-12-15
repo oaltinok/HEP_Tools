@@ -63,6 +63,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     plotter->DrawDataStackedMC(data,mc_hists,ratio_all,"TR","Data",2,1);
    
     // Add Plot Labels
+    plotter->AddHistoTitle(mc_all[0].GetTitle());
     const double y_pos = 0.88;
     const double y_diff = 0.033;
     //plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
@@ -410,12 +411,12 @@ void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::st
     text.DrawLatex(0.15,0.85,Form("%s%3.2f", "Peak at ",max_bin_location));
   
     // Error Ranges
-    double error = 0.66;
-    TLine err;
-    err.SetLineWidth(2);
-    err.SetLineColor(kBlack);
-    err.DrawLine(error,0,error,max_bin_value);
-    err.DrawLine(-error,0,-error,max_bin_value);
+    //double error = 0.33;
+    //TLine err;
+    //err.SetLineWidth(2);
+    //err.SetLineColor(kBlack);
+    //err.DrawLine(error,0,error,max_bin_value);
+    //err.DrawLine(-error,0,-error,max_bin_value);
 
   
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
@@ -567,6 +568,9 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     plotter->DrawStackedMC(mc_hists,1,"TR");
    
     // Add Plot Labels
+    var = Form("%s_%d",var_name.c_str(),0);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    plotter->AddHistoTitle(temp->GetTitle());
     const double y_pos = 0.88;
     const double y_diff = 0.033;
     plotter->AddPlotLabel(Form("nSignal = %3.0f, nBckg = %3.0f",nSignal,nBckg),0.3,y_pos,y_diff,kBlue); 

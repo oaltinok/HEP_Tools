@@ -111,6 +111,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         mutable SmartRef<Minerva::IDBlob>   m_Pi0Blob2;
         mutable Minerva::ProngVect    m_ProtonProngs;
         mutable Minerva::ParticleVect m_ProtonParticles;
+        mutable double m_extra_energy;
+        mutable double m_vertex_energy;
 
         // Counters for Functions - Debugging Purposes
         mutable double N_tagTruth;
@@ -134,8 +136,10 @@ class CCProtonPi0 : public MinervaAnalysisTool
         double m_recoUpStreamZ;
         double m_recoDownStreamZ;
         
+        // Analysis Parameters
         double m_beamAngleBias;
-        
+        double m_bindingEnergy; 
+
         // Algorihm Flow
         bool m_writeFSParticle_Table;
         bool m_store_all_events;
@@ -158,21 +162,13 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int m_Color_GammaOtherProng;
         int m_Color_clusterUnused;
         int m_Color_clusterUsed;
-        int m_Color_VertexFila;
-        int m_Color_VertexSphere;
+        int m_Color_VertexBlob;
         int m_Color_RejectedBlob;
              
         // VertexBlob
-        bool 	 m_sphereVertex;
-        double  m_maxSearchD;
-        double  m_maxStartingD;
-        double  m_maxSearchGap;		
-        bool	 m_filamentVertex;
-        double  m_maxSearchDFila;
-        double  m_maxStartingDFila;
-        double  m_maxSearchGapFila;
-        bool    fSkipLowEnergyClusterVtxEnergy;
-        bool    fThresholdVertexEnergy;
+        double m_vertex_blob_radius;
+        bool fSkipLowEnergyClusterVtxEnergy;
+        bool fThresholdVertexEnergy;
         
         // ConeBlobs
         double m_energyHoughlimit;     ///< Energy limit to start using Hough T.
@@ -226,13 +222,12 @@ class CCProtonPi0 : public MinervaAnalysisTool
 
         //! Private Functions
         Minerva::IDClusterVect getClusters( Minerva::PhysicsEvent* event ) const;
-        SmartRefVector<Minerva::IDCluster> FilterInSphereClusters( Minerva::PhysicsEvent *event, const SmartRefVector<Minerva::IDCluster>& clusters, const double sphereRadius, std::vector<double>& radii) const;
+        SmartRefVector<Minerva::IDCluster> FilterInSphereClusters( Minerva::PhysicsEvent *event, const SmartRefVector<Minerva::IDCluster>& clusters, const double sphereRadius) const;
         StatusCode HoughBlob( Minerva::PhysicsEvent *event, SmartRefVector<Minerva::IDCluster> idClusters, std::vector<Minerva::IDBlob*>& outBlobs) const;
         StatusCode ODActivity( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs ) const;
         StatusCode getNearestPlane( double z, int & module_return, int & plane_return) const;
         StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
         bool AreBlobsDirectionGood(Minerva::PhysicsEvent *event) const;
-        bool AreBlobsGood() const;
         bool ConeBlobs( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const;
         bool PreFilterPi0( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const;
         bool ShouldReconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const;
@@ -258,8 +253,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool vertexInRecoVolume(Minerva::PhysicsEvent *event) const;
         double CalcMinBlobSeparation( const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
         double Calc_Enu_1Track() const;
+        double Calc_Enu_1Track_Alt() const;
         double Calc_Enu_2Track() const;
-        double Calc_Enu_Cal(double hadronEnergy) const;
         double Calc_Longitudinal_Momentum(Gaudi::LorentzVector particle_4P) const;
         double Calc_Px_wrt_Beam(Gaudi::LorentzVector particle_4P) const;
         double Calc_Py_wrt_Beam(Gaudi::LorentzVector particle_4P) const;
@@ -267,8 +262,10 @@ class CCProtonPi0 : public MinervaAnalysisTool
         double Calc_WSq(double Enu, double QSq) const;
         double TwoParLineFitBlobVtxDistance(const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
         double calcDistance( double x1, double y1, double z1,double x2, double y2, double z2) const;
-        double getClusterEnergy( Minerva::PhysicsEvent* event, std::string input_clusterType) const;
-        int GetNPrimaryProngs(Minerva::PhysicsEvent *event) const;
+        double getEventClusterEnergy( Minerva::PhysicsEvent* event, std::string input_clusterType) const;
+        double getClusterEnergy( SmartRefVector<Minerva::IDCluster> clusters) const;
+        double GetShortProtonCalConstant(double evis) const;
+        void SaveExtraEnergy(Minerva::PhysicsEvent *event) const;
         int getMichelPion(std::vector<int>& piList, int ID ) const;
         std::pair<int,double> OneParLineFitBlob(const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
         void ApplyAttenuationCorrection(Minerva::IDBlob* blob) const;
@@ -296,7 +293,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int muon_ID) const;
         void saveMichelProngToNTuple(Minerva::PhysicsEvent* event, Minerva::Prong &michelProng) const;
         void setBlobData(Minerva::PhysicsEvent* event, Minerva::GenMinInteraction *truthEvent) const;
-        void setEventKinematics(Minerva::NeutrinoInt* nuInt, double hadronVisibleEnergy) const;
+        void setEventKinematics(Minerva::NeutrinoInt* nuInt) const;
         void setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) const;
         void setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const;
         void setTrackDirection( Minerva::Track* track, Minerva::Vertex* vertex ) const;
@@ -314,7 +311,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int GetMCHitPDG(const SmartRef<Minerva::MCHit> mc_hit) const;
         int GetDigitPDG(const Minerva::MCIDDigit* mcdigit) const;
         int GetPDGfromVector(std::vector<int> &all_pdg) const;
-
+        void TestDiscardObject(Minerva::PhysicsEvent *event) const;
+        double GetLeadingProtonEvis(Minerva::PhysicsEvent *event) const;
+        
         // --------------------------------------------------------------------
         // Study: Shower Energy Functions
         //      See Studies/CCProtonPi0_Study_ShowerEnergy.cpp
