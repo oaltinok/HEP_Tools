@@ -87,6 +87,14 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
         pi0Mass.SetLineColor(kBlue);
         pi0Mass.DrawLine(134.98,0,134.98,3200);
     }
+    
+    // Add Delta+ InvMass Line
+    if (var_name.compare("deltaInvMass") == 0) {
+        TLine deltaMass;
+        deltaMass.SetLineWidth(2);
+        deltaMass.SetLineColor(kBlue);
+        deltaMass.DrawLine(1.232,0,1.232,3200);
+    }
 
     // Print Plot
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all.png"), "png");
@@ -594,6 +602,15 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
         pi0Mass.SetLineColor(kBlue);
         pi0Mass.DrawLine(134.98,0,134.98,3200);
     }
+
+    // Add Delta+ InvMass Line
+    if (var_name.compare("deltaInvMass") == 0) {
+        TLine deltaMass;
+        deltaMass.SetLineWidth(2);
+        deltaMass.SetLineColor(kBlue);
+        deltaMass.DrawLine(1232,0,1232,3200);
+    }
+
 
     // Print Plot
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_all.png"), "png");

@@ -1,29 +1,25 @@
-CCPROTONPI0_V="v2_43"
+CCPROTONPI0_V="v2_44"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Study: Neutrino Energy
-		Built in functions and NTuple Variables
-		Will separate implementation file and optional NTuple Variables in future releases
-	VertexBlob() Function Revised
-		Now it creates ONLY VertexBlob with radius 90mm
-		Saves VertexBlob Visible Energy and Protonic Energy
-	SaveExtraEnergy()
-		After all particle reconstructions, this function collects all Unused Cluster Energy 
-			in different volumes
-		Radii for search: 50, 100, 150, 200, 300, 500 [mm]
-	GetShortProtonCalConstant()
-		Uses a line fit to get a calibration constant for given visible energy
-			Not finalized, may change
-		
+	Removed ALL Neutrino Energy Study Functions
+
+	Revised Vertex Energy Calculation
+		New calculation based on CCProtonPi0 MC study
+		Line Equation to estimate Protonic Energy for a given Visible Energy around vertex
+	
+	Improved Nuclear Binding Energy
+		Using Nuclear Binding Energy per Nucleon for Carbon
+		Using expected Number of Nucleons for 1 Track and 2 Track
+	
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	Particle Cannon
-		Single Proton study to get Protonic Energy Constant 
-	Study: Neutrino Energy
-		Specific functions and histograms
-		Will be removed in future releases
-	Revised Interaction Class
-		Histograms modified to study Event Kinematics 
+	FindPlaylistFiles.sh
+		Fixed Ana Directory location for data events
+
+	Removed ALL Neutrino Energy Histograms and Functions
+
+	Reorganized Plotter Class
+		Different Functions for DatavsMC & MCOnly Plots
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

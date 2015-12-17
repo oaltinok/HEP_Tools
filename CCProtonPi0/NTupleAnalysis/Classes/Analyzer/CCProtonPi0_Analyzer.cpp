@@ -43,20 +43,6 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 
     counter1 = 0;
     counter2 = 0;
-
-    energy_density_50_1Track = 0.0;
-    energy_density_100_1Track = 0.0;
-    energy_density_150_1Track = 0.0;
-    energy_density_200_1Track = 0.0;
-    energy_density_300_1Track = 0.0;
-    energy_density_500_1Track = 0.0;
-
-    energy_density_50_2Track = 0.0;
-    energy_density_100_2Track = 0.0;
-    energy_density_150_2Track = 0.0;
-    energy_density_200_2Track = 0.0;
-    energy_density_300_2Track = 0.0;
-    energy_density_500_2Track = 0.0;
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
@@ -212,23 +198,6 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
-
-    cout<<"energy_density_50_1Track = "<<energy_density_50_1Track<<endl;
-    cout<<"energy_density_100_1Track = "<<energy_density_100_1Track<<endl;
-    cout<<"energy_density_150_1Track = "<<energy_density_150_1Track<<endl;
-    cout<<"energy_density_200_1Track = "<<energy_density_200_1Track<<endl;
-    cout<<"energy_density_300_1Track = "<<energy_density_300_1Track<<endl;
-    cout<<"energy_density_500_1Track = "<<energy_density_500_1Track<<endl;
-
-    cout<<"energy_density_50_2Track = "<<energy_density_50_2Track<<endl;
-    cout<<"energy_density_100_2Track = "<<energy_density_100_2Track<<endl;
-    cout<<"energy_density_150_2Track = "<<energy_density_150_2Track<<endl;
-    cout<<"energy_density_200_2Track = "<<energy_density_200_2Track<<endl;
-    cout<<"energy_density_300_2Track = "<<energy_density_300_2Track<<endl;
-    cout<<"energy_density_500_2Track = "<<energy_density_500_2Track<<endl;
-
-
-
 }
 
 
@@ -401,11 +370,11 @@ void CCProtonPi0_Analyzer::fillData()
 
     // Fill Truth Information if Exist and Set Errors
     if( m_isMC ){
-        fillInteractionTrue();
-        fillMuonTrue();
-        if(nProtonCandidates > 0) fillProtonTrue();
-        fillPi0True();
-        fillPi0BlobTrue();
+        fillInteractionMC();
+        fillMuonMC();
+        if(nProtonCandidates > 0) fillProtonMC();
+        fillPi0MC();
+        fillPi0BlobMC();
     }
 }
 
@@ -414,7 +383,7 @@ void CCProtonPi0_Analyzer::fillPi0BlobReco()
     // Do Nothing
 }
 
-void CCProtonPi0_Analyzer::fillPi0BlobTrue()
+void CCProtonPi0_Analyzer::fillPi0BlobMC()
 {
     // Fill Truth Match Results
     fillPi0Blob_Pi0EvisRatio();
@@ -744,12 +713,8 @@ void CCProtonPi0_Analyzer::fill_mc_w()
     if(mc_intType == 3) cutList.mc_w_DIS->Fill(mc_w * MeV_to_GeV);
 }
 
-void CCProtonPi0_Analyzer::fillInteractionTrue()
+void CCProtonPi0_Analyzer::fillInteractionMC()
 {
-
-    FillEventVisibleEnergy();  
-    FillNeutrinoEnergyStudyHistograms();
-
     if(truth_isSignal){
         if(mc_intType == 1) interaction.final_mc_w_CCQE->Fill(mc_w * MeV_to_GeV);
         if(mc_intType == 2) interaction.final_mc_w_RES->Fill(mc_w * MeV_to_GeV);
@@ -763,22 +728,23 @@ void CCProtonPi0_Analyzer::fillInteractionTrue()
             interaction.proton_true_P_1Track->Fill(proton_true_P);
             interaction.proton_true_KE_1Track->Fill(proton_true_KE);
         }
+        
+        // Ejected Nucleon Count
+        double n_nucleons = GetEjectedNucleonCount();
+        if (nProtonCandidates == 0){
+            interaction.n_ejected_nucleons_1Track->Fill(n_nucleons);
+        }else{
+            interaction.n_ejected_nucleons_2Track->Fill(n_nucleons);
+        }
     }
 
-    // True Neutrino Energy
+    //True Neutrino Energy
     double E_true = mc_incomingPartVec[3] * MeV_to_GeV;
     double E_reco = CCProtonPi0_neutrino_E * MeV_to_GeV;
     double E_reco_1Track_Alt = CCProtonPi0_neutrino_E_1Track_Alt * MeV_to_GeV;
 
-    double E_NoExtra = CCProtonPi0_neutrino_E - vertex_blob_energy - extra_energy;
-    double E_Binding = 34;
-    double short_proton_cal_const = GetShortProtonCalConstant(vertex_blob_evis);
-    //double short_proton_cal_const = 1.0; 
     
-    double E_Extra = vertex_blob_evis*short_proton_cal_const;
-    double E_Corrected = (E_NoExtra + E_Extra + extra_energy + E_Binding) * MeV_to_GeV;
     double E_Error = Data_Functions::getError(E_true, E_reco);
-    double E_Corrected_Error = Data_Functions::getError(E_true, E_Corrected);
     double E_1Track_Alt_Error = Data_Functions::getError(E_true, E_reco_1Track_Alt);
 
     FillHistogram(interaction.Enu_True, E_true);
@@ -792,14 +758,9 @@ void CCProtonPi0_Analyzer::fillInteractionTrue()
         interaction.Enu_1Track_Alt_True->Fill(E_reco_1Track_Alt, E_true);
         
         interaction.Enu_1Track_1Track_Alt->Fill(E_reco, E_reco_1Track_Alt);
-        
-        interaction.Enu_1Track_Corrected_Error->Fill(E_Corrected_Error);
-        FillHistogram(interaction.vertex_energy_Corrected_1Track,E_Extra);
     }else{ 
         interaction.Enu_2Track_Error->Fill(E_Error);
         interaction.Enu_2Track_True->Fill(E_reco,E_true);
-        interaction.Enu_2Track_Corrected_Error->Fill(E_Corrected_Error);
-        FillHistogram(interaction.vertex_energy_Corrected_2Track,E_Extra);
     }
 }
 
@@ -827,10 +788,6 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
         FillHistogram(interaction.vertex_evis_2Track, vertex_blob_evis );
         FillHistogram(interaction.extra_energy_2Track, extra_energy );
     }
-
-    // Reconstruction 
-    FillHistogram(interaction.E_Unused_afterReco, evis_Unused_afterReco);
-    FillHistogram(interaction.E_Used_afterReco, evis_Used_afterReco);
 
     // Other Event Parameters
     if (nProtonCandidates > 0){
@@ -932,7 +889,7 @@ void CCProtonPi0_Analyzer::openTextFiles()
     cout<<"Done!"<<endl;
 }
 
-void CCProtonPi0_Analyzer::fillProtonTrue()
+void CCProtonPi0_Analyzer::fillProtonMC()
 {  
     if (truth_isSignal){
         double reco_P = CCProtonPi0_proton_P * MeV_to_GeV;
@@ -960,7 +917,7 @@ void CCProtonPi0_Analyzer::fillProtonReco()
     FillHistogram(proton.phi, CCProtonPi0_proton_phi * TMath::RadToDeg());
 }
 
-void CCProtonPi0_Analyzer::fillPi0True()
+void CCProtonPi0_Analyzer::fillPi0MC()
 {
     // EM Shower Energy Variables
     if ( truth_isSignal ){
@@ -1104,7 +1061,7 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
     pi0.gamma1_convLength_gamma2_convLength->Fill(CCProtonPi0_gamma1_dist_vtx * 0.1, CCProtonPi0_gamma2_dist_vtx * 0.1);
 }
 
-void CCProtonPi0_Analyzer::fillMuonTrue()
+void CCProtonPi0_Analyzer::fillMuonMC()
 {
     if(truth_isSignal){ 
         double reco_P = CCProtonPi0_muon_P * MeV_to_GeV;
@@ -1191,132 +1148,16 @@ int CCProtonPi0_Analyzer::GetBackgroundTypeInd()
     }
 }
 
-void CCProtonPi0_Analyzer::FillEventVisibleEnergy()
+int CCProtonPi0_Analyzer::GetEjectedNucleonCount()
 {
-    // Get True Values
-    double true_neutrino_E = mc_incomingPartVec[3];
-    double true_muon_E = mc_primFSLepton[3]; 
-   
-    // Get Reco values
-    double reco_neutrino_E = CCProtonPi0_neutrino_E;
-    double reco_muon_E = CCProtonPi0_muon_E;
-    double reco_proton_E;
-    if (nProtonCandidates == 0) reco_proton_E = 0;
-    else reco_proton_E = CCProtonPi0_proton_E;
-
-
-    // Calculate Hadronic Energy
-    double evis_hadron = evis_total - evis_muon;
-    double energy_hadron_true = true_neutrino_E - true_muon_E; 
-    double energy_hadron_reco = reco_neutrino_E - reco_muon_E; 
-
-    // 1 Track
-    if (nProtonCandidates == 0){
-
-        FillHistogram(interaction.evis_total_1Track, evis_total);
-        FillHistogram(interaction.evis_muon_1Track, evis_muon);
-        FillHistogram(interaction.evis_pi0_1Track, evis_pi0);
-        
-        FillHistogram(interaction.evis_hadron_1Track, evis_hadron);
-        FillHistogram(interaction.energy_hadron_true_1Track, energy_hadron_true);
-        FillHistogram(interaction.energy_hadron_reco_1Track, energy_hadron_reco);
-        interaction.energy_hadron_reco_true_1Track->Fill(energy_hadron_reco, energy_hadron_true);
-
-    }else{
-        double evis_hadron_nopi0 = evis_total - (evis_muon + evis_pi0);
-        
-        FillHistogram(interaction.evis_total_2Track, evis_total);
-        FillHistogram(interaction.evis_muon_2Track, evis_muon);
-        FillHistogram(interaction.evis_pi0_2Track, evis_pi0);
-        FillHistogram(interaction.evis_proton_2Track, evis_proton);
-        
-        FillHistogram(interaction.evis_hadron_2Track, evis_hadron);
-        FillHistogram(interaction.energy_hadron_true_2Track, energy_hadron_true);
-        FillHistogram(interaction.energy_hadron_reco_2Track, energy_hadron_reco);
-        interaction.energy_hadron_reco_true_2Track->Fill(energy_hadron_reco, energy_hadron_true);
-
-        FillHistogram(interaction.evis_hadron_nopi0_2Track, evis_hadron_nopi0);
-    }
-
-    
-    // Fill Extra Energy for Signal Events
-    if (truth_isSignal){
-    
-        double true_pi0_E = truth_pi0_4P[3]; 
-         if (nProtonCandidates == 0) {
-            double energy_extra_true = (true_neutrino_E) - (true_muon_E + true_pi0_E);
-            
-            FillHistogram(interaction.evis_extra_1Track, evis_extra);
-            FillHistogram(interaction.energy_extra_true_1Track, energy_extra_true);
-         }else{
-            double true_proton_E = truth_proton_4P[3]; 
-            double energy_extra_true = (true_neutrino_E + 938.27) - (true_muon_E + true_pi0_E + true_proton_E);
-            double energy_hadron_nopi0_true = true_neutrino_E - (true_muon_E + true_pi0_E);
- 
-            FillHistogram(interaction.evis_extra_2Track, evis_extra);
-            FillHistogram(interaction.energy_extra_true_2Track, energy_extra_true);
-            FillHistogram(interaction.energy_hadron_nopi0_true_2Track, energy_hadron_nopi0_true);
-            
+    int n_nucleons = 0;
+    for(int i = 0; i < mc_nFSPart; i++ ){
+        if (mc_FSPartPDG[i] == PDG_List::proton || mc_FSPartPDG[i] == PDG_List::neutron){
+            n_nucleons++;
         }
     }
 
-}
-
-void CCProtonPi0_Analyzer::FillNeutrinoEnergyStudyHistograms()
-{
-    double proton_cal_const = 1.50;
-    if (nProtonCandidates == 0){
-        energy_density_50_1Track += (extra_energy_50 * proton_cal_const) / CalcSphereVolume(50);
-        energy_density_100_1Track += (extra_energy_100 * proton_cal_const) / CalcSphereVolume(100);
-        energy_density_150_1Track += (extra_energy_150 * proton_cal_const) / CalcSphereVolume(150);
-        energy_density_200_1Track += (extra_energy_200 * proton_cal_const) / CalcSphereVolume(200);
-        energy_density_300_1Track += (extra_energy_300 * proton_cal_const) / CalcSphereVolume(300);
-        energy_density_500_1Track += (extra_energy_500 * proton_cal_const) / CalcSphereVolume(500);
-
-        interaction.extra_energy_50_1Track->Fill(extra_energy_50 * proton_cal_const);
-        interaction.extra_energy_100_1Track->Fill(extra_energy_100 * proton_cal_const);
-        interaction.extra_energy_150_1Track->Fill(extra_energy_150 * proton_cal_const);
-        interaction.extra_energy_200_1Track->Fill(extra_energy_200 * proton_cal_const);
-        interaction.extra_energy_300_1Track->Fill(extra_energy_300 * proton_cal_const);
-        interaction.extra_energy_500_1Track->Fill(extra_energy_500 * proton_cal_const);
-        
-        if (truth_isSignal){
-            double true_proton_KE = truth_proton_4P[3] - 938.27;
-            failText<<vertex_blob_evis<<" "<<true_proton_KE<<endl;
-            interaction.vertex_evis_true_proton_KE->Fill(vertex_blob_evis,true_proton_KE);
-            interaction.vertex_evis_vertex_evis_ratio->Fill(vertex_blob_evis,true_proton_KE/vertex_blob_evis);
-        }
-
-    }else{
-        energy_density_50_2Track += (extra_energy_50 * proton_cal_const) / CalcSphereVolume(50);
-        energy_density_100_2Track += (extra_energy_100 * proton_cal_const) / CalcSphereVolume(100);
-        energy_density_150_2Track += (extra_energy_150 * proton_cal_const) / CalcSphereVolume(150);
-        energy_density_200_2Track += (extra_energy_200 * proton_cal_const) / CalcSphereVolume(200);
-        energy_density_300_2Track += (extra_energy_300 * proton_cal_const) / CalcSphereVolume(300);
-        energy_density_500_2Track += (extra_energy_500 * proton_cal_const) / CalcSphereVolume(500);
-    
-        interaction.extra_energy_50_2Track->Fill(extra_energy_50 * proton_cal_const);
-        interaction.extra_energy_100_2Track->Fill(extra_energy_100 * proton_cal_const);
-        interaction.extra_energy_150_2Track->Fill(extra_energy_150 * proton_cal_const);
-        interaction.extra_energy_200_2Track->Fill(extra_energy_200 * proton_cal_const);
-        interaction.extra_energy_300_2Track->Fill(extra_energy_300 * proton_cal_const);
-        interaction.extra_energy_500_2Track->Fill(extra_energy_500 * proton_cal_const);
-    }
-}
-
-double CCProtonPi0_Analyzer::CalcSphereVolume(double r)
-{
-    double V = 4/3 * 3.14 * pow(r,3.0);
-    return V;
-}
-
-double CCProtonPi0_Analyzer::GetShortProtonCalConstant(double evis)
-{
-    double m = -0.003856;
-    double c = 1.415;
-    double cal_const = m*evis + c;    
-
-    return cal_const;
+    return n_nucleons;
 }
 
 #endif //CCProtonPi0_Analyzer_cpp

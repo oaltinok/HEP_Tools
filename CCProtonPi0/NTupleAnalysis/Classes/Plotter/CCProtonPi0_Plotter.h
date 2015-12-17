@@ -107,20 +107,29 @@ class CCProtonPi0_Plotter
         void getPOT_MC();
         void getPOT_Data();
 
-        // Default Plots
-        void plotPi0Blob();
-        void plotOtherStudies();
-        void plotInteraction();
-        void plotMuon();
-        void plotProton();
-        void plotPion();
-        
+        // Data vs MC
+        void plotInteraction_DataMC();
+        void plotMuon_DataMC();
+        void plotProton_DataMC();
+        void plotPion_DataMC();
+        void plotPi0Blob_DataMC();
+        void plotCutHistograms_DataMC();
+  
+        // MC Only
+        void plotInteraction_MCOnly();
+        void plotMuon_MCOnly();
+        void plotProton_MCOnly();
+        void plotPion_MCOnly();
+        void plotPi0Blob_MCOnly();
+        void plotCutHistograms_MCOnly();
+      
+        // True Signal Events
+        void plotPion_True();
+
         // Other Plots 
-        void plotPi0True();
+        void plotOtherStudies();
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
-        void plotCutHistograms();
-        void plotCutHistograms_MCOnly();
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
 
         // Helper Functions

@@ -65,43 +65,26 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillHistogram(vector<MnvH1D*> &hist, double par);
 
         //  Interaction Specific Functions
-        void fillInteractionTrue();
+        void fillInteractionMC();
         void fillInteractionReco();
         double calcDeltaInvariantMass();
-        void FillEventVisibleEnergy();
-        void FillNeutrinoEnergyStudyHistograms();
-        double GetShortProtonCalConstant(double evis);
-        // Neutrino Energy Study
-        double energy_density_50_1Track;
-        double energy_density_100_1Track;
-        double energy_density_150_1Track;
-        double energy_density_200_1Track;
-        double energy_density_300_1Track;
-        double energy_density_500_1Track;
-
-        double energy_density_50_2Track;
-        double energy_density_100_2Track;
-        double energy_density_150_2Track;
-        double energy_density_200_2Track;
-        double energy_density_300_2Track;
-        double energy_density_500_2Track;
-
-
+        int GetEjectedNucleonCount();
+        
         //  Muon Specific Functions
-        void fillMuonTrue();
+        void fillMuonMC();
         void fillMuonReco();
 
         //  Proton Specific Functions
-        void fillProtonTrue();
+        void fillProtonMC();
         void fillProtonReco();
 
         //  Pion Specific Functions
         void getPi0Family();
-        void fillPi0True();
+        void fillPi0MC();
         void fillPi0Reco();
 
         // Pi0Blob Specific Functions
-        void fillPi0BlobTrue();
+        void fillPi0BlobMC();
         void fillPi0BlobReco();
         void fillPi0Blob_Evis_MostPDG();
         void fillPi0Blob_Pi0EvisRatio();

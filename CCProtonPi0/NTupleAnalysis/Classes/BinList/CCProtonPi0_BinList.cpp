@@ -24,7 +24,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     particleScoreSum.setBin(200,0.0,2.0);
     particleScoreDiff.setBin(100,-1.0,1.0);
     particleStatus.setBin(17,-1,16);
-    multiplicity.setBin(10,0.0,10.0);
+    multiplicity.setBin(15,0.0,15.0);
     fraction.setBin(11,0,1.1);
     fraction2.setBin(200,-0.5,1.5);
     vertex_z.setBin(114,4300.0,10000.0);
@@ -45,8 +45,8 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     q2.setBin(40,0.0,4.0);
     w.setBin(22,0.8,3.0);
     wSq.setBin(50,0.0,5.0);
-    vertex_energy.setBin(50,0.0,500.0);
-    vertex_evis.setBin(50,0.0,500.0);
+    vertex_energy.setBin(25,0.0,500.0);
+    vertex_evis.setBin(20,0.0,500.0);
     extra_energy.setBin(50,0.0,20.0);
     short_proton_P.setBin(50,0.0,1000.0);
     short_proton_KE.setBin(50,0.0,500.0);
