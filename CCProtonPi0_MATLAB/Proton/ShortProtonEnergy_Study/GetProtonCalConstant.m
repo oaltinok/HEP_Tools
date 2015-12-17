@@ -1,19 +1,28 @@
 function [  ] = GetProtonCalConstant( )
 
+%  GetCalibrationConstant('PC_theta_00.txt');
+%  GetCalibrationConstant('PC_theta_60.txt');
+%  GetCalibrationConstant('PC_short_protons_theta_all.txt');
+  GetCalibrationConstant('CCProtonPi0_protons.txt');
+
+end
+
+function [] = GetCalibrationConstant(input_file)
+
 % Read Data
-data = load('evis.txt');
+data = load(input_file);
 
 evis = data(:,1);
 avg = data(:,2);
 n_events = data(:,3);
 
-% Remove First Bin -- Too much uncertainity
-evis = evis(2:end);
-avg = avg(2:end);
-n_events = n_events(2:end);
+% % Remove First Bin -- Too much uncertainity
+% evis = evis(2:end);
+% avg = avg(2:end);
+% n_events = n_events(2:end);
 
-% Select Only Events having more than 1000 entries
-n_events_high = n_events>1000;
+% Select Only Events having more than 50 entries
+n_events_high = n_events>50;
 
 evis = evis(n_events_high);
 avg = avg(n_events_high);
@@ -22,8 +31,7 @@ n_events = n_events(n_events_high);
 weighted_mean = CalcWeightedMean(avg,n_events);
 
 createfigure(evis,avg,n_events,weighted_mean);
-
-
+    
 end
 
 function [weighted_mean] = CalcWeightedMean(avg, n_events)
@@ -47,7 +55,7 @@ box(axes1,'on');
 hold(axes1,'all');
 
 
-ylim([1 2]);
+ylim([0 2]);
 xlim([0 450]);
 
 % Create plot for x vs y
@@ -66,6 +74,17 @@ plot_legend = sprintf('%s%3.2f','Weighted Mean = ',weighted_mean);
 plot(x_mean,y_mean,...
     'r','LineWidth',2,...
     'DisplayName',plot_legend );
+
+% Plot Fit if there is
+m = -0.003856;
+c = 1.415;
+x_fit = linspace(0,200,1000);
+y_fit = m*x_fit + c;
+fit_legend = sprintf('y = -(3.9E^{-3})x + %3.2f',c);
+plot(x_fit,y_fit,...
+    'k','LineWidth',2,...
+    'DisplayName',fit_legend);
+
 
 % Create xlabel
 xlabel('Visible Energy [MeV]','FontWeight','bold','FontSize',24);
