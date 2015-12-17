@@ -5,7 +5,7 @@
 * Requires ROOT Data Analysis Framework
 	* ROOT URL: http://root.cern.ch/drupal/
 
-## Statistical Data Analysis:
+## Statistical Data Analysis
 ### CCProtonPi0
 * Two stage Data Analysis Package
 	* Reconstruction Stage: 
@@ -31,7 +31,7 @@
 	* Momentum Correction
 	* Short Proton Energy
 
-## Nearline Online Data Processing:
+## Nearline Online Data Processing
 * CAMAC_DataReader
 	* Package responsible for processing CAMAC Readout File
 		* CAMAC Provides electronic signal output from the Test Beam Detector
@@ -42,7 +42,7 @@
 ## Other Algorithms for MINERvA Framework
 * dEdX pID
 
-## Setup:
+## Setup
 
 * Setup Scripts for CCProtonPi0
 	* CCProtonPi0 Package requires MINERvA Software Framework to run
