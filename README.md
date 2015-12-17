@@ -1,13 +1,5 @@
 # Packages for Minerva Neutrino Experiment
 
-|Statistical Data Analysis |MINERvA Operations| Other Algorithms|Setup|
-|----|-----|-----|-----|
-|CCProtonPi0	|CAMAC_DataReader	|dEdX Improvement	|Setup Scripts for CCProtonPi0	|
-|NTuple Analysis|			|True Reco Correction	|				|
-|		|			|dEdX Profile		|				|
-|		|			|Pi0InvMass_Correction	|				|
-|		|			|Pi0Shower_Energy_Study	|				|
-
 * These packages are specialized for MINERvA Experiment data format.
 	* Experiment URL: http://minerva.fnal.gov/
 * Requires ROOT Data Analysis Framework
@@ -26,57 +18,33 @@
 	* Charged Current Neutrino Interaction inside Fiducial Volume
 	* Final State Particles: muon, proton, and pi0
 
-## MINERvA Operations:
-### CAMAC_DataReader
-* Package responsible for processing CAMAC Readout File
-	* CAMAC Provides electronic signal output from the Test Beam Detector
-	* Package reads the output data and converts scalars to real values
-	* Updates the NearlineCurrentHistos.root File interactively
-	* NearlineCurrentHistos.root file read by GMBrowser to show the plots to the Shifter
+## MATLAB Functions for specific studies
+* True Reco Correction
+* Neutrino
+	* Nuclear Binding Energy
+* Pi0
+	* dEdX Profile
+	* Gamma Energy Correction
+	* Invariant Mass
+	* Side ECAL Study
+* Proton
+	* Momentum Correction
+	* Short Proton Energy
+
+## Nearline Online Data Processing:
+* CAMAC_DataReader
+	* Package responsible for processing CAMAC Readout File
+		* CAMAC Provides electronic signal output from the Test Beam Detector
+		* Package reads the output data and converts scalars to real values
+		* Updates the NearlineCurrentHistos.root File interactively
+		* NearlineCurrentHistos.root file read by GMBrowser to show the plots to the Shifter
 	
-## Other Algorithms:
-
-### dEdX pID
-
-* Improvement on pID Calculation: Algorithm improves the pID in case the particle trajectory overlaps with another trajectory.
-
-### True Reco Correction
-* In MC Analysis, most of the time the Reconstructed Parameter (Momentum, Energy, Angle, etc...) agrees with TRUE Parameter
-* Some cases, TRUE vs RECO plot does not create a good x = y distribution, in such cases we apply a correction factor
-* MATLAB Functions designed to find a linear correction factor for Reconstructed values
-
-### Pi0InvMass_Correction
-* We need a Correction Factor which can be calculated from the known Pi0 Invariant Mass Peak
-* Package to find a correction factor using reconstructed Pi0 Invariant Mass Peak.
-	* That correction factor is later used in NTupleAnalysis Package to correct EM Shower Energies
-	
-### Pi0Shower_Energy_Study
-* CCProtonPi0 Analysis Study to calculate Pi0 Shower Energy correctly inside MINERvA Detector
-
-### dEdX Profile
-* EM Shower Profile for Different Shower Lengths
-* Input File:
-	* Each row is unique to a single EM Shower
-	* Each column is total cluster energy in a plane
-* Output:
-	* EM Shower Profile Plots for different Number of Planes
-* Algorithm:
-	1. Read Input File
-	2. Group EM Showers by Plane Numbers 
-		* 4-Plane Showers
-		* 5-Plane Showers
-		* ..
-		* 30-Plane Showers
-		* etc..
-	3. Normalize EM Showers to the MAX Cluster energy in each Group
-		* Each group is normalized uniquely
-	4. Plot Each Group Separately
-		* Prints out plot for each group
+## Other Algorithms for MINERvA Framework
+* dEdX pID
 
 ## Setup:
 
-### Setup Scripts for CCProtonPi0
-
-* CCProtonPi0 Package requires MINERvA Software Framework to run
-* These setup scripts make sure that the user have the correct environmental variables
+* Setup Scripts for CCProtonPi0
+	* CCProtonPi0 Package requires MINERvA Software Framework to run
+	* These setup scripts make sure that the user have the correct environmental variables
   
