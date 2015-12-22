@@ -35,11 +35,6 @@ void CCProtonPi0_Interaction::initHistograms()
     MnvH1D* temp = NULL;
 
     for (int i = 0; i < nHistograms; i++){
-        temp = new MnvH1D( Form("%s_%d","Enu_True",i),"True Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-        temp->GetXaxis()->SetTitle("True E_{#nu}[GeV]");
-        temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
-        Enu_True.push_back(temp);
-        
         temp = new MnvH1D( Form("%s_%d","Enu_1Track",i),"Reconstructed Beam Energy - 1 Track",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - 1Track [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
@@ -54,6 +49,11 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - 2 Track [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
         Enu_2Track.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","Enu",i),"Reconstructed Beam Energy - All Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - All Events [GeV]");
+        temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
+        Enu.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","QSq",i),"Reconstructed Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
@@ -90,15 +90,15 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.vertex_evis.get_width()));
         vertex_evis_2Track.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","extra_energy_1Track",i),"Extra Energy (r = 300mm)",binList.extra_energy.get_nBins(), binList.extra_energy.get_min(), binList.extra_energy.get_max() );
+        temp = new MnvH1D( Form("%s_%d","extra_evis_1Track",i),"Extra Energy (r = 300mm)",binList.extra_energy.get_nBins(), binList.extra_energy.get_min(), binList.extra_energy.get_max() );
         temp->GetXaxis()->SetTitle("Extra Energy [MeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.extra_energy.get_width()));
-        extra_energy_1Track.push_back(temp);
+        extra_evis_1Track.push_back(temp);
  
-        temp = new MnvH1D( Form("%s_%d","extra_energy_2Track",i),"Extra Energy (r = 300mm)",binList.extra_energy.get_nBins(), binList.extra_energy.get_min(), binList.extra_energy.get_max() );
+        temp = new MnvH1D( Form("%s_%d","extra_evis_2Track",i),"Extra Energy (r = 300mm)",binList.extra_energy.get_nBins(), binList.extra_energy.get_min(), binList.extra_energy.get_max() );
         temp->GetXaxis()->SetTitle("Extra Energy [MeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.extra_energy.get_width()));
-        extra_energy_2Track.push_back(temp);
+        extra_evis_2Track.push_back(temp);
       
         temp = new MnvH1D( Form("%s_%d","deltaInvMass",i),"Reconstructed #Delta^{+} Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed #Delta^{+} Inv. Mass [GeV]");
@@ -133,6 +133,7 @@ void CCProtonPi0_Interaction::initHistograms()
     proton_true_KE_1Track->GetXaxis()->SetTitle("Short Proton P_{True} [MeV]");
     proton_true_KE_1Track->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.short_proton_KE.get_width()));
 
+    // Ejected Nucleons
     n_ejected_nucleons_1Track = new TH1D( "n_ejected_nucleons_1Track","N(Nucleons) out of Nucleus",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
     n_ejected_nucleons_1Track->GetXaxis()->SetTitle("N(Nucleons) out of Nucleus");
     n_ejected_nucleons_1Track->GetYaxis()->SetTitle("N(Events)");
@@ -141,7 +142,17 @@ void CCProtonPi0_Interaction::initHistograms()
     n_ejected_nucleons_2Track->GetXaxis()->SetTitle("N(Nucleons) out of Nucleus");
     n_ejected_nucleons_2Track->GetYaxis()->SetTitle("N(Events)");
 
-    // Neutrino Energy Error
+    // ------------------------------------------------------------------------
+    // Neutrino Energy: Truth, Error, Difference
+    // ------------------------------------------------------------------------
+    Enu_True_1Track = new TH1D("Enu_True_1Track","True Neutrino Energy - 1 Track",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    Enu_True_1Track->GetXaxis()->SetTitle("(E_{#nu}^{Reco}-E_{#nu}^{True})/E_{#nu}^{True}");
+    Enu_True_1Track->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
+  
+    Enu_True_2Track = new TH1D("Enu_True_2Track","True Neutrino Energy - 1 Track",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    Enu_True_2Track->GetXaxis()->SetTitle("(E_{#nu}^{Reco}-E_{#nu}^{True})/E_{#nu}^{True}");
+    Enu_True_2Track->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
+    
     Enu_1Track_Error = new TH1D("Enu_1Track_Error","Neutrino Energy Error - 1 Track",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     Enu_1Track_Error->GetXaxis()->SetTitle("(E_{#nu}^{Reco}-E_{#nu}^{True})/E_{#nu}^{True}");
     Enu_1Track_Error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
@@ -154,21 +165,107 @@ void CCProtonPi0_Interaction::initHistograms()
     Enu_2Track_Error->GetXaxis()->SetTitle("(E_{#nu}^{Reco}-E_{#nu}^{True})/E_{#nu}^{True}");
     Enu_2Track_Error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
 
-    Enu_1Track_True = new TH2D("Enu_1Track_True","Neutrino Energy True vs 1 Track",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    Enu_1Track_True->GetXaxis()->SetTitle("E_{#nu}^{Reco} [GeV]");
-    Enu_1Track_True->GetYaxis()->SetTitle("E_{#nu}^{True} [GeV]");
+    Enu_1Track_Diff = new TH1D("Enu_1Track_Diff","Neutrino Energy Difference - 1 Track",binList.beamE_Diff.get_nBins(), binList.beamE_Diff.get_min(), binList.beamE_Diff.get_max() );
+    Enu_1Track_Diff->GetXaxis()->SetTitle("E_{#nu}^{Reco}-E_{#nu}^{True} [GeV]");
+    Enu_1Track_Diff->GetYaxis()->SetTitle("N(Events)");
 
-    Enu_1Track_Alt_True = new TH2D("Enu_1Track_Alt_True","Neutrino Energy True vs 1 Track Alternative",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    Enu_1Track_Alt_True->GetXaxis()->SetTitle("E_{#nu}^{Reco} [GeV]");
-    Enu_1Track_Alt_True->GetYaxis()->SetTitle("E_{#nu}^{True} [GeV]");
+    Enu_2Track_Diff = new TH1D("Enu_2Track_Diff","Neutrino Energy Difference - 2 Track",binList.beamE_Diff.get_nBins(), binList.beamE_Diff.get_min(), binList.beamE_Diff.get_max() );
+    Enu_2Track_Diff->GetXaxis()->SetTitle("E_{#nu}^{Reco}-E_{#nu}^{True} [GeV]");
+    Enu_2Track_Diff->GetYaxis()->SetTitle("N(Events)");
 
-    Enu_1Track_1Track_Alt = new TH2D("Enu_1Track_1Track_Alt","Neutrino Energy 1Track vs 1 Track Alternative",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    Enu_1Track_1Track_Alt->GetXaxis()->SetTitle("E_{#nu}^{Reco} [GeV]");
-    Enu_1Track_1Track_Alt->GetYaxis()->SetTitle("E_{#nu}^{Reco} Alternative [GeV]");
+    // ------------------------------------------------------------------------
+    // Neutrino Energy Study
+    // ------------------------------------------------------------------------
+    Enu_1Track_Corrected_Error = new TH1D("Enu_1Track_Corrected_Error","Neutrino Energy Error - 1 Track",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    Enu_1Track_Corrected_Error->GetXaxis()->SetTitle("(E_{#nu}^{Reco}-E_{#nu}^{True})/E_{#nu}^{True}");
+    Enu_1Track_Corrected_Error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
 
-    Enu_2Track_True = new TH2D("Enu_2Track_True","Neutrino Energy True vs 2 Track",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(),binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
-    Enu_2Track_True->GetXaxis()->SetTitle("E_{#nu}^{Reco} [GeV]");
-    Enu_2Track_True->GetYaxis()->SetTitle("E_{#nu}^{True} [GeV]");
+    Enu_2Track_Corrected_Error = new TH1D("Enu_2Track_Corrected_Error","Neutrino Energy Error - 2 Track",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    Enu_2Track_Corrected_Error->GetXaxis()->SetTitle("(E_{#nu}^{Reco}-E_{#nu}^{True})/E_{#nu}^{True}");
+    Enu_2Track_Corrected_Error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+
+    Enu_1Track_Corrected_Diff = new TH1D("Enu_1Track_Corrected_Diff","Neutrino Energy Difference - 1 Track",binList.beamE_Diff.get_nBins(), binList.beamE_Diff.get_min(), binList.beamE_Diff.get_max() );
+    Enu_1Track_Corrected_Diff->GetXaxis()->SetTitle("E_{#nu}^{Reco}-E_{#nu}^{True} [GeV]");
+    Enu_1Track_Corrected_Diff->GetYaxis()->SetTitle("N(Events)");
+
+    Enu_2Track_Corrected_Diff = new TH1D("Enu_2Track_Corrected_Diff","Neutrino Energy Difference - 2 Track",binList.beamE_Diff.get_nBins(), binList.beamE_Diff.get_min(), binList.beamE_Diff.get_max() );
+    Enu_2Track_Corrected_Diff->GetXaxis()->SetTitle("E_{#nu}^{Reco}-E_{#nu}^{True} [GeV]");
+    Enu_2Track_Corrected_Diff->GetYaxis()->SetTitle("N(Events)");
+
+    // Extra Energy
+    extra_energy_true_1Track = new TH1D("extra_energy_true_1Track","Extra Energy True 1 Track", 20, 0, 500);
+    extra_energy_true_1Track->GetXaxis()->SetTitle("E_{#nu} - (E_{#mu} + E_{#pi^{0}}) [MeV]");
+    extra_energy_true_1Track->GetYaxis()->SetTitle("N(Events)");
+ 
+    extra_energy_true_2Track = new TH1D("extra_energy_true_2Track","Extra Energy True 2 Track", 20, 0, 500);
+    extra_energy_true_2Track->GetXaxis()->SetTitle("E_{#nu} - (E_{#mu} + T_{p} + E_{#pi^{0}}) [MeV]");
+    extra_energy_true_2Track->GetYaxis()->SetTitle("N(Events)");
+ 
+    extra_evis_reco_1Track = new TH1D("extra_evis_reco_1Track","Extra Visible Energy - 1 Track", 20, 0, 500);
+    extra_evis_reco_1Track->GetXaxis()->SetTitle("Extra Visible Energy [MeV]");
+    extra_evis_reco_1Track->GetYaxis()->SetTitle("N(Events)");
+ 
+    extra_evis_reco_2Track = new TH1D("extra_evis_reco_2Track","Extra Visible Energy - 2 Track", 20, 0, 500);
+    extra_evis_reco_2Track->GetXaxis()->SetTitle("Extra Visible Energy [MeV]");
+    extra_evis_reco_2Track->GetYaxis()->SetTitle("N(Events)");
+  
+    extra_energy_reco_1Track = new TH1D("extra_energy_reco_1Track","Extra Visible Energy - 1 Track", 20, 0, 500);
+    extra_energy_reco_1Track->GetXaxis()->SetTitle("Extra Visible Energy [MeV]");
+    extra_energy_reco_1Track->GetYaxis()->SetTitle("N(Events)");
+ 
+    extra_energy_reco_2Track = new TH1D("extra_energy_reco_2Track","Extra Visible Energy - 2 Track", 20, 0, 500);
+    extra_energy_reco_2Track->GetXaxis()->SetTitle("Extra Visible Energy [MeV]");
+    extra_energy_reco_2Track->GetYaxis()->SetTitle("N(Events)");
+
+    extra_energy_reco_ratio_1Track = new TH2D("extra_energy_reco_ratio_1Track","E_{Extra}^{True}/E_{Vertex}^{Visible} vs E_{Vertex}^{Visible} -  1 Track", 4, 0, 200,20,0,3);
+    extra_energy_reco_ratio_1Track->GetXaxis()->SetTitle("E_{Vertex}^{Visible} [MeV]");
+    extra_energy_reco_ratio_1Track->GetYaxis()->SetTitle("E_{Extra}^{True} / E_{Vertex}^{Visible}");
+ 
+    extra_energy_reco_ratio_2Track = new TH2D("extra_energy_reco_ratio_2Track","E_{Extra}^{True}/E_{Vertex}^{Visible} vs E_{Vertex}^{Visible} -  2 Track", 4, 0, 200,20,0,3);
+    extra_energy_reco_ratio_2Track->GetXaxis()->SetTitle("E_{Vertex}^{Visible} [MeV]");
+    extra_energy_reco_ratio_2Track->GetYaxis()->SetTitle("E_{Extra}^{True} / E_{Vertex}^{Visible}");
+
+    extra_energy_reco_true_1Track = new TH2D("extra_energy_reco_true_1Track","E_{Extra}^{True} vs E_{Vertex}^{Visible} -  1 Track", 20, 0, 500,20,0,500);
+    extra_energy_reco_true_1Track->GetXaxis()->SetTitle("E_{Vertex}^{Visible} [MeV]");
+    extra_energy_reco_true_1Track->GetYaxis()->SetTitle("E_{Extra}^{True} [MeV]");
+ 
+    extra_energy_reco_true_2Track = new TH2D("extra_energy_reco_true_2Track","E_{Extra}^{True}i vs E_{Vertex}^{Visible} -  2 Track", 20, 0, 500,20,0,500);
+    extra_energy_reco_true_2Track->GetXaxis()->SetTitle("E_{Vertex}^{Visible} [MeV]");
+    extra_energy_reco_true_2Track->GetYaxis()->SetTitle("E_{Extra}^{True} [MeV]");
+
+    // Energy Differences
+    vertex_energy_Diff_1Track = new TH1D("vertex_energy_Diff_1Track","Vertex Energy Difference 1 Track", 100, -500,500);
+    vertex_energy_Diff_1Track->GetXaxis()->SetTitle("Reco(Vertex Energy) - True(Vertex Energy) [MeV]");
+    vertex_energy_Diff_1Track->GetYaxis()->SetTitle("N(Events)");
+
+    vertex_energy_Diff_2Track = new TH1D("vertex_energy_Diff_2Track","Vertex Energy Difference 2 Track", 100, -500,500);
+    vertex_energy_Diff_2Track->GetXaxis()->SetTitle("Reco(Vertex Energy) - True(Vertex Energy) [MeV]");
+    vertex_energy_Diff_2Track->GetYaxis()->SetTitle("N(Events)");
+ 
+    muon_energy_Diff_1Track = new TH1D("muon_energy_Diff_1Track","muon Energy Difference 1 Track", 100, -1000,1000);
+    muon_energy_Diff_1Track->GetXaxis()->SetTitle("Reco(muon Energy) - True(muon Energy) [MeV]");
+    muon_energy_Diff_1Track->GetYaxis()->SetTitle("N(Events)");
+
+    muon_energy_Diff_2Track = new TH1D("muon_energy_Diff_2Track","muon Energy Difference 2 Track", 100, -1000,1000);
+    muon_energy_Diff_2Track->GetXaxis()->SetTitle("Reco(muon Energy) - True(muon Energy) [MeV]");
+    muon_energy_Diff_2Track->GetYaxis()->SetTitle("N(Events)");
+ 
+    proton_energy_Diff_1Track = new TH1D("proton_energy_Diff_1Track","proton Energy Difference 1 Track", 100, -500,500);
+    proton_energy_Diff_1Track->GetXaxis()->SetTitle("Reco(proton Energy) - True(proton Energy) [MeV]");
+    proton_energy_Diff_1Track->GetYaxis()->SetTitle("N(Events)");
+
+    proton_energy_Diff_2Track = new TH1D("proton_energy_Diff_2Track","proton Energy Difference 2 Track", 100, -500,500);
+    proton_energy_Diff_2Track->GetXaxis()->SetTitle("Reco(proton Energy) - True(proton Energy) [MeV]");
+    proton_energy_Diff_2Track->GetYaxis()->SetTitle("N(Events)");
+
+    pi0_energy_Diff_1Track = new TH1D("pi0_energy_Diff_1Track","pi0 Energy Difference 1 Track", 100, -500,500);
+    pi0_energy_Diff_1Track->GetXaxis()->SetTitle("Reco(pi0 Energy) - True(pi0 Energy) [MeV]");
+    pi0_energy_Diff_1Track->GetYaxis()->SetTitle("N(Events)");
+
+    pi0_energy_Diff_2Track = new TH1D("pi0_energy_Diff_2Track","pi0 Energy Difference 2 Track", 100, -500,500);
+    pi0_energy_Diff_2Track->GetXaxis()->SetTitle("Reco(pi0 Energy) - True(pi0 Energy) [MeV]");
+    pi0_energy_Diff_2Track->GetYaxis()->SetTitle("N(Events)");
+
 }
 
 void CCProtonPi0_Interaction::writeHistograms()
@@ -179,10 +276,10 @@ void CCProtonPi0_Interaction::writeHistograms()
 
     for (int i = 0; i < nHistograms; i++){
         // Event Kinematics
-        Enu_True[i]->Write();
         Enu_1Track[i]->Write();
         Enu_1Track_Alt[i]->Write();
         Enu_2Track[i]->Write();
+        Enu[i]->Write();
         QSq[i]->Write();
         WSq[i]->Write();
         W[i]->Write();
@@ -192,8 +289,8 @@ void CCProtonPi0_Interaction::writeHistograms()
         vertex_energy_2Track[i]->Write();
         vertex_evis_1Track[i]->Write();
         vertex_evis_2Track[i]->Write();
-        extra_energy_1Track[i]->Write();
-        extra_energy_2Track[i]->Write();
+        extra_evis_1Track[i]->Write();
+        extra_evis_2Track[i]->Write();
 
         // Other Event Parameters 
         deltaInvMass[i]->Write();
@@ -204,20 +301,61 @@ void CCProtonPi0_Interaction::writeHistograms()
     final_mc_w_RES->Write();
     final_mc_w_CCQE->Write();
 
+    // Short Proton
     proton_true_P_1Track->Write();
     proton_true_KE_1Track->Write();
     
+    // Ejected Nucleons
     n_ejected_nucleons_1Track->Write();
     n_ejected_nucleons_2Track->Write();
 
+    // Neutrino Energy: Truth, Error, Difference
+    Enu_True_1Track->Write();
+    Enu_True_2Track->Write();
+    
     Enu_1Track_Error->Write();
     Enu_1Track_Alt_Error->Write();
     Enu_2Track_Error->Write();
 
-    Enu_1Track_True->Write();
-    Enu_1Track_Alt_True->Write();
-    Enu_1Track_1Track_Alt->Write();
-    Enu_2Track_True->Write();
+    Enu_1Track_Diff->Write();
+    Enu_2Track_Diff->Write();
+
+    // ------------------------------------------------------------------------
+    // Neutrino Energy Study
+    // ------------------------------------------------------------------------
+    Enu_1Track_Corrected_Error->Write();
+    Enu_2Track_Corrected_Error->Write();
+    Enu_1Track_Corrected_Diff->Write();
+    Enu_2Track_Corrected_Diff->Write();
+
+    // Extra Energy
+    extra_energy_true_1Track->Write();
+    extra_energy_true_2Track->Write();
+    
+    extra_energy_reco_1Track->Write();
+    extra_energy_reco_2Track->Write();
+    
+    extra_evis_reco_1Track->Write();
+    extra_evis_reco_2Track->Write();
+
+    extra_energy_reco_ratio_1Track->Write();
+    extra_energy_reco_ratio_2Track->Write();
+
+    extra_energy_reco_true_1Track->Write();
+    extra_energy_reco_true_2Track->Write();
+   
+    // Energy Differences
+    vertex_energy_Diff_1Track->Write();
+    vertex_energy_Diff_2Track->Write();
+    
+    muon_energy_Diff_1Track->Write();
+    muon_energy_Diff_2Track->Write();
+    
+    proton_energy_Diff_1Track->Write();
+    proton_energy_Diff_2Track->Write();
+    
+    pi0_energy_Diff_1Track->Write();
+    pi0_energy_Diff_2Track->Write();
 
     f->Close();
 }

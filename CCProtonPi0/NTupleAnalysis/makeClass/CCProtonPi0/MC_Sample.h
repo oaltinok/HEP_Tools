@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Dec 16 09:46:13 2015 by ROOT version 5.34/05
+// Mon Dec 21 08:18:42 2015 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -104,30 +104,7 @@ public :
    Double_t        energy_from_mc;
    Double_t        energy_from_mc_fraction;
    Double_t        energy_from_mc_fraction_of_highest;
-   Double_t        evis_ID;
-   Double_t        evis_OD;
-   Double_t        evis_Unused_afterReco;
-   Double_t        evis_Used_afterReco;
-   Double_t        evis_extra;
-   Double_t        evis_gamma1;
-   Double_t        evis_gamma2;
-   Double_t        evis_muon;
-   Double_t        evis_pi0;
-   Double_t        evis_proton;
-   Double_t        evis_total;
-   Double_t        extra_energy;
-   Double_t        extra_energy_100;
-   Double_t        extra_energy_150;
-   Double_t        extra_energy_200;
-   Double_t        extra_energy_300;
-   Double_t        extra_energy_50;
-   Double_t        extra_energy_500;
-   Double_t        extra_evis_100;
-   Double_t        extra_evis_150;
-   Double_t        extra_evis_200;
-   Double_t        extra_evis_300;
-   Double_t        extra_evis_50;
-   Double_t        extra_evis_500;
+   Double_t        extra_evis;
    Double_t        g1blob_1ParFit_fval;
    Double_t        g1blob_2ParFit_vtx_distance;
    Double_t        g1dedx;
@@ -177,7 +154,6 @@ public :
    Double_t        prim_vtx_smallest_opening_angle;
    Double_t        reco_eventID;
    Double_t        time;
-   Double_t        vertex_blob_energy;
    Double_t        vertex_blob_evis;
    Double_t        vtx_fit_chi2;
    Int_t           g1dedx_cluster_occupancy_sz;
@@ -555,6 +531,7 @@ public :
    Double_t        CCProtonPi0_trajMuonProngPy;
    Double_t        CCProtonPi0_trajMuonProngPz;
    Double_t        CCProtonPi0_trajMuonTheta;
+   Double_t        CCProtonPi0_vertex_energy;
    Double_t        CCProtonPi0_vtx_x;
    Double_t        CCProtonPi0_vtx_y;
    Double_t        CCProtonPi0_vtx_z;
@@ -786,30 +763,7 @@ public :
    TBranch        *b_energy_from_mc;   //!
    TBranch        *b_energy_from_mc_fraction;   //!
    TBranch        *b_energy_from_mc_fraction_of_highest;   //!
-   TBranch        *b_evis_ID;   //!
-   TBranch        *b_evis_OD;   //!
-   TBranch        *b_evis_Unused_afterReco;   //!
-   TBranch        *b_evis_Used_afterReco;   //!
-   TBranch        *b_evis_extra;   //!
-   TBranch        *b_evis_gamma1;   //!
-   TBranch        *b_evis_gamma2;   //!
-   TBranch        *b_evis_muon;   //!
-   TBranch        *b_evis_pi0;   //!
-   TBranch        *b_evis_proton;   //!
-   TBranch        *b_evis_total;   //!
-   TBranch        *b_extra_energy;   //!
-   TBranch        *b_extra_energy_100;   //!
-   TBranch        *b_extra_energy_150;   //!
-   TBranch        *b_extra_energy_200;   //!
-   TBranch        *b_extra_energy_300;   //!
-   TBranch        *b_extra_energy_50;   //!
-   TBranch        *b_extra_energy_500;   //!
-   TBranch        *b_extra_evis_100;   //!
-   TBranch        *b_extra_evis_150;   //!
-   TBranch        *b_extra_evis_200;   //!
-   TBranch        *b_extra_evis_300;   //!
-   TBranch        *b_extra_evis_50;   //!
-   TBranch        *b_extra_evis_500;   //!
+   TBranch        *b_extra_evis;   //!
    TBranch        *b_g1blob_1ParFit_fval;   //!
    TBranch        *b_g1blob_2ParFit_vtx_distance;   //!
    TBranch        *b_g1dedx;   //!
@@ -859,7 +813,6 @@ public :
    TBranch        *b_prim_vtx_smallest_opening_angle;   //!
    TBranch        *b_reco_eventID;   //!
    TBranch        *b_time;   //!
-   TBranch        *b_vertex_blob_energy;   //!
    TBranch        *b_vertex_blob_evis;   //!
    TBranch        *b_vtx_fit_chi2;   //!
    TBranch        *b_g1dedx_cluster_occupancy_sz;   //!
@@ -1237,6 +1190,7 @@ public :
    TBranch        *b_CCProtonPi0_trajMuonProngPy;   //!
    TBranch        *b_CCProtonPi0_trajMuonProngPz;   //!
    TBranch        *b_CCProtonPi0_trajMuonTheta;   //!
+   TBranch        *b_CCProtonPi0_vertex_energy;   //!
    TBranch        *b_CCProtonPi0_vtx_x;   //!
    TBranch        *b_CCProtonPi0_vtx_y;   //!
    TBranch        *b_CCProtonPi0_vtx_z;   //!
@@ -1419,7 +1373,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_44.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_45a.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1553,30 +1507,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("energy_from_mc", &energy_from_mc, &b_energy_from_mc);
    fChain->SetBranchAddress("energy_from_mc_fraction", &energy_from_mc_fraction, &b_energy_from_mc_fraction);
    fChain->SetBranchAddress("energy_from_mc_fraction_of_highest", &energy_from_mc_fraction_of_highest, &b_energy_from_mc_fraction_of_highest);
-   fChain->SetBranchAddress("evis_ID", &evis_ID, &b_evis_ID);
-   fChain->SetBranchAddress("evis_OD", &evis_OD, &b_evis_OD);
-   fChain->SetBranchAddress("evis_Unused_afterReco", &evis_Unused_afterReco, &b_evis_Unused_afterReco);
-   fChain->SetBranchAddress("evis_Used_afterReco", &evis_Used_afterReco, &b_evis_Used_afterReco);
-   fChain->SetBranchAddress("evis_extra", &evis_extra, &b_evis_extra);
-   fChain->SetBranchAddress("evis_gamma1", &evis_gamma1, &b_evis_gamma1);
-   fChain->SetBranchAddress("evis_gamma2", &evis_gamma2, &b_evis_gamma2);
-   fChain->SetBranchAddress("evis_muon", &evis_muon, &b_evis_muon);
-   fChain->SetBranchAddress("evis_pi0", &evis_pi0, &b_evis_pi0);
-   fChain->SetBranchAddress("evis_proton", &evis_proton, &b_evis_proton);
-   fChain->SetBranchAddress("evis_total", &evis_total, &b_evis_total);
-   fChain->SetBranchAddress("extra_energy", &extra_energy, &b_extra_energy);
-   fChain->SetBranchAddress("extra_energy_100", &extra_energy_100, &b_extra_energy_100);
-   fChain->SetBranchAddress("extra_energy_150", &extra_energy_150, &b_extra_energy_150);
-   fChain->SetBranchAddress("extra_energy_200", &extra_energy_200, &b_extra_energy_200);
-   fChain->SetBranchAddress("extra_energy_300", &extra_energy_300, &b_extra_energy_300);
-   fChain->SetBranchAddress("extra_energy_50", &extra_energy_50, &b_extra_energy_50);
-   fChain->SetBranchAddress("extra_energy_500", &extra_energy_500, &b_extra_energy_500);
-   fChain->SetBranchAddress("extra_evis_100", &extra_evis_100, &b_extra_evis_100);
-   fChain->SetBranchAddress("extra_evis_150", &extra_evis_150, &b_extra_evis_150);
-   fChain->SetBranchAddress("extra_evis_200", &extra_evis_200, &b_extra_evis_200);
-   fChain->SetBranchAddress("extra_evis_300", &extra_evis_300, &b_extra_evis_300);
-   fChain->SetBranchAddress("extra_evis_50", &extra_evis_50, &b_extra_evis_50);
-   fChain->SetBranchAddress("extra_evis_500", &extra_evis_500, &b_extra_evis_500);
+   fChain->SetBranchAddress("extra_evis", &extra_evis, &b_extra_evis);
    fChain->SetBranchAddress("g1blob_1ParFit_fval", &g1blob_1ParFit_fval, &b_g1blob_1ParFit_fval);
    fChain->SetBranchAddress("g1blob_2ParFit_vtx_distance", &g1blob_2ParFit_vtx_distance, &b_g1blob_2ParFit_vtx_distance);
    fChain->SetBranchAddress("g1dedx", &g1dedx, &b_g1dedx);
@@ -1626,7 +1557,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("prim_vtx_smallest_opening_angle", &prim_vtx_smallest_opening_angle, &b_prim_vtx_smallest_opening_angle);
    fChain->SetBranchAddress("reco_eventID", &reco_eventID, &b_reco_eventID);
    fChain->SetBranchAddress("time", &time, &b_time);
-   fChain->SetBranchAddress("vertex_blob_energy", &vertex_blob_energy, &b_vertex_blob_energy);
    fChain->SetBranchAddress("vertex_blob_evis", &vertex_blob_evis, &b_vertex_blob_evis);
    fChain->SetBranchAddress("vtx_fit_chi2", &vtx_fit_chi2, &b_vtx_fit_chi2);
    fChain->SetBranchAddress("g1dedx_cluster_occupancy_sz", &g1dedx_cluster_occupancy_sz, &b_g1dedx_cluster_occupancy_sz);
@@ -2004,6 +1934,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_trajMuonProngPy", &CCProtonPi0_trajMuonProngPy, &b_CCProtonPi0_trajMuonProngPy);
    fChain->SetBranchAddress("CCProtonPi0_trajMuonProngPz", &CCProtonPi0_trajMuonProngPz, &b_CCProtonPi0_trajMuonProngPz);
    fChain->SetBranchAddress("CCProtonPi0_trajMuonTheta", &CCProtonPi0_trajMuonTheta, &b_CCProtonPi0_trajMuonTheta);
+   fChain->SetBranchAddress("CCProtonPi0_vertex_energy", &CCProtonPi0_vertex_energy, &b_CCProtonPi0_vertex_energy);
    fChain->SetBranchAddress("CCProtonPi0_vtx_x", &CCProtonPi0_vtx_x, &b_CCProtonPi0_vtx_x);
    fChain->SetBranchAddress("CCProtonPi0_vtx_y", &CCProtonPi0_vtx_y, &b_CCProtonPi0_vtx_y);
    fChain->SetBranchAddress("CCProtonPi0_vtx_z", &CCProtonPi0_vtx_z, &b_CCProtonPi0_vtx_z);

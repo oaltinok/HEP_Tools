@@ -125,11 +125,6 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
 
     declareProperty("BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian);
 
-    // Nuclear Binding Energy -- See NeutrinoEnergyStudy Notes
-    declareProperty("BindingEnergyPerNucleon",  m_bindingEnergy_per_nucleon = 7.7*CLHEP::MeV); // Carbon
-    declareProperty("nNucleons_1Track",  m_nNucleons_1Track = 2.8);
-    declareProperty("nNucleons_2Track",  m_nNucleons_2Track = 1.7);
-
     // Optional Studies
     declareProperty("StudyShowerEnergy", m_study_shower_energy = false);
 
@@ -492,7 +487,6 @@ StatusCode CCProtonPi0::initialize()
 
     // VertexBlob()
     declareDoubleEventBranch("vertex_blob_evis", SENTINEL );
-    declareDoubleEventBranch("vertex_blob_energy", SENTINEL );
 
     // ConeBlobs()
     declareDoubleEventBranch("RE_energy_Tracker", SENTINEL );
@@ -572,10 +566,7 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("Rejected_blob_vis_energy", SENTINEL );
     declareDoubleEventBranch("Muon_blob_energy", SENTINEL );
 
-    declareDoubleEventBranch("extra_energy", SENTINEL);
     declareDoubleEventBranch("extra_evis", SENTINEL);
-
-
 
     //-------------------------------------------------------------------------
     // NeutrinoInt Branches 
@@ -588,6 +579,7 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch( m_hypMeths, "vtx_z",0.0);
 
     // Event Kinematics -- Filled in setEventKinematics()
+    declareDoubleBranch( m_hypMeths, "vertex_energy", SENTINEL);
     declareDoubleBranch( m_hypMeths, "neutrino_E", SENTINEL);
     declareDoubleBranch( m_hypMeths, "QSq", SENTINEL);
     declareDoubleBranch( m_hypMeths, "WSq", SENTINEL);
@@ -1056,7 +1048,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
 
     // Get Extra Energy after Particle Reconstructions
     SaveExtraEnergy(event);
-
 
     // Write FS Particle Table and Event Record for Reconstructed Events
     if(truthEvent){
@@ -2445,18 +2436,15 @@ double CCProtonPi0::Calc_WSq(double Enu, double QSq) const
     return WSq;
 }
 
-double CCProtonPi0::Calc_Enu_1Track() const
+double CCProtonPi0::Calc_Enu_1Track(double vertex_energy) const
 { 
-    double binding_energy = GetNuclearBindingEnergy();
-
     debug()<<"Calculating Enu_1Track Using:"<<endmsg;
     debug()<<"\tP4(Muon) = "<<m_muon_4P<<endmsg;
     debug()<<"\tP4(Pi0) = "<<m_pi0_4P<<endmsg;
-    debug()<<"\tVertex Energy = "<<m_vertex_energy<<endmsg;
-    debug()<<"\tExtra Energy = "<<m_extra_energy<<endmsg;
-    debug()<<"\tNuclear Binding Energy = "<<binding_energy<<endmsg;
+    debug()<<"\tVertex Energy = "<<vertex_energy<<endmsg;
+    debug()<<"\tExtra Visible Energy = "<<m_extra_evis<<endmsg;
 
-    double Enu = m_muon_4P.E() + m_pi0_4P.E() + m_vertex_energy + m_extra_energy + binding_energy;
+    double Enu = m_muon_4P.E() + m_pi0_4P.E() + vertex_energy + m_extra_evis;
 
     debug()<<"\tNeutrino Energy = "<<Enu<<endmsg;
 
@@ -2466,7 +2454,6 @@ double CCProtonPi0::Calc_Enu_1Track() const
 
 // Using Equation from DocDB: 9749 v2
 // Back-of-napkin derivations for E_nu of CC(nu, meson) reactions 
-// Omits Vertex Energy, Extra Energy and Nuclear Binding Energy
 double CCProtonPi0::Calc_Enu_1Track_Alt() const
 {
     debug()<<"Calculating Enu_1Track_Alt Using:"<<endmsg;
@@ -2506,17 +2493,14 @@ double CCProtonPi0::Calc_Enu_1Track_Alt() const
     return Enu;
 }
 
-double CCProtonPi0::Calc_Enu_2Track() const
+double CCProtonPi0::Calc_Enu_2Track(double vertex_energy) const
 {
-    double binding_energy = GetNuclearBindingEnergy();
-
     debug()<<"Calculating Enu_2Track Using:"<<endmsg;
     debug()<<"\tP4(Muon) = "<<m_muon_4P<<endmsg;
     debug()<<"\tP4(Proton) = "<<m_proton_4P<<endmsg;
     debug()<<"\tP4(Pi0) = "<<m_pi0_4P<<endmsg;
-    debug()<<"\tVertex Energy = "<<m_vertex_energy<<endmsg;
-    debug()<<"\tExtra Energy = "<<m_extra_energy<<endmsg;
-    debug()<<"\tNuclear Binding Energy = "<<binding_energy<<endmsg;
+    debug()<<"\tVertex Energy = "<<vertex_energy<<endmsg;
+    debug()<<"\tExtra Visible Energy = "<<m_extra_evis<<endmsg;
 
     double Mp = MinervaUnits::M_p; // Proton Rest Mass [MeV]
     double Emu = m_muon_4P.E();
@@ -2524,7 +2508,7 @@ double CCProtonPi0::Calc_Enu_2Track() const
     double KEproton = m_proton_4P.E() - Mp;
 
     // Calculate Enu -- Use eq. in Research Log Book page 29
-    double Enu = Emu + Epi0 + KEproton + m_vertex_energy + m_extra_energy + binding_energy;
+    double Enu = Emu + Epi0 + KEproton + vertex_energy + m_extra_evis;
 
     debug()<<"\tNeutrino Energy = "<<Enu<<endmsg;
 
@@ -2560,18 +2544,20 @@ double CCProtonPi0::Calc_Py_wrt_Beam(Gaudi::LorentzVector particle_4P) const
 //==============================================================================
 void CCProtonPi0::setEventKinematics(Minerva::NeutrinoInt* nuInt) const
 {
+    double vertex_energy = GetVertexEnergy();
     double Enu;    
     double QSq;
     double WSq;
 
     // Enu Calculation depends on Proton Reconstruction 
-    if (m_ProtonParticles.size() == 0) Enu = Calc_Enu_1Track();
-    else Enu = Calc_Enu_2Track();
+    if (m_ProtonParticles.size() == 0) Enu = Calc_Enu_1Track(vertex_energy);
+    else Enu = Calc_Enu_2Track(vertex_energy);
 
     QSq = Calc_QSq(Enu); 
     WSq = Calc_WSq(Enu, QSq);
 
     // Fill NTuples
+    nuInt->setDoubleData("vertex_energy",vertex_energy);
     nuInt->setDoubleData("neutrino_E",Enu);
     nuInt->setDoubleData("QSq",QSq);
     nuInt->setDoubleData("WSq",WSq);
@@ -3442,7 +3428,6 @@ void CCProtonPi0::VertexBlob(Minerva::PhysicsEvent *event, Minerva::GenMinIntera
     unusedClusters = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
 
     double evis = 0.0;
-    double energy = 0.0;
 
     // Get VertexBlob 
     SmartRefVector<Minerva::IDCluster> VertexBlobClusters = FilterInSphereClusters(event, unusedClusters, m_vertex_blob_radius);
@@ -3458,8 +3443,6 @@ void CCProtonPi0::VertexBlob(Minerva::PhysicsEvent *event, Minerva::GenMinIntera
 
         // Get VertexBlob Energy
         evis = VertexSphereBlob->energy();
-        double cal_const = GetShortProtonCalConstant(evis);
-        energy = evis * cal_const;
 
         if (truthEvent){
             SaveTruthUnusedClusterEnergyNearVertex(truthEvent, VertexBlobClusters);
@@ -3467,10 +3450,9 @@ void CCProtonPi0::VertexBlob(Minerva::PhysicsEvent *event, Minerva::GenMinIntera
     } 
 
     event->setDoubleData("vertex_blob_evis", evis);
-    event->setDoubleData("vertex_blob_energy", energy);
 
-    // Vertex Energy
-    m_vertex_energy = energy;
+    // Vertex Visible Energy as Global Variable 
+    m_vertex_evis = evis;
 }
 
 //==============================================================================
@@ -5745,13 +5727,11 @@ void CCProtonPi0::SaveExtraEnergy(Minerva::PhysicsEvent *event) const
 
     SmartRefVector<Minerva::IDCluster> Clusters = FilterInSphereClusters(event, unusedClusters, 300);
     double extra_evis = getClusterEnergy(Clusters);
-    double extra_energy = extra_evis * GetShortProtonCalConstant(extra_evis);
 
-    // Save to Global Variable - For Neutrino Energy Calculation
-    m_extra_energy = extra_energy;
-
-    event->setDoubleData("extra_energy", extra_energy);
     event->setDoubleData("extra_evis", extra_evis);
+
+    // Save Extra Visible Energy to use in Neutrino Energy
+    m_extra_evis = extra_evis;
 }
 
 double CCProtonPi0::getClusterEnergy( SmartRefVector<Minerva::IDCluster> clusters) const
@@ -5766,32 +5746,35 @@ double CCProtonPi0::getClusterEnergy( SmartRefVector<Minerva::IDCluster> cluster
     return total_energy;
 }
 
-double CCProtonPi0::GetNuclearBindingEnergy() const
+double CCProtonPi0::GetVertexEnergyCalConst() const
 {
-    double binding_energy;
+    double cal_const;
+    double evis = m_vertex_evis;
 
-    if (m_ProtonParticles.size() == 0){
-        binding_energy = m_nNucleons_1Track * m_bindingEnergy_per_nucleon;
+    if (m_ProtonParticles.size() > 0){
+        cal_const = 0.91;
     }else{
-        binding_energy = m_nNucleons_2Track * m_bindingEnergy_per_nucleon;
+        // Values determined from MC Study
+        double min_cal_const = 1.82;
+        double m = -0.001442;
+        double c = 1.964;
+        cal_const = m*evis + c;
+
+        // We have negative slope, limit min value
+        if (cal_const < min_cal_const) cal_const = min_cal_const;
     }
-
-    return binding_energy;
-}
-
-double CCProtonPi0::GetShortProtonCalConstant(double evis) const
-{
-    // Values determined from MC Study
-    double min_cal_const = 1.7;
-    double m = -0.003856;
-    double c = 1.415;
-    double cal_const = m*evis + c;
-
-    // We have negative slope, limit min value
-    if (cal_const < 1.7) cal_const = min_cal_const;
 
     return cal_const;
 }
+
+double CCProtonPi0::GetVertexEnergy() const
+{
+    double cal_const = GetVertexEnergyCalConst();
+    double vertex_energy = m_vertex_evis * cal_const;
+
+    return vertex_energy;
+}
+
 
 #endif
 

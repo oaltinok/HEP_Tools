@@ -29,10 +29,10 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         //     Histograms
         //--------------------------------------------------------------------------
         // Event Kinematics
-        std::vector<MnvH1D*> Enu_True;
         std::vector<MnvH1D*> Enu_1Track;
         std::vector<MnvH1D*> Enu_1Track_Alt;
         std::vector<MnvH1D*> Enu_2Track;
+        std::vector<MnvH1D*> Enu;
         std::vector<MnvH1D*> QSq;
         std::vector<MnvH1D*> WSq;
         std::vector<MnvH1D*> W;
@@ -42,8 +42,8 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> vertex_energy_2Track;
         std::vector<MnvH1D*> vertex_evis_1Track;
         std::vector<MnvH1D*> vertex_evis_2Track;
-        std::vector<MnvH1D*> extra_energy_1Track;
-        std::vector<MnvH1D*> extra_energy_2Track;
+        std::vector<MnvH1D*> extra_evis_1Track;
+        std::vector<MnvH1D*> extra_evis_2Track;
        
         // Vertex
         std::vector<MnvH1D*> vertex_z;
@@ -55,22 +55,62 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* final_mc_w_DIS;
         TH1D* final_mc_w_RES;
         TH1D* final_mc_w_CCQE;
-        
+
+        // Short Proton
+        TH1D* proton_true_P_1Track;
+        TH1D* proton_true_KE_1Track;
+       
+        // Ejected Nucleons
         TH1D* n_ejected_nucleons_1Track;
         TH1D* n_ejected_nucleons_2Track;
        
-        // Truth Information
+        // Neutrino Energy: Truth, Error, Difference
+        TH1D* Enu_True_1Track;
+        TH1D* Enu_True_2Track;
+        
         TH1D* Enu_1Track_Error;
         TH1D* Enu_1Track_Alt_Error;
         TH1D* Enu_2Track_Error;
+ 
+        TH1D* Enu_1Track_Diff;
+        TH1D* Enu_2Track_Diff;
+
+        // --------------------------------------------------------------------
+        // Neutrino Energy Study
+        // --------------------------------------------------------------------
+        TH1D* Enu_1Track_Corrected_Error;
+        TH1D* Enu_2Track_Corrected_Error;
+        TH1D* Enu_1Track_Corrected_Diff;
+        TH1D* Enu_2Track_Corrected_Diff;
+        
+        // Extra Energy 
+        TH1D* extra_energy_true_1Track;
+        TH1D* extra_energy_true_2Track;
+        
+        TH1D* extra_evis_reco_1Track;
+        TH1D* extra_evis_reco_2Track;
        
-        TH2D* Enu_1Track_True;
-        TH2D* Enu_1Track_Alt_True;
-        TH2D* Enu_1Track_1Track_Alt;
-        TH2D* Enu_2Track_True;
-      
-        TH1D* proton_true_P_1Track;
-        TH1D* proton_true_KE_1Track;
+        TH1D* extra_energy_reco_1Track;
+        TH1D* extra_energy_reco_2Track;
+        
+        TH2D* extra_energy_reco_ratio_1Track;
+        TH2D* extra_energy_reco_ratio_2Track;
+   
+        TH2D* extra_energy_reco_true_1Track;
+        TH2D* extra_energy_reco_true_2Track;
+     
+        // Energy Differences
+        TH1D* vertex_energy_Diff_1Track;
+        TH1D* vertex_energy_Diff_2Track;
+    
+        TH1D* muon_energy_Diff_1Track;
+        TH1D* muon_energy_Diff_2Track;
+        
+        TH1D* proton_energy_Diff_1Track;
+        TH1D* proton_energy_Diff_2Track;
+        
+        TH1D* pi0_energy_Diff_1Track;
+        TH1D* pi0_energy_Diff_2Track;
 
     private:
         void initHistograms();

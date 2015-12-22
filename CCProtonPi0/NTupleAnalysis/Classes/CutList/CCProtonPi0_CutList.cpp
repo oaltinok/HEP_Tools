@@ -131,11 +131,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
         hCut_1Track_neutrinoE.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_1Track_UnusedE",i),"Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
-        temp->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
-        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
-        hCut_1Track_UnusedE.push_back(temp);
-
         // --------------------------------------------------------------------
         // 2 Track
         // --------------------------------------------------------------------
@@ -178,11 +173,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
         hCut_2Track_neutrinoE.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","hCut_2Track_UnusedE",i),"Unused Cluster Energy after Pi0 Reconstruction",binList.UnusedE.get_nBins(), binList.UnusedE.get_min(), binList.UnusedE.get_max() );
-        temp->GetXaxis()->SetTitle("Unused Cluster Energy after Pi0 Reconstruction [MeV]");
-        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.UnusedE.get_width()));
-        hCut_2Track_UnusedE.push_back(temp);
         
         temp = new MnvH1D( Form("%s_%d","hCut_2Track_protonScore_pIDDiff",i),"Proton Score - Pion Score",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
         temp->GetXaxis()->SetTitle("Proton Score - Pion Score");
@@ -243,7 +233,6 @@ void CCProtonPi0_CutList::init_nCutVectors()
         nCut_ProtonScore.push_back(CCProtonPi0_Cut());
         nCut_DeltaInvMass.push_back(CCProtonPi0_Cut());
         nCut_beamEnergy.push_back(CCProtonPi0_Cut());
-        nCut_UnusedE.push_back(CCProtonPi0_Cut());
     }
 }
 
@@ -270,7 +259,6 @@ void CCProtonPi0_CutList::SetCutNames()
         nCut_ProtonScore[i].set_Name("Proton_Score");
         nCut_DeltaInvMass[i].set_Name("Delta_invMass");
         nCut_beamEnergy[i].set_Name("beamEnergy");
-        nCut_UnusedE[i].set_Name("UnusedE");
     }
 }
 
@@ -359,7 +347,6 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_Topology.push_back(nCut_Photon2DistanceLow);
     nCutVector_Topology.push_back(nCut_Pi0_invMass);
     nCutVector_Topology.push_back(nCut_beamEnergy);
-    nCutVector_Topology.push_back(nCut_UnusedE);
 }
 
 void CCProtonPi0_CutList::writeCutTable()
@@ -455,7 +442,6 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_1Track_gamma1ConvDist[i]->Write();
         hCut_1Track_gamma2ConvDist[i]->Write();
         hCut_1Track_neutrinoE[i]->Write();
-        hCut_1Track_UnusedE[i]->Write();
        
         // 2 Track 
         hCut_2Track_eVis_nuclearTarget[i]->Write();
@@ -466,7 +452,6 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_2Track_gamma1ConvDist[i]->Write();
         hCut_2Track_gamma2ConvDist[i]->Write();
         hCut_2Track_neutrinoE[i]->Write();
-        hCut_2Track_UnusedE[i]->Write();
         hCut_2Track_protonScore_pIDDiff[i]->Write();
         hCut_2Track_protonScore_LLR[i]->Write();
         hCut_2Track_deltaInvMass[i]->Write();

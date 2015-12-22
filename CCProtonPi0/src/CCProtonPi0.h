@@ -111,8 +111,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         mutable SmartRef<Minerva::IDBlob>   m_Pi0Blob2;
         mutable Minerva::ProngVect    m_ProtonProngs;
         mutable Minerva::ParticleVect m_ProtonParticles;
-        mutable double m_extra_energy;
-        mutable double m_vertex_energy;
+        mutable double m_vertex_evis;
+        mutable double m_extra_evis;
 
         // Counters for Functions - Debugging Purposes
         mutable double N_tagTruth;
@@ -138,10 +138,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         
         // Analysis Parameters
         double m_beamAngleBias;
-        // Nuclear Binding Energy
-        double m_bindingEnergy_per_nucleon; 
-        double m_nNucleons_1Track;
-        double m_nNucleons_2Track;
 
         // Algorihm Flow
         bool m_writeFSParticle_Table;
@@ -255,9 +251,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool vertexInFiducialVolume(Minerva::PhysicsEvent *event) const;
         bool vertexInRecoVolume(Minerva::PhysicsEvent *event) const;
         double CalcMinBlobSeparation( const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
-        double Calc_Enu_1Track() const;
+        double Calc_Enu_1Track(double vertex_energy) const;
         double Calc_Enu_1Track_Alt() const;
-        double Calc_Enu_2Track() const;
+        double Calc_Enu_2Track(double vertex_energy) const;
         double Calc_Longitudinal_Momentum(Gaudi::LorentzVector particle_4P) const;
         double Calc_Px_wrt_Beam(Gaudi::LorentzVector particle_4P) const;
         double Calc_Py_wrt_Beam(Gaudi::LorentzVector particle_4P) const;
@@ -266,8 +262,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         double TwoParLineFitBlobVtxDistance(const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
         double calcDistance( double x1, double y1, double z1,double x2, double y2, double z2) const;
         double getClusterEnergy( SmartRefVector<Minerva::IDCluster> clusters) const;
-        double GetShortProtonCalConstant(double evis) const;
-        double GetNuclearBindingEnergy() const;
+        double GetVertexEnergyCalConst() const;
+        double GetVertexEnergy() const;
         void SaveExtraEnergy(Minerva::PhysicsEvent *event) const;
         int getMichelPion(std::vector<int>& piList, int ID ) const;
         std::pair<int,double> OneParLineFitBlob(const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;

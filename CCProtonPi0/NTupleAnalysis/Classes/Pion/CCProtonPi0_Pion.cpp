@@ -26,6 +26,8 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana
 
         // Initialize Bins
         bin_P.setBin(17, 0.0, 1.7);
+        bin_E.setBin(17, 0.0, 1.7);
+        bin_E_Diff.setBin(100, -0.5, 0.5);
         bin_KE.setBin(30, 0.0, 3.0);
         bin_invMass.setBin(20,50,250.0);
         bin_photonConvLength.setBin(50,0.0,100.0);
@@ -162,13 +164,24 @@ void CCProtonPi0_Pion::initHistograms()
 
 
     reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed #pi^0 Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(), bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
-    reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{p} [GeV]");
-    reco_P_true_P->GetYaxis()->SetTitle("True P_{p} [GeV]");
+    reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{#pi^0} [GeV]");
+    reco_P_true_P->GetYaxis()->SetTitle("True P_{#pi^0} [GeV]");
 
     P_error = new TH1D( "P_error","Error on #pi^0 Momentum",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     P_error->GetXaxis()->SetTitle("(P_{Reco}-P_{True})/P_{True}");
     P_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
 
+    reco_E_true_E = new TH2D( "reco_E_true_E","True vs Reconstructed #pi^0 Energy",bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max(), bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max());
+    reco_E_true_E->GetXaxis()->SetTitle("Reconstructed E_{#pi^0} [GeV]");
+    reco_E_true_E->GetYaxis()->SetTitle("True E_{#pi^0} [GeV]");
+
+    E_error = new TH1D( "E_error","Error on #pi^0 Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    E_error->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
+    E_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+
+    E_Diff = new TH1D( "E_Diff","Error on #pi^0 Energy",bin_E_Diff.get_nBins(), bin_E_Diff.get_min(), bin_E_Diff.get_max() );
+    E_Diff->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
+    E_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_E_Diff.get_width()));
 }
 
 void CCProtonPi0_Pion::writeHistograms()
@@ -217,6 +230,11 @@ void CCProtonPi0_Pion::writeHistograms()
 
     reco_P_true_P->Write();
     P_error->Write();
+
+    reco_E_true_E->Write();
+    E_error->Write();
+    
+    E_Diff->Write();
 
     f->Close();
 }

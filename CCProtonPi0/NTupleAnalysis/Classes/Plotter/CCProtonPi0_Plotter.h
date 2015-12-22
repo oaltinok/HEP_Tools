@@ -133,11 +133,9 @@ class CCProtonPi0_Plotter
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
 
         // Helper Functions
-        double GetAreaNormalizeRatio(TH1* h_mc, TH1* h_data);
         void ApplyStyle(MnvPlotter* plotter);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow);
         void SavePi0InvMassPoints();
-        void SaveEvisPoints();
         
         // Plottting Macros
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
@@ -146,14 +144,18 @@ class CCProtonPi0_Plotter
         void DrawMCWithErrorBand(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
-        void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
-        void DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
-        void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
+        void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
+        void DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
+        void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
-        void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir);
+        void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm);
+        void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);
         void DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir);
-        double CalcExpectedValue(rootDir& dir, std::string var_name);
+        void AddNormBox(MnvPlotter* plotter, bool isPOTNorm, double mc_ratio);
+        void SaveRecoRatioPoints(rootDir& dir, std::string var_name, std::string plotDir);
+        void Save2DHistPoints(rootDir& dir, std::string var_name, std::string plotDir);     
+        double GetMCNormalization(std::string &norm_label, bool isPOTNorm, MnvH1D* data, MnvH1D* mc);
 };
 
 

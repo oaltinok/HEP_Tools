@@ -53,7 +53,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<CCProtonPi0_Cut> nCut_ProtonScore;
         vector<CCProtonPi0_Cut> nCut_DeltaInvMass;
         vector<CCProtonPi0_Cut> nCut_beamEnergy;
-        vector<CCProtonPi0_Cut> nCut_UnusedE;
         
         // -------------------------------------------------------------------------
         // Cut Histograms
@@ -76,7 +75,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_1Track_gamma1ConvDist;
         vector<MnvH1D*> hCut_1Track_gamma2ConvDist;
         vector<MnvH1D*> hCut_1Track_neutrinoE;
-        vector<MnvH1D*> hCut_1Track_UnusedE;
 
         // 2Track
         vector<MnvH1D*> hCut_2Track_eVis_nuclearTarget;
@@ -86,7 +84,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_2Track_pi0invMass_2;
         vector<MnvH1D*> hCut_2Track_gamma1ConvDist;
         vector<MnvH1D*> hCut_2Track_gamma2ConvDist;
-        vector<MnvH1D*> hCut_2Track_UnusedE;
         vector<MnvH1D*> hCut_2Track_neutrinoE;
         vector<MnvH1D*> hCut_2Track_protonScore_pIDDiff;
         vector<MnvH1D*> hCut_2Track_protonScore_LLR;

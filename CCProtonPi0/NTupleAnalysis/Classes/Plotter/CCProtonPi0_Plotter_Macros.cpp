@@ -1,5 +1,5 @@
 /*
-    See CCProtonPi0_Plotter.h header for Class Information
+   See CCProtonPi0_Plotter.h header for Class Information
 */
 
 #ifndef CCProtonPi0_Plotter_Macros_cpp
@@ -11,12 +11,23 @@ using namespace PlotUtils;
 
 void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
 {
-   DrawDataStackedMC_BckgAll(dir,var_name,plotDir, nCutArrows, cutArrow1, cutArrow2);
-   //DrawDataStackedMC_BckgWithPi0(dir,var_name,plotDir, nCutArrows, cutArrow1, cutArrow2);
-   //DrawDataStackedMC_BckgType(dir,var_name,plotDir, nCutArrows, cutArrow1, cutArrow2);
+    // ------------------------------------------------------------------------
+    // POT Normalized Plots 
+    // ------------------------------------------------------------------------
+    DrawDataStackedMC_BckgAll(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
+   //DrawDataStackedMC_BckgWithPi0(dir, var_name,plotDir, false, nCutArrows,  cutArrow1, cutArrow2);
+   //DrawDataStackedMC_BckgType(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
+
+    // ------------------------------------------------------------------------
+    // Area Normalized Plots 
+    // ------------------------------------------------------------------------
+    DrawDataStackedMC_BckgAll(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
+   //DrawDataStackedMC_BckgWithPi0(dir, var_name,plotDir, false, nCutArrows,  cutArrow1, cutArrow2);
+   //DrawDataStackedMC_BckgType(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
+
 }
 
-void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
+void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
 {
     std::string rootDir_data = dir.data;
     std::string rootDir_mc = dir.mc;
@@ -32,10 +43,6 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     var = Form("%s_%d",var_name.c_str(),0);
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
 
-    // Area Normalization according to ALL MC Events
-    MnvH1D* mc_all = (MnvH1D*)f_mc->Get(var.c_str()); 
-    double ratio_all = mc_all->GetAreaNormFactor(data);
-    
     // ------------------------------------------------------------------------
     // Fill TObjArray - For MC Histograms
     // ------------------------------------------------------------------------
@@ -55,20 +62,25 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     mc_hists->Add(temp);
 
     // ------------------------------------------------------------------------
+    // MC Normalization 
+    // ------------------------------------------------------------------------
+    var = Form("%s_%d",var_name.c_str(),0);
+    MnvH1D* mc_all = (MnvH1D*)f_mc->Get(var.c_str()); 
+    std::string norm_label; 
+    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc_all);
+    
+    // ------------------------------------------------------------------------
     // Plot 
     // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
     ApplyStyle(plotter);
-    plotter->DrawDataStackedMC(data,mc_hists,ratio_all,"TR","Data",2,1);
+    plotter->DrawDataStackedMC(data,mc_hists,mc_ratio,"TR","Data",2,1);
    
     // Add Plot Labels
-    plotter->AddHistoTitle(mc_all[0].GetTitle());
-    const double y_pos = 0.88;
-    const double y_diff = 0.033;
-    //plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
-    plotter->AddAreaNormBox(1.0,ratio_all,0.3,y_pos-y_diff);
-    
+    plotter->AddHistoTitle(data[0].GetTitle());
+    AddNormBox(plotter, isPOTNorm, mc_ratio);
+
     // If Cut Histogram - Add Cut Arrows
     if (nCutArrows == 1){
         AddCutArrow(plotter, cutArrow1);
@@ -97,12 +109,13 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     }
 
     // Print Plot
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all.png"), "png");
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all_",norm_label.c_str(),".png"), "png");
 
     delete c;
+    delete plotter;
 }
 
-void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
+void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
 {
     std::string rootDir_data = dir.data;
     std::string rootDir_mc = dir.mc;
@@ -171,20 +184,26 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Bckg: Other");
     mc_hists->Add(temp);
-    
+
+    // ------------------------------------------------------------------------
+    // MC Normalization 
+    // ------------------------------------------------------------------------
+    var = Form("%s_%d",var_name.c_str(),0);
+    MnvH1D* mc_all = (MnvH1D*)f_mc->Get(var.c_str()); 
+    std::string norm_label; 
+    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc_all);
+
     // ------------------------------------------------------------------------
     // Plot 
     // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
     ApplyStyle(plotter);
-    plotter->DrawDataStackedMC(data, mc_hists,POT_Ratio_data_mc ,"TR","Data",3,2);
+    plotter->DrawDataStackedMC(data, mc_hists,mc_ratio ,"TR","Data",3,2);
  
     // Add Plot Labels
-    const double y_pos = 0.88;
-    const double y_diff = 0.033;
-    plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
-    plotter->AddPOTNormBox(data_POT,mc_POT,0.3,y_pos-y_diff);   
+    plotter->AddHistoTitle(data[0].GetTitle());
+    AddNormBox(plotter, isPOTNorm, mc_ratio);
     
     // If Cut Histogram - Add Cut Arrows
     if (nCutArrows == 1){
@@ -195,12 +214,13 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
     }
 
     // Print Plot
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_Type.png"), "png");
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_Type_",norm_label.c_str(),".png"), "png");
 
     delete c;
+    delete plotter;
 }
 
-void CCProtonPi0_Plotter::DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
+void CCProtonPi0_Plotter::DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
 {
     std::string rootDir_data = dir.data;
     std::string rootDir_mc = dir.mc;
@@ -245,14 +265,22 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::strin
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Bckg: MultiPi0");
     mc_hists->Add(temp);
-    
+
+    // ------------------------------------------------------------------------
+    // MC Normalization 
+    // ------------------------------------------------------------------------
+    var = Form("%s_%d",var_name.c_str(),0);
+    MnvH1D* mc_all = (MnvH1D*)f_mc->Get(var.c_str()); 
+    std::string norm_label; 
+    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc_all);
+
     // ------------------------------------------------------------------------
     // Plot 
     // ------------------------------------------------------------------------
     TCanvas* c = new TCanvas("c","c",1280,800);
     MnvPlotter* plotter = new MnvPlotter();
     ApplyStyle(plotter);
-    plotter->DrawDataStackedMC(data,mc_hists,POT_Ratio_data_mc ,"TR","Data",3,2);
+    plotter->DrawDataStackedMC(data,mc_hists,mc_ratio ,"TR","Data",3,2);
 
     // If Cut Histogram - Add Cut Arrows
     if (nCutArrows == 1){
@@ -263,15 +291,14 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::strin
     }
     
     // Add Plot Labels
-    const double y_pos = 0.88;
-    const double y_diff = 0.033;
-    plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
-    plotter->AddPOTNormBox(data_POT,mc_POT,0.3,y_pos-y_diff);
+    plotter->AddHistoTitle(data[0].GetTitle());
+    AddNormBox(plotter, isPOTNorm, mc_ratio);
     
     // Print Plot
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_Pi0.png"), "png");
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_Pi0_",norm_label.c_str(),".png"), "png");
 
     delete c;
+    delete plotter;
 }
 
 void CCProtonPi0_Plotter::ApplyStyle(MnvPlotter* plotter)
@@ -284,8 +311,15 @@ void CCProtonPi0_Plotter::ApplyStyle(MnvPlotter* plotter)
     plotter->legend_text_size = 0.02;
 }
 
+void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir)
+{
+    // POT Normalized
+    DrawDataMC(dir,var_name,plotDir,true);
+    // Area Normalized
+    DrawDataMC(dir,var_name,plotDir,false);
+}
 
-void CCProtonPi0_Plotter::DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir)
+void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm)
 {
     std::string rootDir_mc = dir.mc;
     std::string rootDir_data = dir.data;
@@ -297,22 +331,90 @@ void CCProtonPi0_Plotter::DrawDataMCRatio(rootDir& dir, std::string var_name, st
     MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
 
+
+    // ------------------------------------------------------------------------
+    // MC Normalization 
+    // ------------------------------------------------------------------------
+    std::string norm_label; 
+    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc);
+
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    plotter->DrawDataMC(data, mc, mc_ratio, "TR", false);
+
+    // Add Plot Labels
+    plotter->AddHistoTitle(data[0].GetTitle());
+    AddNormBox(plotter, isPOTNorm, mc_ratio);
+
+    // Add Pi0 InvMass Line
+    if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
+            var_name.compare("hCut_2Track_pi0invMass") == 0 ||
+            var_name.compare("invMass") == 0 ||
+            var_name.compare("invMass_Old") == 0) {
+        TLine pi0Mass;
+        pi0Mass.SetLineWidth(2);
+        pi0Mass.SetLineColor(kBlue);
+        pi0Mass.DrawLine(134.98,0,134.98,3200);
+    }
+
+    // Print Plot
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_",norm_label.c_str(),".png"), "png");
+
+    delete c;
+    delete plotter;
+    
+    if (isPOTNorm){
+        DrawDataMCRatio(dir,var_name,plotDir,isPOTNorm);
+    }
+}
+
+void CCProtonPi0_Plotter::DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm)
+{
+    std::string rootDir_mc = dir.mc;
+    std::string rootDir_data = dir.data;
+    
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+    TFile* f_data = new TFile(rootDir_data.c_str());
+ 
+    // ------------------------------------------------------------------------
+    // Get data and MC 
+    // ------------------------------------------------------------------------
+    std::string var = Form("%s_%d",var_name.c_str(),0);
+    MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
+    MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
+
+    // ------------------------------------------------------------------------
+    // MC Normalization 
+    // ------------------------------------------------------------------------
+    std::string norm_label; 
+    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc);
+
+    // ------------------------------------------------------------------------
+    // Plot
+    // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
  
-    // Plot
-    plotter->DrawDataMCRatio(data, mc, POT_Ratio_data_mc);
+    plotter->DrawDataMCRatio(data, mc, mc_ratio);
     
     // Add Plot Labels
+    plotter->AddHistoTitle(data[0].GetTitle());
+    AddNormBox(plotter, isPOTNorm, mc_ratio);
+
     const double y_pos = 0.88;
     const double y_diff = 0.033;
     plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
     plotter->AddPOTNormBox(data_POT,mc_POT,0.3,y_pos-y_diff);
 
     // Print Plot
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_ratio.png"), "png");
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_ratio_",norm_label.c_str(),".png"), "png");
 
     delete c;
+    delete plotter;
 }
 
 void CCProtonPi0_Plotter::DrawMCWithErrorBand(rootDir& dir, std::string var_name, std::string plotDir)
@@ -329,62 +431,11 @@ void CCProtonPi0_Plotter::DrawMCWithErrorBand(rootDir& dir, std::string var_name
     // Plot
     plotter->DrawMCWithErrorBand(mc);
 
-    // Add Plot Labels
-    const double y_pos = 0.88;
-    const double y_diff = 0.033;
-    plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
-    
     // Print Plot
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
 
     delete c;
-}
-
-void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir)
-{
-    std::string rootDir_mc = dir.mc;
-    std::string rootDir_data = dir.data;
-    
-    TFile* f_mc = new TFile(rootDir_mc.c_str());
-    TFile* f_data = new TFile(rootDir_data.c_str());
-   
-    std::string var = Form("%s_%d",var_name.c_str(),0);
-    MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
-    MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
-
-    // Area Normalization Factor
-    double ratio = mc->GetAreaNormFactor(data);
-
-    MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
-
-    // Plot
-    plotter->DrawDataMC(data, mc, ratio, "TR", false);
-
-    // Add Plot Labels
-    const double y_pos = 0.88;
-    const double y_diff = 0.033;
-    //plotter->AddPlotLabel("Playlist: All LE",0.3,y_pos,y_diff,kBlue);
-    plotter->AddAreaNormBox(1.0,ratio,0.3,y_pos-y_diff);
-   
-    // Add Pi0 InvMass Line
-    if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
-            var_name.compare("hCut_2Track_pi0invMass") == 0 ||
-            var_name.compare("invMass") == 0 ||
-            var_name.compare("invMass_Old") == 0) {
-        TLine pi0Mass;
-        pi0Mass.SetLineWidth(2);
-        pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,3200);
-    }
-
-    // Print Plot
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
-
-    delete c;
-    
-    // Now Plot the Ratio
-    DrawDataMCRatio(dir, var_name, plotDir);
+    delete plotter;
 }
 
 void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::string plotDir, bool isLogScale)
@@ -472,8 +523,9 @@ void CCProtonPi0_Plotter::Draw1DHist_Threshold(rootDir& dir, std::string var_nam
     text.DrawLatex(0.78,0.7,Form("%s%3.2f", "Peak at ",max_bin_value));
     
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
-    delete c;
     
+    delete c;
+    delete f; 
 }
 
 void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir, double threshold)
@@ -515,14 +567,19 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
     double line_max = hist2D->GetXaxis()->GetBinLowEdge(nBinsX);
     TLine xy;
     xy.SetLineWidth(2);
-    xy.SetLineColor(kMagenta);
+    xy.SetLineColor(kBlack);
     xy.DrawLine(line_min,line_min,line_max,line_max);
 
+    //TLine fit;
+    //fit.SetLineWidth(2);
+    //fit.SetLineColor(kRed);
+    //fit.DrawLine(0,80.9,500,585.9);
 
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
     
     delete p;
     delete c;
+    delete f;
 }
 
 void CCProtonPi0_Plotter::AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow)
@@ -567,10 +624,8 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     // ------------------------------------------------------------------------
     // Plot  - If you want A Log Plot, axis_minimum = 0.1
     // ------------------------------------------------------------------------
-    TCanvas* c = new TCanvas(var_name.c_str(),var_name.c_str(),1280,800);
-    //gPad->SetLogy(); 
-    //gPad->Update(); 
     MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas(var_name.c_str(),var_name.c_str(),1280,800);
     ApplyStyle(plotter);
     //plotter->axis_minimum = 0.1;
     plotter->DrawStackedMC(mc_hists,1,"TR");
@@ -616,6 +671,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_all.png"), "png");
 
     delete c;
+    delete plotter;
 }
 
 void CCProtonPi0_Plotter::DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir)
@@ -697,45 +753,107 @@ void CCProtonPi0_Plotter::DrawStackedMC_GammaByPDG(rootDir &dir, std::string var
     
     c->Print(Form("%s%s%d%s%s%s",plotDir.c_str(),"gamma_",gammaID,"_mc_",var_name.c_str(),"_by_particle.png"), "png");
 
+    delete legend;
     delete hs;
     delete c;
 }
 
-double CCProtonPi0_Plotter::CalcExpectedValue(rootDir& dir, std::string var_name)
+void CCProtonPi0_Plotter::AddNormBox(MnvPlotter* plotter, bool isPOTNorm, double mc_ratio)
 {
-    // Get Histogram
-    std::string root_dir = dir.mc;
-    TFile* f = new TFile(root_dir.c_str());
-    TH1D* hist = (TH1D*)f->Get(var_name.c_str());
-    
-    int nBinsX = hist->GetNbinsX();
-    double totalEvents = 0;
-    double totalValue = 0;
-
-    for (int xBin = 1; xBin <= nBinsX; xBin++ ){
-        double value = hist->GetBinLowEdge(xBin);
-        double nEvents = hist->GetBinContent(xBin);
-        totalEvents = totalEvents + nEvents;  
-        totalValue = totalValue + (value*nEvents);
+    const double y_pos = 0.88;
+    const double y_diff = 0.033;
+    //plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
+    if (isPOTNorm){
+        plotter->AddPOTNormBox(data_POT,mc_POT,0.3,y_pos-y_diff);
+    }else{
+        plotter->AddAreaNormBox(1.0,mc_ratio,0.3,y_pos-y_diff);
     }
 
-    double expectedValue = totalValue / totalEvents;
-    
-    std::cout<<var_name<<" Expected Value = "<<expectedValue<<std::endl;
-
-    return expectedValue;
 }
 
-
-double CCProtonPi0_Plotter::GetAreaNormalizeRatio(TH1* h_mc, TH1* h_data)
+double CCProtonPi0_Plotter::GetMCNormalization(std::string &norm_label, bool isPOTNorm, MnvH1D* data, MnvH1D* mc)
 {
-    double mc_area = h_mc->ComputeIntegral();
-    double data_area = h_data->ComputeIntegral();
-    
-    double ratio = data_area / mc_area;
+    double mc_ratio;
+    if (isPOTNorm){
+        mc_ratio = POT_Ratio_data_mc;
+        norm_label = "POT";
+    }else{
+        mc_ratio = mc->GetAreaNormFactor(data);
+        norm_label = "Area";
+    }
 
-    return ratio;
+    return mc_ratio;
 }
+
+void CCProtonPi0_Plotter::SaveRecoRatioPoints(rootDir& dir, std::string var_name, std::string plotDir)     
+{   
+    // Open Output Text file
+    ofstream text;  
+    std::string textFile = plotDir + var_name + ".txt";
+    text.open(textFile.c_str());    
+
+    // Get Histogram    
+    std::string root_dir = dir.mc;
+    TFile* f = new TFile(root_dir.c_str());     
+    TH2D* hist2D = (TH2D*)f->Get(var_name.c_str());   
+
+    // Get Evis Points
+    int nBinsX = hist2D->GetNbinsX();   
+    int nBinsY = hist2D->GetNbinsY();   
+
+    for (int xBin = 1; xBin <= nBinsX; xBin++ ){    
+        double sum = 0;     
+        double n = 0;   
+        for (int yBin = 1; yBin <=nBinsY; yBin++){  
+            double nEvents = hist2D->GetBinContent(xBin,yBin);  
+            double y = hist2D->GetYaxis()->GetBinCenter(yBin);  
+            if ( nEvents > 1){  
+                sum = sum + y*nEvents;  
+                n = n + nEvents;    
+            }   
+        }   
+        text<<std::endl;    
+
+        if (n > 0){     
+            double avg = sum / n;   
+            double x = hist2D->GetXaxis()->GetBinCenter(xBin);  
+            text<<x<<" "<<avg<<" "<<n<<std::endl;   
+        }   
+    }   
+
+    text.close();   
+}
+
+void CCProtonPi0_Plotter::Save2DHistPoints(rootDir& dir, std::string var_name, std::string plotDir)     
+{   
+    // Open Output Text file
+    ofstream text;  
+    std::string textFile = plotDir + var_name + ".txt";
+    text.open(textFile.c_str());    
+
+    // Get Histogram    
+    std::string root_dir = dir.mc;
+    TFile* f = new TFile(root_dir.c_str());     
+    TH2D* hist2D = (TH2D*)f->Get(var_name.c_str());   
+
+    // Get Evis Points
+    int nBinsX = hist2D->GetNbinsX();   
+    int nBinsY = hist2D->GetNbinsY();   
+
+    for (int xBin = 1; xBin <= nBinsX; xBin++ ){    
+        for (int yBin = 1; yBin <=nBinsY; yBin++){  
+            double x = hist2D->GetXaxis()->GetBinLowEdge(xBin);  
+            double y = hist2D->GetYaxis()->GetBinLowEdge(yBin);  
+            double nEvents = hist2D->GetBinContent(xBin,yBin);  
+            if ( nEvents > 5){  
+                text<<x<<" "<<y<<" "<<nEvents<<std::endl;
+            }   
+        }   
+    }   
+
+    text.close();   
+}
+
 
 #endif
 

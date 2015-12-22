@@ -29,9 +29,6 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     applyBeamEnergy = true;
     max_beamEnergy = 20.0; // GeV
 
-    applyUnusedE = true;
-    maxUnusedE = 300;
-
     min_Pi0_invMass = 75.0;
     max_Pi0_invMass = 195.0;
 
@@ -172,6 +169,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         if (isDataAnalysis) fillData();
         if (writeFSParticleMomentum) writeFSParticle4P(jentry);
 
+        if (truth_isSignal) StudyNeutrinoEnergy();
     } // end for-loop
 
     //--------------------------------------------------------------------------
@@ -693,12 +691,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if ( applyBeamEnergy && ((CCProtonPi0_neutrino_E * MeV_to_GeV) > max_beamEnergy)) return false;
     Increment_nCut(cutList.nCut_beamEnergy, study1, study2);
 
-    // Unused Energy Cut  
-    if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_UnusedE,evis_Unused_afterReco);
-    else FillHistogram(cutList.hCut_2Track_UnusedE,evis_Unused_afterReco);
-
-    if ( applyUnusedE && (evis_Unused_afterReco > maxUnusedE)) return false;
-    Increment_nCut(cutList.nCut_UnusedE, study1, study2);
 
     //-------------------------------------------------------------------------
     // Satisfied All Cuts
@@ -736,31 +728,27 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
         }else{
             interaction.n_ejected_nucleons_2Track->Fill(n_nucleons);
         }
-    }
 
-    //True Neutrino Energy
-    double E_true = mc_incomingPartVec[3] * MeV_to_GeV;
-    double E_reco = CCProtonPi0_neutrino_E * MeV_to_GeV;
-    double E_reco_1Track_Alt = CCProtonPi0_neutrino_E_1Track_Alt * MeV_to_GeV;
+        // Neutrino Energy: Truth, Error, Difference
+        double E_true = mc_incomingPartVec[3] * MeV_to_GeV;
+        double E_reco = CCProtonPi0_neutrino_E * MeV_to_GeV;
+        double E_reco_1Track_Alt = CCProtonPi0_neutrino_E_1Track_Alt * MeV_to_GeV;
+        double E_Error = Data_Functions::getError(E_true, E_reco);
+        double E_1Track_Alt_Error = Data_Functions::getError(E_true, E_reco_1Track_Alt);
 
-    
-    double E_Error = Data_Functions::getError(E_true, E_reco);
-    double E_1Track_Alt_Error = Data_Functions::getError(E_true, E_reco_1Track_Alt);
+        // Fill 1Track and 2 Track Enu 
+        if(nProtonCandidates == 0){
+            interaction.Enu_True_1Track->Fill(E_true);
 
-    FillHistogram(interaction.Enu_True, E_true);
-    
-    // Fill 1Track and 2 Track Enu 
-    if(nProtonCandidates == 0){
-        interaction.Enu_1Track_Error->Fill(E_Error);
-        interaction.Enu_1Track_True->Fill(E_reco, E_true);
-        
-        interaction.Enu_1Track_Alt_Error->Fill(E_1Track_Alt_Error);
-        interaction.Enu_1Track_Alt_True->Fill(E_reco_1Track_Alt, E_true);
-        
-        interaction.Enu_1Track_1Track_Alt->Fill(E_reco, E_reco_1Track_Alt);
-    }else{ 
-        interaction.Enu_2Track_Error->Fill(E_Error);
-        interaction.Enu_2Track_True->Fill(E_reco,E_true);
+            interaction.Enu_1Track_Error->Fill(E_Error);
+            interaction.Enu_1Track_Diff->Fill(E_reco-E_true);
+            interaction.Enu_1Track_Alt_Error->Fill(E_1Track_Alt_Error);
+        }else{ 
+            interaction.Enu_True_2Track->Fill(E_true);
+
+            interaction.Enu_2Track_Error->Fill(E_Error);
+            interaction.Enu_2Track_Diff->Fill(E_reco-E_true);
+        }  
     }
 }
 
@@ -774,19 +762,20 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
         FillHistogram(interaction.Enu_2Track, CCProtonPi0_neutrino_E * MeV_to_GeV);
     }
 
+    FillHistogram(interaction.Enu, CCProtonPi0_neutrino_E * MeV_to_GeV);
     FillHistogram(interaction.QSq, CCProtonPi0_QSq * MeVSq_to_GeVSq);
     FillHistogram(interaction.WSq, CCProtonPi0_WSq * MeVSq_to_GeVSq);
     FillHistogram(interaction.W, std::sqrt(CCProtonPi0_WSq) * MeV_to_GeV);
 
     // Vertex & Extra Energy
     if (nProtonCandidates == 0){
-        FillHistogram(interaction.vertex_energy_1Track, vertex_blob_energy );
+        FillHistogram(interaction.vertex_energy_1Track, CCProtonPi0_vertex_energy);
         FillHistogram(interaction.vertex_evis_1Track, vertex_blob_evis );
-        FillHistogram(interaction.extra_energy_1Track, extra_energy );
+        FillHistogram(interaction.extra_evis_1Track, extra_evis );
     }else{
-        FillHistogram(interaction.vertex_energy_2Track, vertex_blob_energy );
+        FillHistogram(interaction.vertex_energy_2Track, CCProtonPi0_vertex_energy);
         FillHistogram(interaction.vertex_evis_2Track, vertex_blob_evis );
-        FillHistogram(interaction.extra_energy_2Track, extra_energy );
+        FillHistogram(interaction.extra_evis_2Track, extra_evis );
     }
 
     // Other Event Parameters
@@ -831,6 +820,8 @@ void CCProtonPi0_Analyzer::closeTextFiles()
 {
     logFile.close();
 
+    vtx_E_1Track.close();
+    vtx_E_2Track.close();
     if(isScanRun){
         roundupText.close();
         DSTFileList.close();
@@ -844,6 +835,11 @@ void CCProtonPi0_Analyzer::closeTextFiles()
 void CCProtonPi0_Analyzer::openTextFiles()
 {
     cout<<"Opening Text Files:"<<endl;
+
+    string vtx_E_1Track_FileName = Folder_List::output + Folder_List::textOut + m_ana_folder + "vtx_E_1Track.txt";
+    string vtx_E_2Track_FileName = Folder_List::output + Folder_List::textOut + m_ana_folder + "vtx_E_2Track.txt";
+    vtx_E_1Track.open(vtx_E_1Track_FileName.c_str());
+    vtx_E_2Track.open(vtx_E_2Track_FileName.c_str());
 
     logFileName = Folder_List::output + Folder_List::textOut + m_ana_folder + "LogFile.txt";
     logFile.open(logFileName.c_str());
@@ -892,6 +888,7 @@ void CCProtonPi0_Analyzer::openTextFiles()
 void CCProtonPi0_Analyzer::fillProtonMC()
 {  
     if (truth_isSignal){
+        // Momentum
         double reco_P = CCProtonPi0_proton_P * MeV_to_GeV;
         double true_P = HEP_Functions::calcMomentum(truth_proton_4P[0],truth_proton_4P[1],truth_proton_4P[2]);
         true_P = true_P * MeV_to_GeV;
@@ -899,6 +896,15 @@ void CCProtonPi0_Analyzer::fillProtonMC()
 
         proton.reco_P_true_P->Fill(reco_P,true_P);
         proton.P_error->Fill(error_P);
+    
+        // Energy
+        double reco_E = CCProtonPi0_proton_E * MeV_to_GeV;
+        double true_E = truth_proton_4P[3] * MeV_to_GeV; 
+        double error_E = Data_Functions::getError(true_E, reco_E);
+
+        proton.reco_E_true_E->Fill(reco_E,true_E);
+        proton.E_error->Fill(error_E);
+        proton.E_Diff->Fill(reco_E-true_E);
     }
 }
 
@@ -941,7 +947,7 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         pi0.gamma2_reco_E_true_E->Fill(g2_reco_E, g2_true_E);
         pi0.gamma2_true_E_reco_E_error->Fill(g2_true_E, g2_E_error);
 
-        // Pi0
+        // Pi0 Momentum
         double pi0_reco_P = CCProtonPi0_pi0_P * MeV_to_GeV;
         double pi0_true_P = HEP_Functions::calcMomentum(truth_pi0_4P[0],truth_pi0_4P[1],truth_pi0_4P[2]);
         pi0_true_P = pi0_true_P * MeV_to_GeV; 
@@ -949,10 +955,16 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         
         pi0.P_error->Fill(pi0_P_error); 
         pi0.reco_P_true_P->Fill(pi0_reco_P, pi0_true_P); 
+    
+        // Pi0 Energy
+        double reco_E = CCProtonPi0_pi0_E * MeV_to_GeV;
+        double true_E = truth_pi0_4P[3] * MeV_to_GeV; 
+        double error_E = Data_Functions::getError(true_E, reco_E);
+
+        pi0.reco_E_true_E->Fill(reco_E,true_E);
+        pi0.E_error->Fill(error_E);
+        pi0.E_Diff->Fill(reco_E-true_E);
     }
-
-
-
 }
 
 void CCProtonPi0_Analyzer::fillPi0Blob_EvisStacked()
@@ -1064,6 +1076,7 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
 void CCProtonPi0_Analyzer::fillMuonMC()
 {
     if(truth_isSignal){ 
+        // Momentum
         double reco_P = CCProtonPi0_muon_P * MeV_to_GeV;
         double true_P = HEP_Functions::calcMomentum(truth_muon_4P[0],truth_muon_4P[1],truth_muon_4P[2]);
         true_P = true_P * MeV_to_GeV;
@@ -1071,6 +1084,15 @@ void CCProtonPi0_Analyzer::fillMuonMC()
 
         muon.reco_P_true_P->Fill(reco_P,true_P);
         muon.P_error->Fill(error_P);
+    
+        // Energy
+        double reco_E = CCProtonPi0_muon_E * MeV_to_GeV;
+        double true_E = truth_muon_4P[3] * MeV_to_GeV; 
+        double error_E = Data_Functions::getError(true_E, reco_E);
+
+        muon.reco_E_true_E->Fill(reco_E,true_E);
+        muon.E_error->Fill(error_E);
+        muon.E_Diff->Fill(reco_E-true_E);
     }
 }
 
@@ -1159,6 +1181,56 @@ int CCProtonPi0_Analyzer::GetEjectedNucleonCount()
 
     return n_nucleons;
 }
+
+double CCProtonPi0_Analyzer::GetVertexEnergy()
+{
+    double energy;
+    if (nProtonCandidates == 0){
+        energy = vertex_blob_evis*1.01 + 80.9;
+    }else{
+        energy = vertex_blob_evis + 29.78;
+    }
+
+    return energy;
+}
+
+void CCProtonPi0_Analyzer::StudyNeutrinoEnergy()
+{
+    // Extra Energy
+    double true_extra_energy_1Track = mc_incomingPartVec[3] - (truth_muon_4P[3] + truth_pi0_4P[3]);
+    double true_extra_energy_2Track = mc_incomingPartVec[3] - (truth_muon_4P[3] + (truth_proton_4P[3]-938.27) + truth_pi0_4P[3]);
+    double vertex_energy_Corrected = CCProtonPi0_vertex_energy;
+    
+    if (nProtonCandidates == 0){
+        interaction.extra_energy_true_1Track->Fill(true_extra_energy_1Track);
+        interaction.extra_energy_reco_1Track->Fill(vertex_energy_Corrected);
+        interaction.extra_evis_reco_1Track->Fill(vertex_blob_evis);
+
+        interaction.extra_energy_reco_ratio_1Track->Fill(vertex_blob_evis, true_extra_energy_1Track/vertex_blob_evis);
+        interaction.extra_energy_reco_true_1Track->Fill(vertex_blob_evis, true_extra_energy_1Track);
+    }else{
+        interaction.extra_energy_true_2Track->Fill(true_extra_energy_2Track);
+        interaction.extra_energy_reco_2Track->Fill(vertex_energy_Corrected);
+        interaction.extra_evis_reco_2Track->Fill(vertex_blob_evis);
+        
+        interaction.extra_energy_reco_ratio_2Track->Fill(vertex_blob_evis, true_extra_energy_2Track/vertex_blob_evis);
+        interaction.extra_energy_reco_true_2Track->Fill(vertex_blob_evis, true_extra_energy_2Track);
+    }
+   
+    // Energy Differences
+    if (nProtonCandidates == 0){
+        interaction.vertex_energy_Diff_1Track->Fill(CCProtonPi0_vertex_energy - true_extra_energy_1Track);
+        interaction.muon_energy_Diff_1Track->Fill(CCProtonPi0_muon_E - truth_muon_4P[3]);
+        interaction.proton_energy_Diff_1Track->Fill(CCProtonPi0_proton_E - truth_proton_4P[3]);
+        interaction.pi0_energy_Diff_1Track->Fill(CCProtonPi0_pi0_E - truth_pi0_4P[3]);
+    }else{
+        interaction.vertex_energy_Diff_2Track->Fill(CCProtonPi0_vertex_energy - true_extra_energy_2Track);
+        interaction.muon_energy_Diff_2Track->Fill(CCProtonPi0_muon_E - truth_muon_4P[3]);
+        interaction.proton_energy_Diff_2Track->Fill(CCProtonPi0_proton_E - truth_proton_4P[3]);
+        interaction.pi0_energy_Diff_2Track->Fill(CCProtonPi0_pi0_E - truth_pi0_4P[3]);
+    }
+}
+
 
 #endif //CCProtonPi0_Analyzer_cpp
     

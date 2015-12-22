@@ -27,6 +27,7 @@ CCProtonPi0_Proton::CCProtonPi0_Proton(bool isModeReduce, bool isMC, std::string
 
         // Initialize Bins
         bin_E.setBin(25, 0.5 ,3.0);
+        bin_E_Diff.setBin(100, -0.1,0.1);
         bin_P.setBin(20, 0.0, 2.0);
         bin_KE.setBin(20, 0.0, 2.0);
         bin_trackLength.setBin(25,0.0,250.0);
@@ -92,6 +93,19 @@ void CCProtonPi0_Proton::initHistograms()
     P_error = new TH1D( "P_error","Error on Proton Momentum",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     P_error->GetXaxis()->SetTitle("(P_{Reco}-P_{True})/P_{True}");
     P_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+
+    reco_E_true_E = new TH2D( "reco_E_true_E","True vs Reconstructed Proton Energy",bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max(), bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max());
+    reco_E_true_E->GetXaxis()->SetTitle("Reconstructed E_{p} [GeV]");
+    reco_E_true_E->GetYaxis()->SetTitle("True E_{p} [GeV]");
+
+    E_error = new TH1D( "E_error","Error on Proton Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    E_error->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
+    E_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+
+    E_Diff = new TH1D( "E_Diff","Difference on Proton Energy",bin_E_Diff.get_nBins(), bin_E_Diff.get_min(), bin_E_Diff.get_max() );
+    E_Diff->GetXaxis()->SetTitle("E_{Reco}-E_{True} [GeV]");
+    E_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_E_Diff.get_width()));
+
 }
 
 void CCProtonPi0_Proton::writeHistograms()
@@ -108,8 +122,14 @@ void CCProtonPi0_Proton::writeHistograms()
         theta[i]->Write();
         phi[i]->Write();
     }
+    
     reco_P_true_P->Write();
     P_error->Write();
+
+    reco_E_true_E->Write();
+    E_error->Write();
+
+    E_Diff->Write();
 
     f->Close();
 }

@@ -69,7 +69,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fillInteractionReco();
         double calcDeltaInvariantMass();
         int GetEjectedNucleonCount();
-        
+        double GetVertexEnergy();
+        void StudyNeutrinoEnergy();
+
         //  Muon Specific Functions
         void fillMuonMC();
         void fillMuonReco();
@@ -116,7 +118,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool applyProtonScore;
         bool applyPhotonDistance;
         bool applyBeamEnergy;
-        bool applyUnusedE;
         bool writeFSParticleMomentum;
         bool isPassedAllCuts;
         bool applyMaxEvents;
@@ -131,7 +132,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double min_Delta_invMass;
         double max_Delta_invMass;
         double max_beamEnergy;
-        double maxUnusedE;
         double nMaxEvents;
         vector<double> PDG_pi0_Mother;
         vector<double> PDG_pi0_GrandMother;
@@ -152,6 +152,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         ofstream failText; 
         ofstream roundupText;
         ofstream logFile;
+        ofstream vtx_E_1Track;
+        ofstream vtx_E_2Track;
         ifstream DSTFileList;
 
         // -------------------------------------------------------------------------
@@ -243,30 +245,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        energy_from_mc;
         Double_t        energy_from_mc_fraction;
         Double_t        energy_from_mc_fraction_of_highest;
-        Double_t        evis_ID;
-        Double_t        evis_OD;
-        Double_t        evis_Unused_afterReco;
-        Double_t        evis_Used_afterReco;
-        Double_t        evis_extra;
-        Double_t        evis_gamma1;
-        Double_t        evis_gamma2;
-        Double_t        evis_muon;
-        Double_t        evis_pi0;
-        Double_t        evis_proton;
-        Double_t        evis_total;
-        Double_t        extra_energy;
-        Double_t        extra_energy_100;
-        Double_t        extra_energy_150;
-        Double_t        extra_energy_200;
-        Double_t        extra_energy_300;
-        Double_t        extra_energy_50;
-        Double_t        extra_energy_500;
-        Double_t        extra_evis_100;
-        Double_t        extra_evis_150;
-        Double_t        extra_evis_200;
-        Double_t        extra_evis_300;
-        Double_t        extra_evis_50;
-        Double_t        extra_evis_500;
+        Double_t        extra_evis;
         Double_t        g1blob_1ParFit_fval;
         Double_t        g1blob_2ParFit_vtx_distance;
         Double_t        g1dedx;
@@ -316,7 +295,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        prim_vtx_smallest_opening_angle;
         Double_t        reco_eventID;
         Double_t        time;
-        Double_t        vertex_blob_energy;
         Double_t        vertex_blob_evis;
         Double_t        vtx_fit_chi2;
         Int_t           g1dedx_cluster_occupancy_sz;
@@ -694,6 +672,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        CCProtonPi0_trajMuonProngPy;
         Double_t        CCProtonPi0_trajMuonProngPz;
         Double_t        CCProtonPi0_trajMuonTheta;
+        Double_t        CCProtonPi0_vertex_energy;
         Double_t        CCProtonPi0_vtx_x;
         Double_t        CCProtonPi0_vtx_y;
         Double_t        CCProtonPi0_vtx_z;
@@ -925,30 +904,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_energy_from_mc;   //!
         TBranch        *b_energy_from_mc_fraction;   //!
         TBranch        *b_energy_from_mc_fraction_of_highest;   //!
-        TBranch        *b_evis_ID;   //!
-        TBranch        *b_evis_OD;   //!
-        TBranch        *b_evis_Unused_afterReco;   //!
-        TBranch        *b_evis_Used_afterReco;   //!
-        TBranch        *b_evis_extra;   //!
-        TBranch        *b_evis_gamma1;   //!
-        TBranch        *b_evis_gamma2;   //!
-        TBranch        *b_evis_muon;   //!
-        TBranch        *b_evis_pi0;   //!
-        TBranch        *b_evis_proton;   //!
-        TBranch        *b_evis_total;   //!
-        TBranch        *b_extra_energy;   //!
-        TBranch        *b_extra_energy_100;   //!
-        TBranch        *b_extra_energy_150;   //!
-        TBranch        *b_extra_energy_200;   //!
-        TBranch        *b_extra_energy_300;   //!
-        TBranch        *b_extra_energy_50;   //!
-        TBranch        *b_extra_energy_500;   //!
-        TBranch        *b_extra_evis_100;   //!
-        TBranch        *b_extra_evis_150;   //!
-        TBranch        *b_extra_evis_200;   //!
-        TBranch        *b_extra_evis_300;   //!
-        TBranch        *b_extra_evis_50;   //!
-        TBranch        *b_extra_evis_500;   //!
+        TBranch        *b_extra_evis;   //!
         TBranch        *b_g1blob_1ParFit_fval;   //!
         TBranch        *b_g1blob_2ParFit_vtx_distance;   //!
         TBranch        *b_g1dedx;   //!
@@ -998,7 +954,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_prim_vtx_smallest_opening_angle;   //!
         TBranch        *b_reco_eventID;   //!
         TBranch        *b_time;   //!
-        TBranch        *b_vertex_blob_energy;   //!
         TBranch        *b_vertex_blob_evis;   //!
         TBranch        *b_vtx_fit_chi2;   //!
         TBranch        *b_g1dedx_cluster_occupancy_sz;   //!
@@ -1376,6 +1331,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_CCProtonPi0_trajMuonProngPy;   //!
         TBranch        *b_CCProtonPi0_trajMuonProngPz;   //!
         TBranch        *b_CCProtonPi0_trajMuonTheta;   //!
+        TBranch        *b_CCProtonPi0_vertex_energy;   //!
         TBranch        *b_CCProtonPi0_vtx_x;   //!
         TBranch        *b_CCProtonPi0_vtx_y;   //!
         TBranch        *b_CCProtonPi0_vtx_z;   //!

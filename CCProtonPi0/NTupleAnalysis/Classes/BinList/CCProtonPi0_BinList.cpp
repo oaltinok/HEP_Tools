@@ -42,11 +42,13 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
 
     // Event Kinematics Bins
     beamE.setBin(20,0,20.0);
+    beamE_Diff_True.setBin(100,1.5,7.5);
+    beamE_Diff.setBin(100,-3,3);
     q2.setBin(40,0.0,4.0);
     w.setBin(22,0.8,3.0);
     wSq.setBin(50,0.0,5.0);
-    vertex_energy.setBin(25,0.0,500.0);
-    vertex_evis.setBin(20,0.0,500.0);
+    vertex_energy.setBin(10,0.0,500.0);
+    vertex_evis.setBin(10,0.0,500.0);
     extra_energy.setBin(50,0.0,20.0);
     short_proton_P.setBin(50,0.0,1000.0);
     short_proton_KE.setBin(50,0.0,500.0);
