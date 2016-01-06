@@ -463,13 +463,13 @@ void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::st
     // Find Peak
     int max_bin = hist1D->GetMaximumBin();
     double max_bin_location = hist1D->GetBinCenter(max_bin);
-    double max_bin_value = hist1D->GetBinContent(max_bin);
     TLatex text;
     text.SetNDC();
     text.SetTextSize(0.03);
     text.DrawLatex(0.15,0.85,Form("%s%3.2f", "Peak at ",max_bin_location));
   
     // Error Ranges
+    //double max_bin_value = hist1D->GetBinContent(max_bin);
     //double error = 0.33;
     //TLine err;
     //err.SetLineWidth(2);

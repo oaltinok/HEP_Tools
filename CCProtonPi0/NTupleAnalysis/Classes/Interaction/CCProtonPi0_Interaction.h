@@ -74,44 +74,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
  
         TH1D* Enu_1Track_Diff;
         TH1D* Enu_2Track_Diff;
-
-        // --------------------------------------------------------------------
-        // Neutrino Energy Study
-        // --------------------------------------------------------------------
-        TH1D* Enu_1Track_Corrected_Error;
-        TH1D* Enu_2Track_Corrected_Error;
-        TH1D* Enu_1Track_Corrected_Diff;
-        TH1D* Enu_2Track_Corrected_Diff;
         
-        // Extra Energy 
-        TH1D* extra_energy_true_1Track;
-        TH1D* extra_energy_true_2Track;
-        
-        TH1D* extra_evis_reco_1Track;
-        TH1D* extra_evis_reco_2Track;
-       
-        TH1D* extra_energy_reco_1Track;
-        TH1D* extra_energy_reco_2Track;
-        
-        TH2D* extra_energy_reco_ratio_1Track;
-        TH2D* extra_energy_reco_ratio_2Track;
-   
-        TH2D* extra_energy_reco_true_1Track;
-        TH2D* extra_energy_reco_true_2Track;
-     
-        // Energy Differences
-        TH1D* vertex_energy_Diff_1Track;
-        TH1D* vertex_energy_Diff_2Track;
-    
-        TH1D* muon_energy_Diff_1Track;
-        TH1D* muon_energy_Diff_2Track;
-        
-        TH1D* proton_energy_Diff_1Track;
-        TH1D* proton_energy_Diff_2Track;
-        
-        TH1D* pi0_energy_Diff_1Track;
-        TH1D* pi0_energy_Diff_2Track;
-
     private:
         void initHistograms();
         

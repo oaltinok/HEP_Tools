@@ -21,16 +21,16 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  Data vs MC
     //--------------------------------------------------------------------------
     plotInteraction_DataMC();
-    //plotMuon_DataMC();
-    //plotProton_DataMC();
-    //plotPion_DataMC();
+    plotMuon_DataMC();
+    plotProton_DataMC();
+    plotPion_DataMC();
     //plotCutHistograms_DataMC();
     //plotPi0Blob_DataMC();
 
     //--------------------------------------------------------------------------
     //  MC Only
     //--------------------------------------------------------------------------
-    plotInteraction_MCOnly();
+    //plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
     //plotPion_MCOnly();
@@ -172,7 +172,6 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     //plot_mc_w_Stacked();
     //plot_final_mc_w_Stacked();
 
-
     //DrawStackedMC_BckgAll(rootDir_Interaction,"vertex_energy_1Track",plotDir);
     //DrawStackedMC_BckgAll(rootDir_Interaction,"vertex_energy_2Track",plotDir);
     //DrawStackedMC_BckgAll(rootDir_Interaction,"vertex_evis_1Track",plotDir);
@@ -194,40 +193,7 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     
     Draw1DHist(rootDir_Interaction,"Enu_1Track_Diff",plotDir);
     Draw1DHist(rootDir_Interaction,"Enu_2Track_Diff",plotDir);
-    
-    // ------------------------------------------------------------------------
-    // Neutrino Energy Study
-    // ------------------------------------------------------------------------
-    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Corrected_Error",plotDir);
-    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Corrected_Diff",plotDir);
-    //Draw1DHist(rootDir_Interaction,"Enu_2Track_Corrected_Error",plotDir);
-    //Draw1DHist(rootDir_Interaction,"Enu_2Track_Corrected_Diff",plotDir);
-
-    //Draw1DHist(rootDir_Interaction,"extra_energy_true_1Track",plotDir);
-    //Draw1DHist(rootDir_Interaction,"extra_energy_true_2Track",plotDir);
-    //Draw1DHist(rootDir_Interaction,"extra_energy_reco_1Track",plotDir);
-    //Draw1DHist(rootDir_Interaction,"extra_energy_reco_2Track",plotDir);
-    //Draw1DHist(rootDir_Interaction,"extra_evis_reco_1Track",plotDir);
-    //Draw1DHist(rootDir_Interaction,"extra_evis_reco_2Track",plotDir);
-    
-    //Draw2DHist(rootDir_Interaction,"extra_energy_reco_ratio_1Track",plotDir);
-    //Draw2DHist(rootDir_Interaction,"extra_energy_reco_ratio_2Track",plotDir);
-    //SaveRecoRatioPoints(rootDir_Interaction,"extra_energy_reco_ratio_1Track",plotDir);
-    //SaveRecoRatioPoints(rootDir_Interaction,"extra_energy_reco_ratio_2Track",plotDir);
-    //Draw2DHist(rootDir_Interaction,"extra_energy_reco_true_1Track",plotDir);
-    //Draw2DHist(rootDir_Interaction,"extra_energy_reco_true_2Track",plotDir);
-    //Save2DHistPoints(rootDir_Interaction,"extra_energy_reco_true_1Track",plotDir);
-    //Save2DHistPoints(rootDir_Interaction,"extra_energy_reco_true_2Track",plotDir);
-    
-    Draw1DHist(rootDir_Interaction,"vertex_energy_Diff_1Track",plotDir);
-    Draw1DHist(rootDir_Interaction,"vertex_energy_Diff_2Track",plotDir);
-    Draw1DHist(rootDir_Interaction,"muon_energy_Diff_1Track",plotDir);
-    Draw1DHist(rootDir_Interaction,"muon_energy_Diff_2Track",plotDir);
-    Draw1DHist(rootDir_Interaction,"proton_energy_Diff_1Track",plotDir);
-    Draw1DHist(rootDir_Interaction,"proton_energy_Diff_2Track",plotDir);
-    Draw1DHist(rootDir_Interaction,"pi0_energy_Diff_1Track",plotDir);
-    Draw1DHist(rootDir_Interaction,"pi0_energy_Diff_2Track",plotDir);
-
+   
     std::cout<<"Plotting Interaction MC Only Finished!"<<std::endl;
 }
 

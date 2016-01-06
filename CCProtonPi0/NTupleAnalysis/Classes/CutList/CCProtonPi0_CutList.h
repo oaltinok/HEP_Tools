@@ -31,29 +31,50 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         void writeHistograms();
         // -------------------------------------------------------------------------
         // CCProtonPi0_Cut Numbers
-        //      nTopologies defined in CCProtonPi0_NTupleAnalysis
         //--------------------------------------------------------------------------
-        vector<CCProtonPi0_Cut> nCut_All;
-        vector<CCProtonPi0_Cut> nCut_Vertex_None;
-        vector<CCProtonPi0_Cut> nCut_Vertex_Not_Reconstructable; 
-        vector<CCProtonPi0_Cut> nCut_Vertex_Not_Fiducial;
-        vector<CCProtonPi0_Cut> nCut_Muon_None;              
-        vector<CCProtonPi0_Cut> nCut_Muon_Charge;
-        vector<CCProtonPi0_Cut> nCut_Vertex_Michel_Exist; 
-        vector<CCProtonPi0_Cut> nCut_EndPoint_Michel_Exist;
-        vector<CCProtonPi0_Cut> nCut_secEndPoint_Michel_Exist;
-        vector<CCProtonPi0_Cut> nCut_PreFilter_Pi0;
-        vector<CCProtonPi0_Cut> nCut_ConeBlobs;
-        vector<CCProtonPi0_Cut> nCut_BlobDirectionBad;
-        vector<CCProtonPi0_Cut> nCut_Photon1DistanceLow;
-        vector<CCProtonPi0_Cut> nCut_Photon2DistanceLow;
-        vector<CCProtonPi0_Cut> nCut_Pi0_invMass;
-        vector<CCProtonPi0_Cut> nCut_Particle_None;
-        vector<CCProtonPi0_Cut> nCut_Proton_None;            
-        vector<CCProtonPi0_Cut> nCut_ProtonScore;
-        vector<CCProtonPi0_Cut> nCut_DeltaInvMass;
-        vector<CCProtonPi0_Cut> nCut_beamEnergy;
-        
+        CCProtonPi0_Cut nCut_All;
+        CCProtonPi0_Cut nCut_Vertex_None;
+        CCProtonPi0_Cut nCut_Vertex_Not_Reconstructable; 
+        CCProtonPi0_Cut nCut_Vertex_Not_Fiducial;
+        CCProtonPi0_Cut nCut_Muon_None;              
+        CCProtonPi0_Cut nCut_Muon_Charge;
+        CCProtonPi0_Cut nCut_Vertex_Michel_Exist; 
+        CCProtonPi0_Cut nCut_EndPoint_Michel_Exist;
+        CCProtonPi0_Cut nCut_secEndPoint_Michel_Exist;
+        CCProtonPi0_Cut nCut_Particle_None;
+        CCProtonPi0_Cut nCut_Proton_None;            
+        CCProtonPi0_Cut nCut_Proton_Bad;            
+        CCProtonPi0_Cut nCut_ProtonScore;
+        CCProtonPi0_Cut nCut_PreFilter_Pi0;
+        CCProtonPi0_Cut nCut_ConeBlobs;
+        CCProtonPi0_Cut nCut_BlobDirectionBad;
+        CCProtonPi0_Cut nCut_Photon1DistanceLow;
+        CCProtonPi0_Cut nCut_Photon2DistanceLow;
+        CCProtonPi0_Cut nCut_Pi0_invMass;
+        CCProtonPi0_Cut nCut_beamEnergy;
+
+        // 1 Track Cuts
+        CCProtonPi0_Cut nCut_1Track_All;
+        CCProtonPi0_Cut nCut_1Track_PreFilter_Pi0;
+        CCProtonPi0_Cut nCut_1Track_ConeBlobs;
+        CCProtonPi0_Cut nCut_1Track_BlobDirectionBad;
+        CCProtonPi0_Cut nCut_1Track_Photon1DistanceLow;
+        CCProtonPi0_Cut nCut_1Track_Photon2DistanceLow;
+        CCProtonPi0_Cut nCut_1Track_Pi0_invMass;
+        CCProtonPi0_Cut nCut_1Track_beamEnergy;
+
+        // 2 Track Cuts
+        CCProtonPi0_Cut nCut_2Track_All;
+        CCProtonPi0_Cut nCut_2Track_Proton_Bad;
+        CCProtonPi0_Cut nCut_2Track_ProtonScore;
+        CCProtonPi0_Cut nCut_2Track_PreFilter_Pi0;
+        CCProtonPi0_Cut nCut_2Track_ConeBlobs;
+        CCProtonPi0_Cut nCut_2Track_BlobDirectionBad;
+        CCProtonPi0_Cut nCut_2Track_Photon1DistanceLow;
+        CCProtonPi0_Cut nCut_2Track_Photon2DistanceLow;
+        CCProtonPi0_Cut nCut_2Track_Pi0_invMass;
+        CCProtonPi0_Cut nCut_2Track_beamEnergy;
+
         // -------------------------------------------------------------------------
         // Cut Histograms
         // -------------------------------------------------------------------------
@@ -100,24 +121,28 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
 
     private:
         void initHistograms();
-        void init_nCutVectors();
         void SetCutNames();
         void OpenTextFiles(bool isMC);
         void formCutVectors();
-        void writeCutTableHeader(int t);
-        void writeCutTableRows(int t, vector< vector<CCProtonPi0_Cut> > &nCutVector);
-        void writeSingleRow(int t, CCProtonPi0_Cut& currentCut);
-        double getCutEfficiency(CCProtonPi0_Cut& currentCut, CCProtonPi0_Cut& effBase) const;
-        double getCutEfficiency(CCProtonPi0_Cut& currentCut, double effBase) const;
-        double getCutPurity(CCProtonPi0_Cut& currentCut) const;
+        void writeAllCuts();
+        void write1TrackCuts();
+        void write2TrackCuts();
+        void writeCutTableHeader(std::ofstream &file);
+        void writeCutTableRows(std::ofstream &file, vector<CCProtonPi0_Cut> &nCutVector, bool isAll);
+        void writeSingleRow(std::ofstream &file, CCProtonPi0_Cut &currentCut, CCProtonPi0_Cut &eff_base_all, CCProtonPi0_Cut &eff_base_MINOS);
+        double getCutEfficiency(CCProtonPi0_Cut &currentCut, CCProtonPi0_Cut &effBase) const;
+        double getCutEfficiency(CCProtonPi0_Cut &currentCut, double effBase) const;
+        double getCutPurity(CCProtonPi0_Cut &currentCut) const;
 
-        vector< vector<CCProtonPi0_Cut> > nCutVector_Common;
-        vector< vector<CCProtonPi0_Cut> > nCutVector_Topology;
+        vector<CCProtonPi0_Cut> nCutVector_All;
+        vector<CCProtonPi0_Cut> nCutVector_1Track;
+        vector<CCProtonPi0_Cut> nCutVector_2Track;
         
         CCProtonPi0_BinList binList;
         
-        ofstream cutText[nTopologies];
-        string cutFile[nTopologies];
+        std::ofstream cutText_All;
+        std::ofstream cutText_1Track;
+        std::ofstream cutText_2Track;
         
         TFile* f;
         string rootDir;

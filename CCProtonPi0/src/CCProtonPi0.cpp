@@ -118,7 +118,7 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
 
     // Private Properties
     declareProperty("WriteFSParticleTable", m_writeFSParticle_Table =   false);
-    declareProperty("StoreAllEvents",       m_store_all_events      =   false);
+    declareProperty("StoreAllEvents",       m_store_all_events      =   true);
     declareProperty("DoPlausibilityCuts",   m_DoPlausibilityCuts    =   true);
     declareProperty("DoTruthMatch",         m_DoTruthMatch          =   true);
     declareProperty("ApplyExtraMichelCuts", m_applyExtraMichelCuts = false);
@@ -956,8 +956,13 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //      They might be tracked photons
     //      Updates nTracks
     //==========================================================================
+    
+    ProngVect before_DiscardFarTracks = event->primaryProngs();
+    debug()<<"before_DiscardFarTracks Size = "<<before_DiscardFarTracks.size()<<endmsg;
     DiscardFarTracks(event);
-
+    ProngVect after_DiscardFarTracks = event->primaryProngs();
+    debug()<<"after_DiscardFarTracks Size = "<<after_DiscardFarTracks.size()<<endmsg;
+    
     //==========================================================================
     // Proton Reconstruction
     //==========================================================================

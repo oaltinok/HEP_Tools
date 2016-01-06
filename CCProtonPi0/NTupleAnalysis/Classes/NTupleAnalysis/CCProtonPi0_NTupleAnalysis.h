@@ -50,6 +50,8 @@ class CCProtonPi0_NTupleAnalysis
         static const double MeVSq_to_GeVSq;
         static const double mm_to_cm;
 
+        void OpenTextFile(string file_name, std::ofstream &file);
+
     private:
 };
 

@@ -20,14 +20,13 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
         cout<<"\tRoot File: "<<rootDir<<endl;
 
         // Create Root File 
-        f = new TFile(rootDir.c_str(),"CREATE");
+        f = new TFile(rootDir.c_str(),"RECREATE");
         if (!f->IsOpen()){
             cout<<"File already exists! Exiting!..."<<endl;
             exit(1);
         }
         
         nTrueSignal = 240237;
-        init_nCutVectors();
         SetCutNames();
         OpenTextFiles(isMC);
         
@@ -206,60 +205,52 @@ void CCProtonPi0_CutList::initHistograms()
     // Pi0 Invariant Mass - Used for Correction Fit
     pi0_invMass_1Track = new TH1D("pi0_invMass_1Track","#pi^{0} Invariant Mass 1 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     pi0_invMass_2Track = new TH1D("pi0_invMass_2Track","#pi^{0} Invariant Mass 2 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-
-
-}
-
-void CCProtonPi0_CutList::init_nCutVectors()
-{
-    for (int i = 0; i < nTopologies; i++){
-        nCut_All.push_back(CCProtonPi0_Cut());
-        nCut_Vertex_None.push_back(CCProtonPi0_Cut());
-        nCut_Vertex_Not_Reconstructable.push_back(CCProtonPi0_Cut()); 
-        nCut_Vertex_Not_Fiducial.push_back(CCProtonPi0_Cut());
-        nCut_Muon_None.push_back(CCProtonPi0_Cut());              
-        nCut_Muon_Charge.push_back(CCProtonPi0_Cut());
-        nCut_Vertex_Michel_Exist.push_back(CCProtonPi0_Cut()); 
-        nCut_EndPoint_Michel_Exist.push_back(CCProtonPi0_Cut());
-        nCut_secEndPoint_Michel_Exist.push_back(CCProtonPi0_Cut());
-        nCut_PreFilter_Pi0.push_back(CCProtonPi0_Cut());
-        nCut_ConeBlobs.push_back(CCProtonPi0_Cut());
-        nCut_BlobDirectionBad.push_back(CCProtonPi0_Cut());
-        nCut_Photon1DistanceLow.push_back(CCProtonPi0_Cut());
-        nCut_Photon2DistanceLow.push_back(CCProtonPi0_Cut());
-        nCut_Pi0_invMass.push_back(CCProtonPi0_Cut());
-        nCut_Particle_None.push_back(CCProtonPi0_Cut());
-        nCut_Proton_None.push_back(CCProtonPi0_Cut());            
-        nCut_ProtonScore.push_back(CCProtonPi0_Cut());
-        nCut_DeltaInvMass.push_back(CCProtonPi0_Cut());
-        nCut_beamEnergy.push_back(CCProtonPi0_Cut());
-    }
 }
 
 void CCProtonPi0_CutList::SetCutNames()
 {
-    for (int i = 0; i < nTopologies; i++){
-        nCut_All[i].set_Name("All");
-        nCut_Vertex_None[i].set_Name("Vertex_None");
-        nCut_Vertex_Not_Reconstructable[i].set_Name("Vertex_Not_Reconstructable"); 
-        nCut_Vertex_Not_Fiducial[i].set_Name("Vertex_Not_Fiducial");
-        nCut_Muon_None[i].set_Name("Muon_None");              
-        nCut_Muon_Charge[i].set_Name("Muon_Charge");
-        nCut_Vertex_Michel_Exist[i].set_Name("Vertex_Michel_Exist"); 
-        nCut_EndPoint_Michel_Exist[i].set_Name("EndPoint_Michel_Exist");
-        nCut_secEndPoint_Michel_Exist[i].set_Name("secEndPoint_Michel_Exist");
-        nCut_PreFilter_Pi0[i].set_Name("PreFilter_Pi0");
-        nCut_ConeBlobs[i].set_Name("ConeBlobs");
-        nCut_BlobDirectionBad[i].set_Name("BlobDirectionBad");
-        nCut_Photon1DistanceLow[i].set_Name("Photon1DistanceLow");
-        nCut_Photon2DistanceLow[i].set_Name("Photon2DistanceLow");
-        nCut_Pi0_invMass[i].set_Name("Pi0_invMass");
-        nCut_Particle_None[i].set_Name("Particle_None");
-        nCut_Proton_None[i].set_Name("Proton_None");            
-        nCut_ProtonScore[i].set_Name("Proton_Score");
-        nCut_DeltaInvMass[i].set_Name("Delta_invMass");
-        nCut_beamEnergy[i].set_Name("beamEnergy");
-    }
+    nCut_All.set_Name("All");
+    nCut_Vertex_None.set_Name("Vertex_None");
+    nCut_Vertex_Not_Reconstructable.set_Name("Vertex_Not_Reconstructable"); 
+    nCut_Vertex_Not_Fiducial.set_Name("Vertex_Not_Fiducial");
+    nCut_Muon_None.set_Name("Muon_None");              
+    nCut_Muon_Charge.set_Name("Muon_Charge");
+    nCut_Vertex_Michel_Exist.set_Name("Vertex_Michel_Exist"); 
+    nCut_EndPoint_Michel_Exist.set_Name("EndPoint_Michel_Exist");
+    nCut_secEndPoint_Michel_Exist.set_Name("secEndPoint_Michel_Exist");
+    nCut_Particle_None.set_Name("Particle_None");
+    nCut_Proton_None.set_Name("Proton_None");            
+    nCut_Proton_Bad.set_Name("Proton_Bad");            
+    nCut_ProtonScore.set_Name("Proton_Score");
+    nCut_PreFilter_Pi0.set_Name("PreFilter_Pi0");
+    nCut_ConeBlobs.set_Name("ConeBlobs");
+    nCut_BlobDirectionBad.set_Name("BlobDirectionBad");
+    nCut_Photon1DistanceLow.set_Name("Photon1DistanceLow");
+    nCut_Photon2DistanceLow.set_Name("Photon2DistanceLow");
+    nCut_Pi0_invMass.set_Name("Pi0_invMass");
+    nCut_beamEnergy.set_Name("beamEnergy");
+
+    // 1Track
+    nCut_1Track_All.set_Name("All_1Track");
+    nCut_1Track_PreFilter_Pi0.set_Name("PreFilter_Pi0");
+    nCut_1Track_ConeBlobs.set_Name("ConeBlobs");
+    nCut_1Track_BlobDirectionBad.set_Name("BlobDirectionBad");
+    nCut_1Track_Photon1DistanceLow.set_Name("Photon1DistanceLow");
+    nCut_1Track_Photon2DistanceLow.set_Name("Photon2DistanceLow");
+    nCut_1Track_Pi0_invMass.set_Name("Pi0_invMass");
+    nCut_1Track_beamEnergy.set_Name("beamEnergy");
+
+    // 2 Track
+    nCut_2Track_All.set_Name("All_2Track");
+    nCut_2Track_Proton_Bad.set_Name("Proton_Bad");
+    nCut_2Track_ProtonScore.set_Name("Proton_Score");
+    nCut_2Track_PreFilter_Pi0.set_Name("PreFilter_Pi0");
+    nCut_2Track_ConeBlobs.set_Name("ConeBlobs");
+    nCut_2Track_BlobDirectionBad.set_Name("BlobDirectionBad");
+    nCut_2Track_Photon1DistanceLow.set_Name("Photon1DistanceLow");
+    nCut_2Track_Photon2DistanceLow.set_Name("Photon2DistanceLow");
+    nCut_2Track_Pi0_invMass.set_Name("Pi0_invMass");
+    nCut_2Track_beamEnergy.set_Name("beamEnergy");
 }
 
 void CCProtonPi0_CutList::OpenTextFiles(bool isMC)
@@ -269,36 +260,26 @@ void CCProtonPi0_CutList::OpenTextFiles(bool isMC)
     if (isMC) type = "CutTable_MC_";
     else type = "CutTable_Data_";
 
-    // Open Cut Files
-    cutFile[0] = Folder_List::output + Folder_List::textOut + type + "1Track_" + version + ".txt";
-    cutFile[1] = Folder_List::output + Folder_List::textOut + type + "2Track_" + version + ".txt";
+    // File Names
+    std::string f_all = Folder_List::output + Folder_List::textOut + type + "All_" + version + ".txt";
+    std::string f_1Track = Folder_List::output + Folder_List::textOut + type + "1Track_" + version + ".txt";
+    std::string f_2Track = Folder_List::output + Folder_List::textOut + type + "2Track_" + version + ".txt";
     
-    for (int i = 0; i < nTopologies; i++){
-        cutText[i].open( cutFile[i].c_str() );
-        if( !cutText[i].is_open() ){
-            cerr<<"Cannot open output text file: "<<cutFile[i]<<endl;
-            exit(1);
-        }else{
-            cout<<"\t"<<cutFile[i]<<endl;
-        }
-    }
-     
+    OpenTextFile(f_all,cutText_All);
+    OpenTextFile(f_1Track,cutText_1Track);
+    OpenTextFile(f_2Track,cutText_2Track);
 }
 
-void CCProtonPi0_CutList::writeCutTableHeader(int t)
+void CCProtonPi0_CutList::writeCutTableHeader(ofstream &file)
 {
-    cutText[t]<<std::left;
-    
-    cutText[t].width(35); cutText[t]<<"Cut"<<" "; 
-    
-    cutText[t].width(12); cutText[t]<<"N(Events)"<<" ";    
-    cutText[t].width(12); cutText[t]<<"N(Signal)"<<" ";      
-    cutText[t].width(12); cutText[t]<<"Eff(All)"<<" ";      
-    cutText[t].width(12); cutText[t]<<"Eff(MINOS)"<<" ";      
-    cutText[t].width(12); cutText[t]<<"Purity"<<" ";
-    cutText[t].width(12); cutText[t]<<"N(Study1)"<<" "; 
-    cutText[t].width(12); cutText[t]<<"N(Study2)"<<" "; 
-    cutText[t]<<endl;
+    file<<std::left;
+    file.width(35); file<<"Cut"<<" "; 
+    file.width(12); file<<"N(Events)"<<" ";    
+    file.width(12); file<<"N(Signal)"<<" ";      
+    file.width(12); file<<"Eff(All)"<<" ";      
+    file.width(12); file<<"Eff(MINOS)"<<" ";      
+    file.width(12); file<<"Purity"<<" ";
+    file<<endl;
 }
 
 double CCProtonPi0_CutList::getCutEfficiency(CCProtonPi0_Cut& currentCut, CCProtonPi0_Cut& effBase) const
@@ -327,96 +308,135 @@ double CCProtonPi0_CutList::getCutPurity(CCProtonPi0_Cut& currentCut) const
 
 void CCProtonPi0_CutList::formCutVectors()
 {   
-    nCutVector_Common.push_back(nCut_All);
-    nCutVector_Common.push_back(nCut_Vertex_None);
-    nCutVector_Common.push_back(nCut_Vertex_Not_Reconstructable); 
-    nCutVector_Common.push_back(nCut_Vertex_Not_Fiducial);
-    nCutVector_Common.push_back(nCut_Muon_None);              
-    nCutVector_Common.push_back(nCut_Muon_Charge);
-    nCutVector_Common.push_back(nCut_Vertex_Michel_Exist); 
-    nCutVector_Common.push_back(nCut_EndPoint_Michel_Exist);
-    nCutVector_Common.push_back(nCut_secEndPoint_Michel_Exist);
-    nCutVector_Topology.push_back(nCut_Particle_None);
-    nCutVector_Topology.push_back(nCut_Proton_None);
-    nCutVector_Topology.push_back(nCut_ProtonScore);
-    nCutVector_Topology.push_back(nCut_DeltaInvMass);
-    nCutVector_Topology.push_back(nCut_PreFilter_Pi0);
-    nCutVector_Topology.push_back(nCut_ConeBlobs);
-    nCutVector_Topology.push_back(nCut_BlobDirectionBad);
-    nCutVector_Topology.push_back(nCut_Photon1DistanceLow);
-    nCutVector_Topology.push_back(nCut_Photon2DistanceLow);
-    nCutVector_Topology.push_back(nCut_Pi0_invMass);
-    nCutVector_Topology.push_back(nCut_beamEnergy);
+    nCutVector_All.push_back(nCut_All);
+    nCutVector_All.push_back(nCut_Vertex_None);
+    nCutVector_All.push_back(nCut_Vertex_Not_Reconstructable); 
+    nCutVector_All.push_back(nCut_Vertex_Not_Fiducial);
+    nCutVector_All.push_back(nCut_Muon_None);              
+    nCutVector_All.push_back(nCut_Muon_Charge);
+    nCutVector_All.push_back(nCut_Vertex_Michel_Exist); 
+    nCutVector_All.push_back(nCut_EndPoint_Michel_Exist);
+    nCutVector_All.push_back(nCut_secEndPoint_Michel_Exist);
+    nCutVector_All.push_back(nCut_Particle_None);
+    nCutVector_All.push_back(nCut_Proton_None);
+    nCutVector_All.push_back(nCut_Proton_Bad);
+    nCutVector_All.push_back(nCut_ProtonScore);
+    nCutVector_All.push_back(nCut_PreFilter_Pi0);
+    nCutVector_All.push_back(nCut_ConeBlobs);
+    nCutVector_All.push_back(nCut_BlobDirectionBad);
+    nCutVector_All.push_back(nCut_Photon1DistanceLow);
+    nCutVector_All.push_back(nCut_Photon2DistanceLow);
+    nCutVector_All.push_back(nCut_Pi0_invMass);
+    nCutVector_All.push_back(nCut_beamEnergy);
+
+    // 1 Track
+    nCutVector_1Track.push_back(nCut_1Track_All);
+    nCutVector_1Track.push_back(nCut_1Track_PreFilter_Pi0);
+    nCutVector_1Track.push_back(nCut_1Track_ConeBlobs);
+    nCutVector_1Track.push_back(nCut_1Track_BlobDirectionBad);
+    nCutVector_1Track.push_back(nCut_1Track_Photon1DistanceLow);
+    nCutVector_1Track.push_back(nCut_1Track_Photon2DistanceLow);
+    nCutVector_1Track.push_back(nCut_1Track_Pi0_invMass);
+    nCutVector_1Track.push_back(nCut_1Track_beamEnergy);
+
+    // 2 Track
+    nCutVector_2Track.push_back(nCut_2Track_All);
+    nCutVector_2Track.push_back(nCut_2Track_Proton_Bad);
+    nCutVector_2Track.push_back(nCut_2Track_ProtonScore);
+    nCutVector_2Track.push_back(nCut_2Track_PreFilter_Pi0);
+    nCutVector_2Track.push_back(nCut_2Track_ConeBlobs);
+    nCutVector_2Track.push_back(nCut_2Track_BlobDirectionBad);
+    nCutVector_2Track.push_back(nCut_2Track_Photon1DistanceLow);
+    nCutVector_2Track.push_back(nCut_2Track_Photon2DistanceLow);
+    nCutVector_2Track.push_back(nCut_2Track_Pi0_invMass);
+    nCutVector_2Track.push_back(nCut_2Track_beamEnergy);
 }
 
 void CCProtonPi0_CutList::writeCutTable()
 {
     formCutVectors();
     
-    for (int t = 0; t < nTopologies; t++){
-        cout<<">> Writing "<<cutFile[t]<<endl;
-    
-        writeCutTableHeader(t);
-        writeCutTableRows(t,nCutVector_Common);
-        cutText[t]<<endl;
-        writeCutTableRows(t,nCutVector_Topology);
-    }
+    writeAllCuts(); 
+    write1TrackCuts();
+    write2TrackCuts();
 }
 
-void CCProtonPi0_CutList::writeCutTableRows(int t, vector< vector<CCProtonPi0_Cut> > &nCutVector)
+void CCProtonPi0_CutList::writeAllCuts()
 {
-    // Write General Cuts upto Proton Reconstruction    
-    for( unsigned int i = 0; i < nCutVector.size(); i++){
-        writeSingleRow(t, nCutVector[i][t]);    
-    }
-
-    cutText[t]<<endl;
+    writeCutTableHeader(cutText_All);
+    writeCutTableRows(cutText_All, nCutVector_All, true);
 }
 
-void CCProtonPi0_CutList::writeSingleRow(int t, CCProtonPi0_Cut& currentCut)
+void CCProtonPi0_CutList::write1TrackCuts()
+{
+    writeCutTableHeader(cutText_1Track);
+    writeCutTableRows(cutText_1Track, nCutVector_1Track, false);
+}
+
+void CCProtonPi0_CutList::write2TrackCuts()
+{
+    writeCutTableHeader(cutText_2Track);
+    writeCutTableRows(cutText_2Track, nCutVector_2Track, false);
+}
+
+void CCProtonPi0_CutList::writeCutTableRows(ofstream &file, vector<CCProtonPi0_Cut> &nCutVector, bool isAll)
+{
+    // First Element on the nCutVector is the All Events
+    CCProtonPi0_Cut eff_base_all = nCutVector[0];
+    CCProtonPi0_Cut eff_base_MINOS;
+    if (isAll){
+        eff_base_MINOS = nCutVector_All[4];
+    }else{
+        eff_base_MINOS = nCutVector[0];
+    }
+    
+    
+    for( unsigned int i = 0; i < nCutVector.size(); i++){
+        writeSingleRow(file, nCutVector[i], eff_base_all, eff_base_MINOS);    
+    }
+}
+
+void CCProtonPi0_CutList::writeSingleRow(ofstream &file, CCProtonPi0_Cut& currentCut, CCProtonPi0_Cut &eff_base_all, CCProtonPi0_Cut &eff_base_MINOS)
 {
     double eff_AllSignal;
     double eff_MINOS;
     double purity;    
 
-    eff_AllSignal = getCutEfficiency(currentCut,nCut_All[t]);
-    eff_MINOS = getCutEfficiency(currentCut,nCut_Muon_None[t]);
+    eff_AllSignal = getCutEfficiency(currentCut, eff_base_all);
+    eff_MINOS = getCutEfficiency(currentCut, eff_base_MINOS);
     purity = getCutPurity(currentCut);
             
-    cutText[t].width(35); cutText[t]<<currentCut.get_Name()<<" ";
-    cutText[t].width(12); cutText[t]<<currentCut.nEvent.getCount()<<" ";
+    file.width(35); file<<currentCut.get_Name()<<" ";
+    file.width(12); file<<currentCut.nEvent.getCount()<<" ";
     
     // Total Signal
-    cutText[t].width(12); cutText[t]<<currentCut.nSignal.getCount()<<" ";
+    file.width(12); file<<currentCut.nSignal.getCount()<<" ";
 
     // Efficiency
     if ( eff_AllSignal <= 100){
-        cutText[t].width(12); cutText[t]<<eff_AllSignal<<" ";
+        file.width(12); file<<eff_AllSignal<<" ";
     }else{
-        cutText[t].width(12); cutText[t]<<"N/A"<<" ";    
+        file.width(12); file<<"N/A"<<" ";    
     }
-
+ 
+    // Efficiency
     if ( eff_MINOS <= 100){
-        cutText[t].width(12); cutText[t]<<eff_MINOS<<" ";
+        file.width(12); file<<eff_MINOS<<" ";
     }else{
-        cutText[t].width(12); cutText[t]<<"N/A"<<" ";    
-    }    
-    
+        file.width(12); file<<"N/A"<<" ";    
+    }
+   
     // Purity
-    cutText[t].width(12); cutText[t]<<purity<<" ";
+    file.width(12); file<<purity<<" ";
 
-    // Number of Events which are studied
-    cutText[t].width(12); cutText[t]<<currentCut.nStudy1.getCount()<<" ";
-    cutText[t].width(12); cutText[t]<<currentCut.nStudy2.getCount()<<" ";
-    
-    cutText[t]<<endl;
+    file<<endl;
 }
 
 CCProtonPi0_CutList::~CCProtonPi0_CutList()
 {
-    for (int i = 0; i < nTopologies; i++){
-        cutText[i].close(); 
-    }
+    cutText_All.close();
+    cutText_1Track.close();
+    cutText_2Track.close();
 }
 
 void CCProtonPi0_CutList::writeHistograms()

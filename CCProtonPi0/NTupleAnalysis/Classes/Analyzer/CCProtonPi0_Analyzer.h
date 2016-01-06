@@ -62,7 +62,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void UpdateScanFileName();
         int GetBackgroundTypeInd();
         int GetBackgroundWithPi0Ind();
-        void FillHistogram(vector<MnvH1D*> &hist, double par);
+        void FillHistogram(vector<MnvH1D*> &hist, double var);
+        void FillHistogram(TH1D* hist, double var);
+        void FillHistogram(TH2D* hist, double var1, double var2);
 
         //  Interaction Specific Functions
         void fillInteractionMC();
@@ -70,7 +72,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double calcDeltaInvariantMass();
         int GetEjectedNucleonCount();
         double GetVertexEnergy();
-        void StudyNeutrinoEnergy();
 
         //  Muon Specific Functions
         void fillMuonMC();

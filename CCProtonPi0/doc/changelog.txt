@@ -1,4 +1,24 @@
 ===============================================================================
+v2_47
+CCProtonPi0 Updates:
+	No Major Changes
+	
+--------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	CutList Class Improved
+		Cut Table is created for all events
+			Overall Efficiency and Purity is important
+		Keeping 1Track and 2Track Cut Tables for internal studies
+===============================================================================
+v2_46
+CCProtonPi0 Updates:
+	No Changes
+	
+--------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	Added MC weights to ALL Histograms
+	Fixed Compiler Warning on CCProtonPi0_Plotter_Macros.cpp
+===============================================================================
 v2_45
 CCProtonPi0 Updates:
 	Latest version of Neutrino Energy Calculations
