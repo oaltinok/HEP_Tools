@@ -38,14 +38,16 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
       
         vector<MnvH1D*> invMass;
         vector<MnvH1D*> photonEnergy_Asymmetry;
-                
+        
+        TH1D* signal_P;
+        TH1D* signal_theta;
         TH2D* gamma1_E_gamma2_E;
         TH2D* gamma1_convLength_gamma2_convLength;
                 
         CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana_folder);
         void initHistograms();
         void writeHistograms();
-
+        
     private:
         CCProtonPi0_SingleBin bin_invMass;
         CCProtonPi0_SingleBin bin_photonEnergy_Asymmetry;

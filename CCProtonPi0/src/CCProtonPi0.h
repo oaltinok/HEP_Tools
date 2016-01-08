@@ -139,12 +139,17 @@ class CCProtonPi0 : public MinervaAnalysisTool
         // Analysis Parameters
         double m_beamAngleBias;
 
+        // Keep Events After Each Cut Set
+        bool m_keepAfter_vertex_cuts;
+        bool m_keepAfter_muon_cuts;
+        bool m_keepAfter_michel_cuts;
+        bool m_keepAfter_proton_cuts;
+        bool m_keepAfter_pi0_cuts;
+
         // Algorihm Flow
         bool m_writeFSParticle_Table;
-        bool m_store_all_events;
         bool m_DoPlausibilityCuts;
         bool m_DoTruthMatch;
-        bool m_applyExtraMichelCuts;
         
         // Optional Studies
         bool m_study_shower_energy;
@@ -244,9 +249,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool isMuonChargeNegative(Minerva::PhysicsEvent *event) const;
         bool isMuonPlausible(Minerva::PhysicsEvent *event) const;
         bool isTrueVertexFiducial(Minerva::GenMinInteraction* truthEvent) const;
-        bool setMuonData( Minerva::NeutrinoInt* nuInt ) const;
-        bool setPi0Data( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent *event) const;
-        bool setProtonData( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent *event ) const;
+        bool setMuonData (Minerva::PhysicsEvent *event ) const;
+        bool setPi0Data( Minerva::PhysicsEvent *event) const;
+        bool setProtonData( Minerva::PhysicsEvent *event ) const;
         bool tagSignal( Minerva::GenMinInteraction* truthEvent) const;
         bool vertexInFiducialVolume(Minerva::PhysicsEvent *event) const;
         bool vertexInRecoVolume(Minerva::PhysicsEvent *event) const;
@@ -296,7 +301,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const;
         void setTrackDirection( Minerva::Track* track, Minerva::Vertex* vertex ) const;
         void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
-        void setVertexData( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent* event ) const;
+        void setVertexData(Minerva::PhysicsEvent* event ) const;
         void tagBackground(Minerva::GenMinInteraction* truthEvent) const;
         void tagBackgroundWithPi0(Minerva::GenMinInteraction* truthEvent) const;
         void tagPrimaryMuon(Minerva::PhysicsEvent *event) const;

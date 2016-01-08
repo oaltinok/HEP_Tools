@@ -118,10 +118,15 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
 
     // Private Properties
     declareProperty("WriteFSParticleTable", m_writeFSParticle_Table =   false);
-    declareProperty("StoreAllEvents",       m_store_all_events      =   true);
+    
+    declareProperty("KeepAfter_VertexCuts", m_keepAfter_vertex_cuts = false);
+    declareProperty("KeepAfter_MuonCuts", m_keepAfter_muon_cuts = false);
+    declareProperty("KeepAfter_MichelCuts", m_keepAfter_michel_cuts = false);
+    declareProperty("KeepAfter_ProtonCuts", m_keepAfter_proton_cuts = false);
+    declareProperty("KeepAfter_Pi0Cuts", m_keepAfter_pi0_cuts = false);
+    
     declareProperty("DoPlausibilityCuts",   m_DoPlausibilityCuts    =   true);
     declareProperty("DoTruthMatch",         m_DoTruthMatch          =   true);
-    declareProperty("ApplyExtraMichelCuts", m_applyExtraMichelCuts = false);
 
     declareProperty("BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian);
 
@@ -441,9 +446,11 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch( "Cut_secEndPoint_Michel_Exist", -1 );
     declareIntEventBranch( "Cut_Particle_None", -1 );
     declareIntEventBranch( "Cut_Proton_None", -1 );
+    declareIntEventBranch( "Cut_Proton_Bad", -1 );
     declareIntEventBranch( "Cut_PreFilter_Pi0", -1 );
     declareIntEventBranch( "Cut_ConeBlobs", -1 );
     declareIntEventBranch( "Cut_BlobDirectionBad", -1 );
+    declareIntEventBranch( "Cut_Pi0_Bad", -1 );
 
     // General Reco
     declareDoubleEventBranch( "time", -1.0 );
@@ -466,7 +473,6 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch( "michelProng_begin_Z", -1.0);
 
     // Number of Proton Candidates
-    declareIntEventBranch("nProtonCandidates", -1);
 
     // Discard Far Tracks  - Update nTracks
     declareIntEventBranch("nTracks", -1);
@@ -568,16 +574,151 @@ StatusCode CCProtonPi0::initialize()
 
     declareDoubleEventBranch("extra_evis", SENTINEL);
 
+    // Primary Vertex
+    declareIntEventBranch("vtx_module", -99);
+    declareIntEventBranch("vtx_plane",-1);
+    declareDoubleEventBranch("vtx_x",0.0);
+    declareDoubleEventBranch("vtx_y",0.0);
+    declareDoubleEventBranch("vtx_z",0.0);
+
+    // Muon Kinematics  -- Filled in setMuonData()
+    declareIntEventBranch("muon_hasMinosMatchTrack", -1);
+    declareIntEventBranch("muon_hasMinosMatchStub", -1);
+    declareIntEventBranch("muon_minervaTrack_types", -1);
+    declareIntEventBranch("muon_N_minosTracks", -1);
+    declareIntEventBranch("muon_minosTrackQuality", -1);
+    declareIntEventBranch("muon_roadUpstreamPlanes", -1);
+    declareIntEventBranch("muon_charge", -99);
+    declareDoubleEventBranch("muon_roadUpstreamEnergy", 0.0);
+    declareDoubleEventBranch("muon_E", 0.0);
+    declareDoubleEventBranch("muon_P", 0.0);
+    declareDoubleEventBranch("muon_KE", 0.0);
+    declareDoubleEventBranch("muon_px", 0.0);
+    declareDoubleEventBranch("muon_py", 0.0);
+    declareDoubleEventBranch("muon_pz", 0.0);  
+    declareDoubleEventBranch("muon_phi", 0.0);
+    declareDoubleEventBranch("muon_theta", 0.0);
+    declareDoubleEventBranch("muon_theta_biasUp", 0.0);
+    declareDoubleEventBranch("muon_theta_biasDown", 0.0); 
+    declareDoubleEventBranch("muon_muScore", -1.0);
+    declareDoubleEventBranch("muon_qp", 99.0);
+    declareDoubleEventBranch("muon_qpqpe", 99.0);
+    declareDoubleEventBranch("muon_E_shift", 0.0);
+
+    // Proton Kinematics -- Filled in setProtonData()
+    declareIntEventBranch("nProtonCandidates", -1);
+    declareContainerIntEventBranch(   "all_protons_kinked", 10, -1);
+    declareContainerIntEventBranch(   "all_protons_odMatch", 10, -1);
+    declareContainerDoubleEventBranch("all_protons_length",10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_startPointX",10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_startPointY",10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_startPointZ", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_endPointX", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_endPointY", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_endPointZ", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_protonScore", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_pionScore", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_LLRScore", 10,  SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_chi2_ndf", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_theta", 10,  SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_thetaX", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_thetaY", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_phi", 10,SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_KE", 10,SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_E", 10,SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_P", 10,SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_px", 10,SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_py", 10,SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_pz", 10,SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_p_calCorrection", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_p_visEnergy", 10,SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_p_dEdXTool", 10,SENTINEL);
+
+    // Leading(Interaction Proton) Kinematics 
+    declareDoubleEventBranch("proton_px",SENTINEL);
+    declareDoubleEventBranch("proton_py",SENTINEL);
+    declareDoubleEventBranch("proton_pz",SENTINEL);
+    declareDoubleEventBranch("proton_E",SENTINEL);
+    declareDoubleEventBranch("proton_P",SENTINEL);
+    declareDoubleEventBranch("proton_theta", SENTINEL);
+    declareDoubleEventBranch("proton_KE", SENTINEL);
+    declareDoubleEventBranch("proton_phi", SENTINEL);
+    declareDoubleEventBranch("proton_thetaX", SENTINEL);
+    declareDoubleEventBranch("proton_thetaY", SENTINEL);
+    declareDoubleEventBranch("proton_length", SENTINEL);
+    declareDoubleEventBranch("proton_protonScore", SENTINEL);
+    declareDoubleEventBranch("proton_pionScore", SENTINEL);
+    declareDoubleEventBranch("proton_LLRScore", SENTINEL);
+    declareIntEventBranch("proton_kinked",-1);
+    declareIntEventBranch("proton_leadingIndice",-1);
+
+    // Pi0 & Gamma1,2 Kinematics -- Filled in setPi0Data()    
+    declareDoubleEventBranch("pi0_px",SENTINEL);
+    declareDoubleEventBranch("pi0_py",SENTINEL);
+    declareDoubleEventBranch("pi0_pz",SENTINEL);
+    declareDoubleEventBranch("pi0_E",SENTINEL);
+    declareDoubleEventBranch("pi0_P",SENTINEL);
+    declareDoubleEventBranch("pi0_KE",SENTINEL);
+    declareDoubleEventBranch("pi0_invMass", SENTINEL);
+    declareDoubleEventBranch("pi0_invMass_Old", SENTINEL);
+    declareDoubleEventBranch("pi0_theta", SENTINEL);
+    declareDoubleEventBranch("pi0_phi",   SENTINEL);
+    declareDoubleEventBranch("pi0_thetaX", SENTINEL);
+    declareDoubleEventBranch("pi0_thetaY",   SENTINEL);
+    declareDoubleEventBranch("pi0_openingAngle",  SENTINEL);
+    declareDoubleEventBranch("pi0_cos_openingAngle", SENTINEL);
+
+    declareDoubleEventBranch("gamma1_px",SENTINEL);
+    declareDoubleEventBranch("gamma1_py",SENTINEL);
+    declareDoubleEventBranch("gamma1_pz",SENTINEL);
+    declareDoubleEventBranch("gamma1_E",SENTINEL);
+    declareDoubleEventBranch("gamma1_E_Old",SENTINEL);
+    declareDoubleEventBranch("gamma1_P",SENTINEL);
+    declareDoubleEventBranch("gamma1_theta",SENTINEL);
+    declareDoubleEventBranch("gamma1_phi",SENTINEL);
+    declareDoubleEventBranch("gamma1_dEdx",SENTINEL);
+    declareDoubleEventBranch("gamma1_time",SENTINEL);
+    declareDoubleEventBranch("gamma1_dist_vtx",SENTINEL);
+    declareDoubleEventBranch("gamma1_evis_trkr", SENTINEL);
+    declareDoubleEventBranch("gamma1_evis_ecal", SENTINEL);
+    declareDoubleEventBranch("gamma1_evis_scal_X", SENTINEL);
+    declareDoubleEventBranch("gamma1_evis_scal_UV", SENTINEL);
+    declareDoubleEventBranch("gamma1_evis_hcal", SENTINEL);
+    declareDoubleEventBranch("gamma1_energy_trkr", SENTINEL);
+    declareDoubleEventBranch("gamma1_energy_ecal", SENTINEL);
+    declareDoubleEventBranch("gamma1_energy_scal_X", SENTINEL);
+    declareDoubleEventBranch("gamma1_energy_scal_UV", SENTINEL);
+    declareDoubleEventBranch("gamma1_energy_hcal", SENTINEL);
+    declareContainerDoubleEventBranch("gamma1_direction",3,SENTINEL);
+    declareContainerDoubleEventBranch("gamma1_vertex",3,SENTINEL);
+
+    declareDoubleEventBranch("gamma2_px",SENTINEL);
+    declareDoubleEventBranch("gamma2_py",SENTINEL);
+    declareDoubleEventBranch("gamma2_pz",SENTINEL);
+    declareDoubleEventBranch("gamma2_E",SENTINEL);
+    declareDoubleEventBranch("gamma2_E_Old",SENTINEL);
+    declareDoubleEventBranch("gamma2_P",SENTINEL);
+    declareDoubleEventBranch("gamma2_theta",SENTINEL);
+    declareDoubleEventBranch("gamma2_phi",SENTINEL);
+    declareDoubleEventBranch("gamma2_dEdx",SENTINEL);
+    declareDoubleEventBranch("gamma2_time",SENTINEL);
+    declareDoubleEventBranch("gamma2_dist_vtx",SENTINEL);
+    declareDoubleEventBranch("gamma2_evis_trkr", SENTINEL);
+    declareDoubleEventBranch("gamma2_evis_ecal", SENTINEL);
+    declareDoubleEventBranch("gamma2_evis_scal_X", SENTINEL);
+    declareDoubleEventBranch("gamma2_evis_scal_UV", SENTINEL);
+    declareDoubleEventBranch("gamma2_evis_hcal", SENTINEL);
+    declareDoubleEventBranch("gamma2_energy_trkr", SENTINEL);
+    declareDoubleEventBranch("gamma2_energy_ecal", SENTINEL);
+    declareDoubleEventBranch("gamma2_energy_scal_X", SENTINEL);
+    declareDoubleEventBranch("gamma2_energy_scal_UV", SENTINEL);
+    declareDoubleEventBranch("gamma2_energy_hcal", SENTINEL);
+    declareContainerDoubleEventBranch("gamma2_direction",3,SENTINEL);
+    declareContainerDoubleEventBranch("gamma2_vertex",3,SENTINEL); 
+
     //-------------------------------------------------------------------------
     // NeutrinoInt Branches 
     //-------------------------------------------------------------------------
-    // Primary Vertex
-    declareIntBranch( m_hypMeths, "vtx_module", -99);
-    declareIntBranch( m_hypMeths, "vtx_plane",-1);
-    declareDoubleBranch( m_hypMeths, "vtx_x",0.0);
-    declareDoubleBranch( m_hypMeths, "vtx_y",0.0);
-    declareDoubleBranch( m_hypMeths, "vtx_z",0.0);
-
     // Event Kinematics -- Filled in setEventKinematics()
     declareDoubleBranch( m_hypMeths, "vertex_energy", SENTINEL);
     declareDoubleBranch( m_hypMeths, "neutrino_E", SENTINEL);
@@ -586,140 +727,6 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleBranch( m_hypMeths, "neutrino_E_1Track_Alt", SENTINEL);
     declareDoubleBranch( m_hypMeths, "QSq_1Track_Alt", SENTINEL);
     declareDoubleBranch( m_hypMeths, "WSq_1Track_Alt", SENTINEL);
-
-    // Muon Kinematics  -- Filled in setMuonData()
-    declareIntBranch( m_hypMeths, "muon_hasMinosMatchTrack", -1);
-    declareIntBranch( m_hypMeths, "muon_hasMinosMatchStub", -1);
-    declareIntBranch( m_hypMeths, "muon_minervaTrack_types", -1);
-    declareIntBranch( m_hypMeths, "muon_N_minosTracks", -1);
-    declareIntBranch( m_hypMeths, "muon_minosTrackQuality", -1);
-    declareIntBranch( m_hypMeths, "muon_roadUpstreamPlanes", -1);
-    declareIntBranch( m_hypMeths, "muon_charge", -99);
-    declareDoubleBranch( m_hypMeths, "muon_roadUpstreamEnergy", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_E", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_P", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_KE", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_px", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_py", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_pz", 0.0);  
-    declareDoubleBranch( m_hypMeths, "muon_phi", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_theta", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_theta_biasUp", 0.0);
-    declareDoubleBranch( m_hypMeths, "muon_theta_biasDown", 0.0); 
-    declareDoubleBranch( m_hypMeths, "muon_muScore", -1.0);
-    declareDoubleBranch( m_hypMeths, "muon_qp", 99.0);
-    declareDoubleBranch( m_hypMeths, "muon_qpqpe", 99.0);
-    declareDoubleBranch( m_hypMeths, "muon_E_shift", 0.0);
-
-    // Proton Kinematics -- Filled in setProtonData()
-    declareContainerIntBranch(m_hypMeths,    "all_protons_kinked", 10, -1);
-    declareContainerIntBranch(m_hypMeths,    "all_protons_odMatch", 10, -1);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_length",10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_startPointX",10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_startPointY",10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_startPointZ", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_endPointX", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_endPointY", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_endPointZ", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_protonScore", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_pionScore", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_LLRScore", 10,  SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_chi2_ndf", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_theta", 10,  SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_thetaX", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_thetaY", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_phi", 10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_KE", 10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_E", 10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_P", 10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_px", 10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_py", 10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_pz", 10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_p_calCorrection", 10, SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_p_visEnergy", 10,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths, "all_protons_p_dEdXTool", 10,SENTINEL);
-
-    // Leading(Interaction Proton) Kinematics 
-    declareDoubleBranch(m_hypMeths,"proton_px",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_py",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_pz",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_E",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_P",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_theta", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_KE", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_phi", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_thetaX", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_thetaY", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_length", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_protonScore", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_pionScore", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"proton_LLRScore", SENTINEL);
-    declareIntBranch(m_hypMeths,"proton_kinked",-1);
-    declareIntBranch(m_hypMeths,"proton_leadingIndice",-1);
-
-    // Pi0 & Gamma1,2 Kinematics -- Filled in setPi0Data()    
-    declareDoubleBranch(m_hypMeths,"pi0_px",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_py",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_pz",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_E",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_P",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_KE",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_invMass", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_invMass_Old", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_theta", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_phi",   SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_thetaX", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_thetaY",   SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_openingAngle",  SENTINEL);
-    declareDoubleBranch(m_hypMeths,"pi0_cos_openingAngle", SENTINEL);
-
-    declareDoubleBranch(m_hypMeths,"gamma1_px",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_py",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_pz",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_E",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_E_Old",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_P",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_theta",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_phi",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_dEdx",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_time",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_dist_vtx",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_evis_trkr", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_evis_ecal", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_evis_scal_X", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_evis_scal_UV", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_evis_hcal", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_energy_trkr", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_energy_ecal", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_energy_scal_X", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_energy_scal_UV", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma1_energy_hcal", SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths,"gamma1_direction",3,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths,"gamma1_vertex",3,SENTINEL);
-
-    declareDoubleBranch(m_hypMeths,"gamma2_px",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_py",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_pz",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_E",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_E_Old",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_P",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_theta",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_phi",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_dEdx",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_time",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_dist_vtx",SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_evis_trkr", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_evis_ecal", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_evis_scal_X", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_evis_scal_UV", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_evis_hcal", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_energy_trkr", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_energy_ecal", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_energy_scal_X", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_energy_scal_UV", SENTINEL);
-    declareDoubleBranch(m_hypMeths,"gamma2_energy_hcal", SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths,"gamma2_direction",3,SENTINEL);
-    declareContainerDoubleBranch(m_hypMeths,"gamma2_vertex",3,SENTINEL); 
 
     // Truth Match for Prongs
     declareIntBranch(m_hypMeths,    "isMuonInsideOD",        -1);
@@ -893,24 +900,26 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     debug() << "START: Vertex Reconstruction..." << endmsg;
 
     if (!hasEventVertex(event) ){
-        if( m_store_all_events ) return interpretFailEvent(event); 
+        if( m_keepAfter_vertex_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
 
     if ( !vertexInRecoVolume(event) ){
-        if( m_store_all_events ) return interpretFailEvent(event); 
+        if( m_keepAfter_vertex_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
 
     RefitVertex_Using_AnchoredShortTracks(event);
 
     if ( !vertexInFiducialVolume(event) ){
-        if( m_store_all_events ) return interpretFailEvent(event); 
+        if( m_keepAfter_vertex_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
 
     SetVertexCount(event);
-
+    
+    setVertexData(event);
+    
     debug() << "FINISH: Vertex Reconstruction!" << endmsg;
 
     //==========================================================================
@@ -919,18 +928,24 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     debug() << "START: Muon Reconstruction..." << endmsg;
 
     if( !hasEventMinosMatchedMuon(event) ){
-        if( m_store_all_events ) return interpretFailEvent(event); 
+        if( m_keepAfter_muon_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
 
     if ( !isMuonChargeNegative(event)){
-        if( m_store_all_events ) return interpretFailEvent(event); 
+        if( m_keepAfter_muon_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
 
     tagPrimaryMuon(event);
 
     GetMuonExtraEnergy(event);
+
+    bool muonFilled = setMuonData(event);
+    if( !muonFilled ){ 
+        error()<<"Muon NTuple Branches did not filled!"<<endmsg;
+        return StatusCode::SUCCESS;
+    }
 
     debug() << "FINISH: Muon Reconstruction" << endmsg;
 
@@ -940,12 +955,12 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     debug()<<"START: Michel Electron Search"<<endmsg;
 
     if ( VertexHasMichels(event) ){
-        if( m_store_all_events ) return interpretFailEvent(event); 
+        if( m_keepAfter_michel_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
 
     if ( TrackEndPointHasMichels(event) ){
-        if( m_store_all_events ) return interpretFailEvent(event); 
+        if( m_keepAfter_michel_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
 
@@ -977,7 +992,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         if (!makeParticles){
             debug() << "Creation of Particles are FAILED!"<< endmsg;
             event->setIntData("Cut_Particle_None",1);
-            if( m_store_all_events ) return interpretFailEvent(event); 
+            if( m_keepAfter_proton_cuts ) return interpretFailEvent(event); 
             else return StatusCode::SUCCESS; 
         }
 
@@ -985,13 +1000,32 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         if( !foundProton ) {
             debug() << "Didn't find any contained in the tracker bit-positive prong with a proton particle!" << endmsg;
             event->setIntData("Cut_Proton_None",1);
-            if( m_store_all_events ) return interpretFailEvent(event); 
+            if( m_keepAfter_proton_cuts ) return interpretFailEvent(event); 
             else return StatusCode::SUCCESS; 
         }
     }
+       
+    // Set Proton Kinematics
+    if( m_ProtonParticles.size() > 0){
+        bool protonFilled = setProtonData( event );
+        if( !protonFilled ){ 
+            debug()<<"Proton Momentum is NaN, rejecting event!"<<endmsg;
+            event->setIntData("Cut_Proton_Bad",1);
+            if( m_keepAfter_proton_cuts ) return interpretFailEvent(event); 
+            else return StatusCode::SUCCESS; 
+        }
+    }else{
+        debug()<<"No Proton Particle, Setting -9.9 to m_proton_4P"<<endmsg;
+        m_proton_4P.SetPxPyPzE(-9.9,-9.9,-9.9,-9.9);
+    }
 
-    debug() <<"Found "<<m_ProtonParticles.size()<<" Proton Candidates!"<<endmsg;
+    debug() <<"Found "<<m_ProtonParticles.size()<<" Good Proton Candidates!"<<endmsg;
     event->setIntData("nProtonCandidates", (int)m_ProtonParticles.size());
+
+    //--------------------------------------------------------------------------
+    // Debugging: Check values
+    debug()<<"m_proton_4P = ( "<<m_proton_4P.px()<<", "<<m_proton_4P.py()<<", "<<m_proton_4P.pz()<<", "<<m_proton_4P.E()<<" )"<<endmsg;
+    //--------------------------------------------------------------------------
 
     debug()<<"FINISH: Proton Reconstruction"<<endmsg;
 
@@ -1002,7 +1036,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
 
     if ( !PreFilterPi0(event, truthEvent) ){
         event->setIntData("Cut_PreFilter_Pi0",1);
-        if( m_store_all_events ) return interpretFailEvent(event); 
+        if( m_keepAfter_pi0_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS;  
     }
 
@@ -1023,7 +1057,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     bool FoundTwoBlobs = ConeBlobs(event, truthEvent);
     if ( !FoundTwoBlobs ){
         event->setIntData("Cut_ConeBlobs",1);
-        if( m_store_all_events ) return interpretFailEvent(event); 
+        if( m_keepAfter_pi0_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS;  
     }
 
@@ -1037,12 +1071,22 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
 
     if ( !AreBlobsDirectionGood(event) ){
         event->setIntData("Cut_BlobDirectionBad",1);
-        if( m_store_all_events ) return interpretFailEvent(event); 
+        if( m_keepAfter_pi0_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS;  
     }
 
     // Get Calorimetric Unused Energy after Pi0 Reconstruction
     DispersedBlob(event, truthEvent);
+
+    // Set Pi0 Kinematics
+    bool pi0Filled = setPi0Data( event );
+    if( !pi0Filled ){
+        debug()<<"Pi0 Momentum is NaN, rejecting event!"<<endmsg;
+        event->setIntData("Cut_Pi0_Bad",1);
+        if( m_keepAfter_pi0_cuts ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
+    }
+
     debug()<<"FINISH: Pi0 Reconstruction"<<endmsg;
 
     //--------------------------------------------------------------------------
@@ -1106,7 +1150,6 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
         return StatusCode::FAILURE; // we crashed!
     }
 
-    const double SENTINEL = -9.9;
     //--------------------------------------------------------------------------
     // Create interaction hypothesis
     //--------------------------------------------------------------------------
@@ -1148,51 +1191,25 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
             warning()<<"Prong is two primary particles!"<<endmsg;
         }
     }
-
-    // Set Muon Kinematics
-    bool muonFilled = setMuonData( nuInt );
-    if( !muonFilled ){ 
-        error()<<"Muon NTuple Branches did not filled!"<<endmsg;
-        return StatusCode::SUCCESS;
-    }
-
-    // Set Pi0 Kinematics
-    bool pi0Filled = setPi0Data( nuInt, event );
-    if( !pi0Filled ){
-        error()<<"Pi0 NTupleBranches did not filled!"<<endmsg;
-        return StatusCode::SUCCESS;
-    }
-
-    // Set Proton Kinematics
-    if( m_ProtonProngs.size() != 0){
-        bool protonFilled = setProtonData( nuInt, event );
-        if( !protonFilled ){ 
-            error()<<"Proton NTuple Branches did not filled!"<<endmsg;
-            return StatusCode::SUCCESS;
-        }
-    }else{
-        debug()<<"No Proton Particle, Setting SENTINEL to m_proton_4P"<<endmsg;
-        m_proton_4P.SetPxPyPzE(SENTINEL,SENTINEL,SENTINEL,SENTINEL);
-    }
-
-    //--------------------------------------------------------------------------
-    // Debugging: Check values
-    debug()<<"m_proton_4P = ( "<<m_proton_4P.px()<<", "<<m_proton_4P.py()<<", "<<m_proton_4P.pz()<<", "<<m_proton_4P.E()<<" )"<<endmsg;
-    //--------------------------------------------------------------------------
-
-    //--------------------------------------------------------------------------  
+ 
     // Calculate and Set Event Kinematics
-    //--------------------------------------------------------------------------
     setEventKinematics(nuInt);
 
-    //--------------------------------------------------------------------------
-    // Calculate and Set Vertex Parameters
-    //--------------------------------------------------------------------------
-    setVertexData(nuInt, event);
+    // Neutrino Interaction Vertex 
+    SmartRef<Minerva::Vertex> vertex  = event->interactionVertex();   
 
-    //--------------------------------------------------------------------------
+    Gaudi::XYZTVector vtx_position( vertex->position().x(), 
+            vertex->position().y(),
+            vertex->position().z(),
+            event->time() );     
+    nuInt->setVertex( vtx_position );
+    nuInt->setScore( 1.0 );
+
+    // Primary Lepton
+    nuInt->setLeptonEnergy( m_muon_4P );
+    fillMinosMuonBranches(nuInt, m_MuonProng);
+   
     // Interaction Parameters
-    //--------------------------------------------------------------------------
     //nuInt->setNeutrinoHelicity( getHelicity( mu_charge ) );
     nuInt->setInteractionCurrent( Minerva::NeutrinoInt::ChargedCurrent );
     nuInt->setInteractionType( Minerva::NeutrinoInt::UnknownInt );
@@ -2266,7 +2283,7 @@ StatusCode CCProtonPi0::interpretFailEvent( Minerva::PhysicsEvent* event ) const
 //==============================================================================
 // Set Vertex Data 
 //==============================================================================
-void CCProtonPi0::setVertexData( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent* event ) const 
+void CCProtonPi0::setVertexData( Minerva::PhysicsEvent* event ) const 
 {
     SmartRef<Minerva::Vertex> vertex  = event->interactionVertex();   
 
@@ -2274,24 +2291,24 @@ void CCProtonPi0::setVertexData( Minerva::NeutrinoInt* nuInt, const Minerva::Phy
             vertex->position().y(),
             vertex->position().z(),
             event->time() );     
-    nuInt->setVertex( vtx_position );
-    nuInt->setScore( 1.0 );
-    nuInt->setDoubleData("vtx_x", vtx_position.x() );
-    nuInt->setDoubleData("vtx_y", vtx_position.y() );
-    nuInt->setDoubleData("vtx_z", vtx_position.z() );
+    //event->setVertex( vtx_position );
+    //event->setScore( 1.0 );
+    event->setDoubleData("vtx_x", vtx_position.x() );
+    event->setDoubleData("vtx_y", vtx_position.y() );
+    event->setDoubleData("vtx_z", vtx_position.z() );
 
     // Get Vertex Module and Planes
     int vtx_module, vtx_plane;
     debug()<<"Calling getNearestPlane, vtx is "<<vtx_position.z()<<endmsg;
     getNearestPlane(vtx_position.z(), vtx_module, vtx_plane); 
-    nuInt->setIntData("vtx_module", vtx_module);
-    nuInt->setIntData("vtx_plane", vtx_plane);
+    event->setIntData("vtx_module", vtx_module);
+    event->setIntData("vtx_plane", vtx_plane);
 }
 
 //==============================================================================
 // Set Muon particle data
 //==============================================================================
-bool CCProtonPi0::setMuonData( Minerva::NeutrinoInt* nuInt ) const 
+bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const 
 {
     const double SENTINEL = -9.9;
     // Sanity Check
@@ -2388,32 +2405,30 @@ bool CCProtonPi0::setMuonData( Minerva::NeutrinoInt* nuInt ) const
     //--------------------------------------------------------------------------
     // Fill Muon Branches
     //--------------------------------------------------------------------------
-    nuInt->setLeptonEnergy( muon_4p );
 
-    nuInt->setIntData("muon_hasMinosMatchTrack", is_minos_track );
-    nuInt->setIntData("muon_hasMinosMatchStub", is_minos_stub );
-    nuInt->setIntData("muon_minervaTrack_types", muon_minervaTrack_types);
-    nuInt->setIntData("muon_N_minosTracks", muon_N_minosTracks);
-    nuInt->setIntData("muon_minosTrackQuality", muon_minosTrackQuality);
-    nuInt->setIntData("muon_roadUpstreamPlanes", muon_roadUpstreamPlanes);
-    nuInt->setIntData("muon_charge",muon_charge);
-    nuInt->setDoubleData("muon_roadUpstreamEnergy", muon_roadUpstreamEnergy);
-    nuInt->setDoubleData("muon_px",muon_px);
-    nuInt->setDoubleData("muon_py",muon_py);
-    nuInt->setDoubleData("muon_pz",muon_pz);
-    nuInt->setDoubleData("muon_E",muon_E);
-    nuInt->setDoubleData("muon_P",muon_p);
-    nuInt->setDoubleData("muon_KE",muon_KE);
-    nuInt->setDoubleData("muon_phi",muon_phi);
-    nuInt->setDoubleData("muon_theta",muon_theta);
-    nuInt->setDoubleData("muon_theta_biasUp",muon_theta_biasUp);
-    nuInt->setDoubleData("muon_theta_biasDown",muon_theta_biasDown);
-    nuInt->setDoubleData("muon_muScore", muon_muScore);
-    nuInt->setDoubleData("muon_qp",muon_qp );
-    nuInt->setDoubleData("muon_qpqpe",muon_qpqpe);
-    nuInt->setDoubleData("muon_E_shift",muon_E_shift);
+    event->setIntData("muon_hasMinosMatchTrack", is_minos_track );
+    event->setIntData("muon_hasMinosMatchStub", is_minos_stub );
+    event->setIntData("muon_minervaTrack_types", muon_minervaTrack_types);
+    event->setIntData("muon_N_minosTracks", muon_N_minosTracks);
+    event->setIntData("muon_minosTrackQuality", muon_minosTrackQuality);
+    event->setIntData("muon_roadUpstreamPlanes", muon_roadUpstreamPlanes);
+    event->setIntData("muon_charge",muon_charge);
+    event->setDoubleData("muon_roadUpstreamEnergy", muon_roadUpstreamEnergy);
+    event->setDoubleData("muon_px",muon_px);
+    event->setDoubleData("muon_py",muon_py);
+    event->setDoubleData("muon_pz",muon_pz);
+    event->setDoubleData("muon_E",muon_E);
+    event->setDoubleData("muon_P",muon_p);
+    event->setDoubleData("muon_KE",muon_KE);
+    event->setDoubleData("muon_phi",muon_phi);
+    event->setDoubleData("muon_theta",muon_theta);
+    event->setDoubleData("muon_theta_biasUp",muon_theta_biasUp);
+    event->setDoubleData("muon_theta_biasDown",muon_theta_biasDown);
+    event->setDoubleData("muon_muScore", muon_muScore);
+    event->setDoubleData("muon_qp",muon_qp );
+    event->setDoubleData("muon_qpqpe",muon_qpqpe);
+    event->setDoubleData("muon_E_shift",muon_E_shift);
 
-    fillMinosMuonBranches(nuInt, m_MuonProng);
 
     return true;
 }
@@ -2731,20 +2746,18 @@ bool CCProtonPi0::getProtonProng(  Minerva::PhysicsEvent *event) const
         }
 
     }
-
-
+    
     return isProtonExist;
 }
-
 
 //==============================================================================
 // Set proton particle data
 //==============================================================================
-bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt, const Minerva::PhysicsEvent *event ) const 
+bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const 
 {
-    if ( m_ProtonProngs.size() == 0 ) {
-        debug()<< "m_ProtonProngs is empty! Exiting..." <<endmsg;
-        return true;
+    if ( m_ProtonParticles.size() == 0 ) {
+        warning()<< "m_ProtonParticles is empty! Exiting..." <<endmsg;
+        return false;
     }
 
     // Sanity Check
@@ -2886,53 +2899,57 @@ bool CCProtonPi0::setProtonData( Minerva::NeutrinoInt* nuInt, const Minerva::Phy
         debug()<<"  ekin[i] = "<<ekin[i]<<endmsg;
         debug()<<"  kinked[i] = "<<kinked[i]<<endmsg;
         debug()<<"  odMatch[i] = "<<odMatch[i]<<endmsg;
+        debug()<<"  leadingProtonIndice = "<<leadingProtonIndice<<endmsg;
         //----------------------------------------------------------------------
+        
+        // Check Momentum 
+        if ( isnan(p[i]) ) return false;
     }
 
     // Set Leading Proton 4-Momentum
     m_proton_4P.SetPxPyPzE( px[leadingProtonIndice], py[leadingProtonIndice], pz[leadingProtonIndice],E[leadingProtonIndice]);
 
-    nuInt->setContainerDoubleData("all_protons_p_calCorrection",p_calCorrection);
-    nuInt->setContainerDoubleData("all_protons_p_visEnergy",p_visEnergyCorrection);
-    nuInt->setContainerDoubleData("all_protons_p_dEdXTool",p_dedx);
-    nuInt->setContainerDoubleData("all_protons_endPointX",proton_end_x);
-    nuInt->setContainerDoubleData("all_protons_endPointY",proton_end_y);
-    nuInt->setContainerDoubleData("all_protons_endPointZ",proton_end_z);
-    nuInt->setContainerDoubleData("all_protons_startPointX",proton_start_x);
-    nuInt->setContainerDoubleData("all_protons_startPointY",proton_start_y);
-    nuInt->setContainerDoubleData("all_protons_startPointZ",proton_start_z);
-    nuInt->setContainerDoubleData("all_protons_length",length);
-    nuInt->setContainerDoubleData("all_protons_px",px);
-    nuInt->setContainerDoubleData("all_protons_py",py);
-    nuInt->setContainerDoubleData("all_protons_pz",pz);
-    nuInt->setContainerDoubleData("all_protons_E",E);
-    nuInt->setContainerDoubleData("all_protons_P",p);
-    nuInt->setContainerDoubleData("all_protons_KE",ekin);
-    nuInt->setContainerIntData("all_protons_kinked",kinked);
-    nuInt->setContainerIntData("all_protons_odMatch",odMatch);
-    nuInt->setContainerDoubleData("all_protons_protonScore",protonScore);
-    nuInt->setContainerDoubleData("all_protons_pionScore",pionScore);
-    nuInt->setContainerDoubleData("all_protons_LLRScore",protonScoreLLR);
-    nuInt->setContainerDoubleData("all_protons_chi2_ndf",chi2);
-    nuInt->setContainerDoubleData("all_protons_theta",proton_theta);
-    nuInt->setContainerDoubleData("all_protons_thetaX",proton_thetaX);
-    nuInt->setContainerDoubleData("all_protons_thetaY",proton_thetaY);
-    nuInt->setContainerDoubleData("all_protons_phi",proton_phi);
+    event->setContainerDoubleData("all_protons_p_calCorrection",p_calCorrection);
+    event->setContainerDoubleData("all_protons_p_visEnergy",p_visEnergyCorrection);
+    event->setContainerDoubleData("all_protons_p_dEdXTool",p_dedx);
+    event->setContainerDoubleData("all_protons_endPointX",proton_end_x);
+    event->setContainerDoubleData("all_protons_endPointY",proton_end_y);
+    event->setContainerDoubleData("all_protons_endPointZ",proton_end_z);
+    event->setContainerDoubleData("all_protons_startPointX",proton_start_x);
+    event->setContainerDoubleData("all_protons_startPointY",proton_start_y);
+    event->setContainerDoubleData("all_protons_startPointZ",proton_start_z);
+    event->setContainerDoubleData("all_protons_length",length);
+    event->setContainerDoubleData("all_protons_px",px);
+    event->setContainerDoubleData("all_protons_py",py);
+    event->setContainerDoubleData("all_protons_pz",pz);
+    event->setContainerDoubleData("all_protons_E",E);
+    event->setContainerDoubleData("all_protons_P",p);
+    event->setContainerDoubleData("all_protons_KE",ekin);
+    event->setContainerIntData("all_protons_kinked",kinked);
+    event->setContainerIntData("all_protons_odMatch",odMatch);
+    event->setContainerDoubleData("all_protons_protonScore",protonScore);
+    event->setContainerDoubleData("all_protons_pionScore",pionScore);
+    event->setContainerDoubleData("all_protons_LLRScore",protonScoreLLR);
+    event->setContainerDoubleData("all_protons_chi2_ndf",chi2);
+    event->setContainerDoubleData("all_protons_theta",proton_theta);
+    event->setContainerDoubleData("all_protons_thetaX",proton_thetaX);
+    event->setContainerDoubleData("all_protons_thetaY",proton_thetaY);
+    event->setContainerDoubleData("all_protons_phi",proton_phi);
 
-    nuInt->setDoubleData("proton_px",px[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_py",py[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_pz",pz[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_E",E[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_P",p[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_KE",ekin[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_theta",proton_theta[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_phi",proton_phi[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_length", length[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_protonScore", protonScore[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_pionScore", pionScore[leadingProtonIndice]);
-    nuInt->setDoubleData("proton_LLRScore", protonScoreLLR[leadingProtonIndice]);
-    nuInt->setIntData("proton_kinked",kinked[leadingProtonIndice]);
-    nuInt->setIntData("proton_leadingIndice",leadingProtonIndice);
+    event->setDoubleData("proton_px",px[leadingProtonIndice]);
+    event->setDoubleData("proton_py",py[leadingProtonIndice]);
+    event->setDoubleData("proton_pz",pz[leadingProtonIndice]);
+    event->setDoubleData("proton_E",E[leadingProtonIndice]);
+    event->setDoubleData("proton_P",p[leadingProtonIndice]);
+    event->setDoubleData("proton_KE",ekin[leadingProtonIndice]);
+    event->setDoubleData("proton_theta",proton_theta[leadingProtonIndice]);
+    event->setDoubleData("proton_phi",proton_phi[leadingProtonIndice]);
+    event->setDoubleData("proton_length", length[leadingProtonIndice]);
+    event->setDoubleData("proton_protonScore", protonScore[leadingProtonIndice]);
+    event->setDoubleData("proton_pionScore", pionScore[leadingProtonIndice]);
+    event->setDoubleData("proton_LLRScore", protonScoreLLR[leadingProtonIndice]);
+    event->setIntData("proton_kinked",kinked[leadingProtonIndice]);
+    event->setIntData("proton_leadingIndice",leadingProtonIndice);
 
     return true;
 }
@@ -3017,7 +3034,7 @@ void CCProtonPi0::correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonPro
 //==============================================================================
 // setPi0Data
 //==============================================================================
-bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::PhysicsEvent *event ) const 
+bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const 
 {    
     // Sanity Check
     if( m_Pi0Blob1 == NULL || m_Pi0Blob2 == NULL){
@@ -3128,10 +3145,14 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     Gaudi::LorentzVector pi0_4P(pimom.Px(), pimom.Py(), pimom.Pz(), pi0_E);
     Gaudi::LorentzVector gamma1_4P(g1mom.Px(), g1mom.Py(), g1mom.Pz(), g1energy);
     Gaudi::LorentzVector gamma2_4P(g2mom.Px(), g2mom.Py(), g2mom.Pz(), g2energy);
+ 
     debug()<<"pi0_4P = "<<pi0_4P<<endmsg;
     debug()<<"gamma1_4P = "<<gamma1_4P<<endmsg;
     debug()<<"gamma2_4P = "<<gamma2_4P<<endmsg;
 
+    // Check Momentum
+    if ( isnan(pi0_4P.P()) ) return false;
+    
     // Get Angles wrt Beam Coordinates
     double pi0_theta = m_coordSysTool->thetaWRTBeam(pi0_4P);
     double pi0_phi = m_coordSysTool->phiWRTBeam(pi0_4P);
@@ -3160,70 +3181,70 @@ bool CCProtonPi0::setPi0Data( Minerva::NeutrinoInt* nuInt,const Minerva::Physics
     //    Fill Branches
     //--------------------------------------------------------------------------
     // Pi0 Information
-    nuInt->setDoubleData("pi0_openingAngle", openingAngle);
-    nuInt->setDoubleData("pi0_cos_openingAngle", cos_openingAngle );
-    nuInt->setDoubleData("pi0_invMass", invMass);
-    nuInt->setDoubleData("pi0_invMass_Old", invMass_Old);
-    nuInt->setDoubleData("pi0_px" ,pimom.Px());
-    nuInt->setDoubleData("pi0_py", pimom.Py());
-    nuInt->setDoubleData("pi0_pz", pimom.Pz());
-    nuInt->setDoubleData("pi0_E", pi0_E);
-    nuInt->setDoubleData("pi0_P", pimom.Mag());
-    nuInt->setDoubleData("pi0_KE", pi0_KE);
-    nuInt->setDoubleData("pi0_theta", pi0_theta);
-    nuInt->setDoubleData("pi0_phi", pi0_phi);
-    nuInt->setDoubleData("pi0_thetaX", std::atan2(pimom.X(),pimom.Z())*TMath::RadToDeg());
-    nuInt->setDoubleData("pi0_thetaY", std::atan2(pimom.Y(),pimom.Z())*TMath::RadToDeg());
+    event->setDoubleData("pi0_openingAngle", openingAngle);
+    event->setDoubleData("pi0_cos_openingAngle", cos_openingAngle );
+    event->setDoubleData("pi0_invMass", invMass);
+    event->setDoubleData("pi0_invMass_Old", invMass_Old);
+    event->setDoubleData("pi0_px" ,pimom.Px());
+    event->setDoubleData("pi0_py", pimom.Py());
+    event->setDoubleData("pi0_pz", pimom.Pz());
+    event->setDoubleData("pi0_E", pi0_E);
+    event->setDoubleData("pi0_P", pimom.Mag());
+    event->setDoubleData("pi0_KE", pi0_KE);
+    event->setDoubleData("pi0_theta", pi0_theta);
+    event->setDoubleData("pi0_phi", pi0_phi);
+    event->setDoubleData("pi0_thetaX", std::atan2(pimom.X(),pimom.Z())*TMath::RadToDeg());
+    event->setDoubleData("pi0_thetaY", std::atan2(pimom.Y(),pimom.Z())*TMath::RadToDeg());
 
     // Gamma1 Information
-    nuInt->setDoubleData("gamma1_px",g1mom.Px());
-    nuInt->setDoubleData("gamma1_py", g1mom.Py());
-    nuInt->setDoubleData("gamma1_pz", g1mom.Pz());
-    nuInt->setDoubleData("gamma1_E", g1energy);
-    nuInt->setDoubleData("gamma1_E_Old", g1energy_Old);
-    nuInt->setDoubleData("gamma1_P", g1mom.Mag());
-    nuInt->setDoubleData("gamma1_theta", gamma1_theta);
-    nuInt->setDoubleData("gamma1_phi",  gamma1_phi);
-    nuInt->setDoubleData("gamma1_dEdx", dEdx1 );
-    nuInt->setDoubleData("gamma1_time", time1 );
-    nuInt->setDoubleData("gamma1_dist_vtx",gamma1_dist_vtx);
-    nuInt->setContainerDoubleData("gamma1_direction", direc_1 );
-    nuInt->setContainerDoubleData("gamma1_vertex", position1 );
-    nuInt->setDoubleData("gamma1_evis_trkr", gamma1_evis_v[0]);
-    nuInt->setDoubleData("gamma1_evis_ecal", gamma1_evis_v[1]);
-    nuInt->setDoubleData("gamma1_evis_scal_X", gamma1_evis_v[2]);
-    nuInt->setDoubleData("gamma1_evis_scal_UV", gamma1_evis_v[3]);
-    nuInt->setDoubleData("gamma1_evis_hcal", gamma1_evis_v[4]);
-    nuInt->setDoubleData("gamma1_energy_trkr", gamma1_energy_v[0]);
-    nuInt->setDoubleData("gamma1_energy_ecal", gamma1_energy_v[1]);
-    nuInt->setDoubleData("gamma1_energy_scal_X", gamma1_energy_v[2]);
-    nuInt->setDoubleData("gamma1_energy_scal_UV", gamma1_energy_v[3]);
-    nuInt->setDoubleData("gamma1_energy_hcal", gamma1_energy_v[4]);
+    event->setDoubleData("gamma1_px",g1mom.Px());
+    event->setDoubleData("gamma1_py", g1mom.Py());
+    event->setDoubleData("gamma1_pz", g1mom.Pz());
+    event->setDoubleData("gamma1_E", g1energy);
+    event->setDoubleData("gamma1_E_Old", g1energy_Old);
+    event->setDoubleData("gamma1_P", g1mom.Mag());
+    event->setDoubleData("gamma1_theta", gamma1_theta);
+    event->setDoubleData("gamma1_phi",  gamma1_phi);
+    event->setDoubleData("gamma1_dEdx", dEdx1 );
+    event->setDoubleData("gamma1_time", time1 );
+    event->setDoubleData("gamma1_dist_vtx",gamma1_dist_vtx);
+    event->setContainerDoubleData("gamma1_direction", direc_1 );
+    event->setContainerDoubleData("gamma1_vertex", position1 );
+    event->setDoubleData("gamma1_evis_trkr", gamma1_evis_v[0]);
+    event->setDoubleData("gamma1_evis_ecal", gamma1_evis_v[1]);
+    event->setDoubleData("gamma1_evis_scal_X", gamma1_evis_v[2]);
+    event->setDoubleData("gamma1_evis_scal_UV", gamma1_evis_v[3]);
+    event->setDoubleData("gamma1_evis_hcal", gamma1_evis_v[4]);
+    event->setDoubleData("gamma1_energy_trkr", gamma1_energy_v[0]);
+    event->setDoubleData("gamma1_energy_ecal", gamma1_energy_v[1]);
+    event->setDoubleData("gamma1_energy_scal_X", gamma1_energy_v[2]);
+    event->setDoubleData("gamma1_energy_scal_UV", gamma1_energy_v[3]);
+    event->setDoubleData("gamma1_energy_hcal", gamma1_energy_v[4]);
 
     // Gamma2 Information
-    nuInt->setDoubleData("gamma2_px", g2mom.Px());
-    nuInt->setDoubleData("gamma2_py", g2mom.Py());
-    nuInt->setDoubleData("gamma2_pz", g2mom.Pz());
-    nuInt->setDoubleData("gamma2_E", g2energy);
-    nuInt->setDoubleData("gamma2_E_Old", g2energy_Old);
-    nuInt->setDoubleData("gamma2_P", g2mom.Mag());
-    nuInt->setDoubleData("gamma2_theta", gamma2_theta);
-    nuInt->setDoubleData("gamma2_phi",  gamma2_phi);
-    nuInt->setDoubleData("gamma2_dEdx", dEdx2 );
-    nuInt->setDoubleData("gamma2_time", time2 );
-    nuInt->setDoubleData("gamma2_dist_vtx", gamma2_dist_vtx);
-    nuInt->setContainerDoubleData("gamma2_direction", direc_2 );
-    nuInt->setContainerDoubleData("gamma2_vertex", position2 );
-    nuInt->setDoubleData("gamma2_evis_trkr", gamma2_evis_v[0]);
-    nuInt->setDoubleData("gamma2_evis_ecal", gamma2_evis_v[1]);
-    nuInt->setDoubleData("gamma2_evis_scal_X", gamma2_evis_v[2]);
-    nuInt->setDoubleData("gamma2_evis_scal_UV", gamma2_evis_v[3]);
-    nuInt->setDoubleData("gamma2_evis_hcal", gamma2_evis_v[4]);
-    nuInt->setDoubleData("gamma2_energy_trkr", gamma2_energy_v[0]);
-    nuInt->setDoubleData("gamma2_energy_ecal", gamma2_energy_v[1]);
-    nuInt->setDoubleData("gamma2_energy_scal_X", gamma2_energy_v[2]);
-    nuInt->setDoubleData("gamma2_energy_scal_UV", gamma2_energy_v[3]);
-    nuInt->setDoubleData("gamma2_energy_hcal", gamma2_energy_v[4]);
+    event->setDoubleData("gamma2_px", g2mom.Px());
+    event->setDoubleData("gamma2_py", g2mom.Py());
+    event->setDoubleData("gamma2_pz", g2mom.Pz());
+    event->setDoubleData("gamma2_E", g2energy);
+    event->setDoubleData("gamma2_E_Old", g2energy_Old);
+    event->setDoubleData("gamma2_P", g2mom.Mag());
+    event->setDoubleData("gamma2_theta", gamma2_theta);
+    event->setDoubleData("gamma2_phi",  gamma2_phi);
+    event->setDoubleData("gamma2_dEdx", dEdx2 );
+    event->setDoubleData("gamma2_time", time2 );
+    event->setDoubleData("gamma2_dist_vtx", gamma2_dist_vtx);
+    event->setContainerDoubleData("gamma2_direction", direc_2 );
+    event->setContainerDoubleData("gamma2_vertex", position2 );
+    event->setDoubleData("gamma2_evis_trkr", gamma2_evis_v[0]);
+    event->setDoubleData("gamma2_evis_ecal", gamma2_evis_v[1]);
+    event->setDoubleData("gamma2_evis_scal_X", gamma2_evis_v[2]);
+    event->setDoubleData("gamma2_evis_scal_UV", gamma2_evis_v[3]);
+    event->setDoubleData("gamma2_evis_hcal", gamma2_evis_v[4]);
+    event->setDoubleData("gamma2_energy_trkr", gamma2_energy_v[0]);
+    event->setDoubleData("gamma2_energy_ecal", gamma2_energy_v[1]);
+    event->setDoubleData("gamma2_energy_scal_X", gamma2_energy_v[2]);
+    event->setDoubleData("gamma2_energy_scal_UV", gamma2_energy_v[3]);
+    event->setDoubleData("gamma2_energy_hcal", gamma2_energy_v[4]);
 
     return true;
 }
@@ -3801,7 +3822,6 @@ bool CCProtonPi0::AreBlobsDirectionGood(Minerva::PhysicsEvent *event) const
     bool goodDirection2 = m_idHoughBlob->GetDirection(m_Pi0Blob2, vtx_position );
     bool isGoodBlob2 = false;
     if (goodPosition2 && goodDirection2) isGoodBlob2 = true;
-
 
     if (isGoodBlob1 && isGoodBlob2)  return true;
     else return false;
@@ -5779,6 +5799,7 @@ double CCProtonPi0::GetVertexEnergy() const
 
     return vertex_energy;
 }
+
 
 
 #endif

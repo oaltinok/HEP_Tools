@@ -98,7 +98,8 @@ void CCProtonPi0_Pion::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",bin_P.get_width()));
         E.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","P",i),"Reconstructed Pion Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+        double binsP[17] = {0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 1.0, 1.5, 1.7};
+        temp = new MnvH1D( Form("%s_%d","P",i),"Reconstructed Pion Momentum",16,binsP);
         temp->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
         temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",bin_P.get_width()));
         P.push_back(temp);
@@ -118,7 +119,17 @@ void CCProtonPi0_Pion::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [Degree]",binList.angle.get_width()));
         phi.push_back(temp);
     }
-    
+
+    double binsP[11] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.5};
+    signal_P = new TH1D( "signal_P","Momentum for Signal Events",10,binsP);
+    signal_P->GetXaxis()->SetTitle("Momentum [GeV]");
+    signal_P->GetYaxis()->SetTitle("N(Events)");
+ 
+    signal_theta = new TH1D( "signal_theta","Theta for Signal Events",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max());
+    signal_theta->GetXaxis()->SetTitle("Theta");
+    signal_theta->GetYaxis()->SetTitle("N(Events)");
+     
+
     // Truth Energy - Gamma 1
     gamma1_true_E = new TH1D( "gamma1_true_E","Leading Photon True Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
     gamma1_true_E->GetXaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
@@ -211,6 +222,8 @@ void CCProtonPi0_Pion::writeHistograms()
         theta[i]->Write();
         phi[i]->Write();
     }
+    signal_P->Write();
+    signal_theta->Write();
 
     // Photon Comparison
     gamma1_E_gamma2_E->Write();

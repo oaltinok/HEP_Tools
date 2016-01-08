@@ -51,19 +51,13 @@ class CutArrow
 {
     public:
         CutArrow(){ /* Do Nothing */ }
-        CutArrow(double cut, double y1, double y2, double arrow_l, std::string arrow_d )
+        CutArrow(double cut, std::string arrow_d )
         {
             cut_location = cut;
-            ymin = y1;
-            ymax = y2;
-            arrow_length = arrow_l;
             arrow_direction = arrow_d;
         }
         
         double cut_location;
-        double ymin;
-        double ymax;
-        double arrow_length;
         std::string arrow_direction;
 };
 
@@ -122,6 +116,7 @@ class CCProtonPi0_Plotter
         void plotPion_MCOnly();
         void plotPi0Blob_MCOnly();
         void plotCutHistograms_MCOnly();
+        void plotEfficiencyCurves();
       
         // True Signal Events
         void plotPion_True();
@@ -134,7 +129,7 @@ class CCProtonPi0_Plotter
 
         // Helper Functions
         void ApplyStyle(MnvPlotter* plotter);
-        void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow);
+        void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, double hist_max, double arrow_length);
         void SavePi0InvMassPoints();
         
         // Plottting Macros
@@ -156,6 +151,9 @@ class CCProtonPi0_Plotter
         void SaveRecoRatioPoints(rootDir& dir, std::string var_name, std::string plotDir);
         void Save2DHistPoints(rootDir& dir, std::string var_name, std::string plotDir);     
         double GetMCNormalization(std::string &norm_label, bool isPOTNorm, MnvH1D* data, MnvH1D* mc);
+        void DrawEfficiencyCurve(std::string var_name, std::string plotDir, TH1D* all_signal, TH1D* signal);
+
+
 };
 
 

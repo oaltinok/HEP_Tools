@@ -51,41 +51,46 @@ void CCProtonPi0_CutList::initHistograms()
         // --------------------------------------------------------------------
         // Common
         // --------------------------------------------------------------------
-        temp = new MnvH1D( Form("%s_%d","hCut_nVertices",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_nVertices",i),"N(Vertices)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Vertex)");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_nVertices.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_nTracks",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_nTracks",i),"N(Tracks)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Tracks)");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_nTracks.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_nTracks2",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_nTracks2",i),"N(Tracks_Close) + N(Tracks_Far)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Tracks_Close) + N(Tracks_Far) - should be same with nTracks");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_nTracks2.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Close",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Close",i),"N(Close Tracks)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Tracks_Close)");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_nTracks_Close.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Far",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Far",i),"N(Far Tracks)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Tracks_Far)");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_nTracks_Far.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Discarded",i),Form("%d",i),binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Discarded",i),"N(Tracks Discarded)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Tracks_Discarded)");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_nTracks_Discarded.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_Michel",i),Form("%d",i),binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_Michel",i),"Michel Electrons",binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
         temp->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_Michel.push_back(temp);
 
+        temp = new MnvH1D( Form("%s_%d","hCut_nProtonCandidates",i),"N(Proton Candidates)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Proton Candidates)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_nProtonCandidates.push_back(temp);
+        
         // --------------------------------------------------------------------
         // 1 Track
         // --------------------------------------------------------------------
@@ -189,6 +194,16 @@ void CCProtonPi0_CutList::initHistograms()
         hCut_2Track_deltaInvMass.push_back(temp);
     }
 
+    double binsP[11] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.5};
+    all_signal_pi0_P = new TH1D( "all_signal_pi0_P","Momentum for Signal Events",10,binsP);
+    all_signal_pi0_P->GetXaxis()->SetTitle("Momentum [GeV]");
+    all_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
+ 
+    all_signal_pi0_theta = new TH1D( "all_signal_pi0_theta","Theta for Signal Events",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max());
+    all_signal_pi0_theta->GetXaxis()->SetTitle("Theta");
+    all_signal_pi0_theta->GetYaxis()->SetTitle("N(Events)");
+     
+
     // MC Only Histograms
     mc_w_DIS = new TH1D( "mc_w_DIS","True W for DIS",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
     mc_w_DIS->GetXaxis()->SetTitle("True W for DIS [GeV]");
@@ -218,13 +233,16 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_Vertex_Michel_Exist.set_Name("Vertex_Michel_Exist"); 
     nCut_EndPoint_Michel_Exist.set_Name("EndPoint_Michel_Exist");
     nCut_secEndPoint_Michel_Exist.set_Name("secEndPoint_Michel_Exist");
+    nCut_Vertex_Count.set_Name("Vertex_Count");
     nCut_Particle_None.set_Name("Particle_None");
     nCut_Proton_None.set_Name("Proton_None");            
     nCut_Proton_Bad.set_Name("Proton_Bad");            
+    nCut_Proton_Count.set_Name("Proton_Count");            
     nCut_ProtonScore.set_Name("Proton_Score");
     nCut_PreFilter_Pi0.set_Name("PreFilter_Pi0");
     nCut_ConeBlobs.set_Name("ConeBlobs");
     nCut_BlobDirectionBad.set_Name("BlobDirectionBad");
+    nCut_Pi0_Bad.set_Name("Pi0_Bad");
     nCut_Photon1DistanceLow.set_Name("Photon1DistanceLow");
     nCut_Photon2DistanceLow.set_Name("Photon2DistanceLow");
     nCut_Pi0_invMass.set_Name("Pi0_invMass");
@@ -235,6 +253,7 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_1Track_PreFilter_Pi0.set_Name("PreFilter_Pi0");
     nCut_1Track_ConeBlobs.set_Name("ConeBlobs");
     nCut_1Track_BlobDirectionBad.set_Name("BlobDirectionBad");
+    nCut_1Track_Pi0_Bad.set_Name("Pi0_Bad");
     nCut_1Track_Photon1DistanceLow.set_Name("Photon1DistanceLow");
     nCut_1Track_Photon2DistanceLow.set_Name("Photon2DistanceLow");
     nCut_1Track_Pi0_invMass.set_Name("Pi0_invMass");
@@ -242,11 +261,11 @@ void CCProtonPi0_CutList::SetCutNames()
 
     // 2 Track
     nCut_2Track_All.set_Name("All_2Track");
-    nCut_2Track_Proton_Bad.set_Name("Proton_Bad");
     nCut_2Track_ProtonScore.set_Name("Proton_Score");
     nCut_2Track_PreFilter_Pi0.set_Name("PreFilter_Pi0");
     nCut_2Track_ConeBlobs.set_Name("ConeBlobs");
     nCut_2Track_BlobDirectionBad.set_Name("BlobDirectionBad");
+    nCut_2Track_Pi0_Bad.set_Name("Pi0_Bad");
     nCut_2Track_Photon1DistanceLow.set_Name("Photon1DistanceLow");
     nCut_2Track_Photon2DistanceLow.set_Name("Photon2DistanceLow");
     nCut_2Track_Pi0_invMass.set_Name("Pi0_invMass");
@@ -317,13 +336,16 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_All.push_back(nCut_Vertex_Michel_Exist); 
     nCutVector_All.push_back(nCut_EndPoint_Michel_Exist);
     nCutVector_All.push_back(nCut_secEndPoint_Michel_Exist);
+    nCutVector_All.push_back(nCut_Vertex_Count);
     nCutVector_All.push_back(nCut_Particle_None);
     nCutVector_All.push_back(nCut_Proton_None);
     nCutVector_All.push_back(nCut_Proton_Bad);
+    nCutVector_All.push_back(nCut_Proton_Count);
     nCutVector_All.push_back(nCut_ProtonScore);
     nCutVector_All.push_back(nCut_PreFilter_Pi0);
     nCutVector_All.push_back(nCut_ConeBlobs);
     nCutVector_All.push_back(nCut_BlobDirectionBad);
+    nCutVector_All.push_back(nCut_Pi0_Bad);
     nCutVector_All.push_back(nCut_Photon1DistanceLow);
     nCutVector_All.push_back(nCut_Photon2DistanceLow);
     nCutVector_All.push_back(nCut_Pi0_invMass);
@@ -334,6 +356,7 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_1Track.push_back(nCut_1Track_PreFilter_Pi0);
     nCutVector_1Track.push_back(nCut_1Track_ConeBlobs);
     nCutVector_1Track.push_back(nCut_1Track_BlobDirectionBad);
+    nCutVector_1Track.push_back(nCut_1Track_Pi0_Bad);
     nCutVector_1Track.push_back(nCut_1Track_Photon1DistanceLow);
     nCutVector_1Track.push_back(nCut_1Track_Photon2DistanceLow);
     nCutVector_1Track.push_back(nCut_1Track_Pi0_invMass);
@@ -341,11 +364,11 @@ void CCProtonPi0_CutList::formCutVectors()
 
     // 2 Track
     nCutVector_2Track.push_back(nCut_2Track_All);
-    nCutVector_2Track.push_back(nCut_2Track_Proton_Bad);
     nCutVector_2Track.push_back(nCut_2Track_ProtonScore);
     nCutVector_2Track.push_back(nCut_2Track_PreFilter_Pi0);
     nCutVector_2Track.push_back(nCut_2Track_ConeBlobs);
     nCutVector_2Track.push_back(nCut_2Track_BlobDirectionBad);
+    nCutVector_2Track.push_back(nCut_2Track_Pi0_Bad);
     nCutVector_2Track.push_back(nCut_2Track_Photon1DistanceLow);
     nCutVector_2Track.push_back(nCut_2Track_Photon2DistanceLow);
     nCutVector_2Track.push_back(nCut_2Track_Pi0_invMass);
@@ -452,6 +475,7 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_nTracks_Far[i]->Write();
         hCut_nTracks_Discarded[i]->Write();
         hCut_Michel[i]->Write();
+        hCut_nProtonCandidates[i]->Write();
         
         // 1 Track
         hCut_1Track_eVis_nuclearTarget[i]->Write();
@@ -478,6 +502,9 @@ void CCProtonPi0_CutList::writeHistograms()
     }
 
     // MC Only
+    all_signal_pi0_P->Write();
+    all_signal_pi0_theta->Write();
+    
     mc_w_DIS->Write();
     mc_w_RES->Write();
     mc_w_CCQE->Write();
