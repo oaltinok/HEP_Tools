@@ -1,4 +1,19 @@
 ===============================================================================
+v2_49
+CCProtonPi0 Updates:
+	No Major Changes
+
+--------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	New Package: TruthAnalysis
+		Class: TruthAnalyzer
+			Loops over Truth Branch of CCProtonPi0 NTuples
+				Get Truth Branch variables using makeClass/Truth
+			Outputs Signal & Background information
+
+	Plotter Improved
+		MC Only Background Plots added
+===============================================================================
 v2_48
 CCProtonPi0 Updates:
  	Modified reconstructEvent() to save NTuple Variables during reconstruction

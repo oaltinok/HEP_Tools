@@ -1,21 +1,18 @@
-CCPROTONPI0_V="v2_48"
+CCPROTONPI0_V="v2_49"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
- 	Modified reconstructEvent() to save NTuple Variables during reconstruction
-		Vertex Variables right after Vertex Reconstruction
-		Muon Variables right after Muon Reconstruction
-		Proton Variables right after Proton Reconstruction
-		Pi0 Variables right after Pi0 Reconstruction
-	This way we have the information of the particle even if the event rejected by a future stage
-	
-	New functions to test proton and pi0 reconstructions
-		In some cases proton and pi0 momentums are -nan
-		Reject these cases
+	No Major Changes
 
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	Improved Method for adding CutArrows on Plots 
-		Automatically find arrow height
+	New Package: TruthAnalysis
+		Class: TruthAnalyzer
+			Loops over Truth Branch of CCProtonPi0 NTuples
+				Get Truth Branch variables using makeClass/Truth
+			Outputs Signal & Background information
+
+	Plotter Improved
+		MC Only Background Plots added
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

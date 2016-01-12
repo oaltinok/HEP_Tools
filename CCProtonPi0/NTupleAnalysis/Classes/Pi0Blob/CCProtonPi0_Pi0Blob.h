@@ -23,7 +23,7 @@ class CCProtonPi0_Pi0Blob : public CCProtonPi0_NTupleAnalysis
         void writeHistograms();
 
         // Histograms
-       
+
         // Truth Match
         // Pi0 Capture Performance
         std::vector<MnvH1D*> evis_frac_true_pi0_reco_all;

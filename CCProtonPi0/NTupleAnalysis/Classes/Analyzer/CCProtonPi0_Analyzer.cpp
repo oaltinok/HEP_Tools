@@ -11,7 +11,7 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
-    nMaxEvents = 1000000;
+    nMaxEvents = 100000;
 
     // Control Flow
     isDataAnalysis  = true;
@@ -551,7 +551,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (truth_isSignal){
         double pi0_true_P = HEP_Functions::calcMomentum(truth_pi0_4P[0],truth_pi0_4P[1],truth_pi0_4P[2]);
         pi0_true_P = pi0_true_P * MeV_to_GeV;
-        cutList.all_signal_pi0_P->Fill(pi0_true_P);
+        FillHistogram(cutList.all_signal_pi0_P,pi0_true_P);
     }
 
 
@@ -572,8 +572,14 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_Muon_None.increment(truth_isSignal, study1, study2);
 
     // Fill Truth_W for MINOS Matched Signal Events
-    if (m_isMC && truth_isSignal) fill_mc_w(); 
+    if (m_isMC && truth_isSignal){ 
+        fill_mc_w(); 
+        
+        double pi0_true_P = HEP_Functions::calcMomentum(truth_pi0_4P[0],truth_pi0_4P[1],truth_pi0_4P[2]);
+        pi0_true_P = pi0_true_P * MeV_to_GeV;
+        FillHistogram(cutList.minos_signal_pi0_P,pi0_true_P);
 
+    }
     // Anti-Muon Cut
     if( Cut_Muon_Charge == 1) return false;
     cutList.nCut_Muon_Charge.increment(truth_isSignal, study1, study2);
@@ -665,6 +671,10 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     else cutList.nCut_2Track_PreFilter_Pi0.increment(truth_isSignal, study1, study2);
 
     // ConeBlobs Cut -- If Cut_ConeBlobs == 1 --> Failed Pi0 Reconstruction
+    FillHistogram(cutList.hCut_nShowerCandidates,anglescan_ncand); 
+    if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_nShowerCandidates,anglescan_ncand); 
+    else FillHistogram(cutList.hCut_2Track_nShowerCandidates,anglescan_ncand); 
+    
     if( Cut_ConeBlobs == 1 || is_houghtransform_applied ) return false;
     cutList.nCut_ConeBlobs.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_ConeBlobs.increment(truth_isSignal, study1, study2);
@@ -997,7 +1007,7 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         FillHistogram(pi0.E_error, error_E);
         FillHistogram(pi0.E_Diff, reco_E-true_E);
     
-        pi0.signal_P->Fill(pi0_true_P);
+        FillHistogram(pi0.signal_P, pi0_true_P);
     }
 }
 

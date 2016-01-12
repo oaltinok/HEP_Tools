@@ -90,10 +90,19 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetXaxis()->SetTitle("N(Proton Candidates)");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_nProtonCandidates.push_back(temp);
+ 
+        temp = new MnvH1D( Form("%s_%d","hCut_nShowerCandidates",i),"N(Shower Candidates)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Shower Candidates)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_nShowerCandidates.push_back(temp);
         
         // --------------------------------------------------------------------
         // 1 Track
         // --------------------------------------------------------------------
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_nShowerCandidates",i),"N(Shower Candidates)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Shower Candidates)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_1Track_nShowerCandidates.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_1Track_eVis_nuclearTarget",i),"Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
         temp->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
@@ -138,6 +147,11 @@ void CCProtonPi0_CutList::initHistograms()
         // --------------------------------------------------------------------
         // 2 Track
         // --------------------------------------------------------------------
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_nShowerCandidates",i),"N(Shower Candidates)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
+        temp->GetXaxis()->SetTitle("N(Shower Candidates)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        hCut_2Track_nShowerCandidates.push_back(temp);
+        
         temp = new MnvH1D( Form("%s_%d","hCut_2Track_eVis_nuclearTarget",i),"Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
         temp->GetXaxis()->SetTitle("Visible Energy in Nuclear Target [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.eVis_nuclearTarget.get_width()));
@@ -199,6 +213,10 @@ void CCProtonPi0_CutList::initHistograms()
     all_signal_pi0_P->GetXaxis()->SetTitle("Momentum [GeV]");
     all_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
  
+    minos_signal_pi0_P = new TH1D( "minos_signal_pi0_P","Momentum for MINOS Matched Signal Events",10,binsP);
+    minos_signal_pi0_P->GetXaxis()->SetTitle("Momentum [GeV]");
+    minos_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
+
     all_signal_pi0_theta = new TH1D( "all_signal_pi0_theta","Theta for Signal Events",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max());
     all_signal_pi0_theta->GetXaxis()->SetTitle("Theta");
     all_signal_pi0_theta->GetYaxis()->SetTitle("N(Events)");
@@ -476,8 +494,10 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_nTracks_Discarded[i]->Write();
         hCut_Michel[i]->Write();
         hCut_nProtonCandidates[i]->Write();
+        hCut_nShowerCandidates[i]->Write();
         
         // 1 Track
+        hCut_1Track_nShowerCandidates[i]->Write();
         hCut_1Track_eVis_nuclearTarget[i]->Write();
         hCut_1Track_eVis_other[i]->Write();
         hCut_1Track_pi0invMass[i]->Write();
@@ -488,6 +508,7 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_1Track_neutrinoE[i]->Write();
        
         // 2 Track 
+        hCut_2Track_nShowerCandidates[i]->Write();
         hCut_2Track_eVis_nuclearTarget[i]->Write();
         hCut_2Track_eVis_other[i]->Write();
         hCut_2Track_pi0invMass[i]->Write();
@@ -503,6 +524,7 @@ void CCProtonPi0_CutList::writeHistograms()
 
     // MC Only
     all_signal_pi0_P->Write();
+    minos_signal_pi0_P->Write();
     all_signal_pi0_theta->Write();
     
     mc_w_DIS->Write();

@@ -91,8 +91,10 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_nTracks_Discarded;
         vector<MnvH1D*> hCut_Michel;
         vector<MnvH1D*> hCut_nProtonCandidates;
+        vector<MnvH1D*> hCut_nShowerCandidates;
         
         // 1Track
+        vector<MnvH1D*> hCut_1Track_nShowerCandidates;
         vector<MnvH1D*> hCut_1Track_eVis_nuclearTarget;
         vector<MnvH1D*> hCut_1Track_eVis_other;
         vector<MnvH1D*> hCut_1Track_pi0invMass;
@@ -103,6 +105,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_1Track_neutrinoE;
 
         // 2Track
+        vector<MnvH1D*> hCut_2Track_nShowerCandidates;
         vector<MnvH1D*> hCut_2Track_eVis_nuclearTarget;
         vector<MnvH1D*> hCut_2Track_eVis_other;
         vector<MnvH1D*> hCut_2Track_pi0invMass;
@@ -117,6 +120,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
  
         // MC Only Histograms
         TH1D* all_signal_pi0_P;
+        TH1D* minos_signal_pi0_P;
         TH1D* all_signal_pi0_theta;
         TH1D* mc_w_DIS;
         TH1D* mc_w_RES;
