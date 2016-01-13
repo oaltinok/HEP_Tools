@@ -41,7 +41,7 @@ class CCProtonPi0_NTupleAnalysis
        
         string ana_folder;
         // Constants 
-        static const int nHistograms = 13;
+        static const int nHistograms = 15;
         static const int nTopologies = 2;
         
         static const string version;

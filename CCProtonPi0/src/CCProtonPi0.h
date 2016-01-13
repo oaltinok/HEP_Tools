@@ -145,6 +145,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool m_keepAfter_michel_cuts;
         bool m_keepAfter_proton_cuts;
         bool m_keepAfter_pi0_cuts;
+        
+        bool m_removeEvents_withMichel;
 
         // Algorihm Flow
         bool m_writeFSParticle_Table;
@@ -175,7 +177,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool fThresholdVertexEnergy;
         
         // ConeBlobs
-        double m_energyHoughlimit;     ///< Energy limit to start using Hough T.
         double m_rejectedClustersTime; ///< window time  to allow clusters
         
         bool m_TrytoRecoverBlobReco;

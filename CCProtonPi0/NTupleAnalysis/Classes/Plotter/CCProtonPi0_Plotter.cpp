@@ -36,7 +36,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotPion_MCOnly();
     plotCutHistograms_MCOnly();
     //plotPi0Blob_MCOnly();
-    //plotEfficiencyCurves();
+    plotEfficiencyCurves();
 
     //--------------------------------------------------------------------------
     //  Plot Function Reserved for Other Studies
@@ -410,7 +410,6 @@ void CCProtonPi0_Plotter::plotCutHistograms_MCOnly()
     CutArrow Proton_Count(3,"L"); 
     DrawStackedMC(rootDir_CutHists,"hCut_nProtonCandidates",plotDir,1 , Proton_Count);
     
-    
     DrawStackedMC(rootDir_CutHists,"hCut_nShowerCandidates",plotDir);
     DrawStackedMC(rootDir_CutHists,"hCut_1Track_nShowerCandidates",plotDir);
     DrawStackedMC(rootDir_CutHists,"hCut_2Track_nShowerCandidates",plotDir);
@@ -428,14 +427,15 @@ void CCProtonPi0_Plotter::plotCutHistograms_MCOnly()
     CutArrow eVis_other_max_1Track(2000,"L"); 
     DrawStackedMC(rootDir_CutHists,"hCut_1Track_eVis_other",plotDir, 2, eVis_other_min_1Track, eVis_other_max_1Track);
 
-    CutArrow gamma1_ConvDist_1Track(15,"R"); 
+    CutArrow gamma1_ConvDist_1Track(14,"R"); 
     DrawStackedMC(rootDir_CutHists,"hCut_1Track_gamma1ConvDist",plotDir, 1, gamma1_ConvDist_1Track);
 
-    CutArrow gamma2_ConvDist_1Track(15,"R"); 
-    DrawStackedMC(rootDir_CutHists,"hCut_1Track_gamma2ConvDist",plotDir, 1, gamma2_ConvDist_1Track);
+    //CutArrow gamma2_ConvDist_1Track(15,"R"); 
+    //DrawStackedMC(rootDir_CutHists,"hCut_1Track_gamma2ConvDist",plotDir, 1, gamma2_ConvDist_1Track);
+    DrawStackedMC(rootDir_CutHists,"hCut_1Track_gamma2ConvDist",plotDir);
 
-    CutArrow pi0invMass_min_1Track(75,"R"); 
-    CutArrow pi0invMass_max_1Track(195,"L"); 
+    CutArrow pi0invMass_min_1Track(60,"R"); 
+    CutArrow pi0invMass_max_1Track(200,"L"); 
     DrawStackedMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min_1Track, pi0invMass_max_1Track);
     DrawStackedMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min_1Track, pi0invMass_max_1Track);
 
@@ -452,14 +452,15 @@ void CCProtonPi0_Plotter::plotCutHistograms_MCOnly()
     CutArrow eVis_other_max_2Track(2000,"L"); 
     DrawStackedMC(rootDir_CutHists,"hCut_2Track_eVis_other",plotDir, 2, eVis_other_min_2Track, eVis_other_max_2Track);
 
-    CutArrow gamma1_ConvDist_2Track(15,"R"); 
+    CutArrow gamma1_ConvDist_2Track(14,"R"); 
     DrawStackedMC(rootDir_CutHists,"hCut_2Track_gamma1ConvDist",plotDir, 1, gamma1_ConvDist_2Track);
 
-    CutArrow gamma2_ConvDist_2Track(15,"R"); 
-    DrawStackedMC(rootDir_CutHists,"hCut_2Track_gamma2ConvDist",plotDir, 1, gamma2_ConvDist_2Track);
+    //CutArrow gamma2_ConvDist_2Track(15,"R"); 
+    //DrawStackedMC(rootDir_CutHists,"hCut_2Track_gamma2ConvDist",plotDir, 1, gamma2_ConvDist_2Track);
+    DrawStackedMC(rootDir_CutHists,"hCut_2Track_gamma2ConvDist",plotDir);
 
-    CutArrow pi0invMass_min_2Track(75,"R"); 
-    CutArrow pi0invMass_max_2Track(195,"L"); 
+    CutArrow pi0invMass_min_2Track(60,"R"); 
+    CutArrow pi0invMass_max_2Track(200,"L"); 
     DrawStackedMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min_2Track, pi0invMass_max_2Track);
     DrawStackedMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min_2Track, pi0invMass_max_2Track);
 
@@ -645,7 +646,7 @@ void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
     rootDir_OtherStudies.data = "";
 
     // Set MC Root Dir
-    rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_48.root";
+    rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_50.root";
     rootDir_Interaction.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Interaction.root";
     rootDir_Muon.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Muon.root";
     rootDir_Proton.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Proton.root";

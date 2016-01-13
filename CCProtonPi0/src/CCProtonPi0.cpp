@@ -125,6 +125,8 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
     declareProperty("KeepAfter_ProtonCuts", m_keepAfter_proton_cuts = false);
     declareProperty("KeepAfter_Pi0Cuts", m_keepAfter_pi0_cuts = false);
     
+    declareProperty("RemoveEvents_WithMichel", m_removeEvents_withMichel = true);
+    
     declareProperty("DoPlausibilityCuts",   m_DoPlausibilityCuts    =   true);
     declareProperty("DoTruthMatch",         m_DoTruthMatch          =   true);
 
@@ -161,7 +163,6 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
     declareProperty( "VertexBlobRadius", m_vertex_blob_radius = 90.0 * CLHEP::millimeter ); 
 
     // Cone Blobs and HoughBlob
-    declareProperty( "HoughEnergyLimit",      m_energyHoughlimit      = 900 * CLHEP::MeV ); 
     declareProperty( "RejectedClustersTime",  m_rejectedClustersTime  = 25 * CLHEP::ns );
 
     declareProperty( "TrytoRecoverBlobReco", m_TrytoRecoverBlobReco = false);
@@ -328,14 +329,15 @@ StatusCode CCProtonPi0::initialize()
     declareBoolTruthBranch("isBckg_MultiPi0");
 
     // Background Types
-    declareIntTruthBranch("Bckg_nPion", -1);
     declareIntTruthBranch("Bckg_nOther", -1);
     declareBoolTruthBranch("isBckg_NC");
     declareBoolTruthBranch("isBckg_AntiNeutrino");
     declareBoolTruthBranch("isBckg_QELike");
-    declareBoolTruthBranch("isBckg_SinglePion");
-    declareBoolTruthBranch("isBckg_DoublePion");
-    declareBoolTruthBranch("isBckg_MultiPion");
+    declareBoolTruthBranch("isBckg_SingleChargedPion");
+    declareBoolTruthBranch("isBckg_DoublePionWithPi0");
+    declareBoolTruthBranch("isBckg_DoublePionWithoutPi0");
+    declareBoolTruthBranch("isBckg_MultiPionWithPi0");
+    declareBoolTruthBranch("isBckg_MultiPionWithoutPi0");
     declareBoolTruthBranch("isBckg_Other");
 
     // Background Branching - For Each Background Type
@@ -954,12 +956,15 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //==========================================================================
     debug()<<"START: Michel Electron Search"<<endmsg;
 
-    if ( VertexHasMichels(event) ){
+    bool has_michel_vertex = VertexHasMichels(event);
+    bool has_michel_trackend = TrackEndPointHasMichels(event);
+    
+    if (m_removeEvents_withMichel && has_michel_vertex ){
         if( m_keepAfter_michel_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
 
-    if ( TrackEndPointHasMichels(event) ){
+    if ( m_removeEvents_withMichel && has_michel_trackend ){
         if( m_keepAfter_michel_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
     }
@@ -1549,8 +1554,10 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
     int nAntiMuon = 0;
     int nMuon = 0;
     int nNucleon = 0;
-    int nPion = 0;
+    int nPiCharged = 0;
+    int nPiZero = 0;
     int nOther = 0;
+
     // Count FS Primary Particles 
     for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
 
@@ -1561,7 +1568,8 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
             if ( particle_PDG == -(PDG::muon) ) nAntiMuon++;
             else if (particle_PDG == PDG::muon) nMuon++;
             else if ( (particle_PDG == PDG::proton) || (particle_PDG == PDG::neutron) ) nNucleon++;
-            else if ( (std::abs(particle_PDG) == PDG::pi) || (particle_PDG == PDG::pi0 ) ) nPion++;
+            else if ( std::abs(particle_PDG) == PDG::pi ) nPiCharged++;
+            else if ( particle_PDG == PDG::pi0 ) nPiZero++;
             else nOther++;    
         }
     } 
@@ -1572,17 +1580,23 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
     bool isNC = isInteractionNC(truthEvent);
     bool isAntiNeutrino = false;
     bool isQELike = false;
-    bool isSinglePion = false;
-    bool isDoublePion = false;
-    bool isMultiPion = false;
+    bool isSingleChargedPion = false;
+    bool isDoublePionWithPi0 = false;
+    bool isDoublePionWithoutPi0 = false;
+    bool isMultiPionWithPi0 = false;
+    bool isMultiPionWithoutPi0 = false;
     bool isOther = false;
 
-    if (isNC) ; //Do Nothing
+    if (isNC) ; // Do Nothing
     else if (nAntiMuon == 1) isAntiNeutrino = true;
-    else if (nPion == 0 && nOther == 0) isQELike = true;
-    else if (nPion == 1) isSinglePion = true;
-    else if (nPion == 2) isDoublePion = true;
-    else if (nPion > 2) isMultiPion = true;
+    else if (nOther > 0) isOther = true;
+    else if (nPiZero == 0 && nPiCharged == 0) isQELike = true;
+    else if (nPiZero == 0 && nPiCharged == 1) isSingleChargedPion = true;
+    else if (nPiZero == 1 && nPiCharged == 1) isDoublePionWithPi0 = true;
+    else if (nPiZero == 2 && nPiCharged == 0) isDoublePionWithPi0 = true;
+    else if (nPiZero == 0 && nPiCharged == 2) isDoublePionWithoutPi0 = true;
+    else if (nPiZero > 0 && nPiCharged > 0) isMultiPionWithPi0 = true;
+    else if (nPiZero == 0 && nPiCharged > 2) isMultiPionWithoutPi0 = true;
     else isOther = true;
 
     // -------------------------------------------------------------------------
@@ -1591,14 +1605,15 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
     bool hasMichel = false;
     hasMichel = checkMichel(truthEvent);
 
-    truthEvent->setIntData("Bckg_nPion",nPion);
     truthEvent->setIntData("Bckg_nOther",nOther);
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_NC", isNC );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_AntiNeutrino", isAntiNeutrino );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_QELike", isQELike );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_SinglePion", isSinglePion );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_DoublePion", isDoublePion );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_MultiPion", isMultiPion );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_SingleChargedPion", isSingleChargedPion );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_DoublePionWithPi0", isDoublePionWithPi0 );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_DoublePionWithoutPi0", isDoublePionWithoutPi0 );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_MultiPionWithPi0", isMultiPionWithPi0 );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_MultiPionWithoutPi0", isMultiPionWithoutPi0 );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_Other", isOther );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_withMichel", hasMichel );
 }
@@ -3599,14 +3614,6 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
     // Check Energy to Analyze
     EnergyToAnalyze = energyTracker + energyECAL + energyHCAL;
     debug() << "Energy to analyze = "<< EnergyToAnalyze << endmsg;
-
-    // Return False if the Energy is Higher than Limit
-    if ( EnergyToAnalyze >= m_energyHoughlimit ){
-        debug() <<"Energy to analyze is higher than the limit! "
-            <<EnergyToAnalyze<<" >= "<<m_energyHoughlimit<<endmsg;
-        return false;
-    }
-
 
     //--------------------------------------------------------------------------
     //

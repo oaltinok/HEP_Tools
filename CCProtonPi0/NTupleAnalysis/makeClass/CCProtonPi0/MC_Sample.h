@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Jan  7 10:25:29 2016 by ROOT version 5.34/05
+// Wed Jan 13 08:11:46 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -291,11 +291,11 @@ public :
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[140];   //[g1dedx_rev_cluster_energy_sz]
+   Double_t        g1dedx_rev_cluster_energy[143];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[86];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[110];   //[g2dedx_rev_cluster_energy_sz]
    Double_t        gamma1_direction[3];
    Double_t        gamma1_vertex[3];
    Double_t        gamma2_direction[3];
@@ -327,16 +327,17 @@ public :
    Bool_t          truth_isBckg_NC;
    Bool_t          truth_isBckg_AntiNeutrino;
    Bool_t          truth_isBckg_QELike;
-   Bool_t          truth_isBckg_SinglePion;
-   Bool_t          truth_isBckg_DoublePion;
-   Bool_t          truth_isBckg_MultiPion;
+   Bool_t          truth_isBckg_SingleChargedPion;
+   Bool_t          truth_isBckg_DoublePionWithPi0;
+   Bool_t          truth_isBckg_DoublePionWithoutPi0;
+   Bool_t          truth_isBckg_MultiPionWithPi0;
+   Bool_t          truth_isBckg_MultiPionWithoutPi0;
    Bool_t          truth_isBckg_Other;
    Bool_t          truth_isBckg_withMichel;
    Int_t           truth_Bckg_nOther;
    Int_t           truth_Bckg_nPi0_Primary;
    Int_t           truth_Bckg_nPi0_Secondary;
    Int_t           truth_Bckg_nPi0_Total;
-   Int_t           truth_Bckg_nPion;
    Int_t           truth_N_FSParticles;
    Int_t           truth_N_other;
    Int_t           truth_N_pi0;
@@ -986,16 +987,17 @@ public :
    TBranch        *b_truth_isBckg_NC;   //!
    TBranch        *b_truth_isBckg_AntiNeutrino;   //!
    TBranch        *b_truth_isBckg_QELike;   //!
-   TBranch        *b_truth_isBckg_SinglePion;   //!
-   TBranch        *b_truth_isBckg_DoublePion;   //!
-   TBranch        *b_truth_isBckg_MultiPion;   //!
+   TBranch        *b_truth_isBckg_SingleChargedPion;   //!
+   TBranch        *b_truth_isBckg_DoublePionWithPi0;   //!
+   TBranch        *b_truth_isBckg_DoublePionWithoutPi0;   //!
+   TBranch        *b_truth_isBckg_MultiPionWithPi0;   //!
+   TBranch        *b_truth_isBckg_MultiPionWithoutPi0;   //!
    TBranch        *b_truth_isBckg_Other;   //!
    TBranch        *b_truth_isBckg_withMichel;   //!
    TBranch        *b_truth_Bckg_nOther;   //!
    TBranch        *b_truth_Bckg_nPi0_Primary;   //!
    TBranch        *b_truth_Bckg_nPi0_Secondary;   //!
    TBranch        *b_truth_Bckg_nPi0_Total;   //!
-   TBranch        *b_truth_Bckg_nPion;   //!
    TBranch        *b_truth_N_FSParticles;   //!
    TBranch        *b_truth_N_other;   //!
    TBranch        *b_truth_N_pi0;   //!
@@ -1373,7 +1375,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_48.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_50.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1730,16 +1732,17 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_isBckg_NC", &truth_isBckg_NC, &b_truth_isBckg_NC);
    fChain->SetBranchAddress("truth_isBckg_AntiNeutrino", &truth_isBckg_AntiNeutrino, &b_truth_isBckg_AntiNeutrino);
    fChain->SetBranchAddress("truth_isBckg_QELike", &truth_isBckg_QELike, &b_truth_isBckg_QELike);
-   fChain->SetBranchAddress("truth_isBckg_SinglePion", &truth_isBckg_SinglePion, &b_truth_isBckg_SinglePion);
-   fChain->SetBranchAddress("truth_isBckg_DoublePion", &truth_isBckg_DoublePion, &b_truth_isBckg_DoublePion);
-   fChain->SetBranchAddress("truth_isBckg_MultiPion", &truth_isBckg_MultiPion, &b_truth_isBckg_MultiPion);
+   fChain->SetBranchAddress("truth_isBckg_SingleChargedPion", &truth_isBckg_SingleChargedPion, &b_truth_isBckg_SingleChargedPion);
+   fChain->SetBranchAddress("truth_isBckg_DoublePionWithPi0", &truth_isBckg_DoublePionWithPi0, &b_truth_isBckg_DoublePionWithPi0);
+   fChain->SetBranchAddress("truth_isBckg_DoublePionWithoutPi0", &truth_isBckg_DoublePionWithoutPi0, &b_truth_isBckg_DoublePionWithoutPi0);
+   fChain->SetBranchAddress("truth_isBckg_MultiPionWithPi0", &truth_isBckg_MultiPionWithPi0, &b_truth_isBckg_MultiPionWithPi0);
+   fChain->SetBranchAddress("truth_isBckg_MultiPionWithoutPi0", &truth_isBckg_MultiPionWithoutPi0, &b_truth_isBckg_MultiPionWithoutPi0);
    fChain->SetBranchAddress("truth_isBckg_Other", &truth_isBckg_Other, &b_truth_isBckg_Other);
    fChain->SetBranchAddress("truth_isBckg_withMichel", &truth_isBckg_withMichel, &b_truth_isBckg_withMichel);
    fChain->SetBranchAddress("truth_Bckg_nOther", &truth_Bckg_nOther, &b_truth_Bckg_nOther);
    fChain->SetBranchAddress("truth_Bckg_nPi0_Primary", &truth_Bckg_nPi0_Primary, &b_truth_Bckg_nPi0_Primary);
    fChain->SetBranchAddress("truth_Bckg_nPi0_Secondary", &truth_Bckg_nPi0_Secondary, &b_truth_Bckg_nPi0_Secondary);
    fChain->SetBranchAddress("truth_Bckg_nPi0_Total", &truth_Bckg_nPi0_Total, &b_truth_Bckg_nPi0_Total);
-   fChain->SetBranchAddress("truth_Bckg_nPion", &truth_Bckg_nPion, &b_truth_Bckg_nPion);
    fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
    fChain->SetBranchAddress("truth_N_other", &truth_N_other, &b_truth_N_other);
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);

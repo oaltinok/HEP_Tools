@@ -37,9 +37,11 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
         void fillBackground(bool NC,
                             bool AntiNeutrino,
                             bool QELike,
-                            bool SinglePion,
-                            bool DoublePion,
-                            bool MultiPion,
+                            bool SingleChargedPion,
+                            bool DoublePionWithPi0,
+                            bool DoublePionWithoutPi0,
+                            bool MultiPionWithPi0,
+                            bool MultiPionWithoutPi0,
                             bool Other,
                             bool withMichel);
     private:
@@ -59,9 +61,11 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
         Background bckg_NC;
         Background bckg_AntiNeutrino;
         Background bckg_QELike;
-        Background bckg_SinglePion;
-        Background bckg_DoublePion;
-        Background bckg_MultiPion;
+        Background bckg_SingleChargedPion;
+        Background bckg_DoublePionWithPi0;
+        Background bckg_DoublePionWithoutPi0;
+        Background bckg_MultiPionWithPi0;
+        Background bckg_MultiPionWithoutPi0;
         Background bckg_Other;
         Background bckg_Total;
 

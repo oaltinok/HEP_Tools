@@ -19,10 +19,10 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     writeFSParticleMomentum = false;
 
     // Event Selections
-    applyVertexCount = true;
+    applyVertexCount = false;
     max_nVertices = 2;
 
-    applyProtonCount = true;
+    applyProtonCount = false;
     max_nProtonCandidates = 2;
 
     applyProtonScore = true;
@@ -32,13 +32,14 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     minPIDDiff = 0.45;
 
     applyPhotonDistance = true;
-    minPhotonDistance = 15; //cm
+    minPhotonDistance_1 = 14; //cm
+    minPhotonDistance_2 = 0; //cm
 
     applyBeamEnergy = true;
     max_beamEnergy = 20.0; // GeV
 
-    min_Pi0_invMass = 75.0;
-    max_Pi0_invMass = 195.0;
+    min_Pi0_invMass = 60.0;
+    max_Pi0_invMass = 200.0;
 
     applyDeltaInvMass = false;
     min_Delta_invMass = 40.0;
@@ -180,7 +181,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         //----------------------------------------------------------------------
         if(m_isMC && !truth_isSignal) {
             bckgTool.fillBackgroundWithPi0(truth_isBckg_NoPi0, truth_isBckg_SinglePi0, truth_isBckg_MultiPi0, truth_isBckg_withMichel);                                    
-            bckgTool.fillBackground(truth_isBckg_NC, truth_isBckg_AntiNeutrino, truth_isBckg_QELike, truth_isBckg_SinglePion, truth_isBckg_DoublePion, truth_isBckg_MultiPion, truth_isBckg_Other, truth_isBckg_withMichel);                                    
+            bckgTool.fillBackground(truth_isBckg_NC, truth_isBckg_AntiNeutrino, truth_isBckg_QELike, truth_isBckg_SingleChargedPion, truth_isBckg_DoublePionWithPi0, truth_isBckg_DoublePionWithoutPi0, truth_isBckg_MultiPionWithPi0, truth_isBckg_MultiPionWithoutPi0, truth_isBckg_Other, truth_isBckg_withMichel);                                    
         }
 
         //----------------------------------------------------------------------
@@ -665,6 +666,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         FillHistogram(cutList.hCut_2Track_eVis_nuclearTarget,preFilter_evis_NuclearTarget);
         FillHistogram(cutList.hCut_2Track_eVis_other,preFilter_evis_TotalExceptNuclearTarget);
     }
+    
     if( Cut_PreFilter_Pi0 == 1) return false;
     cutList.nCut_PreFilter_Pi0.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_PreFilter_Pi0.increment(truth_isSignal, study1, study2);
@@ -674,7 +676,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     FillHistogram(cutList.hCut_nShowerCandidates,anglescan_ncand); 
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_nShowerCandidates,anglescan_ncand); 
     else FillHistogram(cutList.hCut_2Track_nShowerCandidates,anglescan_ncand); 
-    
+
     if( Cut_ConeBlobs == 1 || is_houghtransform_applied ) return false;
     cutList.nCut_ConeBlobs.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_ConeBlobs.increment(truth_isSignal, study1, study2);
@@ -696,7 +698,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_gamma1ConvDist,gamma1_dist_vtx * 0.1);
     else FillHistogram(cutList.hCut_2Track_gamma1ConvDist,gamma1_dist_vtx * 0.1);
 
-    if (applyPhotonDistance && gamma1_dist_vtx * 0.1 < minPhotonDistance) return false;
+    if (applyPhotonDistance && gamma1_dist_vtx * 0.1 < minPhotonDistance_1) return false;
     cutList.nCut_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
@@ -705,7 +707,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_gamma2ConvDist,gamma2_dist_vtx * 0.1);
     else FillHistogram(cutList.hCut_2Track_gamma2ConvDist,gamma2_dist_vtx * 0.1);
 
-    if (applyPhotonDistance && gamma2_dist_vtx * 0.1 < minPhotonDistance) return false;
+    if (applyPhotonDistance && gamma2_dist_vtx * 0.1 < minPhotonDistance_2) return false;
     cutList.nCut_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
@@ -1215,10 +1217,12 @@ int CCProtonPi0_Analyzer::GetBackgroundTypeInd()
     if (truth_isBckg_NC) return 6;
     else if (truth_isBckg_AntiNeutrino) return 7;
     else if (truth_isBckg_QELike) return 8;
-    else if (truth_isBckg_SinglePion) return 9;
-    else if (truth_isBckg_DoublePion) return 10;
-    else if (truth_isBckg_MultiPion) return 11;
-    else if (truth_isBckg_Other) return 12;
+    else if (truth_isBckg_SingleChargedPion) return 9;
+    else if (truth_isBckg_DoublePionWithPi0) return 10;
+    else if (truth_isBckg_DoublePionWithoutPi0) return 11;
+    else if (truth_isBckg_MultiPionWithPi0) return 12;
+    else if (truth_isBckg_MultiPionWithoutPi0) return 13;
+    else if (truth_isBckg_Other) return 14;
     else{
         cout<<"WARNING! No Background Type Found - Returning -1"<<endl;
         return -1;

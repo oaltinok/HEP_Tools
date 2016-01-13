@@ -1,18 +1,28 @@
-CCPROTONPI0_V="v2_49"
+CCPROTONPI0_V="v2_50"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	No Major Changes
+	Background Type Improved
+		NC
+		CC-Anti Neutrino
+		QE Like 
+			No Pion, No other particles than Nucleons and muon
+		Single Charged Pion
+		Double Pions with Pi0
+		Double Pions without Pi0
+		Multiple Pions with Pi0
+		Multiple Pions withotu Pi0
+		Other
+	
+	Keeping Events with Michel Electron is Optional
+		Decided not to remove these events in reconstruction stage
 
+	Removed HoughEnergyLimit inside ConeBlobs
+		PreFilterPi0 already checks max energy no need to check again
+		
 --------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	New Package: TruthAnalysis
-		Class: TruthAnalyzer
-			Loops over Truth Branch of CCProtonPi0 NTuples
-				Get Truth Branch variables using makeClass/Truth
-			Outputs Signal & Background information
-
+	BackgroundTool Updated for the new Background Types
 	Plotter Improved
-		MC Only Background Plots added
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

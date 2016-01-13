@@ -162,6 +162,8 @@ class CCProtonPi0_Plotter
         void DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir);
         
         // Helper
+        void FormTObjArray_BckgType(TFile* f_mc, std::string var_name, TObjArray* mc_hists, double &hist_max, double &bin_width); 
+        void FormTObjArray_BckgWithPi0(TFile* f_mc, std::string var_name, TObjArray* mc_hists, double &hist_max, double &bin_width); 
         void AddNormBox(MnvPlotter* plotter, bool isPOTNorm, double mc_ratio);
         void SaveRecoRatioPoints(rootDir& dir, std::string var_name, std::string plotDir);
         void Save2DHistPoints(rootDir& dir, std::string var_name, std::string plotDir);     

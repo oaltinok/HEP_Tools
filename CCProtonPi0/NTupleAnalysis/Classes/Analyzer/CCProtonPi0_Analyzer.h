@@ -129,7 +129,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double pID_KE_Limit;
         double minProtonScore_LLR;
         double minPIDDiff;
-        double minPhotonDistance;
+        double minPhotonDistance_1;
+        double minPhotonDistance_2;
         double min_Pi0_invMass;
         double max_Pi0_invMass;
         double min_Delta_invMass;
@@ -437,11 +438,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Int_t           g1dedx_cluster_energy_sz;
         Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
         Int_t           g1dedx_rev_cluster_energy_sz;
-        Double_t        g1dedx_rev_cluster_energy[140];   //[g1dedx_rev_cluster_energy_sz]
+        Double_t        g1dedx_rev_cluster_energy[143];   //[g1dedx_rev_cluster_energy_sz]
         Int_t           g2dedx_cluster_energy_sz;
         Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
         Int_t           g2dedx_rev_cluster_energy_sz;
-        Double_t        g2dedx_rev_cluster_energy[86];   //[g2dedx_rev_cluster_energy_sz]
+        Double_t        g2dedx_rev_cluster_energy[110];   //[g2dedx_rev_cluster_energy_sz]
         Double_t        gamma1_direction[3];
         Double_t        gamma1_vertex[3];
         Double_t        gamma2_direction[3];
@@ -473,16 +474,17 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Bool_t          truth_isBckg_NC;
         Bool_t          truth_isBckg_AntiNeutrino;
         Bool_t          truth_isBckg_QELike;
-        Bool_t          truth_isBckg_SinglePion;
-        Bool_t          truth_isBckg_DoublePion;
-        Bool_t          truth_isBckg_MultiPion;
+        Bool_t          truth_isBckg_SingleChargedPion;
+        Bool_t          truth_isBckg_DoublePionWithPi0;
+        Bool_t          truth_isBckg_DoublePionWithoutPi0;
+        Bool_t          truth_isBckg_MultiPionWithPi0;
+        Bool_t          truth_isBckg_MultiPionWithoutPi0;
         Bool_t          truth_isBckg_Other;
         Bool_t          truth_isBckg_withMichel;
         Int_t           truth_Bckg_nOther;
         Int_t           truth_Bckg_nPi0_Primary;
         Int_t           truth_Bckg_nPi0_Secondary;
         Int_t           truth_Bckg_nPi0_Total;
-        Int_t           truth_Bckg_nPion;
         Int_t           truth_N_FSParticles;
         Int_t           truth_N_other;
         Int_t           truth_N_pi0;
@@ -1132,16 +1134,17 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_truth_isBckg_NC;   //!
         TBranch        *b_truth_isBckg_AntiNeutrino;   //!
         TBranch        *b_truth_isBckg_QELike;   //!
-        TBranch        *b_truth_isBckg_SinglePion;   //!
-        TBranch        *b_truth_isBckg_DoublePion;   //!
-        TBranch        *b_truth_isBckg_MultiPion;   //!
+        TBranch        *b_truth_isBckg_SingleChargedPion;   //!
+        TBranch        *b_truth_isBckg_DoublePionWithPi0;   //!
+        TBranch        *b_truth_isBckg_DoublePionWithoutPi0;   //!
+        TBranch        *b_truth_isBckg_MultiPionWithPi0;   //!
+        TBranch        *b_truth_isBckg_MultiPionWithoutPi0;   //!
         TBranch        *b_truth_isBckg_Other;   //!
         TBranch        *b_truth_isBckg_withMichel;   //!
         TBranch        *b_truth_Bckg_nOther;   //!
         TBranch        *b_truth_Bckg_nPi0_Primary;   //!
         TBranch        *b_truth_Bckg_nPi0_Secondary;   //!
         TBranch        *b_truth_Bckg_nPi0_Total;   //!
-        TBranch        *b_truth_Bckg_nPion;   //!
         TBranch        *b_truth_N_FSParticles;   //!
         TBranch        *b_truth_N_other;   //!
         TBranch        *b_truth_N_pi0;   //!

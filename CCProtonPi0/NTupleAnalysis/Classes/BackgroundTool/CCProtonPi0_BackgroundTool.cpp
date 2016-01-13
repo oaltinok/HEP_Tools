@@ -30,9 +30,11 @@ void CCProtonPi0_BackgroundTool::initBackgrounds()
     initSingleBackground(bckg_NC, "NC");
     initSingleBackground(bckg_AntiNeutrino, "AntiNeutrino");
     initSingleBackground(bckg_QELike, "QELike");
-    initSingleBackground(bckg_SinglePion, "SinglePion");
-    initSingleBackground(bckg_DoublePion, "DoublePion");
-    initSingleBackground(bckg_MultiPion, "MultiPion");
+    initSingleBackground(bckg_SingleChargedPion, "SingleChargedPion");
+    initSingleBackground(bckg_DoublePionWithPi0, "DoublePionWithPi0");
+    initSingleBackground(bckg_DoublePionWithoutPi0, "DoublePionWithoutPi0");
+    initSingleBackground(bckg_MultiPionWithPi0, "MultiPionWithPi0");
+    initSingleBackground(bckg_MultiPionWithoutPi0, "MultiPionWithoutPi0");
     initSingleBackground(bckg_Other, "Other");
     initSingleBackground(bckg_Total, "Total");
 }
@@ -65,7 +67,7 @@ void CCProtonPi0_BackgroundTool::fillBackgroundWithPi0(bool NoPi0, bool SinglePi
     else cout<<"WARNING! No BackgroundWithPi0 Found"<<endl;
 }
 
-void CCProtonPi0_BackgroundTool::fillBackground(bool NC, bool AntiNeutrino, bool QELike, bool SinglePion, bool DoublePion, bool MultiPion, bool Other, bool withMichel)
+void CCProtonPi0_BackgroundTool::fillBackground(bool NC, bool AntiNeutrino, bool QELike, bool SingleChargedPion, bool DoublePionWithPi0, bool DoublePionWithoutPi0,  bool MultiPionWithPi0, bool MultiPionWithoutPi0, bool Other, bool withMichel)
 {
     // Update Total Background
     updateBackground(bckg_Total,withMichel);
@@ -74,9 +76,11 @@ void CCProtonPi0_BackgroundTool::fillBackground(bool NC, bool AntiNeutrino, bool
     if (NC) updateBackground(bckg_NC,withMichel);
     else if (AntiNeutrino) updateBackground(bckg_AntiNeutrino,withMichel);
     else if (QELike) updateBackground(bckg_QELike,withMichel);
-    else if (SinglePion) updateBackground(bckg_SinglePion,withMichel);
-    else if (DoublePion) updateBackground(bckg_DoublePion,withMichel);
-    else if (MultiPion) updateBackground(bckg_MultiPion,withMichel);
+    else if (SingleChargedPion) updateBackground(bckg_SingleChargedPion,withMichel);
+    else if (DoublePionWithPi0) updateBackground(bckg_DoublePionWithPi0,withMichel);
+    else if (DoublePionWithoutPi0) updateBackground(bckg_DoublePionWithoutPi0,withMichel);
+    else if (MultiPionWithPi0) updateBackground(bckg_MultiPionWithPi0,withMichel);
+    else if (MultiPionWithoutPi0) updateBackground(bckg_MultiPionWithoutPi0,withMichel);
     else if (Other) updateBackground(bckg_Other,withMichel);
     else cout<<"WARNING! No Background Type Found!"<<endl;
 }
@@ -107,9 +111,11 @@ void CCProtonPi0_BackgroundTool::formBackgroundVectors()
     BackgroundTypeVector.push_back(bckg_NC);
     BackgroundTypeVector.push_back(bckg_AntiNeutrino);
     BackgroundTypeVector.push_back(bckg_QELike);
-    BackgroundTypeVector.push_back(bckg_SinglePion);
-    BackgroundTypeVector.push_back(bckg_DoublePion);
-    BackgroundTypeVector.push_back(bckg_MultiPion);
+    BackgroundTypeVector.push_back(bckg_SingleChargedPion);
+    BackgroundTypeVector.push_back(bckg_DoublePionWithPi0);
+    BackgroundTypeVector.push_back(bckg_DoublePionWithoutPi0);
+    BackgroundTypeVector.push_back(bckg_MultiPionWithPi0);
+    BackgroundTypeVector.push_back(bckg_MultiPionWithoutPi0);
     BackgroundTypeVector.push_back(bckg_Other);
     BackgroundTypeVector.push_back(bckg_Total);
 }
