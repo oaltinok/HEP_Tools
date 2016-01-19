@@ -36,7 +36,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_Vertex_None;
         CCProtonPi0_Cut nCut_Vertex_Not_Reconstructable; 
         CCProtonPi0_Cut nCut_Vertex_Not_Fiducial;
-        CCProtonPi0_Cut nCut_Vertex_Count;
         CCProtonPi0_Cut nCut_Muon_None;              
         CCProtonPi0_Cut nCut_Muon_Charge;
         CCProtonPi0_Cut nCut_Vertex_Michel_Exist; 
@@ -45,7 +44,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_Particle_None;
         CCProtonPi0_Cut nCut_Proton_None;            
         CCProtonPi0_Cut nCut_Proton_Bad;            
-        CCProtonPi0_Cut nCut_Proton_Count;
         CCProtonPi0_Cut nCut_ProtonScore;
         CCProtonPi0_Cut nCut_PreFilter_Pi0;
         CCProtonPi0_Cut nCut_ConeBlobs;
@@ -129,6 +127,28 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         // Pi0 Invariant Mass
         TH1D* pi0_invMass_1Track;
         TH1D* pi0_invMass_2Track;
+
+        // ConeBlobs Study
+        vector<MnvH1D*> OneShower_nClusters;
+        vector<MnvH1D*> OneShower_energy;
+        vector<MnvH1D*> OneShower_theta;
+        vector<MnvH1D*> OneShower_dist_vtx;
+
+        vector<MnvH1D*> ThreeShower_s1_nClusters;
+        vector<MnvH1D*> ThreeShower_s1_energy;
+        vector<MnvH1D*> ThreeShower_s1_theta;
+        vector<MnvH1D*> ThreeShower_s1_dist_vtx;
+
+        vector<MnvH1D*> ThreeShower_s2_nClusters;
+        vector<MnvH1D*> ThreeShower_s2_energy;
+        vector<MnvH1D*> ThreeShower_s2_theta;
+        vector<MnvH1D*> ThreeShower_s2_dist_vtx;
+
+        vector<MnvH1D*> ThreeShower_s3_nClusters;
+        vector<MnvH1D*> ThreeShower_s3_energy;
+        vector<MnvH1D*> ThreeShower_s3_theta;
+        vector<MnvH1D*> ThreeShower_s3_dist_vtx;
+
 
     private:
         void initHistograms();

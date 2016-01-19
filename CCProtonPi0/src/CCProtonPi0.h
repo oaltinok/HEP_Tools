@@ -1,25 +1,25 @@
 /*
-================================================================================
-CCProtonPi0
+   ================================================================================
+   CCProtonPi0
 
-    Reconstruction Package:
-        Exclusive Channel for muon,proton,pi0 on the final state
-        Uses Nightly Build
-    
-    Main Package:
-        AnalysisFramework/Ana/CCProtonPi0/
-        
-    Setup:
-        > getpack -u Ana/CCProtonPi0
-        > cmt config
-        > cmt make
-        
-    Usage:
-        There is a corresponding Options file under Tools/SystemTests
-        Use Tools/ProductionScripts/ana_scripts/ProcessAna.py
+   Reconstruction Package:
+   Exclusive Channel for muon,proton,pi0 on the final state
+   Uses Nightly Build
 
-    
-    Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
+   Main Package:
+   AnalysisFramework/Ana/CCProtonPi0/
+
+Setup:
+> getpack -u Ana/CCProtonPi0
+> cmt config
+> cmt make
+
+Usage:
+There is a corresponding Options file under Tools/SystemTests
+Use Tools/ProductionScripts/ana_scripts/ProcessAna.py
+
+
+Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
 ================================================================================
 */
 #ifndef CCPROTONPI0_H 
@@ -64,8 +64,8 @@ class IVertexFitter;
 class TRandom3;
 
 namespace Minerva {
-  class DeDetector;
-  class DeOuterDetector;
+    class DeDetector;
+    class DeOuterDetector;
 }
 
 //! This class is for Reconstruct Pi0 using muon match vertex
@@ -73,33 +73,33 @@ class CCProtonPi0 : public MinervaAnalysisTool
 {
     private:
         typedef std::vector<Minerva::NeutrinoInt*> NeutrinoVect;
-        
+
     public:
-        
+
         //! Standard constructor
         CCProtonPi0(const std::string& type, 
-                    const std::string& name, 
-                    const IInterface* parent );
-        
+                const std::string& name, 
+                const IInterface* parent );
+
         //! Destructor (mandatory for inheritance)
         virtual ~CCProtonPi0(){};
-        
+
         StatusCode initialize();
         StatusCode finalize();
-        
+
         //! Reconstruct the event (mandatory for inheritance)
         StatusCode reconstructEvent(Minerva::PhysicsEvent* event, 
-                                    Minerva::GenMinInteraction* truthEvent = NULL ) const;
-        
+                Minerva::GenMinInteraction* truthEvent = NULL ) const;
+
         //! Attach an interpretations to the event (mandatory for inheritance)
         StatusCode interpretEvent(  const Minerva::PhysicsEvent* event, 
-                                    const Minerva::GenMinInteraction* truthEvent, 
-                                    NeutrinoVect& interaction_hyp ) const;
-        
+                const Minerva::GenMinInteraction* truthEvent, 
+                NeutrinoVect& interaction_hyp ) const;
+
         StatusCode tagTruth( Minerva::GenMinInteraction* truthEvent ) const;
-        
+
         bool truthIsPlausible( const Minerva::PhysicsEvent*) const;
-        
+
     private:
         // mutable Member Variables which can be modified by const functions
         mutable Gaudi::LorentzVector m_muon_4P;
@@ -125,17 +125,17 @@ class CCProtonPi0 : public MinervaAnalysisTool
         mutable const Minerva::TG4Trajectory* fGamma2;
 
         std::vector<std::string>   m_dedx_uncertainties;
-        
+
         // Fiducial Volume
         double m_fidHexApothem;
         double m_fidUpStreamZ;
         double m_fidDownStreamZ;
-        
+
         // Analyzable Volume
         double m_recoHexApothem;
         double m_recoUpStreamZ;
         double m_recoDownStreamZ;
-        
+
         // Analysis Parameters
         double m_beamAngleBias;
 
@@ -145,14 +145,14 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool m_keepAfter_michel_cuts;
         bool m_keepAfter_proton_cuts;
         bool m_keepAfter_pi0_cuts;
-        
+
         bool m_removeEvents_withMichel;
 
         // Algorihm Flow
         bool m_writeFSParticle_Table;
         bool m_DoPlausibilityCuts;
         bool m_DoTruthMatch;
-        
+
         // Optional Studies
         bool m_study_shower_energy;
 
@@ -170,32 +170,35 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int m_Color_clusterUsed;
         int m_Color_VertexBlob;
         int m_Color_RejectedBlob;
-             
+
         // VertexBlob
         double m_vertex_blob_radius;
         bool fSkipLowEnergyClusterVtxEnergy;
         bool fThresholdVertexEnergy;
-        
+
         // ConeBlobs
         double m_rejectedClustersTime; ///< window time  to allow clusters
-        
-        bool m_TrytoRecoverBlobReco;
+
         bool m_ApplyAttenuationCorrection;
-        
         bool   m_AllowUVMatchWithMoreTolerance;
         double m_UVMatchTolerance;
         double m_UVMatchMoreTolerance;
-  
+
+        bool m_TrytoRecover_1Shower;
+        bool m_TrytoRecover_3Shower;
+        bool m_recoverShower_invMass;
+        bool m_recoverShower_Direction;
+
         TRandom3*                 m_randomGen;
         unsigned long int         m_randomSeed;
-        
+
         Minerva::DeDetector*        m_InnerDetector;
         Minerva::DeOuterDetector*   m_OuterDetector;
-        
+
         // Duplicated variables -- will fix in future
         const Minerva::DeDetector*      m_idDet;                ///< Inner detector
         const Minerva::DeOuterDetector* m_odDet;                ///< Outer detector
-        
+
         IAnchoredTrackFormation* m_anchoredTracker;
         IBlobCreatorUtils* m_blobUtils;
         ITrackLinearPropagator* m_trackPropagator;
@@ -285,10 +288,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void SaveEventTime(Minerva::PhysicsEvent *event) const;
         void SaveTruthUnusedClusterEnergyInsideDetector(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> ecalClusters, SmartRefVector<Minerva::IDCluster> hcalClusters, SmartRefVector<Minerva::IDCluster> otherClusters) const;
         void SaveTruthClusterEnergy_FoundBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction *truthEvent) const;
-        void SaveTruthUnusedClusterEnergyNearVertex(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> vertexClusters) const;
+        void SaveTruthUnusedClusterEnergy_NearVertex(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> vertexClusters) const;
         void SaveTruthUnusedClusterEnergy_Dispersed(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const;
-        void SaveTruthUnusedClusterEnergy_LowCharge(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const;
-        void SaveTruthUnusedClusterEnergy_OutTime(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const;
+        void SaveTruthUnusedClusterEnergy_Rejected(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const;
         void SetSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
         void SetVertexCount(Minerva::PhysicsEvent *event) const;
         void VertexBlob( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction *truthEvent ) const;
@@ -314,7 +316,16 @@ class CCProtonPi0 : public MinervaAnalysisTool
         int GetMCHitPDG(const SmartRef<Minerva::MCHit> mc_hit) const;
         int GetDigitPDG(const Minerva::MCIDDigit* mcdigit) const;
         int GetPDGfromVector(std::vector<int> &all_pdg) const;
-        
+        void FillUsableClusters(SmartRefVector<Minerva::IDCluster> &usableClusters, Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const;
+        void ProcessRejectedClusters(SmartRefVector<Minerva::IDCluster> &rejectedClusters,Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const;
+        bool RecoverShowers_InvMass( std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event) const;
+        bool RecoverShowers_Direction( std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event) const;
+        bool Save_1ShowerInfo( std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event) const;
+        bool Save_3ShowerInfo( std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event) const;
+        void Save_1ShowerTruthMatch( std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::GenMinInteraction* truthEvent) const;
+        void Save_3ShowerTruthMatch( std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::GenMinInteraction* truthEvent) const;
+        bool isShowerGood(Minerva::IDBlob* shower, Minerva::PhysicsEvent* event) const;
+
         // --------------------------------------------------------------------
         // Study: Shower Energy Functions
         //      See Studies/CCProtonPi0_Study_ShowerEnergy.cpp

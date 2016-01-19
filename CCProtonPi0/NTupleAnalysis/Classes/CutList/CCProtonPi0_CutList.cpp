@@ -206,6 +206,88 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetXaxis()->SetTitle("hCut_2Track_deltaInvMass");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.deltaInvMass.get_width()));
         hCut_2Track_deltaInvMass.push_back(temp);
+
+        // ConeBlobs Study
+        temp = new MnvH1D( Form("%s_%d","OneShower_nClusters",i),"OneShower_nClusters",50,0.0,100.0);
+        temp->GetXaxis()->SetTitle("N(Clusters)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        OneShower_nClusters.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","OneShower_energy",i),"OneShower_energy",20,0.0,1000.0);
+        temp->GetXaxis()->SetTitle("Visible Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        OneShower_energy.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","OneShower_theta",i),"OneShower_theta",36,0.0,180.0);
+        temp->GetXaxis()->SetTitle("Theta [degree]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        OneShower_theta.push_back(temp);
+ 
+        temp = new MnvH1D( Form("%s_%d","OneShower_dist_vtx",i),"OneShower_dist_vtx",50,0.0,2000.0);
+        temp->GetXaxis()->SetTitle("Distance to Vertex [mm]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        OneShower_dist_vtx.push_back(temp);
+ 
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s1_nClusters",i),"ThreeShower_s1_nClusters",50,0.0,100.0);
+        temp->GetXaxis()->SetTitle("N(Clusters)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s1_nClusters.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s1_energy",i),"ThreeShower_s1_energy",20,0.0,1000.0);
+        temp->GetXaxis()->SetTitle("Visible Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s1_energy.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s1_theta",i),"ThreeShower_s1_theta",36,0.0,180.0);
+        temp->GetXaxis()->SetTitle("Theta [degree]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s1_theta.push_back(temp);
+ 
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s1_dist_vtx",i),"ThreeShower_s1_dist_vtx",50,0.0,2000.0);
+        temp->GetXaxis()->SetTitle("Distance to Vertex [mm]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s1_dist_vtx.push_back(temp);  
+ 
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s2_nClusters",i),"ThreeShower_s2_nClusters",50,0.0,100.0);
+        temp->GetXaxis()->SetTitle("N(Clusters)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s2_nClusters.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s2_energy",i),"ThreeShower_s2_energy",20,0.0,1000.0);
+        temp->GetXaxis()->SetTitle("Visible Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s2_energy.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s2_theta",i),"ThreeShower_s2_theta",36,0.0,180.0);
+        temp->GetXaxis()->SetTitle("Theta [degree]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s2_theta.push_back(temp);
+ 
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s2_dist_vtx",i),"ThreeShower_s2_dist_vtx",50,0.0,2000.0);
+        temp->GetXaxis()->SetTitle("Distance to Vertex [mm]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s2_dist_vtx.push_back(temp);  
+ 
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s3_nClusters",i),"ThreeShower_s3_nClusters",50,0.0,100.0);
+        temp->GetXaxis()->SetTitle("N(Clusters)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s3_nClusters.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s3_energy",i),"ThreeShower_s3_energy",20,0.0,1000.0);
+        temp->GetXaxis()->SetTitle("Visible Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s3_energy.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s3_theta",i),"ThreeShower_s3_theta",36,0.0,180.0);
+        temp->GetXaxis()->SetTitle("Theta [degree]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s3_theta.push_back(temp);
+ 
+        temp = new MnvH1D( Form("%s_%d","ThreeShower_s3_dist_vtx",i),"ThreeShower_s3_dist_vtx",50,0.0,2000.0);
+        temp->GetXaxis()->SetTitle("Distance to Vertex [mm]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        ThreeShower_s3_dist_vtx.push_back(temp);  
+  
     }
 
     double binsP[11] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.5};
@@ -251,11 +333,9 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_Vertex_Michel_Exist.set_Name("Vertex_Michel_Exist"); 
     nCut_EndPoint_Michel_Exist.set_Name("EndPoint_Michel_Exist");
     nCut_secEndPoint_Michel_Exist.set_Name("secEndPoint_Michel_Exist");
-    nCut_Vertex_Count.set_Name("Vertex_Count");
     nCut_Particle_None.set_Name("Particle_None");
     nCut_Proton_None.set_Name("Proton_None");            
     nCut_Proton_Bad.set_Name("Proton_Bad");            
-    nCut_Proton_Count.set_Name("Proton_Count");            
     nCut_ProtonScore.set_Name("Proton_Score");
     nCut_PreFilter_Pi0.set_Name("PreFilter_Pi0");
     nCut_ConeBlobs.set_Name("ConeBlobs");
@@ -354,11 +434,9 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_All.push_back(nCut_Vertex_Michel_Exist); 
     nCutVector_All.push_back(nCut_EndPoint_Michel_Exist);
     nCutVector_All.push_back(nCut_secEndPoint_Michel_Exist);
-    nCutVector_All.push_back(nCut_Vertex_Count);
     nCutVector_All.push_back(nCut_Particle_None);
     nCutVector_All.push_back(nCut_Proton_None);
     nCutVector_All.push_back(nCut_Proton_Bad);
-    nCutVector_All.push_back(nCut_Proton_Count);
     nCutVector_All.push_back(nCut_ProtonScore);
     nCutVector_All.push_back(nCut_PreFilter_Pi0);
     nCutVector_All.push_back(nCut_ConeBlobs);
@@ -520,6 +598,26 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_2Track_protonScore_pIDDiff[i]->Write();
         hCut_2Track_protonScore_LLR[i]->Write();
         hCut_2Track_deltaInvMass[i]->Write();
+
+        OneShower_nClusters[i]->Write();
+        OneShower_energy[i]->Write();
+        OneShower_theta[i]->Write();
+        OneShower_dist_vtx[i]->Write();
+ 
+        ThreeShower_s1_nClusters[i]->Write();
+        ThreeShower_s1_energy[i]->Write();
+        ThreeShower_s1_theta[i]->Write();
+        ThreeShower_s1_dist_vtx[i]->Write();
+  
+        ThreeShower_s2_nClusters[i]->Write();
+        ThreeShower_s2_energy[i]->Write();
+        ThreeShower_s2_theta[i]->Write();
+        ThreeShower_s2_dist_vtx[i]->Write();
+ 
+        ThreeShower_s3_nClusters[i]->Write();
+        ThreeShower_s3_energy[i]->Write();
+        ThreeShower_s3_theta[i]->Write();
+        ThreeShower_s3_dist_vtx[i]->Write();
     }
 
     // MC Only
@@ -533,6 +631,7 @@ void CCProtonPi0_CutList::writeHistograms()
     
     pi0_invMass_1Track->Write();
     pi0_invMass_2Track->Write();
+
 
     f->Close();
 }

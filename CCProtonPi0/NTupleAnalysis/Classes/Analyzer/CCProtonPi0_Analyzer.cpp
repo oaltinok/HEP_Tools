@@ -15,16 +15,11 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 
     // Control Flow
     isDataAnalysis  = true;
-    isScanRun = false;
+    isScanRun = true;
     writeFSParticleMomentum = false;
 
     // Event Selections
-    applyVertexCount = false;
-    max_nVertices = 2;
-
-    applyProtonCount = false;
-    max_nProtonCandidates = 2;
-
+    
     applyProtonScore = true;
     //pID_KE_Limit = 300.0;
     pID_KE_Limit = 0.0;
@@ -49,6 +44,15 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 
     counter1 = 0;
     counter2 = 0;
+
+    //ConeBlobs Study
+    n1Shower = 0;
+    n3Shower_Signal = 0;
+    n3Shower_Bckg = 0;
+    nMoreShower = 0;
+    n1Shower_BothConverted = 0;
+    n1Shower_OneConverted = 0;
+    n1Shower_NoneConverted = 0;
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
@@ -74,6 +78,9 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     // Clone Tree from Chain
     TTree* tree = fChain->CloneTree(0);
 
+    // Get First Line for the first File
+    getline(DSTFileList,scanFileName);
+
     //------------------------------------------------------------------------
     // Loop over Chain
     //------------------------------------------------------------------------
@@ -92,6 +99,8 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
             break;
         }
 
+        // Update scanFileName if running for scan
+        if(isScanRun) UpdateScanFileName();
 
         // Progress Message on Terminal
         if (jentry%500000 == 0) cout<<"\tEntry "<<jentry<<endl;
@@ -124,6 +133,16 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
+
+    // ConeBlobs Study
+    cout<<"n1Shower = "<<n1Shower<<endl;
+    cout<<"n3Shower_Signal = "<<n3Shower_Signal<<endl;
+    cout<<"n3Shower_Bckg = "<<n3Shower_Bckg<<endl;
+    cout<<"nMoreShower = "<<nMoreShower<<endl;
+
+    cout<<"n1Shower_BothConverted = "<<n1Shower_BothConverted<<endl;
+    cout<<"n1Shower_OneConverted = "<<n1Shower_OneConverted<<endl;
+    cout<<"n1Shower_NoneConverted = "<<n1Shower_NoneConverted<<endl;
 }
 
 
@@ -144,7 +163,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     cout<<"Looping over all entries"<<endl;
 
     // Get First Line for the first File
-    //getline(DSTFileList,scanFileName);
+    getline(DSTFileList,scanFileName);
 
     Long64_t nbytes = 0, nb = 0;
     Long64_t nentries = fChain->GetEntriesFast();
@@ -166,11 +185,18 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             break;
         }
 
+        if (ev_run == 2186 && ev_subrun ==32 && ev_gate == 508) cout<<"Recovered!"<<endl;
+
+        if (is_blobs_recovered){
+             if (truth_isSignal) counter1++;
+             else counter2++;
+        }
+
         // Analyze Event or NOT -- Depend on the 1Track or 2 Track Analysis
         if (!AnalyzeEvent() ) continue;
 
         // Update scanFileName if running for scan
-        //if(isScanRun) UpdateScanFileName();
+        if(isScanRun) UpdateScanFileName();
 
         // Weight is 1 for Data
         if (!m_isMC){
@@ -239,11 +265,7 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC, std::st
 
     specifyRunTime();
 
-    if (isModeReduce){
-        cout<<"\tNTuple Reduce Mode -- Will not create Text Files"<<endl;
-    }else{
-        openTextFiles();
-    }
+    openTextFiles();
 
     cout<<"Initialization Finished!\n"<<endl;
 }
@@ -603,8 +625,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // After Michel I try to save far tracks which changes the Number of Vertices
     // Check nVertices
     FillHistogram(cutList.hCut_nVertices, vtx_total_count);
-    if ( applyVertexCount && vtx_total_count > max_nVertices) return false;
-    cutList.nCut_Vertex_Count.increment(truth_isSignal, study1, study2);
 
     if( Cut_Particle_None == 1) return false;
     cutList.nCut_Particle_None.increment(truth_isSignal, study1, study2);
@@ -618,8 +638,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
 
     // Check nProtonCandidates
     FillHistogram(cutList.hCut_nProtonCandidates, nProtonCandidates);
-    if ( applyProtonCount && nProtonCandidates > max_nProtonCandidates) return false;
-    cutList.nCut_Proton_Count.increment(truth_isSignal, study1, study2);
     
     // After this stage we can analyze different topologies
     //      No Proton Events
@@ -677,7 +695,16 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_nShowerCandidates,anglescan_ncand); 
     else FillHistogram(cutList.hCut_2Track_nShowerCandidates,anglescan_ncand); 
 
-    if( Cut_ConeBlobs == 1 || is_houghtransform_applied ) return false;
+    // ConeBlobs Study Histograms
+    if (anglescan_ncand == 1){
+        Fill_1ShowerHists();
+    }else if (anglescan_ncand == 3){
+        if (truth_isSignal) n3Shower_Signal++;
+        else n3Shower_Bckg++;
+        Fill_3ShowerHists();
+    }
+
+    if( Cut_ConeBlobs == 1  || is_blobs_recovered ) return false;
     cutList.nCut_ConeBlobs.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_ConeBlobs.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_ConeBlobs.increment(truth_isSignal, study1, study2);
@@ -848,13 +875,14 @@ double CCProtonPi0_Analyzer::calcDeltaInvariantMass()
 void CCProtonPi0_Analyzer::writeScanFile()
 {
     if(isScanRun){
+
         // Constants for Roundup List
-        const string arachne_html = "http://minerva05.fnal.gov/Arachne/arachne.html?det=MV&recoVer=v10r6p13&run=";
+        const string arachne_html = "http://minerva05.fnal.gov/Arachne/arachne.html?filename=";
         const string entryString  = "&entry=";
         const string other        = "&slice=-1&filetype=dst";
 //http://minerva05.fnal.gov/Arachne/arachne.html?det=MV&recoVer=v10r6p13&run=3596&subrun=6&gate=597&slice=7
         roundupText<<arachne_html<<scanFileName<<entryString<<truth_eventID<<other<<" ";
-        roundupText<<gamma1_dist_vtx<<"^"<<gamma2_dist_vtx<<"^"<<mc_incomingE<<endl;
+        roundupText<<ev_subrun<<" ^ "<<ev_gate<<" ^ "<<truth_isGamma1_conv_inside<<" ^ "<<truth_isGamma2_conv_inside<<endl;
     }else{
         cout<<"WARNING! ScanRun is NOT Activated! Are you sure what you are doing?"<<endl;    
     }
@@ -1253,6 +1281,46 @@ double CCProtonPi0_Analyzer::GetVertexEnergy()
     return energy;
 }
 
+double CCProtonPi0_Analyzer::Calc_TruePi0OpeningAngle()
+{
+    double g1_P = HEP_Functions::calcMomentum(truth_gamma1_4P[0],truth_gamma1_4P[1],truth_gamma1_4P[2]);
+    double g2_P = HEP_Functions::calcMomentum(truth_gamma2_4P[0],truth_gamma2_4P[1],truth_gamma2_4P[2]);
+    double g1_g2 = truth_gamma1_4P[0]*truth_gamma2_4P[0] + truth_gamma1_4P[1]*truth_gamma2_4P[1] + truth_gamma1_4P[2]*truth_gamma2_4P[2];
+    double cos_theta = g1_g2 / (g1_P*g2_P);
+    double theta = acos(cos_theta) * rad_to_deg;
+    
+    return theta;
+}
+
+void CCProtonPi0_Analyzer::Fill_1ShowerHists()
+{
+    if (OneShower_nClusters != -1){
+        FillHistogram(cutList.OneShower_nClusters, OneShower_nClusters);
+        FillHistogram(cutList.OneShower_energy, OneShower_energy);
+        FillHistogram(cutList.OneShower_theta, OneShower_theta);
+        FillHistogram(cutList.OneShower_dist_vtx, OneShower_dist_vtx);
+    }
+}
+
+void CCProtonPi0_Analyzer::Fill_3ShowerHists()
+{
+    if (ThreeShower_s1_nClusters != -1){
+        FillHistogram(cutList.ThreeShower_s1_nClusters, ThreeShower_s1_nClusters);
+        FillHistogram(cutList.ThreeShower_s1_energy, ThreeShower_s1_energy);
+        FillHistogram(cutList.ThreeShower_s1_theta, ThreeShower_s1_theta);
+        FillHistogram(cutList.ThreeShower_s1_dist_vtx, ThreeShower_s1_dist_vtx);
+
+        FillHistogram(cutList.ThreeShower_s2_nClusters, ThreeShower_s2_nClusters);
+        FillHistogram(cutList.ThreeShower_s2_energy, ThreeShower_s2_energy);
+        FillHistogram(cutList.ThreeShower_s2_theta, ThreeShower_s2_theta);
+        FillHistogram(cutList.ThreeShower_s2_dist_vtx, ThreeShower_s2_dist_vtx);
+
+        FillHistogram(cutList.ThreeShower_s3_nClusters, ThreeShower_s3_nClusters);
+        FillHistogram(cutList.ThreeShower_s3_energy, ThreeShower_s3_energy);
+        FillHistogram(cutList.ThreeShower_s3_theta, ThreeShower_s3_theta);
+        FillHistogram(cutList.ThreeShower_s3_dist_vtx, ThreeShower_s3_dist_vtx);
+    }
+}
 
 #endif //CCProtonPi0_Analyzer_cpp
     

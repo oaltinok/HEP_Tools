@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jan 13 08:11:46 2016 by ROOT version 5.34/05
+// Tue Jan 19 08:48:50 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -43,10 +43,7 @@ public :
    Bool_t          minos_track_inside_partial_plane;
    Bool_t          prim_vtx_has_misassigned_track_direction;
    Bool_t          prim_vtx_has_broken_track;
-   Bool_t          is_anglescan;
-   Bool_t          is_anglescan_applied;
-   Bool_t          is_houghtransform;
-   Bool_t          is_houghtransform_applied;
+   Bool_t          is_blobs_recovered;
    Int_t           Cut_BlobDirectionBad;
    Int_t           Cut_ConeBlobs;
    Int_t           Cut_EndPoint_Michel_Exist;
@@ -62,6 +59,10 @@ public :
    Int_t           Cut_Vertex_Not_Fiducial;
    Int_t           Cut_Vertex_Not_Reconstructable;
    Int_t           Cut_secEndPoint_Michel_Exist;
+   Int_t           OneShower_nClusters;
+   Int_t           ThreeShower_s1_nClusters;
+   Int_t           ThreeShower_s2_nClusters;
+   Int_t           ThreeShower_s3_nClusters;
    Int_t           anglescan_ncand;
    Int_t           anglescan_ncandx;
    Int_t           broken_track_most_us_plane;
@@ -108,12 +109,24 @@ public :
    Int_t           vtx_primary_multiplicity;
    Int_t           vtx_secondary_count;
    Int_t           vtx_total_count;
+   Double_t        ConeBlobs_usable_evis_Tracker;
+   Double_t        Coneblobs_usable_evis_ECAL;
+   Double_t        Coneblobs_usable_evis_HCAL;
    Double_t        Dispersed_blob_energy;
    Double_t        Muon_blob_energy;
-   Double_t        RE_energy_ECAL;
-   Double_t        RE_energy_HCAL;
-   Double_t        RE_energy_Tracker;
+   Double_t        OneShower_dist_vtx;
+   Double_t        OneShower_energy;
+   Double_t        OneShower_theta;
    Double_t        Rejected_blob_vis_energy;
+   Double_t        ThreeShower_s1_dist_vtx;
+   Double_t        ThreeShower_s1_energy;
+   Double_t        ThreeShower_s1_theta;
+   Double_t        ThreeShower_s2_dist_vtx;
+   Double_t        ThreeShower_s2_energy;
+   Double_t        ThreeShower_s2_theta;
+   Double_t        ThreeShower_s3_dist_vtx;
+   Double_t        ThreeShower_s3_energy;
+   Double_t        ThreeShower_s3_theta;
    Double_t        energy_from_mc;
    Double_t        energy_from_mc_fraction;
    Double_t        energy_from_mc_fraction_of_highest;
@@ -291,11 +304,11 @@ public :
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[143];   //[g1dedx_rev_cluster_energy_sz]
+   Double_t        g1dedx_rev_cluster_energy[125];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[110];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[105];   //[g2dedx_rev_cluster_energy_sz]
    Double_t        gamma1_direction[3];
    Double_t        gamma1_vertex[3];
    Double_t        gamma2_direction[3];
@@ -343,11 +356,14 @@ public :
    Int_t           truth_N_pi0;
    Int_t           truth_N_proton;
    Int_t           truth_N_trueMichelElectrons;
+   Int_t           truth_OneShower_evis_most_pdg;
+   Int_t           truth_Rejected_unused_evis_most_pdg;
+   Int_t           truth_ThreeShower_s1_evis_most_pdg;
+   Int_t           truth_ThreeShower_s2_evis_most_pdg;
+   Int_t           truth_ThreeShower_s3_evis_most_pdg;
    Int_t           truth_blob1_evis_most_pdg;
    Int_t           truth_blob2_evis_most_pdg;
    Int_t           truth_dispersed_unused_evis_most_pdg;
-   Int_t           truth_lowcharge_unused_evis_most_pdg;
-   Int_t           truth_outTime_unused_evis_most_pdg;
    Int_t           truth_pi0_GrandMother;
    Int_t           truth_pi0_GrandMotherStatus;
    Int_t           truth_pi0_Mother;
@@ -357,6 +373,40 @@ public :
    Int_t           truth_vertex_module;
    Int_t           truth_vertex_plane;
    Int_t           truth_vertex_unused_evis_most_pdg;
+   Double_t        truth_OneShower_evis_muon;
+   Double_t        truth_OneShower_evis_neutron;
+   Double_t        truth_OneShower_evis_piminus;
+   Double_t        truth_OneShower_evis_piplus;
+   Double_t        truth_OneShower_evis_pizero;
+   Double_t        truth_OneShower_evis_proton;
+   Double_t        truth_OneShower_evis_total_norm;
+   Double_t        truth_OneShower_evis_total_truth;
+   Double_t        truth_Rejected_unused_evis_total_norm;
+   Double_t        truth_Rejected_unused_evis_total_truth;
+   Double_t        truth_ThreeShower_s1_evis_muon;
+   Double_t        truth_ThreeShower_s1_evis_neutron;
+   Double_t        truth_ThreeShower_s1_evis_piminus;
+   Double_t        truth_ThreeShower_s1_evis_piplus;
+   Double_t        truth_ThreeShower_s1_evis_pizero;
+   Double_t        truth_ThreeShower_s1_evis_proton;
+   Double_t        truth_ThreeShower_s1_evis_total_norm;
+   Double_t        truth_ThreeShower_s1_evis_total_truth;
+   Double_t        truth_ThreeShower_s2_evis_muon;
+   Double_t        truth_ThreeShower_s2_evis_neutron;
+   Double_t        truth_ThreeShower_s2_evis_piminus;
+   Double_t        truth_ThreeShower_s2_evis_piplus;
+   Double_t        truth_ThreeShower_s2_evis_pizero;
+   Double_t        truth_ThreeShower_s2_evis_proton;
+   Double_t        truth_ThreeShower_s2_evis_total_norm;
+   Double_t        truth_ThreeShower_s2_evis_total_truth;
+   Double_t        truth_ThreeShower_s3_evis_muon;
+   Double_t        truth_ThreeShower_s3_evis_neutron;
+   Double_t        truth_ThreeShower_s3_evis_piminus;
+   Double_t        truth_ThreeShower_s3_evis_piplus;
+   Double_t        truth_ThreeShower_s3_evis_pizero;
+   Double_t        truth_ThreeShower_s3_evis_proton;
+   Double_t        truth_ThreeShower_s3_evis_total_norm;
+   Double_t        truth_ThreeShower_s3_evis_total_truth;
    Double_t        truth_allClusters_evis_pizero;
    Double_t        truth_blob1_evis_muon;
    Double_t        truth_blob1_evis_neutron;
@@ -400,8 +450,6 @@ public :
    Double_t        truth_hcal_unused_evis_proton;
    Double_t        truth_hcal_unused_evis_total_norm;
    Double_t        truth_hcal_unused_evis_total_truth;
-   Double_t        truth_lowcharge_unused_evis_total_norm;
-   Double_t        truth_lowcharge_unused_evis_total_truth;
    Double_t        truth_michelElectron_E;
    Double_t        truth_michelElectron_P;
    Double_t        truth_michelMuon_P;
@@ -418,8 +466,6 @@ public :
    Double_t        truth_other_unused_evis_proton;
    Double_t        truth_other_unused_evis_total_norm;
    Double_t        truth_other_unused_evis_total_truth;
-   Double_t        truth_outTime_unused_evis_total_norm;
-   Double_t        truth_outTime_unused_evis_total_truth;
    Double_t        truth_total_captured_evis_pizero;
    Double_t        truth_total_captured_evis_total_norm;
    Double_t        truth_total_captured_evis_total_truth;
@@ -703,10 +749,7 @@ public :
    TBranch        *b_minos_track_inside_partial_plane;   //!
    TBranch        *b_prim_vtx_has_misassigned_track_direction;   //!
    TBranch        *b_prim_vtx_has_broken_track;   //!
-   TBranch        *b_is_anglescan;   //!
-   TBranch        *b_is_anglescan_applied;   //!
-   TBranch        *b_is_houghtransform;   //!
-   TBranch        *b_is_houghtransform_applied;   //!
+   TBranch        *b_is_blobs_recovered;   //!
    TBranch        *b_Cut_BlobDirectionBad;   //!
    TBranch        *b_Cut_ConeBlobs;   //!
    TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
@@ -722,6 +765,10 @@ public :
    TBranch        *b_Cut_Vertex_Not_Fiducial;   //!
    TBranch        *b_Cut_Vertex_Not_Reconstructable;   //!
    TBranch        *b_Cut_secEndPoint_Michel_Exist;   //!
+   TBranch        *b_OneShower_nClusters;   //!
+   TBranch        *b_ThreeShower_s1_nClusters;   //!
+   TBranch        *b_ThreeShower_s2_nClusters;   //!
+   TBranch        *b_ThreeShower_s3_nClusters;   //!
    TBranch        *b_anglescan_ncand;   //!
    TBranch        *b_anglescan_ncandx;   //!
    TBranch        *b_broken_track_most_us_plane;   //!
@@ -768,12 +815,24 @@ public :
    TBranch        *b_vtx_primary_multiplicity;   //!
    TBranch        *b_vtx_secondary_count;   //!
    TBranch        *b_vtx_total_count;   //!
+   TBranch        *b_ConeBlobs_usable_evis_Tracker;   //!
+   TBranch        *b_Coneblobs_usable_evis_ECAL;   //!
+   TBranch        *b_Coneblobs_usable_evis_HCAL;   //!
    TBranch        *b_Dispersed_blob_energy;   //!
    TBranch        *b_Muon_blob_energy;   //!
-   TBranch        *b_RE_energy_ECAL;   //!
-   TBranch        *b_RE_energy_HCAL;   //!
-   TBranch        *b_RE_energy_Tracker;   //!
+   TBranch        *b_OneShower_dist_vtx;   //!
+   TBranch        *b_OneShower_energy;   //!
+   TBranch        *b_OneShower_theta;   //!
    TBranch        *b_Rejected_blob_vis_energy;   //!
+   TBranch        *b_ThreeShower_s1_dist_vtx;   //!
+   TBranch        *b_ThreeShower_s1_energy;   //!
+   TBranch        *b_ThreeShower_s1_theta;   //!
+   TBranch        *b_ThreeShower_s2_dist_vtx;   //!
+   TBranch        *b_ThreeShower_s2_energy;   //!
+   TBranch        *b_ThreeShower_s2_theta;   //!
+   TBranch        *b_ThreeShower_s3_dist_vtx;   //!
+   TBranch        *b_ThreeShower_s3_energy;   //!
+   TBranch        *b_ThreeShower_s3_theta;   //!
    TBranch        *b_energy_from_mc;   //!
    TBranch        *b_energy_from_mc_fraction;   //!
    TBranch        *b_energy_from_mc_fraction_of_highest;   //!
@@ -1003,11 +1062,14 @@ public :
    TBranch        *b_truth_N_pi0;   //!
    TBranch        *b_truth_N_proton;   //!
    TBranch        *b_truth_N_trueMichelElectrons;   //!
+   TBranch        *b_truth_OneShower_evis_most_pdg;   //!
+   TBranch        *b_truth_Rejected_unused_evis_most_pdg;   //!
+   TBranch        *b_truth_ThreeShower_s1_evis_most_pdg;   //!
+   TBranch        *b_truth_ThreeShower_s2_evis_most_pdg;   //!
+   TBranch        *b_truth_ThreeShower_s3_evis_most_pdg;   //!
    TBranch        *b_truth_blob1_evis_most_pdg;   //!
    TBranch        *b_truth_blob2_evis_most_pdg;   //!
    TBranch        *b_truth_dispersed_unused_evis_most_pdg;   //!
-   TBranch        *b_truth_lowcharge_unused_evis_most_pdg;   //!
-   TBranch        *b_truth_outTime_unused_evis_most_pdg;   //!
    TBranch        *b_truth_pi0_GrandMother;   //!
    TBranch        *b_truth_pi0_GrandMotherStatus;   //!
    TBranch        *b_truth_pi0_Mother;   //!
@@ -1017,6 +1079,40 @@ public :
    TBranch        *b_truth_vertex_module;   //!
    TBranch        *b_truth_vertex_plane;   //!
    TBranch        *b_truth_vertex_unused_evis_most_pdg;   //!
+   TBranch        *b_truth_OneShower_evis_muon;   //!
+   TBranch        *b_truth_OneShower_evis_neutron;   //!
+   TBranch        *b_truth_OneShower_evis_piminus;   //!
+   TBranch        *b_truth_OneShower_evis_piplus;   //!
+   TBranch        *b_truth_OneShower_evis_pizero;   //!
+   TBranch        *b_truth_OneShower_evis_proton;   //!
+   TBranch        *b_truth_OneShower_evis_total_norm;   //!
+   TBranch        *b_truth_OneShower_evis_total_truth;   //!
+   TBranch        *b_truth_Rejected_unused_evis_total_norm;   //!
+   TBranch        *b_truth_Rejected_unused_evis_total_truth;   //!
+   TBranch        *b_truth_ThreeShower_s1_evis_muon;   //!
+   TBranch        *b_truth_ThreeShower_s1_evis_neutron;   //!
+   TBranch        *b_truth_ThreeShower_s1_evis_piminus;   //!
+   TBranch        *b_truth_ThreeShower_s1_evis_piplus;   //!
+   TBranch        *b_truth_ThreeShower_s1_evis_pizero;   //!
+   TBranch        *b_truth_ThreeShower_s1_evis_proton;   //!
+   TBranch        *b_truth_ThreeShower_s1_evis_total_norm;   //!
+   TBranch        *b_truth_ThreeShower_s1_evis_total_truth;   //!
+   TBranch        *b_truth_ThreeShower_s2_evis_muon;   //!
+   TBranch        *b_truth_ThreeShower_s2_evis_neutron;   //!
+   TBranch        *b_truth_ThreeShower_s2_evis_piminus;   //!
+   TBranch        *b_truth_ThreeShower_s2_evis_piplus;   //!
+   TBranch        *b_truth_ThreeShower_s2_evis_pizero;   //!
+   TBranch        *b_truth_ThreeShower_s2_evis_proton;   //!
+   TBranch        *b_truth_ThreeShower_s2_evis_total_norm;   //!
+   TBranch        *b_truth_ThreeShower_s2_evis_total_truth;   //!
+   TBranch        *b_truth_ThreeShower_s3_evis_muon;   //!
+   TBranch        *b_truth_ThreeShower_s3_evis_neutron;   //!
+   TBranch        *b_truth_ThreeShower_s3_evis_piminus;   //!
+   TBranch        *b_truth_ThreeShower_s3_evis_piplus;   //!
+   TBranch        *b_truth_ThreeShower_s3_evis_pizero;   //!
+   TBranch        *b_truth_ThreeShower_s3_evis_proton;   //!
+   TBranch        *b_truth_ThreeShower_s3_evis_total_norm;   //!
+   TBranch        *b_truth_ThreeShower_s3_evis_total_truth;   //!
    TBranch        *b_truth_allClusters_evis_pizero;   //!
    TBranch        *b_truth_blob1_evis_muon;   //!
    TBranch        *b_truth_blob1_evis_neutron;   //!
@@ -1060,8 +1156,6 @@ public :
    TBranch        *b_truth_hcal_unused_evis_proton;   //!
    TBranch        *b_truth_hcal_unused_evis_total_norm;   //!
    TBranch        *b_truth_hcal_unused_evis_total_truth;   //!
-   TBranch        *b_truth_lowcharge_unused_evis_total_norm;   //!
-   TBranch        *b_truth_lowcharge_unused_evis_total_truth;   //!
    TBranch        *b_truth_michelElectron_E;   //!
    TBranch        *b_truth_michelElectron_P;   //!
    TBranch        *b_truth_michelMuon_P;   //!
@@ -1078,8 +1172,6 @@ public :
    TBranch        *b_truth_other_unused_evis_proton;   //!
    TBranch        *b_truth_other_unused_evis_total_norm;   //!
    TBranch        *b_truth_other_unused_evis_total_truth;   //!
-   TBranch        *b_truth_outTime_unused_evis_total_norm;   //!
-   TBranch        *b_truth_outTime_unused_evis_total_truth;   //!
    TBranch        *b_truth_total_captured_evis_pizero;   //!
    TBranch        *b_truth_total_captured_evis_total_norm;   //!
    TBranch        *b_truth_total_captured_evis_total_truth;   //!
@@ -1375,7 +1467,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_50.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_51a.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1448,10 +1540,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("minos_track_inside_partial_plane", &minos_track_inside_partial_plane, &b_minos_track_inside_partial_plane);
    fChain->SetBranchAddress("prim_vtx_has_misassigned_track_direction", &prim_vtx_has_misassigned_track_direction, &b_prim_vtx_has_misassigned_track_direction);
    fChain->SetBranchAddress("prim_vtx_has_broken_track", &prim_vtx_has_broken_track, &b_prim_vtx_has_broken_track);
-   fChain->SetBranchAddress("is_anglescan", &is_anglescan, &b_is_anglescan);
-   fChain->SetBranchAddress("is_anglescan_applied", &is_anglescan_applied, &b_is_anglescan_applied);
-   fChain->SetBranchAddress("is_houghtransform", &is_houghtransform, &b_is_houghtransform);
-   fChain->SetBranchAddress("is_houghtransform_applied", &is_houghtransform_applied, &b_is_houghtransform_applied);
+   fChain->SetBranchAddress("is_blobs_recovered", &is_blobs_recovered, &b_is_blobs_recovered);
    fChain->SetBranchAddress("Cut_BlobDirectionBad", &Cut_BlobDirectionBad, &b_Cut_BlobDirectionBad);
    fChain->SetBranchAddress("Cut_ConeBlobs", &Cut_ConeBlobs, &b_Cut_ConeBlobs);
    fChain->SetBranchAddress("Cut_EndPoint_Michel_Exist", &Cut_EndPoint_Michel_Exist, &b_Cut_EndPoint_Michel_Exist);
@@ -1467,6 +1556,10 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("Cut_Vertex_Not_Fiducial", &Cut_Vertex_Not_Fiducial, &b_Cut_Vertex_Not_Fiducial);
    fChain->SetBranchAddress("Cut_Vertex_Not_Reconstructable", &Cut_Vertex_Not_Reconstructable, &b_Cut_Vertex_Not_Reconstructable);
    fChain->SetBranchAddress("Cut_secEndPoint_Michel_Exist", &Cut_secEndPoint_Michel_Exist, &b_Cut_secEndPoint_Michel_Exist);
+   fChain->SetBranchAddress("OneShower_nClusters", &OneShower_nClusters, &b_OneShower_nClusters);
+   fChain->SetBranchAddress("ThreeShower_s1_nClusters", &ThreeShower_s1_nClusters, &b_ThreeShower_s1_nClusters);
+   fChain->SetBranchAddress("ThreeShower_s2_nClusters", &ThreeShower_s2_nClusters, &b_ThreeShower_s2_nClusters);
+   fChain->SetBranchAddress("ThreeShower_s3_nClusters", &ThreeShower_s3_nClusters, &b_ThreeShower_s3_nClusters);
    fChain->SetBranchAddress("anglescan_ncand", &anglescan_ncand, &b_anglescan_ncand);
    fChain->SetBranchAddress("anglescan_ncandx", &anglescan_ncandx, &b_anglescan_ncandx);
    fChain->SetBranchAddress("broken_track_most_us_plane", &broken_track_most_us_plane, &b_broken_track_most_us_plane);
@@ -1513,12 +1606,24 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("vtx_primary_multiplicity", &vtx_primary_multiplicity, &b_vtx_primary_multiplicity);
    fChain->SetBranchAddress("vtx_secondary_count", &vtx_secondary_count, &b_vtx_secondary_count);
    fChain->SetBranchAddress("vtx_total_count", &vtx_total_count, &b_vtx_total_count);
+   fChain->SetBranchAddress("ConeBlobs_usable_evis_Tracker", &ConeBlobs_usable_evis_Tracker, &b_ConeBlobs_usable_evis_Tracker);
+   fChain->SetBranchAddress("Coneblobs_usable_evis_ECAL", &Coneblobs_usable_evis_ECAL, &b_Coneblobs_usable_evis_ECAL);
+   fChain->SetBranchAddress("Coneblobs_usable_evis_HCAL", &Coneblobs_usable_evis_HCAL, &b_Coneblobs_usable_evis_HCAL);
    fChain->SetBranchAddress("Dispersed_blob_energy", &Dispersed_blob_energy, &b_Dispersed_blob_energy);
    fChain->SetBranchAddress("Muon_blob_energy", &Muon_blob_energy, &b_Muon_blob_energy);
-   fChain->SetBranchAddress("RE_energy_ECAL", &RE_energy_ECAL, &b_RE_energy_ECAL);
-   fChain->SetBranchAddress("RE_energy_HCAL", &RE_energy_HCAL, &b_RE_energy_HCAL);
-   fChain->SetBranchAddress("RE_energy_Tracker", &RE_energy_Tracker, &b_RE_energy_Tracker);
+   fChain->SetBranchAddress("OneShower_dist_vtx", &OneShower_dist_vtx, &b_OneShower_dist_vtx);
+   fChain->SetBranchAddress("OneShower_energy", &OneShower_energy, &b_OneShower_energy);
+   fChain->SetBranchAddress("OneShower_theta", &OneShower_theta, &b_OneShower_theta);
    fChain->SetBranchAddress("Rejected_blob_vis_energy", &Rejected_blob_vis_energy, &b_Rejected_blob_vis_energy);
+   fChain->SetBranchAddress("ThreeShower_s1_dist_vtx", &ThreeShower_s1_dist_vtx, &b_ThreeShower_s1_dist_vtx);
+   fChain->SetBranchAddress("ThreeShower_s1_energy", &ThreeShower_s1_energy, &b_ThreeShower_s1_energy);
+   fChain->SetBranchAddress("ThreeShower_s1_theta", &ThreeShower_s1_theta, &b_ThreeShower_s1_theta);
+   fChain->SetBranchAddress("ThreeShower_s2_dist_vtx", &ThreeShower_s2_dist_vtx, &b_ThreeShower_s2_dist_vtx);
+   fChain->SetBranchAddress("ThreeShower_s2_energy", &ThreeShower_s2_energy, &b_ThreeShower_s2_energy);
+   fChain->SetBranchAddress("ThreeShower_s2_theta", &ThreeShower_s2_theta, &b_ThreeShower_s2_theta);
+   fChain->SetBranchAddress("ThreeShower_s3_dist_vtx", &ThreeShower_s3_dist_vtx, &b_ThreeShower_s3_dist_vtx);
+   fChain->SetBranchAddress("ThreeShower_s3_energy", &ThreeShower_s3_energy, &b_ThreeShower_s3_energy);
+   fChain->SetBranchAddress("ThreeShower_s3_theta", &ThreeShower_s3_theta, &b_ThreeShower_s3_theta);
    fChain->SetBranchAddress("energy_from_mc", &energy_from_mc, &b_energy_from_mc);
    fChain->SetBranchAddress("energy_from_mc_fraction", &energy_from_mc_fraction, &b_energy_from_mc_fraction);
    fChain->SetBranchAddress("energy_from_mc_fraction_of_highest", &energy_from_mc_fraction_of_highest, &b_energy_from_mc_fraction_of_highest);
@@ -1748,11 +1853,14 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
    fChain->SetBranchAddress("truth_N_proton", &truth_N_proton, &b_truth_N_proton);
    fChain->SetBranchAddress("truth_N_trueMichelElectrons", &truth_N_trueMichelElectrons, &b_truth_N_trueMichelElectrons);
+   fChain->SetBranchAddress("truth_OneShower_evis_most_pdg", &truth_OneShower_evis_most_pdg, &b_truth_OneShower_evis_most_pdg);
+   fChain->SetBranchAddress("truth_Rejected_unused_evis_most_pdg", &truth_Rejected_unused_evis_most_pdg, &b_truth_Rejected_unused_evis_most_pdg);
+   fChain->SetBranchAddress("truth_ThreeShower_s1_evis_most_pdg", &truth_ThreeShower_s1_evis_most_pdg, &b_truth_ThreeShower_s1_evis_most_pdg);
+   fChain->SetBranchAddress("truth_ThreeShower_s2_evis_most_pdg", &truth_ThreeShower_s2_evis_most_pdg, &b_truth_ThreeShower_s2_evis_most_pdg);
+   fChain->SetBranchAddress("truth_ThreeShower_s3_evis_most_pdg", &truth_ThreeShower_s3_evis_most_pdg, &b_truth_ThreeShower_s3_evis_most_pdg);
    fChain->SetBranchAddress("truth_blob1_evis_most_pdg", &truth_blob1_evis_most_pdg, &b_truth_blob1_evis_most_pdg);
    fChain->SetBranchAddress("truth_blob2_evis_most_pdg", &truth_blob2_evis_most_pdg, &b_truth_blob2_evis_most_pdg);
    fChain->SetBranchAddress("truth_dispersed_unused_evis_most_pdg", &truth_dispersed_unused_evis_most_pdg, &b_truth_dispersed_unused_evis_most_pdg);
-   fChain->SetBranchAddress("truth_lowcharge_unused_evis_most_pdg", &truth_lowcharge_unused_evis_most_pdg, &b_truth_lowcharge_unused_evis_most_pdg);
-   fChain->SetBranchAddress("truth_outTime_unused_evis_most_pdg", &truth_outTime_unused_evis_most_pdg, &b_truth_outTime_unused_evis_most_pdg);
    fChain->SetBranchAddress("truth_pi0_GrandMother", &truth_pi0_GrandMother, &b_truth_pi0_GrandMother);
    fChain->SetBranchAddress("truth_pi0_GrandMotherStatus", &truth_pi0_GrandMotherStatus, &b_truth_pi0_GrandMotherStatus);
    fChain->SetBranchAddress("truth_pi0_Mother", &truth_pi0_Mother, &b_truth_pi0_Mother);
@@ -1762,6 +1870,40 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_vertex_module", &truth_vertex_module, &b_truth_vertex_module);
    fChain->SetBranchAddress("truth_vertex_plane", &truth_vertex_plane, &b_truth_vertex_plane);
    fChain->SetBranchAddress("truth_vertex_unused_evis_most_pdg", &truth_vertex_unused_evis_most_pdg, &b_truth_vertex_unused_evis_most_pdg);
+   fChain->SetBranchAddress("truth_OneShower_evis_muon", &truth_OneShower_evis_muon, &b_truth_OneShower_evis_muon);
+   fChain->SetBranchAddress("truth_OneShower_evis_neutron", &truth_OneShower_evis_neutron, &b_truth_OneShower_evis_neutron);
+   fChain->SetBranchAddress("truth_OneShower_evis_piminus", &truth_OneShower_evis_piminus, &b_truth_OneShower_evis_piminus);
+   fChain->SetBranchAddress("truth_OneShower_evis_piplus", &truth_OneShower_evis_piplus, &b_truth_OneShower_evis_piplus);
+   fChain->SetBranchAddress("truth_OneShower_evis_pizero", &truth_OneShower_evis_pizero, &b_truth_OneShower_evis_pizero);
+   fChain->SetBranchAddress("truth_OneShower_evis_proton", &truth_OneShower_evis_proton, &b_truth_OneShower_evis_proton);
+   fChain->SetBranchAddress("truth_OneShower_evis_total_norm", &truth_OneShower_evis_total_norm, &b_truth_OneShower_evis_total_norm);
+   fChain->SetBranchAddress("truth_OneShower_evis_total_truth", &truth_OneShower_evis_total_truth, &b_truth_OneShower_evis_total_truth);
+   fChain->SetBranchAddress("truth_Rejected_unused_evis_total_norm", &truth_Rejected_unused_evis_total_norm, &b_truth_Rejected_unused_evis_total_norm);
+   fChain->SetBranchAddress("truth_Rejected_unused_evis_total_truth", &truth_Rejected_unused_evis_total_truth, &b_truth_Rejected_unused_evis_total_truth);
+   fChain->SetBranchAddress("truth_ThreeShower_s1_evis_muon", &truth_ThreeShower_s1_evis_muon, &b_truth_ThreeShower_s1_evis_muon);
+   fChain->SetBranchAddress("truth_ThreeShower_s1_evis_neutron", &truth_ThreeShower_s1_evis_neutron, &b_truth_ThreeShower_s1_evis_neutron);
+   fChain->SetBranchAddress("truth_ThreeShower_s1_evis_piminus", &truth_ThreeShower_s1_evis_piminus, &b_truth_ThreeShower_s1_evis_piminus);
+   fChain->SetBranchAddress("truth_ThreeShower_s1_evis_piplus", &truth_ThreeShower_s1_evis_piplus, &b_truth_ThreeShower_s1_evis_piplus);
+   fChain->SetBranchAddress("truth_ThreeShower_s1_evis_pizero", &truth_ThreeShower_s1_evis_pizero, &b_truth_ThreeShower_s1_evis_pizero);
+   fChain->SetBranchAddress("truth_ThreeShower_s1_evis_proton", &truth_ThreeShower_s1_evis_proton, &b_truth_ThreeShower_s1_evis_proton);
+   fChain->SetBranchAddress("truth_ThreeShower_s1_evis_total_norm", &truth_ThreeShower_s1_evis_total_norm, &b_truth_ThreeShower_s1_evis_total_norm);
+   fChain->SetBranchAddress("truth_ThreeShower_s1_evis_total_truth", &truth_ThreeShower_s1_evis_total_truth, &b_truth_ThreeShower_s1_evis_total_truth);
+   fChain->SetBranchAddress("truth_ThreeShower_s2_evis_muon", &truth_ThreeShower_s2_evis_muon, &b_truth_ThreeShower_s2_evis_muon);
+   fChain->SetBranchAddress("truth_ThreeShower_s2_evis_neutron", &truth_ThreeShower_s2_evis_neutron, &b_truth_ThreeShower_s2_evis_neutron);
+   fChain->SetBranchAddress("truth_ThreeShower_s2_evis_piminus", &truth_ThreeShower_s2_evis_piminus, &b_truth_ThreeShower_s2_evis_piminus);
+   fChain->SetBranchAddress("truth_ThreeShower_s2_evis_piplus", &truth_ThreeShower_s2_evis_piplus, &b_truth_ThreeShower_s2_evis_piplus);
+   fChain->SetBranchAddress("truth_ThreeShower_s2_evis_pizero", &truth_ThreeShower_s2_evis_pizero, &b_truth_ThreeShower_s2_evis_pizero);
+   fChain->SetBranchAddress("truth_ThreeShower_s2_evis_proton", &truth_ThreeShower_s2_evis_proton, &b_truth_ThreeShower_s2_evis_proton);
+   fChain->SetBranchAddress("truth_ThreeShower_s2_evis_total_norm", &truth_ThreeShower_s2_evis_total_norm, &b_truth_ThreeShower_s2_evis_total_norm);
+   fChain->SetBranchAddress("truth_ThreeShower_s2_evis_total_truth", &truth_ThreeShower_s2_evis_total_truth, &b_truth_ThreeShower_s2_evis_total_truth);
+   fChain->SetBranchAddress("truth_ThreeShower_s3_evis_muon", &truth_ThreeShower_s3_evis_muon, &b_truth_ThreeShower_s3_evis_muon);
+   fChain->SetBranchAddress("truth_ThreeShower_s3_evis_neutron", &truth_ThreeShower_s3_evis_neutron, &b_truth_ThreeShower_s3_evis_neutron);
+   fChain->SetBranchAddress("truth_ThreeShower_s3_evis_piminus", &truth_ThreeShower_s3_evis_piminus, &b_truth_ThreeShower_s3_evis_piminus);
+   fChain->SetBranchAddress("truth_ThreeShower_s3_evis_piplus", &truth_ThreeShower_s3_evis_piplus, &b_truth_ThreeShower_s3_evis_piplus);
+   fChain->SetBranchAddress("truth_ThreeShower_s3_evis_pizero", &truth_ThreeShower_s3_evis_pizero, &b_truth_ThreeShower_s3_evis_pizero);
+   fChain->SetBranchAddress("truth_ThreeShower_s3_evis_proton", &truth_ThreeShower_s3_evis_proton, &b_truth_ThreeShower_s3_evis_proton);
+   fChain->SetBranchAddress("truth_ThreeShower_s3_evis_total_norm", &truth_ThreeShower_s3_evis_total_norm, &b_truth_ThreeShower_s3_evis_total_norm);
+   fChain->SetBranchAddress("truth_ThreeShower_s3_evis_total_truth", &truth_ThreeShower_s3_evis_total_truth, &b_truth_ThreeShower_s3_evis_total_truth);
    fChain->SetBranchAddress("truth_allClusters_evis_pizero", &truth_allClusters_evis_pizero, &b_truth_allClusters_evis_pizero);
    fChain->SetBranchAddress("truth_blob1_evis_muon", &truth_blob1_evis_muon, &b_truth_blob1_evis_muon);
    fChain->SetBranchAddress("truth_blob1_evis_neutron", &truth_blob1_evis_neutron, &b_truth_blob1_evis_neutron);
@@ -1805,8 +1947,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_hcal_unused_evis_proton", &truth_hcal_unused_evis_proton, &b_truth_hcal_unused_evis_proton);
    fChain->SetBranchAddress("truth_hcal_unused_evis_total_norm", &truth_hcal_unused_evis_total_norm, &b_truth_hcal_unused_evis_total_norm);
    fChain->SetBranchAddress("truth_hcal_unused_evis_total_truth", &truth_hcal_unused_evis_total_truth, &b_truth_hcal_unused_evis_total_truth);
-   fChain->SetBranchAddress("truth_lowcharge_unused_evis_total_norm", &truth_lowcharge_unused_evis_total_norm, &b_truth_lowcharge_unused_evis_total_norm);
-   fChain->SetBranchAddress("truth_lowcharge_unused_evis_total_truth", &truth_lowcharge_unused_evis_total_truth, &b_truth_lowcharge_unused_evis_total_truth);
    fChain->SetBranchAddress("truth_michelElectron_E", &truth_michelElectron_E, &b_truth_michelElectron_E);
    fChain->SetBranchAddress("truth_michelElectron_P", &truth_michelElectron_P, &b_truth_michelElectron_P);
    fChain->SetBranchAddress("truth_michelMuon_P", &truth_michelMuon_P, &b_truth_michelMuon_P);
@@ -1823,8 +1963,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_other_unused_evis_proton", &truth_other_unused_evis_proton, &b_truth_other_unused_evis_proton);
    fChain->SetBranchAddress("truth_other_unused_evis_total_norm", &truth_other_unused_evis_total_norm, &b_truth_other_unused_evis_total_norm);
    fChain->SetBranchAddress("truth_other_unused_evis_total_truth", &truth_other_unused_evis_total_truth, &b_truth_other_unused_evis_total_truth);
-   fChain->SetBranchAddress("truth_outTime_unused_evis_total_norm", &truth_outTime_unused_evis_total_norm, &b_truth_outTime_unused_evis_total_norm);
-   fChain->SetBranchAddress("truth_outTime_unused_evis_total_truth", &truth_outTime_unused_evis_total_truth, &b_truth_outTime_unused_evis_total_truth);
    fChain->SetBranchAddress("truth_total_captured_evis_pizero", &truth_total_captured_evis_pizero, &b_truth_total_captured_evis_pizero);
    fChain->SetBranchAddress("truth_total_captured_evis_total_norm", &truth_total_captured_evis_total_norm, &b_truth_total_captured_evis_total_norm);
    fChain->SetBranchAddress("truth_total_captured_evis_total_truth", &truth_total_captured_evis_total_truth, &b_truth_total_captured_evis_total_truth);

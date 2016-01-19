@@ -6,11 +6,12 @@
 using namespace std;
 
 // Initialize Constants
-const string CCProtonPi0_NTupleAnalysis::version = "v2_50";
+const string CCProtonPi0_NTupleAnalysis::version = "v2_51a";
 const double CCProtonPi0_NTupleAnalysis::SENTINEL = -9.9;
 const double CCProtonPi0_NTupleAnalysis::MeV_to_GeV = pow(10,-3);
 const double CCProtonPi0_NTupleAnalysis::MeVSq_to_GeVSq = pow(10,-6);
 const double CCProtonPi0_NTupleAnalysis::mm_to_cm = pow(10,-1);
+const double CCProtonPi0_NTupleAnalysis::rad_to_deg = 180.0/M_PI;
 
 CCProtonPi0_NTupleAnalysis::CCProtonPi0_NTupleAnalysis()
 {

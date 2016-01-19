@@ -12,8 +12,8 @@ using namespace PlotUtils;
 void CCProtonPi0_Plotter::DrawStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
 {
     DrawStackedMC_BckgAll(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
-    DrawStackedMC_BckgWithPi0(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
-    DrawStackedMC_BckgType(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
+    //DrawStackedMC_BckgWithPi0(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
+    //DrawStackedMC_BckgType(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
 }
 
 void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)

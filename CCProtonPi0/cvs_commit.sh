@@ -1,28 +1,33 @@
-CCPROTONPI0_V="v2_50"
+CCPROTONPI0_V="v2_51"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Background Type Improved
-		NC
-		CC-Anti Neutrino
-		QE Like 
-			No Pion, No other particles than Nucleons and muon
-		Single Charged Pion
-		Double Pions with Pi0
-		Double Pions without Pi0
-		Multiple Pions with Pi0
-		Multiple Pions withotu Pi0
-		Other
-	
-	Keeping Events with Michel Electron is Optional
-		Decided not to remove these events in reconstruction stage
-
-	Removed HoughEnergyLimit inside ConeBlobs
-		PreFilterPi0 already checks max energy no need to check again
+	Improved ConeBlobs Function
+		More modular structure, collected common task items under functions such as
+			FillUsableClusters()
+			ProcessRejectedClusters()
+			RecoverShowers_InvMass()
+			etc..
 		
---------------------------------------------------------------------------------
+		Removed old and unnecessary NTuple Variables
+		
+		Improved Cluster Rejection Method
+			Collecting all rejected clusters in a single blob, 
+				Previously out time and low charge was different
+			Rejecting following clusters:
+				Out Time with Muon (OLD)
+				Low Charge Cluster (OLD)
+				Cluster inside HCAL (NEW)
+		
+		Improved Recover Methods
+			Recover 1Shower Events
+				Not recovering anything yet, saving 1Shower Information only
+			Recover 3Shower Events
+				Check position and direction of each shower, 
+					if one fails reject it and keep the other two
+				
+-------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	BackgroundTool Updated for the new Background Types
-	Plotter Improved
+	No Major Changes
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

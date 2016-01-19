@@ -85,6 +85,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void getPi0Family();
         void fillPi0MC();
         void fillPi0Reco();
+        double Calc_TruePi0OpeningAngle();
 
         // Pi0Blob Specific Functions
         void fillPi0BlobMC();
@@ -123,8 +124,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool isPassedAllCuts;
         bool applyMaxEvents;
         bool applyDeltaInvMass;
-        bool applyVertexCount;
-        bool applyProtonCount;
         double latest_ScanID;
         double pID_KE_Limit;
         double minProtonScore_LLR;
@@ -136,13 +135,22 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double min_Delta_invMass;
         double max_Delta_invMass;
         double max_beamEnergy;
-        double max_nVertices;
-        double max_nProtonCandidates;
         double nMaxEvents;
         vector<double> PDG_pi0_Mother;
         vector<double> PDG_pi0_GrandMother;
         double counter1;
         double counter2;
+
+        // ConeBlobs Study
+        double n1Shower;
+        double n3Shower_Signal;
+        double n3Shower_Bckg;
+        double nMoreShower;
+        double n1Shower_BothConverted;
+        double n1Shower_OneConverted;
+        double n1Shower_NoneConverted;
+        void Fill_1ShowerHists();
+        void Fill_3ShowerHists();
 
         // Pi0InvariantMass Correction
         double mean_MC_1Track;
@@ -190,10 +198,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Bool_t          minos_track_inside_partial_plane;
         Bool_t          prim_vtx_has_misassigned_track_direction;
         Bool_t          prim_vtx_has_broken_track;
-        Bool_t          is_anglescan;
-        Bool_t          is_anglescan_applied;
-        Bool_t          is_houghtransform;
-        Bool_t          is_houghtransform_applied;
+        Bool_t          is_blobs_recovered;
         Int_t           Cut_BlobDirectionBad;
         Int_t           Cut_ConeBlobs;
         Int_t           Cut_EndPoint_Michel_Exist;
@@ -209,6 +214,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Int_t           Cut_Vertex_Not_Fiducial;
         Int_t           Cut_Vertex_Not_Reconstructable;
         Int_t           Cut_secEndPoint_Michel_Exist;
+        Int_t           OneShower_nClusters;
+        Int_t           ThreeShower_s1_nClusters;
+        Int_t           ThreeShower_s2_nClusters;
+        Int_t           ThreeShower_s3_nClusters;
         Int_t           anglescan_ncand;
         Int_t           anglescan_ncandx;
         Int_t           broken_track_most_us_plane;
@@ -255,12 +264,24 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Int_t           vtx_primary_multiplicity;
         Int_t           vtx_secondary_count;
         Int_t           vtx_total_count;
+        Double_t        ConeBlobs_usable_evis_Tracker;
+        Double_t        Coneblobs_usable_evis_ECAL;
+        Double_t        Coneblobs_usable_evis_HCAL;
         Double_t        Dispersed_blob_energy;
         Double_t        Muon_blob_energy;
-        Double_t        RE_energy_ECAL;
-        Double_t        RE_energy_HCAL;
-        Double_t        RE_energy_Tracker;
+        Double_t        OneShower_dist_vtx;
+        Double_t        OneShower_energy;
+        Double_t        OneShower_theta;
         Double_t        Rejected_blob_vis_energy;
+        Double_t        ThreeShower_s1_dist_vtx;
+        Double_t        ThreeShower_s1_energy;
+        Double_t        ThreeShower_s1_theta;
+        Double_t        ThreeShower_s2_dist_vtx;
+        Double_t        ThreeShower_s2_energy;
+        Double_t        ThreeShower_s2_theta;
+        Double_t        ThreeShower_s3_dist_vtx;
+        Double_t        ThreeShower_s3_energy;
+        Double_t        ThreeShower_s3_theta;
         Double_t        energy_from_mc;
         Double_t        energy_from_mc_fraction;
         Double_t        energy_from_mc_fraction_of_highest;
@@ -438,11 +459,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Int_t           g1dedx_cluster_energy_sz;
         Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
         Int_t           g1dedx_rev_cluster_energy_sz;
-        Double_t        g1dedx_rev_cluster_energy[143];   //[g1dedx_rev_cluster_energy_sz]
+        Double_t        g1dedx_rev_cluster_energy[125];   //[g1dedx_rev_cluster_energy_sz]
         Int_t           g2dedx_cluster_energy_sz;
         Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
         Int_t           g2dedx_rev_cluster_energy_sz;
-        Double_t        g2dedx_rev_cluster_energy[110];   //[g2dedx_rev_cluster_energy_sz]
+        Double_t        g2dedx_rev_cluster_energy[105];   //[g2dedx_rev_cluster_energy_sz]
         Double_t        gamma1_direction[3];
         Double_t        gamma1_vertex[3];
         Double_t        gamma2_direction[3];
@@ -490,11 +511,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Int_t           truth_N_pi0;
         Int_t           truth_N_proton;
         Int_t           truth_N_trueMichelElectrons;
+        Int_t           truth_OneShower_evis_most_pdg;
+        Int_t           truth_Rejected_unused_evis_most_pdg;
+        Int_t           truth_ThreeShower_s1_evis_most_pdg;
+        Int_t           truth_ThreeShower_s2_evis_most_pdg;
+        Int_t           truth_ThreeShower_s3_evis_most_pdg;
         Int_t           truth_blob1_evis_most_pdg;
         Int_t           truth_blob2_evis_most_pdg;
         Int_t           truth_dispersed_unused_evis_most_pdg;
-        Int_t           truth_lowcharge_unused_evis_most_pdg;
-        Int_t           truth_outTime_unused_evis_most_pdg;
         Int_t           truth_pi0_GrandMother;
         Int_t           truth_pi0_GrandMotherStatus;
         Int_t           truth_pi0_Mother;
@@ -504,6 +528,40 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Int_t           truth_vertex_module;
         Int_t           truth_vertex_plane;
         Int_t           truth_vertex_unused_evis_most_pdg;
+        Double_t        truth_OneShower_evis_muon;
+        Double_t        truth_OneShower_evis_neutron;
+        Double_t        truth_OneShower_evis_piminus;
+        Double_t        truth_OneShower_evis_piplus;
+        Double_t        truth_OneShower_evis_pizero;
+        Double_t        truth_OneShower_evis_proton;
+        Double_t        truth_OneShower_evis_total_norm;
+        Double_t        truth_OneShower_evis_total_truth;
+        Double_t        truth_Rejected_unused_evis_total_norm;
+        Double_t        truth_Rejected_unused_evis_total_truth;
+        Double_t        truth_ThreeShower_s1_evis_muon;
+        Double_t        truth_ThreeShower_s1_evis_neutron;
+        Double_t        truth_ThreeShower_s1_evis_piminus;
+        Double_t        truth_ThreeShower_s1_evis_piplus;
+        Double_t        truth_ThreeShower_s1_evis_pizero;
+        Double_t        truth_ThreeShower_s1_evis_proton;
+        Double_t        truth_ThreeShower_s1_evis_total_norm;
+        Double_t        truth_ThreeShower_s1_evis_total_truth;
+        Double_t        truth_ThreeShower_s2_evis_muon;
+        Double_t        truth_ThreeShower_s2_evis_neutron;
+        Double_t        truth_ThreeShower_s2_evis_piminus;
+        Double_t        truth_ThreeShower_s2_evis_piplus;
+        Double_t        truth_ThreeShower_s2_evis_pizero;
+        Double_t        truth_ThreeShower_s2_evis_proton;
+        Double_t        truth_ThreeShower_s2_evis_total_norm;
+        Double_t        truth_ThreeShower_s2_evis_total_truth;
+        Double_t        truth_ThreeShower_s3_evis_muon;
+        Double_t        truth_ThreeShower_s3_evis_neutron;
+        Double_t        truth_ThreeShower_s3_evis_piminus;
+        Double_t        truth_ThreeShower_s3_evis_piplus;
+        Double_t        truth_ThreeShower_s3_evis_pizero;
+        Double_t        truth_ThreeShower_s3_evis_proton;
+        Double_t        truth_ThreeShower_s3_evis_total_norm;
+        Double_t        truth_ThreeShower_s3_evis_total_truth;
         Double_t        truth_allClusters_evis_pizero;
         Double_t        truth_blob1_evis_muon;
         Double_t        truth_blob1_evis_neutron;
@@ -547,8 +605,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        truth_hcal_unused_evis_proton;
         Double_t        truth_hcal_unused_evis_total_norm;
         Double_t        truth_hcal_unused_evis_total_truth;
-        Double_t        truth_lowcharge_unused_evis_total_norm;
-        Double_t        truth_lowcharge_unused_evis_total_truth;
         Double_t        truth_michelElectron_E;
         Double_t        truth_michelElectron_P;
         Double_t        truth_michelMuon_P;
@@ -565,8 +621,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        truth_other_unused_evis_proton;
         Double_t        truth_other_unused_evis_total_norm;
         Double_t        truth_other_unused_evis_total_truth;
-        Double_t        truth_outTime_unused_evis_total_norm;
-        Double_t        truth_outTime_unused_evis_total_truth;
         Double_t        truth_total_captured_evis_pizero;
         Double_t        truth_total_captured_evis_total_norm;
         Double_t        truth_total_captured_evis_total_truth;
@@ -850,10 +904,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_minos_track_inside_partial_plane;   //!
         TBranch        *b_prim_vtx_has_misassigned_track_direction;   //!
         TBranch        *b_prim_vtx_has_broken_track;   //!
-        TBranch        *b_is_anglescan;   //!
-        TBranch        *b_is_anglescan_applied;   //!
-        TBranch        *b_is_houghtransform;   //!
-        TBranch        *b_is_houghtransform_applied;   //!
+        TBranch        *b_is_blobs_recovered;   //!
         TBranch        *b_Cut_BlobDirectionBad;   //!
         TBranch        *b_Cut_ConeBlobs;   //!
         TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
@@ -869,6 +920,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_Cut_Vertex_Not_Fiducial;   //!
         TBranch        *b_Cut_Vertex_Not_Reconstructable;   //!
         TBranch        *b_Cut_secEndPoint_Michel_Exist;   //!
+        TBranch        *b_OneShower_nClusters;   //!
+        TBranch        *b_ThreeShower_s1_nClusters;   //!
+        TBranch        *b_ThreeShower_s2_nClusters;   //!
+        TBranch        *b_ThreeShower_s3_nClusters;   //!
         TBranch        *b_anglescan_ncand;   //!
         TBranch        *b_anglescan_ncandx;   //!
         TBranch        *b_broken_track_most_us_plane;   //!
@@ -915,12 +970,24 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_vtx_primary_multiplicity;   //!
         TBranch        *b_vtx_secondary_count;   //!
         TBranch        *b_vtx_total_count;   //!
+        TBranch        *b_ConeBlobs_usable_evis_Tracker;   //!
+        TBranch        *b_Coneblobs_usable_evis_ECAL;   //!
+        TBranch        *b_Coneblobs_usable_evis_HCAL;   //!
         TBranch        *b_Dispersed_blob_energy;   //!
         TBranch        *b_Muon_blob_energy;   //!
-        TBranch        *b_RE_energy_ECAL;   //!
-        TBranch        *b_RE_energy_HCAL;   //!
-        TBranch        *b_RE_energy_Tracker;   //!
+        TBranch        *b_OneShower_dist_vtx;   //!
+        TBranch        *b_OneShower_energy;   //!
+        TBranch        *b_OneShower_theta;   //!
         TBranch        *b_Rejected_blob_vis_energy;   //!
+        TBranch        *b_ThreeShower_s1_dist_vtx;   //!
+        TBranch        *b_ThreeShower_s1_energy;   //!
+        TBranch        *b_ThreeShower_s1_theta;   //!
+        TBranch        *b_ThreeShower_s2_dist_vtx;   //!
+        TBranch        *b_ThreeShower_s2_energy;   //!
+        TBranch        *b_ThreeShower_s2_theta;   //!
+        TBranch        *b_ThreeShower_s3_dist_vtx;   //!
+        TBranch        *b_ThreeShower_s3_energy;   //!
+        TBranch        *b_ThreeShower_s3_theta;   //!
         TBranch        *b_energy_from_mc;   //!
         TBranch        *b_energy_from_mc_fraction;   //!
         TBranch        *b_energy_from_mc_fraction_of_highest;   //!
@@ -1150,11 +1217,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_truth_N_pi0;   //!
         TBranch        *b_truth_N_proton;   //!
         TBranch        *b_truth_N_trueMichelElectrons;   //!
+        TBranch        *b_truth_OneShower_evis_most_pdg;   //!
+        TBranch        *b_truth_Rejected_unused_evis_most_pdg;   //!
+        TBranch        *b_truth_ThreeShower_s1_evis_most_pdg;   //!
+        TBranch        *b_truth_ThreeShower_s2_evis_most_pdg;   //!
+        TBranch        *b_truth_ThreeShower_s3_evis_most_pdg;   //!
         TBranch        *b_truth_blob1_evis_most_pdg;   //!
         TBranch        *b_truth_blob2_evis_most_pdg;   //!
         TBranch        *b_truth_dispersed_unused_evis_most_pdg;   //!
-        TBranch        *b_truth_lowcharge_unused_evis_most_pdg;   //!
-        TBranch        *b_truth_outTime_unused_evis_most_pdg;   //!
         TBranch        *b_truth_pi0_GrandMother;   //!
         TBranch        *b_truth_pi0_GrandMotherStatus;   //!
         TBranch        *b_truth_pi0_Mother;   //!
@@ -1164,6 +1234,40 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_truth_vertex_module;   //!
         TBranch        *b_truth_vertex_plane;   //!
         TBranch        *b_truth_vertex_unused_evis_most_pdg;   //!
+        TBranch        *b_truth_OneShower_evis_muon;   //!
+        TBranch        *b_truth_OneShower_evis_neutron;   //!
+        TBranch        *b_truth_OneShower_evis_piminus;   //!
+        TBranch        *b_truth_OneShower_evis_piplus;   //!
+        TBranch        *b_truth_OneShower_evis_pizero;   //!
+        TBranch        *b_truth_OneShower_evis_proton;   //!
+        TBranch        *b_truth_OneShower_evis_total_norm;   //!
+        TBranch        *b_truth_OneShower_evis_total_truth;   //!
+        TBranch        *b_truth_Rejected_unused_evis_total_norm;   //!
+        TBranch        *b_truth_Rejected_unused_evis_total_truth;   //!
+        TBranch        *b_truth_ThreeShower_s1_evis_muon;   //!
+        TBranch        *b_truth_ThreeShower_s1_evis_neutron;   //!
+        TBranch        *b_truth_ThreeShower_s1_evis_piminus;   //!
+        TBranch        *b_truth_ThreeShower_s1_evis_piplus;   //!
+        TBranch        *b_truth_ThreeShower_s1_evis_pizero;   //!
+        TBranch        *b_truth_ThreeShower_s1_evis_proton;   //!
+        TBranch        *b_truth_ThreeShower_s1_evis_total_norm;   //!
+        TBranch        *b_truth_ThreeShower_s1_evis_total_truth;   //!
+        TBranch        *b_truth_ThreeShower_s2_evis_muon;   //!
+        TBranch        *b_truth_ThreeShower_s2_evis_neutron;   //!
+        TBranch        *b_truth_ThreeShower_s2_evis_piminus;   //!
+        TBranch        *b_truth_ThreeShower_s2_evis_piplus;   //!
+        TBranch        *b_truth_ThreeShower_s2_evis_pizero;   //!
+        TBranch        *b_truth_ThreeShower_s2_evis_proton;   //!
+        TBranch        *b_truth_ThreeShower_s2_evis_total_norm;   //!
+        TBranch        *b_truth_ThreeShower_s2_evis_total_truth;   //!
+        TBranch        *b_truth_ThreeShower_s3_evis_muon;   //!
+        TBranch        *b_truth_ThreeShower_s3_evis_neutron;   //!
+        TBranch        *b_truth_ThreeShower_s3_evis_piminus;   //!
+        TBranch        *b_truth_ThreeShower_s3_evis_piplus;   //!
+        TBranch        *b_truth_ThreeShower_s3_evis_pizero;   //!
+        TBranch        *b_truth_ThreeShower_s3_evis_proton;   //!
+        TBranch        *b_truth_ThreeShower_s3_evis_total_norm;   //!
+        TBranch        *b_truth_ThreeShower_s3_evis_total_truth;   //!
         TBranch        *b_truth_allClusters_evis_pizero;   //!
         TBranch        *b_truth_blob1_evis_muon;   //!
         TBranch        *b_truth_blob1_evis_neutron;   //!
@@ -1207,8 +1311,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_truth_hcal_unused_evis_proton;   //!
         TBranch        *b_truth_hcal_unused_evis_total_norm;   //!
         TBranch        *b_truth_hcal_unused_evis_total_truth;   //!
-        TBranch        *b_truth_lowcharge_unused_evis_total_norm;   //!
-        TBranch        *b_truth_lowcharge_unused_evis_total_truth;   //!
         TBranch        *b_truth_michelElectron_E;   //!
         TBranch        *b_truth_michelElectron_P;   //!
         TBranch        *b_truth_michelMuon_P;   //!
@@ -1225,8 +1327,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_truth_other_unused_evis_proton;   //!
         TBranch        *b_truth_other_unused_evis_total_norm;   //!
         TBranch        *b_truth_other_unused_evis_total_truth;   //!
-        TBranch        *b_truth_outTime_unused_evis_total_norm;   //!
-        TBranch        *b_truth_outTime_unused_evis_total_truth;   //!
         TBranch        *b_truth_total_captured_evis_pizero;   //!
         TBranch        *b_truth_total_captured_evis_total_norm;   //!
         TBranch        *b_truth_total_captured_evis_total_truth;   //!
@@ -1487,8 +1587,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_prong_part_pid;   //!
         TBranch        *b_prong_part_E;   //!
         TBranch        *b_prong_part_pos;   //!
-
-
 
 };
 

@@ -33,7 +33,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
-    //plotPion_MCOnly();
+    plotPion_MCOnly();
     plotCutHistograms_MCOnly();
     //plotPi0Blob_MCOnly();
     plotEfficiencyCurves();
@@ -42,7 +42,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  Plot Function Reserved for Other Studies
     //--------------------------------------------------------------------------
     //SavePi0InvMassPoints();
-    //plotOtherStudies();
+    plotOtherStudies();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -147,21 +147,28 @@ void CCProtonPi0_Plotter::plotPi0Blob_DataMC()
 void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
-
     std::string plotDir = plotDir_OtherStudies;
 
-    Draw1DHist(rootDir_OtherStudies,"evis",plotDir);
-    Draw1DHist(rootDir_OtherStudies,"true_energy",plotDir);
-
-    Draw2DHist(rootDir_OtherStudies,"evis_evis_ratio",plotDir,1);
-    Draw2DHist(rootDir_OtherStudies,"true_evis_ratio",plotDir,1);
-    Draw2DHist(rootDir_OtherStudies,"evis_true",plotDir,1);
-
-    Draw1DHist(rootDir_OtherStudies,"error",plotDir);
-    Draw1DHist(rootDir_OtherStudies,"reco_energy",plotDir);
-    Draw2DHist(rootDir_OtherStudies,"reco_true_energy",plotDir);
-    Draw2DHist(rootDir_OtherStudies,"true_recotrue_energy",plotDir);
-
+    DrawStackedMC(rootDir_CutHists, "OneShower_nClusters", plotDir);
+    DrawStackedMC(rootDir_CutHists, "OneShower_energy", plotDir);
+    DrawStackedMC(rootDir_CutHists, "OneShower_theta", plotDir);
+    DrawStackedMC(rootDir_CutHists, "OneShower_dist_vtx", plotDir);
+ 
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s1_nClusters", plotDir);
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s1_energy", plotDir);
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s1_theta", plotDir);
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s1_dist_vtx", plotDir);
+ 
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s2_nClusters", plotDir);
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s2_energy", plotDir);
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s2_theta", plotDir);
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s2_dist_vtx", plotDir);
+    
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s3_nClusters", plotDir);
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s3_energy", plotDir);
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s3_theta", plotDir);
+    DrawStackedMC(rootDir_CutHists, "ThreeShower_s3_dist_vtx", plotDir);
+  
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
 
@@ -646,7 +653,7 @@ void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
     rootDir_OtherStudies.data = "";
 
     // Set MC Root Dir
-    rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_50.root";
+    rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_51a.root";
     rootDir_Interaction.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Interaction.root";
     rootDir_Muon.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Muon.root";
     rootDir_Proton.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Proton.root";

@@ -49,6 +49,7 @@ class CCProtonPi0_NTupleAnalysis
         static const double MeV_to_GeV; 
         static const double MeVSq_to_GeVSq;
         static const double mm_to_cm;
+        static const double rad_to_deg;
 
         void OpenTextFile(string file_name, std::ofstream &file);
 
