@@ -372,15 +372,16 @@ void CCProtonPi0_CutList::SetCutNames()
 
 void CCProtonPi0_CutList::OpenTextFiles(bool isMC)
 {
+    std::string tag = "_NonRecovered"; 
+    
     std::string type;
-
     if (isMC) type = "CutTable_MC_";
     else type = "CutTable_Data_";
 
     // File Names
-    std::string f_all = Folder_List::output + Folder_List::textOut + type + "All_" + version + ".txt";
-    std::string f_1Track = Folder_List::output + Folder_List::textOut + type + "1Track_" + version + ".txt";
-    std::string f_2Track = Folder_List::output + Folder_List::textOut + type + "2Track_" + version + ".txt";
+    std::string f_all = Folder_List::output + Folder_List::textOut + type + "All_" + tag + version +".txt";
+    std::string f_1Track = Folder_List::output + Folder_List::textOut + type + "1Track_" + tag + version + ".txt";
+    std::string f_2Track = Folder_List::output + Folder_List::textOut + type + "2Track_" + tag + version + ".txt";
     
     OpenTextFile(f_all,cutText_All);
     OpenTextFile(f_1Track,cutText_1Track);

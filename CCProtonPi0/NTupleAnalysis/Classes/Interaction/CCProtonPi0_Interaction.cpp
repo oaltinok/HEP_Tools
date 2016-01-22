@@ -109,7 +109,17 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.vertex_z.get_width()));
         vertex_z.push_back(temp);
-}
+
+        temp = new MnvH1D( Form("%s_%d","recovered_Pi0_P",i),"Recovered Pi0 Momentum", 17, 0.0, 1.7 );
+        temp->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        recovered_Pi0_P.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","recovered_Pi0_theta",i),"Recovered Pi0 theta", 90, 0.0, 180.0 );
+        temp->GetXaxis()->SetTitle("Pi0 Theta [degree]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        recovered_Pi0_theta.push_back(temp);
+    }
     
     // MC Only Histograms
     final_mc_w_DIS = new TH1D( "final_mc_w_DIS","True W for DIS",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
@@ -172,6 +182,24 @@ void CCProtonPi0_Interaction::initHistograms()
     Enu_2Track_Diff = new TH1D("Enu_2Track_Diff","Neutrino Energy Difference - 2 Track",binList.beamE_Diff.get_nBins(), binList.beamE_Diff.get_min(), binList.beamE_Diff.get_max() );
     Enu_2Track_Diff->GetXaxis()->SetTitle("E_{#nu}^{Reco}-E_{#nu}^{True} [GeV]");
     Enu_2Track_Diff->GetYaxis()->SetTitle("N(Events)");
+
+    // Recovered Pi0
+    h_recovered_Pi0_P = new TH1D("h_recovered_Pi0_P","Pi0 Momentum",17,0.0,1.7);
+    h_recovered_Pi0_P->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
+    h_recovered_Pi0_P->GetYaxis()->SetTitle("N(Events)");
+
+    h_recovered_Pi0_theta = new TH1D("h_recovered_Pi0_theta","Pi0 theta",90,0.0,180.0);
+    h_recovered_Pi0_theta->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
+    h_recovered_Pi0_theta->GetYaxis()->SetTitle("N(Events)");
+
+    h_original_Pi0_P = new TH1D("h_original_Pi0_P","Pi0 Momentum",17,0.0,1.7);
+    h_original_Pi0_P->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
+    h_original_Pi0_P->GetYaxis()->SetTitle("N(Events)");
+
+    h_original_Pi0_theta = new TH1D("h_original_Pi0_theta","Pi0 theta",90,0.0,180.0);
+    h_original_Pi0_theta->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
+    h_original_Pi0_theta->GetYaxis()->SetTitle("N(Events)");
+
 }
 
 void CCProtonPi0_Interaction::writeHistograms()
@@ -200,6 +228,9 @@ void CCProtonPi0_Interaction::writeHistograms()
 
         // Other Event Parameters 
         deltaInvMass[i]->Write();
+
+        recovered_Pi0_P[i]->Write();
+        recovered_Pi0_theta[i]->Write();
     }
     
     // MC Only Histograms
@@ -214,6 +245,12 @@ void CCProtonPi0_Interaction::writeHistograms()
     // Ejected Nucleons
     n_ejected_nucleons_1Track->Write();
     n_ejected_nucleons_2Track->Write();
+
+    // Recovered Pi0
+    h_recovered_Pi0_P->Write();
+    h_recovered_Pi0_theta->Write();
+    h_original_Pi0_P->Write();
+    h_original_Pi0_theta->Write();
 
     // Neutrino Energy: Truth, Error, Difference
     Enu_True_1Track->Write();

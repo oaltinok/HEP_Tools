@@ -186,6 +186,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
 
         bool m_TrytoRecover_1Shower;
         bool m_TrytoRecover_3Shower;
+        bool m_recoverSingleShower_SmallAngle;
+        bool m_recoverSingleShower_SearchView;
         bool m_recoverShower_invMass;
         bool m_recoverShower_Direction;
 
@@ -325,6 +327,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void Save_1ShowerTruthMatch( std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::GenMinInteraction* truthEvent) const;
         void Save_3ShowerTruthMatch( std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::GenMinInteraction* truthEvent) const;
         bool isShowerGood(Minerva::IDBlob* shower, Minerva::PhysicsEvent* event) const;
+        bool RecoverSingleShower_SmallAngle(SmartRefVector<Minerva::IDCluster> &usableClusters, std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event)const;
+        bool RecoverSingleShower_View_U(SmartRefVector<Minerva::IDCluster> &usableClusters, std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event)const;
+        bool RecoverSingleShower_View_V(SmartRefVector<Minerva::IDCluster> &usableClusters, std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event)const;
 
         // --------------------------------------------------------------------
         // Study: Shower Energy Functions

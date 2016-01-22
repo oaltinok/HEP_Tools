@@ -125,6 +125,8 @@ class CCProtonPi0_Plotter
         void plotOtherStudies();
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
+        void plot_stacked_pi0_P();
+        void plot_stacked_pi0_theta();
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
 
         // Helper Functions

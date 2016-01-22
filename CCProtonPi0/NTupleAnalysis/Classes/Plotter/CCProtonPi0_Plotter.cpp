@@ -30,7 +30,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     //  MC Only
     //--------------------------------------------------------------------------
-    //plotInteraction_MCOnly();
+    plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
     plotPion_MCOnly();
@@ -42,7 +42,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  Plot Function Reserved for Other Studies
     //--------------------------------------------------------------------------
     //SavePi0InvMassPoints();
-    plotOtherStudies();
+    //plotOtherStudies();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -193,15 +193,22 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     //Draw1DHist(rootDir_Interaction,"proton_true_P_1Track",plotDir);
     //Draw1DHist(rootDir_Interaction,"proton_true_KE_1Track",plotDir);
 
-    Draw1DHist(rootDir_Interaction,"Enu_True_1Track",plotDir);
-    Draw1DHist(rootDir_Interaction,"Enu_True_2Track",plotDir);
-    Draw1DHist(rootDir_Interaction,"Enu_1Track_Error",plotDir);
-    Draw1DHist(rootDir_Interaction,"Enu_2Track_Error",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_True_1Track",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_True_2Track",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Error",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_2Track_Error",plotDir);
     //Draw1DHist(rootDir_Interaction,"Enu_1Track_Alt_Error",plotDir);
     
-    Draw1DHist(rootDir_Interaction,"Enu_1Track_Diff",plotDir);
-    Draw1DHist(rootDir_Interaction,"Enu_2Track_Diff",plotDir);
-   
+    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Diff",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_2Track_Diff",plotDir);
+  
+
+    DrawStackedMC(rootDir_Interaction,"recovered_Pi0_P",plotDir);
+    DrawStackedMC(rootDir_Interaction,"recovered_Pi0_theta",plotDir);
+
+    plot_stacked_pi0_P();
+    plot_stacked_pi0_theta();
+
     std::cout<<"Plotting Interaction MC Only Finished!"<<std::endl;
 }
 
@@ -646,6 +653,88 @@ void CCProtonPi0_Plotter::plot_final_mc_w_Stacked()
     delete c1;
 }
 
+void CCProtonPi0_Plotter::plot_stacked_pi0_P()
+{
+    std::string root_dir = rootDir_Interaction.mc;
+    std::string plotDir = plotDir_Interaction;
+
+    std::cout<<"\nPlottting Stacked Pi0 Theta"<<std::endl;
+
+    TFile* f_Root = new TFile(root_dir.c_str());
+    TCanvas* c1 = new TCanvas();
+    THStack *hs = new THStack("hs","Pi0 Momentum");
+    TLegend *legend = new TLegend(0.7,0.8,0.9,0.9);  
+
+    TH1D* h_original = (TH1D*)f_Root->Get("h_original_Pi0_P");
+    h_original->SetFillColor(kBlue);
+    h_original->SetMarkerStyle(21);
+    h_original->SetMarkerColor(kBlue);
+
+    TH1D* h_recovered = (TH1D*)f_Root->Get("h_recovered_Pi0_P");
+    h_recovered->SetFillColor(kGreen);
+    h_recovered->SetMarkerStyle(21);
+    h_recovered->SetMarkerColor(kGreen);
+
+    legend->AddEntry(h_original, "Original", "f");
+    legend->AddEntry(h_recovered, "Recovered", "f");
+
+    hs->Add(h_original);
+    hs->Add(h_recovered);
+    hs->Draw();
+    hs->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
+    hs->GetYaxis()->SetTitle("N(Events)");
+
+    legend->Draw();
+
+    c1->Print(Form("%s%s",plotDir.c_str(),"stacked_pi0_P.png"),"png");
+
+    delete f_Root;
+    delete hs;
+    delete legend;
+    delete c1;
+}
+
+void CCProtonPi0_Plotter::plot_stacked_pi0_theta()
+{
+    std::string root_dir = rootDir_Interaction.mc;
+    std::string plotDir = plotDir_Interaction;
+
+    std::cout<<"\nPlottting Stacked Pi0 Theta"<<std::endl;
+
+    TFile* f_Root = new TFile(root_dir.c_str());
+    TCanvas* c1 = new TCanvas();
+    THStack *hs = new THStack("hs","Pi0 Theta");
+    TLegend *legend = new TLegend(0.7,0.8,0.9,0.9);  
+
+    TH1D* h_original = (TH1D*)f_Root->Get("h_original_Pi0_theta");
+    h_original->SetFillColor(kBlue);
+    h_original->SetMarkerStyle(21);
+    h_original->SetMarkerColor(kBlue);
+
+    TH1D* h_recovered = (TH1D*)f_Root->Get("h_recovered_Pi0_theta");
+    h_recovered->SetFillColor(kGreen);
+    h_recovered->SetMarkerStyle(21);
+    h_recovered->SetMarkerColor(kGreen);
+
+    legend->AddEntry(h_original, "Original", "f");
+    legend->AddEntry(h_recovered, "Recovered", "f");
+
+    hs->Add(h_original);
+    hs->Add(h_recovered);
+    hs->Draw();
+    hs->GetXaxis()->SetTitle("Pi0 Theta [degree]");
+    hs->GetYaxis()->SetTitle("N(Events)");
+
+    legend->Draw();
+
+    c1->Print(Form("%s%s",plotDir.c_str(),"stacked_pi0_theta.png"),"png");
+
+    delete f_Root;
+    delete hs;
+    delete legend;
+    delete c1;
+}
+
 void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
 {
     // Set Other Studies ROOT Dir
@@ -653,7 +742,7 @@ void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
     rootDir_OtherStudies.data = "";
 
     // Set MC Root Dir
-    rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_51a.root";
+    rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_52d.root";
     rootDir_Interaction.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Interaction.root";
     rootDir_Muon.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Muon.root";
     rootDir_Proton.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Proton.root";

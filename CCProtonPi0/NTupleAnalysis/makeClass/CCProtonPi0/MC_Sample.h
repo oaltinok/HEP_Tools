@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jan 19 08:48:50 2016 by ROOT version 5.34/05
+// Wed Jan 20 21:16:54 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -44,6 +44,11 @@ public :
    Bool_t          prim_vtx_has_misassigned_track_direction;
    Bool_t          prim_vtx_has_broken_track;
    Bool_t          is_blobs_recovered;
+   Bool_t          is_blobs_recovered_direction;
+   Bool_t          is_blobs_recovered_invMass;
+   Bool_t          is_blobs_recovered_small_angle;
+   Bool_t          is_blobs_recovered_search_view_U;
+   Bool_t          is_blobs_recovered_search_view_V;
    Int_t           Cut_BlobDirectionBad;
    Int_t           Cut_ConeBlobs;
    Int_t           Cut_EndPoint_Michel_Exist;
@@ -65,6 +70,7 @@ public :
    Int_t           ThreeShower_s3_nClusters;
    Int_t           anglescan_ncand;
    Int_t           anglescan_ncandx;
+   Int_t           anglescan_nfoundBlobs;
    Int_t           broken_track_most_us_plane;
    Int_t           g1blob_1ParFit_ndof;
    Int_t           g1dedx_doublet;
@@ -750,6 +756,11 @@ public :
    TBranch        *b_prim_vtx_has_misassigned_track_direction;   //!
    TBranch        *b_prim_vtx_has_broken_track;   //!
    TBranch        *b_is_blobs_recovered;   //!
+   TBranch        *b_is_blobs_recovered_direction;   //!
+   TBranch        *b_is_blobs_recovered_invMass;   //!
+   TBranch        *b_is_blobs_recovered_small_angle;   //!
+   TBranch        *b_is_blobs_recovered_search_view_U;   //!
+   TBranch        *b_is_blobs_recovered_search_view_V;   //!
    TBranch        *b_Cut_BlobDirectionBad;   //!
    TBranch        *b_Cut_ConeBlobs;   //!
    TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
@@ -771,6 +782,7 @@ public :
    TBranch        *b_ThreeShower_s3_nClusters;   //!
    TBranch        *b_anglescan_ncand;   //!
    TBranch        *b_anglescan_ncandx;   //!
+   TBranch        *b_anglescan_nfoundBlobs;   //!
    TBranch        *b_broken_track_most_us_plane;   //!
    TBranch        *b_g1blob_1ParFit_ndof;   //!
    TBranch        *b_g1dedx_doublet;   //!
@@ -1467,7 +1479,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_51a.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_52b.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1541,6 +1553,11 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("prim_vtx_has_misassigned_track_direction", &prim_vtx_has_misassigned_track_direction, &b_prim_vtx_has_misassigned_track_direction);
    fChain->SetBranchAddress("prim_vtx_has_broken_track", &prim_vtx_has_broken_track, &b_prim_vtx_has_broken_track);
    fChain->SetBranchAddress("is_blobs_recovered", &is_blobs_recovered, &b_is_blobs_recovered);
+   fChain->SetBranchAddress("is_blobs_recovered_direction", &is_blobs_recovered_direction, &b_is_blobs_recovered_direction);
+   fChain->SetBranchAddress("is_blobs_recovered_invMass", &is_blobs_recovered_invMass, &b_is_blobs_recovered_invMass);
+   fChain->SetBranchAddress("is_blobs_recovered_small_angle", &is_blobs_recovered_small_angle, &b_is_blobs_recovered_small_angle);
+   fChain->SetBranchAddress("is_blobs_recovered_search_view_U", &is_blobs_recovered_search_view_U, &b_is_blobs_recovered_search_view_U);
+   fChain->SetBranchAddress("is_blobs_recovered_search_view_V", &is_blobs_recovered_search_view_V, &b_is_blobs_recovered_search_view_V);
    fChain->SetBranchAddress("Cut_BlobDirectionBad", &Cut_BlobDirectionBad, &b_Cut_BlobDirectionBad);
    fChain->SetBranchAddress("Cut_ConeBlobs", &Cut_ConeBlobs, &b_Cut_ConeBlobs);
    fChain->SetBranchAddress("Cut_EndPoint_Michel_Exist", &Cut_EndPoint_Michel_Exist, &b_Cut_EndPoint_Michel_Exist);
@@ -1562,6 +1579,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("ThreeShower_s3_nClusters", &ThreeShower_s3_nClusters, &b_ThreeShower_s3_nClusters);
    fChain->SetBranchAddress("anglescan_ncand", &anglescan_ncand, &b_anglescan_ncand);
    fChain->SetBranchAddress("anglescan_ncandx", &anglescan_ncandx, &b_anglescan_ncandx);
+   fChain->SetBranchAddress("anglescan_nfoundBlobs", &anglescan_nfoundBlobs, &b_anglescan_nfoundBlobs);
    fChain->SetBranchAddress("broken_track_most_us_plane", &broken_track_most_us_plane, &b_broken_track_most_us_plane);
    fChain->SetBranchAddress("g1blob_1ParFit_ndof", &g1blob_1ParFit_ndof, &b_g1blob_1ParFit_ndof);
    fChain->SetBranchAddress("g1dedx_doublet", &g1dedx_doublet, &b_g1dedx_doublet);

@@ -59,11 +59,19 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         // Short Proton
         TH1D* proton_true_P_1Track;
         TH1D* proton_true_KE_1Track;
-       
+      
         // Ejected Nucleons
         TH1D* n_ejected_nucleons_1Track;
         TH1D* n_ejected_nucleons_2Track;
        
+        // Recovered Pi0
+        std::vector<MnvH1D*> recovered_Pi0_P;
+        std::vector<MnvH1D*> recovered_Pi0_theta;
+        TH1D* h_recovered_Pi0_P;
+        TH1D* h_original_Pi0_P;
+        TH1D* h_recovered_Pi0_theta;
+        TH1D* h_original_Pi0_theta;
+
         // Neutrino Energy: Truth, Error, Difference
         TH1D* Enu_True_1Track;
         TH1D* Enu_True_2Track;

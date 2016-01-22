@@ -1,3 +1,6 @@
+#ifndef AngleScan_cpp
+#define AngleScan_cpp
+
 #undef NDEBUG
 #include <cassert>
 #include <cmath>
@@ -15,57 +18,38 @@
 
 namespace {
     struct greaterShower : public std::binary_function <
-        SmartRefVector<Minerva::IDCluster>,
-        SmartRefVector<Minerva::IDCluster>,
-        bool > {
+                           SmartRefVector<Minerva::IDCluster>,
+                           SmartRefVector<Minerva::IDCluster>,
+                           bool > {
 
-        bool operator()(const SmartRefVector<Minerva::IDCluster>& lhs,
-                        const SmartRefVector<Minerva::IDCluster>& rhs) const {
-            
-            return lhs.size() > rhs.size();
-        }
+                               bool operator()(const SmartRefVector<Minerva::IDCluster>& lhs,
+                                       const SmartRefVector<Minerva::IDCluster>& rhs) const {
 
-    };
-
-    class zDistanceFromLessThan : public std::binary_function <
-        SmartRef<Minerva::IDCluster>,
-        SmartRef<Minerva::IDCluster>,
-        bool > {
-    public:
-        explicit zDistanceFromLessThan(double z0) : fZ0(z0) {}
-        bool operator() (const SmartRef<Minerva::IDCluster>& lhs) const {
-            
-            return std::abs(lhs->z() - fZ0) < 50.0;
-        }
-
-    private:
-        double fZ0;
-    };
+                                   return lhs.size() > rhs.size();
+                               }
+                           };
 }
 
 
-AngleScan::AngleScan(const SmartRefVector<Minerva::IDCluster>& clusters,
-                     const Gaudi::XYZPoint& vertex)
-    : fUVMatchTolerance(10.0),
-      fUVMatchMoreTolerance(100.0),
-      fAllowUVMatchWithMoreTolerance(true),
-      m_ApplyMaxDigitEnergyCut(false),
-      m_MaxDigitEnergy(1000.0)
-{
+    AngleScan::AngleScan(const SmartRefVector<Minerva::IDCluster>& clusters, const Gaudi::XYZPoint& vertex)
+: fUVMatchTolerance(10.0),
+    fUVMatchMoreTolerance(100.0),
+    fAllowUVMatchWithMoreTolerance(true),
+    m_UseSmallConeAngle(false)
+{   
     std::copy(clusters.begin(), clusters.end(), std::back_inserter(fAllClusters));
-    
+
     fX = vertex.X();
     fY = vertex.Y();
     fZ = vertex.Z();
     fU = -fY*sqrt(3.)/2 + fX/2;
     fV =  fY*sqrt(3.)/2 + fX/2;
-    
+
     Initialize();
 }
 
 void AngleScan::Initialize()
 {
-
     std::cout << "    AngleScan::Initialize " << std::endl;
 
     ClusterVectorInfo clusterVectorInfo(fAllClusters,true,true,true);
@@ -77,7 +61,7 @@ void AngleScan::Initialize()
     std::cout << "      AngleScan:: u size = " << fUClusters.size() << std::endl;
     std::cout << "      AngleScan:: v size = " << fVClusters.size() << std::endl;
 
-        /* Copy to the working containers */
+    // Copy to the working containers
     fRemainingXClusters = fXClusters;
     fRemainingUClusters = fUClusters;
     fRemainingVClusters = fVClusters;
@@ -89,40 +73,45 @@ void AngleScan::Initialize()
 
 void AngleScan::BuildThetaHistogram()
 {
-    const unsigned int N = 90;
-    const double lower = -180.0;
-    const double upper = +180.0;
-    fTheta = new TH1F("theta","Theta dist", N, lower, upper);
-    
-    for (SmartRefVector<Minerva::IDCluster>::const_iterator c = fRemainingXClusters.begin();
-         c != fRemainingXClusters.end(); ++c) {
+    if (m_UseSmallConeAngle) nBins = 180;
+    else nBins = 90;
+
+    theta_low = -180.0;
+    theta_high = 180.0;
+
+    std::cout<<"nBins = "<<nBins<<std::endl;
+    fTheta = new TH1F("theta","Theta dist", nBins, theta_low, theta_high);
+}
+
+void AngleScan::FillThetaHistogram()
+{
+    SmartRefVector<Minerva::IDCluster>::const_iterator c; 
+    for (c = fRemainingXClusters.begin(); c != fRemainingXClusters.end(); ++c) {
         const double dZ = (*c)->z() - fZ;
         const double dX = (*c)->position() - fX;
         const double theta = std::atan2(dX,dZ)*TMath::RadToDeg();
         const double w = (*c)->pe();
-        
+
         fTheta->Fill(theta,w);
     }
 }
 
 void AngleScan::FindPeaks()
 {
-    const unsigned int N = 90;
-        /* Detect and save lower and upper edges around peaks in the histogram */
+    /* Detect and save lower and upper edges around peaks in the histogram */
     const double width = fTheta->GetBinWidth(1);      /* Use first bin since fixed bin size */
-    for (unsigned int bin = 1; bin <= N; bin++){
+    for (unsigned int bin = 1; bin <= nBins; bin++){
         if (fTheta->GetBinContent(bin) > 15 ){        /* Peak is detected */
             int Limitbin = GetLimitBin(fTheta, bin ); /* Find the upper edge of the peak */
-            
+
             const double lower_edge = fTheta->GetBinCenter(bin) - 0.5*width;
             const double upper_edge = fTheta->GetBinCenter(Limitbin) + 0.5*width;
-            
+
             TVector2 peak(lower_edge,upper_edge);
 
             fPeaks.push_back(peak);
-                        
+
             bin = Limitbin;  /* Finding the next peak starting from this peak's upper edge */
-            
         }
     }
 
@@ -132,7 +121,7 @@ void AngleScan::FindPeaks()
 void AngleScan::FormXShowerCand() 
 {
     for (std::vector<TVector2>::const_iterator peak = fPeaks.begin();
-         peak != fPeaks.end(); ++peak) {
+            peak != fPeaks.end(); ++peak) {
         const double lower_edge = peak->X();
         const double upper_edge = peak->Y();
         const double zmin       = 4500.0;
@@ -140,27 +129,27 @@ void AngleScan::FormXShowerCand()
 
         SmartRefVector<Minerva::IDCluster> showerCand;
         coneView(fRemainingXClusters, showerCand, fX, lower_edge, upper_edge, zmin, zmax);
-        
+
         if (showerCand.empty()) continue;
 
         if (showerCand.size() == 1 && showerCand.front()->pe() > 30) {
 
             fXShowerCandidates.push_back(showerCand);
             fGoodPeaks.push_back(*peak);
-            
+
         } else if (showerCand.size() > 1) {
 
             fXShowerCandidates.push_back(showerCand);
             fGoodPeaks.push_back(*peak);
         }
-        
+
     }
 
-        // Calculate the distance from the shower candidates to the event vertex
-        // Try two definitions of distance: closest and energy weighted
+    // Calculate the distance from the shower candidates to the event vertex
+    // Try two definitions of distance: closest and energy weighted
     for (std::vector<SmartRefVector<Minerva::IDCluster> >::iterator s
-             = fXShowerCandidates.begin();
-         s != fXShowerCandidates.end(); ++s) {
+            = fXShowerCandidates.begin();
+            s != fXShowerCandidates.end(); ++s) {
 
         SmartRefVector<Minerva::IDCluster>& xshowerCand = *s;
 
@@ -168,7 +157,7 @@ void AngleScan::FormXShowerCand()
         double d_weighted = 0.0;
         double total_energy = 0.0;
         for (SmartRefVector<Minerva::IDCluster>::iterator c = xshowerCand.begin();
-             c != xshowerCand.end(); ++c) {
+                c != xshowerCand.end(); ++c) {
 
             double x = (*c)->position();
             double z = (*c)->z();
@@ -185,9 +174,9 @@ void AngleScan::FormXShowerCand()
         fXShowerClosestDistances.push_back(d_min);
         fXShowerWeightedDistances.push_back(d_weighted/total_energy);
     }
-    
+
     std::sort(fXShowerCandidates.begin(),fXShowerCandidates.end(), greaterShower());
-    
+
 }
 
 void AngleScan::FormXUVShowerCand() 
@@ -196,17 +185,17 @@ void AngleScan::FormXUVShowerCand()
     std::vector<SmartRefVector<Minerva::IDCluster> > nogrowShowerCandidates;
     std::cout << "AngleScan::total X candidates: " << fXShowerCandidates.size() << std::endl;
     for (std::vector<SmartRefVector<Minerva::IDCluster> >::iterator s
-             = fXShowerCandidates.begin();
-         s != fXShowerCandidates.end(); ++s) {
+            = fXShowerCandidates.begin();
+            s != fXShowerCandidates.end(); ++s) {
         std::cout << "\tAngleScan::x cand: " << s->size() << std::endl;
         SmartRefVector<Minerva::IDCluster>& xshowerCand = *s;
-        
+
         SmartRefVector<Minerva::IDCluster> showerCand = xshowerCand;
         double zmin = +1e6;
         double zmax = -1e6;
         double ztot = 0.0;
         for (SmartRefVector<Minerva::IDCluster>::iterator c = xshowerCand.begin();
-             c != xshowerCand.end(); ++c) {
+                c != xshowerCand.end(); ++c) {
             zmin  = std::min(zmin,(*c)->z());
             zmax  = std::max(zmax,(*c)->z());
             ztot += (*c)->z();
@@ -221,38 +210,38 @@ void AngleScan::FormXUVShowerCand()
             fRemainingVClusters.swap(vclusters_tmp);
 
             for (SmartRefVector<Minerva::IDCluster>::iterator c = uclusters_tmp.begin();
-                 c != uclusters_tmp.end(); ++c) {
+                    c != uclusters_tmp.end(); ++c) {
                 if (std::abs((*c)->z()-zcenter) < 50.0) {
                     std::cout << "\t\t AngleScan::adding a U cluster " << (*c)->z() << " " << (*c)->pe()
-                              << std::endl;
+                        << std::endl;
                     showerCand.push_back(*c);
                 }
                 else fRemainingUClusters.push_back(*c);
             }
-                        
+
             for (SmartRefVector<Minerva::IDCluster>::iterator c = vclusters_tmp.begin();
-                 c != vclusters_tmp.end(); ++c) {
+                    c != vclusters_tmp.end(); ++c) {
                 if (std::abs((*c)->z()-zcenter) < 50.0) {
                     std::cout << "\t\t AngleScan::adding a V cluster " << (*c)->z() << " " << (*c)->pe()
-                              << std::endl;
+                        << std::endl;
                     showerCand.push_back(*c);
                 }
                 else fRemainingVClusters.push_back(*c);
             }
-            
+
             fShowerCandidates.push_back(showerCand);
 
         } else {
             std::cout << "\t AngleScan::Candidate with large z extent " << std::endl;
             addClustersToBlob(xshowerCand,fRemainingUClusters,fRemainingVClusters,showerCand,
-                              fUVMatchTolerance);
-            
+                    fUVMatchTolerance);
+
             if (showerCand.size() > xshowerCand.size()) fShowerCandidates.push_back(showerCand);
             else if (xshowerCand.size() >= 3) nogrowShowerCandidates.push_back(xshowerCand);
             else {
                 std::cout << "\t AngleScan::Throw away x shower candidate" << std::endl;
             }
-            
+
         }
     }
 
@@ -261,31 +250,31 @@ void AngleScan::FormXUVShowerCand()
 
     if (fAllowUVMatchWithMoreTolerance) {
         for (std::vector<SmartRefVector<Minerva::IDCluster> >::iterator s
-                 = nogrowShowerCandidates.begin();
-             s != nogrowShowerCandidates.end(); ++s) {
+                = nogrowShowerCandidates.begin();
+                s != nogrowShowerCandidates.end(); ++s) {
             SmartRefVector<Minerva::IDCluster>& xshowerCand = *s; 
             SmartRefVector<Minerva::IDCluster>  showerCand = xshowerCand;
-            
+
             addClustersToBlob(xshowerCand,fRemainingUClusters,fRemainingVClusters,showerCand,
-                              fUVMatchMoreTolerance);
-            
+                    fUVMatchMoreTolerance);
+
             fShowerCandidates.push_back(showerCand);
         }
     }
-    
+
     std::cout << "AngleScan::Shower candidates(10x): " << fShowerCandidates.size() << std::endl;
     for (std::vector<SmartRefVector<Minerva::IDCluster> >::iterator s = fShowerCandidates.begin();
-         s != fShowerCandidates.end(); ++s) {
+            s != fShowerCandidates.end(); ++s) {
         std::cout << "\tAngleScan:: cand: " << std::distance(fShowerCandidates.begin(),s) << " "
-                  << fRemainingUClusters.size() << " " << fRemainingVClusters.size()
-                  << std::endl;
+            << fRemainingUClusters.size() << " " << fRemainingVClusters.size()
+            << std::endl;
         completeView(fRemainingUClusters, *s, fU);
         completeView(fRemainingVClusters, *s, fV);
     }
 
     std::cout << "AngleScan::Final showers: " << fShowerCandidates.size() << std::endl;
     std::sort(fShowerCandidates.begin(), fShowerCandidates.end(), greaterShower());
-    
+
     std::copy(fRemainingXClusters.begin(),fRemainingXClusters.end(), std::back_inserter(fRemainingClusters));
     std::copy(fRemainingUClusters.begin(),fRemainingUClusters.end(), std::back_inserter(fRemainingClusters));
     std::copy(fRemainingVClusters.begin(),fRemainingVClusters.end(), std::back_inserter(fRemainingClusters));
@@ -296,13 +285,10 @@ void AngleScan::DoReco()
 {
     std::cout << "AngleScan::DoReco() " << std::endl;
     BuildThetaHistogram();
+    FillThetaHistogram();
     FindPeaks();
     FormXShowerCand();
     FormXUVShowerCand();
-    if (m_ApplyMaxDigitEnergyCut){
-        std::cout<<"Cleaning Shower Candidates by applying MaxDigitEnergyCut with "<<m_MaxDigitEnergy<<std::endl;
-        CleanAllShowerCand();
-    }
 }
 
 int AngleScan::GetLimitBin(const TH1F *hMax, int n_bin )const
@@ -314,36 +300,36 @@ int AngleScan::GetLimitBin(const TH1F *hMax, int n_bin )const
         else count++;
         x++;
     }
-    
-    return max;
 
+    return max;
 }
+
 void AngleScan::addClustersToBlob(SmartRefVector<Minerva::IDCluster>& xshowerCand,
-                                  SmartRefVector<Minerva::IDCluster>& uclusters,
-                                  SmartRefVector<Minerva::IDCluster>& vclusters,
-                                  SmartRefVector<Minerva::IDCluster>& showerCand,
-                                  double epsilon)
+        SmartRefVector<Minerva::IDCluster>& uclusters,
+        SmartRefVector<Minerva::IDCluster>& vclusters,
+        SmartRefVector<Minerva::IDCluster>& showerCand,
+        double epsilon)
 {
 
     for (SmartRefVector<Minerva::IDCluster>::iterator c = xshowerCand.begin();
-         c != xshowerCand.end(); ++c) {
+            c != xshowerCand.end(); ++c) {
         Minerva::IDCluster* cluster_x = *c;
         double min = 1e3;
         SmartRefVector<Minerva::IDCluster>::iterator ucluster = uclusters.end();
         SmartRefVector<Minerva::IDCluster>::iterator vcluster = vclusters.end();
         for (SmartRefVector<Minerva::IDCluster>::iterator itU = uclusters.begin();
-             itU != uclusters.end(); ++itU) {
+                itU != uclusters.end(); ++itU) {
 
             if (std::abs( cluster_x->z() - (*itU)->z() ) > 50.0 ) continue;
 
             for (SmartRefVector<Minerva::IDCluster>::iterator itV = vclusters.begin();
-                 itV != vclusters.end(); ++itV) {
+                    itV != vclusters.end(); ++itV) {
 
                 if ( std::abs( cluster_x->z() - (*itV)->z() ) > 50.0 ) continue;
 
                 double delta = std::abs((*itU)->tpos1()+(*itU)->tpos2()+        /* |u+v-x| */
-                                        (*itV)->tpos1()+(*itV)->tpos2()-
-                                        cluster_x->tpos1()-cluster_x->tpos2());
+                        (*itV)->tpos1()+(*itV)->tpos2()-
+                        cluster_x->tpos1()-cluster_x->tpos2());
                 if ( delta < min ) { 
                     min = delta;
                     ucluster = itU;
@@ -359,28 +345,28 @@ void AngleScan::addClustersToBlob(SmartRefVector<Minerva::IDCluster>& xshowerCan
             uclusters.erase(ucluster);
             vclusters.erase(vcluster);
         }
-        
+
     }
-    
+
 }
 
 void AngleScan::completeView(SmartRefVector<Minerva::IDCluster>& unusedViewClusters,
-                             SmartRefVector<Minerva::IDCluster>& showerCand,
-                             double vtxT)
+        SmartRefVector<Minerva::IDCluster>& showerCand,
+        double vtxT)
 {
 
     if (unusedViewClusters.empty()) return;
-    
+
     double z_min = 10000;
     double z_max = -10000;
     double angle_min = 180;
     double angle_max = -180;
 
     SmartRefVector<Minerva::IDCluster> viewShowerCand;
-    
+
     SmartRefVector<Minerva::IDCluster>::iterator it_view = unusedViewClusters.begin();
     for (SmartRefVector<Minerva::IDCluster>::iterator c = showerCand.begin();
-         c != showerCand.end(); ++c){
+            c != showerCand.end(); ++c){
         if ( (*c)->view() == (*it_view)->view() ) viewShowerCand.push_back(*c);
         if ( (*c)->view() == Minerva::IDCluster::X && (*c)->z() < z_min ) z_min = (*c)->z();
         if ( (*c)->view() == Minerva::IDCluster::X && (*c)->z() > z_max ) z_max = (*c)->z();
@@ -395,42 +381,42 @@ void AngleScan::completeView(SmartRefVector<Minerva::IDCluster>& unusedViewClust
         const double z   = (*it_view)->z() - fZ;
         const double x   = (*it_view)->position() - vtxT;
         const double ang = std::atan2(x,z)*TMath::RadToDeg();
-        
+
         if ( ang >= angle_max ) angle_max = ang;
         if ( ang <= angle_min ) angle_min = ang;
-        
+
     }
 
     z_min = z_min - 100;
     z_max = z_max + 100;
     angle_max = angle_max + 10.0;
     angle_min = angle_min - 10.0;
-    
-        /* Move clusters between (angle_min,angle_max) and (z_min,z_max) from
-           'unusedClusters' to blob */
+
+    /* Move clusters between (angle_min,angle_max) and (z_min,z_max) from
+       'unusedClusters' to blob */
     std::cout << "\tAngleScan::completeView:oldsize: " << showerCand.size() << std::endl;
     coneView(unusedViewClusters, showerCand, vtxT, angle_min, angle_max, z_min, z_max );
     std::cout << "\tAngleScan::completeView:newsize: " << showerCand.size() << std::endl;
- 
+
 }
 
 void AngleScan::coneView(SmartRefVector<Minerva::IDCluster>& unusedViewClusters,
-                         SmartRefVector<Minerva::IDCluster>& showerCand,
-                         double vtxT,
-                         double min_angle, double max_angle,
-                         double zmin, double zmax)
+        SmartRefVector<Minerva::IDCluster>& showerCand,
+        double vtxT,
+        double min_angle, double max_angle,
+        double zmin, double zmax)
 {
     SmartRefVector<Minerva::IDCluster> tmpClusters;
     tmpClusters.swap(unusedViewClusters);
     for (SmartRefVector<Minerva::IDCluster>::iterator c = tmpClusters.begin();
-         c != tmpClusters.end(); ++c) {
+            c != tmpClusters.end(); ++c) {
         const double dZ = (*c)->z() - fZ;
         const double dX = (*c)->position() - vtxT;
         const double theta = std::atan2(dX,dZ)*TMath::RadToDeg();
         const double z_c = (*c)->z();
-        
+
         if ((min_angle <= theta && theta <= max_angle) &&
-            (zmin < z_c && z_c < zmax)) {
+                (zmin < z_c && z_c < zmax)) {
             showerCand.push_back(*c);
         } else {
             unusedViewClusters.push_back(*c);
@@ -504,19 +490,13 @@ std::vector<Minerva::IDBlob*> AngleScan::GetShowers()
 {
     std::vector<Minerva::IDBlob*> finalBlobs;
     std::vector<SmartRefVector<Minerva::IDCluster> >::const_iterator s;
-    
+
     for ( s = fShowerCandidates.begin(); s != fShowerCandidates.end(); ++s) {
         Minerva::IDBlob* newBlob = new Minerva::IDBlob;
         newBlob->add(*s);
-        // If we applied Digit Energy Cut we MUST remove empty Clusters
-        if (m_ApplyMaxDigitEnergyCut){
-            RemoveEmptyClusters(newBlob);
-        }
-        // Add Blob if it is NOT empty
-        int nClusters = newBlob->nclusters();
-        if(nClusters != 0) finalBlobs.push_back(newBlob);
+        finalBlobs.push_back(newBlob);
     }
-    
+
     return finalBlobs;
 }
 
@@ -532,70 +512,9 @@ void AngleScan::AllowUVMatchWithMoreTolerance(bool b) {
     fAllowUVMatchWithMoreTolerance = b;
 }
 
-bool AngleScan::isDigitEnergyHigh(double energy)
-{
-    if (energy > m_MaxDigitEnergy) return true;
-    else return false;
-}
-
-void AngleScan::AllowMaxDigitEnergyCut(bool allowCut)
-{    
-    m_ApplyMaxDigitEnergyCut = allowCut;
-}
-
-void AngleScan::SetMaxDigitEnergy(double maxEnergy)
-{    
-    m_MaxDigitEnergy = maxEnergy;
-}
-
-void AngleScan::CleanAllShowerCand()
-{
-    std::vector<SmartRefVector<Minerva::IDCluster> >::const_iterator s;
-    
-    for (s = fShowerCandidates.begin(); s != fShowerCandidates.end(); ++s){
-        CleanSingleShowerCand(*s);        
-    }
-}
-
-void AngleScan::CleanSingleShowerCand(SmartRefVector<Minerva::IDCluster> clusters)
-{
-    SmartRefVector<Minerva::IDCluster>::iterator c;
-
-    for (c = clusters.begin(); c != clusters.end(); ++c ){
-        // Loop Over all Digits inside Cluster
-        const SmartRefVector< Minerva::IDDigit> digits = (*c)->digits();
-        SmartRefVector<Minerva::IDDigit>::const_iterator d;
-        for ( d = digits.begin(); d != digits.end(); ++d){
-            double digitE = (*d)->normEnergy();
-            if (isDigitEnergyHigh(digitE)){
-                (*c)->remove(*d);
-            }
-        }
-    }
-}
-
-/*
- * When we clean the digits from clusters, some clusters might end up empty
- *  We must remove them from the shower
- */
-void AngleScan::RemoveEmptyClusters(Minerva::IDBlob* blob)
-{
-    SmartRefVector<Minerva::IDCluster>::const_iterator c;
-
-    std::cout<<"Initial NClusters in Blob = "<<blob->nclusters()<<std::endl;
-
-    // Loop Over all Clusters in Blob to find Empty Clusters
-    const SmartRefVector<Minerva::IDCluster> clusters = blob->clusters();
-    for(c = clusters.begin(); c != clusters.end(); ++c){
-        int ndigits = (*c)->iddigs();
-        std::cout<<"NDigits = "<<ndigits<<std::endl;
-        if (ndigits == 0){
-            std::cout<<"Removing Cluster!"<<std::endl;
-            blob->remove(*c);
-        }
-    }
-
-    std::cout<<"Final NClusters in Blob = "<<blob->nclusters()<<std::endl;
+void AngleScan::AllowSmallConeAngle(bool isSmallAngle) {
+    m_UseSmallConeAngle = isSmallAngle;
 }
 
 
+#endif

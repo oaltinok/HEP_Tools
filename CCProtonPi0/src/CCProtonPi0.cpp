@@ -21,6 +21,8 @@
 // Local Libraries
 #include "CCProtonPi0.h"
 #include "Pi0Reco/AngleScan.h"
+#include "Pi0Reco/AngleScan_U.h"
+#include "Pi0Reco/AngleScan_V.h"
 #include "Pi0Reco/ClusterVectorInfo.h"
 #include "Pi0Reco/OneParLineFit.h"
 #include "Pi0Reco/TwoParLineFit.h"
@@ -174,6 +176,8 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
     declareProperty( "TrytoRecover_3Shower", m_TrytoRecover_3Shower = true);
     declareProperty( "RecoverShower_InvMass", m_recoverShower_invMass = false);
     declareProperty( "RecoverShower_Direction", m_recoverShower_Direction = true);
+    declareProperty( "RecoverSingleShower_SmallAngle", m_recoverSingleShower_SmallAngle = true);
+    declareProperty( "RecoverSingleShower_SearchView", m_recoverSingleShower_SearchView = true);
 
     // dedx uncertainties
     m_dedx_uncertainties.push_back("Mass_Up");
@@ -501,7 +505,13 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("Coneblobs_usable_evis_HCAL", SENTINEL );
     declareIntEventBranch("anglescan_ncandx", -1);
     declareIntEventBranch("anglescan_ncand", -1);
+    declareIntEventBranch("anglescan_nfoundBlobs", -1);
     declareBoolEventBranch("is_blobs_recovered");
+    declareBoolEventBranch("is_blobs_recovered_direction");
+    declareBoolEventBranch("is_blobs_recovered_invMass");
+    declareBoolEventBranch("is_blobs_recovered_small_angle");
+    declareBoolEventBranch("is_blobs_recovered_search_view_U");
+    declareBoolEventBranch("is_blobs_recovered_search_view_V");
 
     // ConeBlobs() -- Recovered Showers
     declareIntEventBranch("OneShower_nClusters", -1);
@@ -3623,34 +3633,36 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
     // Initialize Bool Variables
     bool isAngleScan        = false;
     bool isBlobsRecovered   = false;
+    bool isBlobsRecovered_Direction = false;
+    bool isBlobsRecovered_invMass = false;
+    bool isBlobsRecovered_SmallAngle = false;
+    bool isBlobsRecovered_SearchView_U = false;
+    bool isBlobsRecovered_SearchView_V = false;
 
     // Get Vertex Position
     const Gaudi::XYZPoint& vtx_position = event->interactionVertex()->position();
-
-    // Initialize foundBlobs
-    std::vector<Minerva::IDBlob*> foundBlobs;
 
     // Create AngleScan Object
     AngleScan angleScanAlg(usableClusters,vtx_position);
     angleScanAlg.AllowUVMatchWithMoreTolerance(m_AllowUVMatchWithMoreTolerance);
     angleScanAlg.SetUVMatchTolerance(m_UVMatchTolerance);
-    angleScanAlg.AllowMaxDigitEnergyCut(true);
-    angleScanAlg.SetMaxDigitEnergy(20.0);
     angleScanAlg.DoReco();
 
     event->setIntData("anglescan_ncandx", angleScanAlg.GetNxCandidate());   // Number of Shower Candidates in X
     event->setIntData("anglescan_ncand",  angleScanAlg.GetNCandidate());    // Number of Shower Candidates
-
+    
+    // Initialize foundBlobs
+    std::vector<Minerva::IDBlob*> foundBlobs;
     std::vector<Minerva::IDBlob*> angleScanBlobs = angleScanAlg.GetShowers();
-    for (   std::vector<Minerva::IDBlob*>::const_iterator b = angleScanBlobs.begin(); b != angleScanBlobs.end(); ++b) 
-    {
+    std::vector<Minerva::IDBlob*>::const_iterator b;
+    for ( b = angleScanBlobs.begin(); b != angleScanBlobs.end(); ++b){
         if ( !m_idHoughBlob->isPhoton((*b)->clusters(),vtx_position)) continue;
         foundBlobs.push_back(*b);
     }
 
     isAngleScan = (foundBlobs.size() == 2);
-
     debug()<<"foundBlobs.size() = "<<foundBlobs.size()<<endmsg;
+    event->setIntData("anglescan_nfoundBlobs", foundBlobs.size() ); // Number of Found Blobs
 
     // Mark Pi0Blobs with color for Arachne Scan
     MarkFoundPi0Blobs(foundBlobs); 
@@ -3663,7 +3675,23 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
                 if (truthEvent){
                     Save_1ShowerTruthMatch(foundBlobs, truthEvent);
                 }
-                debug()<<"Trying to Recover 1 Shower Events"<<endmsg;  
+
+                if (m_recoverSingleShower_SmallAngle){
+                    isBlobsRecovered = RecoverSingleShower_SmallAngle(usableClusters, foundBlobs, event);
+                    isBlobsRecovered_SmallAngle = isBlobsRecovered;
+                }
+
+                if (!isBlobsRecovered && m_recoverSingleShower_SearchView){
+                    // Start Searching Showers in U View
+                    isBlobsRecovered = RecoverSingleShower_View_U(usableClusters, foundBlobs, event);
+                    isBlobsRecovered_SearchView_U = isBlobsRecovered;
+
+                    // If U View Fails, Start Searching Showers in V View
+                    if (!isBlobsRecovered){
+                        isBlobsRecovered = RecoverSingleShower_View_V(usableClusters, foundBlobs, event);
+                        isBlobsRecovered_SearchView_V = isBlobsRecovered;
+                    }
+                }
             }
         }        
 
@@ -3671,8 +3699,8 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
         // Try to recover showers with different methods
         //  1) Check direction of 3 Showers, 
         //          if only 2 of them have good direction, keep the event
-        //  2) If all 3 showers have good direction, check NClusters
-        //          Reject the shower with least number of clusters
+        //  2) If all 3 showers have good direction
+        //      Get best invariant mass combination
         // --------------------------------------------------------------------
         if (m_TrytoRecover_3Shower && foundBlobs.size() == 3){
             bool areAllShowersGood = Save_3ShowerInfo(foundBlobs,event);  
@@ -3685,15 +3713,22 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
                 debug()<<"Not All Showers direction is Good"<<endmsg;
                 debug()<<"Trying to recover 2 GOOD showers"<<endmsg;
                 isBlobsRecovered = RecoverShowers_Direction(foundBlobs, event);
+                isBlobsRecovered_Direction = isBlobsRecovered;
             }
 
             if (!isBlobsRecovered && m_recoverShower_invMass){
                 isBlobsRecovered = RecoverShowers_InvMass(foundBlobs, event);
+                isBlobsRecovered_invMass = isBlobsRecovered;
             }
         }
     }
 
     event->filtertaglist()->setOrAddFilterTag( "is_blobs_recovered",isBlobsRecovered);
+    event->filtertaglist()->setOrAddFilterTag( "is_blobs_recovered_small_angle",isBlobsRecovered_SmallAngle);
+    event->filtertaglist()->setOrAddFilterTag( "is_blobs_recovered_search_view_U",isBlobsRecovered_SearchView_U);
+    event->filtertaglist()->setOrAddFilterTag( "is_blobs_recovered_search_view_V",isBlobsRecovered_SearchView_V);
+    event->filtertaglist()->setOrAddFilterTag( "is_blobs_recovered_direction",isBlobsRecovered_Direction);
+    event->filtertaglist()->setOrAddFilterTag( "is_blobs_recovered_invMass",isBlobsRecovered_invMass);
 
     // ------------------------------------------------------------------------
     //  We have 2 Reconstructed EM Showers if either of them true
@@ -6090,6 +6125,124 @@ bool CCProtonPi0::isShowerGood(Minerva::IDBlob* shower, Minerva::PhysicsEvent* e
     bool isShowerGood = goodPosition && goodDirection;
 
     return isShowerGood;
+}
+
+bool CCProtonPi0::RecoverSingleShower_SmallAngle(SmartRefVector<Minerva::IDCluster> &usableClusters, std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event)const 
+{
+    debug()<<"Trying to Recover Single Shower Events using Small Angle"<<endmsg;  
+
+    const Gaudi::XYZPoint& vtx_position = event->interactionVertex()->position();
+
+    // Create AngleScan Object
+    AngleScan angleScanAlg(usableClusters,vtx_position);
+    angleScanAlg.AllowUVMatchWithMoreTolerance(m_AllowUVMatchWithMoreTolerance);
+    angleScanAlg.SetUVMatchTolerance(m_UVMatchTolerance);
+    angleScanAlg.AllowSmallConeAngle(true);
+    angleScanAlg.DoReco();
+
+    debug()<<"N(foundShowers) with Small Angle = "<<angleScanAlg.GetNCandidate()<<endmsg;
+
+    if (angleScanAlg.GetNCandidate() == 2){
+        debug()<<"Replacing foundBlobs with new ones"<<endmsg;
+        // --------------------------------------------------------------------
+        //   Blobs found by the AngleScan are not managed, delete them here and
+        //   empty the container 
+        // --------------------------------------------------------------------
+        for (std::vector<Minerva::IDBlob*>::iterator b = foundBlobs.begin();
+                b != foundBlobs.end(); ++b) {
+            delete *b;
+        }
+        foundBlobs.clear();    
+
+        std::vector<Minerva::IDBlob*> angleScanBlobs = angleScanAlg.GetShowers();
+        for (   std::vector<Minerva::IDBlob*>::const_iterator b = angleScanBlobs.begin(); b != angleScanBlobs.end(); ++b) 
+        {
+            if ( !m_idHoughBlob->isPhoton((*b)->clusters(),vtx_position)) continue;
+            foundBlobs.push_back(*b);
+        }
+
+        return true;
+    }else{ 
+        return false;
+    }
+}
+
+bool CCProtonPi0::RecoverSingleShower_View_U(SmartRefVector<Minerva::IDCluster> &usableClusters, std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event)const 
+{
+    debug()<<"Trying to Recover Single Shower Events using U View"<<endmsg;  
+
+    const Gaudi::XYZPoint& vtx_position = event->interactionVertex()->position();
+
+    // Create AngleScan Object
+    AngleScan_U angleScanAlg(usableClusters,vtx_position);
+    angleScanAlg.AllowUVMatchWithMoreTolerance(m_AllowUVMatchWithMoreTolerance);
+    angleScanAlg.SetUVMatchTolerance(m_UVMatchTolerance);
+    angleScanAlg.DoReco();
+
+    debug()<<"N(foundShowers) with View U = "<<angleScanAlg.GetNCandidate()<<endmsg;
+
+    if (angleScanAlg.GetNCandidate() == 2){
+        debug()<<"Replacing foundBlobs with new ones"<<endmsg;
+        // --------------------------------------------------------------------
+        //   Blobs found by the AngleScan are not managed, delete them here and
+        //   empty the container 
+        // --------------------------------------------------------------------
+        for (std::vector<Minerva::IDBlob*>::iterator b = foundBlobs.begin();
+                b != foundBlobs.end(); ++b) {
+            delete *b;
+        }
+        foundBlobs.clear();    
+
+        std::vector<Minerva::IDBlob*> angleScanBlobs = angleScanAlg.GetShowers();
+        for (   std::vector<Minerva::IDBlob*>::const_iterator b = angleScanBlobs.begin(); b != angleScanBlobs.end(); ++b) 
+        {
+            if ( !m_idHoughBlob->isPhoton((*b)->clusters(),vtx_position)) continue;
+            foundBlobs.push_back(*b);
+        }
+
+        return true;
+    }else{ 
+        return false;
+    }
+}
+
+bool CCProtonPi0::RecoverSingleShower_View_V(SmartRefVector<Minerva::IDCluster> &usableClusters, std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event)const 
+{
+    debug()<<"Trying to Recover Single Shower Events using V View"<<endmsg;  
+
+    const Gaudi::XYZPoint& vtx_position = event->interactionVertex()->position();
+
+    // Create AngleScan Object
+    AngleScan_V angleScanAlg(usableClusters,vtx_position);
+    angleScanAlg.AllowUVMatchWithMoreTolerance(m_AllowUVMatchWithMoreTolerance);
+    angleScanAlg.SetUVMatchTolerance(m_UVMatchTolerance);
+    angleScanAlg.DoReco();
+
+    debug()<<"N(foundShowers) with View V = "<<angleScanAlg.GetNCandidate()<<endmsg;
+
+    if (angleScanAlg.GetNCandidate() == 2){
+        debug()<<"Replacing foundBlobs with new ones"<<endmsg;
+        // --------------------------------------------------------------------
+        //   Blobs found by the AngleScan are not managed, delete them here and
+        //   empty the container 
+        // --------------------------------------------------------------------
+        for (std::vector<Minerva::IDBlob*>::iterator b = foundBlobs.begin();
+                b != foundBlobs.end(); ++b) {
+            delete *b;
+        }
+        foundBlobs.clear();    
+
+        std::vector<Minerva::IDBlob*> angleScanBlobs = angleScanAlg.GetShowers();
+        for (   std::vector<Minerva::IDBlob*>::const_iterator b = angleScanBlobs.begin(); b != angleScanBlobs.end(); ++b) 
+        {
+            if ( !m_idHoughBlob->isPhoton((*b)->clusters(),vtx_position)) continue;
+            foundBlobs.push_back(*b);
+        }
+
+        return true;
+    }else{ 
+        return false;
+    }
 }
 
 #endif

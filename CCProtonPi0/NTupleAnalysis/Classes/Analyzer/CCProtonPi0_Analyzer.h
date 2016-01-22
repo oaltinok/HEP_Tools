@@ -142,13 +142,18 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double counter2;
 
         // ConeBlobs Study
-        double n1Shower;
+        double n1Shower_Signal;
+        double n1Shower_Signal_small_angle;
+        double n1Shower_Signal_search_view_U;
+        double n1Shower_Signal_search_view_V;
+        double n1Shower_Bckg;
+        double n1Shower_Bckg_small_angle;
+        double n1Shower_Bckg_search_view_U;
+        double n1Shower_Bckg_search_view_V;
         double n3Shower_Signal;
+        double n3Shower_Signal_direction;
         double n3Shower_Bckg;
-        double nMoreShower;
-        double n1Shower_BothConverted;
-        double n1Shower_OneConverted;
-        double n1Shower_NoneConverted;
+        double n3Shower_Bckg_direction;
         void Fill_1ShowerHists();
         void Fill_3ShowerHists();
 
@@ -199,6 +204,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Bool_t          prim_vtx_has_misassigned_track_direction;
         Bool_t          prim_vtx_has_broken_track;
         Bool_t          is_blobs_recovered;
+        Bool_t          is_blobs_recovered_direction;
+        Bool_t          is_blobs_recovered_invMass;
+        Bool_t          is_blobs_recovered_small_angle;
+        Bool_t          is_blobs_recovered_search_view_U;
+        Bool_t          is_blobs_recovered_search_view_V;
         Int_t           Cut_BlobDirectionBad;
         Int_t           Cut_ConeBlobs;
         Int_t           Cut_EndPoint_Michel_Exist;
@@ -220,6 +230,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Int_t           ThreeShower_s3_nClusters;
         Int_t           anglescan_ncand;
         Int_t           anglescan_ncandx;
+        Int_t           anglescan_nfoundBlobs;
         Int_t           broken_track_most_us_plane;
         Int_t           g1blob_1ParFit_ndof;
         Int_t           g1dedx_doublet;
@@ -905,6 +916,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_prim_vtx_has_misassigned_track_direction;   //!
         TBranch        *b_prim_vtx_has_broken_track;   //!
         TBranch        *b_is_blobs_recovered;   //!
+        TBranch        *b_is_blobs_recovered_direction;   //!
+        TBranch        *b_is_blobs_recovered_invMass;   //!
+        TBranch        *b_is_blobs_recovered_small_angle;   //!
+        TBranch        *b_is_blobs_recovered_search_view_U;   //!
+        TBranch        *b_is_blobs_recovered_search_view_V;   //!
         TBranch        *b_Cut_BlobDirectionBad;   //!
         TBranch        *b_Cut_ConeBlobs;   //!
         TBranch        *b_Cut_EndPoint_Michel_Exist;   //!
@@ -926,6 +942,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_ThreeShower_s3_nClusters;   //!
         TBranch        *b_anglescan_ncand;   //!
         TBranch        *b_anglescan_ncandx;   //!
+        TBranch        *b_anglescan_nfoundBlobs;   //!
         TBranch        *b_broken_track_most_us_plane;   //!
         TBranch        *b_g1blob_1ParFit_ndof;   //!
         TBranch        *b_g1dedx_doublet;   //!

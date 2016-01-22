@@ -1,33 +1,35 @@
-CCPROTONPI0_V="v2_51"
+CCPROTONPI0_V="v2_52"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Improved ConeBlobs Function
-		More modular structure, collected common task items under functions such as
-			FillUsableClusters()
-			ProcessRejectedClusters()
-			RecoverShowers_InvMass()
-			etc..
-		
-		Removed old and unnecessary NTuple Variables
-		
-		Improved Cluster Rejection Method
-			Collecting all rejected clusters in a single blob, 
-				Previously out time and low charge was different
-			Rejecting following clusters:
-				Out Time with Muon (OLD)
-				Low Charge Cluster (OLD)
-				Cluster inside HCAL (NEW)
-		
-		Improved Recover Methods
-			Recover 1Shower Events
-				Not recovering anything yet, saving 1Shower Information only
-			Recover 3Shower Events
-				Check position and direction of each shower, 
-					if one fails reject it and keep the other two
+	Shower Recovery Methods
+		1Shower Recovery Methods
+			See AngleScan Improvements for implementation details
+			Use Smaller Cone Angle
+			Use Different Search View
+		3 Shower Recovery Methods
+			Use Direction Cut 
+				If 2 shower have GOOD direction, keep event
+
+	AngleScan Improved
+		New Mode:
+			AllowSmallConeAngle
+			If it is TRUE, bin size will be 2 degrees (default is 4 degrees)
+		New Modes 
+			AngleScan_U: Start search from U view
+			AngleScan_V: Start search from V view
+			Duplicated from original class
+				I may integrate SearchView into original class, but for now they will stay different
+				I do not have time to work on that for now
+			Do not include Small Angle Mode
+		Removed MaxDigit Energy Cleaning
+			It is not effective, no need to do use it
+		Removed zDistanceFromLessThan
+			It is not used
 				
 -------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
 	No Major Changes
+	Study for Shower Recovery Methods
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

@@ -46,13 +46,21 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     counter2 = 0;
 
     //ConeBlobs Study
-    n1Shower = 0;
+    n1Shower_Signal = 0;
+    n1Shower_Signal_small_angle = 0;
+    n1Shower_Signal_search_view_U = 0;
+    n1Shower_Signal_search_view_V = 0;
+    
+    n1Shower_Bckg = 0;
+    n1Shower_Bckg_small_angle = 0;
+    n1Shower_Bckg_search_view_U = 0;
+    n1Shower_Bckg_search_view_V = 0;
+ 
     n3Shower_Signal = 0;
+    n3Shower_Signal_direction = 0;
+
     n3Shower_Bckg = 0;
-    nMoreShower = 0;
-    n1Shower_BothConverted = 0;
-    n1Shower_OneConverted = 0;
-    n1Shower_NoneConverted = 0;
+    n3Shower_Bckg_direction = 0;
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
@@ -133,16 +141,13 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
-
+    
     // ConeBlobs Study
-    cout<<"n1Shower = "<<n1Shower<<endl;
+    cout<<endl;
+    cout<<"n1Shower_Signal = "<<n1Shower_Signal<<endl;
+    cout<<"n1Shower_Bckg = "<<n1Shower_Bckg<<endl;
     cout<<"n3Shower_Signal = "<<n3Shower_Signal<<endl;
     cout<<"n3Shower_Bckg = "<<n3Shower_Bckg<<endl;
-    cout<<"nMoreShower = "<<nMoreShower<<endl;
-
-    cout<<"n1Shower_BothConverted = "<<n1Shower_BothConverted<<endl;
-    cout<<"n1Shower_OneConverted = "<<n1Shower_OneConverted<<endl;
-    cout<<"n1Shower_NoneConverted = "<<n1Shower_NoneConverted<<endl;
 }
 
 
@@ -185,12 +190,29 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             break;
         }
 
-        if (ev_run == 2186 && ev_subrun ==32 && ev_gate == 508) cout<<"Recovered!"<<endl;
+        if (is_blobs_recovered) counter1++;
+        else counter2++;
 
-        if (is_blobs_recovered){
-             if (truth_isSignal) counter1++;
-             else counter2++;
+        if (is_blobs_recovered_small_angle){
+            if (truth_isSignal) n1Shower_Signal_small_angle++;
+            else n1Shower_Bckg_small_angle++;
         }
+
+        if (is_blobs_recovered_search_view_U){
+            if (truth_isSignal) n1Shower_Signal_search_view_U++;
+            else n1Shower_Bckg_search_view_U++;
+        }
+
+        if (is_blobs_recovered_search_view_V){
+            if (truth_isSignal) n1Shower_Signal_search_view_V++;
+            else n1Shower_Bckg_search_view_V++;
+        }
+
+        if (is_blobs_recovered_direction){
+            if (truth_isSignal) n3Shower_Signal_direction++;
+            else n3Shower_Bckg_direction++;
+        }
+
 
         // Analyze Event or NOT -- Depend on the 1Track or 2 Track Analysis
         if (!AnalyzeEvent() ) continue;
@@ -242,6 +264,19 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
+    
+    // ConeBlobs Study
+    cout<<"n1Shower_Signal_small_angle = "<<n1Shower_Signal_small_angle<<endl;
+    cout<<"n1Shower_Bckg_small_angle = "<<n1Shower_Bckg_small_angle<<endl;
+    cout<<endl;
+    cout<<"n1Shower_Signal_search_view_U = "<<n1Shower_Signal_search_view_U<<endl;
+    cout<<"n1Shower_Bckg_search_view_U = "<<n1Shower_Bckg_search_view_U<<endl;
+    cout<<endl;
+    cout<<"n1Shower_Signal_search_view_V = "<<n1Shower_Signal_search_view_V<<endl;
+    cout<<"n1Shower_Bckg_search_view_V = "<<n1Shower_Bckg_search_view_V<<endl;
+    cout<<endl;
+    cout<<"n3Shower_Signal_direction = "<<n3Shower_Signal_direction<<endl;
+    cout<<"n3Shower_Bckg_direction = "<<n3Shower_Bckg_direction<<endl;
 }
 
 
@@ -697,6 +732,8 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
 
     // ConeBlobs Study Histograms
     if (anglescan_ncand == 1){
+        if (truth_isSignal) n1Shower_Signal++;
+        else n1Shower_Bckg++;
         Fill_1ShowerHists();
     }else if (anglescan_ncand == 3){
         if (truth_isSignal) n3Shower_Signal++;
@@ -704,7 +741,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         Fill_3ShowerHists();
     }
 
-    if( Cut_ConeBlobs == 1  || is_blobs_recovered ) return false;
+    if( Cut_ConeBlobs == 1 || is_blobs_recovered) return false;
     cutList.nCut_ConeBlobs.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_ConeBlobs.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_ConeBlobs.increment(truth_isSignal, study1, study2);
@@ -853,6 +890,18 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
     if (nProtonCandidates > 0){
         FillHistogram(interaction.deltaInvMass, calcDeltaInvariantMass() * MeV_to_GeV);
     }
+
+    // Recovered Pi0
+    if (is_blobs_recovered){
+        FillHistogram(interaction.recovered_Pi0_P, pi0_P * MeV_to_GeV);
+        FillHistogram(interaction.recovered_Pi0_theta, pi0_theta * TMath::RadToDeg());
+        FillHistogram(interaction.h_recovered_Pi0_P, pi0_P * MeV_to_GeV);
+        FillHistogram(interaction.h_recovered_Pi0_theta, pi0_theta * TMath::RadToDeg());
+    }else{
+        FillHistogram(interaction.h_original_Pi0_P, pi0_P * MeV_to_GeV);
+        FillHistogram(interaction.h_original_Pi0_theta, pi0_theta * TMath::RadToDeg());
+    }
+
 }
 
 double CCProtonPi0_Analyzer::calcDeltaInvariantMass()

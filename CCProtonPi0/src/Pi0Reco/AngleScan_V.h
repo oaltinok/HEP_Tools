@@ -1,5 +1,5 @@
-#ifndef cc1pi0_AngleScan_h
-#define cc1pi0_AngleScan_h
+#ifndef cc1pi0_AngleScan_V_h
+#define cc1pi0_AngleScan_V_h
 
 #include <functional>
 
@@ -10,24 +10,24 @@
 
 class TH1F;
 
-class AngleScan {
+class AngleScan_V {
   public:
     
     typedef SmartRefVector<Minerva::IDCluster> ShowerCand;
     
-    AngleScan(const SmartRefVector<Minerva::IDCluster>& clusters, const Gaudi::XYZPoint& vertex);
+    AngleScan_V(const SmartRefVector<Minerva::IDCluster>& clusters, const Gaudi::XYZPoint& vertex);
     void DoReco();
 
     const std::vector<TVector2>& GetPeaks() const;
     const std::vector<TVector2>& GetGoodPeaks() const;
 
-    const std::vector<double>& GetXShowerClosestDistances() const;
-    const std::vector<double>& GetXShowerWeightedDistances() const;
+    const std::vector<double>& GetVShowerClosestDistances() const;
+    const std::vector<double>& GetVShowerWeightedDistances() const;
     
-    unsigned int GetNxCandidate() const;
+    unsigned int GetNuCandidate() const;
     unsigned int GetNCandidate() const;
 
-    const std::vector<SmartRefVector<Minerva::IDCluster> >& GetXShowerCandVector() const;
+    const std::vector<SmartRefVector<Minerva::IDCluster> >& GetVShowerCandVector() const;
     const std::vector<SmartRefVector<Minerva::IDCluster> >& GetShowerCandVector() const;
     std::vector<Minerva::IDBlob*>  GetShowers();
 
@@ -43,17 +43,16 @@ class AngleScan {
     void SetUVMatchTolerance(double epsilon);
     void SetUVMatchMoreTolerance(double big_epsilon);
     void AllowUVMatchWithMoreTolerance(bool b);
-    void AllowSmallConeAngle(bool isSmallAngle);
+    void AllowMaxDigitEnergyCut(bool allowCut);
+    void SetMaxDigitEnergy(double maxEnergy);
   
   private:
     void Initialize();
     void BuildThetaHistogram();
-    void FillThetaHistogram();
     void FindPeaks();
-    
-    void FormXShowerCand();
+
+    void FormVShowerCand();
     void FormXUVShowerCand();
-    void CleanAllShowerCand();
     
     int GetLimitBin(const TH1F *hMax, int n_bin )const;
 
@@ -94,21 +93,16 @@ class AngleScan {
     std::vector<TVector2> fGoodPeaks; /// peaks in the angular distributon that
                                       /// produce shower candidates in the X view
 
-    std::vector<double> fXShowerClosestDistances;
-    std::vector<double> fXShowerWeightedDistances;
+    std::vector<double> fVShowerClosestDistances;
+    std::vector<double> fVShowerWeightedDistances;
     
     std::vector<ShowerCand> fShowerCandidates;
-    std::vector<ShowerCand> fXShowerCandidates;
+    std::vector<ShowerCand> fVShowerCandidates;
 
-    unsigned int nBins;
-    double theta_low;
-    double theta_high;
-
-    // Data member controlling the algorithm behaviors
+        // Data member controlling the algorithm behaviors
     double fUVMatchTolerance;
     double fUVMatchMoreTolerance;
     bool   fAllowUVMatchWithMoreTolerance;
-    bool m_UseSmallConeAngle;
 };
 
 #endif 
