@@ -25,8 +25,10 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
             cout<<"File already exists! Exiting!..."<<endl;
             exit(1);
         }
+       
+        use_nTrueSignal = true;
+        nTrueSignal = 228096;
         
-        nTrueSignal = 240237;
         SetCutNames();
         OpenTextFiles(isMC);
         
@@ -95,7 +97,17 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetXaxis()->SetTitle("N(Shower Candidates)");
         temp->GetYaxis()->SetTitle("N(Events)");
         hCut_nShowerCandidates.push_back(temp);
+ 
+        temp = new MnvH1D( Form("%s_%d","hCut_pi0invMass",i),"Reconstructed Pi0 Invariant Mass All",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+        hCut_pi0invMass.push_back(temp);
         
+        temp = new MnvH1D( Form("%s_%d","hCut_pi0invMass_Old",i),"Reconstructed Pi0 Invariant Mass All -- Old",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
+        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+        hCut_pi0invMass_Old.push_back(temp);
+
         // --------------------------------------------------------------------
         // 1 Track
         // --------------------------------------------------------------------
@@ -129,15 +141,10 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
         hCut_1Track_pi0invMass.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_1Track_pi0invMass_1",i),"Reconstructed Pi0 Invariant Mass New 1",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_1Track_pi0invMass_Old",i),"Reconstructed Pi0 Invariant Mass Old",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
-        hCut_1Track_pi0invMass_1.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","hCut_1Track_pi0invMass_2",i),"Reconstructed Pi0 Invariant Mass New 2",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
-        hCut_1Track_pi0invMass_2.push_back(temp);
+        hCut_1Track_pi0invMass_Old.push_back(temp);
         
         temp = new MnvH1D( Form("%s_%d","hCut_1Track_neutrinoE",i),"Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
@@ -177,26 +184,16 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
         hCut_2Track_pi0invMass.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_2Track_pi0invMass_1",i),"Reconstructed Pi0 Invariant Mass New 1",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp = new MnvH1D( Form("%s_%d","hCut_2Track_pi0invMass_Old",i),"Reconstructed Pi0 Invariant Mass Old",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
-        hCut_2Track_pi0invMass_1.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","hCut_2Track_pi0invMass_2",i),"Reconstructed Pi0 Invariant Mass New 2",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
-        hCut_2Track_pi0invMass_2.push_back(temp);
+        hCut_2Track_pi0invMass_Old.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_2Track_neutrinoE",i),"Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.beamE.get_width()));
         hCut_2Track_neutrinoE.push_back(temp);
-        
-        temp = new MnvH1D( Form("%s_%d","hCut_2Track_protonScore_pIDDiff",i),"Proton Score - Pion Score",binList.particleScoreDiff.get_nBins(), binList.particleScoreDiff.get_min(), binList.particleScoreDiff.get_max() );
-        temp->GetXaxis()->SetTitle("Proton Score - Pion Score");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        hCut_2Track_protonScore_pIDDiff.push_back(temp);
-
+       
         temp = new MnvH1D( Form("%s_%d","hCut_2Track_protonScore_LLR",i),"proton_protonScore_LLR",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
         temp->GetXaxis()->SetTitle("proton_protonScore_LLR");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.particleScore_LLR.get_width()));
@@ -207,102 +204,7 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.deltaInvMass.get_width()));
         hCut_2Track_deltaInvMass.push_back(temp);
 
-        // ConeBlobs Study
-        temp = new MnvH1D( Form("%s_%d","OneShower_nClusters",i),"OneShower_nClusters",50,0.0,100.0);
-        temp->GetXaxis()->SetTitle("N(Clusters)");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        OneShower_nClusters.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","OneShower_energy",i),"OneShower_energy",20,0.0,1000.0);
-        temp->GetXaxis()->SetTitle("Visible Energy [MeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        OneShower_energy.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","OneShower_theta",i),"OneShower_theta",36,0.0,180.0);
-        temp->GetXaxis()->SetTitle("Theta [degree]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        OneShower_theta.push_back(temp);
- 
-        temp = new MnvH1D( Form("%s_%d","OneShower_dist_vtx",i),"OneShower_dist_vtx",50,0.0,2000.0);
-        temp->GetXaxis()->SetTitle("Distance to Vertex [mm]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        OneShower_dist_vtx.push_back(temp);
- 
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s1_nClusters",i),"ThreeShower_s1_nClusters",50,0.0,100.0);
-        temp->GetXaxis()->SetTitle("N(Clusters)");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s1_nClusters.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s1_energy",i),"ThreeShower_s1_energy",20,0.0,1000.0);
-        temp->GetXaxis()->SetTitle("Visible Energy [MeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s1_energy.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s1_theta",i),"ThreeShower_s1_theta",36,0.0,180.0);
-        temp->GetXaxis()->SetTitle("Theta [degree]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s1_theta.push_back(temp);
- 
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s1_dist_vtx",i),"ThreeShower_s1_dist_vtx",50,0.0,2000.0);
-        temp->GetXaxis()->SetTitle("Distance to Vertex [mm]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s1_dist_vtx.push_back(temp);  
- 
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s2_nClusters",i),"ThreeShower_s2_nClusters",50,0.0,100.0);
-        temp->GetXaxis()->SetTitle("N(Clusters)");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s2_nClusters.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s2_energy",i),"ThreeShower_s2_energy",20,0.0,1000.0);
-        temp->GetXaxis()->SetTitle("Visible Energy [MeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s2_energy.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s2_theta",i),"ThreeShower_s2_theta",36,0.0,180.0);
-        temp->GetXaxis()->SetTitle("Theta [degree]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s2_theta.push_back(temp);
- 
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s2_dist_vtx",i),"ThreeShower_s2_dist_vtx",50,0.0,2000.0);
-        temp->GetXaxis()->SetTitle("Distance to Vertex [mm]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s2_dist_vtx.push_back(temp);  
- 
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s3_nClusters",i),"ThreeShower_s3_nClusters",50,0.0,100.0);
-        temp->GetXaxis()->SetTitle("N(Clusters)");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s3_nClusters.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s3_energy",i),"ThreeShower_s3_energy",20,0.0,1000.0);
-        temp->GetXaxis()->SetTitle("Visible Energy [MeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s3_energy.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s3_theta",i),"ThreeShower_s3_theta",36,0.0,180.0);
-        temp->GetXaxis()->SetTitle("Theta [degree]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s3_theta.push_back(temp);
- 
-        temp = new MnvH1D( Form("%s_%d","ThreeShower_s3_dist_vtx",i),"ThreeShower_s3_dist_vtx",50,0.0,2000.0);
-        temp->GetXaxis()->SetTitle("Distance to Vertex [mm]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        ThreeShower_s3_dist_vtx.push_back(temp);  
-  
     }
-
-    double binsP[11] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.5};
-    all_signal_pi0_P = new TH1D( "all_signal_pi0_P","Momentum for Signal Events",10,binsP);
-    all_signal_pi0_P->GetXaxis()->SetTitle("Momentum [GeV]");
-    all_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
- 
-    minos_signal_pi0_P = new TH1D( "minos_signal_pi0_P","Momentum for MINOS Matched Signal Events",10,binsP);
-    minos_signal_pi0_P->GetXaxis()->SetTitle("Momentum [GeV]");
-    minos_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
-
-    all_signal_pi0_theta = new TH1D( "all_signal_pi0_theta","Theta for Signal Events",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max());
-    all_signal_pi0_theta->GetXaxis()->SetTitle("Theta");
-    all_signal_pi0_theta->GetYaxis()->SetTitle("N(Events)");
-     
 
     // MC Only Histograms
     mc_w_DIS = new TH1D( "mc_w_DIS","True W for DIS",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
@@ -372,7 +274,7 @@ void CCProtonPi0_CutList::SetCutNames()
 
 void CCProtonPi0_CutList::OpenTextFiles(bool isMC)
 {
-    std::string tag = "_NonRecovered"; 
+    std::string tag = ""; 
     
     std::string type;
     if (isMC) type = "CutTable_MC_";
@@ -522,7 +424,11 @@ void CCProtonPi0_CutList::writeSingleRow(ofstream &file, CCProtonPi0_Cut& curren
     double eff_MINOS;
     double purity;    
 
-    eff_AllSignal = getCutEfficiency(currentCut, eff_base_all);
+    if (use_nTrueSignal){
+        eff_AllSignal = getCutEfficiency(currentCut, nTrueSignal);
+    }else{
+        eff_AllSignal = getCutEfficiency(currentCut, eff_base_all);
+    }
     eff_MINOS = getCutEfficiency(currentCut, eff_base_MINOS);
     purity = getCutPurity(currentCut);
             
@@ -574,14 +480,15 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_Michel[i]->Write();
         hCut_nProtonCandidates[i]->Write();
         hCut_nShowerCandidates[i]->Write();
+        hCut_pi0invMass[i]->Write();
+        hCut_pi0invMass_Old[i]->Write();
         
         // 1 Track
         hCut_1Track_nShowerCandidates[i]->Write();
         hCut_1Track_eVis_nuclearTarget[i]->Write();
         hCut_1Track_eVis_other[i]->Write();
         hCut_1Track_pi0invMass[i]->Write();
-        hCut_1Track_pi0invMass_1[i]->Write();
-        hCut_1Track_pi0invMass_2[i]->Write();
+        hCut_1Track_pi0invMass_Old[i]->Write();
         hCut_1Track_gamma1ConvDist[i]->Write();
         hCut_1Track_gamma2ConvDist[i]->Write();
         hCut_1Track_neutrinoE[i]->Write();
@@ -591,41 +498,15 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_2Track_eVis_nuclearTarget[i]->Write();
         hCut_2Track_eVis_other[i]->Write();
         hCut_2Track_pi0invMass[i]->Write();
-        hCut_2Track_pi0invMass_1[i]->Write();
-        hCut_2Track_pi0invMass_2[i]->Write();
+        hCut_2Track_pi0invMass_Old[i]->Write();
         hCut_2Track_gamma1ConvDist[i]->Write();
         hCut_2Track_gamma2ConvDist[i]->Write();
         hCut_2Track_neutrinoE[i]->Write();
-        hCut_2Track_protonScore_pIDDiff[i]->Write();
         hCut_2Track_protonScore_LLR[i]->Write();
         hCut_2Track_deltaInvMass[i]->Write();
-
-        OneShower_nClusters[i]->Write();
-        OneShower_energy[i]->Write();
-        OneShower_theta[i]->Write();
-        OneShower_dist_vtx[i]->Write();
- 
-        ThreeShower_s1_nClusters[i]->Write();
-        ThreeShower_s1_energy[i]->Write();
-        ThreeShower_s1_theta[i]->Write();
-        ThreeShower_s1_dist_vtx[i]->Write();
-  
-        ThreeShower_s2_nClusters[i]->Write();
-        ThreeShower_s2_energy[i]->Write();
-        ThreeShower_s2_theta[i]->Write();
-        ThreeShower_s2_dist_vtx[i]->Write();
- 
-        ThreeShower_s3_nClusters[i]->Write();
-        ThreeShower_s3_energy[i]->Write();
-        ThreeShower_s3_theta[i]->Write();
-        ThreeShower_s3_dist_vtx[i]->Write();
     }
 
     // MC Only
-    all_signal_pi0_P->Write();
-    minos_signal_pi0_P->Write();
-    all_signal_pi0_theta->Write();
-    
     mc_w_DIS->Write();
     mc_w_RES->Write();
     mc_w_CCQE->Write();

@@ -38,6 +38,7 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
                             bool AntiNeutrino,
                             bool QELike,
                             bool SingleChargedPion,
+                            bool SingleChargedPion_ChargeExchanged,
                             bool DoublePionWithPi0,
                             bool DoublePionWithoutPi0,
                             bool MultiPionWithPi0,
@@ -62,6 +63,7 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
         Background bckg_AntiNeutrino;
         Background bckg_QELike;
         Background bckg_SingleChargedPion;
+        Background bckg_SingleChargedPion_ChargeExchanged;
         Background bckg_DoublePionWithPi0;
         Background bckg_DoublePionWithoutPi0;
         Background bckg_MultiPionWithPi0;

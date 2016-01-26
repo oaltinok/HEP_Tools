@@ -7,13 +7,13 @@
 #include "../CCProtonPi0.h"
 
 // Gaudi
-#include "GaudiKernel/PhysicalConstants.h"
+//#include "GaudiKernel/PhysicalConstants.h"
 
 // Minerva Analysis Framework
-#include "Event/GenMinHeader.h"
-#include "Event/MCIDDigit.h"
-#include "Event/MCHit.h"
-#include "RecInterfaces/IFiducialPointTool.h"
+//#include "Event/GenMinHeader.h"
+//#include "Event/MCIDDigit.h"
+//#include "Event/MCHit.h"
+//#include "RecInterfaces/IFiducialPointTool.h"
 
 
 void CCProtonPi0::SaveBlobDigitEnergy(Minerva::PhysicsEvent *event, Minerva::IDBlob* blob, int blobID) const

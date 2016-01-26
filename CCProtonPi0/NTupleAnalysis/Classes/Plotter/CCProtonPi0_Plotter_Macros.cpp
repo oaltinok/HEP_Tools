@@ -13,7 +13,7 @@ void CCProtonPi0_Plotter::DrawStackedMC(rootDir &dir, std::string var_name, std:
 {
     DrawStackedMC_BckgAll(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
     //DrawStackedMC_BckgWithPi0(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
-    //DrawStackedMC_BckgType(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
+    DrawStackedMC_BckgType(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
 }
 
 void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
@@ -105,14 +105,12 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     }
 
     // Add Pi0 InvMass Line
-    if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
-            var_name.compare("hCut_2Track_pi0invMass") == 0 ||
-            var_name.compare("invMass") == 0 ||
-            var_name.compare("invMass_Old") == 0) {
+    std::size_t found = var_name.find("invMass");
+    if (found != std::string::npos){
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
         pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,3200);
+        pi0Mass.DrawLine(134.98,0,134.98,hist_max);
     }
 
     // Add Delta+ InvMass Line
@@ -120,7 +118,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
         TLine deltaMass;
         deltaMass.SetLineWidth(2);
         deltaMass.SetLineColor(kBlue);
-        deltaMass.DrawLine(1.232,0,1.232,3200);
+        deltaMass.DrawLine(1.232,0,1.232,hist_max);
     }
 
     // Print Plot
@@ -282,7 +280,6 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
 
-
     // ------------------------------------------------------------------------
     // MC Normalization 
     // ------------------------------------------------------------------------
@@ -302,10 +299,8 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     AddNormBox(plotter, isPOTNorm, mc_ratio);
 
     // Add Pi0 InvMass Line
-    if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
-            var_name.compare("hCut_2Track_pi0invMass") == 0 ||
-            var_name.compare("invMass") == 0 ||
-            var_name.compare("invMass_Old") == 0) {
+    std::size_t found = var_name.find("invMass");
+    if (found != std::string::npos){
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
         pi0Mass.SetLineColor(kBlue);
@@ -618,14 +613,12 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     }
 
     // Add Pi0 InvMass Line
-    if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
-            var_name.compare("hCut_2Track_pi0invMass") == 0 ||
-            var_name.compare("invMass") == 0 || 
-            var_name.compare("invMass_Old") == 0 ) {
+    std::size_t found = var_name.find("invMass");
+    if (found != std::string::npos){
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
         pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,3200);
+        pi0Mass.DrawLine(134.98,0,134.98,hist_max);
     }
 
     // Add Delta+ InvMass Line
@@ -633,7 +626,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
         TLine deltaMass;
         deltaMass.SetLineWidth(2);
         deltaMass.SetLineColor(kBlue);
-        deltaMass.DrawLine(1232,0,1232,3200);
+        deltaMass.DrawLine(1232,0,1232,hist_max);
     }
 
 
@@ -670,14 +663,12 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgType(rootDir &dir, std::string var_n
     plotter->DrawStackedMC(mc_hists,1,"TR",0);
 
     // Add Pi0 InvMass Line
-    if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
-            var_name.compare("hCut_2Track_pi0invMass") == 0 ||
-            var_name.compare("invMass") == 0 ||
-            var_name.compare("invMass_Old") == 0) {
+    std::size_t found = var_name.find("invMass");
+    if (found != std::string::npos){
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
         pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,3200);
+        pi0Mass.DrawLine(134.98,0,134.98,hist_max);
     }
 
     // Add Plot Labels
@@ -731,14 +722,12 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgWithPi0(rootDir &dir, std::string va
     plotter->AddHistoTitle(temp->GetTitle());
 
     // Add Pi0 InvMass Line
-    if (    var_name.compare("hCut_1Track_pi0invMass") == 0 || 
-            var_name.compare("hCut_2Track_pi0invMass") == 0 ||
-            var_name.compare("invMass") == 0 ||
-            var_name.compare("invMass_Old") == 0) {
+    std::size_t found = var_name.find("invMass");
+    if (found != std::string::npos){
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
         pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,3200);
+        pi0Mass.DrawLine(134.98,0,134.98,hist_max);
     }
 
     // If Cut Histogram - Add Cut Arrows
@@ -999,8 +988,18 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     temp->SetFillColor(kRed);
     mc_hists->Add(temp);
 
-    // Get Bckg: DoublePionWithPi0
+    // Get Bckg: SingleChargedPion Charge Exchanged
     var = Form("%s_%d",var_name.c_str(),10);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: SingleChargedPion_ChargeExc");
+    max_bin = temp->GetMaximumBin();
+    hist_max = hist_max + temp->GetBinContent(max_bin);
+    temp->SetLineColor(kTeal);
+    temp->SetFillColor(kTeal);
+    mc_hists->Add(temp);
+
+    // Get Bckg: DoublePionWithPi0
+    var = Form("%s_%d",var_name.c_str(),11);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Bckg: DoublePionWithPi0");
     max_bin = temp->GetMaximumBin();
@@ -1010,7 +1009,7 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     mc_hists->Add(temp);
 
     // Get Bckg: DoublePionWithoutPi0
-    var = Form("%s_%d",var_name.c_str(),11);
+    var = Form("%s_%d",var_name.c_str(),12);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Bckg: DoublePionWithoutPi0");
     max_bin = temp->GetMaximumBin();
@@ -1020,7 +1019,7 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     mc_hists->Add(temp);
 
     // Get Bckg: MultiPionWithPi0
-    var = Form("%s_%d",var_name.c_str(),12);
+    var = Form("%s_%d",var_name.c_str(),13);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Bckg: MultiPionWithPi0");
     max_bin = temp->GetMaximumBin();
@@ -1030,13 +1029,13 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     mc_hists->Add(temp);
 
     // Get Bckg: MultiPionWithoutPi0
-    var = Form("%s_%d",var_name.c_str(),13);
+    var = Form("%s_%d",var_name.c_str(),14);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Bckg: MultiPionWithoutPi0");
     max_bin = temp->GetMaximumBin();
     hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kTeal);
-    temp->SetFillColor(kTeal);
+    temp->SetLineColor(kBlack);
+    temp->SetFillColor(kBlack);
     mc_hists->Add(temp);
 
     // Get Bckg: NC
@@ -1060,7 +1059,7 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     mc_hists->Add(temp);
 
     // Get Bckg: Other
-    var = Form("%s_%d",var_name.c_str(),14);
+    var = Form("%s_%d",var_name.c_str(),15);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Bckg: Other");
     max_bin = temp->GetMaximumBin();
@@ -1117,6 +1116,92 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgWithPi0(TFile* f_mc, std::string var
     temp->SetLineColor(kBlue);
     temp->SetFillColor(kBlue);
     mc_hists->Add(temp);
+}
+
+void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
+{
+    std::string rootDir_mc = dir.mc;
+
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+
+    std::string var;
+    double hist_max = 0;
+    double max_bin;
+    double bin_width;
+
+    // ------------------------------------------------------------------------
+    // Fill TObjArray - For MC Histograms
+    // ------------------------------------------------------------------------
+    TObjArray* mc_hists = new TObjArray;
+    MnvH1D* temp;
+
+    // ------------------------------------------------------------------------
+    // Get Signal
+    // ------------------------------------------------------------------------
+    var = Form("%s_%d",var_name.c_str(),1);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Signal");
+    temp->SetLineColor(kGreen);
+    temp->SetFillColor(kGreen);
+
+    // Get Stats
+    double nSignal = temp->GetEntries(); 
+    max_bin = temp->GetMaximumBin();
+    hist_max = hist_max + temp->GetBinContent(max_bin);
+    bin_width = temp->GetBinWidth(1);
+
+    // Add to TObjArray
+    mc_hists->Add(temp);
+
+    // ------------------------------------------------------------------------
+    // Plot  - If you want A Log Plot, axis_minimum = 0.1
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas(var_name.c_str(),var_name.c_str(),1280,800);
+    ApplyStyle(plotter);
+    //plotter->axis_minimum = 0.1;
+    plotter->axis_minimum = 0.0;
+    plotter->DrawStackedMC(mc_hists,1,"TR",0);
+
+    // Add Plot Labels
+    var = Form("%s_%d",var_name.c_str(),0);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    plotter->AddHistoTitle(temp->GetTitle());
+    const double y_pos = 0.88;
+    const double y_diff = 0.033;
+    plotter->AddPlotLabel(Form("nSignal = %3.0f",nSignal),0.3,y_pos,y_diff,kBlue); 
+
+    // If Cut Histogram - Add Cut Arrows
+    if (nCutArrows == 1){
+        AddCutArrow(plotter, cutArrow1, hist_max, bin_width);
+    }else if (nCutArrows == 2){
+        AddCutArrow(plotter, cutArrow1, hist_max, bin_width);
+        AddCutArrow(plotter, cutArrow2, hist_max, bin_width);
+    }
+
+    // Add Pi0 InvMass Line
+    std::size_t found = var_name.find("invMass");
+    if (found != std::string::npos){
+        TLine pi0Mass;
+        pi0Mass.SetLineWidth(2);
+        pi0Mass.SetLineColor(kBlue);
+        pi0Mass.DrawLine(134.98,0,134.98,hist_max);
+    }
+
+    // Add Delta+ InvMass Line
+    if (var_name.compare("deltaInvMass") == 0) {
+        TLine deltaMass;
+        deltaMass.SetLineWidth(2);
+        deltaMass.SetLineColor(kBlue);
+        deltaMass.DrawLine(1232,0,1232,hist_max);
+    }
+
+
+    // Print Plot
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_signal.png"), "png");
+
+    delete c;
+    delete plotter;
 }
 
 

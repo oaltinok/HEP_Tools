@@ -31,6 +31,7 @@ void CCProtonPi0_BackgroundTool::initBackgrounds()
     initSingleBackground(bckg_AntiNeutrino, "AntiNeutrino");
     initSingleBackground(bckg_QELike, "QELike");
     initSingleBackground(bckg_SingleChargedPion, "SingleChargedPion");
+    initSingleBackground(bckg_SingleChargedPion_ChargeExchanged, "SingleChargedPion_ChargeExc");
     initSingleBackground(bckg_DoublePionWithPi0, "DoublePionWithPi0");
     initSingleBackground(bckg_DoublePionWithoutPi0, "DoublePionWithoutPi0");
     initSingleBackground(bckg_MultiPionWithPi0, "MultiPionWithPi0");
@@ -67,7 +68,7 @@ void CCProtonPi0_BackgroundTool::fillBackgroundWithPi0(bool NoPi0, bool SinglePi
     else cout<<"WARNING! No BackgroundWithPi0 Found"<<endl;
 }
 
-void CCProtonPi0_BackgroundTool::fillBackground(bool NC, bool AntiNeutrino, bool QELike, bool SingleChargedPion, bool DoublePionWithPi0, bool DoublePionWithoutPi0,  bool MultiPionWithPi0, bool MultiPionWithoutPi0, bool Other, bool withMichel)
+void CCProtonPi0_BackgroundTool::fillBackground(bool NC, bool AntiNeutrino, bool QELike, bool SingleChargedPion, bool SingleChargedPion_ChargeExchanged, bool DoublePionWithPi0, bool DoublePionWithoutPi0,  bool MultiPionWithPi0, bool MultiPionWithoutPi0, bool Other, bool withMichel)
 {
     // Update Total Background
     updateBackground(bckg_Total,withMichel);
@@ -77,6 +78,7 @@ void CCProtonPi0_BackgroundTool::fillBackground(bool NC, bool AntiNeutrino, bool
     else if (AntiNeutrino) updateBackground(bckg_AntiNeutrino,withMichel);
     else if (QELike) updateBackground(bckg_QELike,withMichel);
     else if (SingleChargedPion) updateBackground(bckg_SingleChargedPion,withMichel);
+    else if (SingleChargedPion_ChargeExchanged) updateBackground(bckg_SingleChargedPion_ChargeExchanged,withMichel);
     else if (DoublePionWithPi0) updateBackground(bckg_DoublePionWithPi0,withMichel);
     else if (DoublePionWithoutPi0) updateBackground(bckg_DoublePionWithoutPi0,withMichel);
     else if (MultiPionWithPi0) updateBackground(bckg_MultiPionWithPi0,withMichel);
@@ -90,11 +92,11 @@ void CCProtonPi0_BackgroundTool::writeBackgroundTableHeader()
     textFile<<std::left;
     
     // Table Header
-    textFile.width(20); textFile<< "Background Type";
+    textFile.width(40); textFile<< "Background Type";
     textFile.width(16); textFile<< "N(Events)"; 
     textFile.width(16); textFile<< "Percent"; 
-    textFile.width(16); textFile<< "N(WithMichel)"; 
-    textFile.width(16); textFile<< "Percent"; 
+    //textFile.width(16); textFile<< "N(WithMichel)"; 
+    //textFile.width(16); textFile<< "Percent"; 
     textFile<<endl;
 }
 
@@ -112,6 +114,7 @@ void CCProtonPi0_BackgroundTool::formBackgroundVectors()
     BackgroundTypeVector.push_back(bckg_AntiNeutrino);
     BackgroundTypeVector.push_back(bckg_QELike);
     BackgroundTypeVector.push_back(bckg_SingleChargedPion);
+    BackgroundTypeVector.push_back(bckg_SingleChargedPion_ChargeExchanged);
     BackgroundTypeVector.push_back(bckg_DoublePionWithPi0);
     BackgroundTypeVector.push_back(bckg_DoublePionWithoutPi0);
     BackgroundTypeVector.push_back(bckg_MultiPionWithPi0);
@@ -131,11 +134,11 @@ void CCProtonPi0_BackgroundTool::writeBackgroundTableRows(vector< Background > &
     for (unsigned int i = 0; i < bckgVector.size(); i++){
         Background temp = bckgVector[i];
 
-        textFile.width(20); textFile<<temp.name;  
+        textFile.width(40); textFile<<temp.name;  
         textFile.width(16); textFile<<temp.nAll;    
         textFile.width(16); textFile<<calcPercent(temp.nAll,bckg_Total.nAll);    
-        textFile.width(16); textFile<<temp.nWithMichel;   
-        textFile.width(16); textFile<<calcPercent(temp.nWithMichel,bckg_Total.nWithMichel);    
+        //textFile.width(16); textFile<<temp.nWithMichel;   
+        //textFile.width(16); textFile<<calcPercent(temp.nWithMichel,bckg_Total.nWithMichel);    
         textFile<<endl;
     }
 

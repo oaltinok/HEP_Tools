@@ -25,14 +25,86 @@ Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
 #ifndef CCPROTONPI0_H 
 #define CCPROTONPI0_H 1
 
+// C++ libraries
+#include <cassert>
+#include <algorithm>
+#include <iostream>
+#include <iomanip>
+#include <numeric>
 #include <utility>
 #include <fstream>
+
+// ROOT Libraries
+#include "TString.h"
+#include "TDatabasePDG.h"
+#include "TVector3.h"
+#include "TMath.h"
+#include "TRandom3.h"
 
 // Inheritance
 #include "AnaUtils/MinervaAnalysisTool.h"
 
 //-- Forward Declarations
 #include "Event/MinervaEventFwd.h"
+
+// Local
+#include "Helper/PDG.h"
+#include "Pi0Reco/AngleScan.h"
+#include "Pi0Reco/AngleScan_U.h"
+#include "Pi0Reco/AngleScan_V.h"
+#include "Pi0Reco/ClusterVectorInfo.h"
+#include "Pi0Reco/OneParLineFit.h"
+#include "Pi0Reco/TwoParLineFit.h"
+#include "Pi0Reco/Pi0BlobTool.h"
+#include "TruthMatch/DigitVectorTruthInfo.h"
+#include "TruthMatch/TraverseHistory.h"
+#include "TruthMatch/TrackTruthInfo.h"
+#include "TruthMatch/HitVectorTruthInfo.h"
+#include "CCProtonPi0/IHoughBlob.h"
+#include "CCProtonPi0/IHoughTool.h"
+
+// Gaudi
+#include "GaudiKernel/PhysicalConstants.h"
+
+// Minerva Analysis Framework
+#include "AnaUtils/IProtonUtils.h"
+#include "AnaUtils/MCTrack.h"
+#include "BadChannels/IGetDeadTime.h"
+#include "BlobFormation/IBlobCreatorUtils.h"
+#include "BlobFormation/IIDAnchoredBlobCreator.h"
+#include "BlobFormation/IIDBlobSeedingTool.h"
+#include "CalTools/IGetCalAttenuation.h"
+#include "EnergyRecTools/IEnergyCorrectionTool.h"
+#include "EnergyRecTools/IExtraEnergyTool.h"
+#include "Event/GenMinHeader.h"
+#include "Event/TimeSlice.h"
+#include "Event/MCIDDigit.h"
+#include "Event/MCHit.h"
+#include "G4Material.hh"
+#include "G4Navigator.hh"
+#include "G4ThreeVector.hh"
+#include "G4VPhysicalVolume.hh"
+#include "GeoUtils/IMinervaCoordSysTool.h"
+#include "GiGaCnv/IGiGaGeomCnvSvc.h"
+#include "MinervaDet/DeDetector.h"
+#include "MinervaDet/IGeomUtilSvc.h"
+#include "MinervaUtils/IHitTaggerTool.h"
+#include "MinervaUtils/IMinervaMathTool.h"
+#include "MinervaUtils/IMinervaObjectAssociator.h"
+#include "ODDet/DeOuterDetector.h"
+#include "ParticleMaker/IParticleMakerTool.h"
+#include "ParticleMaker/IParticleTool.h"
+#include "ProngMaker/IMichelTool.h"
+#include "ProngMaker/IODProngClassificationTool.h"
+#include "RecInterfaces/IAnchoredTrackFormation.h"
+#include "RecInterfaces/IFiducialPointTool.h"
+#include "RecInterfaces/IRecoObjectTimeTool.h"
+#include "RecInterfaces/ITrackLinearPropagator.h"
+#include "RecUtils/Cone.h"
+#include "RecUtils/IConeUtilsTool.h"
+#include "RecoStudies/IVertexEnergyStudyTool.h"
+#include "VertexCreation/IVertexFitter.h"
+
 
 class IAnchoredTrackFormation;
 class IBlobCreatorUtils;
@@ -293,7 +365,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void SaveTruthUnusedClusterEnergy_NearVertex(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> vertexClusters) const;
         void SaveTruthUnusedClusterEnergy_Dispersed(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const;
         void SaveTruthUnusedClusterEnergy_Rejected(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const;
-        void SetSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
+        void setSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
         void SetVertexCount(Minerva::PhysicsEvent *event) const;
         void VertexBlob( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction *truthEvent ) const;
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
@@ -313,8 +385,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void writeBackgroundType(Minerva::GenMinInteraction* truthEvent) const;
         void writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool isSignal) const;
         void writeFSParticleTable(bool isSignal) const;
-        void SetSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
-        void SetSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
+        void setSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
+        void setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const;
         int GetMCHitPDG(const SmartRef<Minerva::MCHit> mc_hit) const;
         int GetDigitPDG(const Minerva::MCIDDigit* mcdigit) const;
         int GetPDGfromVector(std::vector<int> &all_pdg) const;

@@ -21,10 +21,7 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     // Event Selections
     
     applyProtonScore = true;
-    //pID_KE_Limit = 300.0;
-    pID_KE_Limit = 0.0;
     minProtonScore_LLR = -10.0;
-    minPIDDiff = 0.45;
 
     applyPhotonDistance = true;
     minPhotonDistance_1 = 14; //cm
@@ -44,23 +41,6 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 
     counter1 = 0;
     counter2 = 0;
-
-    //ConeBlobs Study
-    n1Shower_Signal = 0;
-    n1Shower_Signal_small_angle = 0;
-    n1Shower_Signal_search_view_U = 0;
-    n1Shower_Signal_search_view_V = 0;
-    
-    n1Shower_Bckg = 0;
-    n1Shower_Bckg_small_angle = 0;
-    n1Shower_Bckg_search_view_U = 0;
-    n1Shower_Bckg_search_view_V = 0;
- 
-    n3Shower_Signal = 0;
-    n3Shower_Signal_direction = 0;
-
-    n3Shower_Bckg = 0;
-    n3Shower_Bckg_direction = 0;
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
@@ -141,13 +121,6 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
-    
-    // ConeBlobs Study
-    cout<<endl;
-    cout<<"n1Shower_Signal = "<<n1Shower_Signal<<endl;
-    cout<<"n1Shower_Bckg = "<<n1Shower_Bckg<<endl;
-    cout<<"n3Shower_Signal = "<<n3Shower_Signal<<endl;
-    cout<<"n3Shower_Bckg = "<<n3Shower_Bckg<<endl;
 }
 
 
@@ -190,29 +163,8 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             break;
         }
 
-        if (is_blobs_recovered) counter1++;
-        else counter2++;
-
-        if (is_blobs_recovered_small_angle){
-            if (truth_isSignal) n1Shower_Signal_small_angle++;
-            else n1Shower_Bckg_small_angle++;
-        }
-
-        if (is_blobs_recovered_search_view_U){
-            if (truth_isSignal) n1Shower_Signal_search_view_U++;
-            else n1Shower_Bckg_search_view_U++;
-        }
-
-        if (is_blobs_recovered_search_view_V){
-            if (truth_isSignal) n1Shower_Signal_search_view_V++;
-            else n1Shower_Bckg_search_view_V++;
-        }
-
-        if (is_blobs_recovered_direction){
-            if (truth_isSignal) n3Shower_Signal_direction++;
-            else n3Shower_Bckg_direction++;
-        }
-
+        //if (is_blobs_recovered) counter1++;
+        //else counter2++;
 
         // Analyze Event or NOT -- Depend on the 1Track or 2 Track Analysis
         if (!AnalyzeEvent() ) continue;
@@ -229,7 +181,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         //----------------------------------------------------------------------
         if(m_isMC && !truth_isSignal) {
             bckgTool.fillBackgroundWithPi0(truth_isBckg_NoPi0, truth_isBckg_SinglePi0, truth_isBckg_MultiPi0, truth_isBckg_withMichel);                                    
-            bckgTool.fillBackground(truth_isBckg_NC, truth_isBckg_AntiNeutrino, truth_isBckg_QELike, truth_isBckg_SingleChargedPion, truth_isBckg_DoublePionWithPi0, truth_isBckg_DoublePionWithoutPi0, truth_isBckg_MultiPionWithPi0, truth_isBckg_MultiPionWithoutPi0, truth_isBckg_Other, truth_isBckg_withMichel);                                    
+            bckgTool.fillBackground(truth_isBckg_NC, truth_isBckg_AntiNeutrino, truth_isBckg_QELike, truth_isBckg_SingleChargedPion,truth_isBckg_SingleChargedPion_ChargeExchanged, truth_isBckg_DoublePionWithPi0, truth_isBckg_DoublePionWithoutPi0, truth_isBckg_MultiPionWithPi0, truth_isBckg_MultiPionWithoutPi0, truth_isBckg_Other, truth_isBckg_withMichel);                                    
         }
 
         //----------------------------------------------------------------------
@@ -264,19 +216,6 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
-    
-    // ConeBlobs Study
-    cout<<"n1Shower_Signal_small_angle = "<<n1Shower_Signal_small_angle<<endl;
-    cout<<"n1Shower_Bckg_small_angle = "<<n1Shower_Bckg_small_angle<<endl;
-    cout<<endl;
-    cout<<"n1Shower_Signal_search_view_U = "<<n1Shower_Signal_search_view_U<<endl;
-    cout<<"n1Shower_Bckg_search_view_U = "<<n1Shower_Bckg_search_view_U<<endl;
-    cout<<endl;
-    cout<<"n1Shower_Signal_search_view_V = "<<n1Shower_Signal_search_view_V<<endl;
-    cout<<"n1Shower_Bckg_search_view_V = "<<n1Shower_Bckg_search_view_V<<endl;
-    cout<<endl;
-    cout<<"n3Shower_Signal_direction = "<<n3Shower_Signal_direction<<endl;
-    cout<<"n3Shower_Bckg_direction = "<<n3Shower_Bckg_direction<<endl;
 }
 
 
@@ -605,44 +544,44 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     //==========================================================================
     cutList.nCut_All.increment(truth_isSignal, study1, study2);
 
-    // Fill Pi0 truth P
-    if (truth_isSignal){
-        double pi0_true_P = HEP_Functions::calcMomentum(truth_pi0_4P[0],truth_pi0_4P[1],truth_pi0_4P[2]);
-        pi0_true_P = pi0_true_P * MeV_to_GeV;
-        FillHistogram(cutList.all_signal_pi0_P,pi0_true_P);
-    }
-
-
+    // ------------------------------------------------------------------------
     // Vertex Cut -- If Cut_Vertex_None == 1 --> No Event Vertex
+    // ------------------------------------------------------------------------
     if( Cut_Vertex_None == 1) return false;
     cutList.nCut_Vertex_None.increment(truth_isSignal, study1, study2);
 
+    // ------------------------------------------------------------------------
     // Vertex Reconstructable Cut
+    // ------------------------------------------------------------------------
     if( Cut_Vertex_Not_Reconstructable == 1) return false;
     cutList.nCut_Vertex_Not_Reconstructable.increment(truth_isSignal, study1, study2);
 
+    // ------------------------------------------------------------------------
     // Vertex Fiducial Cut
+    // ------------------------------------------------------------------------
     if( Cut_Vertex_Not_Fiducial == 1) return false;
     cutList.nCut_Vertex_Not_Fiducial.increment(truth_isSignal, study1, study2);
 
+    // ------------------------------------------------------------------------
     // Muon Cut -- If Cut_Muon_None == 1 --> No MINOS Matched Muon
+    // ------------------------------------------------------------------------
     if( Cut_Muon_None == 1) return false;
     cutList.nCut_Muon_None.increment(truth_isSignal, study1, study2);
 
     // Fill Truth_W for MINOS Matched Signal Events
     if (m_isMC && truth_isSignal){ 
         fill_mc_w(); 
-        
-        double pi0_true_P = HEP_Functions::calcMomentum(truth_pi0_4P[0],truth_pi0_4P[1],truth_pi0_4P[2]);
-        pi0_true_P = pi0_true_P * MeV_to_GeV;
-        FillHistogram(cutList.minos_signal_pi0_P,pi0_true_P);
-
     }
+    
+    // ------------------------------------------------------------------------
     // Anti-Muon Cut
+    // ------------------------------------------------------------------------
     if( Cut_Muon_Charge == 1) return false;
     cutList.nCut_Muon_Charge.increment(truth_isSignal, study1, study2);
 
+    // ------------------------------------------------------------------------
     // Michel Cuts
+    // ------------------------------------------------------------------------
     if( Cut_Vertex_Michel_Exist == 1 || Cut_EndPoint_Michel_Exist == 1 || Cut_secEndPoint_Michel_Exist == 1 ){
         FillHistogram(cutList.hCut_Michel,1);
     }else{
@@ -661,13 +600,21 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // Check nVertices
     FillHistogram(cutList.hCut_nVertices, vtx_total_count);
 
+    // ------------------------------------------------------------------------
+    // Tracked Particle Reconstruction Fails
+    // ------------------------------------------------------------------------
     if( Cut_Particle_None == 1) return false;
     cutList.nCut_Particle_None.increment(truth_isSignal, study1, study2);
 
+    // ------------------------------------------------------------------------
+    // Cannot Find Proton in Tracked Particles
+    // ------------------------------------------------------------------------
     if( Cut_Proton_None == 1) return false;
     cutList.nCut_Proton_None.increment(truth_isSignal, study1, study2);
   
+    // ------------------------------------------------------------------------
     // Proton Momentum NaN
+    // ------------------------------------------------------------------------
     if ( Cut_Proton_Bad == 1) return false;
     cutList.nCut_Proton_Bad.increment(truth_isSignal, study1, study2);
 
@@ -675,29 +622,22 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     FillHistogram(cutList.hCut_nProtonCandidates, nProtonCandidates);
     
     // After this stage we can analyze different topologies
-    //      No Proton Events
-    //      With Proton
+    //      1Track = No Proton Events (Only Muon Track)
+    //      2Track = With Proton (Muon + Proton)
     if (nProtonCandidates == 0){
         cutList.nCut_1Track_All.increment(truth_isSignal, study1, study2);
     }else{
         cutList.nCut_2Track_All.increment(truth_isSignal, study1, study2);
     }
    
+    // ------------------------------------------------------------------------
     // Apply Proton Score to All Proton Candidates
+    // ------------------------------------------------------------------------
     if (nProtonCandidates > 0){
         for( int i = 0; i < nProtonCandidates; i++){
             if ( applyProtonScore ){
-                // Use pID Difference for KE < pID_KE_Limit 
-                // Use LLR for KE > pID_KE_Limit
-                if (all_protons_KE[i] < pID_KE_Limit ){
-                    cout<<"Negative Proton KE"<<endl;
-                    double pIDDiff = all_protons_protonScore[i] - all_protons_pionScore[i];
-                    FillHistogram(cutList.hCut_2Track_protonScore_pIDDiff,pIDDiff);
-                    if ( pIDDiff < minPIDDiff ) return false;
-                }else{
-                    FillHistogram(cutList.hCut_2Track_protonScore_LLR,all_protons_LLRScore[i]);
-                    if ( all_protons_LLRScore[i] < minProtonScore_LLR ) return false;
-                }
+                FillHistogram(cutList.hCut_2Track_protonScore_LLR,all_protons_LLRScore[i]);
+                if ( all_protons_LLRScore[i] < minProtonScore_LLR ) return false;
             }
         }
         cutList.nCut_2Track_ProtonScore.increment(truth_isSignal, study1, study2);
@@ -711,7 +651,9 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     FillHistogram(cutList.hCut_nTracks_Far, nTracks_Far);
     FillHistogram(cutList.hCut_nTracks_Discarded, nTracks_Discarded);
 
+    // ------------------------------------------------------------------------
     // PreFilter Cut
+    // ------------------------------------------------------------------------
     if(nProtonCandidates == 0){
         FillHistogram(cutList.hCut_1Track_eVis_nuclearTarget,preFilter_evis_NuclearTarget);
         FillHistogram(cutList.hCut_1Track_eVis_other,preFilter_evis_TotalExceptNuclearTarget);
@@ -719,46 +661,45 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         FillHistogram(cutList.hCut_2Track_eVis_nuclearTarget,preFilter_evis_NuclearTarget);
         FillHistogram(cutList.hCut_2Track_eVis_other,preFilter_evis_TotalExceptNuclearTarget);
     }
-    
+   
+    if (preFilter_evis_TotalExceptNuclearTarget > 1500 && truth_isSignal )  counter1++;
+    if (preFilter_evis_TotalExceptNuclearTarget > 2000 && truth_isSignal )  counter2++;
     if( Cut_PreFilter_Pi0 == 1) return false;
     cutList.nCut_PreFilter_Pi0.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_PreFilter_Pi0.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_PreFilter_Pi0.increment(truth_isSignal, study1, study2);
 
+    // ------------------------------------------------------------------------
     // ConeBlobs Cut -- If Cut_ConeBlobs == 1 --> Failed Pi0 Reconstruction
+    // ------------------------------------------------------------------------
     FillHistogram(cutList.hCut_nShowerCandidates,anglescan_ncand); 
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_nShowerCandidates,anglescan_ncand); 
     else FillHistogram(cutList.hCut_2Track_nShowerCandidates,anglescan_ncand); 
 
-    // ConeBlobs Study Histograms
-    if (anglescan_ncand == 1){
-        if (truth_isSignal) n1Shower_Signal++;
-        else n1Shower_Bckg++;
-        Fill_1ShowerHists();
-    }else if (anglescan_ncand == 3){
-        if (truth_isSignal) n3Shower_Signal++;
-        else n3Shower_Bckg++;
-        Fill_3ShowerHists();
-    }
-
-    if( Cut_ConeBlobs == 1 || is_blobs_recovered) return false;
+    if( Cut_ConeBlobs == 1 ) return false;
     cutList.nCut_ConeBlobs.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_ConeBlobs.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_ConeBlobs.increment(truth_isSignal, study1, study2);
    
+    // ------------------------------------------------------------------------
     // Blob Direction Bad Cut
+    // ------------------------------------------------------------------------
     if ( Cut_BlobDirectionBad == 1 ) return false;
     cutList.nCut_BlobDirectionBad.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_BlobDirectionBad.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_BlobDirectionBad.increment(truth_isSignal, study1, study2);
   
+    // ------------------------------------------------------------------------
     // Pi0 Momentum NaN
+    // ------------------------------------------------------------------------
     if ( Cut_Pi0_Bad == 1) return false;
     cutList.nCut_Pi0_Bad.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Pi0_Bad.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Pi0_Bad.increment(truth_isSignal, study1, study2);
 
+    // ------------------------------------------------------------------------
     // Gamma1 Conv Length Cut Hist
+    // ------------------------------------------------------------------------
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_gamma1ConvDist,gamma1_dist_vtx * 0.1);
     else FillHistogram(cutList.hCut_2Track_gamma1ConvDist,gamma1_dist_vtx * 0.1);
 
@@ -767,7 +708,9 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) cutList.nCut_1Track_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
 
+    // ------------------------------------------------------------------------
     // Gamma2 Conv Length Cut
+    // ------------------------------------------------------------------------
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_gamma2ConvDist,gamma2_dist_vtx * 0.1);
     else FillHistogram(cutList.hCut_2Track_gamma2ConvDist,gamma2_dist_vtx * 0.1);
 
@@ -776,22 +719,28 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) cutList.nCut_1Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
 
+    // ------------------------------------------------------------------------
     // Pi0 Invariant Mass Cut
+    // ------------------------------------------------------------------------
+    FillHistogram(cutList.hCut_pi0invMass, pi0_invMass);
+    FillHistogram(cutList.hCut_pi0invMass_Old, pi0_invMass_Old);
     if (nProtonCandidates == 0){
         FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
         FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
-        FillHistogram(cutList.hCut_1Track_pi0invMass_1,pi0_invMass_Old);
+        FillHistogram(cutList.hCut_1Track_pi0invMass_Old,pi0_invMass_Old);
     }else{ 
         FillHistogram(cutList.pi0_invMass_2Track, pi0_invMass);
         FillHistogram(cutList.hCut_2Track_pi0invMass, pi0_invMass);
-        FillHistogram(cutList.hCut_2Track_pi0invMass_1, pi0_invMass_Old); 
+        FillHistogram(cutList.hCut_2Track_pi0invMass_Old, pi0_invMass_Old); 
     }
     if( pi0_invMass < min_Pi0_invMass || pi0_invMass > max_Pi0_invMass ) return false;
     cutList.nCut_Pi0_invMass.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Pi0_invMass.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Pi0_invMass.increment(truth_isSignal, study1, study2);
 
+    // ------------------------------------------------------------------------
     // Neutrino Energy Cut
+    // ------------------------------------------------------------------------
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_neutrinoE,CCProtonPi0_neutrino_E * MeV_to_GeV);
     else FillHistogram(cutList.hCut_2Track_neutrinoE,CCProtonPi0_neutrino_E * MeV_to_GeV); 
 
@@ -939,10 +888,6 @@ void CCProtonPi0_Analyzer::writeScanFile()
 
 void CCProtonPi0_Analyzer::closeTextFiles()
 {
-    logFile.close();
-
-    vtx_E_1Track.close();
-    vtx_E_2Track.close();
     if(isScanRun){
         roundupText.close();
         DSTFileList.close();
@@ -956,20 +901,6 @@ void CCProtonPi0_Analyzer::closeTextFiles()
 void CCProtonPi0_Analyzer::openTextFiles()
 {
     cout<<"Opening Text Files:"<<endl;
-
-    string vtx_E_1Track_FileName = Folder_List::output + Folder_List::textOut + m_ana_folder + "vtx_E_1Track.txt";
-    string vtx_E_2Track_FileName = Folder_List::output + Folder_List::textOut + m_ana_folder + "vtx_E_2Track.txt";
-    vtx_E_1Track.open(vtx_E_1Track_FileName.c_str());
-    vtx_E_2Track.open(vtx_E_2Track_FileName.c_str());
-
-    logFileName = Folder_List::output + Folder_List::textOut + m_ana_folder + "LogFile.txt";
-    logFile.open(logFileName.c_str());
-    if( !logFile.is_open() ){
-        cerr<<"Cannot open output text file: "<<logFileName<<endl;
-        exit(EXIT_FAILURE);    
-    }else{
-        cout<<"\t"<<logFileName<<endl;
-    }
 
     // Open Fail-Check File
     failFile = Folder_List::output + Folder_List::textOut + m_ana_folder + "FailChecks.txt";
@@ -1295,11 +1226,12 @@ int CCProtonPi0_Analyzer::GetBackgroundTypeInd()
     else if (truth_isBckg_AntiNeutrino) return 7;
     else if (truth_isBckg_QELike) return 8;
     else if (truth_isBckg_SingleChargedPion) return 9;
-    else if (truth_isBckg_DoublePionWithPi0) return 10;
-    else if (truth_isBckg_DoublePionWithoutPi0) return 11;
-    else if (truth_isBckg_MultiPionWithPi0) return 12;
-    else if (truth_isBckg_MultiPionWithoutPi0) return 13;
-    else if (truth_isBckg_Other) return 14;
+    else if (truth_isBckg_SingleChargedPion_ChargeExchanged) return 10;
+    else if (truth_isBckg_DoublePionWithPi0) return 11;
+    else if (truth_isBckg_DoublePionWithoutPi0) return 12;
+    else if (truth_isBckg_MultiPionWithPi0) return 13;
+    else if (truth_isBckg_MultiPionWithoutPi0) return 14;
+    else if (truth_isBckg_Other) return 15;
     else{
         cout<<"WARNING! No Background Type Found - Returning -1"<<endl;
         return -1;
@@ -1339,36 +1271,6 @@ double CCProtonPi0_Analyzer::Calc_TruePi0OpeningAngle()
     double theta = acos(cos_theta) * rad_to_deg;
     
     return theta;
-}
-
-void CCProtonPi0_Analyzer::Fill_1ShowerHists()
-{
-    if (OneShower_nClusters != -1){
-        FillHistogram(cutList.OneShower_nClusters, OneShower_nClusters);
-        FillHistogram(cutList.OneShower_energy, OneShower_energy);
-        FillHistogram(cutList.OneShower_theta, OneShower_theta);
-        FillHistogram(cutList.OneShower_dist_vtx, OneShower_dist_vtx);
-    }
-}
-
-void CCProtonPi0_Analyzer::Fill_3ShowerHists()
-{
-    if (ThreeShower_s1_nClusters != -1){
-        FillHistogram(cutList.ThreeShower_s1_nClusters, ThreeShower_s1_nClusters);
-        FillHistogram(cutList.ThreeShower_s1_energy, ThreeShower_s1_energy);
-        FillHistogram(cutList.ThreeShower_s1_theta, ThreeShower_s1_theta);
-        FillHistogram(cutList.ThreeShower_s1_dist_vtx, ThreeShower_s1_dist_vtx);
-
-        FillHistogram(cutList.ThreeShower_s2_nClusters, ThreeShower_s2_nClusters);
-        FillHistogram(cutList.ThreeShower_s2_energy, ThreeShower_s2_energy);
-        FillHistogram(cutList.ThreeShower_s2_theta, ThreeShower_s2_theta);
-        FillHistogram(cutList.ThreeShower_s2_dist_vtx, ThreeShower_s2_dist_vtx);
-
-        FillHistogram(cutList.ThreeShower_s3_nClusters, ThreeShower_s3_nClusters);
-        FillHistogram(cutList.ThreeShower_s3_energy, ThreeShower_s3_energy);
-        FillHistogram(cutList.ThreeShower_s3_theta, ThreeShower_s3_theta);
-        FillHistogram(cutList.ThreeShower_s3_dist_vtx, ThreeShower_s3_dist_vtx);
-    }
 }
 
 #endif //CCProtonPi0_Analyzer_cpp

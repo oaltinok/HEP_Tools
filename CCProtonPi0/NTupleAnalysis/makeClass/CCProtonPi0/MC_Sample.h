@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jan 20 21:16:54 2016 by ROOT version 5.34/05
+// Tue Jan 26 07:50:05 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -281,7 +281,7 @@ public :
    Int_t           g2dedx_cluster_occupancy_sz;
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
    Int_t           nTracks_Secondary_Vtx_sz;
-   Int_t           nTracks_Secondary_Vtx[11];   //[nTracks_Secondary_Vtx_sz]
+   Int_t           nTracks_Secondary_Vtx[5];   //[nTracks_Secondary_Vtx_sz]
    Double_t        all_protons_E[10];
    Double_t        all_protons_KE[10];
    Double_t        all_protons_LLRScore[10];
@@ -347,6 +347,7 @@ public :
    Bool_t          truth_isBckg_AntiNeutrino;
    Bool_t          truth_isBckg_QELike;
    Bool_t          truth_isBckg_SingleChargedPion;
+   Bool_t          truth_isBckg_SingleChargedPion_ChargeExchanged;
    Bool_t          truth_isBckg_DoublePionWithPi0;
    Bool_t          truth_isBckg_DoublePionWithoutPi0;
    Bool_t          truth_isBckg_MultiPionWithPi0;
@@ -357,6 +358,8 @@ public :
    Int_t           truth_Bckg_nPi0_Primary;
    Int_t           truth_Bckg_nPi0_Secondary;
    Int_t           truth_Bckg_nPi0_Total;
+   Int_t           truth_Bckg_nPiCharged;
+   Int_t           truth_Bckg_nPiCharged_ChargeExchanged;
    Int_t           truth_N_FSParticles;
    Int_t           truth_N_other;
    Int_t           truth_N_pi0;
@@ -678,26 +681,26 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[51];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[51];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[51];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[51];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[51];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[30];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[30];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[30];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[30];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[30];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[77];   //[mc_er_nPart]
-   Int_t           mc_er_status[77];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[77];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[77];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[77];   //[mc_er_nPart]
-   Double_t        mc_er_Px[77];   //[mc_er_nPart]
-   Double_t        mc_er_Py[77];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[77];   //[mc_er_nPart]
-   Double_t        mc_er_E[77];   //[mc_er_nPart]
-   Int_t           mc_er_FD[77];   //[mc_er_nPart]
-   Int_t           mc_er_LD[77];   //[mc_er_nPart]
-   Int_t           mc_er_mother[77];   //[mc_er_nPart]
+   Int_t           mc_er_ID[44];   //[mc_er_nPart]
+   Int_t           mc_er_status[44];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[44];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[44];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[44];   //[mc_er_nPart]
+   Double_t        mc_er_Px[44];   //[mc_er_nPart]
+   Double_t        mc_er_Py[44];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[44];   //[mc_er_nPart]
+   Double_t        mc_er_E[44];   //[mc_er_nPart]
+   Int_t           mc_er_FD[44];   //[mc_er_nPart]
+   Int_t           mc_er_LD[44];   //[mc_er_nPart]
+   Int_t           mc_er_mother[44];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[10];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -725,11 +728,11 @@ public :
    Int_t           mc_wgt_ppfx1_Total_sz;
    Double_t        mc_wgt_ppfx1_Total[100];   //[mc_wgt_ppfx1_Total_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[11];   //[n_prongs]
-   Double_t        prong_part_score[11];   //[n_prongs]
-   Double_t        prong_part_mass[11];   //[n_prongs]
-   Int_t           prong_part_charge[11];   //[n_prongs]
-   Int_t           prong_part_pid[11];   //[n_prongs]
+   Int_t           prong_nParticles[7];   //[n_prongs]
+   Double_t        prong_part_score[7];   //[n_prongs]
+   Double_t        prong_part_mass[7];   //[n_prongs]
+   Int_t           prong_part_charge[7];   //[n_prongs]
+   Int_t           prong_part_pid[7];   //[n_prongs]
    vector<vector<double> > *prong_part_E;
    vector<vector<double> > *prong_part_pos;
 
@@ -1059,6 +1062,7 @@ public :
    TBranch        *b_truth_isBckg_AntiNeutrino;   //!
    TBranch        *b_truth_isBckg_QELike;   //!
    TBranch        *b_truth_isBckg_SingleChargedPion;   //!
+   TBranch        *b_truth_isBckg_SingleChargedPion_ChargeExchanged;   //!
    TBranch        *b_truth_isBckg_DoublePionWithPi0;   //!
    TBranch        *b_truth_isBckg_DoublePionWithoutPi0;   //!
    TBranch        *b_truth_isBckg_MultiPionWithPi0;   //!
@@ -1069,6 +1073,8 @@ public :
    TBranch        *b_truth_Bckg_nPi0_Primary;   //!
    TBranch        *b_truth_Bckg_nPi0_Secondary;   //!
    TBranch        *b_truth_Bckg_nPi0_Total;   //!
+   TBranch        *b_truth_Bckg_nPiCharged;   //!
+   TBranch        *b_truth_Bckg_nPiCharged_ChargeExchanged;   //!
    TBranch        *b_truth_N_FSParticles;   //!
    TBranch        *b_truth_N_other;   //!
    TBranch        *b_truth_N_pi0;   //!
@@ -1479,7 +1485,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_52b.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_53.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1856,6 +1862,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_isBckg_AntiNeutrino", &truth_isBckg_AntiNeutrino, &b_truth_isBckg_AntiNeutrino);
    fChain->SetBranchAddress("truth_isBckg_QELike", &truth_isBckg_QELike, &b_truth_isBckg_QELike);
    fChain->SetBranchAddress("truth_isBckg_SingleChargedPion", &truth_isBckg_SingleChargedPion, &b_truth_isBckg_SingleChargedPion);
+   fChain->SetBranchAddress("truth_isBckg_SingleChargedPion_ChargeExchanged", &truth_isBckg_SingleChargedPion_ChargeExchanged, &b_truth_isBckg_SingleChargedPion_ChargeExchanged);
    fChain->SetBranchAddress("truth_isBckg_DoublePionWithPi0", &truth_isBckg_DoublePionWithPi0, &b_truth_isBckg_DoublePionWithPi0);
    fChain->SetBranchAddress("truth_isBckg_DoublePionWithoutPi0", &truth_isBckg_DoublePionWithoutPi0, &b_truth_isBckg_DoublePionWithoutPi0);
    fChain->SetBranchAddress("truth_isBckg_MultiPionWithPi0", &truth_isBckg_MultiPionWithPi0, &b_truth_isBckg_MultiPionWithPi0);
@@ -1866,6 +1873,8 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_Bckg_nPi0_Primary", &truth_Bckg_nPi0_Primary, &b_truth_Bckg_nPi0_Primary);
    fChain->SetBranchAddress("truth_Bckg_nPi0_Secondary", &truth_Bckg_nPi0_Secondary, &b_truth_Bckg_nPi0_Secondary);
    fChain->SetBranchAddress("truth_Bckg_nPi0_Total", &truth_Bckg_nPi0_Total, &b_truth_Bckg_nPi0_Total);
+   fChain->SetBranchAddress("truth_Bckg_nPiCharged", &truth_Bckg_nPiCharged, &b_truth_Bckg_nPiCharged);
+   fChain->SetBranchAddress("truth_Bckg_nPiCharged_ChargeExchanged", &truth_Bckg_nPiCharged_ChargeExchanged, &b_truth_Bckg_nPiCharged_ChargeExchanged);
    fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
    fChain->SetBranchAddress("truth_N_other", &truth_N_other, &b_truth_N_other);
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);

@@ -79,6 +79,7 @@ class CCProtonPi0_Plotter
         double mc_POT;
         double POT_Ratio_data_mc;
         
+        rootDir rootDir_Truth;
         rootDir rootDir_OtherStudies;
         rootDir rootDir_CutHists;
         rootDir rootDir_Interaction;
@@ -144,6 +145,7 @@ class CCProtonPi0_Plotter
         
         // MC Only
         void DrawMCWithErrorBand(rootDir& dir, std::string var_name, std::string plotDir);
+        void DrawSignalMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());

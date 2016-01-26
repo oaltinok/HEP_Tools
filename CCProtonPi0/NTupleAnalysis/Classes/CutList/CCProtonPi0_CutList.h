@@ -90,14 +90,15 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_Michel;
         vector<MnvH1D*> hCut_nProtonCandidates;
         vector<MnvH1D*> hCut_nShowerCandidates;
+        vector<MnvH1D*> hCut_pi0invMass;
+        vector<MnvH1D*> hCut_pi0invMass_Old;
         
         // 1Track
         vector<MnvH1D*> hCut_1Track_nShowerCandidates;
         vector<MnvH1D*> hCut_1Track_eVis_nuclearTarget;
         vector<MnvH1D*> hCut_1Track_eVis_other;
         vector<MnvH1D*> hCut_1Track_pi0invMass;
-        vector<MnvH1D*> hCut_1Track_pi0invMass_1;
-        vector<MnvH1D*> hCut_1Track_pi0invMass_2;
+        vector<MnvH1D*> hCut_1Track_pi0invMass_Old;
         vector<MnvH1D*> hCut_1Track_gamma1ConvDist;
         vector<MnvH1D*> hCut_1Track_gamma2ConvDist;
         vector<MnvH1D*> hCut_1Track_neutrinoE;
@@ -107,19 +108,14 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_2Track_eVis_nuclearTarget;
         vector<MnvH1D*> hCut_2Track_eVis_other;
         vector<MnvH1D*> hCut_2Track_pi0invMass;
-        vector<MnvH1D*> hCut_2Track_pi0invMass_1;
-        vector<MnvH1D*> hCut_2Track_pi0invMass_2;
+        vector<MnvH1D*> hCut_2Track_pi0invMass_Old;
         vector<MnvH1D*> hCut_2Track_gamma1ConvDist;
         vector<MnvH1D*> hCut_2Track_gamma2ConvDist;
         vector<MnvH1D*> hCut_2Track_neutrinoE;
-        vector<MnvH1D*> hCut_2Track_protonScore_pIDDiff;
         vector<MnvH1D*> hCut_2Track_protonScore_LLR;
         vector<MnvH1D*> hCut_2Track_deltaInvMass;
  
         // MC Only Histograms
-        TH1D* all_signal_pi0_P;
-        TH1D* minos_signal_pi0_P;
-        TH1D* all_signal_pi0_theta;
         TH1D* mc_w_DIS;
         TH1D* mc_w_RES;
         TH1D* mc_w_CCQE;
@@ -127,28 +123,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         // Pi0 Invariant Mass
         TH1D* pi0_invMass_1Track;
         TH1D* pi0_invMass_2Track;
-
-        // ConeBlobs Study
-        vector<MnvH1D*> OneShower_nClusters;
-        vector<MnvH1D*> OneShower_energy;
-        vector<MnvH1D*> OneShower_theta;
-        vector<MnvH1D*> OneShower_dist_vtx;
-
-        vector<MnvH1D*> ThreeShower_s1_nClusters;
-        vector<MnvH1D*> ThreeShower_s1_energy;
-        vector<MnvH1D*> ThreeShower_s1_theta;
-        vector<MnvH1D*> ThreeShower_s1_dist_vtx;
-
-        vector<MnvH1D*> ThreeShower_s2_nClusters;
-        vector<MnvH1D*> ThreeShower_s2_energy;
-        vector<MnvH1D*> ThreeShower_s2_theta;
-        vector<MnvH1D*> ThreeShower_s2_dist_vtx;
-
-        vector<MnvH1D*> ThreeShower_s3_nClusters;
-        vector<MnvH1D*> ThreeShower_s3_energy;
-        vector<MnvH1D*> ThreeShower_s3_theta;
-        vector<MnvH1D*> ThreeShower_s3_dist_vtx;
-
 
     private:
         void initHistograms();
@@ -180,6 +154,8 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
 
         // Number of Signal Events from Truth Info
         double nTrueSignal;
+        bool use_nTrueSignal;
+    
 };
 
 
