@@ -1,4 +1,22 @@
 ===============================================================================
+v2_54
+CCProtonPi0 Updates:
+	Corrected Neutrino Energy Calculation
+		Extra Energy is collected in 3 different ways
+			Dispersed Blob after Pi0 reconstruction
+			Muon Extra Energy
+			Rejected Cluster Energy
+		Adding total extra energy 
+
+	Corrected WSq Calculation
+		I was using Q2 instead of q2 — (Q2 = -q2)
+	
+-------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	New script FindAllAnaFiles.sh
+		Outputs a file listing ALL Ana_Tuple Files
+
+===============================================================================
 v2_53
 CCProtonPi0 Updates:
 	Structure Changed

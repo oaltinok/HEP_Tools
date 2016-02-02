@@ -30,11 +30,11 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     //  MC Only
     //--------------------------------------------------------------------------
-    //plotInteraction_MCOnly();
+    plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
     //plotPion_MCOnly();
-    plotCutHistograms_MCOnly();
+    //plotCutHistograms_MCOnly();
     //plotPi0Blob_MCOnly();
     //plotEfficiencyCurves();
 
@@ -68,8 +68,8 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter(std::string ana_folder)
     //--------------------------------------------------------------------------
     // Set POT -- Run getPOT_MC() and getPOT_Data() Functions once to get POT
     //--------------------------------------------------------------------------
-    data_POT = 9.60557e+19; 
-    mc_POT = 9.40901e+20;
+    data_POT = 3.33464e+20; 
+    mc_POT = 2.73784e+21;
     POT_Ratio_data_mc = data_POT / mc_POT;
     std::cout<<"POT Data = "<<data_POT<<std::endl;
     std::cout<<"POT MC = "<<mc_POT<<std::endl;
@@ -157,8 +157,8 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     std::cout<<"Plotting Interaction MC Only"<<std::endl;
     std::string plotDir = plotDir_Interaction;
 
-    //plot_mc_w_Stacked();
-    //plot_final_mc_w_Stacked();
+    plot_mc_w_Stacked();
+    plot_final_mc_w_Stacked();
 
     //DrawStackedMC(rootDir_Interaction,"vertex_energy_1Track",plotDir);
     //DrawStackedMC(rootDir_Interaction,"vertex_energy_2Track",plotDir);
@@ -173,20 +173,41 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     //Draw1DHist(rootDir_Interaction,"proton_true_P_1Track",plotDir);
     //Draw1DHist(rootDir_Interaction,"proton_true_KE_1Track",plotDir);
 
-    //Draw1DHist(rootDir_Interaction,"Enu_True_1Track",plotDir);
-    //Draw1DHist(rootDir_Interaction,"Enu_True_2Track",plotDir);
-    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Error",plotDir);
-    //Draw1DHist(rootDir_Interaction,"Enu_2Track_Error",plotDir);
-    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Alt_Error",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_True_1Track",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_True_2Track",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_1Track_Error",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_2Track_Error",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_1Track_Alt_Error",plotDir);
     
-    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Diff",plotDir);
-    //Draw1DHist(rootDir_Interaction,"Enu_2Track_Diff",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_1Track_Diff",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_2Track_Diff",plotDir);
 
-    DrawStackedMC(rootDir_Interaction,"recovered_Pi0_P",plotDir);
-    DrawStackedMC(rootDir_Interaction,"recovered_Pi0_theta",plotDir);
+    //DrawStackedMC(rootDir_Interaction,"recovered_Pi0_P",plotDir);
+    //DrawStackedMC(rootDir_Interaction,"recovered_Pi0_theta",plotDir);
 
-    plot_stacked_pi0_P();
-    plot_stacked_pi0_theta();
+    Draw1DHist(rootDir_Interaction,"h_extra_muon_energy",plotDir);
+    Draw1DHist(rootDir_Interaction,"h_extra_dispersed_energy",plotDir);
+    Draw1DHist(rootDir_Interaction,"h_extra_rejected_energy",plotDir);
+
+    DrawStackedMC(rootDir_Interaction,"vertex_energy_1Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"vertex_evis_1Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"extra_evis_1Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"extra_muon_energy_1Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"extra_dispersed_energy_1Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"extra_rejected_energy_1Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"extra_total_energy_1Track",plotDir);
+ 
+    DrawStackedMC(rootDir_Interaction,"vertex_energy_2Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"vertex_evis_2Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"extra_evis_2Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"extra_muon_energy_2Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"extra_dispersed_energy_2Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"extra_rejected_energy_2Track",plotDir);
+    DrawStackedMC(rootDir_Interaction,"extra_total_energy_2Track",plotDir);
+ 
+
+    //plot_stacked_pi0_P();
+    //plot_stacked_pi0_theta();
 
     std::cout<<"Plotting Interaction MC Only Finished!"<<std::endl;
 }
@@ -196,31 +217,41 @@ void CCProtonPi0_Plotter::plotInteraction_DataMC()
     std::cout<<"Plotting Interaction Data vs MC"<<std::endl;
     std::string plotDir = plotDir_Interaction;
 
-    DrawDataMC(rootDir_Interaction,"Enu_1Track",plotDir);
+    //DrawDataMC(rootDir_Interaction,"Enu_1Track",plotDir);
     //DrawDataMC(rootDir_Interaction,"Enu_1Track_Alt",plotDir);
-    DrawDataMC(rootDir_Interaction,"Enu_2Track",plotDir);
-    DrawDataMC(rootDir_Interaction,"Enu",plotDir);
-    DrawDataMC(rootDir_Interaction,"QSq",plotDir);
-    DrawDataMC(rootDir_Interaction,"WSq",plotDir);
-    DrawDataMC(rootDir_Interaction,"W",plotDir);
-    DrawDataMC(rootDir_Interaction,"deltaInvMass",plotDir);
+    //DrawDataMC(rootDir_Interaction,"Enu_2Track",plotDir);
+    //DrawDataMC(rootDir_Interaction,"Enu",plotDir);
+    //DrawDataMC(rootDir_Interaction,"QSq",plotDir);
+    //DrawDataMC(rootDir_Interaction,"WSq",plotDir);
+    //DrawDataMC(rootDir_Interaction,"W",plotDir);
+    //DrawDataMC(rootDir_Interaction,"deltaInvMass",plotDir);
 
     DrawDataStackedMC(rootDir_Interaction,"Enu_1Track",plotDir);
-    //DrawDataStackedMC(rootDir_Interaction,"Enu_1Track_Alt",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"Enu_1Track_Alt",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"Enu_2Track",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"Enu",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"QSq",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"WSq",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"W",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"W_Calc",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"deltaInvMass",plotDir);
 
     DrawDataStackedMC(rootDir_Interaction,"vertex_energy_1Track",plotDir);
-    DrawDataStackedMC(rootDir_Interaction,"vertex_energy_2Track",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"vertex_evis_1Track",plotDir);
-    DrawDataStackedMC(rootDir_Interaction,"vertex_evis_2Track",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"extra_evis_1Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"extra_muon_energy_1Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"extra_dispersed_energy_1Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"extra_rejected_energy_1Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"extra_total_energy_1Track",plotDir);
+ 
+    DrawDataStackedMC(rootDir_Interaction,"vertex_energy_2Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"vertex_evis_2Track",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"extra_evis_2Track",plotDir);
-
+    DrawDataStackedMC(rootDir_Interaction,"extra_muon_energy_2Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"extra_dispersed_energy_2Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"extra_rejected_energy_2Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"extra_total_energy_2Track",plotDir);
+       
     std::cout<<"Plotting Interaction Data vs MC Finished!"<<std::endl;
 }
 
@@ -291,6 +322,7 @@ void CCProtonPi0_Plotter::plotPion_MCOnly()
 
     plotPion_True();
 
+
     DrawStackedMC(rootDir_Pion,"gamma1_E",plotDir);
     DrawStackedMC(rootDir_Pion,"gamma1_theta",plotDir);
     DrawStackedMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
@@ -358,6 +390,10 @@ void CCProtonPi0_Plotter::plotPion_True()
     Draw1DHist(rootDir_Pion,"gamma2_reco_error_E",plotDir);
     Draw2DHist(rootDir_Pion,"gamma2_true_E_reco_E_error",plotDir);
     Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
+    
+    Draw2DHist(rootDir_Pion,"signal_gamma1_E_gamma2_E",plotDir);
+    Draw2DHist(rootDir_Pion,"bckg_gamma1_E_gamma2_E",plotDir);
+    Draw2DHist(rootDir_Pion,"bckg_signal_diff",plotDir);
 
     Draw1DHist(rootDir_Pion,"P_error",plotDir);
     Draw1DHist(rootDir_Pion,"E_error",plotDir);
@@ -424,7 +460,7 @@ void CCProtonPi0_Plotter::plotCutHistograms_MCOnly()
     DrawStackedMC(rootDir_CutHists,"hCut_1Track_eVis_nuclearTarget",plotDir, 1, eVis_nuclearTarget_1Track);
 
     CutArrow eVis_other_min_1Track(50,"R"); 
-    CutArrow eVis_other_max_1Track(2000,"L"); 
+    CutArrow eVis_other_max_1Track(2500,"L"); 
     DrawStackedMC(rootDir_CutHists,"hCut_1Track_eVis_other",plotDir, 2, eVis_other_min_1Track, eVis_other_max_1Track);
 
     CutArrow gamma1_ConvDist_1Track(14,"R"); 
@@ -484,18 +520,34 @@ void CCProtonPi0_Plotter::plotCutHistograms_DataMC()
     std::cout<<"Plotting CutHistograms Data vs MC"<<std::endl;
     std::string plotDir = plotDir_CutHists;
 
+   // DrawDataStackedMC(rootDir_CutHists,"hCut_nTracks",plotDir);
+   // DrawDataStackedMC(rootDir_CutHists,"hCut_nTracks2",plotDir);
+   // DrawDataStackedMC(rootDir_CutHists,"hCut_nTracks_Close",plotDir);
+   // DrawDataStackedMC(rootDir_CutHists,"hCut_nTracks_Far",plotDir);
+   // DrawDataStackedMC(rootDir_CutHists,"hCut_nTracks_Discarded",plotDir);
+
     // ------------------------------------------------------------------------
     // Common
     // ------------------------------------------------------------------------
-    DrawDataStackedMC(rootDir_CutHists,"hCut_nVertices",plotDir);
-    DrawDataStackedMC(rootDir_CutHists,"hCut_nTracks",plotDir);
-    DrawDataStackedMC(rootDir_CutHists,"hCut_nTracks2",plotDir);
-    DrawDataStackedMC(rootDir_CutHists,"hCut_nTracks_Close",plotDir);
-    DrawDataStackedMC(rootDir_CutHists,"hCut_nTracks_Far",plotDir);
-    DrawDataStackedMC(rootDir_CutHists,"hCut_nTracks_Discarded",plotDir);
+    CutArrow Vertex_Count(3,"L"); 
+    DrawDataStackedMC(rootDir_CutHists,"hCut_nVertices",plotDir, 1, Vertex_Count);
+       
+    CutArrow Proton_Count(3,"L"); 
+    DrawDataStackedMC(rootDir_CutHists,"hCut_nProtonCandidates",plotDir,1 , Proton_Count);
+    
+    DrawDataStackedMC(rootDir_CutHists,"hCut_nShowerCandidates",plotDir);
+    //DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_nShowerCandidates",plotDir);
+    //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_nShowerCandidates",plotDir);
 
-    CutArrow Michel_1Track(1,"L"); 
-    DrawDataStackedMC(rootDir_CutHists,"hCut_Michel",plotDir,1, Michel_1Track);
+    //CutArrow Michel(1,"L"); 
+    //DrawDataStackedMC(rootDir_CutHists,"hCut_Michel",plotDir,1, Michel);
+
+    CutArrow pi0invMass_min(60,"R"); 
+    CutArrow pi0invMass_max(200,"L"); 
+    DrawSignalMC(rootDir_CutHists,"hCut_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawSignalMC(rootDir_CutHists,"hCut_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawDataStackedMC(rootDir_CutHists,"hCut_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawDataStackedMC(rootDir_CutHists,"hCut_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
 
     // ------------------------------------------------------------------------
     // 1 Track
@@ -512,11 +564,12 @@ void CCProtonPi0_Plotter::plotCutHistograms_DataMC()
 
     //CutArrow gamma2_ConvDist_1Track(15,"R"); 
     //DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_gamma2ConvDist",plotDir, 1, gamma2_ConvDist_1Track);
+    DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_gamma2ConvDist",plotDir);
 
-    CutArrow pi0invMass_min_1Track(60,"R"); 
-    CutArrow pi0invMass_max_1Track(200,"L"); 
-    DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min_1Track, pi0invMass_max_1Track);
-    DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min_1Track, pi0invMass_max_1Track);
+    DrawSignalMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawSignalMC(rootDir_CutHists,"hCut_1Track_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
 
     CutArrow neutrinoE_1Track(20,"L"); 
     DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_neutrinoE",plotDir, 1, neutrinoE_1Track);
@@ -536,11 +589,12 @@ void CCProtonPi0_Plotter::plotCutHistograms_DataMC()
 
     //CutArrow gamma2_ConvDist_2Track(15,"R"); 
     //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_gamma2ConvDist",plotDir, 1, gamma2_ConvDist_2Track);
+    DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_gamma2ConvDist",plotDir);
 
-    CutArrow pi0invMass_min_2Track(60,"R"); 
-    CutArrow pi0invMass_max_2Track(200,"L"); 
-    DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min_2Track, pi0invMass_max_2Track);
-    DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min_2Track, pi0invMass_max_2Track);
+    DrawSignalMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawSignalMC(rootDir_CutHists,"hCut_2Track_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
 
     CutArrow neutrinoE_2Track(20,"L"); 
     DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_neutrinoE",plotDir, 1, neutrinoE_2Track);
@@ -568,6 +622,7 @@ void CCProtonPi0_Plotter::plot_mc_w_Stacked()
     TCanvas* c1 = new TCanvas();
     THStack *hs = new THStack("hs","TRUE Signal Events (MINOS Matched)");
     TLegend *legend = new TLegend(0.7,0.8,0.9,0.9);  
+    
 
     TH1D* h_mc_w_DIS = (TH1D*)f_Root->Get("mc_w_DIS");
     h_mc_w_DIS->SetFillColor(kRed);
@@ -578,6 +633,9 @@ void CCProtonPi0_Plotter::plot_mc_w_Stacked()
     h_mc_w_RES->SetFillColor(kBlue);
     h_mc_w_RES->SetMarkerStyle(21);
     h_mc_w_RES->SetMarkerColor(kBlue);
+
+    double nEvents = h_mc_w_DIS->GetEntries() + h_mc_w_RES->GetEntries();
+    std::cout<<"nEvents = "<<nEvents<<std::endl;
 
     legend->AddEntry(h_mc_w_DIS , "DIS", "f");
     legend->AddEntry(h_mc_w_RES, "RES", "f");
@@ -619,6 +677,10 @@ void CCProtonPi0_Plotter::plot_final_mc_w_Stacked()
     h_mc_w_RES->SetFillColor(kBlue);
     h_mc_w_RES->SetMarkerStyle(21);
     h_mc_w_RES->SetMarkerColor(kBlue);
+
+
+    double nEvents = h_mc_w_DIS->GetEntries() + h_mc_w_RES->GetEntries();
+    std::cout<<"nEvents = "<<nEvents<<std::endl;
 
     legend->AddEntry(h_mc_w_DIS , "DIS", "f");
     legend->AddEntry(h_mc_w_RES, "RES", "f");
@@ -721,7 +783,7 @@ void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
     rootDir_OtherStudies.data = "";
 
     // Set MC Root Dir
-    rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_53.root";
+    rootDir_CutHists.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_v2_54a.root";
     rootDir_Interaction.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Interaction.root";
     rootDir_Muon.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Muon.root";
     rootDir_Proton.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Proton.root";
@@ -729,7 +791,7 @@ void CCProtonPi0_Plotter::setRootDirs(std::string ana_folder)
     rootDir_Pi0Blob.mc = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Pi0Blob.root";
 
     // Set Data Root Dir
-    rootDir_CutHists.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms_v2_53.root";
+    rootDir_CutHists.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms_v2_54.root";
     rootDir_Interaction.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Interaction.root";
     rootDir_Muon.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Muon.root";
     rootDir_Proton.data = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Proton.root";

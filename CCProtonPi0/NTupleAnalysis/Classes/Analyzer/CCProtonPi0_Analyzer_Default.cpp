@@ -33,7 +33,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         if (filename[0] != '/') break;
 
         fChain->Add( filename.c_str() );
-        cout<<" Added "<<filename.c_str()<<endl;
+        //cout<<" Added "<<filename.c_str()<<endl;
     }
 
     // Set object pointer
@@ -138,12 +138,13 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("ConeBlobs_usable_evis_Tracker", &ConeBlobs_usable_evis_Tracker, &b_ConeBlobs_usable_evis_Tracker);
     fChain->SetBranchAddress("Coneblobs_usable_evis_ECAL", &Coneblobs_usable_evis_ECAL, &b_Coneblobs_usable_evis_ECAL);
     fChain->SetBranchAddress("Coneblobs_usable_evis_HCAL", &Coneblobs_usable_evis_HCAL, &b_Coneblobs_usable_evis_HCAL);
-    fChain->SetBranchAddress("Dispersed_blob_energy", &Dispersed_blob_energy, &b_Dispersed_blob_energy);
-    fChain->SetBranchAddress("Muon_blob_energy", &Muon_blob_energy, &b_Muon_blob_energy);
+    fChain->SetBranchAddress("Extra_Energy_Dispersed", &Extra_Energy_Dispersed, &b_Extra_Energy_Dispersed);
+    fChain->SetBranchAddress("Extra_Energy_Muon", &Extra_Energy_Muon, &b_Extra_Energy_Muon);
+    fChain->SetBranchAddress("Extra_Energy_Rejected", &Extra_Energy_Rejected, &b_Extra_Energy_Rejected);
+    fChain->SetBranchAddress("Extra_Evis_Leftover", &Extra_Evis_Leftover, &b_Extra_Evis_Leftover);
     fChain->SetBranchAddress("OneShower_dist_vtx", &OneShower_dist_vtx, &b_OneShower_dist_vtx);
     fChain->SetBranchAddress("OneShower_energy", &OneShower_energy, &b_OneShower_energy);
     fChain->SetBranchAddress("OneShower_theta", &OneShower_theta, &b_OneShower_theta);
-    fChain->SetBranchAddress("Rejected_blob_vis_energy", &Rejected_blob_vis_energy, &b_Rejected_blob_vis_energy);
     fChain->SetBranchAddress("ThreeShower_s1_dist_vtx", &ThreeShower_s1_dist_vtx, &b_ThreeShower_s1_dist_vtx);
     fChain->SetBranchAddress("ThreeShower_s1_energy", &ThreeShower_s1_energy, &b_ThreeShower_s1_energy);
     fChain->SetBranchAddress("ThreeShower_s1_theta", &ThreeShower_s1_theta, &b_ThreeShower_s1_theta);
@@ -156,7 +157,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("energy_from_mc", &energy_from_mc, &b_energy_from_mc);
     fChain->SetBranchAddress("energy_from_mc_fraction", &energy_from_mc_fraction, &b_energy_from_mc_fraction);
     fChain->SetBranchAddress("energy_from_mc_fraction_of_highest", &energy_from_mc_fraction_of_highest, &b_energy_from_mc_fraction_of_highest);
-    fChain->SetBranchAddress("extra_evis", &extra_evis, &b_extra_evis);
     fChain->SetBranchAddress("g1blob_1ParFit_fval", &g1blob_1ParFit_fval, &b_g1blob_1ParFit_fval);
     fChain->SetBranchAddress("g1blob_2ParFit_vtx_distance", &g1blob_2ParFit_vtx_distance, &b_g1blob_2ParFit_vtx_distance);
     fChain->SetBranchAddress("g1dedx", &g1dedx, &b_g1dedx);

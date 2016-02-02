@@ -29,7 +29,7 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana
         bin_E.setBin(17, 0.0, 1.7);
         bin_E_Diff.setBin(100, -0.5, 0.5);
         bin_KE.setBin(30, 0.0, 3.0);
-        bin_invMass.setBin(20,50,250.0);
+        bin_invMass.setBin(28,60,200.0);
         bin_photonConvLength.setBin(50,0.0,100.0);
         bin_photonP.setBin(20,0.0,1.0);
         bin_photonEnergy_Asymmetry.setBin(100,0.0,1.0);
@@ -169,10 +169,17 @@ void CCProtonPi0_Pion::initHistograms()
     gamma1_convLength_gamma2_convLength->GetXaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
     gamma1_convLength_gamma2_convLength->GetYaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
      
-    gamma1_E_gamma2_E = new TH2D( "gamma1_E_gamma2_E","Leading Photon vs Secondary Photon Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max() );
-    gamma1_E_gamma2_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [GeV]");
-    gamma1_E_gamma2_E->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [GeV]");
+    signal_gamma1_E_gamma2_E = new TH2D( "signal_gamma1_E_gamma2_E","Signal: Gamma1 Energy vs Gamma2 Energy",20,0.0,200.0,20,0.0,200.0);
+    signal_gamma1_E_gamma2_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [MeV]");
+    signal_gamma1_E_gamma2_E->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [MeV]");
+ 
+    bckg_gamma1_E_gamma2_E = new TH2D( "bckg_gamma1_E_gamma2_E","Background: Gamma1 Energy vs Gamma2 Energy",20,0.0,200.0,20,0.0,200.0);
+    bckg_gamma1_E_gamma2_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [MeV]");
+    bckg_gamma1_E_gamma2_E->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [MeV]");
 
+    bckg_signal_diff = new TH2D( "bckg_signal_diff","Background - Signal: Gamma1 Energy vs Gamma2 Energy",20,0.0,200.0,20,0.0,200.0);
+    bckg_signal_diff->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [MeV]");
+    bckg_signal_diff->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [MeV]");
 
     reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed #pi^0 Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(), bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
     reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{#pi^0} [GeV]");
@@ -226,8 +233,11 @@ void CCProtonPi0_Pion::writeHistograms()
     signal_theta->Write();
 
     // Photon Comparison
-    gamma1_E_gamma2_E->Write();
-    gamma1_convLength_gamma2_convLength->Write();
+    bckg_signal_diff->Add(signal_gamma1_E_gamma2_E, -1);
+    bckg_signal_diff->Add(bckg_gamma1_E_gamma2_E, +1);
+    signal_gamma1_E_gamma2_E->Write();
+    bckg_gamma1_E_gamma2_E->Write();
+    bckg_signal_diff->Write();
 
     // Gamma1 True Energy
     gamma1_true_E->Write();

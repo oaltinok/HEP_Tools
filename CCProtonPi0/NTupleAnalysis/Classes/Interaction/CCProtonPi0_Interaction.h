@@ -36,21 +36,35 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> QSq;
         std::vector<MnvH1D*> WSq;
         std::vector<MnvH1D*> W;
+        std::vector<MnvH1D*> W_Calc;
   
         // Vertex & Extra Energy
         std::vector<MnvH1D*> vertex_energy_1Track;
-        std::vector<MnvH1D*> vertex_energy_2Track;
         std::vector<MnvH1D*> vertex_evis_1Track;
-        std::vector<MnvH1D*> vertex_evis_2Track;
         std::vector<MnvH1D*> extra_evis_1Track;
+        std::vector<MnvH1D*> extra_muon_energy_1Track;
+        std::vector<MnvH1D*> extra_dispersed_energy_1Track;
+        std::vector<MnvH1D*> extra_rejected_energy_1Track;
+        std::vector<MnvH1D*> extra_total_energy_1Track;
+        
+        std::vector<MnvH1D*> vertex_energy_2Track;
+        std::vector<MnvH1D*> vertex_evis_2Track;
         std::vector<MnvH1D*> extra_evis_2Track;
-       
+        std::vector<MnvH1D*> extra_muon_energy_2Track;
+        std::vector<MnvH1D*> extra_dispersed_energy_2Track;
+        std::vector<MnvH1D*> extra_rejected_energy_2Track;
+        std::vector<MnvH1D*> extra_total_energy_2Track;
+
         // Vertex
         std::vector<MnvH1D*> vertex_z;
         
         // Other Event Parameters 
         std::vector<MnvH1D*> deltaInvMass;
-       
+      
+        TH1D* h_extra_muon_energy;
+        TH1D* h_extra_dispersed_energy;
+        TH1D* h_extra_rejected_energy;
+        
         // MC Only Histograms
         TH1D* final_mc_w_DIS;
         TH1D* final_mc_w_RES;
@@ -82,7 +96,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
  
         TH1D* Enu_1Track_Diff;
         TH1D* Enu_2Track_Diff;
-        
+
     private:
         void initHistograms();
         

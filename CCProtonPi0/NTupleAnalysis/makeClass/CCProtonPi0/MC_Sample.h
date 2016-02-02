@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jan 26 07:50:05 2016 by ROOT version 5.34/05
+// Tue Feb  2 08:49:54 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -118,12 +118,13 @@ public :
    Double_t        ConeBlobs_usable_evis_Tracker;
    Double_t        Coneblobs_usable_evis_ECAL;
    Double_t        Coneblobs_usable_evis_HCAL;
-   Double_t        Dispersed_blob_energy;
-   Double_t        Muon_blob_energy;
+   Double_t        Extra_Energy_Dispersed;
+   Double_t        Extra_Energy_Muon;
+   Double_t        Extra_Energy_Rejected;
+   Double_t        Extra_Evis_Leftover;
    Double_t        OneShower_dist_vtx;
    Double_t        OneShower_energy;
    Double_t        OneShower_theta;
-   Double_t        Rejected_blob_vis_energy;
    Double_t        ThreeShower_s1_dist_vtx;
    Double_t        ThreeShower_s1_energy;
    Double_t        ThreeShower_s1_theta;
@@ -136,7 +137,6 @@ public :
    Double_t        energy_from_mc;
    Double_t        energy_from_mc_fraction;
    Double_t        energy_from_mc_fraction_of_highest;
-   Double_t        extra_evis;
    Double_t        g1blob_1ParFit_fval;
    Double_t        g1blob_2ParFit_vtx_distance;
    Double_t        g1dedx;
@@ -281,7 +281,7 @@ public :
    Int_t           g2dedx_cluster_occupancy_sz;
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
    Int_t           nTracks_Secondary_Vtx_sz;
-   Int_t           nTracks_Secondary_Vtx[5];   //[nTracks_Secondary_Vtx_sz]
+   Int_t           nTracks_Secondary_Vtx[11];   //[nTracks_Secondary_Vtx_sz]
    Double_t        all_protons_E[10];
    Double_t        all_protons_KE[10];
    Double_t        all_protons_LLRScore[10];
@@ -681,26 +681,26 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[30];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[30];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[30];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[30];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[30];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[51];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[51];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[51];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[51];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[51];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[44];   //[mc_er_nPart]
-   Int_t           mc_er_status[44];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[44];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[44];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[44];   //[mc_er_nPart]
-   Double_t        mc_er_Px[44];   //[mc_er_nPart]
-   Double_t        mc_er_Py[44];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[44];   //[mc_er_nPart]
-   Double_t        mc_er_E[44];   //[mc_er_nPart]
-   Int_t           mc_er_FD[44];   //[mc_er_nPart]
-   Int_t           mc_er_LD[44];   //[mc_er_nPart]
-   Int_t           mc_er_mother[44];   //[mc_er_nPart]
+   Int_t           mc_er_ID[77];   //[mc_er_nPart]
+   Int_t           mc_er_status[77];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[77];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[77];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[77];   //[mc_er_nPart]
+   Double_t        mc_er_Px[77];   //[mc_er_nPart]
+   Double_t        mc_er_Py[77];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[77];   //[mc_er_nPart]
+   Double_t        mc_er_E[77];   //[mc_er_nPart]
+   Int_t           mc_er_FD[77];   //[mc_er_nPart]
+   Int_t           mc_er_LD[77];   //[mc_er_nPart]
+   Int_t           mc_er_mother[77];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[10];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -728,11 +728,11 @@ public :
    Int_t           mc_wgt_ppfx1_Total_sz;
    Double_t        mc_wgt_ppfx1_Total[100];   //[mc_wgt_ppfx1_Total_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[7];   //[n_prongs]
-   Double_t        prong_part_score[7];   //[n_prongs]
-   Double_t        prong_part_mass[7];   //[n_prongs]
-   Int_t           prong_part_charge[7];   //[n_prongs]
-   Int_t           prong_part_pid[7];   //[n_prongs]
+   Int_t           prong_nParticles[11];   //[n_prongs]
+   Double_t        prong_part_score[11];   //[n_prongs]
+   Double_t        prong_part_mass[11];   //[n_prongs]
+   Int_t           prong_part_charge[11];   //[n_prongs]
+   Int_t           prong_part_pid[11];   //[n_prongs]
    vector<vector<double> > *prong_part_E;
    vector<vector<double> > *prong_part_pos;
 
@@ -833,12 +833,13 @@ public :
    TBranch        *b_ConeBlobs_usable_evis_Tracker;   //!
    TBranch        *b_Coneblobs_usable_evis_ECAL;   //!
    TBranch        *b_Coneblobs_usable_evis_HCAL;   //!
-   TBranch        *b_Dispersed_blob_energy;   //!
-   TBranch        *b_Muon_blob_energy;   //!
+   TBranch        *b_Extra_Energy_Dispersed;   //!
+   TBranch        *b_Extra_Energy_Muon;   //!
+   TBranch        *b_Extra_Energy_Rejected;   //!
+   TBranch        *b_Extra_Evis_Leftover;   //!
    TBranch        *b_OneShower_dist_vtx;   //!
    TBranch        *b_OneShower_energy;   //!
    TBranch        *b_OneShower_theta;   //!
-   TBranch        *b_Rejected_blob_vis_energy;   //!
    TBranch        *b_ThreeShower_s1_dist_vtx;   //!
    TBranch        *b_ThreeShower_s1_energy;   //!
    TBranch        *b_ThreeShower_s1_theta;   //!
@@ -851,7 +852,6 @@ public :
    TBranch        *b_energy_from_mc;   //!
    TBranch        *b_energy_from_mc_fraction;   //!
    TBranch        *b_energy_from_mc_fraction_of_highest;   //!
-   TBranch        *b_extra_evis;   //!
    TBranch        *b_g1blob_1ParFit_fval;   //!
    TBranch        *b_g1blob_2ParFit_vtx_distance;   //!
    TBranch        *b_g1dedx;   //!
@@ -1485,7 +1485,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_53.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_54b.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1633,12 +1633,13 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("ConeBlobs_usable_evis_Tracker", &ConeBlobs_usable_evis_Tracker, &b_ConeBlobs_usable_evis_Tracker);
    fChain->SetBranchAddress("Coneblobs_usable_evis_ECAL", &Coneblobs_usable_evis_ECAL, &b_Coneblobs_usable_evis_ECAL);
    fChain->SetBranchAddress("Coneblobs_usable_evis_HCAL", &Coneblobs_usable_evis_HCAL, &b_Coneblobs_usable_evis_HCAL);
-   fChain->SetBranchAddress("Dispersed_blob_energy", &Dispersed_blob_energy, &b_Dispersed_blob_energy);
-   fChain->SetBranchAddress("Muon_blob_energy", &Muon_blob_energy, &b_Muon_blob_energy);
+   fChain->SetBranchAddress("Extra_Energy_Dispersed", &Extra_Energy_Dispersed, &b_Extra_Energy_Dispersed);
+   fChain->SetBranchAddress("Extra_Energy_Muon", &Extra_Energy_Muon, &b_Extra_Energy_Muon);
+   fChain->SetBranchAddress("Extra_Energy_Rejected", &Extra_Energy_Rejected, &b_Extra_Energy_Rejected);
+   fChain->SetBranchAddress("Extra_Evis_Leftover", &Extra_Evis_Leftover, &b_Extra_Evis_Leftover);
    fChain->SetBranchAddress("OneShower_dist_vtx", &OneShower_dist_vtx, &b_OneShower_dist_vtx);
    fChain->SetBranchAddress("OneShower_energy", &OneShower_energy, &b_OneShower_energy);
    fChain->SetBranchAddress("OneShower_theta", &OneShower_theta, &b_OneShower_theta);
-   fChain->SetBranchAddress("Rejected_blob_vis_energy", &Rejected_blob_vis_energy, &b_Rejected_blob_vis_energy);
    fChain->SetBranchAddress("ThreeShower_s1_dist_vtx", &ThreeShower_s1_dist_vtx, &b_ThreeShower_s1_dist_vtx);
    fChain->SetBranchAddress("ThreeShower_s1_energy", &ThreeShower_s1_energy, &b_ThreeShower_s1_energy);
    fChain->SetBranchAddress("ThreeShower_s1_theta", &ThreeShower_s1_theta, &b_ThreeShower_s1_theta);
@@ -1651,7 +1652,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("energy_from_mc", &energy_from_mc, &b_energy_from_mc);
    fChain->SetBranchAddress("energy_from_mc_fraction", &energy_from_mc_fraction, &b_energy_from_mc_fraction);
    fChain->SetBranchAddress("energy_from_mc_fraction_of_highest", &energy_from_mc_fraction_of_highest, &b_energy_from_mc_fraction_of_highest);
-   fChain->SetBranchAddress("extra_evis", &extra_evis, &b_extra_evis);
    fChain->SetBranchAddress("g1blob_1ParFit_fval", &g1blob_1ParFit_fval, &b_g1blob_1ParFit_fval);
    fChain->SetBranchAddress("g1blob_2ParFit_vtx_distance", &g1blob_2ParFit_vtx_distance, &b_g1blob_2ParFit_vtx_distance);
    fChain->SetBranchAddress("g1dedx", &g1dedx, &b_g1dedx);

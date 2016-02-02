@@ -29,7 +29,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     fraction2.setBin(200,-0.5,1.5);
     vertex_z.setBin(114,4300.0,10000.0);
     vertex_x_y.setBin(200,-1000.0,1000.0);
-    deltaInvMass.setBin(22,0.8,3.0);
+    deltaInvMass.setBin(30,0.0,3.0);
     preFilter_Status.setBin(4,0,4);
     preFilter_RejectedEnergy.setBin(50,0.0,5000.0);
     strip_numbers.setBin(127,1,127);
@@ -45,7 +45,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     beamE_Diff_True.setBin(100,1.5,7.5);
     beamE_Diff.setBin(100,-3,3);
     q2.setBin(40,0.0,4.0);
-    w.setBin(22,0.8,3.0);
+    w.setBin(30,0.0,3.0);
     wSq.setBin(50,0.0,5.0);
     vertex_energy.setBin(10,0.0,500.0);
     vertex_evis.setBin(10,0.0,500.0);

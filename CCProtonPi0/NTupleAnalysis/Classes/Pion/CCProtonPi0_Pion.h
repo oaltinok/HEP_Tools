@@ -41,7 +41,9 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         
         TH1D* signal_P;
         TH1D* signal_theta;
-        TH2D* gamma1_E_gamma2_E;
+        TH2D* signal_gamma1_E_gamma2_E;
+        TH2D* bckg_gamma1_E_gamma2_E;
+        TH2D* bckg_signal_diff;
         TH2D* gamma1_convLength_gamma2_convLength;
                 
         CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana_folder);

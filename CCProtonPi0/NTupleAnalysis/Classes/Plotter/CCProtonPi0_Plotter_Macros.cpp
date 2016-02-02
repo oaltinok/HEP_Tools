@@ -22,15 +22,15 @@ void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, 
     // POT Normalized Plots 
     // ------------------------------------------------------------------------
     DrawDataStackedMC_BckgAll(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
-    //DrawDataStackedMC_BckgWithPi0(dir, var_name,plotDir, false, nCutArrows,  cutArrow1, cutArrow2);
-    //DrawDataStackedMC_BckgType(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
+    DrawDataStackedMC_BckgWithPi0(dir, var_name,plotDir, false, nCutArrows,  cutArrow1, cutArrow2);
+    DrawDataStackedMC_BckgType(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
 
     // ------------------------------------------------------------------------
     // Area Normalized Plots 
     // ------------------------------------------------------------------------
     DrawDataStackedMC_BckgAll(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
-    //DrawDataStackedMC_BckgWithPi0(dir, var_name,plotDir, false, nCutArrows,  cutArrow1, cutArrow2);
-    //DrawDataStackedMC_BckgType(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
+    DrawDataStackedMC_BckgWithPi0(dir, var_name,plotDir, false, nCutArrows,  cutArrow1, cutArrow2);
+    DrawDataStackedMC_BckgType(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
 
 }
 
@@ -53,7 +53,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     var = Form("%s_%d",var_name.c_str(),0);
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
     max_bin = data->GetMaximumBin();
-    hist_max = hist_max + data->GetBinContent(max_bin);
+    hist_max = (hist_max + data->GetBinContent(max_bin))*1.2;
     bin_width = data->GetBinWidth(1);
 
     // ------------------------------------------------------------------------
@@ -114,12 +114,14 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     }
 
     // Add Delta+ InvMass Line
-    if (var_name.compare("deltaInvMass") == 0) {
+    if (    var_name.compare("deltaInvMass") == 0 ||
+            var_name.compare("W_Calc") == 0 ){
         TLine deltaMass;
         deltaMass.SetLineWidth(2);
         deltaMass.SetLineColor(kBlue);
         deltaMass.DrawLine(1.232,0,1.232,hist_max);
     }
+
 
     // Print Plot
     c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all_",norm_label.c_str(),".png"), "png");
@@ -168,7 +170,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
     ApplyStyle(plotter);
     //plotter->axis_minimum = 0.1;
     plotter->axis_minimum = 0.0;
-    plotter->DrawDataStackedMC(data, mc_hists,mc_ratio ,"TR","Data",3,2);
+    plotter->DrawDataStackedMC(data, mc_hists,mc_ratio ,"TR","Data",0);
 
     // Add Plot Labels
     plotter->AddHistoTitle(data[0].GetTitle());
@@ -229,7 +231,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::strin
     ApplyStyle(plotter);
     //plotter->axis_minimum = 0.1;
     plotter->axis_minimum = 0.0;
-    plotter->DrawDataStackedMC(data,mc_hists,mc_ratio ,"TR","Data",3,2);
+    plotter->DrawDataStackedMC(data,mc_hists,mc_ratio ,"TR","Data",0);
 
     // If Cut Histogram - Add Cut Arrows
     if (nCutArrows == 1){
@@ -622,7 +624,8 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     }
 
     // Add Delta+ InvMass Line
-    if (var_name.compare("deltaInvMass") == 0) {
+    if (    var_name.compare("deltaInvMass") == 0 ||
+            var_name.compare("W_Calc") == 0 ){
         TLine deltaMass;
         deltaMass.SetLineWidth(2);
         deltaMass.SetLineColor(kBlue);
@@ -1189,12 +1192,14 @@ void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::
     }
 
     // Add Delta+ InvMass Line
-    if (var_name.compare("deltaInvMass") == 0) {
+    if (    var_name.compare("deltaInvMass") == 0 ||
+            var_name.compare("W_Calc") == 0 ){
         TLine deltaMass;
         deltaMass.SetLineWidth(2);
         deltaMass.SetLineColor(kBlue);
         deltaMass.DrawLine(1232,0,1232,hist_max);
     }
+
 
 
     // Print Plot

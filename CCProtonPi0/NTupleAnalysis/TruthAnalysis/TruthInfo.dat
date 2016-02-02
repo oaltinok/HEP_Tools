@@ -1,23 +1,23 @@
-nAll = 17074658.00
-nFidVol = 4113874.00 24.09%
-nNoFidVol = 12960784.00 75.91%
+nAll = 60094444.00
+nFidVol = 12791927.00 21.29%
+nNoFidVol = 47302517.00 78.71%
 ================================================================
-nSignal = 228096.00 5.54%
+nSignal = 710164.00 5.55%
 ----------------------------------------------------------------
-nBckg_NoPi0 = 1830325.00 44.49%
-nBckg_SinglePi0 = 982096.00 23.87%
-nBckg_MultiPi0 = 1073357.00 26.09%
+nBckg_NoPi0 = 5696050.00 44.53%
+nBckg_SinglePi0 = 3048441.00 23.83%
+nBckg_MultiPi0 = 3337272.00 26.09%
 ----------------------------------------------------------------
-nBckg_NC = 1085681.00 26.39%
-nBckg_AntiNeutrino = 234632.00 5.70%
-nBckg_QELike = 505339.00 12.28%
-nBckg_SingleChargedPion = 597837.00 14.53%
-nBckg_SingleChargedPion_ChargeExchanged = 115210.00 2.80%
-nBckg_DoublePion_WithPi0 = 312300.00 7.59%
-nBckg_DoublePion_WithoutPi0 = 101742.00 2.47%
-nBckg_MultiPion_WithPi0 = 513667.00 12.49%
-nBckg_MultiPion_WithoutPi0 = 51804.00 1.26%
-nBckg_Other = 367566.00 8.93%
+nBckg_NC = 3374521.00 26.38%
+nBckg_AntiNeutrino = 732910.00 5.73%
+nBckg_QELike = 1572282.00 12.29%
+nBckg_SingleChargedPion = 1859892.00 14.54%
+nBckg_SingleChargedPion_ChargeExchanged = 356940.00 2.79%
+nBckg_DoublePion_WithPi0 = 967957.00 7.57%
+nBckg_DoublePion_WithoutPi0 = 316672.00 2.48%
+nBckg_MultiPion_WithPi0 = 1594520.00 12.47%
+nBckg_MultiPion_WithoutPi0 = 161190.00 1.26%
+nBckg_Other = 1144879.00 8.95%
 ----------------------------------------------------------------
-Total Signal & Background With Pi0 = 4113874.00 100.00%
-Total Signal & Background = 4113874.00 100.00%
+Total Signal & Background With Pi0 = 12791927.00 100.00%
+Total Signal & Background = 12791927.00 100.00%

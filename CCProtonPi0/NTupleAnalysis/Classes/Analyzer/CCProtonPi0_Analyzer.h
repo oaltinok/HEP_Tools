@@ -65,6 +65,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillHistogram(vector<MnvH1D*> &hist, double var);
         void FillHistogram(TH1D* hist, double var);
         void FillHistogram(TH2D* hist, double var1, double var2);
+        void CorrectNTupleVariables();
 
         //  Interaction Specific Functions
         void fillInteractionMC();
@@ -256,12 +257,13 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        ConeBlobs_usable_evis_Tracker;
         Double_t        Coneblobs_usable_evis_ECAL;
         Double_t        Coneblobs_usable_evis_HCAL;
-        Double_t        Dispersed_blob_energy;
-        Double_t        Muon_blob_energy;
+        Double_t        Extra_Energy_Dispersed;
+        Double_t        Extra_Energy_Muon;
+        Double_t        Extra_Energy_Rejected;
+        Double_t        Extra_Evis_Leftover;
         Double_t        OneShower_dist_vtx;
         Double_t        OneShower_energy;
         Double_t        OneShower_theta;
-        Double_t        Rejected_blob_vis_energy;
         Double_t        ThreeShower_s1_dist_vtx;
         Double_t        ThreeShower_s1_energy;
         Double_t        ThreeShower_s1_theta;
@@ -274,7 +276,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        energy_from_mc;
         Double_t        energy_from_mc_fraction;
         Double_t        energy_from_mc_fraction_of_highest;
-        Double_t        extra_evis;
         Double_t        g1blob_1ParFit_fval;
         Double_t        g1blob_2ParFit_vtx_distance;
         Double_t        g1dedx;
@@ -419,7 +420,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Int_t           g2dedx_cluster_occupancy_sz;
         Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
         Int_t           nTracks_Secondary_Vtx_sz;
-        Int_t           nTracks_Secondary_Vtx[5];   //[nTracks_Secondary_Vtx_sz]
+        Int_t           nTracks_Secondary_Vtx[11];   //[nTracks_Secondary_Vtx_sz]
         Double_t        all_protons_E[10];
         Double_t        all_protons_KE[10];
         Double_t        all_protons_LLRScore[10];
@@ -819,26 +820,26 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        mc_initNucVec[4];
         Double_t        mc_primFSLepton[4];
         Int_t           mc_nFSPart;
-        Double_t        mc_FSPartPx[30];   //[mc_nFSPart]
-        Double_t        mc_FSPartPy[30];   //[mc_nFSPart]
-        Double_t        mc_FSPartPz[30];   //[mc_nFSPart]
-        Double_t        mc_FSPartE[30];   //[mc_nFSPart]
-        Int_t           mc_FSPartPDG[30];   //[mc_nFSPart]
+        Double_t        mc_FSPartPx[51];   //[mc_nFSPart]
+        Double_t        mc_FSPartPy[51];   //[mc_nFSPart]
+        Double_t        mc_FSPartPz[51];   //[mc_nFSPart]
+        Double_t        mc_FSPartE[51];   //[mc_nFSPart]
+        Int_t           mc_FSPartPDG[51];   //[mc_nFSPart]
         Int_t           mc_er_nPart;
-        Int_t           mc_er_ID[44];   //[mc_er_nPart]
-        Int_t           mc_er_status[44];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucX[44];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucY[44];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucZ[44];   //[mc_er_nPart]
-        Double_t        mc_er_Px[44];   //[mc_er_nPart]
-        Double_t        mc_er_Py[44];   //[mc_er_nPart]
-        Double_t        mc_er_Pz[44];   //[mc_er_nPart]
-        Double_t        mc_er_E[44];   //[mc_er_nPart]
-        Int_t           mc_er_FD[44];   //[mc_er_nPart]
-        Int_t           mc_er_LD[44];   //[mc_er_nPart]
-        Int_t           mc_er_mother[44];   //[mc_er_nPart]
+        Int_t           mc_er_ID[77];   //[mc_er_nPart]
+        Int_t           mc_er_status[77];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucX[77];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucY[77];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucZ[77];   //[mc_er_nPart]
+        Double_t        mc_er_Px[77];   //[mc_er_nPart]
+        Double_t        mc_er_Py[77];   //[mc_er_nPart]
+        Double_t        mc_er_Pz[77];   //[mc_er_nPart]
+        Double_t        mc_er_E[77];   //[mc_er_nPart]
+        Int_t           mc_er_FD[77];   //[mc_er_nPart]
+        Int_t           mc_er_LD[77];   //[mc_er_nPart]
+        Int_t           mc_er_mother[77];   //[mc_er_nPart]
         Int_t           mc_fr_nNuAncestorIDs;
-        Int_t           mc_fr_nuAncestorIDs[10];   //[mc_fr_nNuAncestorIDs]
+        Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
         Int_t           mc_fr_nuParentID;
         Int_t           mc_fr_decMode;
         Double_t        mc_fr_primProtonVtx[3];
@@ -866,11 +867,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Int_t           mc_wgt_ppfx1_Total_sz;
         Double_t        mc_wgt_ppfx1_Total[100];   //[mc_wgt_ppfx1_Total_sz]
         Int_t           n_prongs;
-        Int_t           prong_nParticles[7];   //[n_prongs]
-        Double_t        prong_part_score[7];   //[n_prongs]
-        Double_t        prong_part_mass[7];   //[n_prongs]
-        Int_t           prong_part_charge[7];   //[n_prongs]
-        Int_t           prong_part_pid[7];   //[n_prongs]
+        Int_t           prong_nParticles[11];   //[n_prongs]
+        Double_t        prong_part_score[11];   //[n_prongs]
+        Double_t        prong_part_mass[11];   //[n_prongs]
+        Int_t           prong_part_charge[11];   //[n_prongs]
+        Int_t           prong_part_pid[11];   //[n_prongs]
         vector<vector<double> > *prong_part_E;
         vector<vector<double> > *prong_part_pos;
 
@@ -971,12 +972,13 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_ConeBlobs_usable_evis_Tracker;   //!
         TBranch        *b_Coneblobs_usable_evis_ECAL;   //!
         TBranch        *b_Coneblobs_usable_evis_HCAL;   //!
-        TBranch        *b_Dispersed_blob_energy;   //!
-        TBranch        *b_Muon_blob_energy;   //!
+        TBranch        *b_Extra_Energy_Dispersed;   //!
+        TBranch        *b_Extra_Energy_Muon;   //!
+        TBranch        *b_Extra_Energy_Rejected;   //!
+        TBranch        *b_Extra_Evis_Leftover;   //!
         TBranch        *b_OneShower_dist_vtx;   //!
         TBranch        *b_OneShower_energy;   //!
         TBranch        *b_OneShower_theta;   //!
-        TBranch        *b_Rejected_blob_vis_energy;   //!
         TBranch        *b_ThreeShower_s1_dist_vtx;   //!
         TBranch        *b_ThreeShower_s1_energy;   //!
         TBranch        *b_ThreeShower_s1_theta;   //!
@@ -989,7 +991,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_energy_from_mc;   //!
         TBranch        *b_energy_from_mc_fraction;   //!
         TBranch        *b_energy_from_mc_fraction_of_highest;   //!
-        TBranch        *b_extra_evis;   //!
         TBranch        *b_g1blob_1ParFit_fval;   //!
         TBranch        *b_g1blob_2ParFit_vtx_distance;   //!
         TBranch        *b_g1dedx;   //!

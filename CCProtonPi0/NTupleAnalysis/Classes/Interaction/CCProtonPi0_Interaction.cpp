@@ -70,6 +70,11 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.w.get_width()));
         W.push_back(temp);
  
+        temp = new MnvH1D( Form("%s_%d","W_Calc",i),"Reconstructed W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed W [GeV]");
+        temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.w.get_width()));
+        W_Calc.push_back(temp);
+
         temp = new MnvH1D( Form("%s_%d","vertex_energy_1Track",i),"Vertex Blob Energy (r = 90mm)",binList.vertex_energy.get_nBins(), binList.vertex_energy.get_min(), binList.vertex_energy.get_max() );
         temp->GetXaxis()->SetTitle("Vertex Blob Energy [MeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.vertex_energy.get_width()));
@@ -90,13 +95,13 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.vertex_evis.get_width()));
         vertex_evis_2Track.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","extra_evis_1Track",i),"Extra Energy (r = 300mm)",binList.extra_energy.get_nBins(), binList.extra_energy.get_min(), binList.extra_energy.get_max() );
-        temp->GetXaxis()->SetTitle("Extra Energy [MeV]");
+        temp = new MnvH1D( Form("%s_%d","extra_evis_1Track",i),"Extra Leftover Visible Energy (r = 300mm)",binList.extra_energy.get_nBins(), binList.extra_energy.get_min(), binList.extra_energy.get_max() );
+        temp->GetXaxis()->SetTitle("Extra Leftover Energy [MeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.extra_energy.get_width()));
         extra_evis_1Track.push_back(temp);
  
-        temp = new MnvH1D( Form("%s_%d","extra_evis_2Track",i),"Extra Energy (r = 300mm)",binList.extra_energy.get_nBins(), binList.extra_energy.get_min(), binList.extra_energy.get_max() );
-        temp->GetXaxis()->SetTitle("Extra Energy [MeV]");
+        temp = new MnvH1D( Form("%s_%d","extra_evis_2Track",i),"Extra Leftover Visible Energy (r = 300mm)",binList.extra_energy.get_nBins(), binList.extra_energy.get_min(), binList.extra_energy.get_max() );
+        temp->GetXaxis()->SetTitle("Extra Leftover Energy [MeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.extra_energy.get_width()));
         extra_evis_2Track.push_back(temp);
       
@@ -119,7 +124,50 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("Pi0 Theta [degree]");
         temp->GetYaxis()->SetTitle("N(Events)");
         recovered_Pi0_theta.push_back(temp);
+
+        // Extra Energy
+        temp = new MnvH1D( Form("%s_%d","extra_dispersed_energy_1Track",i),"Extra Dispersed Energy 1 Track", 20, 0.0, 500.0 );
+        temp->GetXaxis()->SetTitle("Extra Dispersed Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        extra_dispersed_energy_1Track.push_back(temp);
+        
+        temp = new MnvH1D( Form("%s_%d","extra_muon_energy_1Track",i),"Extra Muon Energy 1 Track", 20, 0.0, 500.0 );
+        temp->GetXaxis()->SetTitle("Extra Muon Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        extra_muon_energy_1Track.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","extra_rejected_energy_1Track",i),"Extra Rejected Visible Energy 1 Track", 20, 0.0, 500.0 );
+        temp->GetXaxis()->SetTitle("Extra Rejected Visible Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        extra_rejected_energy_1Track.push_back(temp);
+    
+        temp = new MnvH1D( Form("%s_%d","extra_total_energy_1Track",i),"Total Extra Energy 1 Track", 20, 0.0, 500.0 );
+        temp->GetXaxis()->SetTitle("Total Extra Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        extra_total_energy_1Track.push_back(temp);
+        
+        temp = new MnvH1D( Form("%s_%d","extra_dispersed_energy_2Track",i),"Extra Dispersed Energy 2 Track", 20, 0.0, 500.0 );
+        temp->GetXaxis()->SetTitle("Extra Dispersed Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        extra_dispersed_energy_2Track.push_back(temp);
+        
+        temp = new MnvH1D( Form("%s_%d","extra_muon_energy_2Track",i),"Extra Muon Energy 2 Track", 20, 0.0, 500.0 );
+        temp->GetXaxis()->SetTitle("Extra Muon Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        extra_muon_energy_2Track.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","extra_rejected_energy_2Track",i),"Extra Rejected Visible Energy 2 Track", 20, 0.0, 500.0 );
+        temp->GetXaxis()->SetTitle("Extra Rejected Visible Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        extra_rejected_energy_2Track.push_back(temp);
+    
+        temp = new MnvH1D( Form("%s_%d","extra_total_energy_2Track",i),"Total Extra Energy 2 Track", 20, 0.0, 500.0 );
+        temp->GetXaxis()->SetTitle("Total Extra Energy [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        extra_total_energy_2Track.push_back(temp);
+
     }
+
     
     // MC Only Histograms
     final_mc_w_DIS = new TH1D( "final_mc_w_DIS","True W for DIS",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
@@ -183,13 +231,27 @@ void CCProtonPi0_Interaction::initHistograms()
     Enu_2Track_Diff->GetXaxis()->SetTitle("E_{#nu}^{Reco}-E_{#nu}^{True} [GeV]");
     Enu_2Track_Diff->GetYaxis()->SetTitle("N(Events)");
 
+    // Extra Energy
+    h_extra_muon_energy = new TH1D("h_extra_muon_energy","Extra Muon Energy",20,0.0,1000);
+    h_extra_muon_energy->GetXaxis()->SetTitle("Extra Muon Energy [MeV]");
+    h_extra_muon_energy->GetYaxis()->SetTitle("N(Events)");
+
+    h_extra_dispersed_energy = new TH1D("h_extra_dispersed_energy","Extra Dispersed Energy",20,0.0,1000);
+    h_extra_dispersed_energy->GetXaxis()->SetTitle("Extra Dispersed Energy [MeV]");
+    h_extra_dispersed_energy->GetYaxis()->SetTitle("N(Events)");
+ 
+    h_extra_rejected_energy = new TH1D("h_extra_rejected_energy","Extra Rejected Energy",20,0.0,1000);
+    h_extra_rejected_energy->GetXaxis()->SetTitle("Extra Rejected Energy [MeV]");
+    h_extra_rejected_energy->GetYaxis()->SetTitle("N(Events)");
+  
+
     // Recovered Pi0
     h_recovered_Pi0_P = new TH1D("h_recovered_Pi0_P","Pi0 Momentum",17,0.0,1.7);
     h_recovered_Pi0_P->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
     h_recovered_Pi0_P->GetYaxis()->SetTitle("N(Events)");
 
     h_recovered_Pi0_theta = new TH1D("h_recovered_Pi0_theta","Pi0 theta",90,0.0,180.0);
-    h_recovered_Pi0_theta->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
+    h_recovered_Pi0_theta->GetXaxis()->SetTitle("Pi0 Theta [degree]");
     h_recovered_Pi0_theta->GetYaxis()->SetTitle("N(Events)");
 
     h_original_Pi0_P = new TH1D("h_original_Pi0_P","Pi0 Momentum",17,0.0,1.7);
@@ -197,7 +259,7 @@ void CCProtonPi0_Interaction::initHistograms()
     h_original_Pi0_P->GetYaxis()->SetTitle("N(Events)");
 
     h_original_Pi0_theta = new TH1D("h_original_Pi0_theta","Pi0 theta",90,0.0,180.0);
-    h_original_Pi0_theta->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
+    h_original_Pi0_theta->GetXaxis()->SetTitle("Pi0 Theta [degree]");
     h_original_Pi0_theta->GetYaxis()->SetTitle("N(Events)");
 
 }
@@ -217,6 +279,7 @@ void CCProtonPi0_Interaction::writeHistograms()
         QSq[i]->Write();
         WSq[i]->Write();
         W[i]->Write();
+        W_Calc[i]->Write();
        
         // Vertex & Extra Energy
         vertex_energy_1Track[i]->Write();
@@ -229,15 +292,26 @@ void CCProtonPi0_Interaction::writeHistograms()
         // Other Event Parameters 
         deltaInvMass[i]->Write();
 
+
         recovered_Pi0_P[i]->Write();
         recovered_Pi0_theta[i]->Write();
+   
+        // Extra Energy
+        extra_muon_energy_1Track[i]->Write();
+        extra_dispersed_energy_1Track[i]->Write();
+        extra_rejected_energy_1Track[i]->Write();
+        extra_total_energy_1Track[i]->Write();
+        extra_muon_energy_2Track[i]->Write();
+        extra_dispersed_energy_2Track[i]->Write();
+        extra_rejected_energy_2Track[i]->Write();
+        extra_total_energy_2Track[i]->Write();
+
     }
     
     // MC Only Histograms
     final_mc_w_DIS->Write();
     final_mc_w_RES->Write();
     final_mc_w_CCQE->Write();
-
     // Short Proton
     proton_true_P_1Track->Write();
     proton_true_KE_1Track->Write();
@@ -252,6 +326,11 @@ void CCProtonPi0_Interaction::writeHistograms()
     h_original_Pi0_P->Write();
     h_original_Pi0_theta->Write();
 
+    //Extra Energy
+    h_extra_muon_energy->Write();
+    h_extra_dispersed_energy->Write();
+    h_extra_rejected_energy->Write();
+    
     // Neutrino Energy: Truth, Error, Difference
     Enu_True_1Track->Write();
     Enu_True_2Track->Write();
