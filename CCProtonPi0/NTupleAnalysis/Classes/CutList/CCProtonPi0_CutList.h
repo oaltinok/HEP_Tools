@@ -123,6 +123,10 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         // Pi0 Invariant Mass
         TH1D* pi0_invMass_1Track;
         TH1D* pi0_invMass_2Track;
+        TH2D* signal_gamma_E_cos_openingAngle;
+        TH2D* bckg_gamma_E_cos_openingAngle;
+        TH2D* bckg_signal_diff_E_cos_openingAngle;
+
 
     private:
         void initHistograms();

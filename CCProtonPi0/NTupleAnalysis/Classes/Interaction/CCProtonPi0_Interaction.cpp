@@ -8,15 +8,15 @@
 
 using namespace PlotUtils;
 
-CCProtonPi0_Interaction::CCProtonPi0_Interaction(bool isModeReduce, bool isMC, std::string ana_folder) : CCProtonPi0_NTupleAnalysis()
+CCProtonPi0_Interaction::CCProtonPi0_Interaction(bool isModeReduce, bool isMC) : CCProtonPi0_NTupleAnalysis()
 {
     std::cout<<"Initializing CCProtonPi0_Interaction"<<std::endl;
     
     if(isModeReduce){
         std::cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<std::endl;
     }else{
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Interaction.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed  + ana_folder + "Interaction.root";
+        if (isMC) rootDir = Folder_List::rootDir_Interaction_mc;
+        else rootDir = Folder_List::rootDir_Interaction_data;
         
         std::cout<<"\tRoot File: "<<rootDir<<std::endl;
  
@@ -262,6 +262,23 @@ void CCProtonPi0_Interaction::initHistograms()
     h_original_Pi0_theta->GetXaxis()->SetTitle("Pi0 Theta [degree]");
     h_original_Pi0_theta->GetYaxis()->SetTitle("N(Events)");
 
+    // Signal
+    eff_neutrino_E = new TH1D("eff_neutrino_E","Efficiency Neutrino Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
+    eff_neutrino_E->GetXaxis()->SetTitle("True Neutrino Energy [GeV]");
+    eff_neutrino_E->GetYaxis()->SetTitle("Efficiency");
+ 
+    eff_QSq = new TH1D("eff_QSq","Efficiency Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
+    eff_QSq->GetXaxis()->SetTitle("True Q^{2} [GeV^{2}]");
+    eff_QSq->GetYaxis()->SetTitle("Efficiency");
+
+    response_neutrino_E = new TH2D("response_neutrino_E","Neutrino Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(), binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    response_neutrino_E->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
+    response_neutrino_E->GetYaxis()->SetTitle("True E_{#nu} [GeV]");
+ 
+    response_QSq = new TH2D("response_QSq","Signal Neutrino Energy",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() ,binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max());
+    response_QSq->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
+    response_QSq->GetYaxis()->SetTitle("True Q^2 [GeV^{2}]");
+ 
 }
 
 void CCProtonPi0_Interaction::writeHistograms()
@@ -341,6 +358,11 @@ void CCProtonPi0_Interaction::writeHistograms()
 
     Enu_1Track_Diff->Write();
     Enu_2Track_Diff->Write();
+
+    eff_neutrino_E->Write();
+    eff_QSq->Write();
+    response_neutrino_E->Write();
+    response_QSq->Write();
 
     f->Close();
 }

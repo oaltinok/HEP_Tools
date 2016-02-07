@@ -1,20 +1,27 @@
-CCPROTONPI0_V="v2_54"
+CCPROTONPI0_V="v2_55"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Corrected Neutrino Energy Calculation
-		Extra Energy is collected in 3 different ways
-			Dispersed Blob after Pi0 reconstruction
-			Muon Extra Energy
-			Rejected Cluster Energy
-		Neutrino Energy includes Total Extra Energy 
+	Added P and Theta for Signal FS particles Truth Variables
 
-	Corrected WSq Calculation
-		I was using Q2 instead of q2 (q2 = -Q2)
-	
 -------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	New script FindAllAnaFiles.sh
-		Outputs a file listing ALL Ana_Tuple Files
+	New Mode:
+		Calculate Cross Section
+			./main.exe calc
+	New Class:
+		CCProtonPi0_CrossSection
+			Class responsible for Cross Section Calculation
+			Initial commit for the Class
+				No methods implemented yet!
+
+	Folder structure improved
+		Forming final folder structure inside Libraries/Folder_List.h
+		Other Objects gets the final folder structure from Folder_List
+
+	Added new histograms for the variables we will calculate the cross section
+		Efficiency
+		Response
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .
+

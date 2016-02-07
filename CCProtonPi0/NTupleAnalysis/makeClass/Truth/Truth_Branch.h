@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Jan 25 15:52:10 2016 by ROOT version 5.34/05
+// Sat Feb  6 09:48:06 2016 by ROOT version 5.34/05
 // from TChain Truth/
 //////////////////////////////////////////////////////////
 
@@ -156,6 +156,8 @@ public :
    Double_t        truth_michelPion_P;
    Double_t        truth_michelPion_begin_dist_vtx;
    Double_t        truth_michelPion_length;
+   Double_t        truth_muon_P;
+   Double_t        truth_muon_theta;
    Double_t        truth_other_unused_evis_muon;
    Double_t        truth_other_unused_evis_neutron;
    Double_t        truth_other_unused_evis_piminus;
@@ -164,6 +166,10 @@ public :
    Double_t        truth_other_unused_evis_proton;
    Double_t        truth_other_unused_evis_total_norm;
    Double_t        truth_other_unused_evis_total_truth;
+   Double_t        truth_pi0_P;
+   Double_t        truth_pi0_theta;
+   Double_t        truth_proton_P;
+   Double_t        truth_proton_theta;
    Double_t        truth_total_captured_evis_pizero;
    Double_t        truth_total_captured_evis_total_norm;
    Double_t        truth_total_captured_evis_total_truth;
@@ -259,26 +265,26 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[192];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[192];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[192];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[192];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[192];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[106];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[106];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[106];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[106];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[106];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[229];   //[mc_er_nPart]
-   Int_t           mc_er_status[229];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[229];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[229];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[229];   //[mc_er_nPart]
-   Double_t        mc_er_Px[229];   //[mc_er_nPart]
-   Double_t        mc_er_Py[229];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[229];   //[mc_er_nPart]
-   Double_t        mc_er_E[229];   //[mc_er_nPart]
-   Int_t           mc_er_FD[229];   //[mc_er_nPart]
-   Int_t           mc_er_LD[229];   //[mc_er_nPart]
-   Int_t           mc_er_mother[229];   //[mc_er_nPart]
+   Int_t           mc_er_ID[134];   //[mc_er_nPart]
+   Int_t           mc_er_status[134];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[134];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[134];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[134];   //[mc_er_nPart]
+   Double_t        mc_er_Px[134];   //[mc_er_nPart]
+   Double_t        mc_er_Py[134];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[134];   //[mc_er_nPart]
+   Double_t        mc_er_E[134];   //[mc_er_nPart]
+   Int_t           mc_er_FD[134];   //[mc_er_nPart]
+   Int_t           mc_er_LD[134];   //[mc_er_nPart]
+   Int_t           mc_er_mother[134];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[12];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[6];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -442,6 +448,8 @@ public :
    TBranch        *b_truth_michelPion_P;   //!
    TBranch        *b_truth_michelPion_begin_dist_vtx;   //!
    TBranch        *b_truth_michelPion_length;   //!
+   TBranch        *b_truth_muon_P;   //!
+   TBranch        *b_truth_muon_theta;   //!
    TBranch        *b_truth_other_unused_evis_muon;   //!
    TBranch        *b_truth_other_unused_evis_neutron;   //!
    TBranch        *b_truth_other_unused_evis_piminus;   //!
@@ -450,6 +458,10 @@ public :
    TBranch        *b_truth_other_unused_evis_proton;   //!
    TBranch        *b_truth_other_unused_evis_total_norm;   //!
    TBranch        *b_truth_other_unused_evis_total_truth;   //!
+   TBranch        *b_truth_pi0_P;   //!
+   TBranch        *b_truth_pi0_theta;   //!
+   TBranch        *b_truth_proton_P;   //!
+   TBranch        *b_truth_proton_theta;   //!
    TBranch        *b_truth_total_captured_evis_pizero;   //!
    TBranch        *b_truth_total_captured_evis_total_norm;   //!
    TBranch        *b_truth_total_captured_evis_total_truth;   //!
@@ -626,7 +638,7 @@ Truth_Branch::Truth_Branch(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("Truth","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_53.root/Truth");
+      chain->Add("/minerva/data/users/oaltinok/CCProtonPi0/MC/v2_55/test/nogrid/central_value/minerva/ana/v10r8p7/00/01/02/00/SIM_minerva_00010200_Subruns_0034_CCProtonPi0_Ana_Tuple_v10r8p7-oaltinok.root/Truth");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -810,6 +822,8 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_michelPion_P", &truth_michelPion_P, &b_truth_michelPion_P);
    fChain->SetBranchAddress("truth_michelPion_begin_dist_vtx", &truth_michelPion_begin_dist_vtx, &b_truth_michelPion_begin_dist_vtx);
    fChain->SetBranchAddress("truth_michelPion_length", &truth_michelPion_length, &b_truth_michelPion_length);
+   fChain->SetBranchAddress("truth_muon_P", &truth_muon_P, &b_truth_muon_P);
+   fChain->SetBranchAddress("truth_muon_theta", &truth_muon_theta, &b_truth_muon_theta);
    fChain->SetBranchAddress("truth_other_unused_evis_muon", &truth_other_unused_evis_muon, &b_truth_other_unused_evis_muon);
    fChain->SetBranchAddress("truth_other_unused_evis_neutron", &truth_other_unused_evis_neutron, &b_truth_other_unused_evis_neutron);
    fChain->SetBranchAddress("truth_other_unused_evis_piminus", &truth_other_unused_evis_piminus, &b_truth_other_unused_evis_piminus);
@@ -818,6 +832,10 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_other_unused_evis_proton", &truth_other_unused_evis_proton, &b_truth_other_unused_evis_proton);
    fChain->SetBranchAddress("truth_other_unused_evis_total_norm", &truth_other_unused_evis_total_norm, &b_truth_other_unused_evis_total_norm);
    fChain->SetBranchAddress("truth_other_unused_evis_total_truth", &truth_other_unused_evis_total_truth, &b_truth_other_unused_evis_total_truth);
+   fChain->SetBranchAddress("truth_pi0_P", &truth_pi0_P, &b_truth_pi0_P);
+   fChain->SetBranchAddress("truth_pi0_theta", &truth_pi0_theta, &b_truth_pi0_theta);
+   fChain->SetBranchAddress("truth_proton_P", &truth_proton_P, &b_truth_proton_P);
+   fChain->SetBranchAddress("truth_proton_theta", &truth_proton_theta, &b_truth_proton_theta);
    fChain->SetBranchAddress("truth_total_captured_evis_pizero", &truth_total_captured_evis_pizero, &b_truth_total_captured_evis_pizero);
    fChain->SetBranchAddress("truth_total_captured_evis_total_norm", &truth_total_captured_evis_total_norm, &b_truth_total_captured_evis_total_norm);
    fChain->SetBranchAddress("truth_total_captured_evis_total_truth", &truth_total_captured_evis_total_truth, &b_truth_total_captured_evis_total_truth);

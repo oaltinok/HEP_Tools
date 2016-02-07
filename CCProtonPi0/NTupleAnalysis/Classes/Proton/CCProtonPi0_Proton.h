@@ -21,7 +21,7 @@ class CCProtonPi0_Proton : public CCProtonPi0_Particle
         vector<MnvH1D*> trackKinked;
         vector<MnvH1D*> partScore;
 
-        CCProtonPi0_Proton(bool isModeReduce, bool isMC, std::string ana_folder);
+        CCProtonPi0_Proton(bool isModeReduce, bool isMC);
         void initHistograms();
         void writeHistograms();
     

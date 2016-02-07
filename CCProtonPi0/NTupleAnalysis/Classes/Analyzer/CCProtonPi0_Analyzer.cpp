@@ -11,7 +11,7 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
-    nMaxEvents = 100;
+    nMaxEvents = 100000;
 
     // Control Flow
     isDataAnalysis  = true;
@@ -92,7 +92,7 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         if(isScanRun) UpdateScanFileName();
 
         // Progress Message on Terminal
-        if (jentry%500000 == 0) cout<<"\tEntry "<<jentry<<endl;
+        if (jentry%50000 == 0) cout<<"\tEntry "<<jentry<<endl;
 
         if (applyMaxEvents && jentry == nMaxEvents){
             cout<<"\tReached Event Limit!"<<endl;
@@ -164,16 +164,14 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             break;
         }
 
-        if (gamma1_E < 80 && gamma2_E < 60){
-            if (truth_isSignal) counter1++;
-            else counter2++;
+        //if ((gamma1_dist_vtx*0.1) < 15 ) continue;
+        //if ((gamma2_dist_vtx*0.1) < 15 ) continue;
 
-        }
+        if (truth_isSignal) counter1++;
+        else counter2++;
+
         //if (is_blobs_recovered) counter1++;
         //else counter2++;
-
-        // Analyze Event or NOT -- Depend on the 1Track or 2 Track Analysis
-        if (!AnalyzeEvent() ) continue;
 
         // Update scanFileName if running for scan
         if(isScanRun) UpdateScanFileName();
@@ -228,20 +226,19 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
 //------------------------------------------------------------------------------
 //  Constructor
 //------------------------------------------------------------------------------
-CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC, std::string ana_folder) : 
+CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) : 
     CCProtonPi0_NTupleAnalysis(),
-    interaction(isModeReduce, isMC, ana_folder),
-    muon(isModeReduce, isMC, ana_folder),
-    proton(isModeReduce, isMC, ana_folder),
-    pi0(isModeReduce, isMC, ana_folder),
-    pi0Blob(isModeReduce, isMC, ana_folder),
-    bckgTool(isModeReduce, ana_folder),
+    interaction(isModeReduce, isMC),
+    muon(isModeReduce, isMC),
+    proton(isModeReduce, isMC),
+    pi0(isModeReduce, isMC),
+    pi0Blob(isModeReduce, isMC),
+    bckgTool(isModeReduce),
     cutList(isModeReduce, isMC)
 {   
     cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
 
     m_isMC = isMC;
-    m_ana_folder = ana_folder;
 
     specifyRunTime();
 
@@ -266,25 +263,6 @@ void CCProtonPi0_Analyzer::UpdateScanFileName()
         getline(DSTFileList,scanFileName);
     }
     latest_ScanID = truth_eventID;   
-}
-
-bool CCProtonPi0_Analyzer::AnalyzeEvent()
-{
-    const string ana_folder_all = "All/";
-    const string ana_folder_1 = "1Track/";
-    const string ana_folder_2 = "2Track/";
-
-    if (m_ana_folder.compare(ana_folder_all) == 0) return true;
-    else if (m_ana_folder.compare(ana_folder_1) == 0 ){
-        if (nProtonCandidates == 0) return true;
-        else return false;
-    }else if (m_ana_folder.compare(ana_folder_2) == 0 ){
-        if (nProtonCandidates > 0 ) return true;
-        else return false;
-    }else{
-        cout<<"WARNING! None of the analysis modes matched!"<<endl;
-        return false;
-    }
 }
 
 void CCProtonPi0_Analyzer::getPi0Family()
@@ -714,17 +692,31 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) cutList.nCut_1Track_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
 
+ 
+    // Gamma Comparison
+    if (truth_isSignal){
+        FillHistogram(cutList.signal_gamma_E_cos_openingAngle, gamma1_E * gamma2_E, pi0_cos_openingAngle);
+    }else{
+        FillHistogram(cutList.bckg_gamma_E_cos_openingAngle, gamma1_E * gamma2_E, pi0_cos_openingAngle);
+    }
+
+
     // ------------------------------------------------------------------------
     // Gamma2 Conv Length Cut
     // ------------------------------------------------------------------------
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_gamma2ConvDist,gamma2_dist_vtx * 0.1);
     else FillHistogram(cutList.hCut_2Track_gamma2ConvDist,gamma2_dist_vtx * 0.1);
 
+    //bool isAngleSmall = pi0_cos_openingAngle > 0.95;
+    //bool isEnergyLow = (gamma1_E*gamma2_E) < 20000.0;
+    //if (isEnergyLow && isAngleSmall) return false;
+
+    //cout<<"cos_openingAngle = "<<pi0_cos_openingAngle<<endl;
+    //cout<<"calc_cos_openingAgle = "<<cos(pi0_openingAngle*M_PI/180);
     if (applyPhotonDistance && gamma2_dist_vtx * 0.1 < minPhotonDistance_2) return false;
     cutList.nCut_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
-
     // ------------------------------------------------------------------------
     // Pi0 Invariant Mass Cut
     // ------------------------------------------------------------------------
@@ -812,6 +804,14 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
             FillHistogram(interaction.Enu_2Track_Error, E_Error);
             FillHistogram(interaction.Enu_2Track_Diff, E_reco-E_true);
         }  
+    
+        // Efficiency
+        FillHistogram(interaction.eff_neutrino_E, mc_incomingE * MeV_to_GeV);
+        FillHistogram(interaction.eff_QSq, mc_Q2 * MeVSq_to_GeVSq);
+
+        // Response
+        FillHistogram(interaction.response_neutrino_E, CCProtonPi0_neutrino_E * MeV_to_GeV, mc_incomingE * MeV_to_GeV);
+        FillHistogram(interaction.response_QSq,CCProtonPi0_QSq * MeVSq_to_GeVSq, mc_Q2 * MeVSq_to_GeVSq);
     }
 }
 
@@ -926,7 +926,7 @@ void CCProtonPi0_Analyzer::openTextFiles()
     cout<<"Opening Text Files:"<<endl;
 
     // Open Fail-Check File
-    failFile = Folder_List::output + Folder_List::textOut + m_ana_folder + "FailChecks.txt";
+    failFile = Folder_List::output + Folder_List::textOut + "FailChecks.txt";
 
     failText.open( failFile.c_str() );
     if( !failText.is_open() ){
@@ -938,7 +938,7 @@ void CCProtonPi0_Analyzer::openTextFiles()
 
     if(isScanRun){
         // Open Roundup Text for Arachne Scanning
-        string roundupFile = Folder_List::output + Folder_List::textOut + m_ana_folder + "ArachneRoundup.txt";
+        string roundupFile = Folder_List::output + Folder_List::textOut + "ArachneRoundup.txt";
         roundupText.open(roundupFile.c_str() );
         if( !roundupText.is_open() ){
             cerr<<"Cannot open output text file: "<<roundupFile<<endl;
@@ -1039,15 +1039,23 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         FillHistogram(pi0.reco_E_true_E, reco_E,true_E);
         FillHistogram(pi0.E_error, error_E);
         FillHistogram(pi0.E_Diff, reco_E-true_E);
-    
-        FillHistogram(pi0.signal_P, pi0_true_P);
+  
+        // Efficiency
+        FillHistogram(pi0.eff_P, truth_pi0_P * MeV_to_GeV);
+        FillHistogram(pi0.eff_theta, truth_pi0_theta * rad_to_deg);
+        
+        // Response
+        FillHistogram(pi0.response_P, pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV);
+        FillHistogram(pi0.response_theta, pi0_theta * rad_to_deg, truth_pi0_theta * rad_to_deg);
     }
 
-    // Gamma Energy Comparison
+    // Gamma Comparison
     if (truth_isSignal){
         FillHistogram(pi0.signal_gamma1_E_gamma2_E, gamma1_E, gamma2_E);
+        FillHistogram(pi0.signal_gamma1_convLength_gamma2_convLength, gamma1_dist_vtx * 0.1, gamma2_dist_vtx * 0.1);
     }else{
         FillHistogram(pi0.bckg_gamma1_E_gamma2_E, gamma1_E, gamma2_E);
+        FillHistogram(pi0.bckg_gamma1_convLength_gamma2_convLength, gamma1_dist_vtx * 0.1, gamma2_dist_vtx * 0.1);
     }
 }
 
@@ -1131,7 +1139,8 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
 {
     // Unique Histograms
     FillHistogram(pi0.invMass, pi0_invMass);
-    
+    FillHistogram(pi0.cos_openingAngle, pi0_cos_openingAngle);
+   
     // Leading Photon - Energetic Photon
     FillHistogram(pi0.gamma1_ConvLength, gamma1_dist_vtx * 0.1);
     FillHistogram(pi0.gamma1_E, gamma1_E * MeV_to_GeV);
@@ -1154,7 +1163,7 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
 
     // Photon Comparison
     //FillHistogram(pi0.gamma1_E_gamma2_E, gamma1_E * MeV_to_GeV, gamma2_E * MeV_to_GeV);
-    FillHistogram(pi0.gamma1_convLength_gamma2_convLength, gamma1_dist_vtx * 0.1, gamma2_dist_vtx * 0.1);
+    
 }
 
 void CCProtonPi0_Analyzer::fillMuonMC()
@@ -1177,6 +1186,14 @@ void CCProtonPi0_Analyzer::fillMuonMC()
         FillHistogram(muon.reco_E_true_E, reco_E,true_E);
         FillHistogram(muon.E_error, error_E);
         FillHistogram(muon.E_Diff, reco_E-true_E);
+
+        // Efficiency
+        FillHistogram(muon.eff_P, truth_muon_P * MeV_to_GeV);
+        FillHistogram(muon.eff_theta, truth_muon_theta * rad_to_deg);
+        
+        // Response
+        FillHistogram(muon.response_P, muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV);
+        FillHistogram(muon.response_theta,muon_theta * rad_to_deg, truth_muon_theta * rad_to_deg);
     }
 }
 
@@ -1196,6 +1213,11 @@ void CCProtonPi0_Analyzer::FillHistogram(TH1D* hist, double var)
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(TH2D* hist, double var1, double var2)
+{
+    hist->Fill(var1,var2, wgt);
+}
+
+void CCProtonPi0_Analyzer::FillHistogram(MnvH2D* hist, double var1, double var2)
 {
     hist->Fill(var1,var2, wgt);
 }

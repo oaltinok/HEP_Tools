@@ -229,6 +229,12 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleTruthBranch("gamma2_final_pos", 3, SENTINEL );
     declareBoolTruthBranch("isGamma1_conv_inside");
     declareBoolTruthBranch("isGamma2_conv_inside");
+    declareDoubleTruthBranch("muon_P",SENTINEL);
+    declareDoubleTruthBranch("pi0_P",SENTINEL);
+    declareDoubleTruthBranch("proton_P",SENTINEL);
+    declareDoubleTruthBranch("muon_theta",SENTINEL);
+    declareDoubleTruthBranch("pi0_theta",SENTINEL);
+    declareDoubleTruthBranch("proton_theta",SENTINEL);
 
     declareIntTruthBranch("pi0_status", -9 );
     declareIntTruthBranch("pi0_Mother", -9 );

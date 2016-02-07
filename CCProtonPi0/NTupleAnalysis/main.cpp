@@ -26,6 +26,7 @@ main.cpp
 
 // Include Required Classes
 #include "Classes/Analyzer/CCProtonPi0_Analyzer.h"
+#include "Classes/CrossSection/CCProtonPi0_CrossSection.h"
 #include "Classes/Plotter/CCProtonPi0_Plotter.h"
 #include "Cintex/Cintex.h"
 
@@ -37,6 +38,7 @@ using namespace std;
 const string runOption_Run = "run";
 const string runOption_Plot = "plot";
 const string runOption_Reduce = "reduce";
+const string runOption_CrossSection = "calc";
 
 const string typeOption_mc = "mc";
 const string typeOption_data = "data";
@@ -46,6 +48,7 @@ void showInputError(char *argv[]);
 void Plot();
 void Reduce(string playlist, bool isMC);
 void Analyze(string playlist, bool isMC);
+void Calculate_CrossSection();
 
 int main(int argc, char *argv[] )
 {
@@ -68,11 +71,11 @@ int main(int argc, char *argv[] )
     if (nMode == 0 || nMode == 2) isMC = true;
     else isMC = false;
 
-    if (isMC && nMode != 4){
+    if (isMC && nMode < 4){
         cout<<"MC Playlists Selected!\n"<<endl;
         pl_reduce = "Input/Playlists/pl_MC_Merged.dat"; 
         pl_analyze = "Input/Playlists/pl_MC_Reduced.dat"; 
-    }else if (nMode != 4){
+    }else if (nMode < 4){
         cout<<"Data Playlists Selected!\n"<<endl;
         pl_reduce = "Input/Playlists/pl_Data_Merged.dat"; 
         pl_analyze = "Input/Playlists/pl_Data_Reduced.dat"; 
@@ -82,8 +85,13 @@ int main(int argc, char *argv[] )
 
     if (nMode == 0 || nMode == 1) Reduce(pl_reduce, isMC);
     else if (nMode == 2 || nMode == 3) Analyze(pl_analyze, isMC);
-    else Plot();
-    
+    else if (nMode == 4) Plot();
+    else if (nMode == 5) Calculate_CrossSection();
+    else{
+        cout<<"Problem on Mode!, Returning"<<endl;
+        return 0;
+    }
+
     time(&timeEnd);
     timeDiff = ( timeEnd - timeStart );
     
@@ -97,6 +105,10 @@ int main(int argc, char *argv[] )
 void Reduce(string playlist, bool isMC)
 {
     bool isModeReduce = true;
+    cout<<"\n"<<endl;
+    cout<<"======================================================================"<<endl;
+    cout<<"Reducing NTuples..."<<endl;
+    cout<<"======================================================================"<<endl;
     CCProtonPi0_Analyzer t(isModeReduce, isMC);
     t.reduce(playlist);
 }
@@ -104,52 +116,32 @@ void Reduce(string playlist, bool isMC)
 void Analyze(string playlist, bool isMC)
 {
     bool isModeReduce = false;
-    //// First Analyze 1Track Events
-    //cout<<"======================================================================"<<endl;
-    //cout<<"Analyzing 1 Track Events..."<<endl;
-    //cout<<"======================================================================"<<endl;
-    //CCProtonPi0_Analyzer analyzer_1Track(isModeReduce, isMC, "1Track/");
-    //analyzer_1Track.analyze(playlist);
-
-    //// Second Analyze 2Track Events 
-    //cout<<"\n"<<endl;
-    //cout<<"======================================================================"<<endl;
-    //cout<<"Analyzing 2+ Track Events..."<<endl;
-    //cout<<"======================================================================"<<endl;
-    //CCProtonPi0_Analyzer analyzer_2Track(isModeReduce, isMC, "2Track/");
-    //analyzer_2Track.analyze(playlist);
-
-    // Finally Analyze All Events 
     cout<<"\n"<<endl;
     cout<<"======================================================================"<<endl;
-    cout<<"Analyzing All Events..."<<endl;
+    cout<<"Analyzing NTuples, Creating Histograms..."<<endl;
     cout<<"======================================================================"<<endl;
-    CCProtonPi0_Analyzer analyzer_All(isModeReduce, isMC, "All/");
-    analyzer_All.analyze(playlist);
+    CCProtonPi0_Analyzer analyzer(isModeReduce, isMC);
+    analyzer.analyze(playlist);
 }
+
+void Calculate_CrossSection()
+{
+    cout<<"\n"<<endl;
+    cout<<"======================================================================"<<endl;
+    cout<<"Calculating Cross Section..."<<endl;
+    cout<<"======================================================================"<<endl;
+    CCProtonPi0_CrossSection crossSection;
+
+}
+
 
 void Plot()
 {
-    //// First Plot 1Track Events
-    //cout<<"======================================================================"<<endl;
-    //cout<<"Plotting 1 Track Events..."<<endl;
-    //cout<<"======================================================================"<<endl;
-    //CCProtonPi0_Plotter plotter_1Track("1Track/");
-    //plotter_1Track.plotHistograms();
-
-    //// Second Plot 2+Track Events
-    //cout<<"======================================================================"<<endl;
-    //cout<<"Plotting 2+ Track Events..."<<endl;
-    //cout<<"======================================================================"<<endl;
-    //CCProtonPi0_Plotter plotter_2Track("2Track/");
-    //plotter_2Track.plotHistograms();
-
-    // Finally Plot All Events
     cout<<"======================================================================"<<endl;
-    cout<<"Plotting All Events..."<<endl;
+    cout<<"Plotting Histograms..."<<endl;
     cout<<"======================================================================"<<endl;
-    CCProtonPi0_Plotter plotter_all("All/");
-    plotter_all.plotHistograms();
+    CCProtonPi0_Plotter plotter;
+    plotter.plotHistograms();
 }
 
 /*
@@ -168,6 +160,7 @@ int GetMode(int argc, char* argv[])
     std::string runSelect = argv[1];
     if (argc == 2){
         if (runSelect.compare(runOption_Plot) == 0) return 4;
+        else if (runSelect.compare(runOption_CrossSection) == 0) return 5;
         else return -1;
     }
      
@@ -204,6 +197,8 @@ void showInputError(char *argv[])
     cout<<"Correct Syntax for NTuple Analysis"<<endl;
     cout<<"\t"<<argv[0]<<" "<<runOption_Run<<" "<<typeOption_mc<<endl;
     cout<<"\t"<<argv[0]<<" "<<runOption_Run<<" "<<typeOption_data<<"\n"<<endl;
+    cout<<"Correct Syntax for Calculating Cross Section"<<endl;
+    cout<<"\t"<<argv[0]<<" "<<runOption_CrossSection<<"\n"<<endl;
     cout<<"Correct Syntax for Plotting"<<endl;
     cout<<"\t"<<argv[0]<<" "<<runOption_Plot<<"\n"<<endl;
     cout<<"----------------------------------------------------------------------"<<endl;

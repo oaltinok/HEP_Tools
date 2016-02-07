@@ -8,7 +8,7 @@
 
 using namespace PlotUtils;
 
-CCProtonPi0_Muon::CCProtonPi0_Muon(bool isModeReduce, bool isMC, std::string ana_folder) : CCProtonPi0_Particle()
+CCProtonPi0_Muon::CCProtonPi0_Muon(bool isModeReduce, bool isMC) : CCProtonPi0_Particle()
 {
     std::cout<<"Initializing CCProtonPi0_Muon"<<std::endl;
     
@@ -16,8 +16,8 @@ CCProtonPi0_Muon::CCProtonPi0_Muon(bool isModeReduce, bool isMC, std::string ana
         std::cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<std::endl;
     }else{
         // File Locations
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Muon.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Muon.root";
+        if (isMC) rootDir = Folder_List::rootDir_Muon_mc;
+        else rootDir = Folder_List::rootDir_Muon_data;
 
         std::cout<<"\tRoot File: "<<rootDir<<std::endl;
         
@@ -90,7 +90,24 @@ void CCProtonPi0_Muon::initHistograms()
     E_Diff->GetXaxis()->SetTitle("E_{Reco}-E_{True} [GeV]");
     E_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_E_Diff.get_width()));
 
+    // Signal
+    eff_P = new TH1D( "eff_P","Efficiency P_{#mu}",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    eff_P->GetXaxis()->SetTitle("P_{#mu} [GeV]");
+    eff_P->GetYaxis()->SetTitle("Efficiency");
+
+    eff_theta = new TH1D( "eff_theta","Efficiency #theta_{#mu}",bin_muonTheta.get_nBins(), bin_muonTheta.get_min(), bin_muonTheta.get_max() );
+    eff_theta->GetXaxis()->SetTitle("#theta_{#mu} [degree]");
+    eff_theta->GetYaxis()->SetTitle("Efficiency");
+
+    response_P = new TH2D( "response_P","Signal Muon Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(),bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+    response_P->GetXaxis()->SetTitle("Reconstructed P_{#mu} [GeV]");
+    response_P->GetYaxis()->SetTitle("True P_{#mu} [GeV]");
+
+    response_theta = new TH2D( "response_theta","Signal Muon Momentum",bin_muonTheta.get_nBins(), bin_muonTheta.get_min(), bin_muonTheta.get_max(),bin_muonTheta.get_nBins(), bin_muonTheta.get_min(), bin_muonTheta.get_max() );
+    response_theta->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [degree]");
+    response_theta->GetYaxis()->SetTitle("True #theta_{#mu} [degree]");
 }
+
 
 void CCProtonPi0_Muon::writeHistograms()
 {
@@ -112,6 +129,12 @@ void CCProtonPi0_Muon::writeHistograms()
     reco_E_true_E->Write();
 
     E_Diff->Write();
+
+    eff_P->Write();
+    eff_theta->Write();
+    response_P->Write();
+    response_theta->Write();
+    
     f->Close();
 }
 

@@ -8,7 +8,7 @@
 
 using namespace PlotUtils;
 
-CCProtonPi0_Pi0Blob::CCProtonPi0_Pi0Blob(bool isModeReduce, bool isMC, std::string ana_folder) : CCProtonPi0_NTupleAnalysis()
+CCProtonPi0_Pi0Blob::CCProtonPi0_Pi0Blob(bool isModeReduce, bool isMC) : CCProtonPi0_NTupleAnalysis()
 {
     std::cout<<"Initializing CCProtonPi0_Pi0Blob"<<std::endl;
 
@@ -16,8 +16,8 @@ CCProtonPi0_Pi0Blob::CCProtonPi0_Pi0Blob(bool isModeReduce, bool isMC, std::stri
         std::cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<std::endl;
     }else{
         // File Locations
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Pi0Blob.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Pi0Blob.root";      
+        if (isMC) rootDir = Folder_List::rootDir_Pi0Blob_mc;
+        else rootDir = Folder_List::rootDir_Pi0Blob_data;
 
         std::cout<<"\tRoot File: "<<rootDir<<std::endl;
      

@@ -8,7 +8,7 @@
 
 using namespace PlotUtils;
 
-CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana_folder) : CCProtonPi0_Particle()
+CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC) : CCProtonPi0_Particle()
 {
     std::cout<<"Initializing CCProtonPi0_Pion"<<std::endl;    
     
@@ -16,8 +16,8 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC, std::string ana
         std::cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<std::endl;
     }else{
         // File Locations
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + ana_folder + "Pion.root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + ana_folder + "Pion.root";      
+        if (isMC) rootDir = Folder_List::rootDir_Pion_mc;
+        else rootDir = Folder_List::rootDir_Pion_data;
         
         std::cout<<"\tRoot File: "<<rootDir<<std::endl;
         
@@ -92,6 +92,11 @@ void CCProtonPi0_Pion::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV]",bin_invMass.get_width()));   
         invMass.push_back(temp);
 
+        temp = new MnvH1D( Form("%s_%d","cos_openingAngle",i),"Cosine Opening Angle",40,-1.0,1.0);
+        temp->GetXaxis()->SetTitle("cos(#theta_{#gamma#gamma})");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        cos_openingAngle.push_back(temp);
+
         // Standard Histograms 
         temp = new MnvH1D( Form("%s_%d","E",i),"Reconstructed Pion Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed E_{#pi^{0}} [GeV]");
@@ -121,14 +126,21 @@ void CCProtonPi0_Pion::initHistograms()
     }
 
     double binsP[11] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.5};
-    signal_P = new TH1D( "signal_P","Momentum for Signal Events",10,binsP);
-    signal_P->GetXaxis()->SetTitle("Momentum [GeV]");
-    signal_P->GetYaxis()->SetTitle("N(Events)");
+    eff_P = new TH1D( "eff_P","Efficiency P_{#pi^{0}}",10,binsP);
+    eff_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
+    eff_P->GetYaxis()->SetTitle("Efficiency");
  
-    signal_theta = new TH1D( "signal_theta","Theta for Signal Events",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max());
-    signal_theta->GetXaxis()->SetTitle("Theta");
-    signal_theta->GetYaxis()->SetTitle("N(Events)");
-     
+    eff_theta = new TH1D( "eff_theta","Efficiency #theta_{#pi^{0}}",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max());
+    eff_theta->GetXaxis()->SetTitle("#theta_{#pi^{0}}");
+    eff_theta->GetYaxis()->SetTitle("Efficiency");
+
+    response_P = new TH2D( "response_P","Momentum for Signal Events",10,binsP,10,binsP);
+    response_P->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
+    response_P->GetYaxis()->SetTitle("True P_{#pi^{0}} [GeV]");
+ 
+    response_theta = new TH2D( "response_theta","Theta for Signal Events",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max(),binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+    response_theta->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
+    response_theta->GetYaxis()->SetTitle("True #theta_{#pi_{0}} [degree]");
 
     // Truth Energy - Gamma 1
     gamma1_true_E = new TH1D( "gamma1_true_E","Leading Photon True Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
@@ -165,10 +177,18 @@ void CCProtonPi0_Pion::initHistograms()
     gamma2_true_E_reco_E_error->GetYaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
 
     // Other
-    gamma1_convLength_gamma2_convLength= new TH2D( "gamma1_convLength_gamma2_convLength","Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
-    gamma1_convLength_gamma2_convLength->GetXaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
-    gamma1_convLength_gamma2_convLength->GetYaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
-     
+    signal_gamma1_convLength_gamma2_convLength= new TH2D( "signal_gamma1_convLength_gamma2_convLength","Signal Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
+    signal_gamma1_convLength_gamma2_convLength->GetXaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
+    signal_gamma1_convLength_gamma2_convLength->GetYaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
+ 
+    bckg_gamma1_convLength_gamma2_convLength= new TH2D( "bckg_gamma1_convLength_gamma2_convLength","Background Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
+    bckg_gamma1_convLength_gamma2_convLength->GetXaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
+    bckg_gamma1_convLength_gamma2_convLength->GetYaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
+
+    bckg_signal_diff_convLength= new TH2D( "bckg_signal_diff_convLength","Background - Signal Leading vs Second Photon Conversion Length",bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max(),bin_photonConvLength.get_nBins(), bin_photonConvLength.get_min(), bin_photonConvLength.get_max() );
+    bckg_signal_diff_convLength->GetXaxis()->SetTitle("Leading Photon Distance from Vertex [cm]");
+    bckg_signal_diff_convLength->GetYaxis()->SetTitle("Second Photon Distance from Vertex [cm]");
+
     signal_gamma1_E_gamma2_E = new TH2D( "signal_gamma1_E_gamma2_E","Signal: Gamma1 Energy vs Gamma2 Energy",20,0.0,200.0,20,0.0,200.0);
     signal_gamma1_E_gamma2_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [MeV]");
     signal_gamma1_E_gamma2_E->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [MeV]");
@@ -177,10 +197,10 @@ void CCProtonPi0_Pion::initHistograms()
     bckg_gamma1_E_gamma2_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [MeV]");
     bckg_gamma1_E_gamma2_E->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [MeV]");
 
-    bckg_signal_diff = new TH2D( "bckg_signal_diff","Background - Signal: Gamma1 Energy vs Gamma2 Energy",20,0.0,200.0,20,0.0,200.0);
-    bckg_signal_diff->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [MeV]");
-    bckg_signal_diff->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [MeV]");
-
+    bckg_signal_diff_E = new TH2D( "bckg_signal_diff_E","Background - Signal: Gamma1 Energy vs Gamma2 Energy",20,0.0,200.0,20,0.0,200.0);
+    bckg_signal_diff_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [MeV]");
+    bckg_signal_diff_E->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [MeV]");
+ 
     reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed #pi^0 Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(), bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
     reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{#pi^0} [GeV]");
     reco_P_true_P->GetYaxis()->SetTitle("True P_{#pi^0} [GeV]");
@@ -209,6 +229,7 @@ void CCProtonPi0_Pion::writeHistograms()
 
     for (int i = 0; i < nHistograms; i++){
         // Unique Histograms
+        cos_openingAngle[i]->Write();
         invMass[i]->Write();
         photonEnergy_Asymmetry[i]->Write();
         
@@ -229,16 +250,26 @@ void CCProtonPi0_Pion::writeHistograms()
         theta[i]->Write();
         phi[i]->Write();
     }
-    signal_P->Write();
-    signal_theta->Write();
+
+    eff_P->Write();
+    eff_theta->Write();
+    response_P->Write();
+    response_theta->Write();
 
     // Photon Comparison
-    bckg_signal_diff->Add(signal_gamma1_E_gamma2_E, -1);
-    bckg_signal_diff->Add(bckg_gamma1_E_gamma2_E, +1);
+    bckg_signal_diff_E->Add(signal_gamma1_E_gamma2_E, -1);
+    bckg_signal_diff_E->Add(bckg_gamma1_E_gamma2_E, +1);
     signal_gamma1_E_gamma2_E->Write();
     bckg_gamma1_E_gamma2_E->Write();
-    bckg_signal_diff->Write();
+    bckg_signal_diff_E->Write();
+ 
+    bckg_signal_diff_convLength->Add(signal_gamma1_convLength_gamma2_convLength, -1);
+    bckg_signal_diff_convLength->Add(bckg_gamma1_convLength_gamma2_convLength, +1);
+    signal_gamma1_convLength_gamma2_convLength->Write();
+    bckg_gamma1_convLength_gamma2_convLength->Write();
+    bckg_signal_diff_convLength->Write();
 
+    
     // Gamma1 True Energy
     gamma1_true_E->Write();
     gamma1_reco_error_E->Write();

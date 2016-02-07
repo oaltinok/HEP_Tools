@@ -5,7 +5,13 @@
 
 using namespace std;
 
-void CCProtonPi0_TruthAnalyzer::Loop(string playlist)
+// Initialize Constants
+const double CCProtonPi0_TruthAnalyzer::MeV_to_GeV = pow(10,-3);
+const double CCProtonPi0_TruthAnalyzer::MeVSq_to_GeVSq = pow(10,-6);
+const double CCProtonPi0_TruthAnalyzer::mm_to_cm = pow(10,-1);
+const double CCProtonPi0_TruthAnalyzer::rad_to_deg = 180.0/M_PI;
+
+void CCProtonPi0_TruthAnalyzer::Loop(string playlist) 
 {
     // Control Flow
     bool applyMaxEvents = false;
@@ -23,7 +29,10 @@ void CCProtonPi0_TruthAnalyzer::Loop(string playlist)
     // Disable Branches for Performance
     fChain->SetBranchStatus("*", false);
     fChain->SetBranchStatus("truth_is*", true);
-    fChain->SetBranchStatus("truth_pi0_4P", true);
+    fChain->SetBranchStatus("truth_pi0_*", true);
+    fChain->SetBranchStatus("truth_muon_*", true);
+    fChain->SetBranchStatus("mc_Q2", true);
+    fChain->SetBranchStatus("mc_incomingE", true);
     fChain->SetBranchStatus("wgt", true);
 
     //------------------------------------------------------------------------
@@ -59,11 +68,10 @@ void CCProtonPi0_TruthAnalyzer::Loop(string playlist)
             continue;
         }
 
+
         // Count Signal and Background
         if (truth_isSignal){
-            double pi0_P = HEP_Functions::calcMomentum(truth_pi0_4P[0], truth_pi0_4P[1], truth_pi0_4P[2]);
-            pi0_P = pi0_P * 0.001;
-            FillHistogram(all_signal_pi0_P, pi0_P);
+            FillSignalHistograms();
             nSignal++;
         }
 
@@ -141,7 +149,8 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer()
     cout<<"Initializing TruthAnalyzer!"<<endl;
 
     // Open ROOT File
-    rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "TruthHistograms" + ".root";
+    rootDir = Folder_List::rootDir_Truth_mc;
+
     cout<<"\tRoot File: "<<rootDir<<endl;
     f = new TFile(rootDir.c_str(),"RECREATE");
 
@@ -195,27 +204,81 @@ void CCProtonPi0_TruthAnalyzer::openTextFiles()
 
 void CCProtonPi0_TruthAnalyzer::initHistograms()
 {
+    // ------------------------------------------------------------------------
+    // Muon Variables
+    // ------------------------------------------------------------------------
+    int nBins_muon_P = 10;
+    double min_muon_P = 0.0;
+    double max_muon_P = 10.0;
+    all_signal_muon_P = new TH1D( "all_signal_muon_P","Muon Momentum for Signal Events",nBins_muon_P, min_muon_P, max_muon_P);
+    all_signal_muon_P->GetXaxis()->SetTitle("Momentum [GeV]");
+    all_signal_muon_P->GetYaxis()->SetTitle("N(Events)");
+
+    int nBins_muon_theta = 12;
+    double min_muon_theta = 0.0;
+    double max_muon_theta = 25.0;
+    all_signal_muon_theta = new TH1D( "all_signal_muon_theta","Pi0 Muon Theta for Signal Events",nBins_muon_theta,min_muon_theta,max_muon_theta);
+    all_signal_muon_theta->GetXaxis()->SetTitle("Theta");
+    all_signal_muon_theta->GetYaxis()->SetTitle("N(Events)");
+
+    // ------------------------------------------------------------------------
+    // Pi0 Variables
+    // ------------------------------------------------------------------------
     double binsP[11] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.5};
-    all_signal_pi0_P = new TH1D( "all_signal_pi0_P","Momentum for Signal Events",10,binsP);
+    all_signal_pi0_P = new TH1D( "all_signal_pi0_P","Pi0 Momentum for Signal Events",10,binsP);
     all_signal_pi0_P->GetXaxis()->SetTitle("Momentum [GeV]");
     all_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
 
-    all_signal_pi0_theta = new TH1D( "all_signal_pi0_theta","Theta for Signal Events",18,0.0,180.0);
+    int nBins_pi0_theta = 18;
+    double min_pi0_theta = 0.0;
+    double max_pi0_theta = 180.0;
+    all_signal_pi0_theta = new TH1D( "all_signal_pi0_theta","Theta for Signal Events",nBins_pi0_theta, min_pi0_theta, max_pi0_theta);
     all_signal_pi0_theta->GetXaxis()->SetTitle("Theta");
     all_signal_pi0_theta->GetYaxis()->SetTitle("N(Events)");
-}
 
-void CCProtonPi0_TruthAnalyzer::writeHistograms()
-{
-    all_signal_pi0_P->Write();
-    all_signal_pi0_theta->Write();
+    // ------------------------------------------------------------------------
+    // Neutrino Energy & Q2
+    // ------------------------------------------------------------------------
+    int nBins_neutrino_E = 20;
+    double min_neutrino_E = 0.0;
+    double max_neutrino_E = 20.0;
+    all_signal_neutrino_E = new TH1D( "all_signal_neutrino_E","Neutrino Energy for Signal Events",nBins_neutrino_E, min_neutrino_E, max_neutrino_E);
+    all_signal_neutrino_E->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
+    all_signal_neutrino_E->GetYaxis()->SetTitle("N(Events)");
 
-    f->Close();
+    int nBins_QSq = 40;
+    double min_QSq = 0.0;
+    double max_QSq = 4.0;
+    all_signal_QSq = new TH1D( "all_signal_QSq","Q^{2} for Signal Events",nBins_QSq,min_QSq,max_QSq);
+    all_signal_QSq->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    all_signal_QSq->GetYaxis()->SetTitle("N(Events)");
 }
 
 void CCProtonPi0_TruthAnalyzer::FillHistogram(TH1D* hist, double var)
 {
     hist->Fill(var, wgt);
+}
+
+void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
+{
+    FillHistogram(all_signal_muon_P, truth_muon_P * MeV_to_GeV);
+    FillHistogram(all_signal_muon_theta, truth_muon_theta * rad_to_deg);
+    FillHistogram(all_signal_pi0_P, truth_pi0_P * MeV_to_GeV);
+    FillHistogram(all_signal_pi0_theta, truth_pi0_theta * rad_to_deg);
+    FillHistogram(all_signal_neutrino_E, mc_incomingE * MeV_to_GeV);
+    FillHistogram(all_signal_QSq, mc_Q2 * MeVSq_to_GeVSq);
+}
+
+void CCProtonPi0_TruthAnalyzer::writeHistograms()
+{
+    all_signal_muon_P->Write();
+    all_signal_muon_theta->Write();
+    all_signal_pi0_P->Write();
+    all_signal_pi0_theta->Write();
+    all_signal_neutrino_E->Write();
+    all_signal_QSq->Write();
+
+    f->Close();
 }
 
 #endif

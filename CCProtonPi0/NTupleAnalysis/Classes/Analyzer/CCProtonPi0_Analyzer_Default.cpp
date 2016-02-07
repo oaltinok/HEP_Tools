@@ -37,8 +37,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     }
 
     // Set object pointer
-    prong_part_E = 0;
-    prong_part_pos = 0;
+    //prong_part_E = NULL;
+    //prong_part_pos = NULL;
 
     // Set branch addresses and branch pointers
     fChain->SetMakeClass(1);
@@ -487,6 +487,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_michelPion_P", &truth_michelPion_P, &b_truth_michelPion_P);
     fChain->SetBranchAddress("truth_michelPion_begin_dist_vtx", &truth_michelPion_begin_dist_vtx, &b_truth_michelPion_begin_dist_vtx);
     fChain->SetBranchAddress("truth_michelPion_length", &truth_michelPion_length, &b_truth_michelPion_length);
+    fChain->SetBranchAddress("truth_muon_P", &truth_muon_P, &b_truth_muon_P);
+    fChain->SetBranchAddress("truth_muon_theta", &truth_muon_theta, &b_truth_muon_theta);
     fChain->SetBranchAddress("truth_other_unused_evis_muon", &truth_other_unused_evis_muon, &b_truth_other_unused_evis_muon);
     fChain->SetBranchAddress("truth_other_unused_evis_neutron", &truth_other_unused_evis_neutron, &b_truth_other_unused_evis_neutron);
     fChain->SetBranchAddress("truth_other_unused_evis_piminus", &truth_other_unused_evis_piminus, &b_truth_other_unused_evis_piminus);
@@ -495,6 +497,10 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_other_unused_evis_proton", &truth_other_unused_evis_proton, &b_truth_other_unused_evis_proton);
     fChain->SetBranchAddress("truth_other_unused_evis_total_norm", &truth_other_unused_evis_total_norm, &b_truth_other_unused_evis_total_norm);
     fChain->SetBranchAddress("truth_other_unused_evis_total_truth", &truth_other_unused_evis_total_truth, &b_truth_other_unused_evis_total_truth);
+    fChain->SetBranchAddress("truth_pi0_P", &truth_pi0_P, &b_truth_pi0_P);
+    fChain->SetBranchAddress("truth_pi0_theta", &truth_pi0_theta, &b_truth_pi0_theta);
+    fChain->SetBranchAddress("truth_proton_P", &truth_proton_P, &b_truth_proton_P);
+    fChain->SetBranchAddress("truth_proton_theta", &truth_proton_theta, &b_truth_proton_theta);
     fChain->SetBranchAddress("truth_total_captured_evis_pizero", &truth_total_captured_evis_pizero, &b_truth_total_captured_evis_pizero);
     fChain->SetBranchAddress("truth_total_captured_evis_total_norm", &truth_total_captured_evis_total_norm, &b_truth_total_captured_evis_total_norm);
     fChain->SetBranchAddress("truth_total_captured_evis_total_truth", &truth_total_captured_evis_total_truth, &b_truth_total_captured_evis_total_truth);
@@ -579,6 +585,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("CCProtonPi0_t_minos_trk_primFSLeptonPDG", &CCProtonPi0_t_minos_trk_primFSLeptonPDG, &b_CCProtonPi0_t_minos_trk_primFSLeptonPDG);
     fChain->SetBranchAddress("CCProtonPi0_trajMuonProngPDG", &CCProtonPi0_trajMuonProngPDG, &b_CCProtonPi0_trajMuonProngPDG);
     fChain->SetBranchAddress("CCProtonPi0_trajMuonProngPrimary", &CCProtonPi0_trajMuonProngPrimary, &b_CCProtonPi0_trajMuonProngPrimary);
+    fChain->SetBranchAddress("CCProtonPi0_Extra_Energy_Total", &CCProtonPi0_Extra_Energy_Total, &b_CCProtonPi0_Extra_Energy_Total);
     fChain->SetBranchAddress("CCProtonPi0_QSq", &CCProtonPi0_QSq, &b_CCProtonPi0_QSq);
     fChain->SetBranchAddress("CCProtonPi0_QSq_1Track_Alt", &CCProtonPi0_QSq_1Track_Alt, &b_CCProtonPi0_QSq_1Track_Alt);
     fChain->SetBranchAddress("CCProtonPi0_WSq", &CCProtonPi0_WSq, &b_CCProtonPi0_WSq);
@@ -753,8 +760,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("prong_part_mass", prong_part_mass, &b_prong_part_mass);
     fChain->SetBranchAddress("prong_part_charge", prong_part_charge, &b_prong_part_charge);
     fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
-    fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
-    fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
+    //fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
+    //fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
 
 
 

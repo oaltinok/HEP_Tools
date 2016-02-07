@@ -18,7 +18,7 @@ using namespace PlotUtils;
 class CCProtonPi0_Pi0Blob : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_Pi0Blob(bool isModeReduce, bool isMC, std::string ana_folder);
+        CCProtonPi0_Pi0Blob(bool isModeReduce, bool isMC);
 
         void writeHistograms();
 

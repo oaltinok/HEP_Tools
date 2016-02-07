@@ -14,8 +14,8 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
     
     if(isModeReduce){
         // File Locations
-        if (isMC) rootDir = Folder_List::rootOut + Folder_List::MC + Folder_List::analyzed + "CutHistograms_" + version + ".root";
-        else rootDir = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed + "CutHistograms_" + version + ".root";
+        if (isMC) rootDir = Folder_List::rootDir_CutHists_mc;
+        else rootDir = Folder_List::rootDir_CutHists_data;
         
         cout<<"\tRoot File: "<<rootDir<<endl;
 
@@ -222,6 +222,24 @@ void CCProtonPi0_CutList::initHistograms()
     // Pi0 Invariant Mass - Used for Correction Fit
     pi0_invMass_1Track = new TH1D("pi0_invMass_1Track","#pi^{0} Invariant Mass 1 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     pi0_invMass_2Track = new TH1D("pi0_invMass_2Track","#pi^{0} Invariant Mass 2 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+
+    int nBins = 20;
+    double min_photon_E = 0.0;
+    double max_photon_E = 40000;
+    double min_cos_angle = 0.5;
+    double max_cos_angle = 1.0;
+    signal_gamma_E_cos_openingAngle = new TH2D( "signal_gamma_E_cos_openingAngle","Signal E_{#gamma}E_{#gamma} vs. cos(#theta_{#gamma#gamma})",nBins, min_photon_E, max_photon_E, nBins, min_cos_angle, max_cos_angle);
+    signal_gamma_E_cos_openingAngle->GetXaxis()->SetTitle("E_{#gamma_{1}}xE_{#gamma_{2}} [MeV^{2}]");
+    signal_gamma_E_cos_openingAngle->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma}");
+
+    bckg_gamma_E_cos_openingAngle = new TH2D( "bckg_gamma_E_cos_openingAngle","Background E_{#gamma}E_{#gamma} vs. cos(#theta_{#gamma#gamma})",nBins, min_photon_E, max_photon_E, nBins, min_cos_angle, max_cos_angle);
+    bckg_gamma_E_cos_openingAngle->GetXaxis()->SetTitle("E_{#gamma_{1}}xE_{#gamma_{2}} [MeV^{2}]");
+    bckg_gamma_E_cos_openingAngle->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma}");
+
+    bckg_signal_diff_E_cos_openingAngle = new TH2D( "bckg_signal_diff_E_cos_openingAngle","Background - Signal E_{#gamma}E_{#gamma} vs. cos(#theta_{#gamma#gamma})",nBins, min_photon_E, max_photon_E, nBins, min_cos_angle, max_cos_angle);
+    bckg_signal_diff_E_cos_openingAngle->GetXaxis()->SetTitle("E_{#gamma_{1}}xE_{#gamma_{2}} [MeV^{2}]");
+    bckg_signal_diff_E_cos_openingAngle->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma}");
+
 }
 
 void CCProtonPi0_CutList::SetCutNames()
@@ -514,6 +532,11 @@ void CCProtonPi0_CutList::writeHistograms()
     pi0_invMass_1Track->Write();
     pi0_invMass_2Track->Write();
 
+    bckg_signal_diff_E_cos_openingAngle->Add(signal_gamma_E_cos_openingAngle, -1);
+    bckg_signal_diff_E_cos_openingAngle->Add(bckg_gamma_E_cos_openingAngle, +1);
+    signal_gamma_E_cos_openingAngle->Write();
+    bckg_gamma_E_cos_openingAngle->Write();
+    bckg_signal_diff_E_cos_openingAngle->Write();
 
     f->Close();
 }

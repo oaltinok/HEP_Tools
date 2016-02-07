@@ -1209,6 +1209,36 @@ void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::
     delete plotter;
 }
 
+void CCProtonPi0_Plotter::DrawNormalizedMigrationHistogram(rootDir &dir, std::string var_name, std::string plotDir)
+{
+    std::string root_dir = dir.mc;
+
+    // Get Histogram
+    TFile* f = new TFile(root_dir.c_str());
+    TH2D* hist2D = (TH2D*)f->Get(var_name.c_str());
+
+    // Canvas
+    Double_t w = 800; 
+    Double_t h = 800;
+    TCanvas* c = new TCanvas("c","c",w,h);
+    c->SetWindowSize(w,h);
+
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    ApplyStyle(plotter);
+    //plotter->axis_minimum = 0.1;
+    plotter->axis_minimum = 0.0;
+    plotter->DrawNormalizedMigrationHistogram(hist2D);
+
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    
+    delete c;
+    delete plotter;
+    delete hist2D;
+    delete f;
+}
 
 #endif
 

@@ -16,17 +16,20 @@
 #include <TFile.h>
 
 #include "../../../Libraries/Folder_List.h"
-#include "../../../Libraries/HEP_Functions.h"
 
-class CCProtonPi0_TruthAnalyzer {
-
+class CCProtonPi0_TruthAnalyzer
+{
     public:
         CCProtonPi0_TruthAnalyzer();
         ~CCProtonPi0_TruthAnalyzer();
         void Loop(std::string playlist);
 
+        TH1D* all_signal_muon_P;
         TH1D* all_signal_pi0_P;
+        TH1D* all_signal_muon_theta;
         TH1D* all_signal_pi0_theta;
+        TH1D* all_signal_neutrino_E;
+        TH1D* all_signal_QSq;
 
     private :
         TFile* f;
@@ -39,6 +42,12 @@ class CCProtonPi0_TruthAnalyzer {
         void writeTextFile();
         void writeHistograms();
         void FillHistogram(TH1D *hist, double var);
+        void FillSignalHistograms();
+
+        static const double MeV_to_GeV; 
+        static const double MeVSq_to_GeVSq;
+        static const double mm_to_cm;
+        static const double rad_to_deg;
 
         // Default Functions    
         void     Init(std::string playlist, TChain* fChain);
@@ -210,6 +219,8 @@ class CCProtonPi0_TruthAnalyzer {
         Double_t        truth_michelPion_P;
         Double_t        truth_michelPion_begin_dist_vtx;
         Double_t        truth_michelPion_length;
+        Double_t        truth_muon_P;
+        Double_t        truth_muon_theta;
         Double_t        truth_other_unused_evis_muon;
         Double_t        truth_other_unused_evis_neutron;
         Double_t        truth_other_unused_evis_piminus;
@@ -218,6 +229,10 @@ class CCProtonPi0_TruthAnalyzer {
         Double_t        truth_other_unused_evis_proton;
         Double_t        truth_other_unused_evis_total_norm;
         Double_t        truth_other_unused_evis_total_truth;
+        Double_t        truth_pi0_P;
+        Double_t        truth_pi0_theta;
+        Double_t        truth_proton_P;
+        Double_t        truth_proton_theta;
         Double_t        truth_total_captured_evis_pizero;
         Double_t        truth_total_captured_evis_total_norm;
         Double_t        truth_total_captured_evis_total_truth;
@@ -313,26 +328,26 @@ class CCProtonPi0_TruthAnalyzer {
         Double_t        mc_initNucVec[4];
         Double_t        mc_primFSLepton[4];
         Int_t           mc_nFSPart;
-        Double_t        mc_FSPartPx[192];   //[mc_nFSPart]
-        Double_t        mc_FSPartPy[192];   //[mc_nFSPart]
-        Double_t        mc_FSPartPz[192];   //[mc_nFSPart]
-        Double_t        mc_FSPartE[192];   //[mc_nFSPart]
-        Int_t           mc_FSPartPDG[192];   //[mc_nFSPart]
+        Double_t        mc_FSPartPx[106];   //[mc_nFSPart]
+        Double_t        mc_FSPartPy[106];   //[mc_nFSPart]
+        Double_t        mc_FSPartPz[106];   //[mc_nFSPart]
+        Double_t        mc_FSPartE[106];   //[mc_nFSPart]
+        Int_t           mc_FSPartPDG[106];   //[mc_nFSPart]
         Int_t           mc_er_nPart;
-        Int_t           mc_er_ID[229];   //[mc_er_nPart]
-        Int_t           mc_er_status[229];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucX[229];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucY[229];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucZ[229];   //[mc_er_nPart]
-        Double_t        mc_er_Px[229];   //[mc_er_nPart]
-        Double_t        mc_er_Py[229];   //[mc_er_nPart]
-        Double_t        mc_er_Pz[229];   //[mc_er_nPart]
-        Double_t        mc_er_E[229];   //[mc_er_nPart]
-        Int_t           mc_er_FD[229];   //[mc_er_nPart]
-        Int_t           mc_er_LD[229];   //[mc_er_nPart]
-        Int_t           mc_er_mother[229];   //[mc_er_nPart]
+        Int_t           mc_er_ID[134];   //[mc_er_nPart]
+        Int_t           mc_er_status[134];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucX[134];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucY[134];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucZ[134];   //[mc_er_nPart]
+        Double_t        mc_er_Px[134];   //[mc_er_nPart]
+        Double_t        mc_er_Py[134];   //[mc_er_nPart]
+        Double_t        mc_er_Pz[134];   //[mc_er_nPart]
+        Double_t        mc_er_E[134];   //[mc_er_nPart]
+        Int_t           mc_er_FD[134];   //[mc_er_nPart]
+        Int_t           mc_er_LD[134];   //[mc_er_nPart]
+        Int_t           mc_er_mother[134];   //[mc_er_nPart]
         Int_t           mc_fr_nNuAncestorIDs;
-        Int_t           mc_fr_nuAncestorIDs[12];   //[mc_fr_nNuAncestorIDs]
+        Int_t           mc_fr_nuAncestorIDs[6];   //[mc_fr_nNuAncestorIDs]
         Int_t           mc_fr_nuParentID;
         Int_t           mc_fr_decMode;
         Double_t        mc_fr_primProtonVtx[3];
@@ -496,6 +511,8 @@ class CCProtonPi0_TruthAnalyzer {
         TBranch        *b_truth_michelPion_P;   //!
         TBranch        *b_truth_michelPion_begin_dist_vtx;   //!
         TBranch        *b_truth_michelPion_length;   //!
+        TBranch        *b_truth_muon_P;   //!
+        TBranch        *b_truth_muon_theta;   //!
         TBranch        *b_truth_other_unused_evis_muon;   //!
         TBranch        *b_truth_other_unused_evis_neutron;   //!
         TBranch        *b_truth_other_unused_evis_piminus;   //!
@@ -504,6 +521,10 @@ class CCProtonPi0_TruthAnalyzer {
         TBranch        *b_truth_other_unused_evis_proton;   //!
         TBranch        *b_truth_other_unused_evis_total_norm;   //!
         TBranch        *b_truth_other_unused_evis_total_truth;   //!
+        TBranch        *b_truth_pi0_P;   //!
+        TBranch        *b_truth_pi0_theta;   //!
+        TBranch        *b_truth_proton_P;   //!
+        TBranch        *b_truth_proton_theta;   //!
         TBranch        *b_truth_total_captured_evis_pizero;   //!
         TBranch        *b_truth_total_captured_evis_total_norm;   //!
         TBranch        *b_truth_total_captured_evis_total_truth;   //!

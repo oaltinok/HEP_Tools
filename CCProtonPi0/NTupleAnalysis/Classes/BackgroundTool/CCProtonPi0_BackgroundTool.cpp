@@ -5,13 +5,13 @@
 
 using namespace std;
 
-CCProtonPi0_BackgroundTool::CCProtonPi0_BackgroundTool(bool isModeReduce, std::string ana_folder) : CCProtonPi0_NTupleAnalysis()
+CCProtonPi0_BackgroundTool::CCProtonPi0_BackgroundTool(bool isModeReduce) : CCProtonPi0_NTupleAnalysis()
 {
     cout<<"Initializing CCProtonPi0_BackgroundTool"<<endl;
     if(isModeReduce){
         cout<<"\tNTuple Reduce Mode -- Will not create Text Files"<<endl;
     }else{
-        OpenTextFile(ana_folder);
+        OpenTextFile();
     
         initBackgrounds();
     }
@@ -156,10 +156,10 @@ void CCProtonPi0_BackgroundTool::writeBackgroundTable()
     writeBackgroundTableRows(BackgroundTypeVector);
 }
 
-void CCProtonPi0_BackgroundTool::OpenTextFile(std::string ana_folder)
+void CCProtonPi0_BackgroundTool::OpenTextFile()
 {
     // Open Background Files
-    fileName = Folder_List::output + Folder_List::textOut + ana_folder + "BackgroundTable.txt";
+    fileName = Folder_List::output + Folder_List::textOut + "BackgroundTable.txt";
 
     textFile.open( fileName.c_str() );
     if( !textFile.is_open() ){

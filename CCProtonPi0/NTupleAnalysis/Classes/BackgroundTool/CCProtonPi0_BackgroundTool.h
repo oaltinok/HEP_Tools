@@ -28,7 +28,7 @@ struct Background
 class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_BackgroundTool(bool isModeReduce, std::string ana_folder);
+        CCProtonPi0_BackgroundTool(bool isModeReduce);
         ~CCProtonPi0_BackgroundTool();
         
         void writeBackgroundTable();
@@ -78,7 +78,7 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
         void initSingleBackground(Background &b, string name);
         void writeBackgroundTableHeader();
         void writeBackgroundTableRows(vector< Background > &bckgVector);
-        void OpenTextFile(std::string ana_folder);
+        void OpenTextFile();
 
 };
 
