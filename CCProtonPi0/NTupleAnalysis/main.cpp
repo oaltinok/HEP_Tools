@@ -131,7 +131,7 @@ void Calculate_CrossSection()
     cout<<"Calculating Cross Section..."<<endl;
     cout<<"======================================================================"<<endl;
     CCProtonPi0_CrossSection crossSection;
-
+    crossSection.Calc_Crossections();
 }
 
 

@@ -1,4 +1,19 @@
 ===============================================================================
+v2_56
+CCProtonPi0 Updates:
+	No Major Changes	
+-------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	Data Correction Methods for Cross Section Calculation Implemented
+		Background Subtraction
+		Unfolding
+		Efficiency Correction
+	
+	Tested Muon and Pi0 Momentum with Data Correction Methods
+
+	New Plotting Functions for Cross Section Variables
+
+===============================================================================
 v2_55
 CCProtonPi0 Updates:
 	Added P and Theta for Signal FS particles Truth Variables

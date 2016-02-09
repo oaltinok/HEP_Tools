@@ -103,7 +103,8 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         if (!m_isMC){
             wgt = 1.0;
         }
-
+        
+        CorrectEMShowerCalibration();
         // Get Cut Statistics
         isPassedAllCuts = getCutStatistics();
         if( !isPassedAllCuts ) continue;
@@ -692,36 +693,56 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) cutList.nCut_1Track_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Photon1DistanceLow.increment(truth_isSignal, study1, study2);
 
- 
-    // Gamma Comparison
-    if (truth_isSignal){
-        FillHistogram(cutList.signal_gamma_E_cos_openingAngle, gamma1_E * gamma2_E, pi0_cos_openingAngle);
-    }else{
-        FillHistogram(cutList.bckg_gamma_E_cos_openingAngle, gamma1_E * gamma2_E, pi0_cos_openingAngle);
-    }
-
-
     // ------------------------------------------------------------------------
     // Gamma2 Conv Length Cut
     // ------------------------------------------------------------------------
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_gamma2ConvDist,gamma2_dist_vtx * 0.1);
     else FillHistogram(cutList.hCut_2Track_gamma2ConvDist,gamma2_dist_vtx * 0.1);
 
-    //bool isAngleSmall = pi0_cos_openingAngle > 0.95;
-    //bool isEnergyLow = (gamma1_E*gamma2_E) < 20000.0;
-    //if (isEnergyLow && isAngleSmall) return false;
-
-    //cout<<"cos_openingAngle = "<<pi0_cos_openingAngle<<endl;
-    //cout<<"calc_cos_openingAgle = "<<cos(pi0_openingAngle*M_PI/180);
     if (applyPhotonDistance && gamma2_dist_vtx * 0.1 < minPhotonDistance_2) return false;
     cutList.nCut_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
+
+ 
+    // Gamma Comparison
+    if (truth_isSignal){
+        FillHistogram(cutList.signal_gamma_E_cos_openingAngle, (gamma1_E+gamma2_E)*MeV_to_GeV, pi0_cos_openingAngle);
+        FillHistogram(cutList.signal_E_cosTheta_convLength, (gamma1_E+gamma2_E)*MeV_to_GeV, pi0_cos_openingAngle, (gamma1_dist_vtx+gamma2_dist_vtx)*0.1);
+    }else{
+        FillHistogram(cutList.bckg_gamma_E_cos_openingAngle, (gamma1_E+gamma2_E)*MeV_to_GeV, pi0_cos_openingAngle);
+        FillHistogram(cutList.bckg_E_cosTheta_convLength, (gamma1_E+gamma2_E)*MeV_to_GeV, pi0_cos_openingAngle, (gamma1_dist_vtx+gamma2_dist_vtx)*0.1);
+    }
+
+    // ------------------------------------------------------------------------
+    // Low Gamma Energies AND Small Opening Angle Cut 
+    // ------------------------------------------------------------------------
+    bool isAngleSmall = pi0_cos_openingAngle > 0.95;
+    bool isEnergyLow = (gamma1_E+gamma2_E) < 400.0;
+    if (isEnergyLow && isAngleSmall) return false;
+    cutList.nCut_LowE_SmallAngle.increment(truth_isSignal, study1, study2);
+    
+    // ------------------------------------------------------------------------
+    // Neutrino Energy Cut
+    // ------------------------------------------------------------------------
+    if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_neutrinoE,CCProtonPi0_neutrino_E * MeV_to_GeV);
+    else FillHistogram(cutList.hCut_2Track_neutrinoE,CCProtonPi0_neutrino_E * MeV_to_GeV); 
+
+    if ( applyBeamEnergy && ((CCProtonPi0_neutrino_E * MeV_to_GeV) > max_beamEnergy)) return false;
+    cutList.nCut_beamEnergy.increment(truth_isSignal, study1, study2);
+    if (nProtonCandidates == 0) cutList.nCut_1Track_beamEnergy.increment(truth_isSignal, study1, study2);
+    else cutList.nCut_2Track_beamEnergy.increment(truth_isSignal, study1, study2);
+
     // ------------------------------------------------------------------------
     // Pi0 Invariant Mass Cut
     // ------------------------------------------------------------------------
     FillHistogram(cutList.hCut_pi0invMass, pi0_invMass);
     FillHistogram(cutList.hCut_pi0invMass_Old, pi0_invMass_Old);
+    if (truth_isSignal)  FillHistogram(cutList.signal_invMass_All, pi0_invMass);
+    else FillHistogram(cutList.bckg_invMass_All, pi0_invMass);
+    FillHistogram(cutList.P_invMass, pi0_P*MeV_to_GeV, pi0_invMass);
+    FillHistogram(cutList.data_invMass_All, pi0_invMass);
+
     if (nProtonCandidates == 0){
         FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
         FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
@@ -735,17 +756,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_Pi0_invMass.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Pi0_invMass.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Pi0_invMass.increment(truth_isSignal, study1, study2);
-
-    // ------------------------------------------------------------------------
-    // Neutrino Energy Cut
-    // ------------------------------------------------------------------------
-    if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_neutrinoE,CCProtonPi0_neutrino_E * MeV_to_GeV);
-    else FillHistogram(cutList.hCut_2Track_neutrinoE,CCProtonPi0_neutrino_E * MeV_to_GeV); 
-
-    if ( applyBeamEnergy && ((CCProtonPi0_neutrino_E * MeV_to_GeV) > max_beamEnergy)) return false;
-    cutList.nCut_beamEnergy.increment(truth_isSignal, study1, study2);
-    if (nProtonCandidates == 0) cutList.nCut_1Track_beamEnergy.increment(truth_isSignal, study1, study2);
-    else cutList.nCut_2Track_beamEnergy.increment(truth_isSignal, study1, study2);
 
     //-------------------------------------------------------------------------
     // Satisfied All Cuts
@@ -805,10 +815,6 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
             FillHistogram(interaction.Enu_2Track_Diff, E_reco-E_true);
         }  
     
-        // Efficiency
-        FillHistogram(interaction.eff_neutrino_E, mc_incomingE * MeV_to_GeV);
-        FillHistogram(interaction.eff_QSq, mc_Q2 * MeVSq_to_GeVSq);
-
         // Response
         FillHistogram(interaction.response_neutrino_E, CCProtonPi0_neutrino_E * MeV_to_GeV, mc_incomingE * MeV_to_GeV);
         FillHistogram(interaction.response_QSq,CCProtonPi0_QSq * MeVSq_to_GeVSq, mc_Q2 * MeVSq_to_GeVSq);
@@ -1040,13 +1046,11 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         FillHistogram(pi0.E_error, error_E);
         FillHistogram(pi0.E_Diff, reco_E-true_E);
   
-        // Efficiency
-        FillHistogram(pi0.eff_P, truth_pi0_P * MeV_to_GeV);
-        FillHistogram(pi0.eff_theta, truth_pi0_theta * rad_to_deg);
-        
         // Response
         FillHistogram(pi0.response_P, pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV);
         FillHistogram(pi0.response_theta, pi0_theta * rad_to_deg, truth_pi0_theta * rad_to_deg);
+        
+        FillHistogram(pi0.mc_truth_signal_pi0_P, truth_pi0_P*MeV_to_GeV);
     }
 
     // Gamma Comparison
@@ -1161,6 +1165,11 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
     FillHistogram(pi0.theta, pi0_theta * TMath::RadToDeg());
     FillHistogram(pi0.phi, pi0_phi * TMath::RadToDeg());
 
+    // Cross Section Variables
+    FillHistogram(pi0.data_all_pi0_P, pi0_P * MeV_to_GeV);
+    if (truth_isSignal) FillHistogram(pi0.mc_reco_signal_pi0_P, pi0_P * MeV_to_GeV);
+    else FillHistogram(pi0.mc_reco_bckg_pi0_P, pi0_P * MeV_to_GeV);
+
     // Photon Comparison
     //FillHistogram(pi0.gamma1_E_gamma2_E, gamma1_E * MeV_to_GeV, gamma2_E * MeV_to_GeV);
     
@@ -1187,13 +1196,11 @@ void CCProtonPi0_Analyzer::fillMuonMC()
         FillHistogram(muon.E_error, error_E);
         FillHistogram(muon.E_Diff, reco_E-true_E);
 
-        // Efficiency
-        FillHistogram(muon.eff_P, truth_muon_P * MeV_to_GeV);
-        FillHistogram(muon.eff_theta, truth_muon_theta * rad_to_deg);
-        
         // Response
         FillHistogram(muon.response_P, muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV);
         FillHistogram(muon.response_theta,muon_theta * rad_to_deg, truth_muon_theta * rad_to_deg);
+        
+        FillHistogram(muon.mc_truth_signal_muon_P, truth_muon_P * MeV_to_GeV);
     }
 }
 
@@ -1204,6 +1211,10 @@ void CCProtonPi0_Analyzer::fillMuonReco()
     FillHistogram(muon.KE, muon_KE * MeV_to_GeV);
     FillHistogram(muon.theta, muon_theta * TMath::RadToDeg());
     FillHistogram(muon.phi, muon_phi * TMath::RadToDeg());
+    
+    FillHistogram(muon.data_all_muon_P, muon_P * MeV_to_GeV);
+    if(truth_isSignal) FillHistogram(muon.mc_reco_signal_muon_P, muon_P * MeV_to_GeV);
+    else FillHistogram(muon.mc_reco_bckg_muon_P, muon_P * MeV_to_GeV);
 }
 
 
@@ -1215,6 +1226,11 @@ void CCProtonPi0_Analyzer::FillHistogram(TH1D* hist, double var)
 void CCProtonPi0_Analyzer::FillHistogram(TH2D* hist, double var1, double var2)
 {
     hist->Fill(var1,var2, wgt);
+}
+
+void CCProtonPi0_Analyzer::FillHistogram(TH3D* hist, double var1, double var2, double var3)
+{
+    hist->Fill(var1, var2, var3, wgt);
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(MnvH2D* hist, double var1, double var2)
@@ -1330,6 +1346,14 @@ double CCProtonPi0_Analyzer::Calc_TruePi0OpeningAngle()
 void CCProtonPi0_Analyzer::CorrectNTupleVariables()
 {
     // Nothing for now
+}
+
+void CCProtonPi0_Analyzer::CorrectEMShowerCalibration()
+{
+    if (m_isMC){
+        double c = 134.98/125;
+        pi0_invMass = pi0_invMass*c;
+    }
 }
 
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <string>
+#include "Cintex/Cintex.h"
 
 #include "Classes/TruthAnalyzer/CCProtonPi0_TruthAnalyzer.h"
 

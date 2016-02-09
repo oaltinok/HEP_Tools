@@ -25,7 +25,7 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC) : CCProtonPi0_P
         f = new TFile(rootDir.c_str(),"RECREATE");
 
         // Initialize Bins
-        bin_P.setBin(17, 0.0, 1.7);
+        //binList.pi0_P.setBin(17, 0.0, 1.7);
         bin_E.setBin(17, 0.0, 1.7);
         bin_E_Diff.setBin(100, -0.5, 0.5);
         bin_KE.setBin(30, 0.0, 3.0);
@@ -98,20 +98,19 @@ void CCProtonPi0_Pion::initHistograms()
         cos_openingAngle.push_back(temp);
 
         // Standard Histograms 
-        temp = new MnvH1D( Form("%s_%d","E",i),"Reconstructed Pion Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+        temp = new MnvH1D( Form("%s_%d","E",i),"Reconstructed Pion Energy",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed E_{#pi^{0}} [GeV]");
-        temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",bin_P.get_width()));
+        temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",binList.pi0_P.get_width()));
         E.push_back(temp);
-
-        double binsP[17] = {0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 1.0, 1.5, 1.7};
-        temp = new MnvH1D( Form("%s_%d","P",i),"Reconstructed Pion Momentum",16,binsP);
+        
+        temp = new MnvH1D( Form("%s_%d","P",i),"Reconstructed Pion Momentum",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
         temp->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
-        temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",bin_P.get_width()));
+        temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",binList.pi0_P.get_width()));
         P.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","KE",i),"Reconstructed Pion Kinetic Energy",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max() );
+        temp = new MnvH1D( Form("%s_%d","KE",i),"Reconstructed Pion Kinetic Energy",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed T_{#pi^{0}} [GeV]");
-        temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",bin_P.get_width()));
+        temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [GeV]",binList.pi0_P.get_width()));
         KE.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","theta",i),"Reconstructed Pion Theta",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
@@ -125,20 +124,28 @@ void CCProtonPi0_Pion::initHistograms()
         phi.push_back(temp);
     }
 
-    double binsP[11] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.5};
-    eff_P = new TH1D( "eff_P","Efficiency P_{#pi^{0}}",10,binsP);
-    eff_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    eff_P->GetYaxis()->SetTitle("Efficiency");
+    // Cross Section Variables
+    data_all_pi0_P = new MnvH1D( "data_all_pi0_P","Data All P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    data_all_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
+    data_all_pi0_P->GetYaxis()->SetTitle("N(Events)");
+   
+    mc_truth_signal_pi0_P = new MnvH1D( "mc_truth_signal_pi0_P","MC Truth Signal P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    mc_truth_signal_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
+    mc_truth_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
  
-    eff_theta = new TH1D( "eff_theta","Efficiency #theta_{#pi^{0}}",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max());
-    eff_theta->GetXaxis()->SetTitle("#theta_{#pi^{0}}");
-    eff_theta->GetYaxis()->SetTitle("Efficiency");
+    mc_reco_signal_pi0_P = new MnvH1D( "mc_reco_signal_pi0_P","MC Reconstructed Signal P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    mc_reco_signal_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
+    mc_reco_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
 
-    response_P = new TH2D( "response_P","Momentum for Signal Events",10,binsP,10,binsP);
+    mc_reco_bckg_pi0_P = new MnvH1D( "mc_reco_bckg_pi0_P","MC Reconstructed Background P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    mc_reco_bckg_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
+    mc_reco_bckg_pi0_P->GetYaxis()->SetTitle("N(Events)");
+
+    response_P = new MnvH2D( "response_P","Momentum for Signal Events",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max(),binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
     response_P->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
     response_P->GetYaxis()->SetTitle("True P_{#pi^{0}} [GeV]");
  
-    response_theta = new TH2D( "response_theta","Theta for Signal Events",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max(),binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+    response_theta = new MnvH2D( "response_theta","Theta for Signal Events",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max(),binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
     response_theta->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
     response_theta->GetYaxis()->SetTitle("True #theta_{#pi_{0}} [degree]");
 
@@ -201,7 +208,7 @@ void CCProtonPi0_Pion::initHistograms()
     bckg_signal_diff_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [MeV]");
     bckg_signal_diff_E->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [MeV]");
  
-    reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed #pi^0 Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(), bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
+    reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed #pi^0 Momentum",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max(), binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
     reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{#pi^0} [GeV]");
     reco_P_true_P->GetYaxis()->SetTitle("True P_{#pi^0} [GeV]");
 
@@ -251,9 +258,12 @@ void CCProtonPi0_Pion::writeHistograms()
         phi[i]->Write();
     }
 
-    eff_P->Write();
-    eff_theta->Write();
+    data_all_pi0_P->Write();
+    mc_truth_signal_pi0_P->Write();
+    mc_reco_signal_pi0_P->Write();
+    mc_reco_bckg_pi0_P->Write();
     response_P->Write();
+    
     response_theta->Write();
 
     // Photon Comparison
@@ -268,7 +278,6 @@ void CCProtonPi0_Pion::writeHistograms()
     signal_gamma1_convLength_gamma2_convLength->Write();
     bckg_gamma1_convLength_gamma2_convLength->Write();
     bckg_signal_diff_convLength->Write();
-
     
     // Gamma1 True Energy
     gamma1_true_E->Write();

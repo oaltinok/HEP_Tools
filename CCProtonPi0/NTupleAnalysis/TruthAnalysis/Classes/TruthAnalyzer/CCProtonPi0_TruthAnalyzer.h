@@ -14,8 +14,12 @@
 #include <TH1.h>
 #include <TH2.h>
 #include <TFile.h>
+#include <PlotUtils/MnvH1D.h>
 
+#include "Cintex/Cintex.h"
 #include "../../../Libraries/Folder_List.h"
+
+using namespace PlotUtils;
 
 class CCProtonPi0_TruthAnalyzer
 {
@@ -24,12 +28,12 @@ class CCProtonPi0_TruthAnalyzer
         ~CCProtonPi0_TruthAnalyzer();
         void Loop(std::string playlist);
 
-        TH1D* all_signal_muon_P;
-        TH1D* all_signal_pi0_P;
-        TH1D* all_signal_muon_theta;
-        TH1D* all_signal_pi0_theta;
-        TH1D* all_signal_neutrino_E;
-        TH1D* all_signal_QSq;
+        MnvH1D* mc_truth_all_signal_muon_P;
+        MnvH1D* mc_truth_all_signal_pi0_P;
+        MnvH1D* mc_truth_all_signal_muon_theta;
+        MnvH1D* mc_truth_all_signal_pi0_theta;
+        MnvH1D* mc_truth_all_signal_neutrino_E;
+        MnvH1D* mc_truth_all_signal_QSq;
 
     private :
         TFile* f;

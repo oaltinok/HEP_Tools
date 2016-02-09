@@ -39,22 +39,25 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         vector<MnvH1D*> invMass;
         vector<MnvH1D*> photonEnergy_Asymmetry;
         vector<MnvH1D*> cos_openingAngle;
-        
-        // Efficiency & Response
-        // Efficiency will be calculated by dividing eff_ hists to all_signal
-        TH1D* eff_P;
-        TH1D* eff_theta;
-        TH2D* response_P;
+ 
+        TH2D* signal_gamma1_convLength_gamma2_convLength;
+        TH2D* bckg_gamma1_convLength_gamma2_convLength;
+        TH2D* bckg_signal_diff_convLength;
+
+        // Pi0 Momentum 
+        MnvH1D* data_all_pi0_P;
+        MnvH1D* mc_truth_signal_pi0_P;
+        MnvH1D* mc_reco_signal_pi0_P;
+        MnvH1D* mc_reco_bckg_pi0_P;
+        MnvH2D* response_P;
+
+        // Pi0 Theta
         TH2D* response_theta;
 
         TH2D* signal_gamma1_E_gamma2_E;
         TH2D* bckg_gamma1_E_gamma2_E;
         TH2D* bckg_signal_diff_E;
-        
-        TH2D* signal_gamma1_convLength_gamma2_convLength;
-        TH2D* bckg_gamma1_convLength_gamma2_convLength;
-        TH2D* bckg_signal_diff_convLength;
-        
+       
         CCProtonPi0_Pion(bool isModeReduce, bool isMC);
         void initHistograms();
         void writeHistograms();

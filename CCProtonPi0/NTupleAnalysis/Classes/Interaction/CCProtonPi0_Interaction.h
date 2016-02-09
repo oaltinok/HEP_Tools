@@ -55,12 +55,8 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> extra_rejected_energy_2Track;
         std::vector<MnvH1D*> extra_total_energy_2Track;
 
-        // Efficiency & Response
-        // Efficiency will be calculated by dividing eff_ hists to all_signal
-        TH1D* eff_neutrino_E;
-        TH1D* eff_QSq;
-        TH2D* response_neutrino_E;
-        TH2D* response_QSq;
+        MnvH2D* response_neutrino_E;
+        MnvH2D* response_QSq;
 
         // Vertex
         std::vector<MnvH1D*> vertex_z;

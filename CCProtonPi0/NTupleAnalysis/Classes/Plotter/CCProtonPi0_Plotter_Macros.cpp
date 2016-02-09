@@ -22,8 +22,8 @@ void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, 
     // POT Normalized Plots 
     // ------------------------------------------------------------------------
     DrawDataStackedMC_BckgAll(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
-    DrawDataStackedMC_BckgWithPi0(dir, var_name,plotDir, false, nCutArrows,  cutArrow1, cutArrow2);
-    DrawDataStackedMC_BckgType(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
+    DrawDataStackedMC_BckgWithPi0(dir, var_name,plotDir, true, nCutArrows,  cutArrow1, cutArrow2);
+    DrawDataStackedMC_BckgType(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
 
     // ------------------------------------------------------------------------
     // Area Normalized Plots 
@@ -214,7 +214,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::strin
     // ------------------------------------------------------------------------
     TObjArray* mc_hists = new TObjArray;
     FormTObjArray_BckgWithPi0(f_mc, var_name, mc_hists, hist_max, bin_width);
- 
+
     // ------------------------------------------------------------------------
     // MC Normalization 
     // ------------------------------------------------------------------------
@@ -268,6 +268,54 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     DrawDataMC(dir,var_name,plotDir,true);
     // Area Normalized
     DrawDataMC(dir,var_name,plotDir,false);
+}
+
+void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir)
+{
+    // POT Normalized
+    DrawDataMC(data, mc, var_name, plotDir, true);
+    // Area Normalized
+    DrawDataMC(data, mc, var_name, plotDir, false);
+}
+
+void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm)
+{
+    // ------------------------------------------------------------------------
+    // MC Normalization 
+    // ------------------------------------------------------------------------
+    std::string norm_label; 
+    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc);
+
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    plotter->DrawDataMC(data, mc, mc_ratio, "TR", false);
+
+    // Add Plot Labels
+    plotter->AddHistoTitle(data[0].GetTitle());
+    AddNormBox(plotter, isPOTNorm, mc_ratio);
+
+    // Add Pi0 InvMass Line
+    std::size_t found = var_name.find("invMass");
+    if (found != std::string::npos){
+        TLine pi0Mass;
+        pi0Mass.SetLineWidth(2);
+        pi0Mass.SetLineColor(kBlue);
+        pi0Mass.DrawLine(134.98,0,134.98,3200);
+    }
+
+    // Print Plot
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_",norm_label.c_str(),".png"), "png");
+
+    delete c;
+    delete plotter;
+    //
+    //if (isPOTNorm){
+    //DrawDataMCRatio(dir,var_name,plotDir,isPOTNorm);
+    //}
 }
 
 void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm)
@@ -386,11 +434,64 @@ void CCProtonPi0_Plotter::DrawMCWithErrorBand(rootDir& dir, std::string var_name
     delete plotter;
 }
 
+void CCProtonPi0_Plotter::DrawMnvH1D(rootDir& dir, std::string var_name, std::string plotDir)
+{
+    // Get Histogram
+    std::string root_dir;
+    std::size_t found = var_name.find("data");
+    if (found != std::string::npos) root_dir = dir.data;
+    else root_dir = dir.mc;
+
+    TFile* f = new TFile(root_dir.c_str());
+    MnvH1D* hist1D = (MnvH1D*)f->Get(var_name.c_str());
+
+    // Create Canvas
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    // Plot Options
+    hist1D->SetLineColor(kBlack);
+    hist1D->SetLineWidth(2);
+    hist1D->SetMarkerStyle(21);
+    //hist1D->SetFillColor(kRed);
+    //hist1D->SetFillStyle(3010);
+
+    hist1D->Draw();
+    gPad->Update();
+    gStyle->SetOptStat(111111); 
+
+    // Find Peak
+    //double max_bin_location = hist1D->GetBinCenter(max_bin);
+    //TLatex text;
+    //text.SetNDC();
+    //text.SetTextSize(0.03);
+    //text.DrawLatex(0.15,0.85,Form("%s%3.2f", "Peak at ",max_bin_location));
+
+    // Add Pi0 InvMass Line
+    found = var_name.find("invMass");
+    if (found != std::string::npos){
+        int max_bin = hist1D->GetMaximumBin();
+        int max_value = hist1D->GetBinContent(max_bin);
+        TLine pi0Mass;
+        pi0Mass.SetLineWidth(2);
+        pi0Mass.SetLineColor(kBlue);
+        pi0Mass.DrawLine(134.98,0,134.98,max_value);
+    }
+
+
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    delete c;
+    delete hist1D;
+    delete f;
+}
+
 void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::string plotDir, bool isLogScale)
 {
-    std::string root_dir = dir.mc;
-
     // Get Histogram
+    std::string root_dir;
+    std::size_t found = var_name.find("data");
+    if (found != std::string::npos) root_dir = dir.data;
+    else root_dir = dir.mc;
+
     TFile* f = new TFile(root_dir.c_str());
     TH1D* hist1D = (TH1D*)f->Get(var_name.c_str());
 
@@ -410,11 +511,21 @@ void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::st
 
     // Find Peak
     int max_bin = hist1D->GetMaximumBin();
+    int max_value = hist1D->GetBinContent(max_bin);
     double max_bin_location = hist1D->GetBinCenter(max_bin);
     TLatex text;
     text.SetNDC();
     text.SetTextSize(0.03);
     text.DrawLatex(0.15,0.85,Form("%s%3.2f", "Peak at ",max_bin_location));
+
+    // Add Pi0 InvMass Line
+    found = var_name.find("invMass");
+    if (found != std::string::npos){
+        TLine pi0Mass;
+        pi0Mass.SetLineWidth(2);
+        pi0Mass.SetLineColor(kBlue);
+        pi0Mass.DrawLine(134.98,0,134.98,max_value);
+    }
 
     // Error Ranges
     //double max_bin_value = hist1D->GetBinContent(max_bin);
@@ -511,17 +622,50 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
     hist2D->Draw("colz");
     gPad->Update();
 
-    double line_min = hist2D->GetXaxis()->GetBinLowEdge(1);
-    double line_max = hist2D->GetXaxis()->GetBinLowEdge(nBinsX);
-    TLine xy;
-    xy.SetLineWidth(2);
-    xy.SetLineColor(kBlack);
-    xy.DrawLine(line_min,line_min,line_max,line_max);
+    //double line_min = hist2D->GetXaxis()->GetBinLowEdge(1);
+    //double line_max = hist2D->GetXaxis()->GetBinLowEdge(nBinsX);
+    //TLine xy;
+    //xy.SetLineWidth(2);
+    //xy.SetLineColor(kBlack);
+    //xy.DrawLine(line_min,line_min,line_max,line_max);
 
     //TLine fit;
     //fit.SetLineWidth(2);
     //fit.SetLineColor(kRed);
     //fit.DrawLine(0,80.9,500,585.9);
+
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+
+    delete p;
+    delete c;
+    delete f;
+}
+
+void CCProtonPi0_Plotter::Draw3DHist(rootDir& dir, std::string var_name, std::string plotDir)
+{
+    std::string root_dir = dir.mc;
+
+    // Get Histogram
+    TFile* f = new TFile(root_dir.c_str());
+    TH3D* hist3D = (TH3D*)f->Get(var_name.c_str());
+
+    // Canvas
+    Double_t w = 800; 
+    Double_t h = 800;
+    TCanvas* c = new TCanvas("c","c",w,h);
+    c->SetWindowSize(w,h);
+
+    //gStyle->SetCanvasPreferGL(true);
+    // Pad
+    TPad *p = new TPad("p","p",0.05,0.05,0.95,0.95);
+    p->Draw();
+
+    p->cd();
+    hist3D->GetXaxis()->SetTitleOffset(1.8);
+    hist3D->GetYaxis()->SetTitleOffset(2.4);
+    hist3D->GetZaxis()->SetTitleOffset(1.8);
+    hist3D->Draw("BOX");
+    gPad->Update();
 
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
 
@@ -651,7 +795,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgType(rootDir &dir, std::string var_n
     // ------------------------------------------------------------------------
     double hist_max = 0;
     double bin_width;
-    
+
     TObjArray* mc_hists = new TObjArray;
     FormTObjArray_BckgType(f_mc, var_name, mc_hists, hist_max, bin_width);
 
@@ -708,7 +852,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgWithPi0(rootDir &dir, std::string va
     // ------------------------------------------------------------------------
     TObjArray* mc_hists = new TObjArray;
     FormTObjArray_BckgWithPi0(f_mc, var_name, mc_hists, hist_max, bin_width);
-    
+
     // ------------------------------------------------------------------------
     // Plot 
     // ------------------------------------------------------------------------
@@ -959,7 +1103,7 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     std::string var;
     double max_bin;
     MnvH1D* temp;
-    
+
     // Get Signal
     var = Form("%s_%d",var_name.c_str(),1);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
@@ -1233,13 +1377,32 @@ void CCProtonPi0_Plotter::DrawNormalizedMigrationHistogram(rootDir &dir, std::st
     plotter->DrawNormalizedMigrationHistogram(hist2D);
 
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
-    
+
     delete c;
     delete plotter;
     delete hist2D;
     delete f;
 }
 
+void CCProtonPi0_Plotter::DrawTGraph(rootDir &dir, std::string var_name, std::string plotDir)
+{
+    std::string root_dir = dir.mc;
+
+    // Get Histogram
+    TFile* f = new TFile(root_dir.c_str());
+    TGraph* graph = (TGraph*)f->Get(var_name.c_str());
+
+    // Canvas
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    // Plot 
+    graph->Draw();
+    c->Update();
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+
+    delete c;
+    delete f;
+}
 #endif
 
 

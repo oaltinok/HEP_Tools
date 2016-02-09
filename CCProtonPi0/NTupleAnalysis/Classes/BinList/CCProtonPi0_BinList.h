@@ -47,6 +47,7 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin digit_E;
         CCProtonPi0_SingleBin kE;
         
+        CCProtonPi0_SingleBin pi0_P;
         // Analysis
         CCProtonPi0_SingleBin beamE;
         CCProtonPi0_SingleBin beamE_Diff_True;

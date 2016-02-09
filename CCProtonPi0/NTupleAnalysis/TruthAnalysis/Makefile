@@ -17,6 +17,10 @@ TRUTHANALYZERALLCPP = $(TRUTHANALYZERCPP) $(TRUTHANALYZERDEFAULTCPP)
 # ALL Classes Required for the Package
 ALLCPP = $(MAINCPP) $(TRUTHANALYZERALLCPP)
 
+# PlotUtils from MINERvA Framework
+INCLUDES += -I$(PLOTUTILSROOT)/ -I$(UNFOLDUTILSROOT)/
+LDLIBS += -L$(PLOTUTILSROOT)/$(CMTCONFIG) -lplotutils -L$(UNFOLDUTILSROOT)/$(CMTCONFIG) -lUnfoldUtils
+
 # ------------------------------------------------------------------------------
 # Commands and Flags
 # ------------------------------------------------------------------------------
@@ -32,10 +36,10 @@ EXECUTABLE = $(MAINEXE)
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(ROOTFLAGS) $(CFLAGS) -o $(EXECUTABLE) $(OBJECTS) 
+	$(CC) $(ROOTFLAGS) $(CFLAGS) $(INCLUDES) -o $(EXECUTABLE) $(OBJECTS) $(LDLIBS) 
 
 .cpp.o:
-	$(CC) $(ROOTFLAGS) $(CFLAGS)  -c $< -o $@
+	$(CC) $(ROOTFLAGS) $(CFLAGS) $(INCLUDES) -c $< -o $@
 	
 clean: 
 	$(RM) $(MAINEXE) $(OBJECTS)

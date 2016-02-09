@@ -20,13 +20,15 @@ class CCProtonPi0_Muon : public CCProtonPi0_Particle
         void initHistograms();
         void writeHistograms();
 
-        // Efficiency & Response
-        // Efficiency will be calculated by dividing eff_ hists to all_signal
-        TH1D* eff_P;
-        TH1D* eff_theta;
-        TH2D* response_P;
-        TH2D* response_theta;
-
+        // Muon Momentum 
+        MnvH1D* data_all_muon_P;
+        MnvH1D* mc_reco_bckg_muon_P;
+        MnvH1D* mc_reco_signal_muon_P;
+        MnvH1D* mc_truth_signal_muon_P;
+        MnvH2D* response_P;
+        
+        // Muon Theta
+        MnvH2D* response_theta;
 
     private:
         CCProtonPi0_SingleBin bin_muonTheta;

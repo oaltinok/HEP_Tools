@@ -22,6 +22,7 @@ Class: CCProtonPi0_NTupleAnalysis
 #include <TMath.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TH3.h>
 #include <TFile.h>
 #include <PlotUtils/MnvH1D.h>
 #include <PlotUtils/MnvH2D.h>

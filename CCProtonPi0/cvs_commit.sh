@@ -1,26 +1,17 @@
-CCPROTONPI0_V="v2_55"
+CCPROTONPI0_V="v2_56"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Added P and Theta for Signal FS particles Truth Variables
-
+	No Major Changes	
 -------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	New Mode:
-		Calculate Cross Section
-			./main.exe calc
-	New Class:
-		CCProtonPi0_CrossSection
-			Class responsible for Cross Section Calculation
-			Initial commit for the Class
-				No methods implemented yet!
+	Data Correction Methods for Cross Section Calculation Implemented
+		Background Subtraction
+		Unfolding
+		Efficiency Correction
+	
+	Tested Muon and Pi0 Momentum with Data Correction Methods
 
-	Folder structure improved
-		Forming final folder structure inside Libraries/Folder_List.h
-		Other Objects gets the final folder structure from Folder_List
-
-	Added new histograms for the variables we will calculate the cross section
-		Efficiency
-		Response
+	New Plotting Functions for Cross Section Variables
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

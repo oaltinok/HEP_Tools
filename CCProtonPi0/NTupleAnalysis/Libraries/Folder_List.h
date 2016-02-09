@@ -61,7 +61,9 @@ namespace Folder_List
     const std::string rootDir_OtherStudies_mc = "/minerva/data/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Test.root"; 
     const std::string rootDir_OtherStudies_data = "";
 
-    // Set MC Root Dir
+    const std::string rootDir_CrossSection = rootOut + Data + analyzed + "CrossSection.root";
+    
+    // Set MC Root Dir;
     const std::string rootDir_CutHists_mc = rootOut + MC + analyzed + "CutHistograms.root";
     const std::string rootDir_Interaction_mc = rootOut + MC + analyzed + "Interaction.root";
     const std::string rootDir_Muon_mc = rootOut + MC + analyzed + "Muon.root";

@@ -64,8 +64,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillHistogram(vector<MnvH1D*> &hist, double var);
         void FillHistogram(TH1D* hist, double var);
         void FillHistogram(TH2D* hist, double var1, double var2);
+        void FillHistogram(TH3D* hist, double var1, double var2, double var3);
         void FillHistogram(MnvH2D* hist, double var1, double var2);
         void CorrectNTupleVariables();
+        void CorrectEMShowerCalibration();
 
         //  Interaction Specific Functions
         void fillInteractionMC();

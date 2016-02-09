@@ -19,26 +19,16 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 #ifndef CCProtonPi0_Plotter_H
 #define CCProtonPi0_Plotter_h
 
-#include <fstream>
-#include <string>
-#include <iostream>
 #include <TVectorD.h>
 #include <TStyle.h>
-#include <TROOT.h>
 #include <TPaveStats.h>
 #include <TPad.h>
-#include <TMath.h>
 #include <TLegend.h>
 #include <THStack.h>
-#include <TH2.h>
-#include <TH1.h>
 #include <TGraph.h>
-#include <TFile.h>
 #include <TCanvas.h>
 #include <TLatex.h>
 #include <PlotUtils/MnvPlotter.h>
-#include <PlotUtils/MnvH2D.h>
-#include <PlotUtils/MnvH1D.h>
 #include <PlotUtils/MnvFluxConstraint.h>
 #include <PlotUtils/POTCounter.h>
 #include "Cintex/Cintex.h"
@@ -75,6 +65,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
     private:
         rootDir rootDir_Truth;
+        rootDir rootDir_CrossSection;
         rootDir rootDir_OtherStudies;
         rootDir rootDir_CutHists;
         rootDir rootDir_Interaction;
@@ -91,6 +82,12 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void setRootDirs();
         void getPOT_MC();
         void getPOT_Data();
+
+        // Cross Section Plots
+        void plotOriginalData();
+        void plotBackgroundSubtracted();
+        void plotEfficiencyCorrected();
+        void plotUnfolded();
 
         // Data vs MC
         void plotInteraction_DataMC();
@@ -129,9 +126,11 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // Plottting Macros - Implemented in CCProtonPi0_Plotter_Macros.cpp
         // --------------------------------------------------------------------
         // Default
+        void DrawMnvH1D(rootDir& dir, std::string var_name, std::string plotDir);
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
         void Draw1DHist_Threshold(rootDir &dir, std::string var_name, std::string plotDir, double threshold = 0, bool isLogScale = false);
         void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir, double threshold = 0);
+        void Draw3DHist(rootDir& dir, std::string var_name, std::string plotDir);
 
         // MC Only
         void DrawNormalizedMigrationHistogram(rootDir &dir, std::string var_name, std::string plotDir);
@@ -143,6 +142,8 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
 
         // Data vs MC
+        void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir);
+        void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm);
         void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm);
@@ -152,6 +153,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
 
         // Other
+        void DrawTGraph(rootDir &dir, std::string var_name, std::string plotDir);
         void DrawEfficiencyCurve(std::string var_name, std::string plotDir, TH1D* all_signal, TH1D* signal);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);
         void DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir);
