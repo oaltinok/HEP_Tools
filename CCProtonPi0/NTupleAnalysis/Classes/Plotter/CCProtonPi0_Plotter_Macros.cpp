@@ -1072,29 +1072,35 @@ void CCProtonPi0_Plotter::Save2DHistPoints(rootDir& dir, std::string var_name, s
     text.close();   
 }
 
-void CCProtonPi0_Plotter::DrawEfficiencyCurve(std::string var_name, std::string plotDir, TH1D* all_signal, TH1D* signal)
+void CCProtonPi0_Plotter::DrawEfficiencyCurve(rootDir& dir, std::string var_name, std::string plotDir)
 {
-    TH1D* h_eff = new TH1D();
-    h_eff = signal;
-    h_eff->Divide(all_signal);
-    h_eff->GetYaxis()->SetTitle("Efficiency");
-    h_eff->SetMaximum(0.15);
+    // Get Histogram
+    std::string root_dir;
+    std::size_t found = var_name.find("data");
+    if (found != std::string::npos) root_dir = dir.data;
+    else root_dir = dir.mc;
 
+    TFile* f = new TFile(root_dir.c_str());
+    MnvH1D* hist1D = (MnvH1D*)f->Get(var_name.c_str());
+    
     // Create Canvas
     TCanvas* c = new TCanvas("c","c",1280,800);
 
     // Plot Options
-    h_eff->SetLineColor(kRed);
-    h_eff->SetLineWidth(3);
-    h_eff->SetFillColor(kWhite);
-
-    h_eff->Draw();
+    hist1D->SetMinimum(0.0);
+    hist1D->SetMaximum(0.15);
+    hist1D->SetLineColor(kRed);
+    hist1D->SetLineWidth(3);
+    hist1D->SetFillColor(kWhite);
+    
+    hist1D->Draw("HIST");
     gPad->Update();
     gStyle->SetOptStat(111111); 
 
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
     delete c;
-    delete h_eff;
+    delete hist1D;
+    delete f;
 }
 
 
@@ -1359,7 +1365,7 @@ void CCProtonPi0_Plotter::DrawNormalizedMigrationHistogram(rootDir &dir, std::st
 
     // Get Histogram
     TFile* f = new TFile(root_dir.c_str());
-    TH2D* hist2D = (TH2D*)f->Get(var_name.c_str());
+    MnvH2D* hist2D = (MnvH2D*)f->Get(var_name.c_str());
 
     // Canvas
     Double_t w = 800; 

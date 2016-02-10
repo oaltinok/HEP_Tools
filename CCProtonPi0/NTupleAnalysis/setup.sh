@@ -25,6 +25,8 @@ PlotFolder_List=(Muon
         CutHists
         CrossSection
         Efficiency 
+        BackgroundSubtraction 
+        Unfolding 
         OtherStudies)
 
 # Create Main Folder

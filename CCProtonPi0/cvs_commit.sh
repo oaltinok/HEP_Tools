@@ -1,17 +1,14 @@
-CCPROTONPI0_V="v2_56"
+CCPROTONPI0_V="v2_57"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	No Major Changes	
+	No Major Changes
 -------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	Data Correction Methods for Cross Section Calculation Implemented
-		Background Subtraction
-		Unfolding
-		Efficiency Correction
-	
-	Tested Muon and Pi0 Momentum with Data Correction Methods
+	Cross Section Calculation Method Implemented
+		Integrated Trungs functions with CrossSection Class
+		Directly copied calc_flux.h and its required libraries
 
-	New Plotting Functions for Cross Section Variables
+	Added new Plotter Functions
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

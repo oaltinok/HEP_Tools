@@ -61,6 +61,8 @@ int main(int argc, char *argv[] )
     string pl_analyze;
     bool isMC;
 
+    TH1::AddDirectory(false);
+    
     // Check User Command
     int nMode = GetMode(argc,argv);
     if (nMode == -1){
@@ -131,7 +133,7 @@ void Calculate_CrossSection()
     cout<<"Calculating Cross Section..."<<endl;
     cout<<"======================================================================"<<endl;
     CCProtonPi0_CrossSection crossSection;
-    crossSection.Calc_Crossections();
+    crossSection.Calc_CrossSections();
 }
 
 

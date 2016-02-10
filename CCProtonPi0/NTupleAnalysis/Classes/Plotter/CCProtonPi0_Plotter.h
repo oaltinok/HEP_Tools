@@ -88,6 +88,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotBackgroundSubtracted();
         void plotEfficiencyCorrected();
         void plotUnfolded();
+        void plotCrossSection();
 
         // Data vs MC
         void plotInteraction_DataMC();
@@ -104,7 +105,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotPion_MCOnly();
         void plotPi0Blob_MCOnly();
         void plotCutHistograms_MCOnly();
-        void plotEfficiencyCurves();
 
         // True Signal Events
         void plotPion_True();
@@ -154,7 +154,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
         // Other
         void DrawTGraph(rootDir &dir, std::string var_name, std::string plotDir);
-        void DrawEfficiencyCurve(std::string var_name, std::string plotDir, TH1D* all_signal, TH1D* signal);
+        void DrawEfficiencyCurve(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);
         void DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir);
 

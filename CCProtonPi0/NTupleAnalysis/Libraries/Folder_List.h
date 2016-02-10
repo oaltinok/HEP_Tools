@@ -60,8 +60,9 @@ namespace Folder_List
     // Set Other Studies ROOT Dir
     const std::string rootDir_OtherStudies_mc = "/minerva/data/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Test.root"; 
     const std::string rootDir_OtherStudies_data = "";
-
-    const std::string rootDir_CrossSection = rootOut + Data + analyzed + "CrossSection.root";
+   
+    // Set Flux File ROOT Dir
+    const std::string rootDir_Flux = rootOut + Data + analyzed + "fhc_flux_constrained.root";
     
     // Set MC Root Dir;
     const std::string rootDir_CutHists_mc = rootOut + MC + analyzed + "CutHistograms.root";
@@ -72,6 +73,7 @@ namespace Folder_List
     const std::string rootDir_Pi0Blob_mc = rootOut + MC + analyzed + "Pi0Blob.root";
 
     // Set Data Root Dir
+    const std::string rootDir_CrossSection = rootOut + Data + analyzed + "CrossSection.root";
     const std::string rootDir_CutHists_data = rootOut + Data + analyzed + "CutHistograms.root";
     const std::string rootDir_Interaction_data = rootOut + Data + analyzed + "Interaction.root";
     const std::string rootDir_Muon_data = rootOut + Data + analyzed + "Muon.root";
@@ -82,6 +84,8 @@ namespace Folder_List
     //-------------------------------------------------------------------------
     // Plot Dirs
     //-------------------------------------------------------------------------
+    const std::string plotDir_Unfolding = output + plotOut + "Unfolding/";
+    const std::string plotDir_BackgroundSubtraction = output + plotOut + "BackgroundSubtraction/";
     const std::string plotDir_Efficiency = output + plotOut + "Efficiency/";
     const std::string plotDir_OtherStudies = output + plotOut + "OtherStudies/";
     const std::string plotDir_CutHists = output + plotOut + "CutHists/";

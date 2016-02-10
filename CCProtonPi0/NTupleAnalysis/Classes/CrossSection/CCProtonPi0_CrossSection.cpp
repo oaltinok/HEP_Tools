@@ -13,16 +13,21 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection() : CCProtonPi0_NTupleAnalysi
     min_invMass = 60; // MeV
     max_invMass = 200; // MeV
     
+    data_POT = 9.44854e+19;   
+    mc_POT = 9.0182e+20;
+    
     OpenRootFiles();
     initHistograms();
     std::cout<<"Done!"<<std::endl;
 }
 
-void CCProtonPi0_CrossSection::Calc_Crossections()
+void CCProtonPi0_CrossSection::Calc_CrossSections()
 {
     Calc_Normalized_NBackground();
     Calc_CrossSection_Muon_P();   
     Calc_CrossSection_Pi0_P();   
+
+    Label_CrossSection_Hists();
     writeHistograms();
 }
 
@@ -30,9 +35,22 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_Muon_P()
 {
     std::cout<<"\nCalculating Cross Section for Muon Momentum"<<std::endl;
 
-    Subtract_Background(data_bckg_subtracted_muon_P, data_all_muon_P, mc_reco_bckg_muon_P, "muon_P");
-    Unfold_Data(data_unfolded_muon_P, data_bckg_subtracted_muon_P, response_muon_P, "muon_P");   
-    Efficiency_Divide(data_efficiency_corrected_muon_P, data_unfolded_muon_P, eff_muon_P, "muon_P");   
+    // Data Correction
+    data_bckg_subtracted_muon_P = Subtract_Background(data_all_muon_P, mc_reco_bckg_muon_P, "muon_P");
+    data_unfolded_muon_P = Unfold_Data(data_bckg_subtracted_muon_P, response_muon_P, "muon_P");   
+    data_efficiency_corrected_muon_P = Efficiency_Divide(data_unfolded_muon_P, eff_muon_P, "muon_P");   
+
+    // Integrate Flux
+    data_integrated_flux_muon_P = Integrate_Flux(data_efficiency_corrected_muon_P, "muon_P",false);
+    mc_truth_integrated_flux_muon_P = Integrate_Flux(mc_truth_all_signal_muon_P, "muon_P",false);
+    
+    // Calculate Cross Section for Data
+    data_xsec_muon_P = Calc_CrossSection(data_efficiency_corrected_muon_P, data_integrated_flux_muon_P, data_POT, false);
+    data_xsec_muon_P->SetName("data_xsec_muon_P");
+ 
+    // Calculate Cross Section for MC Truth All 
+    mc_truth_xsec_muon_P = Calc_CrossSection(mc_truth_all_signal_muon_P, mc_truth_integrated_flux_muon_P, mc_POT, true);
+    mc_truth_xsec_muon_P->SetName("mc_truth_xsec_muon_P");
 
     std::cout<<"Done!"<<std::endl;
 }
@@ -42,10 +60,23 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_Pi0_P()
 {
     std::cout<<"\nCalculating Cross Section for Pi0 Momentum"<<std::endl;
 
-    Subtract_Background(data_bckg_subtracted_pi0_P, data_all_pi0_P, mc_reco_bckg_pi0_P, "pi0_P");
-    Unfold_Data(data_unfolded_pi0_P, data_bckg_subtracted_pi0_P, response_pi0_P, "pi0_P");   
-    Efficiency_Divide(data_efficiency_corrected_pi0_P, data_unfolded_pi0_P, eff_pi0_P, "pi0_P");   
-   
+    // Data Correction
+    data_bckg_subtracted_pi0_P = Subtract_Background(data_all_pi0_P, mc_reco_bckg_pi0_P, "pi0_P");
+    data_unfolded_pi0_P = Unfold_Data(data_bckg_subtracted_pi0_P, response_pi0_P, "pi0_P");   
+    data_efficiency_corrected_pi0_P = Efficiency_Divide(data_unfolded_pi0_P, eff_pi0_P, "pi0_P");   
+
+    // Integrate Flux
+    data_integrated_flux_pi0_P = Integrate_Flux(data_efficiency_corrected_pi0_P, "pi0_P",false);
+    mc_truth_integrated_flux_pi0_P = Integrate_Flux(mc_truth_all_signal_pi0_P, "pi0_P",false);
+
+    // Calculate Cross Section for Data
+    data_xsec_pi0_P = Calc_CrossSection(data_efficiency_corrected_pi0_P, data_integrated_flux_pi0_P, data_POT, false);
+    data_xsec_pi0_P->SetName("data_xsec_pi0_P");
+ 
+    // Calculate Cross Section for MC Truth All 
+    mc_truth_xsec_pi0_P = Calc_CrossSection(mc_truth_all_signal_pi0_P, mc_truth_integrated_flux_pi0_P, mc_POT, true);
+    mc_truth_xsec_pi0_P->SetName("mc_truth_xsec_pi0_P");
+
     std::cout<<"Done!"<<std::endl;
 }
 
@@ -161,19 +192,21 @@ double CCProtonPi0_CrossSection::Integrate_SignalRegion(TH1D* h)
 
 void CCProtonPi0_CrossSection::NormalizeHistogram(MnvH1D* h)
 {
+    std::cout<<"\tNormalizing Background Shape"<<std::endl;
     int NBins = h->GetNbinsX();
     double area = h->Integral();
     double nOverFlow = h->GetBinContent(NBins+1);
-    cout<<"Before Norm = "<<area<<endl;
+    cout<<"\t\tBefore Norm = "<<area<<endl;
     h->Scale(1/(area+nOverFlow));
-    cout<<"After Norm = "<<h->Integral()<<endl;
+    cout<<"\t\tAfter Norm = "<<h->Integral()<<endl;
+    std::cout<<"\tDone!"<<endl;
 }
 
-void CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* &bckg_subtracted, MnvH1D* data, MnvH1D* mc_bckg, std::string var_name)
+MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, std::string var_name)
 {
     std::cout<<"Subtracting Background for "<<var_name<<std::endl;
     // Init Histogram
-    bckg_subtracted = new MnvH1D(*data); 
+    MnvH1D* bckg_subtracted = new MnvH1D(*data); 
     std::string hist_name = "data_bckg_subtracted_" + var_name;
     bckg_subtracted->SetName(hist_name.c_str());
     bckg_subtracted->SetTitle("Background Subtracted Data");
@@ -194,13 +227,15 @@ void CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* &bckg_subtracted, Mnv
     std::cout<<"\tBackground Subtracted Data Area = "<<bckg_subtracted->Integral()<<std::endl;
 
     std::cout<<"Done!"<<std::endl;
+
+    return bckg_subtracted;
 }
 
-void CCProtonPi0_CrossSection::Unfold_Data(MnvH1D* &unfolded, MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name)
+MnvH1D* CCProtonPi0_CrossSection::Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name)
 {
     std::cout<<"Unfolding Data for "<<var_name<<std::endl;
     // Init Histogram
-    unfolded = 0;
+    MnvH1D* unfolded = 0;
 
     std::cout<<"\tNumber of iteratons = "<<iteration<<std::endl;
     // Use MnvUnfold to Unfold Data
@@ -212,24 +247,50 @@ void CCProtonPi0_CrossSection::Unfold_Data(MnvH1D* &unfolded, MnvH1D* bckg_subtr
     unfolded->SetTitle("Unfolded Data");
 
     std::cout<<"Done!"<<std::endl;
+
+    return unfolded;
 }
 
-void CCProtonPi0_CrossSection::Efficiency_Divide(MnvH1D* &efficiency_corrected, MnvH1D* unfolded, MnvH1D* eff, std::string var_name)
+MnvH1D* CCProtonPi0_CrossSection::Efficiency_Divide(MnvH1D* unfolded, MnvH1D* eff, std::string var_name)
 {
     std::cout<<"Efficiency Correction for "<<var_name<<std::endl;
-   
-    efficiency_corrected = new MnvH1D(*unfolded);
-    efficiency_corrected->Divide(unfolded, eff);
-    
+  
+    // Init Histogram
+    MnvH1D* efficiency_corrected = new MnvH1D(*unfolded);
     std::string hist_name = "data_efficiency_corrected_" + var_name;
     efficiency_corrected->SetName(hist_name.c_str());
     efficiency_corrected->SetTitle("Efficiency Corrected Data");
 
+    // Divide by Efficiency
+    std::cout<<"\tArea Before = "<<efficiency_corrected->Integral()<<std::endl;
+    efficiency_corrected->Divide(unfolded, eff);
+    std::cout<<"\tArea After = "<<efficiency_corrected->Integral()<<std::endl;
+    
     std::cout<<"Done!"<<std::endl;
+
+    return efficiency_corrected;
+}
+
+MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name, bool isEv)
+{
+    std::cout<<"Integrating Flux for "<<var_name<<std::endl;
+    
+    bool apply_Enu_cut = false;
+    MnvH1D* integrated_flux = calc_flux(data_efficiency_corrected, rootDir_flux, apply_Enu_cut, isEv);
+
+    std::string hist_name = "integrated_flux_" + var_name;
+    integrated_flux->SetName(hist_name.c_str());
+
+    std::cout<<"Done!"<<var_name<<std::endl;
+
+    return integrated_flux;
 }
 
 void CCProtonPi0_CrossSection::OpenRootFiles()
 {
+    // Flux File
+    rootDir_flux = Folder_List::rootDir_Flux;
+
     // Output File
     rootDir_out = Folder_List::rootDir_CrossSection;
     std::cout<<"\tRoot File: "<<rootDir_out<<std::endl;
@@ -314,6 +375,48 @@ void CCProtonPi0_CrossSection::initHistograms()
     
 }
 
+MnvH1D* CCProtonPi0_CrossSection::Calc_CrossSection(MnvH1D* data_efficiency_corrected, MnvH1D* integrated_flux, double pot, bool isMC)
+{
+    MnvH1D* h_xs = new MnvH1D(*data_efficiency_corrected);
+
+    // Divide the efficiency corrected distribution by the integrated flux
+    h_xs->Divide(data_efficiency_corrected, integrated_flux);
+
+    //fiducial is modules 27-80 inclusive
+    int nplanes = 2 * ( 80 - 27 + 1 );
+    double n_atoms    = TargetUtils::Get().GetTrackerNCarbonAtoms( nplanes, isMC, 850.0 );
+    double n_nucleons = TargetUtils::Get().GetTrackerNNucleons(nplanes, isMC, 850.0);
+
+    std::cout << "Number of C atoms   (1e30): " << n_atoms/1e30 << std::endl;
+    std::cout << "Number of neutrons: (1e30): " << n_nucleons/1e30 << std::endl;
+
+    h_xs->Scale(1/pot);
+    h_xs->Scale(1/n_nucleons);
+
+    h_xs->Scale(1e40); // to quote xs in 1-e40, 1e-42 for theta;
+
+    return h_xs;
+}
+
+void CCProtonPi0_CrossSection::Label_CrossSection_Hists()
+{
+    data_xsec_muon_P->SetTitle("Differential Cross Section for P_{#mu}");
+    data_xsec_muon_P->GetXaxis()->SetTitle("Muon Momentum [GeV]");
+    data_xsec_muon_P->GetYaxis()->SetTitle("d#sigma/d_{P_{#mu}} (10^{-40} cm^{2}/nucleon/GeV)");
+
+    mc_truth_xsec_muon_P->SetTitle("Differential Cross Section for P_{#mu}");
+    mc_truth_xsec_muon_P->GetXaxis()->SetTitle("Muon Momentum [GeV]");
+    mc_truth_xsec_muon_P->GetYaxis()->SetTitle("d#sigma/d_{P_{#mu}} (10^{-40} cm^{2}/nucleon/GeV)");
+
+    data_xsec_pi0_P->SetTitle("Differential Cross Section for P_{#pi^{0}}");
+    data_xsec_pi0_P->GetXaxis()->SetTitle("Pion Momentum [GeV]");
+    data_xsec_pi0_P->GetYaxis()->SetTitle("d#sigma/d_{P_{#pi^{0}}} (10^{-40} cm^{2}/nucleon/GeV)");
+
+    mc_truth_xsec_pi0_P->SetTitle("Differential Cross Section for P_{#pi^{0}}");
+    mc_truth_xsec_pi0_P->GetXaxis()->SetTitle("Pion Momentum [GeV]");
+    mc_truth_xsec_pi0_P->GetYaxis()->SetTitle("d#sigma/d_{P_{#pi^{0}}} (10^{-40} cm^{2}/nucleon/GeV)");
+}
+
 void CCProtonPi0_CrossSection::writeHistograms()
 {
     std::cout<<">> Writing "<<rootDir_out<<std::endl;
@@ -321,34 +424,44 @@ void CCProtonPi0_CrossSection::writeHistograms()
     f_out->cd();
   
     // Muon Momentum
+    data_xsec_muon_P->Write();
     data_all_muon_P->Write();
     data_bckg_subtracted_muon_P->Write();
     data_unfolded_muon_P->Write();
     data_efficiency_corrected_muon_P->Write();
+    data_integrated_flux_muon_P->Write();
     
     mc_reco_all_muon_P->Write();
     mc_reco_signal_muon_P->Write();
     mc_reco_bckg_muon_P->Write();
+    mc_truth_xsec_muon_P->Write();
     mc_truth_all_signal_muon_P->Write();
     mc_truth_signal_muon_P->Write();
+    mc_truth_integrated_flux_muon_P->Write();
     
     response_muon_P->Write();
     eff_muon_P->Write();
+    
 
     // Pi0 Momentum
+    data_xsec_pi0_P->Write();
     data_all_pi0_P->Write();
     data_bckg_subtracted_pi0_P->Write();
     data_unfolded_pi0_P->Write();
     data_efficiency_corrected_pi0_P->Write();
+    data_integrated_flux_pi0_P->Write();
     
     mc_reco_all_pi0_P->Write();
     mc_reco_signal_pi0_P->Write();
     mc_reco_bckg_pi0_P->Write();
+    mc_truth_xsec_pi0_P->Write();
     mc_truth_all_signal_pi0_P->Write();
     mc_truth_signal_pi0_P->Write();
+    mc_truth_integrated_flux_pi0_P->Write();
     
     response_pi0_P->Write();
     eff_pi0_P->Write();
+
 
     f_out->Close();
 }

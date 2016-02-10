@@ -1,4 +1,15 @@
 ===============================================================================
+v2_57
+CCProtonPi0 Updates:
+	No Major Changes
+-------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	Cross Section Calculation Method Implemented
+		Integrated Trung’s functions with CrossSection Class
+		Directly copied calc_flux.h and its required libraries
+
+	Added new Plotter Functions
+===============================================================================
 v2_56
 CCProtonPi0 Updates:
 	No Major Changes	
