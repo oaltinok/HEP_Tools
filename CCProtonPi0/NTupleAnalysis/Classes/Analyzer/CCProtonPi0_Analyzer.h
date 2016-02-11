@@ -65,9 +65,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillHistogram(TH1D* hist, double var);
         void FillHistogram(TH2D* hist, double var1, double var2);
         void FillHistogram(TH3D* hist, double var1, double var2, double var3);
+        void FillHistogramWithErrors(MnvH1D* hist, double var);
         void FillHistogram(MnvH2D* hist, double var1, double var2);
+        void FillVertErrorBand_Flux(MnvH1D* h, double var);
+        void FillVertErrorBand_Genie(MnvH1D* h, double var);
+        void FillVertErrorBand_Normalization(MnvH1D* h, double var);
         void CorrectNTupleVariables();
         void CorrectEMShowerCalibration();
+        void Calc_WeightFromSystematics();
 
         //  Interaction Specific Functions
         void fillInteractionMC();
@@ -98,6 +103,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fillPi0Blob_EvisStacked();
         void fillPi0Blob_Evis_Fractions();
         void fillPi0Blob_Evis_Total(); 
+        
+        // Error Calculations
+        double CalcVertError_Normalization(double p);
 
         // Helper Functions
         double CalcSphereVolume(double r);
@@ -127,6 +135,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool isPassedAllCuts;
         bool applyMaxEvents;
         bool applyDeltaInvMass;
+        double cvweight;
         double latest_ScanID;
         double minProtonScore_LLR;
         double minPhotonDistance_1;

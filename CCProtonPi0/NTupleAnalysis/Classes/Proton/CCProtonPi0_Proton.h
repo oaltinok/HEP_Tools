@@ -17,9 +17,9 @@ using namespace PlotUtils;
 class CCProtonPi0_Proton : public CCProtonPi0_Particle
 {
     public:
-        vector<MnvH1D*> trackLength;
-        vector<MnvH1D*> trackKinked;
-        vector<MnvH1D*> partScore;
+        std::vector<MnvH1D*> trackLength;
+        std::vector<MnvH1D*> trackKinked;
+        std::vector<MnvH1D*> partScore;
 
         CCProtonPi0_Proton(bool isModeReduce, bool isMC);
         void initHistograms();

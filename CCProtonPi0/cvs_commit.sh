@@ -1,14 +1,17 @@
-CCPROTONPI0_V="v2_57"
+CCPROTONPI0_V="v2_58"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
 	No Major Changes
 -------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	Cross Section Calculation Method Implemented
-		Integrated Trungs functions with CrossSection Class
-		Directly copied calc_flux.h and its required libraries
+	Flux Systematics Added
+		Using Trung’s new_flux.h Class to calculate it
+	GENIE Default Systematics Added
+		
+	Normalization Systematic Added
+		MINOS Track Momentum
 
-	Added new Plotter Functions
+	Added new functions to Plotter for Error Handling
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

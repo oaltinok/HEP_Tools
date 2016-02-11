@@ -27,6 +27,7 @@ PlotFolder_List=(Muon
         Efficiency 
         BackgroundSubtraction 
         Unfolding 
+        Errors 
         OtherStudies)
 
 # Create Main Folder

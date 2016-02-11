@@ -104,7 +104,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         void initHistograms();
         
         TFile* f;
-        string rootDir;
+        std::string rootDir;
         
         CCProtonPi0_BinList binList;
 };

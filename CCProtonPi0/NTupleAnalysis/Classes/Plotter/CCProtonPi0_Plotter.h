@@ -110,6 +110,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotPion_True();
 
         // Other Plots 
+        void plotErrors();
         void plotOtherStudies();
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
@@ -119,6 +120,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
         // Helper Functions
         void ApplyStyle(MnvPlotter* plotter);
+        void ApplyStyle_Errors(MnvPlotter* plotter);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, double hist_max, double arrow_length);
         void SavePi0InvMassPoints();
 
@@ -136,23 +138,24 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawNormalizedMigrationHistogram(rootDir &dir, std::string var_name, std::string plotDir);
         void DrawMCWithErrorBand(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawSignalMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
+        void DrawErrorBand(MnvH1D* hist, std::string error_name, int error_color, std::string var_name, std::string plotDir);
         void DrawStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
 
         // Data vs MC
+        void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir);
         void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
-        void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
-        void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm);
-        void DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm);
+        void DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
 
         // Other
+        void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir);
         void DrawTGraph(rootDir &dir, std::string var_name, std::string plotDir);
         void DrawEfficiencyCurve(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);

@@ -33,26 +33,39 @@ Class: CCProtonPi0_NTupleAnalysis
 #include "../../Libraries/Data_Functions.h"
 #include "../../Libraries/HEP_Functions.h"
 
-using namespace std;
+using namespace PlotUtils;
 
 class CCProtonPi0_NTupleAnalysis
 {
     public:
         CCProtonPi0_NTupleAnalysis();
        
-        string ana_folder;
+        std::string ana_folder;
         // Constants 
         static const int nHistograms = 16;
         static const int nTopologies = 2;
-        
-        static const string version;
+        static const int n_universe = 100;
+
+        static const std::string version;
         static const double SENTINEL;
         static const double MeV_to_GeV; 
         static const double MeVSq_to_GeVSq;
         static const double mm_to_cm;
         static const double rad_to_deg;
 
-        void OpenTextFile(string file_name, std::ofstream &file);
+        void OpenTextFile(std::string file_name, std::ofstream &file);
+        
+        // Errors for Data
+        void AddVertErrorBands_Data(MnvH1D* h);
+        void AddVertErrorBandAndFillWithCV_Flux(MnvH1D* h);
+        void AddVertErrorBandAndFillWithCV_Genie(MnvH1D* h);
+        void AddVertErrorBandAndFillWithCV_Normalization(MnvH1D* h);
+        
+        // Errors for MC
+        void AddVertErrorBands_MC(MnvH1D* h);
+        void AddVertErrorBand_Flux(MnvH1D* h);
+        void AddVertErrorBand_Genie(MnvH1D* h);
+        void AddVertErrorBand_Normalization(MnvH1D* h);
 
     private:
 };

@@ -4,6 +4,9 @@
 #ifndef CCProtonPi0_Analyzer_cpp
 #define CCProtonPi0_Analyzer_cpp
 
+// Trung's Implementations
+#include "new_flux.h"
+
 #include "CCProtonPi0_Analyzer.h"
 
 using namespace std;
@@ -18,8 +21,11 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     isScanRun = true;
     writeFSParticleMomentum = false;
 
+    new_flux::get().read_newflux_histogram(Folder_List::rootDir_Flux);
+    new_flux::get().calc_weights();
+
     // Event Selections
-    
+
     applyProtonScore = true;
     minProtonScore_LLR = -10.0;
 
@@ -41,6 +47,8 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 
     counter1 = 0;
     counter2 = 0;
+
+    cvweight = 1.0;
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
@@ -80,7 +88,7 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
 
         Long64_t ientry = fChain->GetEntry(jentry);
         if (ientry < 0) break;
-        
+
         nb = fChain->GetEntry(jentry);   nbytes += nb;    
 
         if (ientry == 0) {
@@ -103,12 +111,12 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         if (!m_isMC){
             wgt = 1.0;
         }
-        
+
         CorrectEMShowerCalibration();
         // Get Cut Statistics
         isPassedAllCuts = getCutStatistics();
         if( !isPassedAllCuts ) continue;
-        
+
         tree->Fill();
     }
     cutList.writeCutTable();
@@ -188,13 +196,15 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             bckgTool.fillBackgroundWithPi0(truth_isBckg_NoPi0, truth_isBckg_SinglePi0, truth_isBckg_MultiPi0, truth_isBckg_withMichel);                                    
             bckgTool.fillBackground(truth_isBckg_NC, truth_isBckg_AntiNeutrino, truth_isBckg_QELike, truth_isBckg_SingleChargedPion,truth_isBckg_SingleChargedPion_ChargeExchanged, truth_isBckg_DoublePionWithPi0, truth_isBckg_DoublePionWithoutPi0, truth_isBckg_MultiPionWithPi0, truth_isBckg_MultiPionWithoutPi0, truth_isBckg_Other, truth_isBckg_withMichel);                                    
         }
-
+       
+        if (m_isMC) Calc_WeightFromSystematics();
+        
         //----------------------------------------------------------------------
         // Data Analysis and Other Studies
         //----------------------------------------------------------------------
         if (isDataAnalysis) fillData();
         if (writeFSParticleMomentum) writeFSParticle4P(jentry);
-   
+
     } // end for-loop
 
     //--------------------------------------------------------------------------
@@ -557,7 +567,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (m_isMC && truth_isSignal){ 
         fill_mc_w(); 
     }
-    
+
     // ------------------------------------------------------------------------
     // Anti-Muon Cut
     // ------------------------------------------------------------------------
@@ -596,7 +606,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // ------------------------------------------------------------------------
     if( Cut_Proton_None == 1) return false;
     cutList.nCut_Proton_None.increment(truth_isSignal, study1, study2);
-  
+
     // ------------------------------------------------------------------------
     // Proton Momentum NaN
     // ------------------------------------------------------------------------
@@ -605,7 +615,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
 
     // Check nProtonCandidates
     FillHistogram(cutList.hCut_nProtonCandidates, nProtonCandidates);
-    
+
     // After this stage we can analyze different topologies
     //      1Track = No Proton Events (Only Muon Track)
     //      2Track = With Proton (Muon + Proton)
@@ -614,7 +624,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     }else{
         cutList.nCut_2Track_All.increment(truth_isSignal, study1, study2);
     }
-   
+
     // ------------------------------------------------------------------------
     // Apply Proton Score to All Proton Candidates
     // ------------------------------------------------------------------------
@@ -628,7 +638,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         cutList.nCut_2Track_ProtonScore.increment(truth_isSignal, study1, study2);
     }
     cutList.nCut_ProtonScore.increment(truth_isSignal, study1, study2);
-   
+
     // Check nTracks 
     FillHistogram(cutList.hCut_nTracks, nTracks);
     FillHistogram(cutList.hCut_nTracks2, nTracks_Close + nTracks_Far);
@@ -646,7 +656,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         FillHistogram(cutList.hCut_2Track_eVis_nuclearTarget,preFilter_evis_NuclearTarget);
         FillHistogram(cutList.hCut_2Track_eVis_other,preFilter_evis_TotalExceptNuclearTarget);
     }
-   
+
     if (preFilter_evis_TotalExceptNuclearTarget > 1500 && truth_isSignal )  counter1++;
     if (preFilter_evis_TotalExceptNuclearTarget > 2000 && truth_isSignal )  counter2++;
     if( Cut_PreFilter_Pi0 == 1) return false;
@@ -665,7 +675,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_ConeBlobs.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_ConeBlobs.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_ConeBlobs.increment(truth_isSignal, study1, study2);
-   
+
     // ------------------------------------------------------------------------
     // Blob Direction Bad Cut
     // ------------------------------------------------------------------------
@@ -673,7 +683,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_BlobDirectionBad.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_BlobDirectionBad.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_BlobDirectionBad.increment(truth_isSignal, study1, study2);
-  
+
     // ------------------------------------------------------------------------
     // Pi0 Momentum NaN
     // ------------------------------------------------------------------------
@@ -704,7 +714,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) cutList.nCut_1Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
 
- 
+
     // Gamma Comparison
     if (truth_isSignal){
         FillHistogram(cutList.signal_gamma_E_cos_openingAngle, (gamma1_E+gamma2_E)*MeV_to_GeV, pi0_cos_openingAngle);
@@ -721,7 +731,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     bool isEnergyLow = (gamma1_E+gamma2_E) < 400.0;
     if (isEnergyLow && isAngleSmall) return false;
     cutList.nCut_LowE_SmallAngle.increment(truth_isSignal, study1, study2);
-    
+
     // ------------------------------------------------------------------------
     // Neutrino Energy Cut
     // ------------------------------------------------------------------------
@@ -776,7 +786,7 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
         if(mc_intType == 1) FillHistogram(interaction.final_mc_w_CCQE, mc_w * MeV_to_GeV);
         if(mc_intType == 2) FillHistogram(interaction.final_mc_w_RES, mc_w * MeV_to_GeV);
         if(mc_intType == 3) FillHistogram(interaction.final_mc_w_DIS, mc_w * MeV_to_GeV);
-    
+
         // Short Proton True Information
         if (nProtonCandidates == 0){
             double proton_mass = 938.27; // MeV
@@ -785,7 +795,7 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
             FillHistogram(interaction.proton_true_P_1Track, proton_true_P);
             FillHistogram(interaction.proton_true_KE_1Track, proton_true_KE);
         }
-        
+
         // Ejected Nucleon Count
         double n_nucleons = GetEjectedNucleonCount();
         if (nProtonCandidates == 0){
@@ -814,7 +824,7 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
             FillHistogram(interaction.Enu_2Track_Error, E_Error);
             FillHistogram(interaction.Enu_2Track_Diff, E_reco-E_true);
         }  
-    
+
         // Response
         FillHistogram(interaction.response_neutrino_E, CCProtonPi0_neutrino_E * MeV_to_GeV, mc_incomingE * MeV_to_GeV);
         FillHistogram(interaction.response_QSq,CCProtonPi0_QSq * MeVSq_to_GeVSq, mc_Q2 * MeVSq_to_GeVSq);
@@ -831,7 +841,7 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
         FillHistogram(interaction.Enu_2Track, CCProtonPi0_neutrino_E * MeV_to_GeV);
     }
     const double Mn = 939.57; //MeV
- 
+
     double calc_WSq = -CCProtonPi0_QSq + Mn*Mn + 2*Mn*(CCProtonPi0_neutrino_E - muon_E);
     double calc_W = sqrt(calc_WSq);
 
@@ -859,26 +869,26 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
         FillHistogram(interaction.extra_rejected_energy_2Track, Extra_Energy_Rejected); 
         FillHistogram(interaction.extra_total_energy_2Track, Extra_Energy_Dispersed + Extra_Energy_Muon + Extra_Energy_Rejected);    }
 
-    // Other Event Parameters
-    if (nProtonCandidates > 0){
-        FillHistogram(interaction.deltaInvMass, calcDeltaInvariantMass() * MeV_to_GeV);
-    }
+        // Other Event Parameters
+        if (nProtonCandidates > 0){
+            FillHistogram(interaction.deltaInvMass, calcDeltaInvariantMass() * MeV_to_GeV);
+        }
 
-    // Recovered Pi0
-    if (is_blobs_recovered){
-        FillHistogram(interaction.recovered_Pi0_P, pi0_P * MeV_to_GeV);
-        FillHistogram(interaction.recovered_Pi0_theta, pi0_theta * TMath::RadToDeg());
-        FillHistogram(interaction.h_recovered_Pi0_P, pi0_P * MeV_to_GeV);
-        FillHistogram(interaction.h_recovered_Pi0_theta, pi0_theta * TMath::RadToDeg());
-    }else{
-        FillHistogram(interaction.h_original_Pi0_P, pi0_P * MeV_to_GeV);
-        FillHistogram(interaction.h_original_Pi0_theta, pi0_theta * TMath::RadToDeg());
-    }
+        // Recovered Pi0
+        if (is_blobs_recovered){
+            FillHistogram(interaction.recovered_Pi0_P, pi0_P * MeV_to_GeV);
+            FillHistogram(interaction.recovered_Pi0_theta, pi0_theta * TMath::RadToDeg());
+            FillHistogram(interaction.h_recovered_Pi0_P, pi0_P * MeV_to_GeV);
+            FillHistogram(interaction.h_recovered_Pi0_theta, pi0_theta * TMath::RadToDeg());
+        }else{
+            FillHistogram(interaction.h_original_Pi0_P, pi0_P * MeV_to_GeV);
+            FillHistogram(interaction.h_original_Pi0_theta, pi0_theta * TMath::RadToDeg());
+        }
 
-    // Extra Energy
-    FillHistogram(interaction.h_extra_muon_energy, Extra_Energy_Muon); 
-    FillHistogram(interaction.h_extra_dispersed_energy, Extra_Energy_Dispersed); 
-    FillHistogram(interaction.h_extra_rejected_energy, Extra_Energy_Rejected); 
+        // Extra Energy
+        FillHistogram(interaction.h_extra_muon_energy, Extra_Energy_Muon); 
+        FillHistogram(interaction.h_extra_dispersed_energy, Extra_Energy_Dispersed); 
+        FillHistogram(interaction.h_extra_rejected_energy, Extra_Energy_Rejected); 
 
 }
 
@@ -907,7 +917,7 @@ void CCProtonPi0_Analyzer::writeScanFile()
         const string arachne_html = "http://minerva05.fnal.gov/Arachne/arachne.html?filename=";
         const string entryString  = "&entry=";
         const string other        = "&slice=-1&filetype=dst";
-//http://minerva05.fnal.gov/Arachne/arachne.html?det=MV&recoVer=v10r6p13&run=3596&subrun=6&gate=597&slice=7
+        //http://minerva05.fnal.gov/Arachne/arachne.html?det=MV&recoVer=v10r6p13&run=3596&subrun=6&gate=597&slice=7
         roundupText<<arachne_html<<scanFileName<<entryString<<truth_eventID<<other<<" ";
         roundupText<<ev_subrun<<" ^ "<<ev_gate<<" ^ "<<truth_isGamma1_conv_inside<<" ^ "<<truth_isGamma2_conv_inside<<endl;
     }else{
@@ -977,7 +987,7 @@ void CCProtonPi0_Analyzer::fillProtonMC()
 
         FillHistogram(proton.reco_P_true_P, reco_P,true_P);
         FillHistogram(proton.P_error, error_P);
-    
+
         // Energy
         double reco_E = proton_E * MeV_to_GeV;
         double true_E = truth_proton_4P[3] * MeV_to_GeV; 
@@ -1033,10 +1043,10 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         double pi0_true_P = HEP_Functions::calcMomentum(truth_pi0_4P[0],truth_pi0_4P[1],truth_pi0_4P[2]);
         pi0_true_P = pi0_true_P * MeV_to_GeV; 
         double pi0_P_error = Data_Functions::getError(pi0_true_P, pi0_reco_P);
-        
+
         FillHistogram(pi0.P_error, pi0_P_error); 
         FillHistogram(pi0.reco_P_true_P, pi0_reco_P, pi0_true_P); 
-    
+
         // Pi0 Energy
         double reco_E = pi0_E * MeV_to_GeV;
         double true_E = truth_pi0_4P[3] * MeV_to_GeV; 
@@ -1045,11 +1055,11 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         FillHistogram(pi0.reco_E_true_E, reco_E,true_E);
         FillHistogram(pi0.E_error, error_E);
         FillHistogram(pi0.E_Diff, reco_E-true_E);
-  
+
         // Response
         FillHistogram(pi0.response_P, pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV);
         FillHistogram(pi0.response_theta, pi0_theta * rad_to_deg, truth_pi0_theta * rad_to_deg);
-        
+
         FillHistogram(pi0.mc_truth_signal_pi0_P, truth_pi0_P*MeV_to_GeV);
     }
 
@@ -1144,7 +1154,7 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
     // Unique Histograms
     FillHistogram(pi0.invMass, pi0_invMass);
     FillHistogram(pi0.cos_openingAngle, pi0_cos_openingAngle);
-   
+
     // Leading Photon - Energetic Photon
     FillHistogram(pi0.gamma1_ConvLength, gamma1_dist_vtx * 0.1);
     FillHistogram(pi0.gamma1_E, gamma1_E * MeV_to_GeV);
@@ -1166,13 +1176,15 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
     FillHistogram(pi0.phi, pi0_phi * TMath::RadToDeg());
 
     // Cross Section Variables
-    FillHistogram(pi0.data_all_pi0_P, pi0_P * MeV_to_GeV);
-    if (truth_isSignal) FillHistogram(pi0.mc_reco_signal_pi0_P, pi0_P * MeV_to_GeV);
-    else FillHistogram(pi0.mc_reco_bckg_pi0_P, pi0_P * MeV_to_GeV);
+    if (m_isMC){
+        FillHistogramWithErrors(pi0.mc_truth_signal_pi0_P, pi0_P * MeV_to_GeV);
+        FillHistogramWithErrors(pi0.mc_reco_all_pi0_P, pi0_P * MeV_to_GeV);
+        if (truth_isSignal) FillHistogramWithErrors(pi0.mc_reco_signal_pi0_P, pi0_P * MeV_to_GeV);
+        else FillHistogramWithErrors(pi0.mc_reco_bckg_pi0_P, pi0_P * MeV_to_GeV);
+    }else{
+        FillHistogramWithErrors(pi0.data_all_pi0_P, pi0_P * MeV_to_GeV);
+    }
 
-    // Photon Comparison
-    //FillHistogram(pi0.gamma1_E_gamma2_E, gamma1_E * MeV_to_GeV, gamma2_E * MeV_to_GeV);
-    
 }
 
 void CCProtonPi0_Analyzer::fillMuonMC()
@@ -1186,7 +1198,7 @@ void CCProtonPi0_Analyzer::fillMuonMC()
 
         FillHistogram(muon.reco_P_true_P, reco_P,true_P);
         FillHistogram(muon.P_error, error_P);
-    
+
         // Energy
         double reco_E = muon_E * MeV_to_GeV;
         double true_E = truth_muon_4P[3] * MeV_to_GeV; 
@@ -1199,7 +1211,7 @@ void CCProtonPi0_Analyzer::fillMuonMC()
         // Response
         FillHistogram(muon.response_P, muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV);
         FillHistogram(muon.response_theta,muon_theta * rad_to_deg, truth_muon_theta * rad_to_deg);
-        
+
         FillHistogram(muon.mc_truth_signal_muon_P, truth_muon_P * MeV_to_GeV);
     }
 }
@@ -1211,12 +1223,11 @@ void CCProtonPi0_Analyzer::fillMuonReco()
     FillHistogram(muon.KE, muon_KE * MeV_to_GeV);
     FillHistogram(muon.theta, muon_theta * TMath::RadToDeg());
     FillHistogram(muon.phi, muon_phi * TMath::RadToDeg());
-    
+
     FillHistogram(muon.data_all_muon_P, muon_P * MeV_to_GeV);
     if(truth_isSignal) FillHistogram(muon.mc_reco_signal_muon_P, muon_P * MeV_to_GeV);
     else FillHistogram(muon.mc_reco_bckg_muon_P, muon_P * MeV_to_GeV);
 }
-
 
 void CCProtonPi0_Analyzer::FillHistogram(TH1D* hist, double var)
 {
@@ -1231,6 +1242,14 @@ void CCProtonPi0_Analyzer::FillHistogram(TH2D* hist, double var1, double var2)
 void CCProtonPi0_Analyzer::FillHistogram(TH3D* hist, double var1, double var2, double var3)
 {
     hist->Fill(var1, var2, var3, wgt);
+}
+
+void CCProtonPi0_Analyzer::FillHistogramWithErrors(MnvH1D* hist, double var)
+{
+    hist->Fill(var, wgt);
+    FillVertErrorBand_Flux(hist, var);
+    FillVertErrorBand_Genie(hist, var);
+    FillVertErrorBand_Normalization(hist, var);
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(MnvH2D* hist, double var1, double var2)
@@ -1263,6 +1282,61 @@ void CCProtonPi0_Analyzer::FillHistogram(vector<MnvH1D*> &hist, double var)
     }
 }
 
+void CCProtonPi0_Analyzer::FillVertErrorBand_Normalization(MnvH1D* h, double var)
+{
+    double norm_err = CalcVertError_Normalization(CCProtonPi0_minos_trk_p);
+    assert(norm_err < 1.0);
+    h->FillVertErrorBand("Normalization", var, 1-norm_err, 1+norm_err, wgt);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_Flux(MnvH1D* h, double var)
+{
+    if (m_isMC){
+        double enu0 = mc_incomingE/1.e3;
+        std::vector<double> random_weights = new_flux::get().get_random_weights(enu0);
+        h->FillVertErrorBand("Flux",  var, &random_weights[0],  wgt, 1.0);
+    }
+}
+void CCProtonPi0_Analyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
+{
+    if (m_isMC){
+        h->FillVertErrorBand("GENIE_AGKYxF1pi"         ,var, truth_genie_wgt_AGKYxF1pi[2]        , truth_genie_wgt_AGKYxF1pi[4]        , wgt);
+        h->FillVertErrorBand("GENIE_AhtBY"             ,var, truth_genie_wgt_AhtBY[2]            , truth_genie_wgt_AhtBY[4]            , wgt);
+        h->FillVertErrorBand("GENIE_BhtBY"             ,var, truth_genie_wgt_BhtBY[2]            , truth_genie_wgt_BhtBY[4]            , wgt);
+        h->FillVertErrorBand("GENIE_CCQEPauliSupViaKF" ,var, truth_genie_wgt_CCQEPauliSupViaKF[2], truth_genie_wgt_CCQEPauliSupViaKF[4], wgt);
+        h->FillVertErrorBand("GENIE_CV1uBY"            ,var, truth_genie_wgt_CV1uBY[2]           , truth_genie_wgt_CV1uBY[4]           , wgt);
+        h->FillVertErrorBand("GENIE_CV2uBY"            ,var, truth_genie_wgt_CV2uBY[2]           , truth_genie_wgt_CV2uBY[4]           , wgt);
+        h->FillVertErrorBand("GENIE_EtaNCEL"           ,var, truth_genie_wgt_EtaNCEL[2]          , truth_genie_wgt_EtaNCEL[4]          , wgt);
+        h->FillVertErrorBand("GENIE_FrAbs_N"           ,var, truth_genie_wgt_FrAbs_N[2]          , truth_genie_wgt_FrAbs_N[4]          , wgt);
+        h->FillVertErrorBand("GENIE_FrAbs_pi"          ,var, truth_genie_wgt_FrAbs_pi[2]         , truth_genie_wgt_FrAbs_pi[4]         , wgt);
+        h->FillVertErrorBand("GENIE_FrCEx_N"           ,var, truth_genie_wgt_FrCEx_N[2]          , truth_genie_wgt_FrCEx_N[4]          , wgt);
+        h->FillVertErrorBand("GENIE_FrCEx_pi"          ,var, truth_genie_wgt_FrCEx_pi[2]         , truth_genie_wgt_FrCEx_pi[4]         , wgt);
+        h->FillVertErrorBand("GENIE_FrElas_N"          ,var, truth_genie_wgt_FrElas_N[2]         , truth_genie_wgt_FrElas_N[4]         , wgt);
+        h->FillVertErrorBand("GENIE_FrElas_pi"         ,var, truth_genie_wgt_FrElas_pi[2]        , truth_genie_wgt_FrElas_pi[4]        , wgt);
+        h->FillVertErrorBand("GENIE_FrInel_N"          ,var, truth_genie_wgt_FrInel_N[2]         , truth_genie_wgt_FrInel_N[4]         , wgt);
+        h->FillVertErrorBand("GENIE_FrInel_pi"         ,var, truth_genie_wgt_FrInel_pi[2]        , truth_genie_wgt_FrInel_pi[4]        , wgt);
+        h->FillVertErrorBand("GENIE_FrPiProd_N"        ,var, truth_genie_wgt_FrPiProd_N[2]       , truth_genie_wgt_FrPiProd_N[4]       , wgt);
+        h->FillVertErrorBand("GENIE_FrPiProd_pi"       ,var, truth_genie_wgt_FrPiProd_pi[2]      , truth_genie_wgt_FrPiProd_pi[4]      , wgt);
+        h->FillVertErrorBand("GENIE_MFP_N"             ,var, truth_genie_wgt_MFP_N[2]            , truth_genie_wgt_MFP_N[4]            , wgt);
+        h->FillVertErrorBand("GENIE_MFP_pi"            ,var, truth_genie_wgt_MFP_pi[2]           , truth_genie_wgt_MFP_pi[4]           , wgt);
+        h->FillVertErrorBand("GENIE_MaCCQE"            ,var, truth_genie_wgt_MaCCQE[2]           , truth_genie_wgt_MaCCQE[4]           , wgt);
+        h->FillVertErrorBand("GENIE_MaCCQEshape"       ,var, truth_genie_wgt_MaCCQEshape[2]      , truth_genie_wgt_MaCCQEshape[4]      , wgt);
+        h->FillVertErrorBand("GENIE_MaNCEL"            ,var, truth_genie_wgt_MaNCEL[2]           , truth_genie_wgt_MaNCEL[4]           , wgt);
+        h->FillVertErrorBand("GENIE_MaRES"             ,var, truth_genie_wgt_MaRES[2]            , truth_genie_wgt_MaRES[4]            , wgt);
+        h->FillVertErrorBand("GENIE_MvRES"             ,var, truth_genie_wgt_MvRES[2]            , truth_genie_wgt_MvRES[4]            , wgt);
+        h->FillVertErrorBand("GENIE_NormCCQE"          ,var, truth_genie_wgt_NormCCQE[2]         , truth_genie_wgt_NormCCQE[4]         , wgt);
+        h->FillVertErrorBand("GENIE_NormCCRES"         ,var, truth_genie_wgt_NormCCRES[2]        , truth_genie_wgt_NormCCRES[4]        , wgt);
+        h->FillVertErrorBand("GENIE_NormDISCC"         ,var, truth_genie_wgt_NormDISCC[2]        , truth_genie_wgt_NormDISCC[4]        , wgt);
+        h->FillVertErrorBand("GENIE_NormNCRES"         ,var, truth_genie_wgt_NormNCRES[2]        , truth_genie_wgt_NormNCRES[4]        , wgt);
+        h->FillVertErrorBand("GENIE_RDecBR1gamma"      ,var, truth_genie_wgt_RDecBR1gamma[2]     , truth_genie_wgt_RDecBR1gamma[4]     , wgt);
+        h->FillVertErrorBand("GENIE_Rvn1pi"            ,var, truth_genie_wgt_Rvn1pi[2]           , truth_genie_wgt_Rvn1pi[4]           , wgt);
+        h->FillVertErrorBand("GENIE_Rvn2pi"            ,var, truth_genie_wgt_Rvn2pi[2]           , truth_genie_wgt_Rvn2pi[4]           , wgt);
+        h->FillVertErrorBand("GENIE_Rvp1pi"            ,var, truth_genie_wgt_Rvp1pi[2]           , truth_genie_wgt_Rvp1pi[4]           , wgt);
+        h->FillVertErrorBand("GENIE_Rvp2pi"            ,var, truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           , wgt);
+        h->FillVertErrorBand("GENIE_Theta_Delta2Npi"   ,var, truth_genie_wgt_Theta_Delta2Npi[2]  , truth_genie_wgt_Theta_Delta2Npi[4]  , wgt);
+        h->FillVertErrorBand("GENIE_VecFFCCQEshape"    ,var, truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   , wgt);
+    }
+}
 int CCProtonPi0_Analyzer::GetBackgroundWithPi0Ind()
 {
     // Check For Signal
@@ -1337,10 +1411,48 @@ double CCProtonPi0_Analyzer::Calc_TruePi0OpeningAngle()
     double g1_g2 = truth_gamma1_4P[0]*truth_gamma2_4P[0] + truth_gamma1_4P[1]*truth_gamma2_4P[1] + truth_gamma1_4P[2]*truth_gamma2_4P[2];
     double cos_theta = g1_g2 / (g1_P*g2_P);
     double theta = acos(cos_theta) * rad_to_deg;
-    
+
     return theta;
 }
 
+
+double CCProtonPi0_Analyzer::CalcVertError_Normalization(double p)
+{
+    //const double mass_scale = 1.0;
+    const double mass_scale_err = 0.014;
+
+    //const double mnv_mu_reco_eff = 0.976;
+    const double mnv_mu_reco_eff_err = 0.01;
+
+    // MINERvA 5      
+    const double minos_mu_reco_eff_lowP      = 0.956;
+    const double minos_mu_reco_eff_highP     = 0.989;
+
+    //const double minos_mu_reco_eff_lowP_err  = 0.002;
+    //const double minos_mu_reco_eff_highP_err = 0.001;
+    const double minos_mu_reco_eff_lowP_err  = (1 - minos_mu_reco_eff_lowP)/2.0;
+    const double minos_mu_reco_eff_highP_err = (1 - minos_mu_reco_eff_highP)/2.0;
+
+    const double p_threshold = 3000.; //MeV/c
+
+    //const double dead_time_tdead     = 1.0;
+    const double dead_time_tdead_err = 0.0;
+
+    double norm_uncertainty = sqrt( 0.  + mass_scale_err * mass_scale_err 
+                                        + mnv_mu_reco_eff_err * mnv_mu_reco_eff_err 
+                                        + dead_time_tdead_err * dead_time_tdead_err);
+
+    if (p < p_threshold) {
+        norm_uncertainty = sqrt(    norm_uncertainty * norm_uncertainty +
+                                    minos_mu_reco_eff_lowP_err * minos_mu_reco_eff_lowP_err );
+    }
+    else {
+        norm_uncertainty = sqrt(    norm_uncertainty * norm_uncertainty +
+                                     minos_mu_reco_eff_highP_err * minos_mu_reco_eff_highP_err );
+    }
+
+    return norm_uncertainty;
+}
 
 // Function Reserved for Correcting a NTupleVariables
 void CCProtonPi0_Analyzer::CorrectNTupleVariables()
@@ -1356,7 +1468,16 @@ void CCProtonPi0_Analyzer::CorrectEMShowerCalibration()
     }
 }
 
+void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
+{
+    double enu0 = CCProtonPi0_neutrino_E * MeV_to_GeV;
+    cvweight = new_flux::get().get_cvweight(enu0);
+
+    //const double minos_eff_correction = normalizer.GetCorrection(mc_object->minos_trk_p);
+    //cvweight *= minos_eff_correction;
+
+}
 
 #endif //CCProtonPi0_Analyzer_cpp
-    
+
 

@@ -287,8 +287,8 @@ MnvH1D* CCProtonPi0_CrossSection::calc_flux( MnvH1D* mnvh1d_template,          /
     std::cout << "Integrated flux (10^-8 v/cm^2/POT)" << std::endl;
     std::cout.precision(5);
     for (int i = 1; i <= mnvh1d_flux_integrated->GetNbinsX(); ++i) {
-        std::cout << setw(8) << i << setw(20) << mnvh1d_flux_integrated->GetBinContent(i)/1e-8
-                  << std::endl;
+        //std::cout << setw(8) << i << setw(20) << mnvh1d_flux_integrated->GetBinContent(i)/1e-8
+                  //<< std::endl;
     }
 
     

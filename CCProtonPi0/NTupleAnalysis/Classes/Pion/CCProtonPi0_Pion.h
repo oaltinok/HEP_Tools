@@ -19,26 +19,26 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
 {
     public:
         // Leading Photon - Energetic Photon
-        vector<MnvH1D*> gamma1_E;
-        vector<MnvH1D*> gamma1_theta;
-        vector<MnvH1D*> gamma1_ConvLength;
+        std::vector<MnvH1D*> gamma1_E;
+        std::vector<MnvH1D*> gamma1_theta;
+        std::vector<MnvH1D*> gamma1_ConvLength;
         TH1D* gamma1_true_E;
         TH1D* gamma1_reco_error_E;
         TH2D* gamma1_reco_E_true_E;
         TH2D* gamma1_true_E_reco_E_error;
 
         // Secondary Photon
-        vector<MnvH1D*> gamma2_E;
-        vector<MnvH1D*> gamma2_theta;
-        vector<MnvH1D*> gamma2_ConvLength;
+        std::vector<MnvH1D*> gamma2_E;
+        std::vector<MnvH1D*> gamma2_theta;
+        std::vector<MnvH1D*> gamma2_ConvLength;
         TH1D* gamma2_true_E;
         TH1D* gamma2_reco_error_E;
         TH2D* gamma2_reco_E_true_E;
         TH2D* gamma2_true_E_reco_E_error;
       
-        vector<MnvH1D*> invMass;
-        vector<MnvH1D*> photonEnergy_Asymmetry;
-        vector<MnvH1D*> cos_openingAngle;
+        std::vector<MnvH1D*> invMass;
+        std::vector<MnvH1D*> photonEnergy_Asymmetry;
+        std::vector<MnvH1D*> cos_openingAngle;
  
         TH2D* signal_gamma1_convLength_gamma2_convLength;
         TH2D* bckg_gamma1_convLength_gamma2_convLength;
@@ -47,6 +47,7 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         // Pi0 Momentum 
         MnvH1D* data_all_pi0_P;
         MnvH1D* mc_truth_signal_pi0_P;
+        MnvH1D* mc_reco_all_pi0_P;
         MnvH1D* mc_reco_signal_pi0_P;
         MnvH1D* mc_reco_bckg_pi0_P;
         MnvH2D* response_P;

@@ -84,6 +84,7 @@ namespace Folder_List
     //-------------------------------------------------------------------------
     // Plot Dirs
     //-------------------------------------------------------------------------
+    const std::string plotDir_Errors = output + plotOut + "Errors/";
     const std::string plotDir_Unfolding = output + plotOut + "Unfolding/";
     const std::string plotDir_BackgroundSubtraction = output + plotOut + "BackgroundSubtraction/";
     const std::string plotDir_Efficiency = output + plotOut + "Efficiency/";

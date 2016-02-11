@@ -40,6 +40,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         MnvH1D* data_xsec_muon_P;
         MnvH1D* data_all_muon_P;
         MnvH1D* data_bckg_subtracted_muon_P;
+        MnvH1D* data_bckg_estimated_muon_P;
         MnvH1D* data_unfolded_muon_P;
         MnvH1D* data_efficiency_corrected_muon_P;
         MnvH1D* data_integrated_flux_muon_P;
@@ -59,6 +60,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         MnvH1D* data_xsec_pi0_P;
         MnvH1D* data_all_pi0_P;
         MnvH1D* data_bckg_subtracted_pi0_P;
+        MnvH1D* data_bckg_estimated_pi0_P;
         MnvH1D* data_unfolded_pi0_P;
         MnvH1D* data_efficiency_corrected_pi0_P;
         MnvH1D* data_integrated_flux_pi0_P;
@@ -96,7 +98,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void writeHistograms();
         void OpenRootFiles();
         void initHistograms();
-        MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, std::string var_name);
+        MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name);
         MnvH1D* Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name);
         MnvH1D* Efficiency_Divide(MnvH1D* unfolded, MnvH1D* eff, std::string var_name);
         MnvH1D* Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name, bool isEv);

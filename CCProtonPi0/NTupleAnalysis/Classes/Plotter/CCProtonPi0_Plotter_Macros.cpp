@@ -262,12 +262,127 @@ void CCProtonPi0_Plotter::ApplyStyle(MnvPlotter* plotter)
     plotter->legend_text_size = 0.02;
 }
 
+void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter)
+{
+    //plotter->hist_min_zero = false;
+    //plotter->mc_line_width = 0;
+    //plotter->axis_title_size_x = 0.04;
+    //plotter->axis_title_size_y = 0.04;
+    //plotter->axis_label_size = 0.03;
+    plotter->legend_text_size = 0.02;
+    plotter->legend_n_columns = 2;
+    plotter->height_nspaces_per_hist = 0.5;
+    plotter->width_xspace_per_letter = 0.1;
+    //-- define colors of the standard errors
+    plotter->error_color_map.clear();
+    plotter->error_summary_group_map.clear();
+
+    plotter->error_color_map["Interaction Model"] = kGreen+2;
+
+    std::vector<std::string> genieGroup;
+    genieGroup.push_back("GENIE_AGKYxF1pi"         );
+    genieGroup.push_back("GENIE_AhtBY"             );
+    genieGroup.push_back("GENIE_BhtBY"             );
+    genieGroup.push_back("GENIE_CCQEPauliSupViaKF" );
+    genieGroup.push_back("GENIE_CV1uBY"            );
+    genieGroup.push_back("GENIE_CV2uBY"            );
+    genieGroup.push_back("GENIE_EtaNCEL"           );
+    genieGroup.push_back("GENIE_FrAbs_N"           );
+    genieGroup.push_back("GENIE_FrAbs_pi"          );
+    genieGroup.push_back("GENIE_FrCEx_N"           );
+    genieGroup.push_back("GENIE_FrCEx_pi"          );
+    genieGroup.push_back("GENIE_FrElas_N"          );
+    genieGroup.push_back("GENIE_FrElas_pi"         );
+    genieGroup.push_back("GENIE_FrInel_N"          );
+    genieGroup.push_back("GENIE_FrInel_pi"         );
+    genieGroup.push_back("GENIE_FrPiProd_N"        );
+    genieGroup.push_back("GENIE_FrPiProd_pi"       );
+    genieGroup.push_back("GENIE_MFP_N"             );
+    genieGroup.push_back("GENIE_MFP_pi"            );
+    genieGroup.push_back("GENIE_MaCCQE"            );
+    genieGroup.push_back("GENIE_MaCCQEshape"       );
+    genieGroup.push_back("GENIE_MaNCEL"            );
+    genieGroup.push_back("GENIE_MaRES"             );
+    genieGroup.push_back("GENIE_MvRES"             );
+    genieGroup.push_back("GENIE_NormCCQE"          );
+    genieGroup.push_back("GENIE_NormCCRES"         );
+    genieGroup.push_back("GENIE_NormDISCC"         );
+    genieGroup.push_back("GENIE_NormNCRES"         );
+    genieGroup.push_back("GENIE_RDecBR1gamma"      );
+    genieGroup.push_back("GENIE_Rvn1pi"            );
+    genieGroup.push_back("GENIE_Rvn2pi"            );
+    genieGroup.push_back("GENIE_Rvp1pi"            );
+    genieGroup.push_back("GENIE_Rvp2pi"            );
+    genieGroup.push_back("GENIE_Theta_Delta2Npi"   );
+    genieGroup.push_back("GENIE_VecFFCCQEshape"    );
+    plotter->error_summary_group_map["Interaction Model"] = genieGroup;   
+}
+
+void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir)
+{
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+    
+    ApplyStyle_Errors(plotter);
+    
+    plotter->DrawErrorSummary(hist);
+
+    // Add Plot Labels
+    plotter->AddHistoTitle(hist->GetTitle());
+
+    // Print Plot
+    c->Print(Form("%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_Errors",".png"), "png");
+
+    delete c;
+    delete plotter;
+}
+
+void CCProtonPi0_Plotter::DrawErrorBand(MnvH1D* hist, std::string error_name, int error_color, std::string var_name, std::string plotDir)
+{
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    //ApplyStyle_Error(plotter);
+    
+    TH1D* error = hist->GetVertErrorBand(error_name.c_str());
+    plotter->DrawErrorBand(error, error_color);
+    
+    // Add Plot Labels
+    plotter->AddHistoTitle(hist->GetTitle());
+
+    // Print Plot
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_Error_", error_name.c_str() ,".png"), "png");
+
+    delete c;
+    delete plotter;
+}
+
 void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir)
 {
+    std::string rootDir_mc = dir.mc;
+    std::string rootDir_data = dir.data;
+
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+    TFile* f_data = new TFile(rootDir_data.c_str());
+
+    std::string var = Form("%s_%d",var_name.c_str(),0);
+    
     // POT Normalized
-    DrawDataMC(dir,var_name,plotDir,true);
+    MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
+    MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
+    DrawDataMC(data, mc, var_name, plotDir, true);
+  
     // Area Normalized
-    DrawDataMC(dir,var_name,plotDir,false);
+    mc = (MnvH1D*)f_mc->Get(var.c_str());
+    data = (MnvH1D*)f_data->Get(var.c_str()); 
+    DrawDataMC(data, mc, var_name, plotDir, false);
+
 }
 
 void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir)
@@ -312,77 +427,12 @@ void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_n
 
     delete c;
     delete plotter;
-    //
-    //if (isPOTNorm){
-    //DrawDataMCRatio(dir,var_name,plotDir,isPOTNorm);
-    //}
+    
+    DrawDataMCRatio(data,mc,var_name,plotDir,isPOTNorm);
 }
 
-void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm)
+void CCProtonPi0_Plotter::DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm)
 {
-    std::string rootDir_mc = dir.mc;
-    std::string rootDir_data = dir.data;
-
-    TFile* f_mc = new TFile(rootDir_mc.c_str());
-    TFile* f_data = new TFile(rootDir_data.c_str());
-
-    std::string var = Form("%s_%d",var_name.c_str(),0);
-    MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
-    MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
-
-    // ------------------------------------------------------------------------
-    // MC Normalization 
-    // ------------------------------------------------------------------------
-    std::string norm_label; 
-    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc);
-
-    // ------------------------------------------------------------------------
-    // Plot 
-    // ------------------------------------------------------------------------
-    MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
-
-    plotter->DrawDataMC(data, mc, mc_ratio, "TR", false);
-
-    // Add Plot Labels
-    plotter->AddHistoTitle(data[0].GetTitle());
-    AddNormBox(plotter, isPOTNorm, mc_ratio);
-
-    // Add Pi0 InvMass Line
-    std::size_t found = var_name.find("invMass");
-    if (found != std::string::npos){
-        TLine pi0Mass;
-        pi0Mass.SetLineWidth(2);
-        pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,3200);
-    }
-
-    // Print Plot
-    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_",norm_label.c_str(),".png"), "png");
-
-    delete c;
-    delete plotter;
-
-    if (isPOTNorm){
-        DrawDataMCRatio(dir,var_name,plotDir,isPOTNorm);
-    }
-}
-
-void CCProtonPi0_Plotter::DrawDataMCRatio(rootDir& dir, std::string var_name, std::string plotDir, bool isPOTNorm)
-{
-    std::string rootDir_mc = dir.mc;
-    std::string rootDir_data = dir.data;
-
-    TFile* f_mc = new TFile(rootDir_mc.c_str());
-    TFile* f_data = new TFile(rootDir_data.c_str());
-
-    // ------------------------------------------------------------------------
-    // Get data and MC 
-    // ------------------------------------------------------------------------
-    std::string var = Form("%s_%d",var_name.c_str(),0);
-    MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
-    MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
-
     // ------------------------------------------------------------------------
     // MC Normalization 
     // ------------------------------------------------------------------------
@@ -400,11 +450,6 @@ void CCProtonPi0_Plotter::DrawDataMCRatio(rootDir& dir, std::string var_name, st
     // Add Plot Labels
     plotter->AddHistoTitle(data[0].GetTitle());
     AddNormBox(plotter, isPOTNorm, mc_ratio);
-
-    const double y_pos = 0.88;
-    const double y_diff = 0.033;
-    plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
-    plotter->AddPOTNormBox(data_POT,mc_POT,0.3,y_pos-y_diff);
 
     // Print Plot
     c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_ratio_",norm_label.c_str(),".png"), "png");
