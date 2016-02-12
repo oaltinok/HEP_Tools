@@ -1,17 +1,14 @@
 #ifndef CCProtonPi0_TruthAnalyzer_cpp
 #define CCProtonPi0_TruthAnalyzer_cpp
 
+
+#include "../../../Classes/Analyzer/new_flux.h"
+
 #include "CCProtonPi0_TruthAnalyzer.h"
 
 using namespace PlotUtils;
 
-// Initialize Constants
-const double CCProtonPi0_TruthAnalyzer::MeV_to_GeV = pow(10,-3);
-const double CCProtonPi0_TruthAnalyzer::MeVSq_to_GeVSq = pow(10,-6);
-const double CCProtonPi0_TruthAnalyzer::mm_to_cm = pow(10,-1);
-const double CCProtonPi0_TruthAnalyzer::rad_to_deg = 180.0/M_PI;
-
-void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist) 
+void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 {
     // Control Flow
     bool applyMaxEvents = false;
@@ -25,6 +22,11 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 
     if (!fChain) return;
     if (fChain == 0) return;
+    
+    // Read Flux & Calc Weights 
+    new_flux::get().read_oldflux_histogram(Folder_List::rootDir_Flux_old);
+    new_flux::get().read_newflux_histogram(Folder_List::rootDir_Flux_new);
+    new_flux::get().calc_weights();
 
     // Disable Branches for Performance
     fChain->SetBranchStatus("*", false);
@@ -33,7 +35,6 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
     fChain->SetBranchStatus("truth_muon_*", true);
     fChain->SetBranchStatus("mc_Q2", true);
     fChain->SetBranchStatus("mc_incomingE", true);
-    fChain->SetBranchStatus("wgt", true);
 
     //------------------------------------------------------------------------
     // Loop over Chain
@@ -68,7 +69,6 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
             continue;
         }
 
-
         // Count Signal and Background
         if (truth_isSignal){
             FillSignalHistograms();
@@ -93,6 +93,9 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
         else if (truth_isBckg_Other) nBckg_Other++;
         else if (truth_isFidVol && !truth_isSignal) std::cout<<"WARNING! No Background Type"<<std::endl;
     }
+
+    // Add Other Error Bands and Fill With CV
+    AddOtherErrorBands_FillWithCV();
 
     writeTextFile();
     writeHistograms();
@@ -144,7 +147,8 @@ double CCProtonPi0_TruthAnalyzer::GetPercent(double nAll, double nOther)
     return percent;
 }
 
-CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer()
+CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() : CCProtonPi0_NTupleAnalysis()
+
 {
     std::cout<<"Initializing TruthAnalyzer!"<<std::endl;
 
@@ -158,7 +162,7 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer()
     f = new TFile(rootDir.c_str(),"RECREATE");
 
     initHistograms();
-
+    
     openTextFiles();
 
     resetCounters();
@@ -216,6 +220,8 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     mc_truth_all_signal_muon_P = new MnvH1D( "mc_truth_all_signal_muon_P","Muon Momentum for Signal Events",nBins_muon_P, min_muon_P, max_muon_P);
     mc_truth_all_signal_muon_P->GetXaxis()->SetTitle("Momentum [GeV]");
     mc_truth_all_signal_muon_P->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBand_Flux(mc_truth_all_signal_muon_P);
+    AddVertErrorBand_Genie(mc_truth_all_signal_muon_P);
 
     int nBins_muon_theta = 12;
     double min_muon_theta = 0.0;
@@ -223,6 +229,8 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     mc_truth_all_signal_muon_theta = new MnvH1D( "mc_truth_all_signal_muon_theta","Pi0 Muon Theta for Signal Events",nBins_muon_theta,min_muon_theta,max_muon_theta);
     mc_truth_all_signal_muon_theta->GetXaxis()->SetTitle("Theta");
     mc_truth_all_signal_muon_theta->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBand_Flux(mc_truth_all_signal_muon_theta);
+    AddVertErrorBand_Genie(mc_truth_all_signal_muon_theta);
 
     // ------------------------------------------------------------------------
     // Pi0 Variables
@@ -233,6 +241,8 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     mc_truth_all_signal_pi0_P = new MnvH1D( "mc_truth_all_signal_pi0_P","Pi0 Momentum for Signal Events",nBins_pi0_P, min_pi0_P, max_pi0_P);
     mc_truth_all_signal_pi0_P->GetXaxis()->SetTitle("Momentum [GeV]");
     mc_truth_all_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBand_Flux(mc_truth_all_signal_pi0_P);
+    AddVertErrorBand_Genie(mc_truth_all_signal_pi0_P);
 
     int nBins_pi0_theta = 18;
     double min_pi0_theta = 0.0;
@@ -240,6 +250,8 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     mc_truth_all_signal_pi0_theta = new MnvH1D( "mc_truth_all_signal_pi0_theta","Theta for Signal Events",nBins_pi0_theta, min_pi0_theta, max_pi0_theta);
     mc_truth_all_signal_pi0_theta->GetXaxis()->SetTitle("Theta");
     mc_truth_all_signal_pi0_theta->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBand_Flux(mc_truth_all_signal_pi0_theta);
+    AddVertErrorBand_Genie(mc_truth_all_signal_pi0_theta);
 
     // ------------------------------------------------------------------------
     // Neutrino Energy & Q2
@@ -250,6 +262,8 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     mc_truth_all_signal_neutrino_E = new MnvH1D( "mc_truth_all_signal_neutrino_E","Neutrino Energy for Signal Events",nBins_neutrino_E, min_neutrino_E, max_neutrino_E);
     mc_truth_all_signal_neutrino_E->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
     mc_truth_all_signal_neutrino_E->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBand_Flux(mc_truth_all_signal_neutrino_E);
+    AddVertErrorBand_Genie(mc_truth_all_signal_neutrino_E);
 
     int nBins_QSq = 40;
     double min_QSq = 0.0;
@@ -257,15 +271,89 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     mc_truth_all_signal_QSq = new MnvH1D( "mc_truth_all_signal_QSq","Q^{2} for Signal Events",nBins_QSq,min_QSq,max_QSq);
     mc_truth_all_signal_QSq->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_truth_all_signal_QSq->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBand_Flux(mc_truth_all_signal_QSq);
+    AddVertErrorBand_Genie(mc_truth_all_signal_QSq);
 }
 
-void CCProtonPi0_TruthAnalyzer::FillHistogram(TH1D* hist, double var)
+void CCProtonPi0_TruthAnalyzer::FillHistogram(MnvH1D* hist, double var)
 {
-    hist->Fill(var, wgt);
+    hist->Fill(var, cvweight);
+    FillVertErrorBand_Flux(hist, var);
+    FillVertErrorBand_Genie(hist, var);
+}
+
+void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Flux(MnvH1D* h, double var)
+{
+    double enu0 = mc_incomingE/1.e3;
+    std::vector<double> random_weights = new_flux::get().get_random_weights(enu0);
+    h->FillVertErrorBand("Flux",  var, &random_weights[0],  cvweight, 1.0);
+}
+
+void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
+{
+    h->FillVertErrorBand("GENIE_AGKYxF1pi"         ,var, truth_genie_wgt_AGKYxF1pi[2]        , truth_genie_wgt_AGKYxF1pi[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_AhtBY"             ,var, truth_genie_wgt_AhtBY[2]            , truth_genie_wgt_AhtBY[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_BhtBY"             ,var, truth_genie_wgt_BhtBY[2]            , truth_genie_wgt_BhtBY[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_CCQEPauliSupViaKF" ,var, truth_genie_wgt_CCQEPauliSupViaKF[2], truth_genie_wgt_CCQEPauliSupViaKF[4], cvweight);
+    h->FillVertErrorBand("GENIE_CV1uBY"            ,var, truth_genie_wgt_CV1uBY[2]           , truth_genie_wgt_CV1uBY[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_CV2uBY"            ,var, truth_genie_wgt_CV2uBY[2]           , truth_genie_wgt_CV2uBY[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_EtaNCEL"           ,var, truth_genie_wgt_EtaNCEL[2]          , truth_genie_wgt_EtaNCEL[4]          , cvweight);
+    h->FillVertErrorBand("GENIE_FrAbs_N"           ,var, truth_genie_wgt_FrAbs_N[2]          , truth_genie_wgt_FrAbs_N[4]          , cvweight);
+    h->FillVertErrorBand("GENIE_FrAbs_pi"          ,var, truth_genie_wgt_FrAbs_pi[2]         , truth_genie_wgt_FrAbs_pi[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrCEx_N"           ,var, truth_genie_wgt_FrCEx_N[2]          , truth_genie_wgt_FrCEx_N[4]          , cvweight);
+    h->FillVertErrorBand("GENIE_FrCEx_pi"          ,var, truth_genie_wgt_FrCEx_pi[2]         , truth_genie_wgt_FrCEx_pi[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrElas_N"          ,var, truth_genie_wgt_FrElas_N[2]         , truth_genie_wgt_FrElas_N[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrElas_pi"         ,var, truth_genie_wgt_FrElas_pi[2]        , truth_genie_wgt_FrElas_pi[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_FrInel_N"          ,var, truth_genie_wgt_FrInel_N[2]         , truth_genie_wgt_FrInel_N[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrInel_pi"         ,var, truth_genie_wgt_FrInel_pi[2]        , truth_genie_wgt_FrInel_pi[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_FrPiProd_N"        ,var, truth_genie_wgt_FrPiProd_N[2]       , truth_genie_wgt_FrPiProd_N[4]       , cvweight);
+    h->FillVertErrorBand("GENIE_FrPiProd_pi"       ,var, truth_genie_wgt_FrPiProd_pi[2]      , truth_genie_wgt_FrPiProd_pi[4]      , cvweight);
+    h->FillVertErrorBand("GENIE_MFP_N"             ,var, truth_genie_wgt_MFP_N[2]            , truth_genie_wgt_MFP_N[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_MFP_pi"            ,var, truth_genie_wgt_MFP_pi[2]           , truth_genie_wgt_MFP_pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_MaCCQE"            ,var, truth_genie_wgt_MaCCQE[2]           , truth_genie_wgt_MaCCQE[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_MaCCQEshape"       ,var, truth_genie_wgt_MaCCQEshape[2]      , truth_genie_wgt_MaCCQEshape[4]      , cvweight);
+    h->FillVertErrorBand("GENIE_MaNCEL"            ,var, truth_genie_wgt_MaNCEL[2]           , truth_genie_wgt_MaNCEL[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_MaRES"             ,var, truth_genie_wgt_MaRES[2]            , truth_genie_wgt_MaRES[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_MvRES"             ,var, truth_genie_wgt_MvRES[2]            , truth_genie_wgt_MvRES[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_NormCCQE"          ,var, truth_genie_wgt_NormCCQE[2]         , truth_genie_wgt_NormCCQE[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_NormCCRES"         ,var, truth_genie_wgt_NormCCRES[2]        , truth_genie_wgt_NormCCRES[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_NormDISCC"         ,var, truth_genie_wgt_NormDISCC[2]        , truth_genie_wgt_NormDISCC[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_NormNCRES"         ,var, truth_genie_wgt_NormNCRES[2]        , truth_genie_wgt_NormNCRES[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_RDecBR1gamma"      ,var, truth_genie_wgt_RDecBR1gamma[2]     , truth_genie_wgt_RDecBR1gamma[4]     , cvweight);
+    h->FillVertErrorBand("GENIE_Rvn1pi"            ,var, truth_genie_wgt_Rvn1pi[2]           , truth_genie_wgt_Rvn1pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Rvn2pi"            ,var, truth_genie_wgt_Rvn2pi[2]           , truth_genie_wgt_Rvn2pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Rvp1pi"            ,var, truth_genie_wgt_Rvp1pi[2]           , truth_genie_wgt_Rvp1pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Rvp2pi"            ,var, truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Theta_Delta2Npi"   ,var, truth_genie_wgt_Theta_Delta2Npi[2]  , truth_genie_wgt_Theta_Delta2Npi[4]  , cvweight);
+    h->FillVertErrorBand("GENIE_VecFFCCQEshape"    ,var, truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   , cvweight);
+}
+
+void CCProtonPi0_TruthAnalyzer::Calc_WeightFromSystematics()
+{
+    // Update cvweight with Flux
+    double enu0 = mc_incomingE * MeV_to_GeV;
+    cvweight = new_flux::get().get_cvweight(enu0);
+    //std::cout<<"cvweight = "<<cvweight<<std::endl;
+}
+
+void CCProtonPi0_TruthAnalyzer::AddOtherErrorBands_FillWithCV()
+{
+    AddErrorBands_FillWithCV(mc_truth_all_signal_muon_P);
+    AddErrorBands_FillWithCV(mc_truth_all_signal_muon_theta);
+    AddErrorBands_FillWithCV(mc_truth_all_signal_pi0_P);
+    AddErrorBands_FillWithCV(mc_truth_all_signal_pi0_theta);
+    AddErrorBands_FillWithCV(mc_truth_all_signal_neutrino_E);
+    AddErrorBands_FillWithCV(mc_truth_all_signal_QSq);
+}
+
+void CCProtonPi0_TruthAnalyzer::AddErrorBands_FillWithCV(MnvH1D* hist)
+{
+    AddVertErrorBandAndFillWithCV_MuonTracking(hist);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
 {
+    Calc_WeightFromSystematics();
     FillHistogram(mc_truth_all_signal_muon_P, truth_muon_P * MeV_to_GeV);
     FillHistogram(mc_truth_all_signal_muon_theta, truth_muon_theta * rad_to_deg);
     FillHistogram(mc_truth_all_signal_pi0_P, truth_pi0_P * MeV_to_GeV);

@@ -59,13 +59,23 @@ class CCProtonPi0_NTupleAnalysis
         void AddVertErrorBands_Data(MnvH1D* h);
         void AddVertErrorBandAndFillWithCV_Flux(MnvH1D* h);
         void AddVertErrorBandAndFillWithCV_Genie(MnvH1D* h);
-        void AddVertErrorBandAndFillWithCV_Normalization(MnvH1D* h);
+        void AddVertErrorBandAndFillWithCV_MuonTracking(MnvH1D* h);
         
+        void AddVertErrorBands_Data(MnvH2D* h);
+        void AddVertErrorBandAndFillWithCV_Flux(MnvH2D* h);
+        void AddVertErrorBandAndFillWithCV_Genie(MnvH2D* h);
+        void AddVertErrorBandAndFillWithCV_MuonTracking(MnvH2D* h);
+
         // Errors for MC
         void AddVertErrorBands_MC(MnvH1D* h);
         void AddVertErrorBand_Flux(MnvH1D* h);
         void AddVertErrorBand_Genie(MnvH1D* h);
-        void AddVertErrorBand_Normalization(MnvH1D* h);
+        void AddVertErrorBand_MuonTracking(MnvH1D* h);
+
+        void AddVertErrorBands_MC(MnvH2D* h);
+        void AddVertErrorBand_Flux(MnvH2D* h);
+        void AddVertErrorBand_Genie(MnvH2D* h);
+        void AddVertErrorBand_MuonTracking(MnvH2D* h);
 
     private:
 };

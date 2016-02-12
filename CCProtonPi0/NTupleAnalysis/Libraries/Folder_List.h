@@ -30,6 +30,7 @@ namespace Folder_List
     const std::string MC = "MC/";
     const std::string Data = "Data/";
     const std::string ParticleCannon = "ParticleCannon/";
+    const std::string Flux = "Flux/";
     
     const std::string analyzed = "Analyzed/";
     const std::string reduced = "Reduced/"; 
@@ -62,7 +63,8 @@ namespace Folder_List
     const std::string rootDir_OtherStudies_data = "";
    
     // Set Flux File ROOT Dir
-    const std::string rootDir_Flux = rootOut + Data + analyzed + "fhc_flux_constrained.root";
+    const std::string rootDir_Flux_new = rootOut + Flux + "fhc_flux_constrained.root";
+    const std::string rootDir_Flux_old = rootOut + Flux + "eroica-mipp-off-flux-nuint-minerva1-minerva13C.root";
     
     // Set MC Root Dir;
     const std::string rootDir_CutHists_mc = rootOut + MC + analyzed + "CutHistograms.root";
@@ -84,10 +86,18 @@ namespace Folder_List
     //-------------------------------------------------------------------------
     // Plot Dirs
     //-------------------------------------------------------------------------
-    const std::string plotDir_Errors = output + plotOut + "Errors/";
-    const std::string plotDir_Unfolding = output + plotOut + "Unfolding/";
-    const std::string plotDir_BackgroundSubtraction = output + plotOut + "BackgroundSubtraction/";
-    const std::string plotDir_Efficiency = output + plotOut + "Efficiency/";
+    // CrossSection Plot Dirs
+    const std::string xsec_muon_P = output + plotOut + "xsec_muon_P/";
+    const std::string xsec_pi0_P = output + plotOut + "xsec_pi0_P/";
+
+    const std::string plotDir_CrossSection = "CrossSection/";
+    const std::string plotDir_Original = "Original/";
+    const std::string plotDir_BackgroundEstimated = "BackgroundEstimated/";
+    const std::string plotDir_BackgroundSubtracted = "BackgroundSubtracted/";
+    const std::string plotDir_Unfolding = "Unfolded/";
+    const std::string plotDir_Efficiency = "EfficiencyCorrected/";
+
+    // Default Plot Dirs
     const std::string plotDir_OtherStudies = output + plotOut + "OtherStudies/";
     const std::string plotDir_CutHists = output + plotOut + "CutHists/";
     const std::string plotDir_Interaction = output + plotOut + "Interaction/";
@@ -95,7 +105,6 @@ namespace Folder_List
     const std::string plotDir_Proton = output + plotOut + "Proton/";
     const std::string plotDir_Pion = output + plotOut + "Pion/";
     const std::string plotDir_Pi0Blob = output + plotOut + "Pi0Blob/";
-    const std::string plotDir_CrossSection = output + plotOut +"CrossSection/";
 }
 
 #endif 

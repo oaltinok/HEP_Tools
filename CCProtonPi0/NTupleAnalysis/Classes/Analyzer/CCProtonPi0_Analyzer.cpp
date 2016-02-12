@@ -21,11 +21,14 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     isScanRun = true;
     writeFSParticleMomentum = false;
 
-    new_flux::get().read_newflux_histogram(Folder_List::rootDir_Flux);
-    new_flux::get().calc_weights();
-
+    // Weights & Systematics
+    if (m_isMC){
+        new_flux::get().read_oldflux_histogram(Folder_List::rootDir_Flux_old);
+        new_flux::get().read_newflux_histogram(Folder_List::rootDir_Flux_new);
+        new_flux::get().calc_weights();
+    }
+    
     // Event Selections
-
     applyProtonScore = true;
     minProtonScore_LLR = -10.0;
 
@@ -196,8 +199,8 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             bckgTool.fillBackgroundWithPi0(truth_isBckg_NoPi0, truth_isBckg_SinglePi0, truth_isBckg_MultiPi0, truth_isBckg_withMichel);                                    
             bckgTool.fillBackground(truth_isBckg_NC, truth_isBckg_AntiNeutrino, truth_isBckg_QELike, truth_isBckg_SingleChargedPion,truth_isBckg_SingleChargedPion_ChargeExchanged, truth_isBckg_DoublePionWithPi0, truth_isBckg_DoublePionWithoutPi0, truth_isBckg_MultiPionWithPi0, truth_isBckg_MultiPionWithoutPi0, truth_isBckg_Other, truth_isBckg_withMichel);                                    
         }
-       
-        if (m_isMC) Calc_WeightFromSystematics();
+
+        Calc_WeightFromSystematics();
         
         //----------------------------------------------------------------------
         // Data Analysis and Other Studies
@@ -207,6 +210,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
 
     } // end for-loop
 
+    if (!m_isMC) AddErrorBands_Data();
     //--------------------------------------------------------------------------
     // Studies
     //--------------------------------------------------------------------------
@@ -245,7 +249,8 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
     pi0(isModeReduce, isMC),
     pi0Blob(isModeReduce, isMC),
     bckgTool(isModeReduce),
-    cutList(isModeReduce, isMC)
+    cutList(isModeReduce, isMC),
+    normalizer("Eroica","minerva1")
 {   
     cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
 
@@ -370,6 +375,11 @@ void CCProtonPi0_Analyzer::getPi0Family()
 
 void CCProtonPi0_Analyzer::fillData()
 {          
+    // Fill Cross Section Variables
+
+    fill_pi0_P();
+    fill_muon_P();
+
     // Fill Reconstructed Information
     fillInteractionReco();
     fillMuonReco();
@@ -1057,10 +1067,8 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         FillHistogram(pi0.E_Diff, reco_E-true_E);
 
         // Response
-        FillHistogram(pi0.response_P, pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV);
         FillHistogram(pi0.response_theta, pi0_theta * rad_to_deg, truth_pi0_theta * rad_to_deg);
 
-        FillHistogram(pi0.mc_truth_signal_pi0_P, truth_pi0_P*MeV_to_GeV);
     }
 
     // Gamma Comparison
@@ -1149,6 +1157,8 @@ void CCProtonPi0_Analyzer::fillPi0Blob_Pi0EvisRatio()
 
 }
 
+
+
 void CCProtonPi0_Analyzer::fillPi0Reco()
 {
     // Unique Histograms
@@ -1175,16 +1185,6 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
     FillHistogram(pi0.theta, pi0_theta * TMath::RadToDeg());
     FillHistogram(pi0.phi, pi0_phi * TMath::RadToDeg());
 
-    // Cross Section Variables
-    if (m_isMC){
-        FillHistogramWithErrors(pi0.mc_truth_signal_pi0_P, pi0_P * MeV_to_GeV);
-        FillHistogramWithErrors(pi0.mc_reco_all_pi0_P, pi0_P * MeV_to_GeV);
-        if (truth_isSignal) FillHistogramWithErrors(pi0.mc_reco_signal_pi0_P, pi0_P * MeV_to_GeV);
-        else FillHistogramWithErrors(pi0.mc_reco_bckg_pi0_P, pi0_P * MeV_to_GeV);
-    }else{
-        FillHistogramWithErrors(pi0.data_all_pi0_P, pi0_P * MeV_to_GeV);
-    }
-
 }
 
 void CCProtonPi0_Analyzer::fillMuonMC()
@@ -1209,10 +1209,51 @@ void CCProtonPi0_Analyzer::fillMuonMC()
         FillHistogram(muon.E_Diff, reco_E-true_E);
 
         // Response
-        FillHistogram(muon.response_P, muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV);
-        FillHistogram(muon.response_theta,muon_theta * rad_to_deg, truth_muon_theta * rad_to_deg);
 
-        FillHistogram(muon.mc_truth_signal_muon_P, truth_muon_P * MeV_to_GeV);
+    }
+}
+
+void CCProtonPi0_Analyzer::fill_muon_P() 
+{
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithDefaultErrors(muon.mc_reco_all_muon_P, muon_P * MeV_to_GeV);
+        if (truth_isSignal){
+            // MC Truth Signal
+            FillHistogramWithDefaultErrors(muon.mc_truth_signal_muon_P, muon_P * MeV_to_GeV);
+            // MC Reco Signal
+            FillHistogramWithDefaultErrors(muon.mc_reco_signal_muon_P, muon_P * MeV_to_GeV);
+            // MC Reco vs True -- Response
+            FillHistogramWithDefaultErrors(muon.response_P, muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV);
+        }else{
+            // MC Reco Background
+            FillHistogramWithDefaultErrors(muon.mc_reco_bckg_muon_P, muon_P * MeV_to_GeV);
+        }
+    }else{
+        // Data
+        FillHistogram(muon.data_all_muon_P, muon_P * MeV_to_GeV);
+    }
+}
+
+void CCProtonPi0_Analyzer::fill_pi0_P() 
+{
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithDefaultErrors(pi0.mc_reco_all_pi0_P, pi0_P * MeV_to_GeV);
+        if (truth_isSignal){
+            // MC Truth Signal
+            FillHistogramWithDefaultErrors(pi0.mc_truth_signal_pi0_P, pi0_P * MeV_to_GeV);
+            // MC Reco Signal
+            FillHistogramWithDefaultErrors(pi0.mc_reco_signal_pi0_P, pi0_P * MeV_to_GeV);
+            // MC Reco vs True -- Response
+            FillHistogramWithDefaultErrors(pi0.response_P, pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV);
+        }else{
+            // MC Reco Background
+            FillHistogramWithDefaultErrors(pi0.mc_reco_bckg_pi0_P, pi0_P * MeV_to_GeV);
+        }
+    }else{
+        // Data
+        FillHistogram(pi0.data_all_pi0_P, pi0_P * MeV_to_GeV);
     }
 }
 
@@ -1224,119 +1265,181 @@ void CCProtonPi0_Analyzer::fillMuonReco()
     FillHistogram(muon.theta, muon_theta * TMath::RadToDeg());
     FillHistogram(muon.phi, muon_phi * TMath::RadToDeg());
 
-    FillHistogram(muon.data_all_muon_P, muon_P * MeV_to_GeV);
-    if(truth_isSignal) FillHistogram(muon.mc_reco_signal_muon_P, muon_P * MeV_to_GeV);
-    else FillHistogram(muon.mc_reco_bckg_muon_P, muon_P * MeV_to_GeV);
+
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(TH1D* hist, double var)
 {
-    hist->Fill(var, wgt);
+    hist->Fill(var, cvweight);
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(TH2D* hist, double var1, double var2)
 {
-    hist->Fill(var1,var2, wgt);
+    hist->Fill(var1,var2, cvweight);
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(TH3D* hist, double var1, double var2, double var3)
 {
-    hist->Fill(var1, var2, var3, wgt);
+    hist->Fill(var1, var2, var3, cvweight);
 }
 
-void CCProtonPi0_Analyzer::FillHistogramWithErrors(MnvH1D* hist, double var)
+void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors(MnvH1D* hist, double var)
 {
-    hist->Fill(var, wgt);
+    hist->Fill(var, cvweight);
     FillVertErrorBand_Flux(hist, var);
     FillVertErrorBand_Genie(hist, var);
-    FillVertErrorBand_Normalization(hist, var);
+    FillVertErrorBand_MuonTracking(hist, var);
+}
+
+void CCProtonPi0_Analyzer::FillHistogram(MnvH1D* hist, double var)
+{
+    hist->Fill(var, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors(MnvH2D* hist, double var1, double var2)
+{
+    hist->Fill(var1,var2, cvweight);
+    FillVertErrorBand_Flux(hist, var1, var2);
+    FillVertErrorBand_Genie(hist, var1, var2);
+    FillVertErrorBand_MuonTracking(hist, var1, var2);
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(MnvH2D* hist, double var1, double var2)
 {
-    hist->Fill(var1,var2, wgt);
+    hist->Fill(var1,var2, cvweight);
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(vector<MnvH1D*> &hist, double var)
 {
     // Always Fill hist[0]
-    hist[0]->Fill(var, wgt);
+    hist[0]->Fill(var, cvweight);
 
     // Fill others only if Analyzing MC
     if (m_isMC){
         // Fill Signal
         if (truth_isSignal){
-            hist[1]->Fill(var, wgt);
+            hist[1]->Fill(var, cvweight);
         }else{
             // Fill Background
-            hist[2]->Fill(var, wgt); // Always Fill ind == 2 -- All Background
+            hist[2]->Fill(var, cvweight); // Always Fill ind == 2 -- All Background
 
             // Fill Background with Pi0
             int ind = GetBackgroundWithPi0Ind();
-            hist[ind]->Fill(var, wgt);
+            hist[ind]->Fill(var, cvweight);
 
             // Fill Background Type
             ind = GetBackgroundTypeInd();
-            hist[ind]->Fill(var, wgt);
+            hist[ind]->Fill(var, cvweight);
         }
     }
 }
 
-void CCProtonPi0_Analyzer::FillVertErrorBand_Normalization(MnvH1D* h, double var)
+void CCProtonPi0_Analyzer::FillVertErrorBand_MuonTracking(MnvH1D* h, double var)
 {
-    double norm_err = CalcVertError_Normalization(CCProtonPi0_minos_trk_p);
-    assert(norm_err < 1.0);
-    h->FillVertErrorBand("Normalization", var, 1-norm_err, 1+norm_err, wgt);
+    double correctionErr = normalizer.GetCorrectionErr(CCProtonPi0_minos_trk_p);
+    assert(correctionErr < 1.0);
+    h->FillVertErrorBand("MuonTracking", var, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_MuonTracking(MnvH2D* h, double var1, double var2)
+{
+    double correctionErr = normalizer.GetCorrectionErr(CCProtonPi0_minos_trk_p);
+    assert(correctionErr < 1.0);
+    h->FillVertErrorBand("MuonTracking", var1, var2, 1-correctionErr, 1+correctionErr, cvweight);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_Flux(MnvH1D* h, double var)
 {
-    if (m_isMC){
-        double enu0 = mc_incomingE/1.e3;
-        std::vector<double> random_weights = new_flux::get().get_random_weights(enu0);
-        h->FillVertErrorBand("Flux",  var, &random_weights[0],  wgt, 1.0);
-    }
+    double enu0 = mc_incomingE/1.e3;
+    std::vector<double> random_weights = new_flux::get().get_random_weights(enu0);
+    h->FillVertErrorBand("Flux",  var, &random_weights[0],  cvweight, 1.0);
 }
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_Flux(MnvH2D* h, double var1, double var2)
+{
+    double enu0 = mc_incomingE/1.e3;
+    std::vector<double> random_weights = new_flux::get().get_random_weights(enu0);
+    h->FillVertErrorBand("Flux",  var1, var2,  &random_weights[0],  cvweight, 1.0);
+}
+
 void CCProtonPi0_Analyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
 {
-    if (m_isMC){
-        h->FillVertErrorBand("GENIE_AGKYxF1pi"         ,var, truth_genie_wgt_AGKYxF1pi[2]        , truth_genie_wgt_AGKYxF1pi[4]        , wgt);
-        h->FillVertErrorBand("GENIE_AhtBY"             ,var, truth_genie_wgt_AhtBY[2]            , truth_genie_wgt_AhtBY[4]            , wgt);
-        h->FillVertErrorBand("GENIE_BhtBY"             ,var, truth_genie_wgt_BhtBY[2]            , truth_genie_wgt_BhtBY[4]            , wgt);
-        h->FillVertErrorBand("GENIE_CCQEPauliSupViaKF" ,var, truth_genie_wgt_CCQEPauliSupViaKF[2], truth_genie_wgt_CCQEPauliSupViaKF[4], wgt);
-        h->FillVertErrorBand("GENIE_CV1uBY"            ,var, truth_genie_wgt_CV1uBY[2]           , truth_genie_wgt_CV1uBY[4]           , wgt);
-        h->FillVertErrorBand("GENIE_CV2uBY"            ,var, truth_genie_wgt_CV2uBY[2]           , truth_genie_wgt_CV2uBY[4]           , wgt);
-        h->FillVertErrorBand("GENIE_EtaNCEL"           ,var, truth_genie_wgt_EtaNCEL[2]          , truth_genie_wgt_EtaNCEL[4]          , wgt);
-        h->FillVertErrorBand("GENIE_FrAbs_N"           ,var, truth_genie_wgt_FrAbs_N[2]          , truth_genie_wgt_FrAbs_N[4]          , wgt);
-        h->FillVertErrorBand("GENIE_FrAbs_pi"          ,var, truth_genie_wgt_FrAbs_pi[2]         , truth_genie_wgt_FrAbs_pi[4]         , wgt);
-        h->FillVertErrorBand("GENIE_FrCEx_N"           ,var, truth_genie_wgt_FrCEx_N[2]          , truth_genie_wgt_FrCEx_N[4]          , wgt);
-        h->FillVertErrorBand("GENIE_FrCEx_pi"          ,var, truth_genie_wgt_FrCEx_pi[2]         , truth_genie_wgt_FrCEx_pi[4]         , wgt);
-        h->FillVertErrorBand("GENIE_FrElas_N"          ,var, truth_genie_wgt_FrElas_N[2]         , truth_genie_wgt_FrElas_N[4]         , wgt);
-        h->FillVertErrorBand("GENIE_FrElas_pi"         ,var, truth_genie_wgt_FrElas_pi[2]        , truth_genie_wgt_FrElas_pi[4]        , wgt);
-        h->FillVertErrorBand("GENIE_FrInel_N"          ,var, truth_genie_wgt_FrInel_N[2]         , truth_genie_wgt_FrInel_N[4]         , wgt);
-        h->FillVertErrorBand("GENIE_FrInel_pi"         ,var, truth_genie_wgt_FrInel_pi[2]        , truth_genie_wgt_FrInel_pi[4]        , wgt);
-        h->FillVertErrorBand("GENIE_FrPiProd_N"        ,var, truth_genie_wgt_FrPiProd_N[2]       , truth_genie_wgt_FrPiProd_N[4]       , wgt);
-        h->FillVertErrorBand("GENIE_FrPiProd_pi"       ,var, truth_genie_wgt_FrPiProd_pi[2]      , truth_genie_wgt_FrPiProd_pi[4]      , wgt);
-        h->FillVertErrorBand("GENIE_MFP_N"             ,var, truth_genie_wgt_MFP_N[2]            , truth_genie_wgt_MFP_N[4]            , wgt);
-        h->FillVertErrorBand("GENIE_MFP_pi"            ,var, truth_genie_wgt_MFP_pi[2]           , truth_genie_wgt_MFP_pi[4]           , wgt);
-        h->FillVertErrorBand("GENIE_MaCCQE"            ,var, truth_genie_wgt_MaCCQE[2]           , truth_genie_wgt_MaCCQE[4]           , wgt);
-        h->FillVertErrorBand("GENIE_MaCCQEshape"       ,var, truth_genie_wgt_MaCCQEshape[2]      , truth_genie_wgt_MaCCQEshape[4]      , wgt);
-        h->FillVertErrorBand("GENIE_MaNCEL"            ,var, truth_genie_wgt_MaNCEL[2]           , truth_genie_wgt_MaNCEL[4]           , wgt);
-        h->FillVertErrorBand("GENIE_MaRES"             ,var, truth_genie_wgt_MaRES[2]            , truth_genie_wgt_MaRES[4]            , wgt);
-        h->FillVertErrorBand("GENIE_MvRES"             ,var, truth_genie_wgt_MvRES[2]            , truth_genie_wgt_MvRES[4]            , wgt);
-        h->FillVertErrorBand("GENIE_NormCCQE"          ,var, truth_genie_wgt_NormCCQE[2]         , truth_genie_wgt_NormCCQE[4]         , wgt);
-        h->FillVertErrorBand("GENIE_NormCCRES"         ,var, truth_genie_wgt_NormCCRES[2]        , truth_genie_wgt_NormCCRES[4]        , wgt);
-        h->FillVertErrorBand("GENIE_NormDISCC"         ,var, truth_genie_wgt_NormDISCC[2]        , truth_genie_wgt_NormDISCC[4]        , wgt);
-        h->FillVertErrorBand("GENIE_NormNCRES"         ,var, truth_genie_wgt_NormNCRES[2]        , truth_genie_wgt_NormNCRES[4]        , wgt);
-        h->FillVertErrorBand("GENIE_RDecBR1gamma"      ,var, truth_genie_wgt_RDecBR1gamma[2]     , truth_genie_wgt_RDecBR1gamma[4]     , wgt);
-        h->FillVertErrorBand("GENIE_Rvn1pi"            ,var, truth_genie_wgt_Rvn1pi[2]           , truth_genie_wgt_Rvn1pi[4]           , wgt);
-        h->FillVertErrorBand("GENIE_Rvn2pi"            ,var, truth_genie_wgt_Rvn2pi[2]           , truth_genie_wgt_Rvn2pi[4]           , wgt);
-        h->FillVertErrorBand("GENIE_Rvp1pi"            ,var, truth_genie_wgt_Rvp1pi[2]           , truth_genie_wgt_Rvp1pi[4]           , wgt);
-        h->FillVertErrorBand("GENIE_Rvp2pi"            ,var, truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           , wgt);
-        h->FillVertErrorBand("GENIE_Theta_Delta2Npi"   ,var, truth_genie_wgt_Theta_Delta2Npi[2]  , truth_genie_wgt_Theta_Delta2Npi[4]  , wgt);
-        h->FillVertErrorBand("GENIE_VecFFCCQEshape"    ,var, truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   , wgt);
-    }
+    h->FillVertErrorBand("GENIE_AGKYxF1pi"         ,var, truth_genie_wgt_AGKYxF1pi[2]        , truth_genie_wgt_AGKYxF1pi[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_AhtBY"             ,var, truth_genie_wgt_AhtBY[2]            , truth_genie_wgt_AhtBY[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_BhtBY"             ,var, truth_genie_wgt_BhtBY[2]            , truth_genie_wgt_BhtBY[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_CCQEPauliSupViaKF" ,var, truth_genie_wgt_CCQEPauliSupViaKF[2], truth_genie_wgt_CCQEPauliSupViaKF[4], cvweight);
+    h->FillVertErrorBand("GENIE_CV1uBY"            ,var, truth_genie_wgt_CV1uBY[2]           , truth_genie_wgt_CV1uBY[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_CV2uBY"            ,var, truth_genie_wgt_CV2uBY[2]           , truth_genie_wgt_CV2uBY[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_EtaNCEL"           ,var, truth_genie_wgt_EtaNCEL[2]          , truth_genie_wgt_EtaNCEL[4]          , cvweight);
+    h->FillVertErrorBand("GENIE_FrAbs_N"           ,var, truth_genie_wgt_FrAbs_N[2]          , truth_genie_wgt_FrAbs_N[4]          , cvweight);
+    h->FillVertErrorBand("GENIE_FrAbs_pi"          ,var, truth_genie_wgt_FrAbs_pi[2]         , truth_genie_wgt_FrAbs_pi[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrCEx_N"           ,var, truth_genie_wgt_FrCEx_N[2]          , truth_genie_wgt_FrCEx_N[4]          , cvweight);
+    h->FillVertErrorBand("GENIE_FrCEx_pi"          ,var, truth_genie_wgt_FrCEx_pi[2]         , truth_genie_wgt_FrCEx_pi[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrElas_N"          ,var, truth_genie_wgt_FrElas_N[2]         , truth_genie_wgt_FrElas_N[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrElas_pi"         ,var, truth_genie_wgt_FrElas_pi[2]        , truth_genie_wgt_FrElas_pi[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_FrInel_N"          ,var, truth_genie_wgt_FrInel_N[2]         , truth_genie_wgt_FrInel_N[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrInel_pi"         ,var, truth_genie_wgt_FrInel_pi[2]        , truth_genie_wgt_FrInel_pi[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_FrPiProd_N"        ,var, truth_genie_wgt_FrPiProd_N[2]       , truth_genie_wgt_FrPiProd_N[4]       , cvweight);
+    h->FillVertErrorBand("GENIE_FrPiProd_pi"       ,var, truth_genie_wgt_FrPiProd_pi[2]      , truth_genie_wgt_FrPiProd_pi[4]      , cvweight);
+    h->FillVertErrorBand("GENIE_MFP_N"             ,var, truth_genie_wgt_MFP_N[2]            , truth_genie_wgt_MFP_N[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_MFP_pi"            ,var, truth_genie_wgt_MFP_pi[2]           , truth_genie_wgt_MFP_pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_MaCCQE"            ,var, truth_genie_wgt_MaCCQE[2]           , truth_genie_wgt_MaCCQE[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_MaCCQEshape"       ,var, truth_genie_wgt_MaCCQEshape[2]      , truth_genie_wgt_MaCCQEshape[4]      , cvweight);
+    h->FillVertErrorBand("GENIE_MaNCEL"            ,var, truth_genie_wgt_MaNCEL[2]           , truth_genie_wgt_MaNCEL[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_MaRES"             ,var, truth_genie_wgt_MaRES[2]            , truth_genie_wgt_MaRES[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_MvRES"             ,var, truth_genie_wgt_MvRES[2]            , truth_genie_wgt_MvRES[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_NormCCQE"          ,var, truth_genie_wgt_NormCCQE[2]         , truth_genie_wgt_NormCCQE[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_NormCCRES"         ,var, truth_genie_wgt_NormCCRES[2]        , truth_genie_wgt_NormCCRES[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_NormDISCC"         ,var, truth_genie_wgt_NormDISCC[2]        , truth_genie_wgt_NormDISCC[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_NormNCRES"         ,var, truth_genie_wgt_NormNCRES[2]        , truth_genie_wgt_NormNCRES[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_RDecBR1gamma"      ,var, truth_genie_wgt_RDecBR1gamma[2]     , truth_genie_wgt_RDecBR1gamma[4]     , cvweight);
+    h->FillVertErrorBand("GENIE_Rvn1pi"            ,var, truth_genie_wgt_Rvn1pi[2]           , truth_genie_wgt_Rvn1pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Rvn2pi"            ,var, truth_genie_wgt_Rvn2pi[2]           , truth_genie_wgt_Rvn2pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Rvp1pi"            ,var, truth_genie_wgt_Rvp1pi[2]           , truth_genie_wgt_Rvp1pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Rvp2pi"            ,var, truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Theta_Delta2Npi"   ,var, truth_genie_wgt_Theta_Delta2Npi[2]  , truth_genie_wgt_Theta_Delta2Npi[4]  , cvweight);
+    h->FillVertErrorBand("GENIE_VecFFCCQEshape"    ,var, truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   , cvweight);
 }
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_Genie(MnvH2D* h, double var1, double var2)
+{
+    h->FillVertErrorBand("GENIE_AGKYxF1pi"         ,var1, var2, truth_genie_wgt_AGKYxF1pi[2]        , truth_genie_wgt_AGKYxF1pi[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_AhtBY"             ,var1, var2, truth_genie_wgt_AhtBY[2]            , truth_genie_wgt_AhtBY[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_BhtBY"             ,var1, var2, truth_genie_wgt_BhtBY[2]            , truth_genie_wgt_BhtBY[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_CCQEPauliSupViaKF" ,var1, var2, truth_genie_wgt_CCQEPauliSupViaKF[2], truth_genie_wgt_CCQEPauliSupViaKF[4], cvweight);
+    h->FillVertErrorBand("GENIE_CV1uBY"            ,var1, var2, truth_genie_wgt_CV1uBY[2]           , truth_genie_wgt_CV1uBY[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_CV2uBY"            ,var1, var2, truth_genie_wgt_CV2uBY[2]           , truth_genie_wgt_CV2uBY[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_EtaNCEL"           ,var1, var2, truth_genie_wgt_EtaNCEL[2]          , truth_genie_wgt_EtaNCEL[4]          , cvweight);
+    h->FillVertErrorBand("GENIE_FrAbs_N"           ,var1, var2, truth_genie_wgt_FrAbs_N[2]          , truth_genie_wgt_FrAbs_N[4]          , cvweight);
+    h->FillVertErrorBand("GENIE_FrAbs_pi"          ,var1, var2, truth_genie_wgt_FrAbs_pi[2]         , truth_genie_wgt_FrAbs_pi[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrCEx_N"           ,var1, var2, truth_genie_wgt_FrCEx_N[2]          , truth_genie_wgt_FrCEx_N[4]          , cvweight);
+    h->FillVertErrorBand("GENIE_FrCEx_pi"          ,var1, var2, truth_genie_wgt_FrCEx_pi[2]         , truth_genie_wgt_FrCEx_pi[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrElas_N"          ,var1, var2, truth_genie_wgt_FrElas_N[2]         , truth_genie_wgt_FrElas_N[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrElas_pi"         ,var1, var2, truth_genie_wgt_FrElas_pi[2]        , truth_genie_wgt_FrElas_pi[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_FrInel_N"          ,var1, var2, truth_genie_wgt_FrInel_N[2]         , truth_genie_wgt_FrInel_N[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_FrInel_pi"         ,var1, var2, truth_genie_wgt_FrInel_pi[2]        , truth_genie_wgt_FrInel_pi[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_FrPiProd_N"        ,var1, var2, truth_genie_wgt_FrPiProd_N[2]       , truth_genie_wgt_FrPiProd_N[4]       , cvweight);
+    h->FillVertErrorBand("GENIE_FrPiProd_pi"       ,var1, var2, truth_genie_wgt_FrPiProd_pi[2]      , truth_genie_wgt_FrPiProd_pi[4]      , cvweight);
+    h->FillVertErrorBand("GENIE_MFP_N"             ,var1, var2, truth_genie_wgt_MFP_N[2]            , truth_genie_wgt_MFP_N[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_MFP_pi"            ,var1, var2, truth_genie_wgt_MFP_pi[2]           , truth_genie_wgt_MFP_pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_MaCCQE"            ,var1, var2, truth_genie_wgt_MaCCQE[2]           , truth_genie_wgt_MaCCQE[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_MaCCQEshape"       ,var1, var2, truth_genie_wgt_MaCCQEshape[2]      , truth_genie_wgt_MaCCQEshape[4]      , cvweight);
+    h->FillVertErrorBand("GENIE_MaNCEL"            ,var1, var2, truth_genie_wgt_MaNCEL[2]           , truth_genie_wgt_MaNCEL[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_MaRES"             ,var1, var2, truth_genie_wgt_MaRES[2]            , truth_genie_wgt_MaRES[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_MvRES"             ,var1, var2, truth_genie_wgt_MvRES[2]            , truth_genie_wgt_MvRES[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_NormCCQE"          ,var1, var2, truth_genie_wgt_NormCCQE[2]         , truth_genie_wgt_NormCCQE[4]         , cvweight);
+    h->FillVertErrorBand("GENIE_NormCCRES"         ,var1, var2, truth_genie_wgt_NormCCRES[2]        , truth_genie_wgt_NormCCRES[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_NormDISCC"         ,var1, var2, truth_genie_wgt_NormDISCC[2]        , truth_genie_wgt_NormDISCC[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_NormNCRES"         ,var1, var2, truth_genie_wgt_NormNCRES[2]        , truth_genie_wgt_NormNCRES[4]        , cvweight);
+    h->FillVertErrorBand("GENIE_RDecBR1gamma"      ,var1, var2, truth_genie_wgt_RDecBR1gamma[2]     , truth_genie_wgt_RDecBR1gamma[4]     , cvweight);
+    h->FillVertErrorBand("GENIE_Rvn1pi"            ,var1, var2, truth_genie_wgt_Rvn1pi[2]           , truth_genie_wgt_Rvn1pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Rvn2pi"            ,var1, var2, truth_genie_wgt_Rvn2pi[2]           , truth_genie_wgt_Rvn2pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Rvp1pi"            ,var1, var2, truth_genie_wgt_Rvp1pi[2]           , truth_genie_wgt_Rvp1pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Rvp2pi"            ,var1, var2, truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Theta_Delta2Npi"   ,var1, var2, truth_genie_wgt_Theta_Delta2Npi[2]  , truth_genie_wgt_Theta_Delta2Npi[4]  , cvweight);
+    h->FillVertErrorBand("GENIE_VecFFCCQEshape"    ,var1, var2, truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   , cvweight);
+}
+
 int CCProtonPi0_Analyzer::GetBackgroundWithPi0Ind()
 {
     // Check For Signal
@@ -1415,45 +1518,6 @@ double CCProtonPi0_Analyzer::Calc_TruePi0OpeningAngle()
     return theta;
 }
 
-
-double CCProtonPi0_Analyzer::CalcVertError_Normalization(double p)
-{
-    //const double mass_scale = 1.0;
-    const double mass_scale_err = 0.014;
-
-    //const double mnv_mu_reco_eff = 0.976;
-    const double mnv_mu_reco_eff_err = 0.01;
-
-    // MINERvA 5      
-    const double minos_mu_reco_eff_lowP      = 0.956;
-    const double minos_mu_reco_eff_highP     = 0.989;
-
-    //const double minos_mu_reco_eff_lowP_err  = 0.002;
-    //const double minos_mu_reco_eff_highP_err = 0.001;
-    const double minos_mu_reco_eff_lowP_err  = (1 - minos_mu_reco_eff_lowP)/2.0;
-    const double minos_mu_reco_eff_highP_err = (1 - minos_mu_reco_eff_highP)/2.0;
-
-    const double p_threshold = 3000.; //MeV/c
-
-    //const double dead_time_tdead     = 1.0;
-    const double dead_time_tdead_err = 0.0;
-
-    double norm_uncertainty = sqrt( 0.  + mass_scale_err * mass_scale_err 
-                                        + mnv_mu_reco_eff_err * mnv_mu_reco_eff_err 
-                                        + dead_time_tdead_err * dead_time_tdead_err);
-
-    if (p < p_threshold) {
-        norm_uncertainty = sqrt(    norm_uncertainty * norm_uncertainty +
-                                    minos_mu_reco_eff_lowP_err * minos_mu_reco_eff_lowP_err );
-    }
-    else {
-        norm_uncertainty = sqrt(    norm_uncertainty * norm_uncertainty +
-                                     minos_mu_reco_eff_highP_err * minos_mu_reco_eff_highP_err );
-    }
-
-    return norm_uncertainty;
-}
-
 // Function Reserved for Correcting a NTupleVariables
 void CCProtonPi0_Analyzer::CorrectNTupleVariables()
 {
@@ -1470,12 +1534,23 @@ void CCProtonPi0_Analyzer::CorrectEMShowerCalibration()
 
 void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
 {
-    double enu0 = CCProtonPi0_neutrino_E * MeV_to_GeV;
-    cvweight = new_flux::get().get_cvweight(enu0);
+    if (m_isMC){
+        // Update cvweight with Flux
+        double enu0 = mc_incomingE * MeV_to_GeV;
+        cvweight = new_flux::get().get_cvweight(enu0);
+        
+        // Update cvweight with MINOS Efficiency Correction
+        const double minos_eff_correction = normalizer.GetCorrection(CCProtonPi0_minos_trk_p);
+        cvweight *= minos_eff_correction;
+    }else{
+        cvweight = 1.0; 
+    }
+}
 
-    //const double minos_eff_correction = normalizer.GetCorrection(mc_object->minos_trk_p);
-    //cvweight *= minos_eff_correction;
-
+void CCProtonPi0_Analyzer::AddErrorBands_Data()
+{
+    AddVertErrorBands_Data(pi0.data_all_pi0_P);
+    AddVertErrorBands_Data(muon.data_all_muon_P);
 }
 
 #endif //CCProtonPi0_Analyzer_cpp

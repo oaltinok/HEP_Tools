@@ -18,10 +18,11 @@
 
 #include "Cintex/Cintex.h"
 #include "../../../Libraries/Folder_List.h"
+#include "../../../Classes/NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 
 using namespace PlotUtils;
 
-class CCProtonPi0_TruthAnalyzer
+class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
 {
     public:
         CCProtonPi0_TruthAnalyzer();
@@ -39,20 +40,21 @@ class CCProtonPi0_TruthAnalyzer
         TFile* f;
         std::string rootDir;
 
+        void FillVertErrorBand_Flux(MnvH1D* h, double var);
+        void FillVertErrorBand_Genie(MnvH1D* h, double var);
+        void Calc_WeightFromSystematics();
+        void AddOtherErrorBands_FillWithCV();
+        void AddErrorBands_FillWithCV(MnvH1D* hist);
         double GetPercent(double nAll, double nOther);
         void initHistograms();
         void openTextFiles();
         void resetCounters();
         void writeTextFile();
         void writeHistograms();
-        void FillHistogram(TH1D *hist, double var);
+        void FillHistogram(MnvH1D *hist, double var);
         void FillSignalHistograms();
 
-        static const double MeV_to_GeV; 
-        static const double MeVSq_to_GeVSq;
-        static const double mm_to_cm;
-        static const double rad_to_deg;
-
+        
         // Default Functions    
         void     Init(std::string playlist, TChain* fChain);
         Int_t    GetEntry(Long64_t entry);
@@ -82,6 +84,8 @@ class CCProtonPi0_TruthAnalyzer
         double nBckg_MultiPion_WithPi0;
         double nBckg_MultiPion_WithoutPi0;
         double nBckg_Other;
+
+        double cvweight;
 
         // NTuple Truth Branch
         TTree          *fChain;   //!pointer to the analyzed TTree or TChain
@@ -670,8 +674,6 @@ class CCProtonPi0_TruthAnalyzer
         TBranch        *b_mc_wgt_Norm;   //!
         TBranch        *b_mc_wgt_ppfx1_Total_sz;   //!
         TBranch        *b_mc_wgt_ppfx1_Total;   //!
-
-
 
 };
 

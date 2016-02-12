@@ -3,6 +3,7 @@
 #include <string>
 #include "Cintex/Cintex.h"
 
+#include "../Classes/NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 #include "Classes/TruthAnalyzer/CCProtonPi0_TruthAnalyzer.h"
 
 using namespace std;
@@ -15,6 +16,8 @@ int main()
     int timeDiff_m;
     int timeDiff_s;
 
+    TH1::AddDirectory(false);
+    
     string playlist = "../Input/Playlists/pl_MC_Merged.dat";
     CCProtonPi0_TruthAnalyzer t;
     t.Loop(playlist);

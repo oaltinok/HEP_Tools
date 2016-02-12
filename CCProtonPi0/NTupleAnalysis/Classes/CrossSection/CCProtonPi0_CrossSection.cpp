@@ -52,11 +52,12 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_Muon_P()
     // Calculate Cross Section for Data
     data_xsec_muon_P = Calc_CrossSection(data_efficiency_corrected_muon_P, data_integrated_flux_muon_P, data_POT, false);
     data_xsec_muon_P->SetName("data_xsec_muon_P");
+    data_xsec_muon_P->SetNormBinWidth(1.0);
     
     // Calculate Cross Section for MC Truth All 
     mc_truth_xsec_muon_P = Calc_CrossSection(mc_truth_all_signal_muon_P, mc_truth_integrated_flux_muon_P, mc_POT, true);
     mc_truth_xsec_muon_P->SetName("mc_truth_xsec_muon_P");
-
+    mc_truth_xsec_muon_P->SetNormBinWidth(1.0);
     std::cout<<"Done!"<<std::endl;
     std::cout<<"-----------------------------------------------------------------------"<<std::endl;
 }
@@ -79,10 +80,12 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_Pi0_P()
     // Calculate Cross Section for Data
     data_xsec_pi0_P = Calc_CrossSection(data_efficiency_corrected_pi0_P, data_integrated_flux_pi0_P, data_POT, false);
     data_xsec_pi0_P->SetName("data_xsec_pi0_P");
- 
+    data_xsec_pi0_P->SetNormBinWidth(0.1);
+
     // Calculate Cross Section for MC Truth All 
     mc_truth_xsec_pi0_P = Calc_CrossSection(mc_truth_all_signal_pi0_P, mc_truth_integrated_flux_pi0_P, mc_POT, true);
     mc_truth_xsec_pi0_P->SetName("mc_truth_xsec_pi0_P");
+    mc_truth_xsec_pi0_P->SetNormBinWidth(0.1);
 
     std::cout<<"Done!"<<std::endl;
     std::cout<<"-----------------------------------------------------------------------"<<std::endl;
@@ -303,7 +306,7 @@ MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_correct
 void CCProtonPi0_CrossSection::OpenRootFiles()
 {
     // Flux File
-    rootDir_flux = Folder_List::rootDir_Flux;
+    rootDir_flux = Folder_List::rootDir_Flux_new;
 
     // Output File
     rootDir_out = Folder_List::rootDir_CrossSection;
@@ -335,7 +338,7 @@ void CCProtonPi0_CrossSection::initHistograms()
     data_all_muon_P = new MnvH1D(*(MnvH1D*)f_data_muon->Get("data_all_muon_P")); 
     data_all_muon_P->SetTitle("Original Data P_{#mu}");
 
-    mc_reco_all_muon_P = new MnvH1D(*(MnvH1D*)f_mc_muon->Get("data_all_muon_P")); 
+    mc_reco_all_muon_P = new MnvH1D(*(MnvH1D*)f_mc_muon->Get("mc_reco_all_muon_P")); 
     mc_reco_all_muon_P->SetTitle("MC Reconstructed P_{#mu}");
     mc_reco_all_muon_P->SetName("mc_reco_all_muon_P");
 
@@ -363,7 +366,7 @@ void CCProtonPi0_CrossSection::initHistograms()
     data_all_pi0_P = new MnvH1D(*(MnvH1D*)f_data_pi0->Get("data_all_pi0_P")); 
     data_all_pi0_P->SetTitle("Original Data P_{#pi^{0}}");
  
-    mc_reco_all_pi0_P = new MnvH1D(*(MnvH1D*)f_mc_pi0->Get("data_all_pi0_P")); 
+    mc_reco_all_pi0_P = new MnvH1D(*(MnvH1D*)f_mc_pi0->Get("mc_reco_all_pi0_P")); 
     mc_reco_all_pi0_P->SetTitle("MC Reconstructed P_{#mu}");
     mc_reco_all_pi0_P->SetName("mc_reco_all_pi0_P");
    

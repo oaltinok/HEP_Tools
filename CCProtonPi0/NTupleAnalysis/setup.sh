@@ -17,18 +17,23 @@ Main_Folder="Output"
 Folder_List=(${DefaultText}
         ${DefaultPlots})
 
-PlotFolder_List=(Muon
+DefaultPlotFolder_List=(Muon
 		Proton
 		Pion
 		Pi0Blob
 		Interaction
         CutHists
-        CrossSection
-        Efficiency 
-        BackgroundSubtraction 
-        Unfolding 
-        Errors 
         OtherStudies)
+
+VariableList=(xsec_pi0_P
+        xsec_muon_P)
+
+XSecPlotList=(Original
+        BackgroundEstimated
+        BackgroundSubtracted
+        Unfolded
+        EfficiencyCorrected
+        CrossSection)
 
 # Create Main Folder
 echo "... Creating ${Main_Folder}"
@@ -43,9 +48,21 @@ done
 
 # Create Folders inside Plots Folders
 cd ${DefaultPlots}
-for folder in ${PlotFolder_List[@]}; do
+for folder in ${DefaultPlotFolder_List[@]}; do
     echo "... Creating ${Main_Folder}/${DefaultPlots}/${folder}"
     mkdir ${folder}
+done
+# Create Variable Folder inside Plots/
+for folder in ${VariableList[@]}; do
+    echo "... Creating ${Main_Folder}/${DefaultPlots}/${folder}"
+    mkdir ${folder}
+    cd ${folder}
+    # Create XSec Folders inside Plots/Variable
+    for subfolder in ${XSecPlotList[@]}; do
+        echo "... Creating ${Main_Folder}/${DefaultPlots}/${folder}/${subfolder}"
+        mkdir ${subfolder}
+    done
+    cd .. ## exit Variable
 done
 cd .. # exit DefaultPlots
 cd .. # exit Main_Folder

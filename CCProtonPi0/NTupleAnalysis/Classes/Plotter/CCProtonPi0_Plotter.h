@@ -86,6 +86,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // Cross Section Plots
         void plotOriginalData();
         void plotBackgroundSubtracted();
+        void plotBackgroundEstimated();
         void plotEfficiencyCorrected();
         void plotUnfolded();
         void plotCrossSection();
@@ -110,7 +111,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotPion_True();
 
         // Other Plots 
-        void plotErrors();
         void plotOtherStudies();
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
@@ -148,7 +148,10 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir);
         void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
+        void DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir);
+        void DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
         void DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
+        void DrawDataMCRatio_CrossSection(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());

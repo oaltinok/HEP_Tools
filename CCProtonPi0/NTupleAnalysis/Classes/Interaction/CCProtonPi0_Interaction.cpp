@@ -8,8 +8,7 @@
 
 using namespace PlotUtils;
 
-CCProtonPi0_Interaction::CCProtonPi0_Interaction(bool isModeReduce, bool isMC) : CCProtonPi0_NTupleAnalysis()
-{
+CCProtonPi0_Interaction::CCProtonPi0_Interaction(bool isModeReduce, bool isMC) {
     std::cout<<"Initializing CCProtonPi0_Interaction"<<std::endl;
     
     if(isModeReduce){

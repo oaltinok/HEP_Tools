@@ -9,13 +9,16 @@
 MAINCPP = main.cpp
 MAINEXE = main.exe
 
+# Class: Base Class
+NTUPLEANALYSISCPP = ../Classes/NTupleAnalysis/CCProtonPi0_NTupleAnalysis.cpp
+
 # Classes
 TRUTHANALYZERCPP = Classes/TruthAnalyzer/CCProtonPi0_TruthAnalyzer.cpp
 TRUTHANALYZERDEFAULTCPP = Classes/TruthAnalyzer/CCProtonPi0_TruthAnalyzer_Default.cpp
 TRUTHANALYZERALLCPP = $(TRUTHANALYZERCPP) $(TRUTHANALYZERDEFAULTCPP)
 
 # ALL Classes Required for the Package
-ALLCPP = $(MAINCPP) $(TRUTHANALYZERALLCPP)
+ALLCPP = $(MAINCPP) $(NTUPLEANALYSISCPP) $(TRUTHANALYZERALLCPP)
 
 # PlotUtils from MINERvA Framework
 INCLUDES += -I$(PLOTUTILSROOT)/ -I$(UNFOLDUTILSROOT)/

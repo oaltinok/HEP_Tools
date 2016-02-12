@@ -128,7 +128,6 @@ void CCProtonPi0_Pion::initHistograms()
     data_all_pi0_P = new MnvH1D( "data_all_pi0_P","Data All P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
     data_all_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
     data_all_pi0_P->GetYaxis()->SetTitle("N(Events)");
-    AddVertErrorBands_Data(data_all_pi0_P);
 
     mc_reco_all_pi0_P = new MnvH1D( "mc_reco_all_pi0_P","MC Reco All P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
     mc_reco_all_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
@@ -153,6 +152,7 @@ void CCProtonPi0_Pion::initHistograms()
     response_P = new MnvH2D( "response_P","Momentum for Signal Events",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max(),binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
     response_P->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
     response_P->GetYaxis()->SetTitle("True P_{#pi^{0}} [GeV]");
+    AddVertErrorBands_MC(response_P);
  
     response_theta = new MnvH2D( "response_theta","Theta for Signal Events",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max(),binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
     response_theta->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");

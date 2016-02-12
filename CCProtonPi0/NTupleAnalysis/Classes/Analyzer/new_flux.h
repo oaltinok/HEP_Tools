@@ -158,8 +158,8 @@ void new_flux::read_oldflux_histogram(const std::string& filename)
     
     __h1d_oldflux_cv = TinyHist(h1d_tmp);
 
-    std::cout << "Old flux histogram" << std::endl;
-    __h1d_oldflux_cv.Print();
+    //std::cout << "Old flux histogram" << std::endl;
+    //__h1d_oldflux_cv.Print();
 
     delete mnvh1d_flux;
     delete h1d_tmp;
@@ -195,7 +195,7 @@ void new_flux::read_newflux_histogram(const std::string& filename)
 
     __h1d_newflux_cv = TinyHist(h1d_tmp);
 
-    std::cout << "New flux histogram" << std::endl;
+    //std::cout << "New flux histogram" << std::endl;
     //__h1d_newflux_cv.Print();
 
     std::vector<TH1D*> universe_tmp_histograms = mnvh1d_tmp->GetVertErrorBand("Flux")->GetHists();
@@ -276,16 +276,14 @@ void new_flux::calc_weights(bool verbose)
 
 double new_flux::get_cvweight(double enu0)
 {
-    
+  
     double bin    = __h1d_flux_ratio.FindBin(enu0);
     double weight = __h1d_flux_ratio.GetBinContent(bin);
-    
     if (bin > __h1d_newflux_cv.GetNbinsX()) {
         
         return __h1d_flux_ratio.GetBinContent(__h1d_flux_ratio.GetNbinsX());
 
     }
-
     return weight;
 }
 

@@ -23,6 +23,8 @@
 #include <TChain.h>
 #include <TVector3.h>
 
+#include "PlotUtils/MnvNormalization.h"
+
 // Classes
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 #include "../CutList/CCProtonPi0_CutList.h"
@@ -52,6 +54,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool getCutStatistics();
         void Increment_nCut(vector<CCProtonPi0_Cut> &nCut, bool study1, bool study2);
         void fillData();
+        void fill_muon_P();
+        void fill_pi0_P();
         void specifyRunTime();
         void openTextFiles();
         void closeTextFiles();
@@ -62,17 +66,23 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         int GetBackgroundTypeInd();
         int GetBackgroundWithPi0Ind();
         void FillHistogram(vector<MnvH1D*> &hist, double var);
+        void FillHistogram(MnvH1D* hist, double var);
         void FillHistogram(TH1D* hist, double var);
         void FillHistogram(TH2D* hist, double var1, double var2);
         void FillHistogram(TH3D* hist, double var1, double var2, double var3);
-        void FillHistogramWithErrors(MnvH1D* hist, double var);
+        void FillHistogramWithDefaultErrors(MnvH1D* hist, double var);
         void FillHistogram(MnvH2D* hist, double var1, double var2);
+        void FillHistogramWithDefaultErrors(MnvH2D* hist, double var1, double var2);
         void FillVertErrorBand_Flux(MnvH1D* h, double var);
+        void FillVertErrorBand_Flux(MnvH2D* h, double var1, double var2);
         void FillVertErrorBand_Genie(MnvH1D* h, double var);
-        void FillVertErrorBand_Normalization(MnvH1D* h, double var);
+        void FillVertErrorBand_Genie(MnvH2D* h, double var1, double var2);
+        void FillVertErrorBand_MuonTracking(MnvH1D* h, double var);
+        void FillVertErrorBand_MuonTracking(MnvH2D* h, double var1, double var2);
         void CorrectNTupleVariables();
         void CorrectEMShowerCalibration();
         void Calc_WeightFromSystematics();
+        void AddErrorBands_Data();
 
         //  Interaction Specific Functions
         void fillInteractionMC();
@@ -104,9 +114,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fillPi0Blob_Evis_Fractions();
         void fillPi0Blob_Evis_Total(); 
         
-        // Error Calculations
-        double CalcVertError_Normalization(double p);
-
         // Helper Functions
         double CalcSphereVolume(double r);
 
@@ -125,6 +132,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         CCProtonPi0_CutList cutList;
 
         // Other Variables
+        MnvNormalizer normalizer;
         bool m_isMC;
         bool isScanRun;
         bool isDataAnalysis;

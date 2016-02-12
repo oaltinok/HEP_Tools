@@ -22,6 +22,7 @@ class CCProtonPi0_Muon : public CCProtonPi0_Particle
 
         // Muon Momentum 
         MnvH1D* data_all_muon_P;
+        MnvH1D* mc_reco_all_muon_P;
         MnvH1D* mc_reco_bckg_muon_P;
         MnvH1D* mc_reco_signal_muon_P;
         MnvH1D* mc_truth_signal_muon_P;
