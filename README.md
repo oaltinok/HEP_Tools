@@ -6,17 +6,28 @@
 	* ROOT URL: http://root.cern.ch/drupal/
 
 ## Statistical Data Analysis
-### CCProtonPi0
-* Two stage Data Analysis Package
-	* Reconstruction Stage: 
-		* Process raw data and MC simulation to detect signal
-		* Create a smaller sample with processed information called NTuple
-	* NTuple Analysis Stage: 
-		* Process NTuples created in first stage for a detailed Data Analysis
-
-* Signal Definition: 
+* Two Stage Data Analysis package for an exclusive channel on neutrino interactions
+* Signal Definition:
 	* Charged Current Neutrino Interaction inside Fiducial Volume
 	* Final State Particles: muon, proton, and pi0
+	
+### First Stage: CCProtonPi0
+* Processes raw data using many other packages on MINERvA Framework
+* Reconstructs final state particles and calculates their estimated kinematics
+* Identifies Events who are likely to be Signal
+* Outputs a smaller data sample with processed information called NTuple
+
+### Second Stage: CCProtonPi0/NTupleAnalysis
+* Reduce Initial Data to Final 
+	* ./main.exe reduce data
+	* Selects best Signal Candidates from Signal-Likely Events
+* Analyze Reduced Data Sample 
+	* ./main.exe run data
+	* Analyzes reduced data sample and create histograms for further study
+* Calculate Cross Section
+	* ./main.exe calc
+	* Calculates Cross Section of the CCProtonPi0 Neutrino Interaction
+	* Estimates Statistical & Systematic Errors of the final result
 
 ## MATLAB Functions for specific studies
 * True Reco Correction
