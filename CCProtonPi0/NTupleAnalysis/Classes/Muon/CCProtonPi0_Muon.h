@@ -21,16 +21,13 @@ class CCProtonPi0_Muon : public CCProtonPi0_Particle
         void writeHistograms();
 
         // Muon Momentum 
-        MnvH1D* data_all_muon_P;
-        MnvH1D* mc_reco_all_muon_P;
-        MnvH1D* mc_reco_bckg_muon_P;
-        MnvH1D* mc_reco_signal_muon_P;
-        MnvH1D* mc_truth_signal_muon_P;
-        MnvH2D* response_P;
+        MnvH1D* muon_P_all;
+        MnvH1D* muon_P_mc_reco_all;
+        MnvH1D* muon_P_mc_reco_signal;
+        MnvH1D* muon_P_mc_reco_bckg;
+        MnvH1D* muon_P_mc_truth_signal;
+        MnvH2D* muon_P_response;
         
-        // Muon Theta
-        MnvH2D* response_theta;
-
     private:
         CCProtonPi0_SingleBin bin_muonTheta;
 };

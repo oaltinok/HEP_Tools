@@ -45,15 +45,12 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         TH2D* bckg_signal_diff_convLength;
 
         // Pi0 Momentum 
-        MnvH1D* data_all_pi0_P;
-        MnvH1D* mc_truth_signal_pi0_P;
-        MnvH1D* mc_reco_all_pi0_P;
-        MnvH1D* mc_reco_signal_pi0_P;
-        MnvH1D* mc_reco_bckg_pi0_P;
-        MnvH2D* response_P;
-
-        // Pi0 Theta
-        TH2D* response_theta;
+        MnvH1D* pi0_P_all;
+        MnvH1D* pi0_P_mc_truth_signal;
+        MnvH1D* pi0_P_mc_reco_all;
+        MnvH1D* pi0_P_mc_reco_signal;
+        MnvH1D* pi0_P_mc_reco_bckg;
+        MnvH2D* pi0_P_response;
 
         TH2D* signal_gamma1_E_gamma2_E;
         TH2D* bckg_gamma1_E_gamma2_E;

@@ -84,12 +84,14 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void getPOT_Data();
 
         // Cross Section Plots
+        void plotErrorSummary();
         void plotOriginalData();
         void plotBackgroundSubtracted();
         void plotBackgroundEstimated();
         void plotEfficiencyCorrected();
         void plotUnfolded();
         void plotCrossSection();
+        void plotCrossSection_Check();
 
         // Data vs MC
         void plotInteraction_DataMC();

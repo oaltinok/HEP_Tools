@@ -301,6 +301,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IVertexFitter* m_vertexFitter;
 
         //! Private Functions
+        Gaudi::LorentzVector Get_Neutrino_4P(double Enu) const;
         Minerva::IDClusterVect getClusters( Minerva::PhysicsEvent* event ) const;
         SmartRefVector<Minerva::IDCluster> FilterInSphereClusters( Minerva::PhysicsEvent *event, const SmartRefVector<Minerva::IDCluster>& clusters, const double sphereRadius) const;
         StatusCode HoughBlob( Minerva::PhysicsEvent *event, SmartRefVector<Minerva::IDCluster> idClusters, std::vector<Minerva::IDBlob*>& outBlobs) const;

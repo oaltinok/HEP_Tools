@@ -20,13 +20,15 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     // Cross Sections
     //--------------------------------------------------------------------------
+    //plotErrorSummary();
     plotOriginalData();
     plotBackgroundEstimated();
     plotBackgroundSubtracted();
     plotUnfolded();
     plotEfficiencyCorrected();
     plotCrossSection();
-    
+    //plotCrossSection_Check();
+
     //--------------------------------------------------------------------------
     //  Data vs MC
     //--------------------------------------------------------------------------
@@ -77,8 +79,8 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter() : CCProtonPi0_NTupleAnalysis()
     //--------------------------------------------------------------------------
     // Set POT -- Run getPOT_MC() and getPOT_Data() Functions once to get POT
     //--------------------------------------------------------------------------
-    data_POT = 9.44854e+19; 
-    mc_POT = 9.0182e+20;
+    data_POT = 9.58472e+19; 
+    mc_POT = 9.42219e+20;
     POT_Ratio_data_mc = data_POT/mc_POT;
 
     std::cout<<"POT Data = "<<data_POT<<std::endl;
@@ -153,31 +155,179 @@ void CCProtonPi0_Plotter::plotPi0Blob_DataMC()
     // Do Nothing 
 }
 
+
+void CCProtonPi0_Plotter::plotCrossSection_Check()
+{
+    std::cout<<"Plotting Cross Section Check..."<<std::endl;
+    std::string plotDir;
+
+    // Check must use MC
+    //  For Testing you can turn it off
+    bool isMC = true;
+
+    TFile* f_xsec;
+    MnvH1D* data;
+    MnvH1D* mc;
+   
+    if(isMC) f_xsec = new TFile(rootDir_CrossSection.mc.c_str());
+    else f_xsec = new TFile(rootDir_CrossSection.data.c_str());
+
+    // ------------------------------------------------------------------------
+    // Pi0 Momentum
+    // ------------------------------------------------------------------------
+    plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Check;
+    // Background Subtraction Check
+    mc = (MnvH1D*)f_xsec->Get("pi0_P_mc_reco_bckg");
+    data = (MnvH1D*)f_xsec->Get("pi0_P_bckg_estimated"); 
+    if (isMC) DrawDataMC_CrossSection(data,mc,"pi0_P_check_bckg_estimated",plotDir);
+    else DrawDataMC(data,mc,"pi0_P_check_bckg_estimated",plotDir);
+
+    mc = (MnvH1D*)f_xsec->Get("pi0_P_mc_reco_signal");
+    data = (MnvH1D*)f_xsec->Get("pi0_P_bckg_subtracted"); 
+    if (isMC) DrawDataMC_CrossSection(data,mc,"pi0_P_check_bckg_subtracted",plotDir);
+    else DrawDataMC(data,mc,"pi0_P_check_bckg_subtracted",plotDir);
+
+    // Unfolding Check
+    DrawNormalizedMigrationHistogram(rootDir_CrossSection,"pi0_P_response",plotDir);
+    mc = (MnvH1D*)f_xsec->Get("pi0_P_mc_truth_signal");
+    data = (MnvH1D*)f_xsec->Get("pi0_P_unfolded"); 
+    if (isMC) DrawDataMC_CrossSection(data,mc,"pi0_P_check_unfolding",plotDir);
+    else DrawDataMC(data,mc,"pi0_P_check_unfolding",plotDir);
+
+    // Efficiency Check
+    mc = (MnvH1D*)f_xsec->Get("pi0_P_mc_truth_all_signal");
+    data = (MnvH1D*)f_xsec->Get("pi0_P_efficiency_corrected"); 
+    if (isMC) DrawDataMC_CrossSection(data,mc,"pi0_P_check_efficiency",plotDir);
+    else DrawDataMC(data,mc,"pi0_P_check_efficiency",plotDir);
+    DrawEfficiencyCurve(rootDir_CrossSection,"pi0_P_eff",plotDir);
+
+    // ------------------------------------------------------------------------
+    // Muon Momentum
+    // ------------------------------------------------------------------------
+    plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Check;
+    // Background Subtraction Check
+    mc = (MnvH1D*)f_xsec->Get("muon_P_mc_reco_bckg");
+    data = (MnvH1D*)f_xsec->Get("muon_P_bckg_estimated"); 
+    if (isMC) DrawDataMC_CrossSection(data,mc,"muon_P_check_bckg_estimated",plotDir);
+    else DrawDataMC(data,mc,"muon_P_check_bckg_estimated",plotDir);
+
+    mc = (MnvH1D*)f_xsec->Get("muon_P_mc_reco_signal");
+    data = (MnvH1D*)f_xsec->Get("muon_P_bckg_subtracted"); 
+    if (isMC) DrawDataMC_CrossSection(data,mc,"muon_P_check_bckg_subtracted",plotDir);
+    else DrawDataMC(data,mc,"muon_P_check_bckg_subtracted",plotDir);
+
+    // Unfolding Check
+    DrawNormalizedMigrationHistogram(rootDir_CrossSection,"muon_P_response",plotDir);
+    mc = (MnvH1D*)f_xsec->Get("muon_P_mc_truth_signal");
+    data = (MnvH1D*)f_xsec->Get("muon_P_unfolded"); 
+    if (isMC) DrawDataMC_CrossSection(data,mc,"muon_P_check_unfolding",plotDir);
+    else DrawDataMC(data,mc,"muon_P_check_unfolding",plotDir);
+
+    // Efficiency Check
+    mc = (MnvH1D*)f_xsec->Get("muon_P_mc_truth_all_signal");
+    data = (MnvH1D*)f_xsec->Get("muon_P_efficiency_corrected"); 
+    if (isMC) DrawDataMC_CrossSection(data,mc,"muon_P_check_efficiency",plotDir);
+    else DrawDataMC(data,mc,"muon_P_check_efficiency",plotDir);
+    DrawEfficiencyCurve(rootDir_CrossSection,"muon_P_eff",plotDir);
+
+    std::cout<<"Plotting Cross Section Check Finished!"<<std::endl;
+}
+
 void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
     std::string plotDir = Folder_List::plotDir_OtherStudies;
  
-    TFile* f_data = new TFile(rootDir_Pion.data.c_str());
-    TFile* f_mc = new TFile(rootDir_Pion.mc.c_str());
+    TFile* f_data = new TFile(rootDir_Muon.data.c_str());
+    TFile* f_mc= new TFile(rootDir_Muon.mc.c_str());
     MnvH1D* hist;
-    
-    hist = (MnvH1D*)f_data->Get("data_all_pi0_P");
-    DrawErrorSummary(hist,"data_all_pi0_P",plotDir);
 
-    hist = (MnvH1D*)f_mc->Get("mc_truth_signal_pi0_P");
-    DrawErrorSummary(hist,"mc_truth_signal_pi0_P",plotDir);
+    hist = (MnvH1D*)f_data->Get("muon_P_all");
+    DrawErrorSummary(hist,"muon_P_all",plotDir);
 
-    hist = (MnvH1D*)f_mc->Get("mc_reco_all_pi0_P");
-    DrawErrorSummary(hist,"mc_reco_all_pi0_P",plotDir);
+    hist = (MnvH1D*)f_mc->Get("muon_P_mc_reco_all");
+    DrawErrorSummary(hist,"muon_P_mc_reco_all",plotDir);
 
-    hist = (MnvH1D*)f_mc->Get("mc_reco_signal_pi0_P");
-    DrawErrorSummary(hist,"mc_reco_signal_pi0_P",plotDir);
+    hist = (MnvH1D*)f_mc->Get("muon_P_mc_reco_signal");
+    DrawErrorSummary(hist,"muon_P_mc_reco_signal",plotDir);
 
-    hist = (MnvH1D*)f_mc->Get("mc_reco_bckg_pi0_P");
-    DrawErrorSummary(hist,"mc_reco_bckg_pi0_P",plotDir);
+    hist = (MnvH1D*)f_mc->Get("muon_P_mc_reco_bckg");
+    DrawErrorSummary(hist,"muon_P_mc_reco_bckg",plotDir);
+
+    hist = (MnvH1D*)f_mc->Get("muon_P_mc_truth_signal");
+    DrawErrorSummary(hist,"muon_P_mc_truth_signal",plotDir);
+
+    MnvH1D* data = (MnvH1D*)f_data->Get("muon_P_all");
+    MnvH1D* mc = (MnvH1D*)f_mc->Get("muon_P_mc_reco_all");
+    DrawDataMC(data,mc,"muon_P_data_MC",plotDir);
 
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
+}
+
+void CCProtonPi0_Plotter::plotErrorSummary()
+{
+    std::cout<<"Plotting Error Summary..."<<std::endl;
+
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    MnvH1D* hist;
+
+    // Muon Momentum
+    std::string plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_ErrorSummary;
+
+    hist = (MnvH1D*)f_xsec_data->Get("muon_P_all");
+    DrawErrorSummary(hist,"muon_P_all",plotDir);
+
+    hist = (MnvH1D*)f_xsec_mc->Get("muon_P_mc_reco_all");
+    DrawErrorSummary(hist,"muon_P_mc_reco_all",plotDir);
+
+    hist = (MnvH1D*)f_xsec_mc->Get("muon_P_mc_reco_signal");
+    DrawErrorSummary(hist,"muon_P_mc_reco_signal",plotDir);
+
+    hist = (MnvH1D*)f_xsec_mc->Get("muon_P_mc_reco_bckg");
+    DrawErrorSummary(hist,"muon_P_mc_reco_bckg",plotDir);
+
+    hist = (MnvH1D*)f_xsec_mc->Get("muon_P_mc_truth_signal");
+    DrawErrorSummary(hist,"muon_P_mc_truth_signal",plotDir);
+
+    hist = (MnvH1D*)f_xsec_mc->Get("muon_P_mc_truth_signal_all");
+    DrawErrorSummary(hist,"muon_P_mc_truth_signal_all",plotDir);
+
+    TFile* f_data = new TFile(rootDir_Muon.data.c_str());
+    TFile* f_mc = new TFile(rootDir_Muon.mc.c_str());
+    MnvH1D* data = (MnvH1D*)f_data->Get("muon_P_all");
+    MnvH1D* mc = (MnvH1D*)f_mc->Get("muon_P_mc_reco_all");
+    DrawDataMC(data,mc,"muon_P_data_MC",plotDir);
+
+
+    // Pi0 Momentum
+    plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_ErrorSummary;
+
+    hist = (MnvH1D*)f_xsec_data->Get("pi0_P_all");
+    DrawErrorSummary(hist,"pi0_P_all",plotDir);
+
+    hist = (MnvH1D*)f_xsec_mc->Get("pi0_P_mc_reco_all");
+    DrawErrorSummary(hist,"pi0_P_mc_reco_all",plotDir);
+
+    hist = (MnvH1D*)f_xsec_mc->Get("pi0_P_mc_reco_signal");
+    DrawErrorSummary(hist,"pi0_P_mc_reco_signal",plotDir);
+
+    hist = (MnvH1D*)f_xsec_mc->Get("pi0_P_mc_reco_bckg");
+    DrawErrorSummary(hist,"pi0_P_mc_reco_bckg",plotDir);
+
+    hist = (MnvH1D*)f_xsec_mc->Get("pi0_P_mc_truth_signal");
+    DrawErrorSummary(hist,"pi0_P_mc_truth_signal",plotDir);
+
+    hist = (MnvH1D*)f_xsec_mc->Get("pi0_P_mc_truth_signal_all");
+    DrawErrorSummary(hist,"pi0_P_mc_truth_signal_all",plotDir);
+
+    f_data = new TFile(rootDir_Pion.data.c_str());
+    f_mc = new TFile(rootDir_Pion.mc.c_str());
+    data = (MnvH1D*)f_data->Get("pi0_P_all");
+    mc = (MnvH1D*)f_mc->Get("pi0_P_mc_reco_all");
+    DrawDataMC(data,mc,"pi0_P_data_MC",plotDir);
+
+    std::cout<<"Plotting Error Summary Finished!"<<std::endl;
 }
 
 void CCProtonPi0_Plotter::plotOriginalData()
@@ -185,28 +335,30 @@ void CCProtonPi0_Plotter::plotOriginalData()
     std::cout<<"Plotting Original Data..."<<std::endl;
     std::string plotDir;
  
-    TFile* f_xsec = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
     MnvH1D* mc;
     MnvH1D* data;
 
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Original;
-    mc = (MnvH1D*)f_xsec->Get("mc_reco_all_pi0_P");
-    data = (MnvH1D*)f_xsec->Get("data_all_pi0_P"); 
-    
-    DrawDataMC(data,mc,"data_all_pi0_P",plotDir);
-    DrawErrorSummary(data,"data_all_pi0_P",plotDir);
-    DrawErrorSummary(mc,"mc_reco_all_pi0_P",plotDir);
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_mc_reco_all");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_P_all"); 
+    DrawDataMC(data,mc,"pi0_P_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_P_all",plotDir);
+    DrawErrorSummary(mc,"pi0_P_mc_reco_all",plotDir);
 
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Original;
-    mc = (MnvH1D*)f_xsec->Get("mc_reco_all_muon_P");
-    data = (MnvH1D*)f_xsec->Get("data_all_muon_P"); 
-    DrawDataMC(data,mc,"data_all_muon_P",plotDir);
-    DrawErrorSummary(data,"data_all_muon_P",plotDir);
-    DrawErrorSummary(mc,"mc_reco_all_muon_P",plotDir);
+    mc = (MnvH1D*)f_xsec_mc->Get("muon_P_mc_reco_all");
+    data = (MnvH1D*)f_xsec_data->Get("muon_P_all"); 
+    DrawDataMC(data,mc,"muon_P_data_MC",plotDir);
+    DrawErrorSummary(data,"muon_P_all",plotDir);
+    DrawErrorSummary(mc,"muon_P_mc_reco_all",plotDir);
 
-    delete f_xsec;
+
+    delete f_xsec_mc;
+    delete f_xsec_data;
     std::cout<<"Plotting Original Data Finished!"<<std::endl;
 }
 
@@ -216,27 +368,29 @@ void CCProtonPi0_Plotter::plotCrossSection()
 
     std::string plotDir;
   
-    TFile* f_xsec = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
     MnvH1D* mc;
     MnvH1D* data;
 
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_CrossSection;
-    mc = (MnvH1D*)f_xsec->Get("mc_truth_xsec_pi0_P");
-    data = (MnvH1D*)f_xsec->Get("data_xsec_pi0_P"); 
-    DrawDataMC_CrossSection(data,mc,"data_xsec_pi0_P",plotDir);
-    DrawErrorSummary(data,"data_xsec_pi0_P",plotDir);
-    DrawErrorSummary(mc,"mc_truth_xsec_pi0_P",plotDir);
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_P_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"pi0_P_xsec_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_P_xsec_data",plotDir);
+    DrawErrorSummary(mc,"pi0_P_xsec_mc",plotDir);
 
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_CrossSection;
-    mc = (MnvH1D*)f_xsec->Get("mc_truth_xsec_muon_P");
-    data = (MnvH1D*)f_xsec->Get("data_xsec_muon_P"); 
-    DrawDataMC_CrossSection(data,mc,"data_xsec_muon_P",plotDir);
-    DrawErrorSummary(data,"data_xsec_muon_P",plotDir);
-    DrawErrorSummary(mc,"mc_truth_xsec_muon_P",plotDir);
+    mc = (MnvH1D*)f_xsec_mc->Get("muon_P_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("muon_P_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"muon_P_xsec_data_MC",plotDir);
+    DrawErrorSummary(data,"muon_P_xsec_data",plotDir);
+    DrawErrorSummary(mc,"muon_P_xsec_mc",plotDir);
 
-    delete f_xsec;
+    delete f_xsec_mc;
+    delete f_xsec_data;
     std::cout<<"Plotting Cross Sections Finished!"<<std::endl;
 }
 
@@ -245,27 +399,29 @@ void CCProtonPi0_Plotter::plotBackgroundEstimated()
     std::cout<<"Plotting Background Estimated..."<<std::endl;
     std::string plotDir;
 
-    TFile* f_xsec = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
     MnvH1D* mc;
     MnvH1D* data;
 
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_BackgroundEstimated;
-    mc = (MnvH1D*)f_xsec->Get("mc_reco_bckg_pi0_P");
-    data = (MnvH1D*)f_xsec->Get("data_bckg_estimated_pi0_P"); 
-    DrawDataMC(data,mc,"data_bckg_estimated_pi0_P",plotDir);
-    DrawErrorSummary(data,"data_bckg_estimated_pi0_P",plotDir);
-    DrawErrorSummary(mc,"mc_reco_bckg_pi0_P",plotDir);
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_bckg_estimated");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_P_bckg_estimated"); 
+    DrawDataMC(data,mc,"pi0_P_bckg_estimated_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_P_bckg_estimated_data",plotDir);
+    DrawErrorSummary(mc,"pi0_P_bckg_estimated_mc",plotDir);
 
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_BackgroundEstimated;
-    mc = (MnvH1D*)f_xsec->Get("mc_reco_bckg_muon_P");
-    data = (MnvH1D*)f_xsec->Get("data_bckg_estimated_muon_P"); 
-    DrawDataMC(data,mc,"data_bckg_estimated_muon_P",plotDir);
-    DrawErrorSummary(data,"data_bckg_estimated_muon_P",plotDir);
-    DrawErrorSummary(mc,"mc_reco_bckg_muon_P",plotDir);
+    mc = (MnvH1D*)f_xsec_mc->Get("muon_P_bckg_estimated");
+    data = (MnvH1D*)f_xsec_data->Get("muon_P_bckg_estimated"); 
+    DrawDataMC(data,mc,"muon_P_bckg_estimated_data_MC",plotDir);
+    DrawErrorSummary(data,"muon_P_bckg_estimated_data",plotDir);
+    DrawErrorSummary(mc,"muon_P_bckg_estimated_mc",plotDir);
 
-    delete f_xsec;
+    delete f_xsec_mc;
+    delete f_xsec_data;
     std::cout<<"Plotting Background Estimated Finished!"<<std::endl;
 }
 
@@ -274,27 +430,29 @@ void CCProtonPi0_Plotter::plotBackgroundSubtracted()
     std::cout<<"Plotting Background Subtracted..."<<std::endl;
     std::string plotDir;
   
-    TFile* f_xsec = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
     MnvH1D* mc;
     MnvH1D* data;
 
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_BackgroundSubtracted;
-    mc = (MnvH1D*)f_xsec->Get("mc_reco_signal_pi0_P");
-    data = (MnvH1D*)f_xsec->Get("data_bckg_subtracted_pi0_P"); 
-    DrawDataMC(data,mc,"data_bckg_subtracted_pi0_P",plotDir);
-    DrawErrorSummary(data,"data_bckg_subtracted_pi0_P",plotDir);
-    DrawErrorSummary(mc,"mc_reco_signal_pi0_P",plotDir);
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_bckg_subtracted");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_P_bckg_subtracted"); 
+    DrawDataMC(data,mc,"pi0_P_bckg_subtracted_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_P_bckg_subtracted_data",plotDir);
+    DrawErrorSummary(mc,"pi0_P_bckg_subtracted_mc",plotDir);
    
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_BackgroundSubtracted;
-    mc = (MnvH1D*)f_xsec->Get("mc_reco_signal_muon_P");
-    data = (MnvH1D*)f_xsec->Get("data_bckg_subtracted_muon_P"); 
-    DrawDataMC(data,mc,"data_bckg_subtracted_muon_P",plotDir);
-    DrawErrorSummary(data,"data_bckg_subtracted_muon_P",plotDir);
-    DrawErrorSummary(mc,"mc_reco_signal_muon_P",plotDir);
-  
-    delete f_xsec;
+    mc = (MnvH1D*)f_xsec_mc->Get("muon_P_bckg_subtracted");
+    data = (MnvH1D*)f_xsec_data->Get("muon_P_bckg_subtracted"); 
+    DrawDataMC(data,mc,"muon_P_bckg_subtracted_data_MC",plotDir);
+    DrawErrorSummary(data,"muon_P_bckg_subtracted_data",plotDir);
+    DrawErrorSummary(mc,"muon_P_bckg_subtracted_mc",plotDir);
+ 
+    delete f_xsec_mc;
+    delete f_xsec_data;
     std::cout<<"Plotting Background Subtracted Finished!"<<std::endl;
 }
 
@@ -303,29 +461,31 @@ void CCProtonPi0_Plotter::plotUnfolded()
     std::cout<<"Plotting Unfolded..."<<std::endl;
     std::string plotDir;
   
-    TFile* f_xsec = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
     MnvH1D* mc;
     MnvH1D* data;
 
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Unfolding;
-    mc = (MnvH1D*)f_xsec->Get("mc_truth_signal_pi0_P");
-    data = (MnvH1D*)f_xsec->Get("data_unfolded_pi0_P"); 
-    DrawDataMC(data,mc,"data_unfolded_pi0_P",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_CrossSection,"response_pi0_P",plotDir);
-    DrawErrorSummary(data,"data_unfolded_pi0_P",plotDir);
-    DrawErrorSummary(mc,"mc_truth_signal_pi0_P",plotDir);
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_unfolded");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_P_unfolded"); 
+    DrawDataMC(data,mc,"pi0_P_unfolded_data_MC",plotDir);
+    DrawNormalizedMigrationHistogram(rootDir_CrossSection,"pi0_P_response",plotDir);
+    DrawErrorSummary(data,"pi0_P_unfolded_data",plotDir);
+    DrawErrorSummary(mc,"pi0_P_unfolded_mc",plotDir);
     
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Unfolding;
-    mc = (MnvH1D*)f_xsec->Get("mc_truth_signal_muon_P");
-    data = (MnvH1D*)f_xsec->Get("data_unfolded_muon_P"); 
-    DrawDataMC(data,mc,"data_unfolded_muon_P",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_CrossSection,"response_muon_P",plotDir);
-    DrawErrorSummary(data,"data_unfolded_muon_P",plotDir);
-    DrawErrorSummary(mc,"mc_truth_signal_muon_P",plotDir);
-
-    delete f_xsec;
+    mc = (MnvH1D*)f_xsec_mc->Get("muon_P_unfolded");
+    data = (MnvH1D*)f_xsec_data->Get("muon_P_unfolded"); 
+    DrawDataMC(data,mc,"muon_P_unfolded_data_MC",plotDir);
+    DrawNormalizedMigrationHistogram(rootDir_CrossSection,"muon_P_response",plotDir);
+    DrawErrorSummary(data,"muon_P_unfolded_data",plotDir);
+    DrawErrorSummary(mc,"muon_P_unfolded_mc",plotDir);
+ 
+    delete f_xsec_mc;
+    delete f_xsec_data;
     std::cout<<"Plotting Unfolded Finished!"<<std::endl;
 }
 
@@ -334,28 +494,32 @@ void CCProtonPi0_Plotter::plotEfficiencyCorrected()
     std::cout<<"Plotting Efficiency Corrected..."<<std::endl;
     std::string plotDir;
   
-    TFile* f_xsec = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
     MnvH1D* mc;
     MnvH1D* data;
 
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Efficiency;
-    mc = (MnvH1D*)f_xsec->Get("mc_truth_all_signal_pi0_P");
-    data = (MnvH1D*)f_xsec->Get("data_efficiency_corrected_pi0_P"); 
-    DrawDataMC(data,mc,"data_efficiency_corrected_pi0_P",plotDir);
-    DrawEfficiencyCurve(rootDir_CrossSection,"eff_pi0_P",plotDir);
-    DrawErrorSummary(data,"data_efficiency_corrected_pi0_P",plotDir);
-    DrawErrorSummary(mc,"mc_truth_all_signal_pi0_P",plotDir);
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_efficiency_corrected");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_P_efficiency_corrected"); 
+    DrawDataMC(data,mc,"pi0_P_efficiency_corrected_data_MC",plotDir);
+    DrawEfficiencyCurve(rootDir_CrossSection,"pi0_P_eff",plotDir);
+    DrawErrorSummary(data,"pi0_P_efficiency_corrected_data",plotDir);
+    DrawErrorSummary(mc,"pi0_P_efficiency_corrected_mc",plotDir);
 
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Efficiency;
-    mc = (MnvH1D*)f_xsec->Get("mc_truth_all_signal_muon_P");
-    data = (MnvH1D*)f_xsec->Get("data_efficiency_corrected_muon_P"); 
-    DrawDataMC(data,mc,"data_efficiency_corrected_muon_P",plotDir);
-    DrawEfficiencyCurve(rootDir_CrossSection,"eff_muon_P",plotDir);
-    DrawErrorSummary(data,"data_efficiency_corrected_muon_P",plotDir);
-    DrawErrorSummary(mc,"mc_truth_all_signal_muon_P",plotDir);
+    mc = (MnvH1D*)f_xsec_mc->Get("muon_P_efficiency_corrected");
+    data = (MnvH1D*)f_xsec_data->Get("muon_P_efficiency_corrected"); 
+    DrawDataMC(data,mc,"muon_P_efficiency_corrected_data_MC",plotDir);
+    DrawEfficiencyCurve(rootDir_CrossSection,"muon_P_eff",plotDir);
+    DrawErrorSummary(data,"muon_P_efficiency_corrected_data",plotDir);
+    DrawErrorSummary(mc,"muon_P_efficiency_corrected_mc",plotDir);
 
+
+    delete f_xsec_mc;
+    delete f_xsec_data;
     std::cout<<"Plotting Efficiency Corrected Finished!"<<std::endl;
 }
 
@@ -1082,8 +1246,8 @@ void CCProtonPi0_Plotter::setRootDirs()
     rootDir_OtherStudies.mc = Folder_List::rootDir_OtherStudies_mc; 
     rootDir_OtherStudies.data = Folder_List::rootDir_OtherStudies_data;
 
-    rootDir_CrossSection.mc = Folder_List::rootDir_CrossSection;
-    rootDir_CrossSection.data = Folder_List::rootDir_CrossSection;
+    rootDir_CrossSection.mc = Folder_List::rootDir_CrossSection_mc;
+    rootDir_CrossSection.data = Folder_List::rootDir_CrossSection_data;
 
     // Set MC Root Dir
     rootDir_CutHists.mc = Folder_List::rootDir_CutHists_mc;

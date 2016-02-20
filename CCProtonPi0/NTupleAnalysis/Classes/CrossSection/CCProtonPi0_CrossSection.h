@@ -24,10 +24,11 @@ using namespace PlotUtils;
 class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_CrossSection();
+        CCProtonPi0_CrossSection(bool isMC);
         void Calc_CrossSections();
     
     private:
+        bool m_isMC;
         int iteration;
         double min_invMass;
         double max_invMass;
@@ -36,52 +37,56 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         double data_POT;
         double mc_POT;
 
+        // Pi0 Invariant Mass
+        MnvH1D* invMass_all;
+        MnvH1D* invMass_mc_reco_signal;
+        MnvH1D* invMass_mc_reco_bckg;
+
+        // --------------------------------------------------------------------
         // Muon Momentum
-        MnvH1D* data_xsec_muon_P;
-        MnvH1D* data_all_muon_P;
-        MnvH1D* data_bckg_subtracted_muon_P;
-        MnvH1D* data_bckg_estimated_muon_P;
-        MnvH1D* data_unfolded_muon_P;
-        MnvH1D* data_efficiency_corrected_muon_P;
-        MnvH1D* data_integrated_flux_muon_P;
+        // --------------------------------------------------------------------
+        // Data
+        MnvH1D* muon_P_all;
+        MnvH1D* muon_P_bckg_subtracted;
+        MnvH1D* muon_P_bckg_estimated;
+        MnvH1D* muon_P_unfolded;
+        MnvH1D* muon_P_efficiency_corrected;
+        MnvH1D* muon_P_integrated_flux;
+        MnvH1D* muon_P_xsec;
+        // MC Truth 
+        MnvH1D* muon_P_mc_truth_all_signal;
+        MnvH1D* muon_P_mc_truth_signal;
+        MnvH1D* muon_P_mc_reco_signal;
+        MnvH1D* muon_P_mc_reco_bckg;
+        MnvH2D* muon_P_response;
+        MnvH1D* muon_P_eff;
 
-        MnvH1D* mc_truth_xsec_muon_P;
-        MnvH1D* mc_truth_all_signal_muon_P;
-        MnvH1D* mc_truth_signal_muon_P;
-        MnvH1D* mc_truth_integrated_flux_muon_P;
-        MnvH1D* mc_reco_all_muon_P;
-        MnvH1D* mc_reco_signal_muon_P;
-        MnvH1D* mc_reco_bckg_muon_P;
+        // --------------------------------------------------------------------
+        // Pi0 Momentum 
+        // --------------------------------------------------------------------
+        // Data
+        MnvH1D* pi0_P_all;
+        MnvH1D* pi0_P_bckg_subtracted;
+        MnvH1D* pi0_P_bckg_estimated;
+        MnvH1D* pi0_P_unfolded;
+        MnvH1D* pi0_P_efficiency_corrected;
+        MnvH1D* pi0_P_integrated_flux;
+        MnvH1D* pi0_P_xsec;
+        // MC Truth
+        MnvH1D* pi0_P_mc_truth_all_signal;
+        MnvH1D* pi0_P_mc_truth_signal;
+        MnvH1D* pi0_P_mc_reco_signal;
+        MnvH1D* pi0_P_mc_reco_bckg;
+        MnvH2D* pi0_P_response;
+        MnvH1D* pi0_P_eff;
         
-        MnvH2D* response_muon_P;
-        MnvH1D* eff_muon_P;
-
-        // Data Histograms
-        MnvH1D* data_xsec_pi0_P;
-        MnvH1D* data_all_pi0_P;
-        MnvH1D* data_bckg_subtracted_pi0_P;
-        MnvH1D* data_bckg_estimated_pi0_P;
-        MnvH1D* data_unfolded_pi0_P;
-        MnvH1D* data_efficiency_corrected_pi0_P;
-        MnvH1D* data_integrated_flux_pi0_P;
-
-        MnvH1D* mc_truth_xsec_pi0_P;
-        MnvH1D* mc_truth_all_signal_pi0_P;
-        MnvH1D* mc_truth_signal_pi0_P;
-        MnvH1D* mc_truth_integrated_flux_pi0_P;
-        MnvH1D* mc_reco_all_pi0_P;
-        MnvH1D* mc_reco_signal_pi0_P;
-        MnvH1D* mc_reco_bckg_pi0_P;
-
-        MnvH2D* response_pi0_P;
-        MnvH1D* eff_pi0_P;
-
-
         // ROOT Files    
         TFile* f_out;
         TFile* f_truth;
+        TFile* f_data_cutHists;
         TFile* f_data_muon;
         TFile* f_data_pi0;
+        TFile* f_mc_cutHists;
         TFile* f_mc_muon;
         TFile* f_mc_pi0;
         
@@ -102,7 +107,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         MnvH1D* Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name);
         MnvH1D* Efficiency_Divide(MnvH1D* unfolded, MnvH1D* eff, std::string var_name);
         MnvH1D* Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name, bool isEv);
-        MnvH1D* Calc_CrossSection(MnvH1D* data_efficiency_corrected, MnvH1D* integrated_flux, double pot, bool isMC);
+        MnvH1D* Calc_FinalCrossSection(MnvH1D* data_efficiency_corrected, MnvH1D* integrated_flux, std::string var_name);
         MnvH1D* calc_flux( MnvH1D* mnvh1d_template,          // Template histogram to copy the binning for the flux histogram 
                 const std::string& flux_filename, // The flux file name
                 bool enu_cut,                     // whether to apply the enu cut

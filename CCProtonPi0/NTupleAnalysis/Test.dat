@@ -1,0 +1,1203 @@
+
+[1mRooFit v3.55 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2012 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+MC Playlists Selected!
+
+
+
+======================================================================
+Reducing NTuples...
+======================================================================
+Initializing CCProtonPi0_Interaction
+	NTuple Reduce Mode -- Will not create ROOT Files
+Done!
+Initializing CCProtonPi0_Muon
+	NTuple Reduce Mode -- Will not create ROOT Files
+Done!
+Initializing CCProtonPi0_Proton
+	NTuple Reduce Mode -- Will not create ROOT Files
+Done!
+Initializing CCProtonPi0_Pion
+	NTuple Reduce Mode -- Will not create ROOT Files
+Done!
+Initializing CCProtonPi0_Pi0Blob
+	NTuple Reduce Mode -- Will not create ROOT Files
+Done!
+Initializing CCProtonPi0_BackgroundTool
+	NTuple Reduce Mode -- Will not create Text Files
+Done!
+Initializing CCProtonPi0_CutList
+	Root File: /minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms.root
+	Output/TextFiles/CutTable_MC_All_v2_60.txt
+	Output/TextFiles/CutTable_MC_1Track_v2_60.txt
+	Output/TextFiles/CutTable_MC_2Track_v2_60.txt
+Done!
+Initializing CCProtonPi0_Analyzer
+Reading old flux file: /minerva/data/users/oaltinok/NTupleAnalysis/Flux/eroica-mipp-off-flux-nuint-minerva1-minerva13C.root
+Reading new flux file: /minerva/data/users/oaltinok/NTupleAnalysis/Flux/fhc_flux_constrained.root
+__h1d_oldflux_cv: 0x6e7ba0
+__h1d_newflux_cv: 0x6e7bd8
+New flux / Old flux ratio
+Opening Text Files:
+	Output/TextFiles/FailChecks.txt
+	Output/TextFiles/ArachneRoundup.txt
+	Input/Playlists/pl_Scan.dat
+Done!
+Initialization Finished!
+
+Reducing NTuple Files to a single file
+	Root File: /minerva/data/users/oaltinok/NTupleAnalysis/MC/Reduced/ReducedNTuple_v2_60.root
+Reading Playlist: Input/Playlists/pl_MC_Merged.dat
+Looping over all entries
+	Entry 0
+true = 3.03499 reco = 33.9811
+MuonE True = 2301.2 Muon Reco = 33450.7
+muon_E_shift = 673.087
+muon_muScore = 1
+muon_qp = -0.0313504
+muon_qpqpe = -1.20905
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 5.16516
+true = 3.07741 reco = 23.0202
+MuonE True = 1065.2 Muon Reco = 21131.9
+muon_E_shift = 414.568
+muon_muScore = 1
+muon_qp = -0.0509593
+muon_qpqpe = -12.7087
+muon_roadUpstreamEnergy = 2.04686
+muon_minosTrackQuality = 1
+Extra Muon = 10.3971
+true = 2.57387 reco = 4156.22
+MuonE True = 2203.19 Muon Reco = 4.15577e+06
+muon_E_shift = 86742.7
+muon_muScore = 1
+muon_qp = -0.000242653
+muon_qpqpe = -2.077
+muon_roadUpstreamEnergy = 0.818206
+muon_minosTrackQuality = 2
+Extra Muon = 19.841
+true = 13.3112 reco = 24.7238
+MuonE True = 11587.4 Muon Reco = 23216.3
+muon_E_shift = 456.61
+muon_muScore = 1
+muon_qp = -0.0462403
+muon_qpqpe = -1.52802
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 0.938378
+true = 6.99978 reco = 33.0558
+MuonE True = 1992.39 Muon Reco = 29329
+muon_E_shift = 590.528
+muon_muScore = 1
+muon_qp = -0.0357131
+muon_qpqpe = -13.7285
+muon_roadUpstreamEnergy = 117.095
+muon_minosTrackQuality = 2
+Extra Muon = 72.3145
+true = 13.2187 reco = 32.2885
+MuonE True = 10810.7 Muon Reco = 30576.9
+muon_E_shift = 608.743
+muon_muScore = 1
+muon_qp = -0.034641
+muon_qpqpe = -0.605536
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 5.79185
+true = 14.8114 reco = 20.7943
+MuonE True = 14484.9 Muon Reco = 20536.2
+muon_E_shift = 404.714
+muon_muScore = 1
+muon_qp = -0.0522087
+muon_qpqpe = -9.98879
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 1.00334
+true = 3.5376 reco = 60.2337
+MuonE True = 2052.13 Muon Reco = 59072
+muon_E_shift = 1202.71
+muon_muScore = 1
+muon_qp = -0.0175315
+muon_qpqpe = -0.0179427
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 40.6463
+true = 4.25932 reco = 30.0959
+MuonE True = 3334.06 Muon Reco = 29248.3
+muon_E_shift = 583.102
+muon_muScore = 1
+muon_qp = -0.0361694
+muon_qpqpe = -0.0958216
+muon_roadUpstreamEnergy = 1.98692
+muon_minosTrackQuality = 2
+Extra Muon = 16.3706
+true = 3.53464 reco = 27.0743
+MuonE True = 2160.73 Muon Reco = 25612.6
+muon_E_shift = 509.037
+muon_muScore = 1
+muon_qp = -0.0415082
+muon_qpqpe = -15.8656
+muon_roadUpstreamEnergy = 0.234739
+muon_minosTrackQuality = 2
+Extra Muon = 98.9604
+true = 16.0383 reco = 43.2496
+MuonE True = 14348.4 Muon Reco = 41699.5
+muon_E_shift = 836.741
+muon_muScore = 1
+muon_qp = -0.0251819
+muon_qpqpe = -0.637525
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 43.5579
+true = 16.2253 reco = 27.2881
+MuonE True = 14071.6 Muon Reco = 25508.8
+muon_E_shift = 499.32
+muon_muScore = 1
+muon_qp = -0.0423214
+muon_qpqpe = -114.531
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 41.9305
+true = 4.74721 reco = 22.9324
+MuonE True = 3561.82 Muon Reco = 21556.1
+muon_E_shift = 419.306
+muon_muScore = 1
+muon_qp = -0.0506172
+muon_qpqpe = -16.8432
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 14.8607
+true = 3.47694 reco = 26.9409
+MuonE True = 2227.35 Muon Reco = 25525.1
+muon_E_shift = 499.491
+muon_muScore = 1
+muon_qp = -0.0422507
+muon_qpqpe = -1.48703
+muon_roadUpstreamEnergy = 1.55825
+muon_minosTrackQuality = 2
+Extra Muon = 10.3369
+true = 5.07953 reco = 49.0082
+MuonE True = 4765.87 Muon Reco = 48603.6
+muon_E_shift = 980.635
+muon_muScore = 1
+muon_qp = -0.0214815
+muon_qpqpe = -1.24514
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 34.8133
+true = 2.61327 reco = 23.2242
+MuonE True = 1678.76 Muon Reco = 22119.8
+muon_E_shift = 429.84
+muon_muScore = 1
+muon_qp = -0.0491372
+muon_qpqpe = -10.4382
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 47.6388
+true = 17.651 reco = 922.352
+MuonE True = 16871.1 Muon Reco = 921688
+muon_E_shift = 19205.5
+muon_muScore = 1
+muon_qp = -0.00109609
+muon_qpqpe = -0.260636
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 8.95311
+true = 4.28161 reco = 25.3056
+MuonE True = 3132.69 Muon Reco = 23735.8
+muon_E_shift = 466.958
+muon_muScore = 1
+muon_qp = -0.045338
+muon_qpqpe = -2.80476
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 6.67901
+true = 2.61875 reco = 30.237
+MuonE True = 1492.32 Muon Reco = 28876.5
+muon_E_shift = 577.334
+muon_muScore = 1
+muon_qp = -0.0365735
+muon_qpqpe = -18.0797
+muon_roadUpstreamEnergy = 123.693
+muon_minosTrackQuality = 2
+Extra Muon = 15.2094
+true = 15.4162 reco = 24.7121
+MuonE True = 8031.51 Muon Reco = 16892.6
+muon_E_shift = 320.808
+muon_muScore = 1
+muon_qp = -0.0660034
+muon_qpqpe = -0.233645
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 234.331
+true = 9.18203 reco = 22.6787
+MuonE True = 5215.2 Muon Reco = 18848.3
+muon_E_shift = 368.847
+muon_muScore = 1
+muon_qp = -0.0574305
+muon_qpqpe = -13.2271
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 84.3885
+true = 5.25765 reco = 68.0497
+MuonE True = 4177.02 Muon Reco = 66532.3
+muon_E_shift = 1359.08
+muon_muScore = 1
+muon_qp = -0.0155021
+muon_qpqpe = -0.286636
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 5.04991
+true = 2.14172 reco = 20.5272
+MuonE True = 1694.02 Muon Reco = 19673.5
+muon_E_shift = 384.469
+muon_muScore = 1
+muon_qp = -0.0549787
+muon_qpqpe = -7.19684
+muon_roadUpstreamEnergy = 60.6341
+muon_minosTrackQuality = 1
+Extra Muon = 48.8956
+true = 4.14662 reco = 54.4144
+MuonE True = 3471.26 Muon Reco = 53850.4
+muon_E_shift = 1098.1
+muon_muScore = 1
+muon_qp = -0.0191813
+muon_qpqpe = -0.113934
+muon_roadUpstreamEnergy = 0.345937
+muon_minosTrackQuality = 1
+Extra Muon = 4.44167
+true = 3.80574 reco = 30.4947
+MuonE True = 2738.16 Muon Reco = 29831.1
+muon_E_shift = 596.266
+muon_muScore = 1
+muon_qp = -0.0353683
+muon_qpqpe = -0.293515
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 19.0043
+true = 3.45986 reco = 75.706
+MuonE True = 2002.44 Muon Reco = 74549.8
+muon_E_shift = 1527.39
+muon_muScore = 1
+muon_qp = -0.0137918
+muon_qpqpe = -0.0235056
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 67.1844
+true = 4.82156 reco = 40.6697
+MuonE True = 3889.12 Muon Reco = 39593.2
+muon_E_shift = 800.127
+muon_muScore = 1
+muon_qp = -0.0263367
+muon_qpqpe = -0.0979361
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 22.9272
+true = 2.6667 reco = 28.5376
+MuonE True = 1673.6 Muon Reco = 27689.6
+muon_E_shift = 546.297
+muon_muScore = 1
+muon_qp = -0.0386676
+muon_qpqpe = -0.0396479
+muon_roadUpstreamEnergy = 25.0618
+muon_minosTrackQuality = 1
+Extra Muon = 90.7801
+true = 13.5496 reco = 36.1231
+MuonE True = 11241.3 Muon Reco = 34594.7
+muon_E_shift = 694.51
+muon_muScore = 1
+muon_qp = -0.0303799
+muon_qpqpe = -14.9378
+muon_roadUpstreamEnergy = 10.6129
+muon_minosTrackQuality = 2
+Extra Muon = 1.27466
+true = 6.0302 reco = 30.6432
+MuonE True = 3370.1 Muon Reco = 28635
+muon_E_shift = 568.355
+muon_muScore = 1
+muon_qp = -0.0371116
+muon_qpqpe = -0.424335
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 94.1438
+true = 13.9081 reco = 23.6936
+MuonE True = 11658 Muon Reco = 21743.4
+muon_E_shift = 431.353
+muon_muScore = 1
+muon_qp = -0.0489637
+muon_qpqpe = -320.999
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 65.3735
+true = 3.76323 reco = 45.6057
+MuonE True = 3366.06 Muon Reco = 45259.1
+muon_E_shift = 920.192
+muon_muScore = 1
+muon_qp = -0.0229109
+muon_qpqpe = -0.0588691
+muon_roadUpstreamEnergy = 3.54935
+muon_minosTrackQuality = 2
+Extra Muon = 0
+true = 2.99412 reco = 29.2
+MuonE True = 2227.45 Muon Reco = 28656
+muon_E_shift = 569.373
+muon_muScore = 1
+muon_qp = -0.0371305
+muon_qpqpe = -0.482679
+muon_roadUpstreamEnergy = 1.40993
+muon_minosTrackQuality = 2
+Extra Muon = 13.2951
+true = 9.86624 reco = 77.4587
+MuonE True = 6895.96 Muon Reco = 74626.7
+muon_E_shift = 1529.95
+muon_muScore = 1
+muon_qp = -0.0137629
+muon_qpqpe = -0.0892826
+muon_roadUpstreamEnergy = 5.66391
+muon_minosTrackQuality = 1
+Extra Muon = 52.3591
+true = 3.76173 reco = 30.8818
+MuonE True = 3009.35 Muon Reco = 30490.3
+muon_E_shift = 605.276
+muon_muScore = 1
+muon_qp = -0.0349937
+muon_qpqpe = -336.103
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 59.7999
+true = 6.35697 reco = 35.3235
+MuonE True = 4870.92 Muon Reco = 33757.5
+muon_E_shift = 671.131
+muon_muScore = 1
+muon_qp = -0.031412
+muon_qpqpe = -0.237111
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 56.3377
+true = 3.26894 reco = 52.6054
+MuonE True = 2574.03 Muon Reco = 51972.2
+muon_E_shift = 1057.56
+muon_muScore = 1
+muon_qp = -0.0199171
+muon_qpqpe = -0.0368077
+muon_roadUpstreamEnergy = 18.7361
+muon_minosTrackQuality = 1
+Extra Muon = 7.52445
+true = 15.5275 reco = 64.6273
+MuonE True = 14755.6 Muon Reco = 63756.7
+muon_E_shift = 1295.79
+muon_muScore = 1
+muon_qp = -0.0162518
+muon_qpqpe = -1.78025
+muon_roadUpstreamEnergy = 0.329686
+muon_minosTrackQuality = 2
+Extra Muon = 197.15
+true = 2.51735 reco = 31.366
+MuonE True = 2177.35 Muon Reco = 30523.7
+muon_E_shift = 609.818
+muon_muScore = 1
+muon_qp = -0.0346912
+muon_qpqpe = -15.6619
+muon_roadUpstreamEnergy = 0.914253
+muon_minosTrackQuality = 2
+Extra Muon = 11.8792
+true = 9.00439 reco = 20.0156
+MuonE True = 7895.96 Muon Reco = 18591.3
+muon_E_shift = 364.307
+muon_muScore = 1
+muon_qp = -0.0580474
+muon_qpqpe = -10.4877
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 7.0253
+true = 14.7373 reco = 78.9829
+MuonE True = 12283 Muon Reco = 77014.6
+muon_E_shift = 1575.01
+muon_muScore = 1
+muon_qp = -0.0133744
+muon_qpqpe = -0.946878
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 1.73466
+true = 3.55884 reco = 25.5023
+MuonE True = 2117.52 Muon Reco = 22752.1
+muon_E_shift = 448.113
+muon_muScore = 1
+muon_qp = -0.0471215
+muon_qpqpe = -11.4141
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 81.0693
+true = 18.6102 reco = 102.736
+MuonE True = 17867.1 Muon Reco = 102374
+muon_E_shift = 2104.03
+muon_muScore = 1
+muon_qp = -0.0100092
+muon_qpqpe = -5.7103
+muon_roadUpstreamEnergy = 11.3683
+muon_minosTrackQuality = 2
+Extra Muon = 1.7144
+true = 14.9527 reco = 25.4272
+MuonE True = 13600.4 Muon Reco = 12907.4
+muon_E_shift = 244.697
+muon_muScore = 1
+muon_qp = -0.0868679
+muon_qpqpe = -26.7186
+muon_roadUpstreamEnergy = 64.2455
+muon_minosTrackQuality = 1
+Extra Muon = 72.7923
+true = 6.77723 reco = 21.3038
+MuonE True = 4801.69 Muon Reco = 18559.4
+muon_E_shift = 361.337
+muon_muScore = 1
+muon_qp = -0.0585289
+muon_qpqpe = -0.602214
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 20.9741
+true = 6.17289 reco = 26.0707
+MuonE True = 5722.65 Muon Reco = 25716
+muon_E_shift = 499.996
+muon_muScore = 1
+muon_qp = -0.0423193
+muon_qpqpe = -0.0473149
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 6.50973
+true = 14.2666 reco = 23.8605
+MuonE True = 13394.6 Muon Reco = 23014.1
+muon_E_shift = 449.702
+muon_muScore = 1
+muon_qp = -0.0470227
+muon_qpqpe = -19.9493
+muon_roadUpstreamEnergy = 1.82918
+muon_minosTrackQuality = 2
+Extra Muon = 3.32893
+true = 2.60265 reco = 145.239
+MuonE True = 2239.37 Muon Reco = 144896
+muon_E_shift = 2988.02
+muon_muScore = 1
+muon_qp = -0.00704825
+muon_qpqpe = -7.44458
+muon_roadUpstreamEnergy = 0.81826
+muon_minosTrackQuality = 2
+Extra Muon = 5.4328
+true = 3.78834 reco = 92.6956
+MuonE True = 2613.83 Muon Reco = 91256.4
+muon_E_shift = 1871.74
+muon_muScore = 1
+muon_qp = -0.0112564
+muon_qpqpe = -112.564
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 44.0855
+true = 5.92545 reco = 51.6426
+MuonE True = 5067.2 Muon Reco = 50629.5
+muon_E_shift = 1029.55
+muon_muScore = 1
+muon_qp = -0.0204858
+muon_qpqpe = -3.18195
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 3.19731
+true = 5.66333 reco = 31.7063
+MuonE True = 4089.48 Muon Reco = 30684.3
+muon_E_shift = 609.441
+muon_muScore = 1
+muon_qp = -0.0346389
+muon_qpqpe = -0.447111
+muon_roadUpstreamEnergy = 0.322224
+muon_minosTrackQuality = 1
+Extra Muon = 17.6731
+true = 15.2025 reco = 20.9916
+MuonE True = 11122.6 Muon Reco = 16786.4
+muon_E_shift = 318.558
+muon_muScore = 1
+muon_qp = -0.0664708
+muon_qpqpe = -10.1878
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 16.3906
+true = 4.11085 reco = 20.3816
+MuonE True = 3094.32 Muon Reco = 19557.9
+muon_E_shift = 379.427
+muon_muScore = 1
+muon_qp = -0.0557171
+muon_qpqpe = -0.220893
+muon_roadUpstreamEnergy = 0.326648
+muon_minosTrackQuality = 1
+Extra Muon = 58.9838
+true = 4.92373 reco = 99.35
+MuonE True = 4594.43 Muon Reco = 98995.9
+muon_E_shift = 2037.97
+muon_muScore = 1
+muon_qp = -0.0103306
+muon_qpqpe = -1.15576
+muon_roadUpstreamEnergy = 19.476
+muon_minosTrackQuality = 2
+Extra Muon = 6.51335
+true = 3.28461 reco = 28.253
+MuonE True = 1984.76 Muon Reco = 26937.6
+muon_E_shift = 536.218
+muon_muScore = 1
+muon_qp = -0.0393928
+muon_qpqpe = -9.83891
+muon_roadUpstreamEnergy = 0.888182
+muon_minosTrackQuality = 2
+Extra Muon = 27.7937
+true = 11.1543 reco = 27.8016
+MuonE True = 10600.6 Muon Reco = 27214.5
+muon_E_shift = 539.88
+muon_muScore = 1
+muon_qp = -0.0391238
+muon_qpqpe = -10.231
+muon_roadUpstreamEnergy = 44.1078
+muon_minosTrackQuality = 2
+Extra Muon = 117.384
+true = 3.23318 reco = 27.2844
+MuonE True = 1617.37 Muon Reco = 26294
+muon_E_shift = 521.253
+muon_muScore = 1
+muon_qp = -0.0405301
+muon_qpqpe = -13.9464
+muon_roadUpstreamEnergy = 3.17858
+muon_minosTrackQuality = 2
+Extra Muon = 57.0455
+true = 3.98704 reco = 128.169
+MuonE True = 3260.11 Muon Reco = 127882
+muon_E_shift = 2636.45
+muon_muScore = 1
+muon_qp = -0.00798487
+muon_qpqpe = -1.51286
+muon_roadUpstreamEnergy = 1.54536
+muon_minosTrackQuality = 2
+Extra Muon = 2.02496
+true = 8.32171 reco = 32.6802
+MuonE True = 6974.02 Muon Reco = 30940.1
+muon_E_shift = 622.41
+muon_muScore = 1
+muon_qp = -0.0339137
+muon_qpqpe = -0.373364
+muon_roadUpstreamEnergy = 0.404355
+muon_minosTrackQuality = 1
+Extra Muon = 51.8851
+true = 2.56032 reco = 23.1824
+MuonE True = 2141.8 Muon Reco = 22700.5
+muon_E_shift = 449.098
+muon_muScore = 1
+muon_qp = -0.0471554
+muon_qpqpe = -24.9443
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 108.17
+true = 10.3208 reco = 23.39
+MuonE True = 9728.94 Muon Reco = 22818.2
+muon_E_shift = 443.415
+muon_muScore = 1
+muon_qp = -0.0476242
+muon_qpqpe = -13.3743
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 32.6735
+true = 11.3196 reco = 23.8041
+MuonE True = 10545 Muon Reco = 11110.7
+muon_E_shift = 206.99
+muon_muScore = 1
+muon_qp = -0.103072
+muon_qpqpe = -22.4509
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 41.7055
+true = 3.61756 reco = 35.9608
+MuonE True = 2812.17 Muon Reco = 35181.5
+muon_E_shift = 706.666
+muon_muScore = 1
+muon_qp = -0.0298575
+muon_qpqpe = -0.0319226
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 2.47883
+true = 14.9458 reco = 25.202
+MuonE True = 14379.3 Muon Reco = 24383.6
+muon_E_shift = 484.216
+muon_muScore = 1
+muon_qp = -0.0435901
+muon_qpqpe = -16.1197
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 71.1383
+true = 5.39435 reco = 24.6982
+MuonE True = 4798.2 Muon Reco = 24201.4
+muon_E_shift = 479.587
+muon_muScore = 1
+muon_qp = -0.0440131
+muon_qpqpe = -0.291309
+muon_roadUpstreamEnergy = 0.142134
+muon_minosTrackQuality = 2
+Extra Muon = 12.5372
+true = 13.433 reco = 35.3912
+MuonE True = 12609.1 Muon Reco = 34608.5
+muon_E_shift = 688.772
+muon_muScore = 1
+muon_qp = -0.0306047
+muon_qpqpe = -53.7833
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 102.764
+true = 4.22187 reco = 44.709
+MuonE True = 2640.83 Muon Reco = 43376.2
+muon_E_shift = 870.291
+muon_muScore = 1
+muon_qp = -0.0242095
+muon_qpqpe = -0.0643309
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 95.1962
+true = 8.2544 reco = 32.2522
+MuonE True = 6780.33 Muon Reco = 30860.4
+muon_E_shift = 620.366
+muon_muScore = 1
+muon_qp = -0.0340985
+muon_qpqpe = -7.1229
+muon_roadUpstreamEnergy = 36.0665
+muon_minosTrackQuality = 2
+Extra Muon = 0.8003
+true = 8.52856 reco = 20.4001
+MuonE True = 7396.93 Muon Reco = 18651.7
+muon_E_shift = 359.542
+muon_muScore = 1
+muon_qp = -0.058824
+muon_qpqpe = -10.9521
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 137.399
+true = 15.3781 reco = 24.497
+MuonE True = 14493.9 Muon Reco = 23307.9
+muon_E_shift = 452.936
+muon_muScore = 1
+muon_qp = -0.0466171
+muon_qpqpe = -7.39938
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 45.3392
+true = 7.7668 reco = 27.8821
+MuonE True = 7263.46 Muon Reco = 7303.35
+muon_E_shift = 130.802
+muon_muScore = 1
+muon_qp = -0.166342
+muon_qpqpe = -22.8297
+muon_roadUpstreamEnergy = 11.8354
+muon_minosTrackQuality = 1
+Extra Muon = 71.4769
+true = 4.74153 reco = 2719.95
+MuonE True = 2370.32 Muon Reco = 2.71776e+06
+muon_E_shift = 56710.2
+muon_muScore = 1
+muon_qp = -0.000371151
+muon_qpqpe = -3.27075
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 26.135
+true = 4.87763 reco = 28.3599
+MuonE True = 1958.32 Muon Reco = 25420.4
+muon_E_shift = 500.784
+muon_muScore = 1
+muon_qp = -0.0421411
+muon_qpqpe = -9.00628
+muon_roadUpstreamEnergy = 8.24846
+muon_minosTrackQuality = 2
+Extra Muon = 22.5721
+true = 3.37051 reco = 21.1638
+MuonE True = 2186.84 Muon Reco = 20321.4
+muon_E_shift = 397.271
+muon_muScore = 1
+muon_qp = -0.0531966
+muon_qpqpe = -0.106093
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 18.4923
+true = 15.7671 reco = 25.1789
+MuonE True = 13871 Muon Reco = 23622.9
+muon_E_shift = 466.547
+muon_muScore = 1
+muon_qp = -0.0453773
+muon_qpqpe = -6.03093
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 8.08116
+true = 15.2167 reco = 20.3855
+MuonE True = 14405.1 Muon Reco = 18518.2
+muon_E_shift = 357.846
+muon_muScore = 1
+muon_qp = -0.0591043
+muon_qpqpe = -25.3026
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 26.0272
+true = 4.7296 reco = 33.2177
+MuonE True = 3597.57 Muon Reco = 32275.2
+muon_E_shift = 648.222
+muon_muScore = 1
+muon_qp = -0.032525
+muon_qpqpe = -3.46157
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 29.8105
+true = 4.56309 reco = 42.107
+MuonE True = 3051.97 Muon Reco = 40527.3
+muon_E_shift = 815.93
+muon_muScore = 1
+muon_qp = -0.0258462
+muon_qpqpe = -0.0533349
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 13.1076
+true = 11.6824 reco = 25.7595
+MuonE True = 9632.16 Muon Reco = 24339.6
+muon_E_shift = 484.099
+muon_muScore = 1
+muon_qp = -0.0436007
+muon_qpqpe = -17.93
+muon_roadUpstreamEnergy = 1.88966
+muon_minosTrackQuality = 2
+Extra Muon = 112.217
+true = 3.1898 reco = 28.6885
+MuonE True = 1985.61 Muon Reco = 1935.44
+muon_E_shift = 44.3189
+muon_muScore = 1
+muon_qp = -1.0677
+muon_qpqpe = -6.41453
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 41.9383
+true = 10.0754 reco = 23.7248
+MuonE True = 9067.56 Muon Reco = 11347.1
+muon_E_shift = 212.052
+muon_muScore = 1
+muon_qp = -0.100864
+muon_qpqpe = -27.0096
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 153.434
+true = 4.97836 reco = 25.9023
+MuonE True = 4373.85 Muon Reco = 25024.4
+muon_E_shift = 492.81
+muon_muScore = 1
+muon_qp = -0.0429987
+muon_qpqpe = -20.6785
+muon_roadUpstreamEnergy = 0.0684926
+muon_minosTrackQuality = 2
+Extra Muon = 0.814924
+true = 3.04997 reco = 20.8511
+MuonE True = 2281.68 Muon Reco = 20098.6
+muon_E_shift = 393.573
+muon_muScore = 1
+muon_qp = -0.0536975
+muon_qpqpe = -9.4211
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 2.06094
+true = 3.55017 reco = 39.4988
+MuonE True = 1719.27 Muon Reco = 37648.1
+muon_E_shift = 759.573
+muon_muScore = 1
+muon_qp = -0.0277935
+muon_qpqpe = -14.0976
+muon_roadUpstreamEnergy = 22.8969
+muon_minosTrackQuality = 1
+Extra Muon = 15.0219
+true = 19.3405 reco = 28.7225
+MuonE True = 18153.8 Muon Reco = 27416.3
+muon_E_shift = 542.647
+muon_muScore = 1
+muon_qp = -0.0388764
+muon_qpqpe = -3.50434
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 88.3644
+true = 9.40201 reco = 56.4719
+MuonE True = 6307.47 Muon Reco = 53653.2
+muon_E_shift = 1087.25
+muon_muScore = 1
+muon_qp = -0.0193727
+muon_qpqpe = -0.0498951
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 19.1016
+true = 16.2875 reco = 34.4404
+MuonE True = 15911.8 Muon Reco = 34134.7
+muon_E_shift = 681.788
+muon_muScore = 1
+muon_qp = -0.0309191
+muon_qpqpe = -4.02424
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 7.44674
+true = 2.60588 reco = 29.4412
+MuonE True = 1846.35 Muon Reco = 29054.5
+muon_E_shift = 571.733
+muon_muScore = 1
+muon_qp = -0.0369334
+muon_qpqpe = -0.0374233
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 0.790073
+true = 10.0281 reco = 65.4568
+MuonE True = 7285.58 Muon Reco = 63000.4
+muon_E_shift = 1285.66
+muon_muScore = 1
+muon_qp = -0.0163801
+muon_qpqpe = -0.0770284
+muon_roadUpstreamEnergy = 45.0397
+muon_minosTrackQuality = 1
+Extra Muon = 64.7871
+	Entry 50000
+true = 2.96132 reco = 26.8635
+MuonE True = 2214.63 Muon Reco = 26104.6
+muon_E_shift = 518.644
+muon_muScore = 1
+muon_qp = -0.0407905
+muon_qpqpe = -5.06703
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 6.76909
+true = 6.54831 reco = 20.6543
+MuonE True = 4939.93 Muon Reco = 5208.82
+muon_E_shift = 89.8105
+muon_muScore = 1
+muon_qp = -0.262129
+muon_qpqpe = -12.2898
+muon_roadUpstreamEnergy = 35.2475
+muon_minosTrackQuality = 2
+Extra Muon = 347.435
+true = 15.843 reco = 22.7144
+MuonE True = 11835 Muon Reco = 17477.7
+muon_E_shift = 337.414
+muon_muScore = 1
+muon_qp = -0.0627192
+muon_qpqpe = -1.51245
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 14.7523
+true = 17.8635 reco = 23.6139
+MuonE True = 15892.2 Muon Reco = 21814.4
+muon_E_shift = 429.936
+muon_muScore = 1
+muon_qp = -0.0491262
+muon_qpqpe = -10.3428
+muon_roadUpstreamEnergy = 1.79067
+muon_minosTrackQuality = 2
+Extra Muon = 35.4325
+true = 4.1016 reco = 84.8273
+MuonE True = 2878.21 Muon Reco = 81677.2
+muon_E_shift = 1676
+muon_muScore = 1
+muon_qp = -0.0125631
+muon_qpqpe = -0.0144928
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 15.4919
+true = 3.77505 reco = 26.9279
+MuonE True = 2739.17 Muon Reco = 25544.7
+muon_E_shift = 507.681
+muon_muScore = 1
+muon_qp = -0.0416224
+muon_qpqpe = -5.03166
+muon_roadUpstreamEnergy = 0.418198
+muon_minosTrackQuality = 2
+Extra Muon = 14.5847
+true = 7.1372 reco = 34.4538
+MuonE True = 6538.71 Muon Reco = 33652
+muon_E_shift = 669.172
+muon_muScore = 1
+muon_qp = -0.0315654
+muon_qpqpe = -0.0842074
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 98.7168
+true = 3.58239 reco = 51.8464
+MuonE True = 2529.25 Muon Reco = 50994
+muon_E_shift = 1031.1
+muon_muScore = 1
+muon_qp = -0.0204292
+muon_qpqpe = -0.0522557
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 51.8998
+true = 15.8857 reco = 24.3081
+MuonE True = 14680 Muon Reco = 14183.5
+muon_E_shift = 271.727
+muon_muScore = 1
+muon_qp = -0.078278
+muon_qpqpe = -11.9995
+muon_roadUpstreamEnergy = 0.874405
+muon_minosTrackQuality = 1
+Extra Muon = 40.0532
+true = 7.92562 reco = 316.372
+MuonE True = 4785.68 Muon Reco = 314616
+muon_E_shift = 6536.34
+muon_muScore = 1
+muon_qp = -0.00322029
+muon_qpqpe = -0.326895
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 34.9244
+true = 8.89719 reco = 22.2625
+MuonE True = 7214.01 Muon Reco = 20677.3
+muon_E_shift = 408.446
+muon_muScore = 1
+muon_qp = -0.0518122
+muon_qpqpe = -2.2152
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 44.4387
+true = 3.3335 reco = 23.5794
+MuonE True = 2929.84 Muon Reco = 23217.8
+muon_E_shift = 452.66
+muon_muScore = 1
+muon_qp = -0.0466456
+muon_qpqpe = -15.2345
+muon_roadUpstreamEnergy = 19.6163
+muon_minosTrackQuality = 2
+Extra Muon = 8.06403
+true = 12.8525 reco = 57.1049
+MuonE True = 11607.3 Muon Reco = 55723.8
+muon_E_shift = 1133.54
+muon_muScore = 1
+muon_qp = -0.0185912
+muon_qpqpe = -0.242062
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 33.8009
+true = 11.0887 reco = 23.9982
+MuonE True = 9784.81 Muon Reco = 22136.8
+muon_E_shift = 432.676
+muon_muScore = 1
+muon_qp = -0.0488131
+muon_qpqpe = -10.0229
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 203.775
+true = 5.53737 reco = 186.234
+MuonE True = 3580.9 Muon Reco = 184785
+muon_E_shift = 3829.74
+muon_muScore = 1
+muon_qp = -0.0054965
+muon_qpqpe = -0.0654318
+muon_roadUpstreamEnergy = 8.41368
+muon_minosTrackQuality = 2
+Extra Muon = 13.3517
+true = 3.66594 reco = 64.1
+MuonE True = 2613.97 Muon Reco = 62996.8
+muon_E_shift = 1285.03
+muon_muScore = 1
+muon_qp = -0.0163883
+muon_qpqpe = -0.0462262
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 18.3731
+true = 4.74829 reco = 133212
+MuonE True = 4167.59 Muon Reco = 1.33212e+08
+muon_E_shift = 2.78151e+06
+muon_muScore = 1
+muon_qp = -7.567e-06
+muon_qpqpe = -0.000814114
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 9.5389
+true = 2.64622 reco = 85.7469
+MuonE True = 2163.25 Muon Reco = 85129.4
+muon_E_shift = 1748.05
+muon_muScore = 1
+muon_qp = -0.0120494
+muon_qpqpe = -0.0130846
+muon_roadUpstreamEnergy = 16.0329
+muon_minosTrackQuality = 2
+Extra Muon = 4.75311
+true = 15.9189 reco = 22.9016
+MuonE True = 14268.9 Muon Reco = 15532.8
+muon_E_shift = 297.86
+muon_muScore = 1
+muon_qp = -0.0713047
+muon_qpqpe = -25.5698
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 159.797
+true = 2.42681 reco = 20.5277
+MuonE True = 1638.76 Muon Reco = 19821.3
+muon_E_shift = 387.433
+muon_muScore = 1
+muon_qp = -0.0545548
+muon_qpqpe = -12.9099
+muon_roadUpstreamEnergy = 0.498644
+muon_minosTrackQuality = 2
+Extra Muon = 2.36493
+true = 4.3038 reco = 21.0672
+MuonE True = 2421.26 Muon Reco = 2337.21
+muon_E_shift = 39.304
+muon_muScore = 1
+muon_qp = -0.954514
+muon_qpqpe = -6.12824
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 112.424
+true = 4.80116 reco = 119.706
+MuonE True = 3860.18 Muon Reco = 118530
+muon_E_shift = 2446.71
+muon_muScore = 1
+muon_qp = -0.00860428
+muon_qpqpe = -0.039149
+muon_roadUpstreamEnergy = 0.64232
+muon_minosTrackQuality = 1
+Extra Muon = 17.9025
+true = 18.5624 reco = 48.8955
+MuonE True = 16689.2 Muon Reco = 46965
+muon_E_shift = 949.542
+muon_muScore = 1
+muon_qp = -0.0222165
+muon_qpqpe = -0.926008
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 12.9706
+true = 7.5786 reco = 20.5919
+MuonE True = 6911.96 Muon Reco = 19666.1
+muon_E_shift = 381.305
+muon_muScore = 1
+muon_qp = -0.0554388
+muon_qpqpe = -1.89521
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 12.0597
+true = 11.2631 reco = 22.5232
+MuonE True = 10393.3 Muon Reco = 21567.9
+muon_E_shift = 425.702
+muon_muScore = 1
+muon_qp = -0.0497722
+muon_qpqpe = -17.4503
+muon_roadUpstreamEnergy = 1.34729
+muon_minosTrackQuality = 2
+Extra Muon = 0
+true = 3.85348 reco = 42.4738
+MuonE True = 2727.83 Muon Reco = 41335.5
+muon_E_shift = 837.362
+muon_muScore = 1
+muon_qp = -0.0252427
+muon_qpqpe = -2.95038
+muon_roadUpstreamEnergy = 18.1925
+muon_minosTrackQuality = 2
+Extra Muon = 13.0678
+true = 3.35566 reco = 25.0939
+MuonE True = 1720.54 Muon Reco = 23211.6
+muon_E_shift = 454.321
+muon_muScore = 1
+muon_qp = -0.0464741
+muon_qpqpe = -8.95479
+muon_roadUpstreamEnergy = 5.30278
+muon_minosTrackQuality = 1
+Extra Muon = 39.2988
+true = 12.2429 reco = 37.809
+MuonE True = 11420.6 Muon Reco = 36561.7
+muon_E_shift = 729.436
+muon_muScore = 1
+muon_qp = -0.0288946
+muon_qpqpe = -1.26692
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 5.20227
+true = 16.5036 reco = 21.6716
+MuonE True = 15163.6 Muon Reco = 20171.7
+muon_E_shift = 394.454
+muon_muScore = 1
+muon_qp = -0.0535768
+muon_qpqpe = -13.3124
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 74.096
+true = 2.56899 reco = 100.661
+MuonE True = 1864.04 Muon Reco = 99916.8
+muon_E_shift = 2055.21
+muon_muScore = 1
+muon_qp = -0.0102441
+muon_qpqpe = -0.01082
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 47.9691
+true = 7.96964 reco = 328.622
+MuonE True = 6709.47 Muon Reco = 326985
+muon_E_shift = 6792.77
+muon_muScore = 1
+muon_qp = -0.00309871
+muon_qpqpe = -0.510987
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 82.9363
+true = 2.32832 reco = 27.2744
+MuonE True = 1553.81 Muon Reco = 1596.31
+muon_E_shift = 31.9531
+muon_muScore = 1
+muon_qp = -9.9
+muon_qpqpe = 0
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = -99
+Extra Muon = 7.23155
+true = 2.28723 reco = 25.4827
+MuonE True = 1632.08 Muon Reco = 24910.6
+muon_E_shift = 495.297
+muon_muScore = 1
+muon_qp = -0.0426112
+muon_qpqpe = -0.0525803
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 2.65302
+true = 17.3593 reco = 774.069
+MuonE True = 15943.5 Muon Reco = 772902
+muon_E_shift = 16103.9
+muon_muScore = 1
+muon_qp = -0.00130702
+muon_qpqpe = -0.0288363
+muon_roadUpstreamEnergy = 34.3349
+muon_minosTrackQuality = 1
+Extra Muon = 92.0385
+true = 5.65709 reco = 68.6676
+MuonE True = 5229.45 Muon Reco = 67974.6
+muon_E_shift = 1386.98
+muon_muScore = 1
+muon_qp = -0.0151969
+muon_qpqpe = -2.92678
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 2
+Extra Muon = 47.8642
+true = 3.54246 reco = 21.6602
+MuonE True = 2374.41 Muon Reco = 21092.7
+muon_E_shift = 405.9
+muon_muScore = 1
+muon_qp = -0.0520598
+muon_qpqpe = -0.053409
+muon_roadUpstreamEnergy = 0
+muon_minosTrackQuality = 1
+Extra Muon = 54.1892
+true = 16.163 reco = 21.4738
+MuonE True = 15451 Muon Reco = 20716.9
+muon_E_shift = 401.424
+muon_muScore = 1
+muon_qp = -0.0526396
+muon_qpqpe = -22.7932
+muon_roadUpstreamEnergy = 0.284937
+muon_minosTrackQuality = 2
+Extra Muon = 18.8325
+true = 16.38 reco = 42.3696
+MuonE True = 14521 Muon Reco = 15881.2
+muon_E_shift = 308.142
+muon_muScore = 1
+muon_qp = -0.0687443
+muon_qpqpe = -25.6679
+muon_roadUpstreamEnergy = 9.55514
+muon_minosTrackQuality = 2
+Extra Muon = 12.1306
+>> Writing /minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms.root
+>> Writing /minerva/data/users/oaltinok/NTupleAnalysis/MC/Reduced/ReducedNTuple_v2_60.root
+counter1 = 148
+counter2 = 40
+Time to Complete = 1' 24" or 84 seconds

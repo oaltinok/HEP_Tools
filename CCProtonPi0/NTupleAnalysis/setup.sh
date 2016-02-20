@@ -33,7 +33,9 @@ XSecPlotList=(Original
         BackgroundSubtracted
         Unfolded
         EfficiencyCorrected
-        CrossSection)
+        CrossSection
+        ErrorSummary 
+        Check)
 
 # Create Main Folder
 echo "... Creating ${Main_Folder}"

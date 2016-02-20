@@ -61,7 +61,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     mc_w.setBin(100,0.8,3.0);
     eVis_nuclearTarget.setBin(50,0.0,25.0);
     eVis_other.setBin(60,0.0,3000.0);
-    pi0_invMass.setBin(60,0.0,600.0);
+    pi0_invMass.setBin(50,0.0,500.0);
     bin_photonConvLength.setBin(50,0.0,100.0);
     
     // Michel Tool

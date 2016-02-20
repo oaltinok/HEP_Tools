@@ -126,9 +126,12 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         // Pi0 Invariant Mass
         TH1D* pi0_invMass_1Track;
         TH1D* pi0_invMass_2Track;
-        TH1D* data_invMass_All;
-        TH1D* signal_invMass_All;
-        TH1D* bckg_invMass_All;
+
+        // Background Subtraction
+        MnvH1D* invMass_all;
+        MnvH1D* invMass_mc_reco_all;
+        MnvH1D* invMass_mc_reco_signal;
+        MnvH1D* invMass_mc_reco_bckg;
 
         // Studies
         TH2D* signal_gamma_E_cos_openingAngle;
@@ -138,9 +141,6 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         TH3D* signal_E_cosTheta_convLength;
         TH3D* bckg_E_cosTheta_convLength;
         TH3D* bckg_signal_diff_E_cosTheta_convLength;
-
-        // Side Band
-        TH2D* P_invMass;
 
     private:
         void initHistograms();

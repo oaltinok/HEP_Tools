@@ -29,12 +29,12 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         ~CCProtonPi0_TruthAnalyzer();
         void Loop(std::string playlist);
 
-        MnvH1D* mc_truth_all_signal_muon_P;
-        MnvH1D* mc_truth_all_signal_pi0_P;
-        MnvH1D* mc_truth_all_signal_muon_theta;
-        MnvH1D* mc_truth_all_signal_pi0_theta;
-        MnvH1D* mc_truth_all_signal_neutrino_E;
-        MnvH1D* mc_truth_all_signal_QSq;
+        MnvH1D* muon_P_mc_truth_all_signal;
+        MnvH1D* pi0_P_mc_truth_all_signal;
+        MnvH1D* muon_theta_mc_truth_all_signal;
+        MnvH1D* pi0_theta_mc_truth_all_signal;
+        MnvH1D* neutrino_E_mc_truth_all_signal;
+        MnvH1D* QSq_mc_truth_all_signal;
 
     private :
         TFile* f;

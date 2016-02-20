@@ -78,18 +78,18 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     //                 CC Neutrino Interaction
     //                 FS Particles: muon, pi0, X (No Meson)
     //--------------------------------------------------------------------------
-    bool isSignal = false;
-    bool isFidVol = false;    
-    bool isCCNeutrino = false;
-    bool isFSGood = false;
     int t_current = truthEvent->current();
     int t_neutrinoPDG = truthEvent->incoming();
+    double Enu = truthEvent->incomingEnergy();
+    const double max_Enu = 20000; 
 
-    isFidVol = truthEvent->filtertaglist()->isFilterTagTrue("isFidVol");
-    isCCNeutrino = (t_current == 1 && t_neutrinoPDG == PDG::nu_mu);
-    isFSGood = (N_pi0 == 1 && N_other == 0);
+    bool isFidVol = truthEvent->filtertaglist()->isFilterTagTrue("isFidVol");
+    bool isCCNeutrino = (t_current == 1 && t_neutrinoPDG == PDG::nu_mu);
+    bool isFSGood = (N_pi0 == 1 && N_other == 0);
+    bool isNeutrinoEnergyLow = Enu <= max_Enu; 
 
-    if(isFidVol && isCCNeutrino && isFSGood){
+    bool isSignal = false;
+    if(isFidVol && isCCNeutrino && isFSGood && isNeutrinoEnergyLow){
         isSignal = true;
         debug()<<"Found a Signal Event!"<<endmsg;
     }

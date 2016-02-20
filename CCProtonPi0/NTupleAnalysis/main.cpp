@@ -48,7 +48,7 @@ void showInputError(char *argv[]);
 void Plot();
 void Reduce(string playlist, bool isMC);
 void Analyze(string playlist, bool isMC);
-void Calculate_CrossSection();
+void Calculate_CrossSection(bool isMC);
 
 int main(int argc, char *argv[] )
 {
@@ -65,30 +65,32 @@ int main(int argc, char *argv[] )
     
     // Check User Command
     int nMode = GetMode(argc,argv);
-    if (nMode == -1){
+    if (nMode == 0){
         showInputError(argv);
         return 0;
     }
 
-    if (nMode == 0 || nMode == 2) isMC = true;
+    if ( nMode < 0) isMC = true;
     else isMC = false;
 
-    if (isMC && nMode < 4){
-        cout<<"MC Playlists Selected!\n"<<endl;
-        pl_reduce = "Input/Playlists/pl_MC_Merged.dat"; 
-        pl_analyze = "Input/Playlists/pl_MC_Reduced.dat"; 
-    }else if (nMode < 4){
-        cout<<"Data Playlists Selected!\n"<<endl;
-        pl_reduce = "Input/Playlists/pl_Data_Merged.dat"; 
-        pl_analyze = "Input/Playlists/pl_Data_Reduced.dat"; 
+    if (nMode != 10){
+        if (isMC){
+            cout<<"MC Playlists Selected!\n"<<endl;
+            pl_reduce = "Input/Playlists/pl_MC_Merged.dat"; 
+            pl_analyze = "Input/Playlists/pl_MC_Reduced.dat"; 
+        }else{
+            cout<<"Data Playlists Selected!\n"<<endl;
+            pl_reduce = "Input/Playlists/pl_Data_Merged.dat"; 
+            pl_analyze = "Input/Playlists/pl_Data_Reduced.dat"; 
+        }
     }
-   
+
     ROOT::Cintex::Cintex::Enable();
 
-    if (nMode == 0 || nMode == 1) Reduce(pl_reduce, isMC);
-    else if (nMode == 2 || nMode == 3) Analyze(pl_analyze, isMC);
-    else if (nMode == 4) Plot();
-    else if (nMode == 5) Calculate_CrossSection();
+    if ( abs(nMode) == 1) Reduce(pl_reduce, isMC);
+    else if ( abs(nMode) == 2) Analyze(pl_analyze, isMC);
+    else if ( abs(nMode) == 3) Calculate_CrossSection(isMC);
+    else if ( nMode == 10) Plot();
     else{
         cout<<"Problem on Mode!, Returning"<<endl;
         return 0;
@@ -126,13 +128,13 @@ void Analyze(string playlist, bool isMC)
     analyzer.analyze(playlist);
 }
 
-void Calculate_CrossSection()
+void Calculate_CrossSection(bool isMC)
 {
     cout<<"\n"<<endl;
     cout<<"======================================================================"<<endl;
     cout<<"Calculating Cross Section..."<<endl;
     cout<<"======================================================================"<<endl;
-    CCProtonPi0_CrossSection crossSection;
+    CCProtonPi0_CrossSection crossSection(isMC);
     crossSection.Calc_CrossSections();
 }
 
@@ -157,34 +159,39 @@ void Plot()
 int GetMode(int argc, char* argv[])
 {
     // argc can only be 2 or 3
-    if (argc != 2 && argc != 3) return -1;
+    if (argc != 2 && argc != 3) return 0;
 
     std::string runSelect = argv[1];
     if (argc == 2){
-        if (runSelect.compare(runOption_Plot) == 0) return 4;
-        else if (runSelect.compare(runOption_CrossSection) == 0) return 5;
-        else return -1;
+        if (runSelect.compare(runOption_Plot) == 0) return 10;
+        else return 0;
     }
      
     std::string typeSelect = argv[2];
     // First check for ERROR
-    if (runSelect.compare(runOption_Reduce) != 0 && runSelect.compare(runOption_Run) != 0) return -1;
-    if (typeSelect.compare(typeOption_mc) != 0 && typeSelect.compare(typeOption_data) != 0) return -1;
+    if (runSelect.compare(runOption_Reduce) != 0 && runSelect.compare(runOption_Run) != 0 && runSelect.compare(runOption_CrossSection) != 0) return 0;
+    if (typeSelect.compare(typeOption_mc) != 0 && typeSelect.compare(typeOption_data) != 0) return 0;
 
     // Passed ERROR Check - Valid Input    
     if (runSelect.compare(runOption_Reduce) == 0){
-        if (typeSelect.compare(typeOption_mc) == 0) return 0;
+        if (typeSelect.compare(typeOption_mc) == 0) return -1;
         else if (typeSelect.compare(typeOption_data) == 0) return 1;
-        else return -1;
+        else return 0;
     }
 
     if (runSelect.compare(runOption_Run) == 0){
-        if (typeSelect.compare(typeOption_mc) == 0) return 2;
-        else if (typeSelect.compare(typeOption_data) == 0) return 3;
-        else return -1;
+        if (typeSelect.compare(typeOption_mc) == 0) return -2;
+        else if (typeSelect.compare(typeOption_data) == 0) return 2;
+        else return 0;
     }
 
-    return -1;
+    if (runSelect.compare(runOption_CrossSection) == 0){
+        if (typeSelect.compare(typeOption_mc) == 0) return -3;
+        else if (typeSelect.compare(typeOption_data) == 0) return 3;
+        else return 0;
+    }
+
+    return 0;
 }
 
 void showInputError(char *argv[])
@@ -200,7 +207,8 @@ void showInputError(char *argv[])
     cout<<"\t"<<argv[0]<<" "<<runOption_Run<<" "<<typeOption_mc<<endl;
     cout<<"\t"<<argv[0]<<" "<<runOption_Run<<" "<<typeOption_data<<"\n"<<endl;
     cout<<"Correct Syntax for Calculating Cross Section"<<endl;
-    cout<<"\t"<<argv[0]<<" "<<runOption_CrossSection<<"\n"<<endl;
+    cout<<"\t"<<argv[0]<<" "<<runOption_CrossSection<<" "<<typeOption_mc<<endl;
+    cout<<"\t"<<argv[0]<<" "<<runOption_CrossSection<<" "<<typeOption_data<<"\n"<<endl;
     cout<<"Correct Syntax for Plotting"<<endl;
     cout<<"\t"<<argv[0]<<" "<<runOption_Plot<<"\n"<<endl;
     cout<<"----------------------------------------------------------------------"<<endl;

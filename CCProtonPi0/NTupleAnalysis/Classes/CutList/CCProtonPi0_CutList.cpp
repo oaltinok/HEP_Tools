@@ -27,7 +27,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
         }
        
         use_nTrueSignal = true;
-        nTrueSignal = 230009;
+        nTrueSignal = 236153;
         
         SetCutNames();
         OpenTextFiles(isMC);
@@ -223,17 +223,24 @@ void CCProtonPi0_CutList::initHistograms()
     pi0_invMass_1Track = new TH1D("pi0_invMass_1Track","#pi^{0} Invariant Mass 1 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     pi0_invMass_2Track = new TH1D("pi0_invMass_2Track","#pi^{0} Invariant Mass 2 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
 
-    data_invMass_All = new TH1D("data_invMass_All","Data #pi^{0} Invariant Mass All",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-    data_invMass_All->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    data_invMass_All->GetYaxis()->SetTitle("N(Events)");
+    invMass_all = new MnvH1D("invMass_all","Data #pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    invMass_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    invMass_all->GetYaxis()->SetTitle("N(Events)");
+ 
+    invMass_mc_reco_all = new MnvH1D("invMass_mc_reco_all","MC Reconstructed #pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    invMass_mc_reco_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    invMass_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(invMass_mc_reco_all);
+
+    invMass_mc_reco_signal = new MnvH1D("invMass_mc_reco_signal","Signal #pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    invMass_mc_reco_signal->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    invMass_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(invMass_mc_reco_signal);
     
-    signal_invMass_All = new TH1D("signal_invMass_All","Signal #pi^{0} Invariant Mass All",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-    signal_invMass_All->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    signal_invMass_All->GetYaxis()->SetTitle("N(Events)");
-    
-    bckg_invMass_All = new TH1D("bckg_invMass_All","Background #pi^{0} Invariant Mass All",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-    bckg_invMass_All->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    bckg_invMass_All->GetYaxis()->SetTitle("N(Events)");
+    invMass_mc_reco_bckg = new MnvH1D("invMass_mc_reco_bckg","Background #pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    invMass_mc_reco_bckg->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    invMass_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(invMass_mc_reco_bckg);
 
     int nBins = 20;
     double min_photon_E = 0.0;
@@ -268,16 +275,6 @@ void CCProtonPi0_CutList::initHistograms()
     bckg_signal_diff_E_cosTheta_convLength->GetXaxis()->SetTitle("E_{#gamma_{1}}+E_{#gamma_{2}} [GeV]");
     bckg_signal_diff_E_cosTheta_convLength->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma})");
     bckg_signal_diff_E_cosTheta_convLength->GetZaxis()->SetTitle("Conversion Distance [cm]");
-
-
-    // Side Band
-    double binsP[11] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.5};
-    P_invMass = new TH2D("P_invMass","Background #pi^{0} Invariant Mass All",10,binsP, binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-    P_invMass->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    P_invMass->GetYaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-
-
-
 }
 
 void CCProtonPi0_CutList::SetCutNames()
@@ -302,8 +299,8 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_Photon1DistanceLow.set_Name("Photon1DistanceLow");
     nCut_Photon2DistanceLow.set_Name("Photon2DistanceLow");
     nCut_LowE_SmallAngle.set_Name("LowE_SmallAngle");
-    nCut_Pi0_invMass.set_Name("Pi0_invMass");
     nCut_beamEnergy.set_Name("beamEnergy");
+    nCut_Pi0_invMass.set_Name("Pi0_invMass");
 
     // 1Track
     nCut_1Track_All.set_Name("All_1Track");
@@ -571,9 +568,11 @@ void CCProtonPi0_CutList::writeHistograms()
     
     pi0_invMass_1Track->Write();
     pi0_invMass_2Track->Write();
-    signal_invMass_All->Write();
-    bckg_invMass_All->Write();
-    data_invMass_All->Write();
+
+    invMass_all->Write();
+    invMass_mc_reco_all->Write();
+    invMass_mc_reco_signal->Write();
+    invMass_mc_reco_bckg->Write();
 
     bckg_signal_diff_E_cos_openingAngle->Add(signal_gamma_E_cos_openingAngle, -1);
     bckg_signal_diff_E_cos_openingAngle->Add(bckg_gamma_E_cos_openingAngle, +1);
@@ -586,9 +585,6 @@ void CCProtonPi0_CutList::writeHistograms()
     signal_E_cosTheta_convLength->Write();
     bckg_E_cosTheta_convLength->Write();
     bckg_signal_diff_E_cosTheta_convLength->Write();
-
-    // SideBand
-    P_invMass->Write();
 
     f->Close();
 }

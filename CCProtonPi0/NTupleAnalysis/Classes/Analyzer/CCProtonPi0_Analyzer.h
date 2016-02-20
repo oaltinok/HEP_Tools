@@ -54,6 +54,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool getCutStatistics();
         void Increment_nCut(vector<CCProtonPi0_Cut> &nCut, bool study1, bool study2);
         void fillData();
+        void fill_BackgroundSubtractionHists();
         void fill_muon_P();
         void fill_pi0_P();
         void specifyRunTime();

@@ -1539,12 +1539,11 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
 double CCProtonPi0::Calc_QSq(double Enu) const
 {
     const double Mmu = MinervaUnits::M_mu;  // Muon Rest Mass [MeV]
-    double Emu = m_muon_4P.E();
-    double Pmu_long = Calc_Longitudinal_Momentum(m_muon_4P); 
-
-    // Calculate QSq - Use eq. in Research Logbook page 30
-    double QSq = 2 * Enu * ( Emu - Pmu_long ) - (Mmu * Mmu);
-
+    Gaudi::LorentzVector beam_4P = Get_Neutrino_4P(Enu);
+    
+    double qSq = (Mmu * Mmu) - 2 * beam_4P.Dot(m_muon_4P);
+    double QSq = -qSq;
+   
     return QSq;
 }
 
@@ -5267,6 +5266,20 @@ double CCProtonPi0::GetTotalExtraEnergy(const Minerva::PhysicsEvent* event) cons
     extra_energy += event->getDoubleData("Extra_Energy_Rejected"); 
 
     return extra_energy;
+}
+
+
+Gaudi::LorentzVector CCProtonPi0::Get_Neutrino_4P(double Enu) const
+{
+    const double theta = MinervaUnits::numi_beam_angle_rad;
+    
+    double Px = 0.0;
+    double Py = Enu*sin(theta);
+    double Pz = Enu*cos(theta); 
+    
+    Gaudi::LorentzVector beam_4P(Px,Py,Pz,Enu);
+
+    return beam_4P;
 }
 
 #endif

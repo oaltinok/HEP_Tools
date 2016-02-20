@@ -125,38 +125,34 @@ void CCProtonPi0_Pion::initHistograms()
     }
 
     // Cross Section Variables
-    data_all_pi0_P = new MnvH1D( "data_all_pi0_P","Data All P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
-    data_all_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    data_all_pi0_P->GetYaxis()->SetTitle("N(Events)");
+    pi0_P_all = new MnvH1D( "pi0_P_all","Data All P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    pi0_P_all->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
+    pi0_P_all->GetYaxis()->SetTitle("N(Events)");
 
-    mc_reco_all_pi0_P = new MnvH1D( "mc_reco_all_pi0_P","MC Reco All P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
-    mc_reco_all_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    mc_reco_all_pi0_P->GetYaxis()->SetTitle("N(Events)");
-    AddVertErrorBands_MC(mc_reco_all_pi0_P);
+    pi0_P_mc_reco_all = new MnvH1D( "pi0_P_mc_reco_all","MC Reco All P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    pi0_P_mc_reco_all->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
+    pi0_P_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(pi0_P_mc_reco_all);
     
-    mc_truth_signal_pi0_P = new MnvH1D( "mc_truth_signal_pi0_P","MC Truth Signal P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
-    mc_truth_signal_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    mc_truth_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
-    AddVertErrorBands_MC(mc_truth_signal_pi0_P);
+    pi0_P_mc_truth_signal = new MnvH1D( "pi0_P_mc_truth_signal","MC Truth Signal P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    pi0_P_mc_truth_signal->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
+    pi0_P_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(pi0_P_mc_truth_signal);
 
-    mc_reco_signal_pi0_P = new MnvH1D( "mc_reco_signal_pi0_P","MC Reconstructed Signal P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
-    mc_reco_signal_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    mc_reco_signal_pi0_P->GetYaxis()->SetTitle("N(Events)");
-    AddVertErrorBands_MC(mc_reco_signal_pi0_P);
+    pi0_P_mc_reco_signal = new MnvH1D( "pi0_P_mc_reco_signal","MC Reconstructed Signal P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    pi0_P_mc_reco_signal->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
+    pi0_P_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(pi0_P_mc_reco_signal);
 
-    mc_reco_bckg_pi0_P = new MnvH1D( "mc_reco_bckg_pi0_P","MC Reconstructed Background P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
-    mc_reco_bckg_pi0_P->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    mc_reco_bckg_pi0_P->GetYaxis()->SetTitle("N(Events)");
-    AddVertErrorBands_MC(mc_reco_bckg_pi0_P);
+    pi0_P_mc_reco_bckg = new MnvH1D( "pi0_P_mc_reco_bckg","MC Reconstructed Background P_{#pi^{0}}",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    pi0_P_mc_reco_bckg->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
+    pi0_P_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(pi0_P_mc_reco_bckg);
 
-    response_P = new MnvH2D( "response_P","Momentum for Signal Events",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max(),binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
-    response_P->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
-    response_P->GetYaxis()->SetTitle("True P_{#pi^{0}} [GeV]");
-    AddVertErrorBands_MC(response_P);
- 
-    response_theta = new MnvH2D( "response_theta","Theta for Signal Events",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max(),binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-    response_theta->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
-    response_theta->GetYaxis()->SetTitle("True #theta_{#pi_{0}} [degree]");
+    pi0_P_response = new MnvH2D( "pi0_P_response","Momentum for Signal Events",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max(),binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    pi0_P_response->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
+    pi0_P_response->GetYaxis()->SetTitle("True P_{#pi^{0}} [GeV]");
+    AddVertErrorBands_MC(pi0_P_response);
 
     // Truth Energy - Gamma 1
     gamma1_true_E = new TH1D( "gamma1_true_E","Leading Photon True Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
@@ -267,14 +263,12 @@ void CCProtonPi0_Pion::writeHistograms()
         phi[i]->Write();
     }
 
-    data_all_pi0_P->Write();
-    mc_truth_signal_pi0_P->Write();
-    mc_reco_all_pi0_P->Write();
-    mc_reco_signal_pi0_P->Write();
-    mc_reco_bckg_pi0_P->Write();
-    response_P->Write();
-    
-    response_theta->Write();
+    pi0_P_all->Write();
+    pi0_P_mc_reco_all->Write();
+    pi0_P_mc_truth_signal->Write();
+    pi0_P_mc_reco_signal->Write();
+    pi0_P_mc_reco_bckg->Write();
+    pi0_P_response->Write();
 
     // Photon Comparison
     bckg_signal_diff_E->Add(signal_gamma1_E_gamma2_E, -1);

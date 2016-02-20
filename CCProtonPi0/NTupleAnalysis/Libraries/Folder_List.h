@@ -67,6 +67,7 @@ namespace Folder_List
     const std::string rootDir_Flux_old = rootOut + Flux + "eroica-mipp-off-flux-nuint-minerva1-minerva13C.root";
     
     // Set MC Root Dir;
+    const std::string rootDir_CrossSection_mc = rootOut + MC + analyzed + "CrossSection.root";
     const std::string rootDir_CutHists_mc = rootOut + MC + analyzed + "CutHistograms.root";
     const std::string rootDir_Interaction_mc = rootOut + MC + analyzed + "Interaction.root";
     const std::string rootDir_Muon_mc = rootOut + MC + analyzed + "Muon.root";
@@ -75,7 +76,7 @@ namespace Folder_List
     const std::string rootDir_Pi0Blob_mc = rootOut + MC + analyzed + "Pi0Blob.root";
 
     // Set Data Root Dir
-    const std::string rootDir_CrossSection = rootOut + Data + analyzed + "CrossSection.root";
+    const std::string rootDir_CrossSection_data = rootOut + Data + analyzed + "CrossSection.root";
     const std::string rootDir_CutHists_data = rootOut + Data + analyzed + "CutHistograms.root";
     const std::string rootDir_Interaction_data = rootOut + Data + analyzed + "Interaction.root";
     const std::string rootDir_Muon_data = rootOut + Data + analyzed + "Muon.root";
@@ -90,6 +91,8 @@ namespace Folder_List
     const std::string xsec_muon_P = output + plotOut + "xsec_muon_P/";
     const std::string xsec_pi0_P = output + plotOut + "xsec_pi0_P/";
 
+    const std::string plotDir_Check = "Check/";
+    const std::string plotDir_ErrorSummary = "ErrorSummary/";
     const std::string plotDir_CrossSection = "CrossSection/";
     const std::string plotDir_Original = "Original/";
     const std::string plotDir_BackgroundEstimated = "BackgroundEstimated/";
