@@ -38,6 +38,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         double mc_POT;
 
         // Pi0 Invariant Mass
+        TH1F* fit_result;
         MnvH1D* invMass_all;
         MnvH1D* invMass_mc_reco_signal;
         MnvH1D* invMass_mc_reco_bckg;
@@ -60,6 +61,25 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         MnvH1D* muon_P_mc_reco_bckg;
         MnvH2D* muon_P_response;
         MnvH1D* muon_P_eff;
+
+        // --------------------------------------------------------------------
+        // Muon Theta 
+        // --------------------------------------------------------------------
+        // Data
+        MnvH1D* muon_theta_all;
+        MnvH1D* muon_theta_bckg_subtracted;
+        MnvH1D* muon_theta_bckg_estimated;
+        MnvH1D* muon_theta_unfolded;
+        MnvH1D* muon_theta_efficiency_corrected;
+        MnvH1D* muon_theta_integrated_flux;
+        MnvH1D* muon_theta_xsec;
+        // MC Truth 
+        MnvH1D* muon_theta_mc_truth_all_signal;
+        MnvH1D* muon_theta_mc_truth_signal;
+        MnvH1D* muon_theta_mc_reco_signal;
+        MnvH1D* muon_theta_mc_reco_bckg;
+        MnvH2D* muon_theta_response;
+        MnvH1D* muon_theta_eff;
 
         // --------------------------------------------------------------------
         // Pi0 Momentum 
@@ -94,9 +114,12 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         std::string rootDir_flux;
 
         // Functions
-        void Label_CrossSection_Hists();
-        void Calc_CrossSection_Muon_P();
-        void Calc_CrossSection_Pi0_P();
+        void Calc_CrossSection_muon_P();
+        void Calc_CrossSection_muon_theta();
+        void Calc_CrossSection_pi0_P();
+        void Style_muon_P();
+        void Style_muon_theta();
+        void Style_pi0_P();
         void Calc_Normalized_NBackground();
         void NormalizeHistogram(MnvH1D* h);
         double Integrate_SignalRegion(TH1D* h);

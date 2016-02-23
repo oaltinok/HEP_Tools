@@ -1,20 +1,15 @@
-CCPROTONPI0_V="v2_60"
+CCPROTONPI0_V="v2_61"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Corrected Q2 Calculation
-		Using 4 Momentum of the Beam 
-	Signal Definition Changed
-		Added Max Neutrino Energy 20 GeV
+	Fiducial Volume Slightly Changed
+		For more accurate N(Nucleon) for Cross Section Calculation
 
 -------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	CrossSection Class Design Improved
-		MC Processing is optional and it will create another file under
-			data/NTupleAnalysis/MC/Analyzed/
-	
-	Plotter Improved 
-		Cross Section Comparison Plots
-		Cross Section Check Plots
+	Cross Section
+		Added Muon Theta
+		Added styling for final cross section plots
+			Includes histogram scaling to match with Label
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

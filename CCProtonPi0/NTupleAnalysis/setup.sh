@@ -26,7 +26,8 @@ DefaultPlotFolder_List=(Muon
         OtherStudies)
 
 VariableList=(xsec_pi0_P
-        xsec_muon_P)
+        xsec_muon_P
+        xsec_muon_theta)
 
 XSecPlotList=(Original
         BackgroundEstimated

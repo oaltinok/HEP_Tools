@@ -56,6 +56,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fillData();
         void fill_BackgroundSubtractionHists();
         void fill_muon_P();
+        void fill_muon_theta();
         void fill_pi0_P();
         void specifyRunTime();
         void openTextFiles();

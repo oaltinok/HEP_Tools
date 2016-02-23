@@ -1210,8 +1210,9 @@ void CCProtonPi0_Plotter::DrawEfficiencyCurve(rootDir& dir, std::string var_name
     TCanvas* c = new TCanvas("c","c",1280,800);
 
     // Plot Options
+    hist1D->GetYaxis()->SetTitle("Reconstruction Efficiency");
     hist1D->SetMinimum(0.0);
-    hist1D->SetMaximum(0.50);
+    hist1D->SetMaximum(0.15);
     hist1D->SetLineColor(kRed);
     hist1D->SetLineWidth(3);
     hist1D->SetFillColor(kWhite);

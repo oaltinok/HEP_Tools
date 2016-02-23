@@ -27,11 +27,10 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
 {
     Calc_Normalized_NBackground();
     
-    Calc_CrossSection_Muon_P();   
+    Calc_CrossSection_muon_P();   
+    Calc_CrossSection_muon_theta();   
     
-    Calc_CrossSection_Pi0_P();   
-
-    Label_CrossSection_Hists();
+    Calc_CrossSection_pi0_P();   
 
     // Re Init Default Histograms Again before Writing to File
     // We Scaled some of them during the data corrections
@@ -39,7 +38,7 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     writeHistograms();
 }
 
-void CCProtonPi0_CrossSection::Calc_CrossSection_Muon_P()
+void CCProtonPi0_CrossSection::Calc_CrossSection_muon_P()
 {
     std::cout<<"\n-----------------------------------------------------------------------"<<std::endl;
     std::cout<<"Calculating Cross Section for Muon Momentum"<<std::endl;
@@ -54,14 +53,65 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_Muon_P()
     muon_P_integrated_flux = Integrate_Flux(muon_P_efficiency_corrected, "muon_P", isEv);
     
     // Calculate Final Cross Section
-    muon_P_xsec = Calc_FinalCrossSection(muon_P_efficiency_corrected, muon_P_integrated_flux,"muon_P");
-    muon_P_xsec->SetNormBinWidth(1.0);
-    
+    muon_P_xsec = Calc_FinalCrossSection(muon_P_efficiency_corrected, muon_P_integrated_flux, "muon_P");
+  
+    Style_muon_P();
     std::cout<<"Done!"<<std::endl;
     std::cout<<"-----------------------------------------------------------------------"<<std::endl;
 }
 
-void CCProtonPi0_CrossSection::Calc_CrossSection_Pi0_P()
+void CCProtonPi0_CrossSection::Style_muon_P()
+{
+    // Add Labels
+    muon_P_xsec->SetTitle("Differential Cross Section for P_{#mu}");
+    muon_P_xsec->GetXaxis()->SetTitle("Muon Momentum [GeV]");
+    muon_P_xsec->GetYaxis()->SetTitle("d#sigma/d_{P_{#mu}} (10^{-40} cm^{2}/nucleon/GeV)");
+    
+    // Scale Cross Section Result to match with Label
+    double bin_width = 1.0; // GeV
+    double quote_width = 1.0; // per GeV
+    double scale = quote_width / bin_width; 
+    muon_P_xsec->Scale(scale);
+}
+
+void CCProtonPi0_CrossSection::Calc_CrossSection_muon_theta()
+{
+    std::cout<<"\n-----------------------------------------------------------------------"<<std::endl;
+    std::cout<<"Calculating Cross Section for Muon Theta"<<std::endl;
+    bool isEv = false;
+
+    // Data Correction
+    muon_theta_bckg_subtracted = Subtract_Background(muon_theta_all, muon_theta_mc_reco_bckg, muon_theta_bckg_estimated,"muon_theta");
+    muon_theta_unfolded = Unfold_Data(muon_theta_bckg_subtracted, muon_theta_response, "muon_theta");   
+    muon_theta_efficiency_corrected = Efficiency_Divide(muon_theta_unfolded, muon_theta_eff, "muon_theta");   
+
+    // Integrate Flux
+    muon_theta_integrated_flux = Integrate_Flux(muon_theta_efficiency_corrected, "muon_theta", isEv);
+    
+    // Calculate Final Cross Section
+    muon_theta_xsec = Calc_FinalCrossSection(muon_theta_efficiency_corrected, muon_theta_integrated_flux, "muon_theta");
+  
+    Style_muon_theta();
+
+    std::cout<<"Done!"<<std::endl;
+    std::cout<<"-----------------------------------------------------------------------"<<std::endl;
+}
+
+void CCProtonPi0_CrossSection::Style_muon_theta()
+{
+    // Add Labels
+    muon_theta_xsec->SetTitle("Differential Cross Section for #theta_{#mu}");
+    muon_theta_xsec->GetXaxis()->SetTitle("Muon Theta [degree]");
+    muon_theta_xsec->GetYaxis()->SetTitle("d#sigma/d_{#theta_{#mu}} (10^{-40} cm^{2}/nucleon/degree)");
+    
+    // Scale Cross Section Result to match with Label
+    double bin_width = 2.08; // degree 
+    double quote_width = 1.0; // per degree
+    double scale = quote_width / bin_width; 
+    muon_theta_xsec->Scale(scale);
+}
+
+void CCProtonPi0_CrossSection::Calc_CrossSection_pi0_P()
 {
     std::cout<<"\n-----------------------------------------------------------------------"<<std::endl;
     std::cout<<"Calculating Cross Section for Pi0 Momentum Data"<<std::endl;
@@ -79,9 +129,27 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_Pi0_P()
     pi0_P_xsec = Calc_FinalCrossSection(pi0_P_efficiency_corrected, pi0_P_integrated_flux, "pi0_P");
     pi0_P_xsec->SetNormBinWidth(0.1);
 
+    Style_pi0_P();
+
     std::cout<<"Done!"<<std::endl;
     std::cout<<"-----------------------------------------------------------------------"<<std::endl;
 }
+
+void CCProtonPi0_CrossSection::Style_pi0_P()
+{
+    // Add Labels
+    pi0_P_xsec->SetTitle("Differential Cross Section for P_{#pi^{0}}");
+    pi0_P_xsec->GetXaxis()->SetTitle("Pion Momentum [GeV]");
+    pi0_P_xsec->GetYaxis()->SetTitle("d#sigma/d_{P_{#pi^{0}}} (10^{-40} cm^{2}/nucleon/GeV)");
+
+    // Style Cross Section Result to match with Label
+    double bin_width = 0.1; // GeV
+    double quote_width = 1.0; // per GeV
+    double scale = quote_width / bin_width; 
+    pi0_P_xsec->Scale(scale);
+
+}
+
 
 void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
 {
@@ -104,15 +172,17 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     mc_models->Add(bckg_invMass);
 
     TFractionFitter* fitter = new TFractionFitter(data_invMass, mc_models, "Q");
+    fitter->Constrain(0, 0.0, 1.0);
     fitter->Constrain(1, 0.0, 1.0);
-
+    
     std::cout<<"\tFitting Background Shape..."<<std::endl;
     Int_t status = fitter->Fit();
 
     if (status != 0) {
         std::cerr<<"\t\tFit Error!"<<std::endl;
     }
-
+    
+    fit_result  = new TH1F (*(TH1F*)fitter->GetPlot());
     Double_t N_Data = data_invMass->Integral();
     Double_t f0 =     0.0; // fittted signal fraction
     Double_t f1 =     0.0; // fitted background fraction
@@ -133,6 +203,7 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
         TH1D* fitted_background = (TH1D*) bckg_invMass->Clone("fitted_bkg");
         double area = fitted_background->Integral();
         double total_fitted_background = f1 * N_Data; // Total N(Bckg) in Data
+        std::cout<<"\tAll Events in Data (Whole Spectrum) = "<<N_Data<<std::endl;
         std::cout<<"\tBackground in Data (Whole Spectrum) = "<<total_fitted_background<<std::endl;
         fitted_background->Scale(total_fitted_background/area); 
 
@@ -142,8 +213,11 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
 
             // integrate the number of background events correctly
             // notice the mass range, not bin range
+        double N_All_Data = Integrate_SignalRegion(data_invMass);
         N_Background_Data = Integrate_SignalRegion(fitted_background);
 
+        std::cout<<std::endl;
+        std::cout<<"\tAll Events in Data (Signal Region) = "<<N_All_Data<<std::endl; 
         std::cout<<"\tBackground in Data (Signal Region) = "<<N_Background_Data<<std::endl; 
     }
 
@@ -375,7 +449,6 @@ void CCProtonPi0_CrossSection::initHistograms()
     // ------------------------------------------------------------------------
     // Muon Momentum
     // ------------------------------------------------------------------------
-
     if (m_isMC) muon_P_all = new MnvH1D(*(MnvH1D*)f_mc_muon->Get("muon_P_mc_reco_all")); 
     else muon_P_all = new MnvH1D(*(MnvH1D*)f_data_muon->Get("muon_P_all")); 
     
@@ -390,7 +463,25 @@ void CCProtonPi0_CrossSection::initHistograms()
     muon_P_eff->Divide(muon_P_mc_truth_signal, muon_P_mc_truth_all_signal);
 
     muon_P_response = new MnvH2D(*(MnvH2D*)f_mc_muon->Get("muon_P_response")); 
-   
+ 
+    // ------------------------------------------------------------------------
+    // Muon Theta 
+    // ------------------------------------------------------------------------
+    if (m_isMC) muon_theta_all = new MnvH1D(*(MnvH1D*)f_mc_muon->Get("muon_theta_mc_reco_all")); 
+    else muon_theta_all = new MnvH1D(*(MnvH1D*)f_data_muon->Get("muon_theta_all")); 
+    
+    muon_theta_mc_reco_signal = new MnvH1D(*(MnvH1D*)f_mc_muon->Get("muon_theta_mc_reco_signal")); 
+    muon_theta_mc_reco_bckg = new MnvH1D(*(MnvH1D*)f_mc_muon->Get("muon_theta_mc_reco_bckg")); 
+
+    muon_theta_mc_truth_all_signal = new MnvH1D(*(MnvH1D*)f_truth->Get("muon_theta_mc_truth_all_signal")); 
+    muon_theta_mc_truth_signal = new MnvH1D(*(MnvH1D*)f_mc_muon->Get("muon_theta_mc_truth_signal")); 
+ 
+    muon_theta_eff = new MnvH1D(*muon_theta_mc_truth_signal);
+    muon_theta_eff->SetName("muon_theta_eff");
+    muon_theta_eff->Divide(muon_theta_mc_truth_signal, muon_theta_mc_truth_all_signal);
+
+    muon_theta_response = new MnvH2D(*(MnvH2D*)f_mc_muon->Get("muon_theta_response")); 
+     
     // ------------------------------------------------------------------------
     // Pi0 Momentum
     // ------------------------------------------------------------------------
@@ -411,16 +502,6 @@ void CCProtonPi0_CrossSection::initHistograms()
  
     std::cout<<"Done!"<<std::endl;
 }
-void CCProtonPi0_CrossSection::Label_CrossSection_Hists()
-{
-    muon_P_xsec->SetTitle("Differential Cross Section for P_{#mu}");
-    muon_P_xsec->GetXaxis()->SetTitle("Muon Momentum [GeV]");
-    muon_P_xsec->GetYaxis()->SetTitle("d#sigma/d_{P_{#mu}} (10^{-40} cm^{2}/nucleon/GeV)");
-    
-    pi0_P_xsec->SetTitle("Differential Cross Section for P_{#pi^{0}}");
-    pi0_P_xsec->GetXaxis()->SetTitle("Pion Momentum [GeV]");
-    pi0_P_xsec->GetYaxis()->SetTitle("d#sigma/d_{P_{#pi^{0}}} (10^{-40} cm^{2}/nucleon/GeV)");
-}
 
 void CCProtonPi0_CrossSection::writeHistograms()
 {
@@ -429,6 +510,7 @@ void CCProtonPi0_CrossSection::writeHistograms()
     f_out->cd();
     
     // Pi0 Invariant Mass
+    fit_result->Write();
     invMass_all->Write();
     invMass_mc_reco_signal->Write();
     invMass_mc_reco_bckg->Write();
@@ -449,7 +531,24 @@ void CCProtonPi0_CrossSection::writeHistograms()
     muon_P_mc_reco_bckg->Write();
     muon_P_eff->Write();
     muon_P_response->Write();
-    
+ 
+    // Muon Momentum - Data
+    muon_theta_xsec->Write();
+    muon_theta_all->Write();
+    muon_theta_bckg_subtracted->Write();
+    muon_theta_bckg_estimated->Write();
+    muon_theta_unfolded->Write();
+    muon_theta_efficiency_corrected->Write();
+    muon_theta_integrated_flux->Write();
+   
+    // Muon Momentum - MC Truth
+    muon_theta_mc_truth_all_signal->Write();
+    muon_theta_mc_truth_signal->Write();
+    muon_theta_mc_reco_signal->Write();
+    muon_theta_mc_reco_bckg->Write();
+    muon_theta_eff->Write();
+    muon_theta_response->Write();
+   
     // Pi0 Momentum - Data
     pi0_P_xsec->Write();
     pi0_P_all->Write();

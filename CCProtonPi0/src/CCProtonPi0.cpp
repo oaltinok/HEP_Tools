@@ -145,8 +145,8 @@ StatusCode CCProtonPi0::initialize()
 
     // Fiducial Volume
     m_fidHexApothem  = 850.0*CLHEP::mm;
-    m_fidUpStreamZ   = 5990.0*CLHEP::mm;   // ~middle of module 27, plane 1
-    m_fidDownStreamZ = 8340.0*CLHEP::mm;   // ~middle of module 79, plane 1
+    m_fidUpStreamZ   = 5991.37*CLHEP::mm;   // ~module 27, plane 1
+    m_fidDownStreamZ = 8363.92*CLHEP::mm;   // ~module 79, plane 2
 
     // Reconstructable Volume
     m_recoHexApothem  = 1000.0*CLHEP::mm; 

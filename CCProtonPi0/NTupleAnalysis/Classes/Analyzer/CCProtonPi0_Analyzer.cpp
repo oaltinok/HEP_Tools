@@ -370,6 +370,7 @@ void CCProtonPi0_Analyzer::fillData()
 
     fill_pi0_P();
     fill_muon_P();
+    fill_muon_theta();
 
     // Fill Reconstructed Information
     fillInteractionReco();
@@ -1234,6 +1235,28 @@ void CCProtonPi0_Analyzer::fill_muon_P()
     }
 }
 
+void CCProtonPi0_Analyzer::fill_muon_theta() 
+{
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithDefaultErrors(muon.muon_theta_mc_reco_all, muon_theta * TMath::RadToDeg());
+        if (truth_isSignal){
+            // MC Truth Signal
+            FillHistogramWithDefaultErrors(muon.muon_theta_mc_truth_signal, truth_muon_theta * TMath::RadToDeg());
+            // MC Reco Signal
+            FillHistogramWithDefaultErrors(muon.muon_theta_mc_reco_signal, muon_theta * TMath::RadToDeg());
+            // MC Reco vs True -- Response
+            FillHistogramWithDefaultErrors(muon.muon_theta_response, muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg());
+        }else{
+            // MC Reco Background
+            FillHistogramWithDefaultErrors(muon.muon_theta_mc_reco_bckg, muon_theta * TMath::RadToDeg());
+        }
+    }else{
+        // Data
+        FillHistogram(muon.muon_theta_all, muon_theta * TMath::RadToDeg());
+    }
+}
+
 void CCProtonPi0_Analyzer::fill_pi0_P() 
 {
     if (m_isMC){
@@ -1548,6 +1571,7 @@ void CCProtonPi0_Analyzer::AddErrorBands_Data()
 {
     AddVertErrorBands_Data(pi0.pi0_P_all);
     AddVertErrorBands_Data(muon.muon_P_all);
+    AddVertErrorBands_Data(muon.muon_theta_all);
 }
 
 #endif //CCProtonPi0_Analyzer_cpp
