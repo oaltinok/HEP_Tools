@@ -21,12 +21,12 @@ void CCProtonPi0_Plotter::plotHistograms()
     // Cross Sections
     //--------------------------------------------------------------------------
     //plotErrorSummary();
-    //plotOriginalData();
+    plotOriginalData();
     //plotBackgroundEstimated();
     //plotBackgroundSubtracted();
     //plotUnfolded();
-    plotEfficiencyCorrected();
-    //plotCrossSection();
+    //plotEfficiencyCorrected();
+    plotCrossSection();
     //plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
@@ -45,7 +45,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
-    //plotPion_MCOnly();
+    plotPion_MCOnly();
     //plotCutHistograms_MCOnly();
     //plotPi0Blob_MCOnly();
 
@@ -237,16 +237,23 @@ void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
     std::string plotDir = Folder_List::plotDir_OtherStudies;
- 
-    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
-    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
-    MnvH1D* mc;
-    MnvH1D* data;
 
-    // Pi0 Momentum 
-    mc = (MnvH1D*)f_xsec_mc->Get("invMass_mc_reco_all");
-    data = (MnvH1D*)f_xsec_data->Get("invMass_all"); 
-    DrawDataMC(data,mc,"invMass_Data_MC",plotDir);
+    DrawBackgroundSubtraction(true);
+    DrawBackgroundSubtraction(false);
+
+
+//    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+//    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+//    MnvH1D* mc;
+//    MnvH1D* data;
+//
+//    // Pi0 Momentum 
+//    mc = (MnvH1D*)f_xsec_mc->Get("invMass_mc_reco_all");
+//    data = (MnvH1D*)f_xsec_data->Get("invMass_all"); 
+//    DrawDataMC(data,mc,"invMass_Data_MC",plotDir);
+//    Draw1DHist(rootDir_CrossSection,"invMass_mc_reco_signal",plotDir);
+//    Draw1DHist(rootDir_CrossSection,"data_fit_result",plotDir);
+//    
     //DrawErrorSummary(data,"invMass_Data",plotDir);
     //DrawErrorSummary(mc,"invMass_MC",plotDir);
 
@@ -260,7 +267,6 @@ void CCProtonPi0_Plotter::plotOtherStudies()
     //TFile* f_data = new TFile(rootDir_Muon.data.c_str());
     //DrawDataStackedMC(rootDir_Muon,"P",plotDir);
     //DrawStackedMC(rootDir_Muon,"P",plotDir);
-    //Draw1DHist(rootDir_CrossSection,"fit_result",plotDir);
     //    
     //    
 //    TFile* f_data = new TFile(rootDir_Muon.data.c_str());
@@ -369,6 +375,14 @@ void CCProtonPi0_Plotter::plotOriginalData()
     MnvH1D* mc;
     MnvH1D* data;
 
+    // QSq 
+    plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_Original;
+    mc = (MnvH1D*)f_xsec_mc->Get("QSq_mc_reco_all");
+    data = (MnvH1D*)f_xsec_data->Get("QSq_all"); 
+    DrawDataMC(data,mc,"QSq_data_MC",plotDir);
+    DrawErrorSummary(data,"QSq_all",plotDir);
+    DrawErrorSummary(mc,"QSq_mc_reco_all",plotDir);
+
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Original;
     mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_mc_reco_all");
@@ -376,6 +390,22 @@ void CCProtonPi0_Plotter::plotOriginalData()
     DrawDataMC(data,mc,"pi0_P_data_MC",plotDir);
     DrawErrorSummary(data,"pi0_P_all",plotDir);
     DrawErrorSummary(mc,"pi0_P_mc_reco_all",plotDir);
+
+    // Pi0 Kinetic Energy
+    plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_Original;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_KE_mc_reco_all");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_KE_all"); 
+    DrawDataMC(data,mc,"pi0_KE_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_KE_all",plotDir);
+    DrawErrorSummary(mc,"pi0_KE_mc_reco_all",plotDir);
+
+    // Pi0 Theta 
+    plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_Original;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_theta_mc_reco_all");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_theta_all"); 
+    DrawDataMC(data,mc,"pi0_theta_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_theta_all",plotDir);
+    DrawErrorSummary(mc,"pi0_theta_mc_reco_all",plotDir);
 
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Original;
@@ -393,8 +423,6 @@ void CCProtonPi0_Plotter::plotOriginalData()
     DrawErrorSummary(data,"muon_theta_all",plotDir);
     DrawErrorSummary(mc,"muon_theta_mc_reco_all",plotDir);
 
-
-
     delete f_xsec_mc;
     delete f_xsec_data;
     std::cout<<"Plotting Original Data Finished!"<<std::endl;
@@ -411,6 +439,14 @@ void CCProtonPi0_Plotter::plotCrossSection()
     MnvH1D* mc;
     MnvH1D* data;
 
+    // QSq
+    plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_CrossSection;
+    mc = (MnvH1D*)f_xsec_mc->Get("QSq_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("QSq_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"QSq_xsec_data_MC",plotDir);
+    DrawErrorSummary(data,"QSq_xsec_data",plotDir);
+    DrawErrorSummary(mc,"QSq_xsec_mc",plotDir);
+
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_CrossSection;
     mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_xsec");
@@ -418,6 +454,22 @@ void CCProtonPi0_Plotter::plotCrossSection()
     DrawDataMC_CrossSection(data,mc,"pi0_P_xsec_data_MC",plotDir);
     DrawErrorSummary(data,"pi0_P_xsec_data",plotDir);
     DrawErrorSummary(mc,"pi0_P_xsec_mc",plotDir);
+
+    // Pi0 Kinetic Energy 
+    plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_CrossSection;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_KE_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_KE_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"pi0_KE_xsec_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_KE_xsec_data",plotDir);
+    DrawErrorSummary(mc,"pi0_KE_xsec_mc",plotDir);
+
+    // Pi0 Theta
+    plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_CrossSection;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_theta_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_theta_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"pi0_theta_xsec_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_theta_xsec_data",plotDir);
+    DrawErrorSummary(mc,"pi0_theta_xsec_mc",plotDir);
 
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_CrossSection;
@@ -427,7 +479,7 @@ void CCProtonPi0_Plotter::plotCrossSection()
     DrawErrorSummary(data,"muon_P_xsec_data",plotDir);
     DrawErrorSummary(mc,"muon_P_xsec_mc",plotDir);
 
-    // Muon Momentum
+    // Muon Theta 
     plotDir = Folder_List::xsec_muon_theta + Folder_List::plotDir_CrossSection;
     mc = (MnvH1D*)f_xsec_mc->Get("muon_theta_xsec");
     data = (MnvH1D*)f_xsec_data->Get("muon_theta_xsec"); 
@@ -450,6 +502,14 @@ void CCProtonPi0_Plotter::plotBackgroundEstimated()
     MnvH1D* mc;
     MnvH1D* data;
 
+    // QSq 
+    plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_BackgroundEstimated;
+    mc = (MnvH1D*)f_xsec_mc->Get("QSq_bckg_estimated");
+    data = (MnvH1D*)f_xsec_data->Get("QSq_bckg_estimated"); 
+    DrawDataMC(data,mc,"QSq_bckg_estimated_data_MC",plotDir);
+    DrawErrorSummary(data,"QSq_bckg_estimated_data",plotDir);
+    DrawErrorSummary(mc,"QSq_bckg_estimated_mc",plotDir);
+
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_BackgroundEstimated;
     mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_bckg_estimated");
@@ -457,6 +517,22 @@ void CCProtonPi0_Plotter::plotBackgroundEstimated()
     DrawDataMC(data,mc,"pi0_P_bckg_estimated_data_MC",plotDir);
     DrawErrorSummary(data,"pi0_P_bckg_estimated_data",plotDir);
     DrawErrorSummary(mc,"pi0_P_bckg_estimated_mc",plotDir);
+
+    // Pi0 Kinetic Energy 
+    plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_BackgroundEstimated;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_KE_bckg_estimated");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_KE_bckg_estimated"); 
+    DrawDataMC(data,mc,"pi0_KE_bckg_estimated_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_KE_bckg_estimated_data",plotDir);
+    DrawErrorSummary(mc,"pi0_KE_bckg_estimated_mc",plotDir);
+    
+    // Pi0 Theta 
+    plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_BackgroundEstimated;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_theta_bckg_estimated");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_theta_bckg_estimated"); 
+    DrawDataMC(data,mc,"pi0_theta_bckg_estimated_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_theta_bckg_estimated_data",plotDir);
+    DrawErrorSummary(mc,"pi0_theta_bckg_estimated_mc",plotDir);
 
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_BackgroundEstimated;
@@ -489,6 +565,14 @@ void CCProtonPi0_Plotter::plotBackgroundSubtracted()
     MnvH1D* mc;
     MnvH1D* data;
 
+    // QSq 
+    plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_BackgroundSubtracted;
+    mc = (MnvH1D*)f_xsec_mc->Get("QSq_bckg_subtracted");
+    data = (MnvH1D*)f_xsec_data->Get("QSq_bckg_subtracted"); 
+    DrawDataMC(data,mc,"QSq_bckg_subtracted_data_MC",plotDir);
+    DrawErrorSummary(data,"QSq_bckg_subtracted_data",plotDir);
+    DrawErrorSummary(mc,"QSq_bckg_subtracted_mc",plotDir);
+
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_BackgroundSubtracted;
     mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_bckg_subtracted");
@@ -496,7 +580,23 @@ void CCProtonPi0_Plotter::plotBackgroundSubtracted()
     DrawDataMC(data,mc,"pi0_P_bckg_subtracted_data_MC",plotDir);
     DrawErrorSummary(data,"pi0_P_bckg_subtracted_data",plotDir);
     DrawErrorSummary(mc,"pi0_P_bckg_subtracted_mc",plotDir);
-   
+ 
+    // Pi0 Kinetic Energy 
+    plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_BackgroundSubtracted;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_KE_bckg_subtracted");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_KE_bckg_subtracted"); 
+    DrawDataMC(data,mc,"pi0_KE_bckg_subtracted_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_KE_bckg_subtracted_data",plotDir);
+    DrawErrorSummary(mc,"pi0_KE_bckg_subtracted_mc",plotDir);
+ 
+    // Pi0 Theta
+    plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_BackgroundSubtracted;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_theta_bckg_subtracted");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_theta_bckg_subtracted"); 
+    DrawDataMC(data,mc,"pi0_theta_bckg_subtracted_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_theta_bckg_subtracted_data",plotDir);
+    DrawErrorSummary(mc,"pi0_theta_bckg_subtracted_mc",plotDir);
+ 
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_BackgroundSubtracted;
     mc = (MnvH1D*)f_xsec_mc->Get("muon_P_bckg_subtracted");
@@ -527,6 +627,15 @@ void CCProtonPi0_Plotter::plotUnfolded()
     TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
     MnvH1D* mc;
     MnvH1D* data;
+    
+    // QSq 
+    plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_Unfolding;
+    mc = (MnvH1D*)f_xsec_mc->Get("QSq_unfolded");
+    data = (MnvH1D*)f_xsec_data->Get("QSq_unfolded"); 
+    DrawDataMC(data,mc,"QSq_unfolded_data_MC",plotDir);
+    DrawNormalizedMigrationHistogram(rootDir_CrossSection,"QSq_response",plotDir);
+    DrawErrorSummary(data,"QSq_unfolded_data",plotDir);
+    DrawErrorSummary(mc,"QSq_unfolded_mc",plotDir);
 
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Unfolding;
@@ -536,7 +645,25 @@ void CCProtonPi0_Plotter::plotUnfolded()
     DrawNormalizedMigrationHistogram(rootDir_CrossSection,"pi0_P_response",plotDir);
     DrawErrorSummary(data,"pi0_P_unfolded_data",plotDir);
     DrawErrorSummary(mc,"pi0_P_unfolded_mc",plotDir);
-    
+ 
+    // Pi0 Kinetic Energy
+    plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_Unfolding;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_KE_unfolded");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_KE_unfolded"); 
+    DrawDataMC(data,mc,"pi0_KE_unfolded_data_MC",plotDir);
+    DrawNormalizedMigrationHistogram(rootDir_CrossSection,"pi0_KE_response",plotDir);
+    DrawErrorSummary(data,"pi0_KE_unfolded_data",plotDir);
+    DrawErrorSummary(mc,"pi0_KE_unfolded_mc",plotDir);
+ 
+    // Pi0 Theta 
+    plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_Unfolding;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_theta_unfolded");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_theta_unfolded"); 
+    DrawDataMC(data,mc,"pi0_theta_unfolded_data_MC",plotDir);
+    DrawNormalizedMigrationHistogram(rootDir_CrossSection,"pi0_theta_response",plotDir);
+    DrawErrorSummary(data,"pi0_theta_unfolded_data",plotDir);
+    DrawErrorSummary(mc,"pi0_theta_unfolded_mc",plotDir);
+  
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Unfolding;
     mc = (MnvH1D*)f_xsec_mc->Get("muon_P_unfolded");
@@ -570,6 +697,15 @@ void CCProtonPi0_Plotter::plotEfficiencyCorrected()
     MnvH1D* mc;
     MnvH1D* data;
 
+    // QSq 
+    plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_Efficiency;
+    mc = (MnvH1D*)f_xsec_mc->Get("QSq_efficiency_corrected");
+    data = (MnvH1D*)f_xsec_data->Get("QSq_efficiency_corrected"); 
+    DrawDataMC(data,mc,"QSq_efficiency_corrected_data_MC",plotDir);
+    DrawEfficiencyCurve(rootDir_CrossSection,"QSq_eff",plotDir);
+    DrawErrorSummary(data,"QSq_efficiency_corrected_data",plotDir);
+    DrawErrorSummary(mc,"QSq_efficiency_corrected_mc",plotDir);
+
     // Pi0 Momentum 
     plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Efficiency;
     mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_efficiency_corrected");
@@ -578,6 +714,24 @@ void CCProtonPi0_Plotter::plotEfficiencyCorrected()
     DrawEfficiencyCurve(rootDir_CrossSection,"pi0_P_eff",plotDir);
     DrawErrorSummary(data,"pi0_P_efficiency_corrected_data",plotDir);
     DrawErrorSummary(mc,"pi0_P_efficiency_corrected_mc",plotDir);
+
+    // Pi0 Kinetic Energy 
+    plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_Efficiency;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_KE_efficiency_corrected");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_KE_efficiency_corrected"); 
+    DrawDataMC(data,mc,"pi0_KE_efficiency_corrected_data_MC",plotDir);
+    DrawEfficiencyCurve(rootDir_CrossSection,"pi0_KE_eff",plotDir);
+    DrawErrorSummary(data,"pi0_KE_efficiency_corrected_data",plotDir);
+    DrawErrorSummary(mc,"pi0_KE_efficiency_corrected_mc",plotDir);
+
+    // Pi0 Theta
+    plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_Efficiency;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_theta_efficiency_corrected");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_theta_efficiency_corrected"); 
+    DrawDataMC(data,mc,"pi0_theta_efficiency_corrected_data_MC",plotDir);
+    DrawEfficiencyCurve(rootDir_CrossSection,"pi0_theta_eff",plotDir);
+    DrawErrorSummary(data,"pi0_theta_efficiency_corrected_data",plotDir);
+    DrawErrorSummary(mc,"pi0_theta_efficiency_corrected_mc",plotDir);
 
     // Muon Momentum
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Efficiency;
@@ -608,12 +762,12 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     std::cout<<"Plotting Interaction MC Only"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Interaction;
 
+    Draw1DHist(rootDir_Interaction,"QSq_True",plotDir);
+    Draw1DHist(rootDir_Interaction,"QSq_Error",plotDir);
+    Draw1DHist(rootDir_Interaction,"QSq_Diff",plotDir);
+    
     //plot_mc_w_Stacked();
-    plot_final_mc_w_Stacked();
-
-    // Response
-    DrawNormalizedMigrationHistogram(rootDir_Interaction,"response_neutrino_E",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Interaction,"response_QSq",plotDir);
+    //plot_final_mc_w_Stacked();
 
     //DrawStackedMC(rootDir_Interaction,"vertex_energy_1Track",plotDir);
     //DrawStackedMC(rootDir_Interaction,"vertex_energy_2Track",plotDir);
@@ -779,21 +933,21 @@ void CCProtonPi0_Plotter::plotPion_MCOnly()
 
     plotPion_True();
 
-    DrawStackedMC(rootDir_Pion,"gamma1_E",plotDir);
-    DrawStackedMC(rootDir_Pion,"gamma1_theta",plotDir);
-    DrawStackedMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
+   // DrawStackedMC(rootDir_Pion,"gamma1_E",plotDir);
+   // DrawStackedMC(rootDir_Pion,"gamma1_theta",plotDir);
+   // DrawStackedMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
 
-    DrawStackedMC(rootDir_Pion,"gamma2_E",plotDir);
-    DrawStackedMC(rootDir_Pion,"gamma2_theta",plotDir);
-    DrawStackedMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
+   // DrawStackedMC(rootDir_Pion,"gamma2_E",plotDir);
+   // DrawStackedMC(rootDir_Pion,"gamma2_theta",plotDir);
+   // DrawStackedMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
 
-    DrawStackedMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
-    DrawStackedMC(rootDir_Pion,"invMass",plotDir);
-    DrawStackedMC(rootDir_Pion,"cos_openingAngle",plotDir);
-    DrawStackedMC(rootDir_Pion,"P",plotDir);
-    DrawStackedMC(rootDir_Pion,"E",plotDir);
-    DrawStackedMC(rootDir_Pion,"theta",plotDir);
-    DrawStackedMC(rootDir_Pion,"phi",plotDir);
+   // DrawStackedMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+   // DrawStackedMC(rootDir_Pion,"invMass",plotDir);
+   // DrawStackedMC(rootDir_Pion,"cos_openingAngle",plotDir);
+   // DrawStackedMC(rootDir_Pion,"P",plotDir);
+   // DrawStackedMC(rootDir_Pion,"E",plotDir);
+   // DrawStackedMC(rootDir_Pion,"theta",plotDir);
+   // DrawStackedMC(rootDir_Pion,"phi",plotDir);
 
     std::cout<<"Plotting Pion MC Only Finished!\n"<<std::endl;
 }
@@ -838,30 +992,32 @@ void CCProtonPi0_Plotter::plotPion_True()
     std::cout<<"Plotting Pion True"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Pion;
 
-    Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma1_reco_error_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_true_E_reco_E_error",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
+//    Draw1DHist(rootDir_Pion,"gamma1_true_E",plotDir);
+//    Draw1DHist(rootDir_Pion,"gamma1_reco_error_E",plotDir);
+//    Draw2DHist(rootDir_Pion,"gamma1_true_E_reco_E_error",plotDir);
+//    Draw2DHist(rootDir_Pion,"gamma1_reco_E_true_E",plotDir);
+//
+//    Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
+//    Draw1DHist(rootDir_Pion,"gamma2_reco_error_E",plotDir);
+//    Draw2DHist(rootDir_Pion,"gamma2_true_E_reco_E_error",plotDir);
+//    Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
+//    
+//    Draw2DHist(rootDir_Pion,"signal_gamma1_E_gamma2_E",plotDir);
+//    Draw2DHist(rootDir_Pion,"bckg_gamma1_E_gamma2_E",plotDir);
+//    Draw2DHist(rootDir_Pion,"bckg_signal_diff_E",plotDir);
+//
+//    Draw2DHist(rootDir_Pion,"signal_gamma1_convLength_gamma2_convLength",plotDir);
+//    Draw2DHist(rootDir_Pion,"bckg_gamma1_convLength_gamma2_convLength",plotDir);
+//    Draw2DHist(rootDir_Pion,"bckg_signal_diff_convLength",plotDir);
 
-    Draw1DHist(rootDir_Pion,"gamma2_true_E",plotDir);
-    Draw1DHist(rootDir_Pion,"gamma2_reco_error_E",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma2_true_E_reco_E_error",plotDir);
-    Draw2DHist(rootDir_Pion,"gamma2_reco_E_true_E",plotDir);
-    
-    Draw2DHist(rootDir_Pion,"signal_gamma1_E_gamma2_E",plotDir);
-    Draw2DHist(rootDir_Pion,"bckg_gamma1_E_gamma2_E",plotDir);
-    Draw2DHist(rootDir_Pion,"bckg_signal_diff_E",plotDir);
-
-    Draw2DHist(rootDir_Pion,"signal_gamma1_convLength_gamma2_convLength",plotDir);
-    Draw2DHist(rootDir_Pion,"bckg_gamma1_convLength_gamma2_convLength",plotDir);
-    Draw2DHist(rootDir_Pion,"bckg_signal_diff_convLength",plotDir);
-
+    Draw2DHist(rootDir_Pion,"reco_P_true_P",plotDir);
     Draw1DHist(rootDir_Pion,"P_error",plotDir);
+    Draw1DHist(rootDir_Pion,"P_Diff",plotDir);
+    Draw2DHist(rootDir_Pion,"reco_E_true_E",plotDir);
     Draw1DHist(rootDir_Pion,"E_error",plotDir);
     Draw1DHist(rootDir_Pion,"E_Diff",plotDir);
-    
-    DrawNormalizedMigrationHistogram(rootDir_Pion,"response_P",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Pion,"response_theta",plotDir);
+    Draw1DHist(rootDir_Pion,"E_true",plotDir);
+    Draw1DHist(rootDir_Pion,"E_reco",plotDir);
 
     std::cout<<"Plotting Pion True Finished!\n"<<std::endl;
 }

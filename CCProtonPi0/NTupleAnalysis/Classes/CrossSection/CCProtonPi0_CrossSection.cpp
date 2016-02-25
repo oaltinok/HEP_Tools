@@ -9,7 +9,7 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
 {
     std::cout<<"Initializing CCProtonPi0_CrossSection"<<std::endl;
 
-    iteration = 1; // Unfolding Iteration
+    iteration = 3; // Unfolding Iteration
     min_invMass = 60; // MeV
     max_invMass = 200; // MeV
     
@@ -31,6 +31,10 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection_muon_theta();   
     
     Calc_CrossSection_pi0_P();   
+    Calc_CrossSection_pi0_KE();   
+    Calc_CrossSection_pi0_theta();   
+    
+    Calc_CrossSection_QSq();   
 
     // Re Init Default Histograms Again before Writing to File
     // We Scaled some of them during the data corrections
@@ -65,7 +69,7 @@ void CCProtonPi0_CrossSection::Style_muon_P()
     // Add Labels
     muon_P_xsec->SetTitle("Differential Cross Section for P_{#mu}");
     muon_P_xsec->GetXaxis()->SetTitle("Muon Momentum [GeV]");
-    muon_P_xsec->GetYaxis()->SetTitle("d#sigma/d_{P_{#mu}} (10^{-40} cm^{2}/nucleon/GeV)");
+    muon_P_xsec->GetYaxis()->SetTitle("d#sigma/dp_{#mu} (10^{-40} cm^{2}/nucleon/GeV)");
     
     // Scale Cross Section Result to match with Label
     double bin_width = 1.0; // GeV
@@ -102,7 +106,7 @@ void CCProtonPi0_CrossSection::Style_muon_theta()
     // Add Labels
     muon_theta_xsec->SetTitle("Differential Cross Section for #theta_{#mu}");
     muon_theta_xsec->GetXaxis()->SetTitle("Muon Theta [degree]");
-    muon_theta_xsec->GetYaxis()->SetTitle("d#sigma/d_{#theta_{#mu}} (10^{-40} cm^{2}/nucleon/degree)");
+    muon_theta_xsec->GetYaxis()->SetTitle("d#sigma/d#theta_{#mu} (10^{-40} cm^{2}/nucleon/degree)");
     
     // Scale Cross Section Result to match with Label
     double bin_width = 2.08; // degree 
@@ -127,7 +131,6 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_pi0_P()
 
     // Calculate Final Cross Section
     pi0_P_xsec = Calc_FinalCrossSection(pi0_P_efficiency_corrected, pi0_P_integrated_flux, "pi0_P");
-    pi0_P_xsec->SetNormBinWidth(0.1);
 
     Style_pi0_P();
 
@@ -140,7 +143,7 @@ void CCProtonPi0_CrossSection::Style_pi0_P()
     // Add Labels
     pi0_P_xsec->SetTitle("Differential Cross Section for P_{#pi^{0}}");
     pi0_P_xsec->GetXaxis()->SetTitle("Pion Momentum [GeV]");
-    pi0_P_xsec->GetYaxis()->SetTitle("d#sigma/d_{P_{#pi^{0}}} (10^{-40} cm^{2}/nucleon/GeV)");
+    pi0_P_xsec->GetYaxis()->SetTitle("d#sigma/dp_{#pi^{0}} (10^{-40} cm^{2}/nucleon/GeV)");
 
     // Style Cross Section Result to match with Label
     double bin_width = 0.1; // GeV
@@ -150,6 +153,116 @@ void CCProtonPi0_CrossSection::Style_pi0_P()
 
 }
 
+void CCProtonPi0_CrossSection::Calc_CrossSection_pi0_KE()
+{
+    std::cout<<"\n-----------------------------------------------------------------------"<<std::endl;
+    std::cout<<"Calculating Cross Section for Pi0 Kinetic Energy Data"<<std::endl;
+    bool isEv = false;
+
+    // Data Correction
+    pi0_KE_bckg_subtracted = Subtract_Background(pi0_KE_all, pi0_KE_mc_reco_bckg, pi0_KE_bckg_estimated, "pi0_KE");
+    pi0_KE_unfolded = Unfold_Data(pi0_KE_bckg_subtracted, pi0_KE_response, "pi0_KE");   
+    pi0_KE_efficiency_corrected = Efficiency_Divide(pi0_KE_unfolded, pi0_KE_eff, "pi0_KE");   
+
+    // Integrate Flux
+    pi0_KE_integrated_flux = Integrate_Flux(pi0_KE_efficiency_corrected, "pi0_KE", isEv);
+
+    // Calculate Final Cross Section
+    pi0_KE_xsec = Calc_FinalCrossSection(pi0_KE_efficiency_corrected, pi0_KE_integrated_flux, "pi0_KE");
+
+    Style_pi0_KE();
+
+    std::cout<<"Done!"<<std::endl;
+    std::cout<<"-----------------------------------------------------------------------"<<std::endl;
+}
+
+void CCProtonPi0_CrossSection::Style_pi0_KE()
+{
+    // Add Labels
+    pi0_KE_xsec->SetTitle("Differential Cross Section for T_{#pi^{0}}");
+    pi0_KE_xsec->GetXaxis()->SetTitle("Pion Kinetic Energy [GeV]");
+    pi0_KE_xsec->GetYaxis()->SetTitle("d#sigma/dT_{#pi^{0}} (10^{-40} cm^{2}/nucleon/GeV)");
+
+    // Style Cross Section Result to match with Label
+    double bin_width = 0.1; // GeV
+    double quote_width = 1.0; // per GeV
+    double scale = quote_width / bin_width; 
+    pi0_KE_xsec->Scale(scale);
+}
+
+void CCProtonPi0_CrossSection::Calc_CrossSection_pi0_theta()
+{
+    std::cout<<"\n-----------------------------------------------------------------------"<<std::endl;
+    std::cout<<"Calculating Cross Section for Pi0 Theta Data"<<std::endl;
+    bool isEv = false;
+
+    // Data Correction
+    pi0_theta_bckg_subtracted = Subtract_Background(pi0_theta_all, pi0_theta_mc_reco_bckg, pi0_theta_bckg_estimated, "pi0_theta");
+    pi0_theta_unfolded = Unfold_Data(pi0_theta_bckg_subtracted, pi0_theta_response, "pi0_theta");   
+    pi0_theta_efficiency_corrected = Efficiency_Divide(pi0_theta_unfolded, pi0_theta_eff, "pi0_theta");   
+
+    // Integrate Flux
+    pi0_theta_integrated_flux = Integrate_Flux(pi0_theta_efficiency_corrected, "pi0_theta", isEv);
+
+    // Calculate Final Cross Section
+    pi0_theta_xsec = Calc_FinalCrossSection(pi0_theta_efficiency_corrected, pi0_theta_integrated_flux, "pi0_theta");
+
+    Style_pi0_theta();
+
+    std::cout<<"Done!"<<std::endl;
+    std::cout<<"-----------------------------------------------------------------------"<<std::endl;
+}
+
+void CCProtonPi0_CrossSection::Style_pi0_theta()
+{
+    // Add Labels
+    pi0_theta_xsec->SetTitle("Differential Cross Section for #theta_{#pi^{0}}");
+    pi0_theta_xsec->GetXaxis()->SetTitle("Pion Theta [degree]");
+    pi0_theta_xsec->GetYaxis()->SetTitle("d#sigma/d#theta_{#pi^{0}} (10^{-40} cm^{2}/nucleon/degree)");
+
+    // Style Cross Section Result to match with Label
+    double bin_width = 10; // degree
+    double quote_width = 1.0; // per degree
+    double scale = quote_width / bin_width; 
+    pi0_theta_xsec->Scale(scale);
+}
+
+void CCProtonPi0_CrossSection::Calc_CrossSection_QSq()
+{
+    std::cout<<"\n-----------------------------------------------------------------------"<<std::endl;
+    std::cout<<"Calculating Cross Section for QSq Data"<<std::endl;
+    bool isEv = false;
+
+    // Data Correction
+    QSq_bckg_subtracted = Subtract_Background(QSq_all, QSq_mc_reco_bckg, QSq_bckg_estimated, "QSq");
+    QSq_unfolded = Unfold_Data(QSq_bckg_subtracted, QSq_response, "QSq");   
+    QSq_efficiency_corrected = Efficiency_Divide(QSq_unfolded, QSq_eff, "QSq");   
+
+    // Integrate Flux
+    QSq_integrated_flux = Integrate_Flux(QSq_efficiency_corrected, "QSq", isEv);
+
+    // Calculate Final Cross Section
+    QSq_xsec = Calc_FinalCrossSection(QSq_efficiency_corrected, QSq_integrated_flux, "QSq");
+
+    Style_QSq();
+
+    std::cout<<"Done!"<<std::endl;
+    std::cout<<"-----------------------------------------------------------------------"<<std::endl;
+}
+
+void CCProtonPi0_CrossSection::Style_QSq()
+{
+    // Add Labels
+    QSq_xsec->SetTitle("Differential Cross Section for Q^{2}");
+    QSq_xsec->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    QSq_xsec->GetYaxis()->SetTitle("d#sigma/dQ^{2} (10^{-40} cm^{2}/nucleon/GeV^{2})");
+
+    // Style Cross Section Result to match with Label
+    double bin_width = 0.1; // GeV^2
+    double quote_width = 1.0; // per GeV^2
+    double scale = quote_width / bin_width; 
+    QSq_xsec->Scale(scale);
+}
 
 void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
 {
@@ -183,6 +296,10 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     }
     
     fit_result  = new TH1F (*(TH1F*)fitter->GetPlot());
+    fit_result->SetName("data_fit_result"); 
+    //std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+
     Double_t N_Data = data_invMass->Integral();
     Double_t f0 =     0.0; // fittted signal fraction
     Double_t f1 =     0.0; // fitted background fraction
@@ -321,7 +438,8 @@ MnvH1D* CCProtonPi0_CrossSection::Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* r
 
     std::cout<<"\tNumber of iteratons = "<<iteration<<std::endl;
     // Use MnvUnfold to Unfold Data
-    MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted, RooUnfold::kBayes, iteration, true);
+    //MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted, RooUnfold::kBayes, iteration, true);
+    MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted);
 
     // Set Name of the Histogram
     std::string hist_name = var_name + "_unfolded";
@@ -418,6 +536,8 @@ void CCProtonPi0_CrossSection::OpenRootFiles()
     // Data Files
     rootDir = Folder_List::rootDir_CutHists_data;
     f_data_cutHists = new TFile(rootDir.c_str());
+    rootDir = Folder_List::rootDir_Interaction_data;
+    f_data_interaction = new TFile(rootDir.c_str());
     rootDir = Folder_List::rootDir_Muon_data;
     f_data_muon = new TFile(rootDir.c_str());
     rootDir = Folder_List::rootDir_Pion_data;
@@ -426,6 +546,8 @@ void CCProtonPi0_CrossSection::OpenRootFiles()
     // MC Files
     rootDir = Folder_List::rootDir_CutHists_mc;
     f_mc_cutHists = new TFile(rootDir.c_str());
+    rootDir = Folder_List::rootDir_Interaction_mc;
+    f_mc_interaction = new TFile(rootDir.c_str());
     rootDir = Folder_List::rootDir_Muon_mc;
     f_mc_muon = new TFile(rootDir.c_str());
     rootDir = Folder_List::rootDir_Pion_mc;
@@ -499,7 +621,61 @@ void CCProtonPi0_CrossSection::initHistograms()
     pi0_P_eff->Divide(pi0_P_mc_truth_signal, pi0_P_mc_truth_all_signal);
 
     pi0_P_response = new MnvH2D(*(MnvH2D*)f_mc_pi0->Get("pi0_P_response")); 
+      
+    // ------------------------------------------------------------------------
+    // Pi0 Kinetic Energy 
+    // ------------------------------------------------------------------------
+    if (m_isMC) pi0_KE_all = new MnvH1D(*(MnvH1D*)f_mc_pi0->Get("pi0_KE_mc_reco_all")); 
+    else pi0_KE_all = new MnvH1D(*(MnvH1D*)f_data_pi0->Get("pi0_KE_all")); 
  
+    pi0_KE_mc_reco_signal = new MnvH1D(*(MnvH1D*)f_mc_pi0->Get("pi0_KE_mc_reco_signal")); 
+    pi0_KE_mc_reco_bckg = new MnvH1D(*(MnvH1D*)f_mc_pi0->Get("pi0_KE_mc_reco_bckg")); 
+   
+    pi0_KE_mc_truth_all_signal = new MnvH1D(*(MnvH1D*)f_truth->Get("pi0_KE_mc_truth_all_signal")); 
+    pi0_KE_mc_truth_signal = new MnvH1D(*(MnvH1D*)f_mc_pi0->Get("pi0_KE_mc_truth_signal")); 
+   
+    pi0_KE_eff = new MnvH1D(*pi0_KE_mc_truth_signal);
+    pi0_KE_eff->SetName("pi0_KE_eff");
+    pi0_KE_eff->Divide(pi0_KE_mc_truth_signal, pi0_KE_mc_truth_all_signal);
+
+    pi0_KE_response = new MnvH2D(*(MnvH2D*)f_mc_pi0->Get("pi0_KE_response")); 
+ 
+    // ------------------------------------------------------------------------
+    // Pi0 Theta 
+    // ------------------------------------------------------------------------
+    if (m_isMC) pi0_theta_all = new MnvH1D(*(MnvH1D*)f_mc_pi0->Get("pi0_theta_mc_reco_all")); 
+    else pi0_theta_all = new MnvH1D(*(MnvH1D*)f_data_pi0->Get("pi0_theta_all")); 
+ 
+    pi0_theta_mc_reco_signal = new MnvH1D(*(MnvH1D*)f_mc_pi0->Get("pi0_theta_mc_reco_signal")); 
+    pi0_theta_mc_reco_bckg = new MnvH1D(*(MnvH1D*)f_mc_pi0->Get("pi0_theta_mc_reco_bckg")); 
+   
+    pi0_theta_mc_truth_all_signal = new MnvH1D(*(MnvH1D*)f_truth->Get("pi0_theta_mc_truth_all_signal")); 
+    pi0_theta_mc_truth_signal = new MnvH1D(*(MnvH1D*)f_mc_pi0->Get("pi0_theta_mc_truth_signal")); 
+   
+    pi0_theta_eff = new MnvH1D(*pi0_theta_mc_truth_signal);
+    pi0_theta_eff->SetName("pi0_theta_eff");
+    pi0_theta_eff->Divide(pi0_theta_mc_truth_signal, pi0_theta_mc_truth_all_signal);
+
+    pi0_theta_response = new MnvH2D(*(MnvH2D*)f_mc_pi0->Get("pi0_theta_response")); 
+ 
+    // ------------------------------------------------------------------------
+    // QSq 
+    // ------------------------------------------------------------------------
+    if (m_isMC) QSq_all = new MnvH1D(*(MnvH1D*)f_mc_interaction->Get("QSq_mc_reco_all")); 
+    else QSq_all = new MnvH1D(*(MnvH1D*)f_data_interaction->Get("QSq_all")); 
+ 
+    QSq_mc_reco_signal = new MnvH1D(*(MnvH1D*)f_mc_interaction->Get("QSq_mc_reco_signal")); 
+    QSq_mc_reco_bckg = new MnvH1D(*(MnvH1D*)f_mc_interaction->Get("QSq_mc_reco_bckg")); 
+   
+    QSq_mc_truth_all_signal = new MnvH1D(*(MnvH1D*)f_truth->Get("QSq_mc_truth_all_signal")); 
+    QSq_mc_truth_signal = new MnvH1D(*(MnvH1D*)f_mc_interaction->Get("QSq_mc_truth_signal")); 
+   
+    QSq_eff = new MnvH1D(*QSq_mc_truth_signal);
+    QSq_eff->SetName("QSq_eff");
+    QSq_eff->Divide(QSq_mc_truth_signal, QSq_mc_truth_all_signal);
+
+    QSq_response = new MnvH2D(*(MnvH2D*)f_mc_interaction->Get("QSq_response")); 
+
     std::cout<<"Done!"<<std::endl;
 }
 
@@ -532,7 +708,7 @@ void CCProtonPi0_CrossSection::writeHistograms()
     muon_P_eff->Write();
     muon_P_response->Write();
  
-    // Muon Momentum - Data
+    // Muon Theta - Data
     muon_theta_xsec->Write();
     muon_theta_all->Write();
     muon_theta_bckg_subtracted->Write();
@@ -541,7 +717,7 @@ void CCProtonPi0_CrossSection::writeHistograms()
     muon_theta_efficiency_corrected->Write();
     muon_theta_integrated_flux->Write();
    
-    // Muon Momentum - MC Truth
+    // Muon Theta - MC Truth
     muon_theta_mc_truth_all_signal->Write();
     muon_theta_mc_truth_signal->Write();
     muon_theta_mc_reco_signal->Write();
@@ -565,6 +741,57 @@ void CCProtonPi0_CrossSection::writeHistograms()
     pi0_P_mc_reco_bckg->Write();
     pi0_P_eff->Write();
     pi0_P_response->Write();
+
+    // Pi0 Kinetic Energy - Data
+    pi0_KE_xsec->Write();
+    pi0_KE_all->Write();
+    pi0_KE_bckg_subtracted->Write();
+    pi0_KE_bckg_estimated->Write();
+    pi0_KE_unfolded->Write();
+    pi0_KE_efficiency_corrected->Write();
+    pi0_KE_integrated_flux->Write();
+
+    // Pi0 Kinetic Energy - MC Truth
+    pi0_KE_mc_truth_all_signal->Write();
+    pi0_KE_mc_truth_signal->Write();
+    pi0_KE_mc_reco_signal->Write();
+    pi0_KE_mc_reco_bckg->Write();
+    pi0_KE_eff->Write();
+    pi0_KE_response->Write();
+
+    // Pi0 Theta - Data
+    pi0_theta_xsec->Write();
+    pi0_theta_all->Write();
+    pi0_theta_bckg_subtracted->Write();
+    pi0_theta_bckg_estimated->Write();
+    pi0_theta_unfolded->Write();
+    pi0_theta_efficiency_corrected->Write();
+    pi0_theta_integrated_flux->Write();
+
+    // Pi0 Theta - MC Truth
+    pi0_theta_mc_truth_all_signal->Write();
+    pi0_theta_mc_truth_signal->Write();
+    pi0_theta_mc_reco_signal->Write();
+    pi0_theta_mc_reco_bckg->Write();
+    pi0_theta_eff->Write();
+    pi0_theta_response->Write();
+
+    // QSq - Data
+    QSq_xsec->Write();
+    QSq_all->Write();
+    QSq_bckg_subtracted->Write();
+    QSq_bckg_estimated->Write();
+    QSq_unfolded->Write();
+    QSq_efficiency_corrected->Write();
+    QSq_integrated_flux->Write();
+
+    // QSq - MC Truth
+    QSq_mc_truth_all_signal->Write();
+    QSq_mc_truth_signal->Write();
+    QSq_mc_reco_signal->Write();
+    QSq_mc_reco_bckg->Write();
+    QSq_eff->Write();
+    QSq_response->Write();
 
     f_out->Close();
 }

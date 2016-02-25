@@ -160,6 +160,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
 
         // Other
+        void DrawBackgroundSubtraction(bool isMC);
         void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir);
         void DrawTGraph(rootDir &dir, std::string var_name, std::string plotDir);
         void DrawEfficiencyCurve(rootDir& dir, std::string var_name, std::string plotDir);

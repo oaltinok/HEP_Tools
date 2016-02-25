@@ -180,6 +180,10 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
        
         CorrectNTupleVariables();
 
+        if (!truth_isSignal){
+            if (pi0_KE < 0) counter1++;
+            else counter2++;
+        }
         // Update scanFileName if running for scan
         if(isScanRun) UpdateScanFileName();
 
@@ -369,8 +373,11 @@ void CCProtonPi0_Analyzer::fillData()
     // Fill Cross Section Variables
 
     fill_pi0_P();
+    fill_pi0_KE();
+    fill_pi0_theta();
     fill_muon_P();
     fill_muon_theta();
+    fill_QSq();
 
     // Fill Reconstructed Information
     fillInteractionReco();
@@ -826,10 +833,14 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
             FillHistogram(interaction.Enu_2Track_Error, E_Error);
             FillHistogram(interaction.Enu_2Track_Diff, E_reco-E_true);
         }  
-
-        // Response
-        FillHistogram(interaction.response_neutrino_E, CCProtonPi0_neutrino_E * MeV_to_GeV, mc_incomingE * MeV_to_GeV);
-        FillHistogram(interaction.response_QSq,CCProtonPi0_QSq * MeVSq_to_GeVSq, mc_Q2 * MeVSq_to_GeVSq);
+    
+        // QSq True, Error and Difference
+        double QSq_error = Data_Functions::getError(mc_Q2,CCProtonPi0_QSq);
+        double QSq_diff = (CCProtonPi0_QSq - mc_Q2) * MeVSq_to_GeVSq;
+        FillHistogram(interaction.QSq_True, mc_Q2 * MeVSq_to_GeVSq);
+        FillHistogram(interaction.QSq_Error, QSq_error);
+        FillHistogram(interaction.QSq_Diff, QSq_diff);
+    
     }
 }
 
@@ -1045,15 +1056,21 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         double pi0_true_P = HEP_Functions::calcMomentum(truth_pi0_4P[0],truth_pi0_4P[1],truth_pi0_4P[2]);
         pi0_true_P = pi0_true_P * MeV_to_GeV; 
         double pi0_P_error = Data_Functions::getError(pi0_true_P, pi0_reco_P);
+        double pi0_P_Diff = pi0_reco_P - pi0_true_P;
 
         FillHistogram(pi0.P_error, pi0_P_error); 
+        FillHistogram(pi0.P_Diff, pi0_P_Diff); 
         FillHistogram(pi0.reco_P_true_P, pi0_reco_P, pi0_true_P); 
 
         // Pi0 Energy
-        double reco_E = pi0_E * MeV_to_GeV;
+        //double reco_E = pi0_E * MeV_to_GeV;
+        const double M_pi0 = 134.98;
+        double reco_E = (sqrt(pow(pi0_P,2) + pow(M_pi0,2))) * MeV_to_GeV;
         double true_E = truth_pi0_4P[3] * MeV_to_GeV; 
         double error_E = Data_Functions::getError(true_E, reco_E);
 
+        FillHistogram(pi0.E_true, true_E);
+        FillHistogram(pi0.E_reco, reco_E);
         FillHistogram(pi0.reco_E_true_E, reco_E,true_E);
         FillHistogram(pi0.E_error, error_E);
         FillHistogram(pi0.E_Diff, reco_E-true_E);
@@ -1213,6 +1230,28 @@ void CCProtonPi0_Analyzer::fill_BackgroundSubtractionHists()
     }
 }
 
+void CCProtonPi0_Analyzer::fill_QSq() 
+{
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithDefaultErrors(interaction.QSq_mc_reco_all, CCProtonPi0_QSq * MeVSq_to_GeVSq);
+        if (truth_isSignal){
+            // MC Truth Signal
+            FillHistogramWithDefaultErrors(interaction.QSq_mc_truth_signal, mc_Q2 * MeVSq_to_GeVSq);
+            // MC Reco Signal
+            FillHistogramWithDefaultErrors(interaction.QSq_mc_reco_signal, CCProtonPi0_QSq * MeVSq_to_GeVSq);
+            // MC Reco vs True -- Response
+            FillHistogramWithDefaultErrors(interaction.QSq_response, CCProtonPi0_QSq * MeVSq_to_GeVSq, mc_Q2 * MeVSq_to_GeVSq);
+        }else{
+            // MC Reco Background
+            FillHistogramWithDefaultErrors(interaction.QSq_mc_reco_bckg, CCProtonPi0_QSq * MeVSq_to_GeVSq);
+        }
+    }else{
+        // Data
+        FillHistogram(interaction.QSq_all, CCProtonPi0_QSq * MeVSq_to_GeVSq);
+    }
+}
+
 void CCProtonPi0_Analyzer::fill_muon_P() 
 {
     if (m_isMC){
@@ -1276,6 +1315,52 @@ void CCProtonPi0_Analyzer::fill_pi0_P()
     }else{
         // Data
         FillHistogram(pi0.pi0_P_all, pi0_P * MeV_to_GeV);
+    }
+}
+
+void CCProtonPi0_Analyzer::fill_pi0_KE() 
+{
+    const double M_pi0 = 134.98; // MeV 
+    const double truth_pi0_KE = truth_pi0_4P[3] - M_pi0;
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithDefaultErrors(pi0.pi0_KE_mc_reco_all, pi0_KE * MeV_to_GeV);
+        if (truth_isSignal){
+            // MC Truth Signal
+            FillHistogramWithDefaultErrors(pi0.pi0_KE_mc_truth_signal, truth_pi0_KE  * MeV_to_GeV);
+            // MC Reco Signal
+            FillHistogramWithDefaultErrors(pi0.pi0_KE_mc_reco_signal, pi0_KE * MeV_to_GeV);
+            // MC Reco vs True -- Response
+            FillHistogramWithDefaultErrors(pi0.pi0_KE_response, pi0_KE * MeV_to_GeV, truth_pi0_KE * MeV_to_GeV);
+        }else{
+            // MC Reco Background
+            FillHistogramWithDefaultErrors(pi0.pi0_KE_mc_reco_bckg, pi0_KE * MeV_to_GeV);
+        }
+    }else{
+        // Data
+        FillHistogram(pi0.pi0_KE_all, pi0_KE * MeV_to_GeV);
+    }
+}
+
+void CCProtonPi0_Analyzer::fill_pi0_theta() 
+{
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_reco_all, pi0_theta * TMath::RadToDeg());
+        if (truth_isSignal){
+            // MC Truth Signal
+            FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_truth_signal, truth_pi0_theta  * TMath::RadToDeg());
+            // MC Reco Signal
+            FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_reco_signal, pi0_theta * TMath::RadToDeg());
+            // MC Reco vs True -- Response
+            FillHistogramWithDefaultErrors(pi0.pi0_theta_response, pi0_theta * TMath::RadToDeg(), truth_pi0_theta * TMath::RadToDeg());
+        }else{
+            // MC Reco Background
+            FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_reco_bckg, pi0_theta * TMath::RadToDeg());
+        }
+    }else{
+        // Data
+        FillHistogram(pi0.pi0_theta_all, pi0_theta * TMath::RadToDeg());
     }
 }
 
@@ -1541,7 +1626,9 @@ double CCProtonPi0_Analyzer::Calc_TruePi0OpeningAngle()
 // Function Reserved for Correcting a NTupleVariables
 void CCProtonPi0_Analyzer::CorrectNTupleVariables()
 {
-    // Nothing for now
+    const double M_pi0 = 134.98; // MeV 
+    pi0_E = (sqrt(pow(pi0_P,2) + pow(M_pi0,2)));
+    pi0_KE = pi0_E-M_pi0;
 }
 
 void CCProtonPi0_Analyzer::CorrectEMShowerCalibration()
@@ -1570,8 +1657,11 @@ void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
 void CCProtonPi0_Analyzer::AddErrorBands_Data()
 {
     AddVertErrorBands_Data(pi0.pi0_P_all);
+    AddVertErrorBands_Data(pi0.pi0_KE_all);
+    AddVertErrorBands_Data(pi0.pi0_theta_all);
     AddVertErrorBands_Data(muon.muon_P_all);
     AddVertErrorBands_Data(muon.muon_theta_all);
+    AddVertErrorBands_Data(interaction.QSq_all);
 }
 
 #endif //CCProtonPi0_Analyzer_cpp

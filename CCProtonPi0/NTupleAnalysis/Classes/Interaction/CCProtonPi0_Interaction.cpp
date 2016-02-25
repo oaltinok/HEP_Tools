@@ -167,6 +167,36 @@ void CCProtonPi0_Interaction::initHistograms()
 
     }
 
+    // Cross Section Variables
+    QSq_all = new MnvH1D( "QSq_all","Data All Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
+    QSq_all->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_all->GetYaxis()->SetTitle("N(Events)");
+
+    QSq_mc_truth_signal = new MnvH1D( "QSq_mc_truth_signal","MC Truth Signal Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
+    QSq_mc_truth_signal->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(QSq_mc_truth_signal);
+
+    QSq_mc_reco_all = new MnvH1D( "QSq_mc_reco_all","MC All Reconstructed Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
+    QSq_mc_reco_all->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(QSq_mc_reco_all);
+
+    QSq_mc_reco_signal = new MnvH1D( "QSq_mc_reco_signal","MC Reconstructed Signal Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
+    QSq_mc_reco_signal->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(QSq_mc_reco_signal);
+
+    QSq_mc_reco_bckg = new MnvH1D( "QSq_mc_reco_bckg","MC Reconstructed Background Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
+    QSq_mc_reco_bckg->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(QSq_mc_reco_bckg);
+
+    QSq_response = new MnvH2D( "QSq_response","Signal Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max(),binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
+    QSq_response->GetXaxis()->SetTitle("Reconstructed Q^{2} [Gev^{2}]");
+    QSq_response->GetYaxis()->SetTitle("True Q^{2} [Gev^{2}]");
+    AddVertErrorBands_MC(QSq_response);
+
     
     // MC Only Histograms
     final_mc_w_DIS = new TH1D( "final_mc_w_DIS","True W for DIS",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
@@ -180,6 +210,19 @@ void CCProtonPi0_Interaction::initHistograms()
     final_mc_w_CCQE = new TH1D( "final_mc_w_CCQE","True W for CCQE",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
     final_mc_w_CCQE->GetXaxis()->SetTitle("True W for CCQE [GeV]");
     final_mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_w.get_width()));
+
+    // QSq: True, Error, Diff
+    QSq_True = new MnvH1D( "QSq_True","True Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
+    QSq_True->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_True->GetYaxis()->SetTitle("N(Events)");
+
+    QSq_Error = new MnvH1D( "QSq_Error","Q^{2} Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    QSq_Error->GetXaxis()->SetTitle("(Q^{2}_{Reco} - Q^{2}_{True})/Q^{2}_{True}");
+    QSq_Error->GetYaxis()->SetTitle("N(Events)");
+
+    QSq_Diff = new MnvH1D( "QSq_Diff","Q^{2} Difference ",binList.beamE_Diff.get_nBins(), binList.beamE_Diff.get_min(), binList.beamE_Diff.get_max() );
+    QSq_Diff->GetXaxis()->SetTitle("Q^{2}_{Reco} - Q^{2}_{True}");
+    QSq_Diff->GetYaxis()->SetTitle("N(Events)");
 
     // Short Proton True Information
     proton_true_P_1Track = new TH1D( "proton_true_P_1Track","Short Proton True Momentum",binList.short_proton_P.get_nBins(), binList.short_proton_P.get_min(), binList.short_proton_P.get_max() );
@@ -261,15 +304,6 @@ void CCProtonPi0_Interaction::initHistograms()
     h_original_Pi0_theta->GetXaxis()->SetTitle("Pi0 Theta [degree]");
     h_original_Pi0_theta->GetYaxis()->SetTitle("N(Events)");
 
-    // Signal
-    response_neutrino_E = new MnvH2D("response_neutrino_E","Neutrino Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max(), binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
-    response_neutrino_E->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
-    response_neutrino_E->GetYaxis()->SetTitle("True E_{#nu} [GeV]");
- 
-    response_QSq = new MnvH2D("response_QSq","Signal Neutrino Energy",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() ,binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max());
-    response_QSq->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
-    response_QSq->GetYaxis()->SetTitle("True Q^2 [GeV^{2}]");
- 
 }
 
 void CCProtonPi0_Interaction::writeHistograms()
@@ -316,6 +350,13 @@ void CCProtonPi0_Interaction::writeHistograms()
 
     }
     
+    QSq_all->Write();
+    QSq_mc_truth_signal->Write();
+    QSq_mc_reco_all->Write();
+    QSq_mc_reco_signal->Write();
+    QSq_mc_reco_bckg->Write();
+    QSq_response->Write();
+   
     // MC Only Histograms
     final_mc_w_DIS->Write();
     final_mc_w_RES->Write();
@@ -339,6 +380,11 @@ void CCProtonPi0_Interaction::writeHistograms()
     h_extra_dispersed_energy->Write();
     h_extra_rejected_energy->Write();
     
+    // QSq Truth, Error, Difference
+    QSq_True->Write();
+    QSq_Error->Write();
+    QSq_Diff->Write();
+    
     // Neutrino Energy: Truth, Error, Difference
     Enu_True_1Track->Write();
     Enu_True_2Track->Write();
@@ -349,9 +395,6 @@ void CCProtonPi0_Interaction::writeHistograms()
 
     Enu_1Track_Diff->Write();
     Enu_2Track_Diff->Write();
-
-    response_neutrino_E->Write();
-    response_QSq->Write();
 
     f->Close();
 }

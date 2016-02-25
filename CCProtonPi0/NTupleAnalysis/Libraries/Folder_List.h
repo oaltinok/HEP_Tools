@@ -88,9 +88,12 @@ namespace Folder_List
     // Plot Dirs
     //-------------------------------------------------------------------------
     // CrossSection Plot Dirs
+    const std::string xsec_QSq = output + plotOut + "xsec_QSq/";
     const std::string xsec_muon_P = output + plotOut + "xsec_muon_P/";
     const std::string xsec_muon_theta = output + plotOut + "xsec_muon_theta/";
     const std::string xsec_pi0_P = output + plotOut + "xsec_pi0_P/";
+    const std::string xsec_pi0_KE = output + plotOut + "xsec_pi0_KE/";
+    const std::string xsec_pi0_theta = output + plotOut + "xsec_pi0_theta/";
 
     const std::string plotDir_Check = "Check/";
     const std::string plotDir_ErrorSummary = "ErrorSummary/";

@@ -231,6 +231,7 @@ StatusCode CCProtonPi0::initialize()
     declareBoolTruthBranch("isGamma2_conv_inside");
     declareDoubleTruthBranch("muon_P",SENTINEL);
     declareDoubleTruthBranch("pi0_P",SENTINEL);
+    declareDoubleTruthBranch("pi0_KE",SENTINEL);
     declareDoubleTruthBranch("proton_P",SENTINEL);
     declareDoubleTruthBranch("muon_theta",SENTINEL);
     declareDoubleTruthBranch("pi0_theta",SENTINEL);
@@ -658,6 +659,7 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("pi0_py",SENTINEL);
     declareDoubleEventBranch("pi0_pz",SENTINEL);
     declareDoubleEventBranch("pi0_E",SENTINEL);
+    declareDoubleEventBranch("pi0_E_Cal",SENTINEL);
     declareDoubleEventBranch("pi0_P",SENTINEL);
     declareDoubleEventBranch("pi0_KE",SENTINEL);
     declareDoubleEventBranch("pi0_invMass", SENTINEL);
@@ -2243,9 +2245,12 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
     g2mom *= g2energy;
 
     // Get Pi0 Kinematics
+    double M_pi0 = MinervaUnits::M_pi0;
+    double pi0_E_Cal = g1energy + g2energy; 
     TVector3 pimom = g1mom + g2mom;
-    double pi0_E = g1energy + g2energy; 
-    double pi0_KE = pi0_E - MinervaUnits::M_pi0;
+    double pi0_P = pimom.Mag();
+    double pi0_E = sqrt(pi0_P*pi0_P + M_pi0*M_pi0); 
+    double pi0_KE = pi0_E - M_pi0;
     Gaudi::LorentzVector pi0_4P(pimom.Px(), pimom.Py(), pimom.Pz(), pi0_E);
     Gaudi::LorentzVector gamma1_4P(g1mom.Px(), g1mom.Py(), g1mom.Pz(), g1energy);
     Gaudi::LorentzVector gamma2_4P(g2mom.Px(), g2mom.Py(), g2mom.Pz(), g2energy);
@@ -2293,7 +2298,8 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("pi0_py", pimom.Py());
     event->setDoubleData("pi0_pz", pimom.Pz());
     event->setDoubleData("pi0_E", pi0_E);
-    event->setDoubleData("pi0_P", pimom.Mag());
+    event->setDoubleData("pi0_E_Cal", pi0_E_Cal);
+    event->setDoubleData("pi0_P", pi0_P);
     event->setDoubleData("pi0_KE", pi0_KE);
     event->setDoubleData("pi0_theta", pi0_theta);
     event->setDoubleData("pi0_phi", pi0_phi);

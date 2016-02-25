@@ -1,15 +1,22 @@
-CCPROTONPI0_V="v2_61"
+CCPROTONPI0_V="v2_62"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Fiducial Volume Slightly Changed
-		For more accurate N(Nucleon) for Cross Section Calculation
+	Pi0 Energy Calculation Changed
+		Calorimetric Energy		
+			pi0_E_Cal =  E_g1 + E_g2
+		Relativistic Energy from Momentum
+			pi0_E = sqrt(P2 + m2)
+	
+	pi0_KE added to truth
 
 -------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	Cross Section
-		Added Muon Theta
-		Added styling for final cross section plots
-			Includes histogram scaling to match with Label
+	New Cross Section Calculations	
+		Pi0 Kinetic Energy
+		Pi0 Theta
+		QSq
+
+	Analyzer & Plotter Improved for new cross section variables
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

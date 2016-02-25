@@ -31,6 +31,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
 
         MnvH1D* muon_P_mc_truth_all_signal;
         MnvH1D* pi0_P_mc_truth_all_signal;
+        MnvH1D* pi0_KE_mc_truth_all_signal;
         MnvH1D* muon_theta_mc_truth_all_signal;
         MnvH1D* pi0_theta_mc_truth_all_signal;
         MnvH1D* neutrino_E_mc_truth_all_signal;

@@ -122,7 +122,6 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
         deltaMass.DrawLine(1.232,0,1.232,hist_max);
     }
 
-
     // Print Plot
     c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all_",norm_label.c_str(),".png"), "png");
 
@@ -325,9 +324,9 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
-    
+
     ApplyStyle_Errors(plotter);
-    
+
     plotter->DrawErrorSummary(hist);
 
     // Add Plot Labels
@@ -349,10 +348,10 @@ void CCProtonPi0_Plotter::DrawErrorBand(MnvH1D* hist, std::string error_name, in
     TCanvas* c = new TCanvas("c","c",1280,800);
 
     //ApplyStyle_Error(plotter);
-    
+
     TH1D* error = hist->GetVertErrorBand(error_name.c_str());
     plotter->DrawErrorBand(error, error_color);
-    
+
     // Add Plot Labels
     plotter->AddHistoTitle(hist->GetTitle());
 
@@ -372,12 +371,12 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     TFile* f_data = new TFile(rootDir_data.c_str());
 
     std::string var = Form("%s_%d",var_name.c_str(),0);
-    
+
     // POT Normalized
     MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
     DrawDataMC(data, mc, var_name, plotDir, true);
-  
+
     // Area Normalized
     mc = (MnvH1D*)f_mc->Get(var.c_str());
     data = (MnvH1D*)f_data->Get(var.c_str()); 
@@ -408,7 +407,7 @@ void CCProtonPi0_Plotter::DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std:
     // ------------------------------------------------------------------------
     std::string norm_label; 
     double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc);
-    
+
     // Cross Section Calculation Already Includes POT Normalization
     if (isPOTNorm) mc_ratio = 1.0;
 
@@ -424,21 +423,19 @@ void CCProtonPi0_Plotter::DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std:
     plotter->AddHistoTitle(data[0].GetTitle());
     AddNormBox(plotter, isPOTNorm, mc_ratio);
 
-    // Add Pi0 InvMass Line
-    std::size_t found = var_name.find("invMass");
-    if (found != std::string::npos){
-        TLine pi0Mass;
-        pi0Mass.SetLineWidth(2);
-        pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,3200);
-    }
+    // Add Areas
+    const double y_pos = 0.88;
+    const double text_size = 0.03;
+    double area_data = data->Integral();
+    double area_mc = mc->Integral() * mc_ratio;
+    plotter->AddPlotLabel(Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc),0.3,y_pos,text_size,kBlue); 
 
     // Print Plot
     c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_",norm_label.c_str(),".png"), "png");
 
     delete c;
     delete plotter;
-    
+
     DrawDataMCRatio_CrossSection(data,mc,var_name,plotDir,isPOTNorm);
 }
 void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm)
@@ -461,6 +458,13 @@ void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_n
     plotter->AddHistoTitle(data[0].GetTitle());
     AddNormBox(plotter, isPOTNorm, mc_ratio);
 
+    // Add Areas
+    const double y_pos = 0.88;
+    const double text_size = 0.03;
+    double area_data = data->Integral();
+    double area_mc = mc->Integral() * mc_ratio;
+    plotter->AddPlotLabel(Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc),0.3,y_pos,text_size,kBlue); 
+
     // Add Pi0 InvMass Line
     std::size_t found = var_name.find("invMass");
     if (found != std::string::npos){
@@ -475,7 +479,7 @@ void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_n
 
     delete c;
     delete plotter;
-    
+
     DrawDataMCRatio(data,mc,var_name,plotDir,isPOTNorm);
 }
 
@@ -628,7 +632,7 @@ void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::st
     hist1D->SetFillColor(kRed);
     hist1D->SetFillStyle(3010);
 
-    hist1D->Draw();
+    hist1D->Draw("HIST");
     gPad->Update();
     gStyle->SetOptStat(111111); 
 
@@ -1119,7 +1123,10 @@ double CCProtonPi0_Plotter::GetMCNormalization(std::string &norm_label, bool isP
         mc_ratio = POT_Ratio_data_mc;
         norm_label = "POT";
     }else{
-        mc_ratio = mc->GetAreaNormFactor(data);
+        //mc_ratio = mc->GetAreaNormFactor(data); // Includes Overflow Bins
+        double area_data = data->Integral();
+        double area_mc = mc->Integral();
+        mc_ratio = area_data/area_mc;
         norm_label = "Area";
     }
 
@@ -1205,7 +1212,7 @@ void CCProtonPi0_Plotter::DrawEfficiencyCurve(rootDir& dir, std::string var_name
 
     TFile* f = new TFile(root_dir.c_str());
     MnvH1D* hist1D = (MnvH1D*)f->Get(var_name.c_str());
-    
+
     // Create Canvas
     TCanvas* c = new TCanvas("c","c",1280,800);
 
@@ -1216,7 +1223,7 @@ void CCProtonPi0_Plotter::DrawEfficiencyCurve(rootDir& dir, std::string var_name
     hist1D->SetLineColor(kRed);
     hist1D->SetLineWidth(3);
     hist1D->SetFillColor(kWhite);
-    
+
     hist1D->Draw("HIST");
     gPad->Update();
     gStyle->SetOptStat(111111); 
@@ -1533,6 +1540,109 @@ void CCProtonPi0_Plotter::DrawTGraph(rootDir &dir, std::string var_name, std::st
     delete c;
     delete f;
 }
+
+void CCProtonPi0_Plotter::DrawBackgroundSubtraction(bool isMC)
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    TFile* f;
+    if (isMC) f = new TFile(rootDir_CrossSection.mc.c_str());
+    else f = new TFile(rootDir_CrossSection.data.c_str());
+
+    double hist_max = 0;
+    double area_data = 0.0;
+    double area_mc = 0.0;
+    double max_bin;
+    double bin_width;
+
+    // ------------------------------------------------------------------------
+    // Get Data Histogram
+    // ------------------------------------------------------------------------
+    MnvH1D* data;
+    if (isMC) data = (MnvH1D*)f->Get("invMass_mc_reco_all"); 
+    else data = (MnvH1D*)f->Get("invMass_all"); 
+    max_bin = data->GetMaximumBin();
+    hist_max = (hist_max + data->GetBinContent(max_bin))*1.2;
+    bin_width = data->GetBinWidth(1);
+    area_data = data->Integral();
+
+    // ------------------------------------------------------------------------
+    // Fill TObjArray - For MC Histograms
+    // ------------------------------------------------------------------------
+    TObjArray* mc_hists = new TObjArray;
+    MnvH1D* temp;
+
+    // Get All Background
+    temp = (MnvH1D*)f->Get("invMass_mc_reco_bckg");
+    temp->SetTitle("Background");
+    area_mc = area_mc + temp->Integral();
+    mc_hists->Add(temp);
+
+    // Get Signal
+    temp = (MnvH1D*)f->Get("invMass_mc_reco_signal");
+    temp->SetTitle("Signal");
+    area_mc = area_mc + temp->Integral();
+    mc_hists->Add(temp);
+
+    // ------------------------------------------------------------------------
+    // MC Normalization 
+    // ------------------------------------------------------------------------
+    double mc_ratio = area_data/area_mc;
+
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+    ApplyStyle(plotter);
+    plotter->axis_minimum = 0.0;
+    plotter->DrawDataStackedMC(data,mc_hists,mc_ratio,"TR","Data",2,1);
+   
+    TH1D* fit_result = (TH1D*)f->Get("data_fit_result");
+
+    // Plot Options
+    fit_result->SetLineColor(kBlue);
+    fit_result->SetLineWidth(3);
+    fit_result->SetFillStyle(0);
+
+    fit_result->Draw("SAME");
+
+    // Add Plot Labels
+    plotter->AddHistoTitle(data->GetTitle());
+    const double x_pos = 0.65;
+    const double y_pos = 0.7;
+    const double text_size = 0.03;
+    area_data = data->Integral();
+    area_mc = area_mc * mc_ratio;
+    double area_fit = fit_result->Integral();
+    plotter->AddPlotLabel(Form("Area(Data) = %3.2f",area_data), x_pos, y_pos, text_size, kBlue, 62, 1); 
+    plotter->AddPlotLabel(Form("Area(MC) = %3.2f",area_mc), x_pos, y_pos-text_size, text_size, kBlue, 62, 1); 
+    plotter->AddPlotLabel(Form("Area(Fit) = %3.2f",area_fit), x_pos, y_pos-(2*text_size), text_size, kBlue, 62, 1); 
+    
+    // Add Cut Arrows
+    CutArrow pi0invMass_min(60,"R"); 
+    CutArrow pi0invMass_max(200,"L"); 
+    AddCutArrow(plotter, pi0invMass_min, hist_max, bin_width);
+    AddCutArrow(plotter, pi0invMass_max, hist_max, bin_width);
+
+    // Add Pi0 InvMass Line
+    TLine pi0Mass;
+    pi0Mass.SetLineWidth(2);
+    pi0Mass.SetLineColor(kBlue);
+    pi0Mass.DrawLine(134.98,0,134.98,hist_max);
+
+
+    // Print Plot
+    std::string tag;
+    if(isMC) tag = "_MC";
+    else tag = "_Data";
+    c->Print(Form("%s%s%s%s",plotDir.c_str(),"Background_Subtraction",tag.c_str(),".png"), "png");
+
+    delete c;
+    delete plotter;
+}
+
+
 #endif
 
 

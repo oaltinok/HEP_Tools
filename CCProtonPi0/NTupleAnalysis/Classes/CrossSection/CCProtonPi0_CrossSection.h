@@ -99,14 +99,73 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         MnvH1D* pi0_P_mc_reco_bckg;
         MnvH2D* pi0_P_response;
         MnvH1D* pi0_P_eff;
-        
+ 
+        // --------------------------------------------------------------------
+        // Pi0 Kinetic Energy 
+        // --------------------------------------------------------------------
+        // Data
+        MnvH1D* pi0_KE_all;
+        MnvH1D* pi0_KE_bckg_subtracted;
+        MnvH1D* pi0_KE_bckg_estimated;
+        MnvH1D* pi0_KE_unfolded;
+        MnvH1D* pi0_KE_efficiency_corrected;
+        MnvH1D* pi0_KE_integrated_flux;
+        MnvH1D* pi0_KE_xsec;
+        // MC Truth
+        MnvH1D* pi0_KE_mc_truth_all_signal;
+        MnvH1D* pi0_KE_mc_truth_signal;
+        MnvH1D* pi0_KE_mc_reco_signal;
+        MnvH1D* pi0_KE_mc_reco_bckg;
+        MnvH2D* pi0_KE_response;
+        MnvH1D* pi0_KE_eff;
+ 
+        // --------------------------------------------------------------------
+        // Pi0 Theta 
+        // --------------------------------------------------------------------
+        // Data
+        MnvH1D* pi0_theta_all;
+        MnvH1D* pi0_theta_bckg_subtracted;
+        MnvH1D* pi0_theta_bckg_estimated;
+        MnvH1D* pi0_theta_unfolded;
+        MnvH1D* pi0_theta_efficiency_corrected;
+        MnvH1D* pi0_theta_integrated_flux;
+        MnvH1D* pi0_theta_xsec;
+        // MC Truth
+        MnvH1D* pi0_theta_mc_truth_all_signal;
+        MnvH1D* pi0_theta_mc_truth_signal;
+        MnvH1D* pi0_theta_mc_reco_signal;
+        MnvH1D* pi0_theta_mc_reco_bckg;
+        MnvH2D* pi0_theta_response;
+        MnvH1D* pi0_theta_eff;
+ 
+        // --------------------------------------------------------------------
+        // QSq 
+        // --------------------------------------------------------------------
+        // Data
+        MnvH1D* QSq_all;
+        MnvH1D* QSq_bckg_subtracted;
+        MnvH1D* QSq_bckg_estimated;
+        MnvH1D* QSq_unfolded;
+        MnvH1D* QSq_efficiency_corrected;
+        MnvH1D* QSq_integrated_flux;
+        MnvH1D* QSq_xsec;
+        // MC Truth
+        MnvH1D* QSq_mc_truth_all_signal;
+        MnvH1D* QSq_mc_truth_signal;
+        MnvH1D* QSq_mc_reco_signal;
+        MnvH1D* QSq_mc_reco_bckg;
+        MnvH2D* QSq_response;
+        MnvH1D* QSq_eff;
+     
         // ROOT Files    
         TFile* f_out;
         TFile* f_truth;
         TFile* f_data_cutHists;
+        TFile* f_data_interaction;
         TFile* f_data_muon;
         TFile* f_data_pi0;
         TFile* f_mc_cutHists;
+        TFile* f_mc_interaction;
         TFile* f_mc_muon;
         TFile* f_mc_pi0;
         
@@ -117,9 +176,15 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void Calc_CrossSection_muon_P();
         void Calc_CrossSection_muon_theta();
         void Calc_CrossSection_pi0_P();
+        void Calc_CrossSection_pi0_KE();
+        void Calc_CrossSection_pi0_theta();
+        void Calc_CrossSection_QSq();
         void Style_muon_P();
         void Style_muon_theta();
         void Style_pi0_P();
+        void Style_pi0_KE();
+        void Style_pi0_theta();
+        void Style_QSq();
         void Calc_Normalized_NBackground();
         void NormalizeHistogram(MnvH1D* h);
         double Integrate_SignalRegion(TH1D* h);

@@ -245,6 +245,15 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     AddVertErrorBand_Flux(pi0_P_mc_truth_all_signal);
     AddVertErrorBand_Genie(pi0_P_mc_truth_all_signal);
 
+    int nBins_pi0_KE = 17;
+    double min_pi0_KE = 0.0;
+    double max_pi0_KE = 1.7;
+    pi0_KE_mc_truth_all_signal = new MnvH1D( "pi0_KE_mc_truth_all_signal","Pi0 Kinetic Energy for Signal Events",nBins_pi0_KE, min_pi0_KE, max_pi0_KE);
+    pi0_KE_mc_truth_all_signal->GetXaxis()->SetTitle("Kinetic Energy [GeV]");
+    pi0_KE_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBand_Flux(pi0_KE_mc_truth_all_signal);
+    AddVertErrorBand_Genie(pi0_KE_mc_truth_all_signal);
+
     int nBins_pi0_theta = 18;
     double min_pi0_theta = 0.0;
     double max_pi0_theta = 180.0;
@@ -342,6 +351,7 @@ void CCProtonPi0_TruthAnalyzer::AddOtherErrorBands_FillWithCV()
     AddErrorBands_FillWithCV(muon_P_mc_truth_all_signal);
     AddErrorBands_FillWithCV(muon_theta_mc_truth_all_signal);
     AddErrorBands_FillWithCV(pi0_P_mc_truth_all_signal);
+    AddErrorBands_FillWithCV(pi0_KE_mc_truth_all_signal);
     AddErrorBands_FillWithCV(pi0_theta_mc_truth_all_signal);
     AddErrorBands_FillWithCV(neutrino_E_mc_truth_all_signal);
     AddErrorBands_FillWithCV(QSq_mc_truth_all_signal);
@@ -355,9 +365,13 @@ void CCProtonPi0_TruthAnalyzer::AddErrorBands_FillWithCV(MnvH1D* hist)
 void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
 {
     Calc_WeightFromSystematics();
+    const double M_pi0 = 134.98; // MeV
+    const double truth_pi0_KE = truth_pi0_4P[3] - M_pi0;
+
     FillHistogram(muon_P_mc_truth_all_signal, truth_muon_P * MeV_to_GeV);
     FillHistogram(muon_theta_mc_truth_all_signal, truth_muon_theta * rad_to_deg);
     FillHistogram(pi0_P_mc_truth_all_signal, truth_pi0_P * MeV_to_GeV);
+    FillHistogram(pi0_KE_mc_truth_all_signal, truth_pi0_KE * MeV_to_GeV);
     FillHistogram(pi0_theta_mc_truth_all_signal, truth_pi0_theta * rad_to_deg);
     FillHistogram(neutrino_E_mc_truth_all_signal, mc_incomingE * MeV_to_GeV);
     FillHistogram(QSq_mc_truth_all_signal, mc_Q2 * MeVSq_to_GeVSq);
@@ -370,6 +384,7 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     muon_P_mc_truth_all_signal->Write();
     muon_theta_mc_truth_all_signal->Write();
     pi0_P_mc_truth_all_signal->Write();
+    pi0_KE_mc_truth_all_signal->Write();
     pi0_theta_mc_truth_all_signal->Write();
     neutrino_E_mc_truth_all_signal->Write();
     QSq_mc_truth_all_signal->Write();

@@ -26,6 +26,9 @@ DefaultPlotFolder_List=(Muon
         OtherStudies)
 
 VariableList=(xsec_pi0_P
+        xsec_pi0_KE
+        xsec_pi0_theta
+        xsec_QSq
         xsec_muon_P
         xsec_muon_theta)
 

@@ -589,6 +589,7 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
     double muon_P;
     double muon_theta;
     double pi0_P;
+    double pi0_KE;
     double pi0_theta;
     double proton_P;
     double proton_theta;
@@ -619,6 +620,7 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
         }else if (particle_PDG == PDG::pi0){
             Pi0_ID = particle_ID; // Update Pi0_ID
             pi0_P = temp_4P.P();
+            pi0_KE = temp_4P.E()-MinervaUnits::M_pi0;
             pi0_theta = temp_4P.theta();
             pi0_4P[0] = temp_4P.px();  
             pi0_4P[1] = temp_4P.py(); 
@@ -644,6 +646,7 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
     truthEvent->setContainerDoubleData("proton_4P", proton_4P);
     truthEvent->setDoubleData("muon_P", muon_P);
     truthEvent->setDoubleData("pi0_P", pi0_P);
+    truthEvent->setDoubleData("pi0_KE", pi0_P);
     truthEvent->setDoubleData("proton_P", proton_P);
     truthEvent->setDoubleData("muon_theta", muon_theta);
     truthEvent->setDoubleData("pi0_theta", pi0_theta);

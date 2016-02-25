@@ -48,6 +48,9 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin kE;
         
         CCProtonPi0_SingleBin pi0_P;
+        CCProtonPi0_SingleBin pi0_KE;
+        CCProtonPi0_SingleBin pi0_theta;
+        CCProtonPi0_SingleBin QSq;
         // Analysis
         CCProtonPi0_SingleBin beamE;
         CCProtonPi0_SingleBin beamE_Diff_True;

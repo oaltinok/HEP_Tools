@@ -32,17 +32,21 @@ class CCProtonPi0_Particle : public CCProtonPi0_NTupleAnalysis
 
         TH2D* reco_P_true_P;
         TH1D* P_error;
+        TH1D* P_Diff;
 
         TH2D* reco_E_true_E;
+        TH1D* E_true;
+        TH1D* E_reco;
         TH1D* E_error;
         TH1D* E_Diff;
 
         // Bins for Histograms
         CCProtonPi0_BinList binList;
         CCProtonPi0_SingleBin bin_E;
-        CCProtonPi0_SingleBin bin_E_Diff;
         CCProtonPi0_SingleBin bin_P;
         CCProtonPi0_SingleBin bin_KE;
+        CCProtonPi0_SingleBin bin_E_Diff;
+        CCProtonPi0_SingleBin bin_P_Diff;
           
         // File Locations
         std::string rootDir;

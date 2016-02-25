@@ -55,8 +55,13 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> extra_rejected_energy_2Track;
         std::vector<MnvH1D*> extra_total_energy_2Track;
 
-        MnvH2D* response_neutrino_E;
-        MnvH2D* response_QSq;
+        // Muon Theta 
+        MnvH1D* QSq_all;
+        MnvH1D* QSq_mc_reco_all;
+        MnvH1D* QSq_mc_reco_signal;
+        MnvH1D* QSq_mc_reco_bckg;
+        MnvH1D* QSq_mc_truth_signal;
+        MnvH2D* QSq_response;
 
         // Vertex
         std::vector<MnvH1D*> vertex_z;
@@ -88,6 +93,11 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* h_original_Pi0_P;
         TH1D* h_recovered_Pi0_theta;
         TH1D* h_original_Pi0_theta;
+
+        // QSq Truth, Error, Difference
+        TH1D* QSq_True;
+        TH1D* QSq_Error;
+        TH1D* QSq_Diff;
 
         // Neutrino Energy: Truth, Error, Difference
         TH1D* Enu_True_1Track;

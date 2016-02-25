@@ -44,6 +44,10 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         TH2D* bckg_gamma1_convLength_gamma2_convLength;
         TH2D* bckg_signal_diff_convLength;
 
+        TH2D* signal_gamma1_E_gamma2_E;
+        TH2D* bckg_gamma1_E_gamma2_E;
+        TH2D* bckg_signal_diff_E;
+
         // Pi0 Momentum 
         MnvH1D* pi0_P_all;
         MnvH1D* pi0_P_mc_truth_signal;
@@ -52,10 +56,23 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         MnvH1D* pi0_P_mc_reco_bckg;
         MnvH2D* pi0_P_response;
 
-        TH2D* signal_gamma1_E_gamma2_E;
-        TH2D* bckg_gamma1_E_gamma2_E;
-        TH2D* bckg_signal_diff_E;
-       
+        // Pi0 Kinetic Energy 
+        MnvH1D* pi0_KE_all;
+        MnvH1D* pi0_KE_mc_truth_signal;
+        MnvH1D* pi0_KE_mc_reco_all;
+        MnvH1D* pi0_KE_mc_reco_signal;
+        MnvH1D* pi0_KE_mc_reco_bckg;
+        MnvH2D* pi0_KE_response;
+
+        // Pi0 Theta 
+        MnvH1D* pi0_theta_all;
+        MnvH1D* pi0_theta_mc_truth_signal;
+        MnvH1D* pi0_theta_mc_reco_all;
+        MnvH1D* pi0_theta_mc_reco_signal;
+        MnvH1D* pi0_theta_mc_reco_bckg;
+        MnvH2D* pi0_theta_response;
+
+               
         CCProtonPi0_Pion(bool isModeReduce, bool isMC);
         void initHistograms();
         void writeHistograms();
