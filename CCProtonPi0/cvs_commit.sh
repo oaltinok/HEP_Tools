@@ -1,22 +1,27 @@
-CCPROTONPI0_V="v2_62"
+CCPROTONPI0_V="v2_63"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Pi0 Energy Calculation Changed
-		Calorimetric Energy		
-			pi0_E_Cal =  E_g1 + E_g2
-		Relativistic Energy from Momentum
-			pi0_E = sqrt(P2 + m2)
+	Signal Definition Changed
+		Added min neutrino Energy = 2 GeV
+		Acceptance: No events having energy less than 2GeV
+
+	Fixed truth_pi0_KE variable
+		was writing pi0_P on it
+
+	Fixed Angles
+		was using angles wrt Beam
+		_theta and _phi are in Lab Frame
+		_theta_beam and _phi_beam are in Beam Frame
+
+	Collected Shower Recovery variables under new Study
+		Use StudyShowerRecovery in options file
 	
-	pi0_KE added to truth
+	Collected Unused Energy Truth Matching under new Study
+		Use StudyUnusedEnergy in options file
 
 -------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	New Cross Section Calculations	
-		Pi0 Kinetic Energy
-		Pi0 Theta
-		QSq
 
-	Analyzer & Plotter Improved for new cross section variables
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

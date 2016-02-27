@@ -27,8 +27,10 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC) : CCProtonPi0_P
         // Initialize Bins
         //binList.pi0_P.setBin(17, 0.0, 1.7);
         bin_P.setBin(17, 0.0, 1.7);
+        bin_KE.setBin(40, 0.0, 1.0);
         bin_E.setBin(40, 0.0, 1.0);
         bin_E_Diff.setBin(100, -0.5, 0.5);
+        bin_KE_Diff.setBin(100, -0.5, 0.5);
         bin_P_Diff.setBin(100, -0.5, 0.5);
         bin_invMass.setBin(28,60,200.0);
         bin_photonConvLength.setBin(50,0.0,100.0);
@@ -274,6 +276,7 @@ void CCProtonPi0_Pion::initHistograms()
     bckg_signal_diff_E->GetXaxis()->SetTitle("Reconstructed E_{#gamma_{1}} [MeV]");
     bckg_signal_diff_E->GetYaxis()->SetTitle("Reconstructed E_{#gamma_{2}} [MeV]");
  
+    // Truth Momentum
     reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed #pi^{0} Momentum",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max(), binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
     reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
     reco_P_true_P->GetYaxis()->SetTitle("True P_{#pi^{0}} [GeV]");
@@ -286,6 +289,7 @@ void CCProtonPi0_Pion::initHistograms()
     P_Diff->GetXaxis()->SetTitle("P_{Reco}-P_{True} [GeV]" );
     P_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_P_Diff.get_width()));
 
+    // Truth Energy
     reco_E_true_E = new TH2D( "reco_E_true_E","True vs Reconstructed #pi^{0} Energy",bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max(), bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max());
     reco_E_true_E->GetXaxis()->SetTitle("Reconstructed E_{#pi^{0}} [GeV]");
     reco_E_true_E->GetYaxis()->SetTitle("True E_{#pi^{0}} [GeV]");
@@ -305,6 +309,28 @@ void CCProtonPi0_Pion::initHistograms()
     E_Diff = new TH1D( "E_Diff","Difference on #pi^{0} Energy",bin_E_Diff.get_nBins(), bin_E_Diff.get_min(), bin_E_Diff.get_max() );
     E_Diff->GetXaxis()->SetTitle("E_{Reco}-E_{True} [GeV]");
     E_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_E_Diff.get_width()));
+
+    // Truth Kinetic Energy
+    reco_KE_true_KE = new TH2D( "reco_KE_true_KE","True vs Reconstructed #pi^{0} Kinetic Energy",bin_KE.get_nBins(), bin_KE.get_min(), bin_KE.get_max(), bin_KE.get_nBins(), bin_KE.get_min(), bin_KE.get_max());
+    reco_KE_true_KE->GetXaxis()->SetTitle("Reconstructed KE_{#pi^{0}} [GeV]");
+    reco_KE_true_KE->GetYaxis()->SetTitle("True KE_{#pi^{0}} [GeV]");
+
+    KE_true = new TH1D( "KE_true","#pi^{0} True Kinetic Energy",bin_KE.get_nBins(), bin_KE.get_min(), bin_KE.get_max() );
+    KE_true->GetXaxis()->SetTitle("KE_{True} [GeV]");
+    KE_true->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_KE.get_width()));
+
+    KE_reco = new TH1D( "KE_reco","#pi^{0} Reconstructed Kinetic Energy",bin_KE.get_nBins(), bin_KE.get_min(), bin_KE.get_max() );
+    KE_reco->GetXaxis()->SetTitle("KE_{Reco} [GeV]");
+    KE_reco->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_KE.get_width()));
+
+    KE_error = new TH1D( "KE_error","Error on #pi^{0} Kinetic Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    KE_error->GetXaxis()->SetTitle("(KE_{Reco}-KE_{True})/KE_{True}");
+    KE_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+
+    KE_Diff = new TH1D( "KE_Diff","Difference on #pi^{0} Kinetic Energy",bin_KE_Diff.get_nBins(), bin_KE_Diff.get_min(), bin_KE_Diff.get_max() );
+    KE_Diff->GetXaxis()->SetTitle("KE_{Reco}-KE_{True} [GeV]");
+    KE_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_KE_Diff.get_width()));
+
 }
 
 void CCProtonPi0_Pion::writeHistograms()
@@ -391,6 +417,13 @@ void CCProtonPi0_Pion::writeHistograms()
     E_reco->Write();
     E_error->Write();
     E_Diff->Write();
+
+    reco_KE_true_KE->Write();
+    KE_true->Write();
+    KE_reco->Write();
+    KE_error->Write();
+    KE_Diff->Write();
+
 
     f->Close();
 }

@@ -225,6 +225,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
 
         // Optional Studies
         bool m_study_shower_energy;
+        bool m_study_shower_recovery;
+        bool m_study_unused_energy;
 
         // Prong and Cluster Colors
         int m_Color_muonProng;

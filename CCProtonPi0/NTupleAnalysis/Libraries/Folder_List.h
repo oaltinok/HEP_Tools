@@ -31,6 +31,7 @@ namespace Folder_List
     const std::string Data = "Data/";
     const std::string ParticleCannon = "ParticleCannon/";
     const std::string Flux = "Flux/";
+    const std::string GENIEXSec = "GENIEXSec/";
     
     const std::string analyzed = "Analyzed/";
     const std::string reduced = "Reduced/"; 
@@ -65,6 +66,7 @@ namespace Folder_List
     // Set Flux File ROOT Dir
     const std::string rootDir_Flux_new = rootOut + Flux + "fhc_flux_constrained.root";
     const std::string rootDir_Flux_old = rootOut + Flux + "eroica-mipp-off-flux-nuint-minerva1-minerva13C.root";
+    const std::string rootDir_GENIEXSec = rootOut + GENIEXSec + "GENIEXSec.root";
     
     // Set MC Root Dir;
     const std::string rootDir_CrossSection_mc = rootOut + MC + analyzed + "CrossSection.root";

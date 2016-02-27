@@ -64,6 +64,8 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
 
     // Optional Studies
     declareProperty("StudyShowerEnergy", m_study_shower_energy = false);
+    declareProperty("StudyShowerRecovery", m_study_shower_recovery = false);
+    declareProperty("StudyUnusedEnergy", m_study_unused_energy = false);
 
     //--------------------------------------------------------------------------
     // Arachne Colors
@@ -288,67 +290,6 @@ StatusCode CCProtonPi0::initialize()
 
     // Background Branching - For Each Background Type
     declareBoolTruthBranch("isBckg_withMichel");
-
-    // ------------------------------------------------------------------------       
-    // Unused Clusters Visible Energy
-    // ------------------------------------------------------------------------       
-    // ECAL -- Filled in PreFilterPi0()
-    declareDoubleTruthBranch("ecal_unused_evis_total_norm", -1.0);
-    declareDoubleTruthBranch("ecal_unused_evis_total_truth", -1.0);
-    declareDoubleTruthBranch("ecal_unused_evis_pizero", -1.0);
-    declareDoubleTruthBranch("ecal_unused_evis_piplus", -1.0);
-    declareDoubleTruthBranch("ecal_unused_evis_piminus", -1.0);
-    declareDoubleTruthBranch("ecal_unused_evis_muon", -1.0);
-    declareDoubleTruthBranch("ecal_unused_evis_proton", -1.0);
-    declareDoubleTruthBranch("ecal_unused_evis_neutron", -1.0);
-    // HCAL -- Filled in PreFilterPi0()
-    declareDoubleTruthBranch("hcal_unused_evis_total_norm", -1.0);
-    declareDoubleTruthBranch("hcal_unused_evis_total_truth", -1.0);
-    declareDoubleTruthBranch("hcal_unused_evis_pizero", -1.0);
-    declareDoubleTruthBranch("hcal_unused_evis_piplus", -1.0);
-    declareDoubleTruthBranch("hcal_unused_evis_piminus", -1.0);
-    declareDoubleTruthBranch("hcal_unused_evis_muon", -1.0);
-    declareDoubleTruthBranch("hcal_unused_evis_proton", -1.0);
-    declareDoubleTruthBranch("hcal_unused_evis_neutron", -1.0);
-    // Tracker + ECAL + HCAL -- Filled in PreFilterPi0()
-    declareDoubleTruthBranch("other_unused_evis_total_norm", -1.0);
-    declareDoubleTruthBranch("other_unused_evis_total_truth", -1.0);
-    declareDoubleTruthBranch("other_unused_evis_pizero", -1.0);
-    declareDoubleTruthBranch("other_unused_evis_piplus", -1.0);
-    declareDoubleTruthBranch("other_unused_evis_piminus", -1.0);
-    declareDoubleTruthBranch("other_unused_evis_muon", -1.0);
-    declareDoubleTruthBranch("other_unused_evis_proton", -1.0);
-    declareDoubleTruthBranch("other_unused_evis_neutron", -1.0);
-
-    // Near Vertex -- Filled in VertexBlob()
-    declareIntTruthBranch("vertex_unused_evis_most_pdg", -1);
-    declareDoubleTruthBranch("vertex_unused_evis_total_norm", -1.0);
-    declareDoubleTruthBranch("vertex_unused_evis_total_truth", -1.0);
-    declareDoubleTruthBranch("vertex_unused_evis_pizero", -1.0);
-    declareDoubleTruthBranch("vertex_unused_evis_piplus", -1.0);
-    declareDoubleTruthBranch("vertex_unused_evis_piminus", -1.0);
-    declareDoubleTruthBranch("vertex_unused_evis_muon", -1.0);
-    declareDoubleTruthBranch("vertex_unused_evis_proton", -1.0);
-    declareDoubleTruthBranch("vertex_unused_evis_neutron", -1.0);
-    declareDoubleTruthBranch("vertex_unused_evis_gamma", -1.0);
-
-    // Rejected -- Filled in ConeBlobs()
-    declareIntTruthBranch("Rejected_unused_evis_most_pdg", -1);
-    declareDoubleTruthBranch("Rejected_unused_evis_total_norm", -1.0);
-    declareDoubleTruthBranch("Rejected_unused_evis_total_truth", -1.0);
-
-    // Dispersed Clusters -- Filled in DispersedBlob(), After Pi0 Reconstruction
-    declareIntTruthBranch("dispersed_unused_evis_most_pdg", -1);
-    declareDoubleTruthBranch("dispersed_unused_evis_total_norm", -1.0);
-    declareDoubleTruthBranch("dispersed_unused_evis_total_truth", -1.0);
-    declareDoubleTruthBranch("dispersed_unused_evis_pizero", -1.0);
-    declareDoubleTruthBranch("dispersed_unused_evis_piplus", -1.0);
-    declareDoubleTruthBranch("dispersed_unused_evis_piminus", -1.0);
-    declareDoubleTruthBranch("dispersed_unused_evis_muon", -1.0);
-    declareDoubleTruthBranch("dispersed_unused_evis_proton", -1.0);
-    declareDoubleTruthBranch("dispersed_unused_evis_neutron", -1.0);
-    declareDoubleTruthBranch("dispersed_unused_evis_gamma", -1.0);
-
     // Truth Match for Found Pi0 Blobs
     declareIntTruthBranch("blob1_evis_most_pdg", -1);
     declareDoubleTruthBranch("blob1_evis_total_norm", -1); 
@@ -415,14 +356,13 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch( "michelProng_end_Z", -1.0);
     declareDoubleEventBranch( "michelProng_begin_Z", -1.0);
 
-    // Number of Proton Candidates
-
     // Discard Far Tracks  - Update nTracks
     declareIntEventBranch("nTracks", -1);
     declareIntEventBranch("nTracks_Close",-1);
     declareIntEventBranch("nTracks_Far",-1);
     declareIntEventBranch("nTracks_Discarded",-1);
     declareContainerIntEventBranch("nTracks_Secondary_Vtx");
+    
     // PreFilterPi0()
     declareIntEventBranch("preFilter_Result", -1);
     declareDoubleEventBranch("preFilter_rejectedEnergy", -1.0);
@@ -452,61 +392,6 @@ StatusCode CCProtonPi0::initialize()
     declareBoolEventBranch("is_blobs_recovered_search_view_V");
 
     // ConeBlobs() -- Recovered Showers
-    declareIntEventBranch("OneShower_nClusters", -1);
-    declareDoubleEventBranch("OneShower_energy", SENTINEL);
-    declareDoubleEventBranch("OneShower_theta", SENTINEL);
-    declareDoubleEventBranch("OneShower_dist_vtx", SENTINEL);
-    declareIntTruthBranch("OneShower_evis_most_pdg", -1);
-    declareDoubleTruthBranch("OneShower_evis_total_norm", SENTINEL);
-    declareDoubleTruthBranch("OneShower_evis_total_truth", SENTINEL);
-    declareDoubleTruthBranch("OneShower_evis_pizero", SENTINEL);
-    declareDoubleTruthBranch("OneShower_evis_piplus", SENTINEL);
-    declareDoubleTruthBranch("OneShower_evis_piminus", SENTINEL);
-    declareDoubleTruthBranch("OneShower_evis_muon", SENTINEL);
-    declareDoubleTruthBranch("OneShower_evis_proton", SENTINEL);
-    declareDoubleTruthBranch("OneShower_evis_neutron", SENTINEL);
-
-    declareIntEventBranch("ThreeShower_s1_nClusters", -1);
-    declareDoubleEventBranch("ThreeShower_s1_energy", SENTINEL);
-    declareDoubleEventBranch("ThreeShower_s1_theta", SENTINEL);
-    declareDoubleEventBranch("ThreeShower_s1_dist_vtx", SENTINEL);
-    declareIntTruthBranch("ThreeShower_s1_evis_most_pdg", -1);
-    declareDoubleTruthBranch("ThreeShower_s1_evis_total_norm", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s1_evis_total_truth", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s1_evis_pizero", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s1_evis_piplus", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s1_evis_piminus", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s1_evis_muon", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s1_evis_proton", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s1_evis_neutron", SENTINEL);
-
-    declareIntEventBranch("ThreeShower_s2_nClusters", -1);
-    declareDoubleEventBranch("ThreeShower_s2_energy", SENTINEL);
-    declareDoubleEventBranch("ThreeShower_s2_theta", SENTINEL);
-    declareDoubleEventBranch("ThreeShower_s2_dist_vtx", SENTINEL);
-    declareIntTruthBranch("ThreeShower_s2_evis_most_pdg", -1);
-    declareDoubleTruthBranch("ThreeShower_s2_evis_total_norm", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s2_evis_total_truth", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s2_evis_pizero", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s2_evis_piplus", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s2_evis_piminus", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s2_evis_muon", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s2_evis_proton", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s2_evis_neutron", SENTINEL);
-
-    declareIntEventBranch("ThreeShower_s3_nClusters", -1);
-    declareDoubleEventBranch("ThreeShower_s3_energy", SENTINEL);
-    declareDoubleEventBranch("ThreeShower_s3_theta", SENTINEL);
-    declareDoubleEventBranch("ThreeShower_s3_dist_vtx", SENTINEL);
-    declareIntTruthBranch("ThreeShower_s3_evis_most_pdg", -1);
-    declareDoubleTruthBranch("ThreeShower_s3_evis_total_norm", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s3_evis_total_truth", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s3_evis_pizero", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s3_evis_piplus", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s3_evis_piminus", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s3_evis_muon", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s3_evis_proton", SENTINEL);
-    declareDoubleTruthBranch("ThreeShower_s3_evis_neutron", SENTINEL);
 
     // processBlobs() -- Called from ConeBlobs()
     declareIntEventBranch("g1blob_1ParFit_ndof", -1);
@@ -599,7 +484,9 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("muon_py", 0.0);
     declareDoubleEventBranch("muon_pz", 0.0);  
     declareDoubleEventBranch("muon_phi", 0.0);
+    declareDoubleEventBranch("muon_phi_beam", 0.0);
     declareDoubleEventBranch("muon_theta", 0.0);
+    declareDoubleEventBranch("muon_theta_beam", 0.0);
     declareDoubleEventBranch("muon_theta_biasUp", 0.0);
     declareDoubleEventBranch("muon_theta_biasDown", 0.0); 
     declareDoubleEventBranch("muon_muScore", -1.0);
@@ -623,9 +510,9 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleEventBranch("all_protons_LLRScore", 10,  SENTINEL);
     declareContainerDoubleEventBranch("all_protons_chi2_ndf", 10, SENTINEL);
     declareContainerDoubleEventBranch("all_protons_theta", 10,  SENTINEL);
-    declareContainerDoubleEventBranch("all_protons_thetaX", 10, SENTINEL);
-    declareContainerDoubleEventBranch("all_protons_thetaY", 10, SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_theta_beam", 10,  SENTINEL);
     declareContainerDoubleEventBranch("all_protons_phi", 10,SENTINEL);
+    declareContainerDoubleEventBranch("all_protons_phi_beam", 10,SENTINEL);
     declareContainerDoubleEventBranch("all_protons_KE", 10,SENTINEL);
     declareContainerDoubleEventBranch("all_protons_E", 10,SENTINEL);
     declareContainerDoubleEventBranch("all_protons_P", 10,SENTINEL);
@@ -642,11 +529,11 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("proton_pz",SENTINEL);
     declareDoubleEventBranch("proton_E",SENTINEL);
     declareDoubleEventBranch("proton_P",SENTINEL);
-    declareDoubleEventBranch("proton_theta", SENTINEL);
     declareDoubleEventBranch("proton_KE", SENTINEL);
+    declareDoubleEventBranch("proton_theta", SENTINEL);
+    declareDoubleEventBranch("proton_theta_beam", SENTINEL);
     declareDoubleEventBranch("proton_phi", SENTINEL);
-    declareDoubleEventBranch("proton_thetaX", SENTINEL);
-    declareDoubleEventBranch("proton_thetaY", SENTINEL);
+    declareDoubleEventBranch("proton_phi_beam", SENTINEL);
     declareDoubleEventBranch("proton_length", SENTINEL);
     declareDoubleEventBranch("proton_protonScore", SENTINEL);
     declareDoubleEventBranch("proton_pionScore", SENTINEL);
@@ -665,9 +552,9 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("pi0_invMass", SENTINEL);
     declareDoubleEventBranch("pi0_invMass_Old", SENTINEL);
     declareDoubleEventBranch("pi0_theta", SENTINEL);
+    declareDoubleEventBranch("pi0_theta_beam", SENTINEL);
     declareDoubleEventBranch("pi0_phi",   SENTINEL);
-    declareDoubleEventBranch("pi0_thetaX", SENTINEL);
-    declareDoubleEventBranch("pi0_thetaY",   SENTINEL);
+    declareDoubleEventBranch("pi0_phi_beam",   SENTINEL);
     declareDoubleEventBranch("pi0_openingAngle",  SENTINEL);
     declareDoubleEventBranch("pi0_cos_openingAngle", SENTINEL);
 
@@ -678,7 +565,9 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("gamma1_E_Old",SENTINEL);
     declareDoubleEventBranch("gamma1_P",SENTINEL);
     declareDoubleEventBranch("gamma1_theta",SENTINEL);
+    declareDoubleEventBranch("gamma1_theta_beam",SENTINEL);
     declareDoubleEventBranch("gamma1_phi",SENTINEL);
+    declareDoubleEventBranch("gamma1_phi_beam",SENTINEL);
     declareDoubleEventBranch("gamma1_dEdx",SENTINEL);
     declareDoubleEventBranch("gamma1_time",SENTINEL);
     declareDoubleEventBranch("gamma1_dist_vtx",SENTINEL);
@@ -702,7 +591,9 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("gamma2_E_Old",SENTINEL);
     declareDoubleEventBranch("gamma2_P",SENTINEL);
     declareDoubleEventBranch("gamma2_theta",SENTINEL);
+    declareDoubleEventBranch("gamma2_theta_beam",SENTINEL);
     declareDoubleEventBranch("gamma2_phi",SENTINEL);
+    declareDoubleEventBranch("gamma2_phi_beam",SENTINEL);
     declareDoubleEventBranch("gamma2_dEdx",SENTINEL);
     declareDoubleEventBranch("gamma2_time",SENTINEL);
     declareDoubleEventBranch("gamma2_dist_vtx",SENTINEL);
@@ -770,6 +661,126 @@ StatusCode CCProtonPi0::initialize()
     // ------------------------------------------------------------------------
     // OPTIONAL STUDY BRANCHES
     // ------------------------------------------------------------------------
+    if (m_study_unused_energy){
+        // ------------------------------------------------------------------------       
+        // Unused Clusters Visible Energy
+        // ------------------------------------------------------------------------       
+        // ECAL -- Filled in PreFilterPi0()
+        declareDoubleTruthBranch("ecal_unused_evis_total_norm", -1.0);
+        declareDoubleTruthBranch("ecal_unused_evis_total_truth", -1.0);
+        declareDoubleTruthBranch("ecal_unused_evis_pizero", -1.0);
+        declareDoubleTruthBranch("ecal_unused_evis_piplus", -1.0);
+        declareDoubleTruthBranch("ecal_unused_evis_piminus", -1.0);
+        declareDoubleTruthBranch("ecal_unused_evis_muon", -1.0);
+        declareDoubleTruthBranch("ecal_unused_evis_proton", -1.0);
+        declareDoubleTruthBranch("ecal_unused_evis_neutron", -1.0);
+        // HCAL -- Filled in PreFilterPi0()
+        declareDoubleTruthBranch("hcal_unused_evis_total_norm", -1.0);
+        declareDoubleTruthBranch("hcal_unused_evis_total_truth", -1.0);
+        declareDoubleTruthBranch("hcal_unused_evis_pizero", -1.0);
+        declareDoubleTruthBranch("hcal_unused_evis_piplus", -1.0);
+        declareDoubleTruthBranch("hcal_unused_evis_piminus", -1.0);
+        declareDoubleTruthBranch("hcal_unused_evis_muon", -1.0);
+        declareDoubleTruthBranch("hcal_unused_evis_proton", -1.0);
+        declareDoubleTruthBranch("hcal_unused_evis_neutron", -1.0);
+        // Tracker + ECAL + HCAL -- Filled in PreFilterPi0()
+        declareDoubleTruthBranch("other_unused_evis_total_norm", -1.0);
+        declareDoubleTruthBranch("other_unused_evis_total_truth", -1.0);
+        declareDoubleTruthBranch("other_unused_evis_pizero", -1.0);
+        declareDoubleTruthBranch("other_unused_evis_piplus", -1.0);
+        declareDoubleTruthBranch("other_unused_evis_piminus", -1.0);
+        declareDoubleTruthBranch("other_unused_evis_muon", -1.0);
+        declareDoubleTruthBranch("other_unused_evis_proton", -1.0);
+        declareDoubleTruthBranch("other_unused_evis_neutron", -1.0);
+
+        // Near Vertex -- Filled in VertexBlob()
+        declareIntTruthBranch("vertex_unused_evis_most_pdg", -1);
+        declareDoubleTruthBranch("vertex_unused_evis_total_norm", -1.0);
+        declareDoubleTruthBranch("vertex_unused_evis_total_truth", -1.0);
+        declareDoubleTruthBranch("vertex_unused_evis_pizero", -1.0);
+        declareDoubleTruthBranch("vertex_unused_evis_piplus", -1.0);
+        declareDoubleTruthBranch("vertex_unused_evis_piminus", -1.0);
+        declareDoubleTruthBranch("vertex_unused_evis_muon", -1.0);
+        declareDoubleTruthBranch("vertex_unused_evis_proton", -1.0);
+        declareDoubleTruthBranch("vertex_unused_evis_neutron", -1.0);
+        declareDoubleTruthBranch("vertex_unused_evis_gamma", -1.0);
+
+        // Rejected -- Filled in ConeBlobs()
+        declareIntTruthBranch("Rejected_unused_evis_most_pdg", -1);
+        declareDoubleTruthBranch("Rejected_unused_evis_total_norm", -1.0);
+        declareDoubleTruthBranch("Rejected_unused_evis_total_truth", -1.0);
+
+        // Dispersed Clusters -- Filled in DispersedBlob(), After Pi0 Reconstruction
+        declareIntTruthBranch("dispersed_unused_evis_most_pdg", -1);
+        declareDoubleTruthBranch("dispersed_unused_evis_total_norm", -1.0);
+        declareDoubleTruthBranch("dispersed_unused_evis_total_truth", -1.0);
+        declareDoubleTruthBranch("dispersed_unused_evis_pizero", -1.0);
+        declareDoubleTruthBranch("dispersed_unused_evis_piplus", -1.0);
+        declareDoubleTruthBranch("dispersed_unused_evis_piminus", -1.0);
+        declareDoubleTruthBranch("dispersed_unused_evis_muon", -1.0);
+        declareDoubleTruthBranch("dispersed_unused_evis_proton", -1.0);
+        declareDoubleTruthBranch("dispersed_unused_evis_neutron", -1.0);
+        declareDoubleTruthBranch("dispersed_unused_evis_gamma", -1.0);
+    }
+
+    if (m_study_shower_recovery){
+        declareIntEventBranch("OneShower_nClusters", -1);
+        declareDoubleEventBranch("OneShower_energy", SENTINEL);
+        declareDoubleEventBranch("OneShower_theta", SENTINEL);
+        declareDoubleEventBranch("OneShower_dist_vtx", SENTINEL);
+        declareIntTruthBranch("OneShower_evis_most_pdg", -1);
+        declareDoubleTruthBranch("OneShower_evis_total_norm", SENTINEL);
+        declareDoubleTruthBranch("OneShower_evis_total_truth", SENTINEL);
+        declareDoubleTruthBranch("OneShower_evis_pizero", SENTINEL);
+        declareDoubleTruthBranch("OneShower_evis_piplus", SENTINEL);
+        declareDoubleTruthBranch("OneShower_evis_piminus", SENTINEL);
+        declareDoubleTruthBranch("OneShower_evis_muon", SENTINEL);
+        declareDoubleTruthBranch("OneShower_evis_proton", SENTINEL);
+        declareDoubleTruthBranch("OneShower_evis_neutron", SENTINEL);
+
+        declareIntEventBranch("ThreeShower_s1_nClusters", -1);
+        declareDoubleEventBranch("ThreeShower_s1_energy", SENTINEL);
+        declareDoubleEventBranch("ThreeShower_s1_theta", SENTINEL);
+        declareDoubleEventBranch("ThreeShower_s1_dist_vtx", SENTINEL);
+        declareIntTruthBranch("ThreeShower_s1_evis_most_pdg", -1);
+        declareDoubleTruthBranch("ThreeShower_s1_evis_total_norm", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s1_evis_total_truth", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s1_evis_pizero", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s1_evis_piplus", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s1_evis_piminus", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s1_evis_muon", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s1_evis_proton", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s1_evis_neutron", SENTINEL);
+
+        declareIntEventBranch("ThreeShower_s2_nClusters", -1);
+        declareDoubleEventBranch("ThreeShower_s2_energy", SENTINEL);
+        declareDoubleEventBranch("ThreeShower_s2_theta", SENTINEL);
+        declareDoubleEventBranch("ThreeShower_s2_dist_vtx", SENTINEL);
+        declareIntTruthBranch("ThreeShower_s2_evis_most_pdg", -1);
+        declareDoubleTruthBranch("ThreeShower_s2_evis_total_norm", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s2_evis_total_truth", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s2_evis_pizero", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s2_evis_piplus", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s2_evis_piminus", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s2_evis_muon", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s2_evis_proton", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s2_evis_neutron", SENTINEL);
+
+        declareIntEventBranch("ThreeShower_s3_nClusters", -1);
+        declareDoubleEventBranch("ThreeShower_s3_energy", SENTINEL);
+        declareDoubleEventBranch("ThreeShower_s3_theta", SENTINEL);
+        declareDoubleEventBranch("ThreeShower_s3_dist_vtx", SENTINEL);
+        declareIntTruthBranch("ThreeShower_s3_evis_most_pdg", -1);
+        declareDoubleTruthBranch("ThreeShower_s3_evis_total_norm", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s3_evis_total_truth", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s3_evis_pizero", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s3_evis_piplus", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s3_evis_piminus", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s3_evis_muon", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s3_evis_proton", SENTINEL);
+        declareDoubleTruthBranch("ThreeShower_s3_evis_neutron", SENTINEL);
+    }
+    
     if (m_study_shower_energy){
         // Blob Digit Energy -- Filled in SaveBlobDigitEnergy 
         declareContainerDoubleEventBranch("gamma1_blob_all_digit_E");
@@ -1458,10 +1469,12 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     double muon_E     = muon_4p.E();
     double muon_p     = muon_4p.P();
     double muon_KE    = muon_4p.E() - MinervaUnits::M_mu; 
-    double muon_phi = m_coordSysTool->phiWRTBeam(muon_4p);
-    double muon_theta = m_coordSysTool->thetaWRTBeam(muon_4p);
-    double muon_theta_biasUp = m_coordSysTool->thetaWRTBeam(muon_4p,m_beamAngleBias) - muon_theta;
-    double muon_theta_biasDown = m_coordSysTool->thetaWRTBeam(muon_4p, -1.0*m_beamAngleBias) - muon_theta;
+    double muon_phi = muon_4p.phi();
+    double muon_theta = muon_4p.theta();
+    double muon_phi_beam = m_coordSysTool->phiWRTBeam(muon_4p);
+    double muon_theta_beam = m_coordSysTool->thetaWRTBeam(muon_4p);
+    double muon_theta_biasUp = m_coordSysTool->thetaWRTBeam(muon_4p,m_beamAngleBias) - muon_theta_beam;
+    double muon_theta_biasDown = m_coordSysTool->thetaWRTBeam(muon_4p, -1.0*m_beamAngleBias) - muon_theta_beam;
 
     // Muon Score
     double muon_muScore = m_MuonParticle->score();
@@ -1526,7 +1539,9 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("muon_P",muon_p);
     event->setDoubleData("muon_KE",muon_KE);
     event->setDoubleData("muon_phi",muon_phi);
+    event->setDoubleData("muon_phi_beam",muon_phi_beam);
     event->setDoubleData("muon_theta",muon_theta);
+    event->setDoubleData("muon_theta_beam",muon_theta_beam);
     event->setDoubleData("muon_theta_biasUp",muon_theta_biasUp);
     event->setDoubleData("muon_theta_biasDown",muon_theta_biasDown);
     event->setDoubleData("muon_muScore", muon_muScore);
@@ -1889,9 +1904,9 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
     std::vector<double> p_dedx(10,SENTINEL);
 
     std::vector<double> proton_theta(10,SENTINEL);
-    std::vector<double> proton_thetaX(10,SENTINEL);
-    std::vector<double> proton_thetaY(10,SENTINEL);
+    std::vector<double> proton_theta_beam(10,SENTINEL);
     std::vector<double> proton_phi(10,SENTINEL);
+    std::vector<double> proton_phi_beam(10,SENTINEL);
 
     std::vector<double> E(10,SENTINEL);
     std::vector<double> px(10,SENTINEL);
@@ -1940,10 +1955,10 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
         double theta = prong->minervaTracks().front()->theta();
         double phi   = prong->minervaTracks().front()->phi();
 
-        proton_theta[i]  = m_coordSysTool->thetaWRTBeam(particle->momentumVec());
-        proton_thetaX[i] = m_coordSysTool->thetaXWRTBeam(particle->momentumVec());
-        proton_thetaY[i] = m_coordSysTool->thetaYWRTBeam(particle->momentumVec());
-        proton_phi[i]    = m_coordSysTool->phiWRTBeam(particle->momentumVec());
+        proton_theta[i] = theta;
+        proton_phi[i] = phi;
+        proton_theta_beam[i]  = m_coordSysTool->thetaWRTBeam(particle->momentumVec());
+        proton_phi_beam[i]    = m_coordSysTool->phiWRTBeam(particle->momentumVec());
 
         Gaudi::LorentzVector dEdXprotonfourVec;
         StatusCode sc = m_energyCorrectionTool->getCorrectedEnergy(prong,particle,vertexZ,dEdXprotonfourVec);
@@ -2038,9 +2053,9 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
     event->setContainerDoubleData("all_protons_LLRScore",protonScoreLLR);
     event->setContainerDoubleData("all_protons_chi2_ndf",chi2);
     event->setContainerDoubleData("all_protons_theta",proton_theta);
-    event->setContainerDoubleData("all_protons_thetaX",proton_thetaX);
-    event->setContainerDoubleData("all_protons_thetaY",proton_thetaY);
+    event->setContainerDoubleData("all_protons_theta_beam",proton_theta_beam);
     event->setContainerDoubleData("all_protons_phi",proton_phi);
+    event->setContainerDoubleData("all_protons_phi_beam",proton_phi_beam);
 
     event->setDoubleData("proton_px",px[leadingProtonIndice]);
     event->setDoubleData("proton_py",py[leadingProtonIndice]);
@@ -2049,7 +2064,9 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("proton_P",p[leadingProtonIndice]);
     event->setDoubleData("proton_KE",ekin[leadingProtonIndice]);
     event->setDoubleData("proton_theta",proton_theta[leadingProtonIndice]);
+    event->setDoubleData("proton_theta_beam",proton_theta_beam[leadingProtonIndice]);
     event->setDoubleData("proton_phi",proton_phi[leadingProtonIndice]);
+    event->setDoubleData("proton_phi_beam",proton_phi_beam[leadingProtonIndice]);
     event->setDoubleData("proton_length", length[leadingProtonIndice]);
     event->setDoubleData("proton_protonScore", protonScore[leadingProtonIndice]);
     event->setDoubleData("proton_pionScore", pionScore[leadingProtonIndice]);
@@ -2263,12 +2280,20 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
     if ( isnan(pi0_4P.P()) ) return false;
 
     // Get Angles wrt Beam Coordinates
-    double pi0_theta = m_coordSysTool->thetaWRTBeam(pi0_4P);
-    double pi0_phi = m_coordSysTool->phiWRTBeam(pi0_4P);
-    double gamma1_theta = m_coordSysTool->thetaWRTBeam(gamma1_4P);
-    double gamma1_phi = m_coordSysTool->phiWRTBeam(gamma1_4P);
-    double gamma2_theta = m_coordSysTool->thetaWRTBeam(gamma2_4P);
-    double gamma2_phi = m_coordSysTool->phiWRTBeam(gamma2_4P);
+    double pi0_theta_beam = m_coordSysTool->thetaWRTBeam(pi0_4P);
+    double pi0_phi_beam = m_coordSysTool->phiWRTBeam(pi0_4P);
+    double gamma1_theta_beam = m_coordSysTool->thetaWRTBeam(gamma1_4P);
+    double gamma1_phi_beam = m_coordSysTool->phiWRTBeam(gamma1_4P);
+    double gamma2_theta_beam = m_coordSysTool->thetaWRTBeam(gamma2_4P);
+    double gamma2_phi_beam = m_coordSysTool->phiWRTBeam(gamma2_4P);
+
+    // Get Angles wrt Lab Coordinates
+    double pi0_theta = pi0_4P.theta();
+    double pi0_phi = pi0_4P.phi(); 
+    double gamma1_theta = gamma1_4P.theta();
+    double gamma1_phi = gamma1_4P.phi();
+    double gamma2_theta = gamma2_4P.theta();
+    double gamma2_phi = gamma2_4P.phi();
 
     // Calculate Opening Angle
     const double openingAngle       = (g1mom.Angle(g2mom))*TMath::RadToDeg();
@@ -2301,10 +2326,10 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("pi0_E_Cal", pi0_E_Cal);
     event->setDoubleData("pi0_P", pi0_P);
     event->setDoubleData("pi0_KE", pi0_KE);
+    event->setDoubleData("pi0_theta_beam", pi0_theta_beam);
+    event->setDoubleData("pi0_phi_beam", pi0_phi_beam);
     event->setDoubleData("pi0_theta", pi0_theta);
     event->setDoubleData("pi0_phi", pi0_phi);
-    event->setDoubleData("pi0_thetaX", std::atan2(pimom.X(),pimom.Z())*TMath::RadToDeg());
-    event->setDoubleData("pi0_thetaY", std::atan2(pimom.Y(),pimom.Z())*TMath::RadToDeg());
 
     // Gamma1 Information
     event->setDoubleData("gamma1_px",g1mom.Px());
@@ -2313,6 +2338,8 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("gamma1_E", g1energy);
     event->setDoubleData("gamma1_E_Old", g1energy_Old);
     event->setDoubleData("gamma1_P", g1mom.Mag());
+    event->setDoubleData("gamma1_theta_beam", gamma1_theta_beam);
+    event->setDoubleData("gamma1_phi_beam",  gamma1_phi_beam);
     event->setDoubleData("gamma1_theta", gamma1_theta);
     event->setDoubleData("gamma1_phi",  gamma1_phi);
     event->setDoubleData("gamma1_dEdx", dEdx1 );
@@ -2338,6 +2365,8 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("gamma2_E", g2energy);
     event->setDoubleData("gamma2_E_Old", g2energy_Old);
     event->setDoubleData("gamma2_P", g2mom.Mag());
+    event->setDoubleData("gamma2_theta_beam", gamma2_theta_beam);
+    event->setDoubleData("gamma2_phi_beam",  gamma2_phi_beam);
     event->setDoubleData("gamma2_theta", gamma2_theta);
     event->setDoubleData("gamma2_phi",  gamma2_phi);
     event->setDoubleData("gamma2_dEdx", dEdx2 );
@@ -2580,7 +2609,7 @@ void CCProtonPi0::VertexBlob(Minerva::PhysicsEvent *event, Minerva::GenMinIntera
         // Get VertexBlob Energy
         evis = VertexSphereBlob->energy();
 
-        if (truthEvent){
+        if (truthEvent && m_study_unused_energy){
             SaveTruthUnusedClusterEnergy_NearVertex(truthEvent, VertexBlobClusters);
         }
     } 
@@ -2701,7 +2730,7 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
         if (m_TrytoRecover_1Shower && foundBlobs.size() == 1){
             bool isShowerGood = Save_1ShowerInfo(foundBlobs,event);  
             if (isShowerGood){
-                if (truthEvent){
+                if (truthEvent && m_study_shower_recovery){
                     Save_1ShowerTruthMatch(foundBlobs, truthEvent);
                 }
 
@@ -2733,7 +2762,7 @@ bool CCProtonPi0::ConeBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInterac
         // --------------------------------------------------------------------
         if (m_TrytoRecover_3Shower && foundBlobs.size() == 3){
             bool areAllShowersGood = Save_3ShowerInfo(foundBlobs,event);  
-            if (areAllShowersGood && truthEvent){
+            if (areAllShowersGood && truthEvent && m_study_shower_recovery){
                 Save_3ShowerTruthMatch(foundBlobs, truthEvent);
             }
 
@@ -3437,7 +3466,7 @@ bool CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event, Minerva::GenMinInte
     // ------------------------------------------------------------------------
     // Get Cluster Truth Info
     // ------------------------------------------------------------------------
-    if (truthEvent){ 
+    if (truthEvent && m_study_unused_energy){ 
         SaveTruthUnusedClusterEnergyInsideDetector(truthEvent, ecalClusters, hcalClusters, otherClusters); 
     }    
 
@@ -4637,7 +4666,7 @@ void CCProtonPi0::DispersedBlob( Minerva::PhysicsEvent *event, Minerva::GenMinIn
             << " clusters; Dispersed energy = "  << dispersed_energy << endmsg;
         addObject( event, dispersedBlob );
 
-        if (truthEvent){
+        if (truthEvent && m_study_unused_energy){
             SaveTruthUnusedClusterEnergy_Dispersed(truthEvent, dispersedClusters);
         }
     }
@@ -4828,7 +4857,7 @@ void CCProtonPi0::FillUsableClusters(SmartRefVector<Minerva::IDCluster> &usableC
 void CCProtonPi0::ProcessRejectedClusters(SmartRefVector<Minerva::IDCluster> &rejectedClusters,Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const
 {
     // Save Truth Information to NTuples for Rejected Clusters
-    if (truthEvent){
+    if (truthEvent && m_study_unused_energy){
         SaveTruthUnusedClusterEnergy_Rejected(truthEvent, rejectedClusters);
     }
 
@@ -4937,26 +4966,28 @@ bool CCProtonPi0::Save_1ShowerInfo( std::vector<Minerva::IDBlob*> &foundBlobs, M
     bool isShower1Good = isShowerGood(shower1, event);
 
     if (isShower1Good){
-        int nclusters = shower1->nclusters();
-        double energy = shower1->energy();
+        if (m_study_shower_recovery){
+            int nclusters = shower1->nclusters();
+            double energy = shower1->energy();
 
-        const Gaudi::XYZPoint& start_point = shower1->startPoint();
-        const Gaudi::XYZVector& direction = shower1->direction();
+            const Gaudi::XYZPoint& start_point = shower1->startPoint();
+            const Gaudi::XYZVector& direction = shower1->direction();
 
-        double theta = direction.theta()*180/M_PI;
-        double dist_vtx = calcDistance( vtx_position.X(), vtx_position.Y(), vtx_position.Z(), 
-                start_point.X(), start_point.Y(), start_point.Z());
+            double theta = direction.theta()*180/M_PI;
+            double dist_vtx = calcDistance( vtx_position.X(), vtx_position.Y(), vtx_position.Z(), 
+                    start_point.X(), start_point.Y(), start_point.Z());
 
-        debug()<<"1Shower nClusters = "<<nclusters<<endmsg;
-        debug()<<"1Shower Energy = "<<energy<<endmsg;
-        debug()<<"1Shower Theta = "<<theta<<endmsg;
-        debug()<<"1Shower Distance to Vertex = "<<dist_vtx<<endmsg;
+            debug()<<"1Shower nClusters = "<<nclusters<<endmsg;
+            debug()<<"1Shower Energy = "<<energy<<endmsg;
+            debug()<<"1Shower Theta = "<<theta<<endmsg;
+            debug()<<"1Shower Distance to Vertex = "<<dist_vtx<<endmsg;
 
-        event->setIntData("OneShower_nClusters", nclusters); 
-        event->setDoubleData("OneShower_energy", energy);
-        event->setDoubleData("OneShower_theta",theta);
-        event->setDoubleData("OneShower_dist_vtx", dist_vtx);
 
+            event->setIntData("OneShower_nClusters", nclusters); 
+            event->setDoubleData("OneShower_energy", energy);
+            event->setDoubleData("OneShower_theta",theta);
+            event->setDoubleData("OneShower_dist_vtx", dist_vtx);
+        }
         return true;
     }else{
         debug()<<"Found 1Shower direction is NOT Good!"<<endmsg;
@@ -4995,64 +5026,65 @@ bool CCProtonPi0::Save_3ShowerInfo( std::vector<Minerva::IDBlob*> &foundBlobs, M
     bool isShower2Good = isShowerGood(shower2, event);
     bool isShower3Good = isShowerGood(shower3, event);
 
-    if (isShower1Good && isShower2Good && isShower3Good){
-        // Shower 1
-        int s1_nclusters = shower1->nclusters();
-        double s1_energy = shower1->energy();
-        const Gaudi::XYZPoint& s1_start_point = shower1->startPoint();
-        const Gaudi::XYZVector& s1_direction = shower1->direction();
-        double s1_theta = s1_direction.theta()*180/M_PI;
-        double s1_dist_vtx = calcDistance( vtx_position.X(), vtx_position.Y(), vtx_position.Z(), 
-                s1_start_point.X(), s1_start_point.Y(), s1_start_point.Z());
+    if (isShower1Good && isShower2Good && isShower3Good){   
+        if (m_study_shower_recovery){
+            // Shower 1
+            int s1_nclusters = shower1->nclusters();
+            double s1_energy = shower1->energy();
+            const Gaudi::XYZPoint& s1_start_point = shower1->startPoint();
+            const Gaudi::XYZVector& s1_direction = shower1->direction();
+            double s1_theta = s1_direction.theta()*180/M_PI;
+            double s1_dist_vtx = calcDistance( vtx_position.X(), vtx_position.Y(), vtx_position.Z(), 
+                    s1_start_point.X(), s1_start_point.Y(), s1_start_point.Z());
 
-        debug()<<"3Shower s1_nClusters = "<<s1_nclusters<<endmsg;
-        debug()<<"3Shower s1_Energy = "<<s1_energy<<endmsg;
-        debug()<<"3Shower s1_Theta = "<<s1_theta<<endmsg;
-        debug()<<"3Shower s1_Distance to Vertex = "<<s1_dist_vtx<<endmsg;
+            debug()<<"3Shower s1_nClusters = "<<s1_nclusters<<endmsg;
+            debug()<<"3Shower s1_Energy = "<<s1_energy<<endmsg;
+            debug()<<"3Shower s1_Theta = "<<s1_theta<<endmsg;
+            debug()<<"3Shower s1_Distance to Vertex = "<<s1_dist_vtx<<endmsg;
 
-        event->setIntData("ThreeShower_s1_nClusters", s1_nclusters); 
-        event->setDoubleData("ThreeShower_s1_energy", s1_energy);
-        event->setDoubleData("ThreeShower_s1_theta",s1_theta);
-        event->setDoubleData("ThreeShower_s1_dist_vtx", s1_dist_vtx);
+            event->setIntData("ThreeShower_s1_nClusters", s1_nclusters); 
+            event->setDoubleData("ThreeShower_s1_energy", s1_energy);
+            event->setDoubleData("ThreeShower_s1_theta",s1_theta);
+            event->setDoubleData("ThreeShower_s1_dist_vtx", s1_dist_vtx);
 
-        // Shower 2
-        int s2_nclusters = shower2->nclusters();
-        double s2_energy = shower2->energy();
-        const Gaudi::XYZPoint& s2_start_point = shower2->startPoint();
-        const Gaudi::XYZVector& s2_direction = shower2->direction();
-        double s2_theta = s2_direction.theta()*180/M_PI;
-        double s2_dist_vtx = calcDistance( vtx_position.X(), vtx_position.Y(), vtx_position.Z(), 
-                s2_start_point.X(), s2_start_point.Y(), s2_start_point.Z());
+            // Shower 2
+            int s2_nclusters = shower2->nclusters();
+            double s2_energy = shower2->energy();
+            const Gaudi::XYZPoint& s2_start_point = shower2->startPoint();
+            const Gaudi::XYZVector& s2_direction = shower2->direction();
+            double s2_theta = s2_direction.theta()*180/M_PI;
+            double s2_dist_vtx = calcDistance( vtx_position.X(), vtx_position.Y(), vtx_position.Z(), 
+                    s2_start_point.X(), s2_start_point.Y(), s2_start_point.Z());
 
-        debug()<<"3Shower s2_gnClusters = "<<s2_nclusters<<endmsg;
-        debug()<<"3Shower s2_gEnergy = "<<s2_energy<<endmsg;
-        debug()<<"3Shower s2_gTheta = "<<s2_theta<<endmsg;
-        debug()<<"3Shower s2_gDistance to Vertex = "<<s2_dist_vtx<<endmsg;
+            debug()<<"3Shower s2_gnClusters = "<<s2_nclusters<<endmsg;
+            debug()<<"3Shower s2_gEnergy = "<<s2_energy<<endmsg;
+            debug()<<"3Shower s2_gTheta = "<<s2_theta<<endmsg;
+            debug()<<"3Shower s2_gDistance to Vertex = "<<s2_dist_vtx<<endmsg;
 
-        event->setIntData("ThreeShower_s2_nClusters", s2_nclusters); 
-        event->setDoubleData("ThreeShower_s2_energy", s2_energy);
-        event->setDoubleData("ThreeShower_s2_theta",s2_theta);
-        event->setDoubleData("ThreeShower_s2_dist_vtx", s2_dist_vtx);
+            event->setIntData("ThreeShower_s2_nClusters", s2_nclusters); 
+            event->setDoubleData("ThreeShower_s2_energy", s2_energy);
+            event->setDoubleData("ThreeShower_s2_theta",s2_theta);
+            event->setDoubleData("ThreeShower_s2_dist_vtx", s2_dist_vtx);
 
-        // Shower 3
-        int s3_nclusters = shower3->nclusters();
-        double s3_energy = shower3->energy();
-        const Gaudi::XYZPoint& s3_start_point = shower3->startPoint();
-        const Gaudi::XYZVector& s3_direction = shower3->direction();
-        double s3_theta = s3_direction.theta()*180/M_PI;
-        double s3_dist_vtx = calcDistance( vtx_position.X(), vtx_position.Y(), vtx_position.Z(), 
-                s3_start_point.X(), s3_start_point.Y(), s3_start_point.Z());
+            // Shower 3
+            int s3_nclusters = shower3->nclusters();
+            double s3_energy = shower3->energy();
+            const Gaudi::XYZPoint& s3_start_point = shower3->startPoint();
+            const Gaudi::XYZVector& s3_direction = shower3->direction();
+            double s3_theta = s3_direction.theta()*180/M_PI;
+            double s3_dist_vtx = calcDistance( vtx_position.X(), vtx_position.Y(), vtx_position.Z(), 
+                    s3_start_point.X(), s3_start_point.Y(), s3_start_point.Z());
 
-        debug()<<"3Shower s3_gnClusters = "<<s3_nclusters<<endmsg;
-        debug()<<"3Shower s3_gEnergy = "<<s3_energy<<endmsg;
-        debug()<<"3Shower s3_gTheta = "<<s3_theta<<endmsg;
-        debug()<<"3Shower s3_gDistance to Vertex = "<<s3_dist_vtx<<endmsg;
+            debug()<<"3Shower s3_gnClusters = "<<s3_nclusters<<endmsg;
+            debug()<<"3Shower s3_gEnergy = "<<s3_energy<<endmsg;
+            debug()<<"3Shower s3_gTheta = "<<s3_theta<<endmsg;
+            debug()<<"3Shower s3_gDistance to Vertex = "<<s3_dist_vtx<<endmsg;
 
-        event->setIntData("ThreeShower_s3_nClusters", s3_nclusters); 
-        event->setDoubleData("ThreeShower_s3_energy", s3_energy);
-        event->setDoubleData("ThreeShower_s3_theta",s3_theta);
-        event->setDoubleData("ThreeShower_s3_dist_vtx", s3_dist_vtx);
-
+            event->setIntData("ThreeShower_s3_nClusters", s3_nclusters); 
+            event->setDoubleData("ThreeShower_s3_energy", s3_energy);
+            event->setDoubleData("ThreeShower_s3_theta",s3_theta);
+            event->setDoubleData("ThreeShower_s3_dist_vtx", s3_dist_vtx);
+        }
         return true;
     }else{
         debug()<<"Not All Showers direction are good!"<<endmsg;

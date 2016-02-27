@@ -749,12 +749,12 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
     hist2D->Draw("colz");
     gPad->Update();
 
-    //double line_min = hist2D->GetXaxis()->GetBinLowEdge(1);
-    //double line_max = hist2D->GetXaxis()->GetBinLowEdge(nBinsX);
-    //TLine xy;
-    //xy.SetLineWidth(2);
-    //xy.SetLineColor(kBlack);
-    //xy.DrawLine(line_min,line_min,line_max,line_max);
+    double line_min = hist2D->GetXaxis()->GetBinLowEdge(1);
+    double line_max = hist2D->GetXaxis()->GetBinLowEdge(nBinsX);
+    TLine xy;
+    xy.SetLineWidth(2);
+    xy.SetLineColor(kBlack);
+    xy.DrawLine(line_min,line_min,line_max,line_max);
 
     //TLine fit;
     //fit.SetLineWidth(2);

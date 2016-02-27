@@ -9,7 +9,7 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
 {
     std::cout<<"Initializing CCProtonPi0_CrossSection"<<std::endl;
 
-    iteration = 3; // Unfolding Iteration
+    iteration = 1; // Unfolding Iteration
     min_invMass = 60; // MeV
     max_invMass = 200; // MeV
     
@@ -438,8 +438,7 @@ MnvH1D* CCProtonPi0_CrossSection::Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* r
 
     std::cout<<"\tNumber of iteratons = "<<iteration<<std::endl;
     // Use MnvUnfold to Unfold Data
-    //MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted, RooUnfold::kBayes, iteration, true);
-    MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted);
+    MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted, RooUnfold::kBayes, iteration, true);
 
     // Set Name of the Histogram
     std::string hist_name = var_name + "_unfolded";

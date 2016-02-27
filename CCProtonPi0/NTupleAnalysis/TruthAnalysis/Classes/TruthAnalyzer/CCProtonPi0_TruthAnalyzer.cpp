@@ -365,9 +365,6 @@ void CCProtonPi0_TruthAnalyzer::AddErrorBands_FillWithCV(MnvH1D* hist)
 void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
 {
     Calc_WeightFromSystematics();
-    const double M_pi0 = 134.98; // MeV
-    const double truth_pi0_KE = truth_pi0_4P[3] - M_pi0;
-
     FillHistogram(muon_P_mc_truth_all_signal, truth_muon_P * MeV_to_GeV);
     FillHistogram(muon_theta_mc_truth_all_signal, truth_muon_theta * rad_to_deg);
     FillHistogram(pi0_P_mc_truth_all_signal, truth_pi0_P * MeV_to_GeV);

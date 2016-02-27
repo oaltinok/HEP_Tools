@@ -184,6 +184,7 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_other_unused_evis_proton", &truth_other_unused_evis_proton, &b_truth_other_unused_evis_proton);
     fChain->SetBranchAddress("truth_other_unused_evis_total_norm", &truth_other_unused_evis_total_norm, &b_truth_other_unused_evis_total_norm);
     fChain->SetBranchAddress("truth_other_unused_evis_total_truth", &truth_other_unused_evis_total_truth, &b_truth_other_unused_evis_total_truth);
+    fChain->SetBranchAddress("truth_pi0_KE", &truth_pi0_KE, &b_truth_pi0_KE);
     fChain->SetBranchAddress("truth_pi0_P", &truth_pi0_P, &b_truth_pi0_P);
     fChain->SetBranchAddress("truth_pi0_theta", &truth_pi0_theta, &b_truth_pi0_theta);
     fChain->SetBranchAddress("truth_proton_P", &truth_proton_P, &b_truth_proton_P);
@@ -329,6 +330,7 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("mc_wgt_Norm", &mc_wgt_Norm, &b_mc_wgt_Norm);
     fChain->SetBranchAddress("mc_wgt_ppfx1_Total_sz", &mc_wgt_ppfx1_Total_sz, &b_mc_wgt_ppfx1_Total_sz);
     fChain->SetBranchAddress("mc_wgt_ppfx1_Total", mc_wgt_ppfx1_Total, &b_mc_wgt_ppfx1_Total);
+
 
 
 

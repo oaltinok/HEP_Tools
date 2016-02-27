@@ -47,6 +47,12 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         TH2D* signal_gamma1_E_gamma2_E;
         TH2D* bckg_gamma1_E_gamma2_E;
         TH2D* bckg_signal_diff_E;
+        
+        TH2D* reco_KE_true_KE;
+        TH1D* KE_true;
+        TH1D* KE_reco;
+        TH1D* KE_error;
+        TH1D* KE_Diff;
 
         // Pi0 Momentum 
         MnvH1D* pi0_P_all;
@@ -78,6 +84,8 @@ class CCProtonPi0_Pion : public CCProtonPi0_Particle
         void writeHistograms();
         
     private:
+        CCProtonPi0_SingleBin bin_KE;
+        CCProtonPi0_SingleBin bin_KE_Diff;
         CCProtonPi0_SingleBin bin_invMass;
         CCProtonPi0_SingleBin bin_photonEnergy_Asymmetry;
         CCProtonPi0_SingleBin bin_photonConvLength;

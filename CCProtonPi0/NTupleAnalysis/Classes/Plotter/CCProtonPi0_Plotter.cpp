@@ -21,18 +21,18 @@ void CCProtonPi0_Plotter::plotHistograms()
     // Cross Sections
     //--------------------------------------------------------------------------
     //plotErrorSummary();
-    plotOriginalData();
+    //plotOriginalData();
     //plotBackgroundEstimated();
     //plotBackgroundSubtracted();
     //plotUnfolded();
     //plotEfficiencyCorrected();
-    plotCrossSection();
+    //plotCrossSection();
     //plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
     //  Data vs MC
     //--------------------------------------------------------------------------
-    //plotInteraction_DataMC();
+    plotInteraction_DataMC();
     //plotMuon_DataMC();
     //plotProton_DataMC();
     //plotPion_DataMC();
@@ -42,10 +42,10 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     //  MC Only
     //--------------------------------------------------------------------------
-    //plotInteraction_MCOnly();
+    plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
-    plotPion_MCOnly();
+    //plotPion_MCOnly();
     //plotCutHistograms_MCOnly();
     //plotPi0Blob_MCOnly();
 
@@ -54,6 +54,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     //SavePi0InvMassPoints();
     //plotOtherStudies();
+    //plotGENIEXSec();
+
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -782,8 +784,8 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     //Draw1DHist(rootDir_Interaction,"proton_true_P_1Track",plotDir);
     //Draw1DHist(rootDir_Interaction,"proton_true_KE_1Track",plotDir);
 
-    //Draw1DHist(rootDir_Interaction,"Enu_True_1Track",plotDir);
-    //Draw1DHist(rootDir_Interaction,"Enu_True_2Track",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_True_1Track",plotDir);
+    Draw1DHist(rootDir_Interaction,"Enu_True_2Track",plotDir);
     //Draw1DHist(rootDir_Interaction,"Enu_1Track_Error",plotDir);
     //Draw1DHist(rootDir_Interaction,"Enu_2Track_Error",plotDir);
     //Draw1DHist(rootDir_Interaction,"Enu_1Track_Alt_Error",plotDir);
@@ -1010,14 +1012,24 @@ void CCProtonPi0_Plotter::plotPion_True()
 //    Draw2DHist(rootDir_Pion,"bckg_gamma1_convLength_gamma2_convLength",plotDir);
 //    Draw2DHist(rootDir_Pion,"bckg_signal_diff_convLength",plotDir);
 
+    // Momentum
     Draw2DHist(rootDir_Pion,"reco_P_true_P",plotDir);
     Draw1DHist(rootDir_Pion,"P_error",plotDir);
     Draw1DHist(rootDir_Pion,"P_Diff",plotDir);
+    
+    // Energy
     Draw2DHist(rootDir_Pion,"reco_E_true_E",plotDir);
     Draw1DHist(rootDir_Pion,"E_error",plotDir);
     Draw1DHist(rootDir_Pion,"E_Diff",plotDir);
     Draw1DHist(rootDir_Pion,"E_true",plotDir);
     Draw1DHist(rootDir_Pion,"E_reco",plotDir);
+ 
+    // Kinetic Energy
+    Draw2DHist(rootDir_Pion,"reco_KE_true_KE",plotDir);
+    Draw1DHist(rootDir_Pion,"KE_error",plotDir);
+    Draw1DHist(rootDir_Pion,"KE_Diff",plotDir);
+    Draw1DHist(rootDir_Pion,"KE_true",plotDir);
+    Draw1DHist(rootDir_Pion,"KE_reco",plotDir);
 
     std::cout<<"Plotting Pion True Finished!\n"<<std::endl;
 }
@@ -1485,6 +1497,9 @@ void CCProtonPi0_Plotter::setRootDirs()
     rootDir_CrossSection.mc = Folder_List::rootDir_CrossSection_mc;
     rootDir_CrossSection.data = Folder_List::rootDir_CrossSection_data;
 
+    rootDir_GENIEXSec.mc = Folder_List::rootDir_GENIEXSec;
+    rootDir_GENIEXSec.data = Folder_List::rootDir_GENIEXSec;
+    
     // Set MC Root Dir
     rootDir_CutHists.mc = Folder_List::rootDir_CutHists_mc;
     rootDir_Interaction.mc = Folder_List::rootDir_Interaction_mc;
@@ -1503,6 +1518,50 @@ void CCProtonPi0_Plotter::setRootDirs()
 }
 
 
+void CCProtonPi0_Plotter::plotGENIEXSec()
+{
+    std::cout<<"Plotting GENIE Cross Sections..."<<std::endl;
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
 
+    // Plot 1D Versions
+    DrawMnvH1D(rootDir_GENIEXSec,"muon_P_xsec",plotDir);   
+    DrawMnvH1D(rootDir_GENIEXSec,"muon_theta_xsec",plotDir);   
+    DrawMnvH1D(rootDir_GENIEXSec,"pi0_P_xsec",plotDir);   
+    DrawMnvH1D(rootDir_GENIEXSec,"pi0_KE_xsec",plotDir);   
+    DrawMnvH1D(rootDir_GENIEXSec,"pi0_theta_xsec",plotDir);   
+    DrawMnvH1D(rootDir_GENIEXSec,"QSq_xsec",plotDir);   
+
+    // Plot Comparison
+    TFile* f_xsec_mc = new TFile(rootDir_GENIEXSec.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.mc.c_str());
+    MnvH1D* mc;
+    MnvH1D* data;
+
+    mc = (MnvH1D*)f_xsec_mc->Get("muon_P_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("muon_P_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"muon_P_MC_GENIE",plotDir);
+ 
+    mc = (MnvH1D*)f_xsec_mc->Get("muon_theta_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("muon_theta_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"muon_theta_MC_GENIE",plotDir);
+  
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_P_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"pi0_P_MC_GENIE",plotDir);
+   
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_KE_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_KE_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"pi0_KE_MC_GENIE",plotDir);
+  
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_theta_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_theta_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"pi0_theta_MC_GENIE",plotDir);
+ 
+    mc = (MnvH1D*)f_xsec_mc->Get("QSq_xsec");
+    data = (MnvH1D*)f_xsec_data->Get("QSq_xsec"); 
+    DrawDataMC_CrossSection(data,mc,"QSq_MC_GENIE",plotDir);
+
+    std::cout<<"Done!"<<std::endl;
+}
 #endif
 

@@ -55,7 +55,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void FillHistogram(MnvH1D *hist, double var);
         void FillSignalHistograms();
 
-        
+
         // Default Functions    
         void     Init(std::string playlist, TChain* fChain);
         Int_t    GetEntry(Long64_t entry);
@@ -238,6 +238,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        truth_other_unused_evis_proton;
         Double_t        truth_other_unused_evis_total_norm;
         Double_t        truth_other_unused_evis_total_truth;
+        Double_t        truth_pi0_KE;
         Double_t        truth_pi0_P;
         Double_t        truth_pi0_theta;
         Double_t        truth_proton_P;
@@ -337,26 +338,26 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        mc_initNucVec[4];
         Double_t        mc_primFSLepton[4];
         Int_t           mc_nFSPart;
-        Double_t        mc_FSPartPx[106];   //[mc_nFSPart]
-        Double_t        mc_FSPartPy[106];   //[mc_nFSPart]
-        Double_t        mc_FSPartPz[106];   //[mc_nFSPart]
-        Double_t        mc_FSPartE[106];   //[mc_nFSPart]
-        Int_t           mc_FSPartPDG[106];   //[mc_nFSPart]
+        Double_t        mc_FSPartPx[198];   //[mc_nFSPart]
+        Double_t        mc_FSPartPy[198];   //[mc_nFSPart]
+        Double_t        mc_FSPartPz[198];   //[mc_nFSPart]
+        Double_t        mc_FSPartE[198];   //[mc_nFSPart]
+        Int_t           mc_FSPartPDG[198];   //[mc_nFSPart]
         Int_t           mc_er_nPart;
-        Int_t           mc_er_ID[134];   //[mc_er_nPart]
-        Int_t           mc_er_status[134];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucX[134];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucY[134];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucZ[134];   //[mc_er_nPart]
-        Double_t        mc_er_Px[134];   //[mc_er_nPart]
-        Double_t        mc_er_Py[134];   //[mc_er_nPart]
-        Double_t        mc_er_Pz[134];   //[mc_er_nPart]
-        Double_t        mc_er_E[134];   //[mc_er_nPart]
-        Int_t           mc_er_FD[134];   //[mc_er_nPart]
-        Int_t           mc_er_LD[134];   //[mc_er_nPart]
-        Int_t           mc_er_mother[134];   //[mc_er_nPart]
+        Int_t           mc_er_ID[245];   //[mc_er_nPart]
+        Int_t           mc_er_status[245];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucX[245];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucY[245];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucZ[245];   //[mc_er_nPart]
+        Double_t        mc_er_Px[245];   //[mc_er_nPart]
+        Double_t        mc_er_Py[245];   //[mc_er_nPart]
+        Double_t        mc_er_Pz[245];   //[mc_er_nPart]
+        Double_t        mc_er_E[245];   //[mc_er_nPart]
+        Int_t           mc_er_FD[245];   //[mc_er_nPart]
+        Int_t           mc_er_LD[245];   //[mc_er_nPart]
+        Int_t           mc_er_mother[245];   //[mc_er_nPart]
         Int_t           mc_fr_nNuAncestorIDs;
-        Int_t           mc_fr_nuAncestorIDs[6];   //[mc_fr_nNuAncestorIDs]
+        Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
         Int_t           mc_fr_nuParentID;
         Int_t           mc_fr_decMode;
         Double_t        mc_fr_primProtonVtx[3];
@@ -530,6 +531,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_other_unused_evis_proton;   //!
         TBranch        *b_truth_other_unused_evis_total_norm;   //!
         TBranch        *b_truth_other_unused_evis_total_truth;   //!
+        TBranch        *b_truth_pi0_KE;   //!
         TBranch        *b_truth_pi0_P;   //!
         TBranch        *b_truth_pi0_theta;   //!
         TBranch        *b_truth_proton_P;   //!

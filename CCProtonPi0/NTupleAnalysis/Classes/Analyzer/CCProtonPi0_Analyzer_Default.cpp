@@ -251,6 +251,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("phys_energy_in_road_upstream", &phys_energy_in_road_upstream, &b_phys_energy_in_road_upstream);
     fChain->SetBranchAddress("phys_energy_unattached", &phys_energy_unattached, &b_phys_energy_unattached);
     fChain->SetBranchAddress("pi0_E", &pi0_E, &b_pi0_E);
+    fChain->SetBranchAddress("pi0_E_Cal", &pi0_E_Cal, &b_pi0_E_Cal);
     fChain->SetBranchAddress("pi0_KE", &pi0_KE, &b_pi0_KE);
     fChain->SetBranchAddress("pi0_P", &pi0_P, &b_pi0_P);
     fChain->SetBranchAddress("pi0_cos_openingAngle", &pi0_cos_openingAngle, &b_pi0_cos_openingAngle);
@@ -497,6 +498,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_other_unused_evis_proton", &truth_other_unused_evis_proton, &b_truth_other_unused_evis_proton);
     fChain->SetBranchAddress("truth_other_unused_evis_total_norm", &truth_other_unused_evis_total_norm, &b_truth_other_unused_evis_total_norm);
     fChain->SetBranchAddress("truth_other_unused_evis_total_truth", &truth_other_unused_evis_total_truth, &b_truth_other_unused_evis_total_truth);
+    fChain->SetBranchAddress("truth_pi0_KE", &truth_pi0_KE, &b_truth_pi0_KE);
     fChain->SetBranchAddress("truth_pi0_P", &truth_pi0_P, &b_truth_pi0_P);
     fChain->SetBranchAddress("truth_pi0_theta", &truth_pi0_theta, &b_truth_pi0_theta);
     fChain->SetBranchAddress("truth_proton_P", &truth_proton_P, &b_truth_proton_P);
@@ -762,8 +764,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
     //fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
     //fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
-
-
 
 }
 

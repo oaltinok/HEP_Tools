@@ -64,6 +64,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotHistograms();
 
     private:
+        rootDir rootDir_GENIEXSec;
         rootDir rootDir_Truth;
         rootDir rootDir_CrossSection;
         rootDir rootDir_OtherStudies;
@@ -113,6 +114,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotPion_True();
 
         // Other Plots 
+        void plotGENIEXSec();
         void plotOtherStudies();
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();

@@ -1063,9 +1063,8 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         FillHistogram(pi0.reco_P_true_P, pi0_reco_P, pi0_true_P); 
 
         // Pi0 Energy
-        //double reco_E = pi0_E * MeV_to_GeV;
-        const double M_pi0 = 134.98;
-        double reco_E = (sqrt(pow(pi0_P,2) + pow(M_pi0,2))) * MeV_to_GeV;
+        double reco_E = pi0_E * MeV_to_GeV;
+        //double reco_E = pi0_E_Cal * MeV_to_GeV;
         double true_E = truth_pi0_4P[3] * MeV_to_GeV; 
         double error_E = Data_Functions::getError(true_E, reco_E);
 
@@ -1075,6 +1074,18 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         FillHistogram(pi0.E_error, error_E);
         FillHistogram(pi0.E_Diff, reco_E-true_E);
 
+        const double M_pi0 = 134.98;
+        double reco_KE = pi0_KE * MeV_to_GeV;
+        double true_KE = (truth_pi0_4P[3] - M_pi0) * MeV_to_GeV; 
+        //double reco_KE = pi0_KE * MeV_to_GeV;
+        //double true_KE = truth_pi0_KE * MeV_to_GeV; 
+        double error_KE = Data_Functions::getError(true_KE, reco_KE);
+
+        FillHistogram(pi0.KE_true, true_KE);
+        FillHistogram(pi0.KE_reco, reco_KE);
+        FillHistogram(pi0.reco_KE_true_KE, reco_KE,true_KE);
+        FillHistogram(pi0.KE_error, error_KE);
+        FillHistogram(pi0.KE_Diff, reco_KE-true_KE);
     }
 
     // Gamma Comparison
@@ -1320,8 +1331,6 @@ void CCProtonPi0_Analyzer::fill_pi0_P()
 
 void CCProtonPi0_Analyzer::fill_pi0_KE() 
 {
-    const double M_pi0 = 134.98; // MeV 
-    const double truth_pi0_KE = truth_pi0_4P[3] - M_pi0;
     if (m_isMC){
         // MC Reco All
         FillHistogramWithDefaultErrors(pi0.pi0_KE_mc_reco_all, pi0_KE * MeV_to_GeV);
@@ -1626,9 +1635,7 @@ double CCProtonPi0_Analyzer::Calc_TruePi0OpeningAngle()
 // Function Reserved for Correcting a NTupleVariables
 void CCProtonPi0_Analyzer::CorrectNTupleVariables()
 {
-    const double M_pi0 = 134.98; // MeV 
-    pi0_E = (sqrt(pow(pi0_P,2) + pow(M_pi0,2)));
-    pi0_KE = pi0_E-M_pi0;
+    // Do Nothing
 }
 
 void CCProtonPi0_Analyzer::CorrectEMShowerCalibration()

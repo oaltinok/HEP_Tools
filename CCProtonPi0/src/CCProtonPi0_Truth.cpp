@@ -81,15 +81,16 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     int t_current = truthEvent->current();
     int t_neutrinoPDG = truthEvent->incoming();
     double Enu = truthEvent->incomingEnergy();
-    const double max_Enu = 20000; 
+    const double min_Enu = 2000;    // MeV 
+    const double max_Enu = 20000;   // MeV
 
     bool isFidVol = truthEvent->filtertaglist()->isFilterTagTrue("isFidVol");
     bool isCCNeutrino = (t_current == 1 && t_neutrinoPDG == PDG::nu_mu);
     bool isFSGood = (N_pi0 == 1 && N_other == 0);
-    bool isNeutrinoEnergyLow = Enu <= max_Enu; 
+    bool isEnuInRange = (Enu >= min_Enu) && (Enu <= max_Enu); 
 
     bool isSignal = false;
-    if(isFidVol && isCCNeutrino && isFSGood && isNeutrinoEnergyLow){
+    if(isFidVol && isCCNeutrino && isFSGood && isEnuInRange){
         isSignal = true;
         debug()<<"Found a Signal Event!"<<endmsg;
     }
@@ -646,7 +647,7 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
     truthEvent->setContainerDoubleData("proton_4P", proton_4P);
     truthEvent->setDoubleData("muon_P", muon_P);
     truthEvent->setDoubleData("pi0_P", pi0_P);
-    truthEvent->setDoubleData("pi0_KE", pi0_P);
+    truthEvent->setDoubleData("pi0_KE", pi0_KE);
     truthEvent->setDoubleData("proton_P", proton_P);
     truthEvent->setDoubleData("muon_theta", muon_theta);
     truthEvent->setDoubleData("pi0_theta", pi0_theta);
