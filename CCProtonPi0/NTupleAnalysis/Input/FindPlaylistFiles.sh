@@ -1,5 +1,5 @@
 DATATYPE=$1
-CCPROTONPI0_V="v2_62"
+CCPROTONPI0_V="v2_64b"
 FINDSCRIPT="/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p7/Tools/ProductionScripts/pot_scripts/FindAnaFilesWithoutMeta.py"
 #PLAYLISTS=( "minerva1" "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
 PLAYLISTS=( "minerva1" );
@@ -16,8 +16,7 @@ find_files()
 {
     for pl in ${PLAYLISTS[@]}; do
         echo "Finding ${DATAFOLDER} Files for ${pl} in version ${CCPROTONPI0_V}"
-        #DATADIR="/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/${pl}/${ANADIR}"
-        DATADIR="/minerva/data/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/${pl}/${ANADIR}"
+        DATADIR="/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/${pl}/${ANADIR}"
         OUTPUTFILE="/minerva/data/users/oaltinok/NTupleAnalysis/${DATAFOLDER}/Merged/merge_files_${DATATYPE}_${pl}_${CCPROTONPI0_V}.sh" 
         python ${FINDSCRIPT} --dir ${DATADIR} --batch --ana_tool CCProtonPi0 --output ${OUTPUTFILE} --remove
     done

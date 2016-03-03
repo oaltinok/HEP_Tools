@@ -36,12 +36,16 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         //cout<<" Added "<<filename.c_str()<<endl;
     }
 
-    // Set object pointer
-    //prong_part_E = NULL;
-    //prong_part_pos = NULL;
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // AFTER makeClass() REMOVE FOLLOWING VARIABLES -- THEY CAUSE CRASH!!
+    //      prong_part_E;
+    //      prong_part_pos;
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     // Set branch addresses and branch pointers
     fChain->SetMakeClass(1);
+
+
     fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
     fChain->SetBranchAddress("physEvtNum", &physEvtNum, &b_physEvtNum);
     fChain->SetBranchAddress("n_hyps", &n_hyps, &b_n_hyps);
@@ -84,10 +88,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("Cut_Vertex_Not_Fiducial", &Cut_Vertex_Not_Fiducial, &b_Cut_Vertex_Not_Fiducial);
     fChain->SetBranchAddress("Cut_Vertex_Not_Reconstructable", &Cut_Vertex_Not_Reconstructable, &b_Cut_Vertex_Not_Reconstructable);
     fChain->SetBranchAddress("Cut_secEndPoint_Michel_Exist", &Cut_secEndPoint_Michel_Exist, &b_Cut_secEndPoint_Michel_Exist);
-    fChain->SetBranchAddress("OneShower_nClusters", &OneShower_nClusters, &b_OneShower_nClusters);
-    fChain->SetBranchAddress("ThreeShower_s1_nClusters", &ThreeShower_s1_nClusters, &b_ThreeShower_s1_nClusters);
-    fChain->SetBranchAddress("ThreeShower_s2_nClusters", &ThreeShower_s2_nClusters, &b_ThreeShower_s2_nClusters);
-    fChain->SetBranchAddress("ThreeShower_s3_nClusters", &ThreeShower_s3_nClusters, &b_ThreeShower_s3_nClusters);
     fChain->SetBranchAddress("anglescan_ncand", &anglescan_ncand, &b_anglescan_ncand);
     fChain->SetBranchAddress("anglescan_ncandx", &anglescan_ncandx, &b_anglescan_ncandx);
     fChain->SetBranchAddress("anglescan_nfoundBlobs", &anglescan_nfoundBlobs, &b_anglescan_nfoundBlobs);
@@ -142,18 +142,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("Extra_Energy_Muon", &Extra_Energy_Muon, &b_Extra_Energy_Muon);
     fChain->SetBranchAddress("Extra_Energy_Rejected", &Extra_Energy_Rejected, &b_Extra_Energy_Rejected);
     fChain->SetBranchAddress("Extra_Evis_Leftover", &Extra_Evis_Leftover, &b_Extra_Evis_Leftover);
-    fChain->SetBranchAddress("OneShower_dist_vtx", &OneShower_dist_vtx, &b_OneShower_dist_vtx);
-    fChain->SetBranchAddress("OneShower_energy", &OneShower_energy, &b_OneShower_energy);
-    fChain->SetBranchAddress("OneShower_theta", &OneShower_theta, &b_OneShower_theta);
-    fChain->SetBranchAddress("ThreeShower_s1_dist_vtx", &ThreeShower_s1_dist_vtx, &b_ThreeShower_s1_dist_vtx);
-    fChain->SetBranchAddress("ThreeShower_s1_energy", &ThreeShower_s1_energy, &b_ThreeShower_s1_energy);
-    fChain->SetBranchAddress("ThreeShower_s1_theta", &ThreeShower_s1_theta, &b_ThreeShower_s1_theta);
-    fChain->SetBranchAddress("ThreeShower_s2_dist_vtx", &ThreeShower_s2_dist_vtx, &b_ThreeShower_s2_dist_vtx);
-    fChain->SetBranchAddress("ThreeShower_s2_energy", &ThreeShower_s2_energy, &b_ThreeShower_s2_energy);
-    fChain->SetBranchAddress("ThreeShower_s2_theta", &ThreeShower_s2_theta, &b_ThreeShower_s2_theta);
-    fChain->SetBranchAddress("ThreeShower_s3_dist_vtx", &ThreeShower_s3_dist_vtx, &b_ThreeShower_s3_dist_vtx);
-    fChain->SetBranchAddress("ThreeShower_s3_energy", &ThreeShower_s3_energy, &b_ThreeShower_s3_energy);
-    fChain->SetBranchAddress("ThreeShower_s3_theta", &ThreeShower_s3_theta, &b_ThreeShower_s3_theta);
     fChain->SetBranchAddress("energy_from_mc", &energy_from_mc, &b_energy_from_mc);
     fChain->SetBranchAddress("energy_from_mc_fraction", &energy_from_mc_fraction, &b_energy_from_mc_fraction);
     fChain->SetBranchAddress("energy_from_mc_fraction_of_highest", &energy_from_mc_fraction_of_highest, &b_energy_from_mc_fraction_of_highest);
@@ -187,10 +175,12 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("gamma1_evis_scal_X", &gamma1_evis_scal_X, &b_gamma1_evis_scal_X);
     fChain->SetBranchAddress("gamma1_evis_trkr", &gamma1_evis_trkr, &b_gamma1_evis_trkr);
     fChain->SetBranchAddress("gamma1_phi", &gamma1_phi, &b_gamma1_phi);
+    fChain->SetBranchAddress("gamma1_phi_beam", &gamma1_phi_beam, &b_gamma1_phi_beam);
     fChain->SetBranchAddress("gamma1_px", &gamma1_px, &b_gamma1_px);
     fChain->SetBranchAddress("gamma1_py", &gamma1_py, &b_gamma1_py);
     fChain->SetBranchAddress("gamma1_pz", &gamma1_pz, &b_gamma1_pz);
     fChain->SetBranchAddress("gamma1_theta", &gamma1_theta, &b_gamma1_theta);
+    fChain->SetBranchAddress("gamma1_theta_beam", &gamma1_theta_beam, &b_gamma1_theta_beam);
     fChain->SetBranchAddress("gamma1_time", &gamma1_time, &b_gamma1_time);
     fChain->SetBranchAddress("gamma2_E", &gamma2_E, &b_gamma2_E);
     fChain->SetBranchAddress("gamma2_E_Old", &gamma2_E_Old, &b_gamma2_E_Old);
@@ -210,10 +200,12 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("gamma2_evis_scal_X", &gamma2_evis_scal_X, &b_gamma2_evis_scal_X);
     fChain->SetBranchAddress("gamma2_evis_trkr", &gamma2_evis_trkr, &b_gamma2_evis_trkr);
     fChain->SetBranchAddress("gamma2_phi", &gamma2_phi, &b_gamma2_phi);
+    fChain->SetBranchAddress("gamma2_phi_beam", &gamma2_phi_beam, &b_gamma2_phi_beam);
     fChain->SetBranchAddress("gamma2_px", &gamma2_px, &b_gamma2_px);
     fChain->SetBranchAddress("gamma2_py", &gamma2_py, &b_gamma2_py);
     fChain->SetBranchAddress("gamma2_pz", &gamma2_pz, &b_gamma2_pz);
     fChain->SetBranchAddress("gamma2_theta", &gamma2_theta, &b_gamma2_theta);
+    fChain->SetBranchAddress("gamma2_theta_beam", &gamma2_theta_beam, &b_gamma2_theta_beam);
     fChain->SetBranchAddress("gamma2_time", &gamma2_time, &b_gamma2_time);
     fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);
     fChain->SetBranchAddress("michelProng_distance", &michelProng_distance, &b_michelProng_distance);
@@ -226,6 +218,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("muon_P", &muon_P, &b_muon_P);
     fChain->SetBranchAddress("muon_muScore", &muon_muScore, &b_muon_muScore);
     fChain->SetBranchAddress("muon_phi", &muon_phi, &b_muon_phi);
+    fChain->SetBranchAddress("muon_phi_beam", &muon_phi_beam, &b_muon_phi_beam);
     fChain->SetBranchAddress("muon_px", &muon_px, &b_muon_px);
     fChain->SetBranchAddress("muon_py", &muon_py, &b_muon_py);
     fChain->SetBranchAddress("muon_pz", &muon_pz, &b_muon_pz);
@@ -235,8 +228,9 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("muon_theta", &muon_theta, &b_muon_theta);
     fChain->SetBranchAddress("muon_thetaX", &muon_thetaX, &b_muon_thetaX);
     fChain->SetBranchAddress("muon_thetaY", &muon_thetaY, &b_muon_thetaY);
-    fChain->SetBranchAddress("muon_theta_biasDown", &muon_theta_biasDown, &b_muon_theta_biasDown);
-    fChain->SetBranchAddress("muon_theta_biasUp", &muon_theta_biasUp, &b_muon_theta_biasUp);
+    fChain->SetBranchAddress("muon_theta_beam", &muon_theta_beam, &b_muon_theta_beam);
+    fChain->SetBranchAddress("muon_theta_beam_biasDown", &muon_theta_beam_biasDown, &b_muon_theta_beam_biasDown);
+    fChain->SetBranchAddress("muon_theta_beam_biasUp", &muon_theta_beam_biasUp, &b_muon_theta_beam_biasUp);
     fChain->SetBranchAddress("od_downstreamFrame", &od_downstreamFrame, &b_od_downstreamFrame);
     fChain->SetBranchAddress("od_downstreamFrame_z", &od_downstreamFrame_z, &b_od_downstreamFrame_z);
     fChain->SetBranchAddress("od_highStory", &od_highStory, &b_od_highStory);
@@ -259,12 +253,14 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("pi0_invMass_Old", &pi0_invMass_Old, &b_pi0_invMass_Old);
     fChain->SetBranchAddress("pi0_openingAngle", &pi0_openingAngle, &b_pi0_openingAngle);
     fChain->SetBranchAddress("pi0_phi", &pi0_phi, &b_pi0_phi);
+    fChain->SetBranchAddress("pi0_phi_beam", &pi0_phi_beam, &b_pi0_phi_beam);
     fChain->SetBranchAddress("pi0_px", &pi0_px, &b_pi0_px);
     fChain->SetBranchAddress("pi0_py", &pi0_py, &b_pi0_py);
     fChain->SetBranchAddress("pi0_pz", &pi0_pz, &b_pi0_pz);
     fChain->SetBranchAddress("pi0_theta", &pi0_theta, &b_pi0_theta);
-    fChain->SetBranchAddress("pi0_thetaX", &pi0_thetaX, &b_pi0_thetaX);
-    fChain->SetBranchAddress("pi0_thetaY", &pi0_thetaY, &b_pi0_thetaY);
+    fChain->SetBranchAddress("pi0_theta_beam", &pi0_theta_beam, &b_pi0_theta_beam);
+    fChain->SetBranchAddress("pi0_theta_beam_biasDown", &pi0_theta_beam_biasDown, &b_pi0_theta_beam_biasDown);
+    fChain->SetBranchAddress("pi0_theta_beam_biasUp", &pi0_theta_beam_biasUp, &b_pi0_theta_beam_biasUp);
     fChain->SetBranchAddress("preFilter_evis_ECAL", &preFilter_evis_ECAL, &b_preFilter_evis_ECAL);
     fChain->SetBranchAddress("preFilter_evis_HCAL", &preFilter_evis_HCAL, &b_preFilter_evis_HCAL);
     fChain->SetBranchAddress("preFilter_evis_NuclearTarget", &preFilter_evis_NuclearTarget, &b_preFilter_evis_NuclearTarget);
@@ -280,14 +276,14 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("proton_P", &proton_P, &b_proton_P);
     fChain->SetBranchAddress("proton_length", &proton_length, &b_proton_length);
     fChain->SetBranchAddress("proton_phi", &proton_phi, &b_proton_phi);
+    fChain->SetBranchAddress("proton_phi_beam", &proton_phi_beam, &b_proton_phi_beam);
     fChain->SetBranchAddress("proton_pionScore", &proton_pionScore, &b_proton_pionScore);
     fChain->SetBranchAddress("proton_protonScore", &proton_protonScore, &b_proton_protonScore);
     fChain->SetBranchAddress("proton_px", &proton_px, &b_proton_px);
     fChain->SetBranchAddress("proton_py", &proton_py, &b_proton_py);
     fChain->SetBranchAddress("proton_pz", &proton_pz, &b_proton_pz);
     fChain->SetBranchAddress("proton_theta", &proton_theta, &b_proton_theta);
-    fChain->SetBranchAddress("proton_thetaX", &proton_thetaX, &b_proton_thetaX);
-    fChain->SetBranchAddress("proton_thetaY", &proton_thetaY, &b_proton_thetaY);
+    fChain->SetBranchAddress("proton_theta_beam", &proton_theta_beam, &b_proton_theta_beam);
     fChain->SetBranchAddress("reco_eventID", &reco_eventID, &b_reco_eventID);
     fChain->SetBranchAddress("time", &time, &b_time);
     fChain->SetBranchAddress("vertex_blob_evis", &vertex_blob_evis, &b_vertex_blob_evis);
@@ -316,6 +312,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("all_protons_p_dEdXTool", all_protons_p_dEdXTool, &b_all_protons_p_dEdXTool);
     fChain->SetBranchAddress("all_protons_p_visEnergy", all_protons_p_visEnergy, &b_all_protons_p_visEnergy);
     fChain->SetBranchAddress("all_protons_phi", all_protons_phi, &b_all_protons_phi);
+    fChain->SetBranchAddress("all_protons_phi_beam", all_protons_phi_beam, &b_all_protons_phi_beam);
     fChain->SetBranchAddress("all_protons_pionScore", all_protons_pionScore, &b_all_protons_pionScore);
     fChain->SetBranchAddress("all_protons_protonScore", all_protons_protonScore, &b_all_protons_protonScore);
     fChain->SetBranchAddress("all_protons_px", all_protons_px, &b_all_protons_px);
@@ -325,8 +322,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("all_protons_startPointY", all_protons_startPointY, &b_all_protons_startPointY);
     fChain->SetBranchAddress("all_protons_startPointZ", all_protons_startPointZ, &b_all_protons_startPointZ);
     fChain->SetBranchAddress("all_protons_theta", all_protons_theta, &b_all_protons_theta);
-    fChain->SetBranchAddress("all_protons_thetaX", all_protons_thetaX, &b_all_protons_thetaX);
-    fChain->SetBranchAddress("all_protons_thetaY", all_protons_thetaY, &b_all_protons_thetaY);
+    fChain->SetBranchAddress("all_protons_theta_beam", all_protons_theta_beam, &b_all_protons_theta_beam);
     fChain->SetBranchAddress("fit_vtx", fit_vtx, &b_fit_vtx);
     fChain->SetBranchAddress("g1dedx_cluster_energy_sz", &g1dedx_cluster_energy_sz, &b_g1dedx_cluster_energy_sz);
     fChain->SetBranchAddress("g1dedx_cluster_energy", g1dedx_cluster_energy, &b_g1dedx_cluster_energy);
@@ -364,6 +360,10 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_isBckg_NoPi0", &truth_isBckg_NoPi0, &b_truth_isBckg_NoPi0);
     fChain->SetBranchAddress("truth_isBckg_SinglePi0", &truth_isBckg_SinglePi0, &b_truth_isBckg_SinglePi0);
     fChain->SetBranchAddress("truth_isBckg_MultiPi0", &truth_isBckg_MultiPi0, &b_truth_isBckg_MultiPi0);
+    fChain->SetBranchAddress("truth_isBckg_Compact_WithPi0", &truth_isBckg_Compact_WithPi0, &b_truth_isBckg_Compact_WithPi0);
+    fChain->SetBranchAddress("truth_isBckg_Compact_QELike", &truth_isBckg_Compact_QELike, &b_truth_isBckg_Compact_QELike);
+    fChain->SetBranchAddress("truth_isBckg_Compact_SinglePiPlus", &truth_isBckg_Compact_SinglePiPlus, &b_truth_isBckg_Compact_SinglePiPlus);
+    fChain->SetBranchAddress("truth_isBckg_Compact_Other", &truth_isBckg_Compact_Other, &b_truth_isBckg_Compact_Other);
     fChain->SetBranchAddress("truth_isBckg_NC", &truth_isBckg_NC, &b_truth_isBckg_NC);
     fChain->SetBranchAddress("truth_isBckg_AntiNeutrino", &truth_isBckg_AntiNeutrino, &b_truth_isBckg_AntiNeutrino);
     fChain->SetBranchAddress("truth_isBckg_QELike", &truth_isBckg_QELike, &b_truth_isBckg_QELike);
@@ -386,14 +386,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
     fChain->SetBranchAddress("truth_N_proton", &truth_N_proton, &b_truth_N_proton);
     fChain->SetBranchAddress("truth_N_trueMichelElectrons", &truth_N_trueMichelElectrons, &b_truth_N_trueMichelElectrons);
-    fChain->SetBranchAddress("truth_OneShower_evis_most_pdg", &truth_OneShower_evis_most_pdg, &b_truth_OneShower_evis_most_pdg);
-    fChain->SetBranchAddress("truth_Rejected_unused_evis_most_pdg", &truth_Rejected_unused_evis_most_pdg, &b_truth_Rejected_unused_evis_most_pdg);
-    fChain->SetBranchAddress("truth_ThreeShower_s1_evis_most_pdg", &truth_ThreeShower_s1_evis_most_pdg, &b_truth_ThreeShower_s1_evis_most_pdg);
-    fChain->SetBranchAddress("truth_ThreeShower_s2_evis_most_pdg", &truth_ThreeShower_s2_evis_most_pdg, &b_truth_ThreeShower_s2_evis_most_pdg);
-    fChain->SetBranchAddress("truth_ThreeShower_s3_evis_most_pdg", &truth_ThreeShower_s3_evis_most_pdg, &b_truth_ThreeShower_s3_evis_most_pdg);
     fChain->SetBranchAddress("truth_blob1_evis_most_pdg", &truth_blob1_evis_most_pdg, &b_truth_blob1_evis_most_pdg);
     fChain->SetBranchAddress("truth_blob2_evis_most_pdg", &truth_blob2_evis_most_pdg, &b_truth_blob2_evis_most_pdg);
-    fChain->SetBranchAddress("truth_dispersed_unused_evis_most_pdg", &truth_dispersed_unused_evis_most_pdg, &b_truth_dispersed_unused_evis_most_pdg);
     fChain->SetBranchAddress("truth_pi0_GrandMother", &truth_pi0_GrandMother, &b_truth_pi0_GrandMother);
     fChain->SetBranchAddress("truth_pi0_GrandMotherStatus", &truth_pi0_GrandMotherStatus, &b_truth_pi0_GrandMotherStatus);
     fChain->SetBranchAddress("truth_pi0_Mother", &truth_pi0_Mother, &b_truth_pi0_Mother);
@@ -402,41 +396,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_target_material", &truth_target_material, &b_truth_target_material);
     fChain->SetBranchAddress("truth_vertex_module", &truth_vertex_module, &b_truth_vertex_module);
     fChain->SetBranchAddress("truth_vertex_plane", &truth_vertex_plane, &b_truth_vertex_plane);
-    fChain->SetBranchAddress("truth_vertex_unused_evis_most_pdg", &truth_vertex_unused_evis_most_pdg, &b_truth_vertex_unused_evis_most_pdg);
-    fChain->SetBranchAddress("truth_OneShower_evis_muon", &truth_OneShower_evis_muon, &b_truth_OneShower_evis_muon);
-    fChain->SetBranchAddress("truth_OneShower_evis_neutron", &truth_OneShower_evis_neutron, &b_truth_OneShower_evis_neutron);
-    fChain->SetBranchAddress("truth_OneShower_evis_piminus", &truth_OneShower_evis_piminus, &b_truth_OneShower_evis_piminus);
-    fChain->SetBranchAddress("truth_OneShower_evis_piplus", &truth_OneShower_evis_piplus, &b_truth_OneShower_evis_piplus);
-    fChain->SetBranchAddress("truth_OneShower_evis_pizero", &truth_OneShower_evis_pizero, &b_truth_OneShower_evis_pizero);
-    fChain->SetBranchAddress("truth_OneShower_evis_proton", &truth_OneShower_evis_proton, &b_truth_OneShower_evis_proton);
-    fChain->SetBranchAddress("truth_OneShower_evis_total_norm", &truth_OneShower_evis_total_norm, &b_truth_OneShower_evis_total_norm);
-    fChain->SetBranchAddress("truth_OneShower_evis_total_truth", &truth_OneShower_evis_total_truth, &b_truth_OneShower_evis_total_truth);
-    fChain->SetBranchAddress("truth_Rejected_unused_evis_total_norm", &truth_Rejected_unused_evis_total_norm, &b_truth_Rejected_unused_evis_total_norm);
-    fChain->SetBranchAddress("truth_Rejected_unused_evis_total_truth", &truth_Rejected_unused_evis_total_truth, &b_truth_Rejected_unused_evis_total_truth);
-    fChain->SetBranchAddress("truth_ThreeShower_s1_evis_muon", &truth_ThreeShower_s1_evis_muon, &b_truth_ThreeShower_s1_evis_muon);
-    fChain->SetBranchAddress("truth_ThreeShower_s1_evis_neutron", &truth_ThreeShower_s1_evis_neutron, &b_truth_ThreeShower_s1_evis_neutron);
-    fChain->SetBranchAddress("truth_ThreeShower_s1_evis_piminus", &truth_ThreeShower_s1_evis_piminus, &b_truth_ThreeShower_s1_evis_piminus);
-    fChain->SetBranchAddress("truth_ThreeShower_s1_evis_piplus", &truth_ThreeShower_s1_evis_piplus, &b_truth_ThreeShower_s1_evis_piplus);
-    fChain->SetBranchAddress("truth_ThreeShower_s1_evis_pizero", &truth_ThreeShower_s1_evis_pizero, &b_truth_ThreeShower_s1_evis_pizero);
-    fChain->SetBranchAddress("truth_ThreeShower_s1_evis_proton", &truth_ThreeShower_s1_evis_proton, &b_truth_ThreeShower_s1_evis_proton);
-    fChain->SetBranchAddress("truth_ThreeShower_s1_evis_total_norm", &truth_ThreeShower_s1_evis_total_norm, &b_truth_ThreeShower_s1_evis_total_norm);
-    fChain->SetBranchAddress("truth_ThreeShower_s1_evis_total_truth", &truth_ThreeShower_s1_evis_total_truth, &b_truth_ThreeShower_s1_evis_total_truth);
-    fChain->SetBranchAddress("truth_ThreeShower_s2_evis_muon", &truth_ThreeShower_s2_evis_muon, &b_truth_ThreeShower_s2_evis_muon);
-    fChain->SetBranchAddress("truth_ThreeShower_s2_evis_neutron", &truth_ThreeShower_s2_evis_neutron, &b_truth_ThreeShower_s2_evis_neutron);
-    fChain->SetBranchAddress("truth_ThreeShower_s2_evis_piminus", &truth_ThreeShower_s2_evis_piminus, &b_truth_ThreeShower_s2_evis_piminus);
-    fChain->SetBranchAddress("truth_ThreeShower_s2_evis_piplus", &truth_ThreeShower_s2_evis_piplus, &b_truth_ThreeShower_s2_evis_piplus);
-    fChain->SetBranchAddress("truth_ThreeShower_s2_evis_pizero", &truth_ThreeShower_s2_evis_pizero, &b_truth_ThreeShower_s2_evis_pizero);
-    fChain->SetBranchAddress("truth_ThreeShower_s2_evis_proton", &truth_ThreeShower_s2_evis_proton, &b_truth_ThreeShower_s2_evis_proton);
-    fChain->SetBranchAddress("truth_ThreeShower_s2_evis_total_norm", &truth_ThreeShower_s2_evis_total_norm, &b_truth_ThreeShower_s2_evis_total_norm);
-    fChain->SetBranchAddress("truth_ThreeShower_s2_evis_total_truth", &truth_ThreeShower_s2_evis_total_truth, &b_truth_ThreeShower_s2_evis_total_truth);
-    fChain->SetBranchAddress("truth_ThreeShower_s3_evis_muon", &truth_ThreeShower_s3_evis_muon, &b_truth_ThreeShower_s3_evis_muon);
-    fChain->SetBranchAddress("truth_ThreeShower_s3_evis_neutron", &truth_ThreeShower_s3_evis_neutron, &b_truth_ThreeShower_s3_evis_neutron);
-    fChain->SetBranchAddress("truth_ThreeShower_s3_evis_piminus", &truth_ThreeShower_s3_evis_piminus, &b_truth_ThreeShower_s3_evis_piminus);
-    fChain->SetBranchAddress("truth_ThreeShower_s3_evis_piplus", &truth_ThreeShower_s3_evis_piplus, &b_truth_ThreeShower_s3_evis_piplus);
-    fChain->SetBranchAddress("truth_ThreeShower_s3_evis_pizero", &truth_ThreeShower_s3_evis_pizero, &b_truth_ThreeShower_s3_evis_pizero);
-    fChain->SetBranchAddress("truth_ThreeShower_s3_evis_proton", &truth_ThreeShower_s3_evis_proton, &b_truth_ThreeShower_s3_evis_proton);
-    fChain->SetBranchAddress("truth_ThreeShower_s3_evis_total_norm", &truth_ThreeShower_s3_evis_total_norm, &b_truth_ThreeShower_s3_evis_total_norm);
-    fChain->SetBranchAddress("truth_ThreeShower_s3_evis_total_truth", &truth_ThreeShower_s3_evis_total_truth, &b_truth_ThreeShower_s3_evis_total_truth);
     fChain->SetBranchAddress("truth_allClusters_evis_pizero", &truth_allClusters_evis_pizero, &b_truth_allClusters_evis_pizero);
     fChain->SetBranchAddress("truth_blob1_evis_muon", &truth_blob1_evis_muon, &b_truth_blob1_evis_muon);
     fChain->SetBranchAddress("truth_blob1_evis_neutron", &truth_blob1_evis_neutron, &b_truth_blob1_evis_neutron);
@@ -454,32 +413,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_blob2_evis_proton", &truth_blob2_evis_proton, &b_truth_blob2_evis_proton);
     fChain->SetBranchAddress("truth_blob2_evis_total_norm", &truth_blob2_evis_total_norm, &b_truth_blob2_evis_total_norm);
     fChain->SetBranchAddress("truth_blob2_evis_total_truth", &truth_blob2_evis_total_truth, &b_truth_blob2_evis_total_truth);
-    fChain->SetBranchAddress("truth_dispersed_unused_evis_gamma", &truth_dispersed_unused_evis_gamma, &b_truth_dispersed_unused_evis_gamma);
-    fChain->SetBranchAddress("truth_dispersed_unused_evis_muon", &truth_dispersed_unused_evis_muon, &b_truth_dispersed_unused_evis_muon);
-    fChain->SetBranchAddress("truth_dispersed_unused_evis_neutron", &truth_dispersed_unused_evis_neutron, &b_truth_dispersed_unused_evis_neutron);
-    fChain->SetBranchAddress("truth_dispersed_unused_evis_piminus", &truth_dispersed_unused_evis_piminus, &b_truth_dispersed_unused_evis_piminus);
-    fChain->SetBranchAddress("truth_dispersed_unused_evis_piplus", &truth_dispersed_unused_evis_piplus, &b_truth_dispersed_unused_evis_piplus);
-    fChain->SetBranchAddress("truth_dispersed_unused_evis_pizero", &truth_dispersed_unused_evis_pizero, &b_truth_dispersed_unused_evis_pizero);
-    fChain->SetBranchAddress("truth_dispersed_unused_evis_proton", &truth_dispersed_unused_evis_proton, &b_truth_dispersed_unused_evis_proton);
-    fChain->SetBranchAddress("truth_dispersed_unused_evis_total_norm", &truth_dispersed_unused_evis_total_norm, &b_truth_dispersed_unused_evis_total_norm);
-    fChain->SetBranchAddress("truth_dispersed_unused_evis_total_truth", &truth_dispersed_unused_evis_total_truth, &b_truth_dispersed_unused_evis_total_truth);
-    fChain->SetBranchAddress("truth_ecal_unused_evis_muon", &truth_ecal_unused_evis_muon, &b_truth_ecal_unused_evis_muon);
-    fChain->SetBranchAddress("truth_ecal_unused_evis_neutron", &truth_ecal_unused_evis_neutron, &b_truth_ecal_unused_evis_neutron);
-    fChain->SetBranchAddress("truth_ecal_unused_evis_piminus", &truth_ecal_unused_evis_piminus, &b_truth_ecal_unused_evis_piminus);
-    fChain->SetBranchAddress("truth_ecal_unused_evis_piplus", &truth_ecal_unused_evis_piplus, &b_truth_ecal_unused_evis_piplus);
-    fChain->SetBranchAddress("truth_ecal_unused_evis_pizero", &truth_ecal_unused_evis_pizero, &b_truth_ecal_unused_evis_pizero);
-    fChain->SetBranchAddress("truth_ecal_unused_evis_proton", &truth_ecal_unused_evis_proton, &b_truth_ecal_unused_evis_proton);
-    fChain->SetBranchAddress("truth_ecal_unused_evis_total_norm", &truth_ecal_unused_evis_total_norm, &b_truth_ecal_unused_evis_total_norm);
-    fChain->SetBranchAddress("truth_ecal_unused_evis_total_truth", &truth_ecal_unused_evis_total_truth, &b_truth_ecal_unused_evis_total_truth);
     fChain->SetBranchAddress("truth_eventID", &truth_eventID, &b_truth_eventID);
-    fChain->SetBranchAddress("truth_hcal_unused_evis_muon", &truth_hcal_unused_evis_muon, &b_truth_hcal_unused_evis_muon);
-    fChain->SetBranchAddress("truth_hcal_unused_evis_neutron", &truth_hcal_unused_evis_neutron, &b_truth_hcal_unused_evis_neutron);
-    fChain->SetBranchAddress("truth_hcal_unused_evis_piminus", &truth_hcal_unused_evis_piminus, &b_truth_hcal_unused_evis_piminus);
-    fChain->SetBranchAddress("truth_hcal_unused_evis_piplus", &truth_hcal_unused_evis_piplus, &b_truth_hcal_unused_evis_piplus);
-    fChain->SetBranchAddress("truth_hcal_unused_evis_pizero", &truth_hcal_unused_evis_pizero, &b_truth_hcal_unused_evis_pizero);
-    fChain->SetBranchAddress("truth_hcal_unused_evis_proton", &truth_hcal_unused_evis_proton, &b_truth_hcal_unused_evis_proton);
-    fChain->SetBranchAddress("truth_hcal_unused_evis_total_norm", &truth_hcal_unused_evis_total_norm, &b_truth_hcal_unused_evis_total_norm);
-    fChain->SetBranchAddress("truth_hcal_unused_evis_total_truth", &truth_hcal_unused_evis_total_truth, &b_truth_hcal_unused_evis_total_truth);
     fChain->SetBranchAddress("truth_michelElectron_E", &truth_michelElectron_E, &b_truth_michelElectron_E);
     fChain->SetBranchAddress("truth_michelElectron_P", &truth_michelElectron_P, &b_truth_michelElectron_P);
     fChain->SetBranchAddress("truth_michelMuon_P", &truth_michelMuon_P, &b_truth_michelMuon_P);
@@ -490,31 +424,17 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_michelPion_length", &truth_michelPion_length, &b_truth_michelPion_length);
     fChain->SetBranchAddress("truth_muon_P", &truth_muon_P, &b_truth_muon_P);
     fChain->SetBranchAddress("truth_muon_theta", &truth_muon_theta, &b_truth_muon_theta);
-    fChain->SetBranchAddress("truth_other_unused_evis_muon", &truth_other_unused_evis_muon, &b_truth_other_unused_evis_muon);
-    fChain->SetBranchAddress("truth_other_unused_evis_neutron", &truth_other_unused_evis_neutron, &b_truth_other_unused_evis_neutron);
-    fChain->SetBranchAddress("truth_other_unused_evis_piminus", &truth_other_unused_evis_piminus, &b_truth_other_unused_evis_piminus);
-    fChain->SetBranchAddress("truth_other_unused_evis_piplus", &truth_other_unused_evis_piplus, &b_truth_other_unused_evis_piplus);
-    fChain->SetBranchAddress("truth_other_unused_evis_pizero", &truth_other_unused_evis_pizero, &b_truth_other_unused_evis_pizero);
-    fChain->SetBranchAddress("truth_other_unused_evis_proton", &truth_other_unused_evis_proton, &b_truth_other_unused_evis_proton);
-    fChain->SetBranchAddress("truth_other_unused_evis_total_norm", &truth_other_unused_evis_total_norm, &b_truth_other_unused_evis_total_norm);
-    fChain->SetBranchAddress("truth_other_unused_evis_total_truth", &truth_other_unused_evis_total_truth, &b_truth_other_unused_evis_total_truth);
+    fChain->SetBranchAddress("truth_muon_theta_beam", &truth_muon_theta_beam, &b_truth_muon_theta_beam);
     fChain->SetBranchAddress("truth_pi0_KE", &truth_pi0_KE, &b_truth_pi0_KE);
     fChain->SetBranchAddress("truth_pi0_P", &truth_pi0_P, &b_truth_pi0_P);
     fChain->SetBranchAddress("truth_pi0_theta", &truth_pi0_theta, &b_truth_pi0_theta);
+    fChain->SetBranchAddress("truth_pi0_theta_beam", &truth_pi0_theta_beam, &b_truth_pi0_theta_beam);
     fChain->SetBranchAddress("truth_proton_P", &truth_proton_P, &b_truth_proton_P);
     fChain->SetBranchAddress("truth_proton_theta", &truth_proton_theta, &b_truth_proton_theta);
+    fChain->SetBranchAddress("truth_proton_theta_beam", &truth_proton_theta_beam, &b_truth_proton_theta_beam);
     fChain->SetBranchAddress("truth_total_captured_evis_pizero", &truth_total_captured_evis_pizero, &b_truth_total_captured_evis_pizero);
     fChain->SetBranchAddress("truth_total_captured_evis_total_norm", &truth_total_captured_evis_total_norm, &b_truth_total_captured_evis_total_norm);
     fChain->SetBranchAddress("truth_total_captured_evis_total_truth", &truth_total_captured_evis_total_truth, &b_truth_total_captured_evis_total_truth);
-    fChain->SetBranchAddress("truth_vertex_unused_evis_gamma", &truth_vertex_unused_evis_gamma, &b_truth_vertex_unused_evis_gamma);
-    fChain->SetBranchAddress("truth_vertex_unused_evis_muon", &truth_vertex_unused_evis_muon, &b_truth_vertex_unused_evis_muon);
-    fChain->SetBranchAddress("truth_vertex_unused_evis_neutron", &truth_vertex_unused_evis_neutron, &b_truth_vertex_unused_evis_neutron);
-    fChain->SetBranchAddress("truth_vertex_unused_evis_piminus", &truth_vertex_unused_evis_piminus, &b_truth_vertex_unused_evis_piminus);
-    fChain->SetBranchAddress("truth_vertex_unused_evis_piplus", &truth_vertex_unused_evis_piplus, &b_truth_vertex_unused_evis_piplus);
-    fChain->SetBranchAddress("truth_vertex_unused_evis_pizero", &truth_vertex_unused_evis_pizero, &b_truth_vertex_unused_evis_pizero);
-    fChain->SetBranchAddress("truth_vertex_unused_evis_proton", &truth_vertex_unused_evis_proton, &b_truth_vertex_unused_evis_proton);
-    fChain->SetBranchAddress("truth_vertex_unused_evis_total_norm", &truth_vertex_unused_evis_total_norm, &b_truth_vertex_unused_evis_total_norm);
-    fChain->SetBranchAddress("truth_vertex_unused_evis_total_truth", &truth_vertex_unused_evis_total_truth, &b_truth_vertex_unused_evis_total_truth);
     fChain->SetBranchAddress("truth_gamma1_4P", truth_gamma1_4P, &b_truth_gamma1_4P);
     fChain->SetBranchAddress("truth_gamma1_final_pos", truth_gamma1_final_pos, &b_truth_gamma1_final_pos);
     fChain->SetBranchAddress("truth_gamma1_init_pos", truth_gamma1_init_pos, &b_truth_gamma1_init_pos);
@@ -762,8 +682,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("prong_part_mass", prong_part_mass, &b_prong_part_mass);
     fChain->SetBranchAddress("prong_part_charge", prong_part_charge, &b_prong_part_charge);
     fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
-    //fChain->SetBranchAddress("prong_part_E", &prong_part_E, &b_prong_part_E);
-    //fChain->SetBranchAddress("prong_part_pos", &prong_part_pos, &b_prong_part_pos);
 
 }
 

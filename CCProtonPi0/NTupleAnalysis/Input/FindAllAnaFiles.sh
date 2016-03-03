@@ -3,7 +3,7 @@
 # outputs list of files to  pl_DATATYPE_Merged.dat
 #
 DATATYPE=$1
-CCPROTONPI0_V="v2_62"
+CCPROTONPI0_V="v2_64b"
 
 input_error()
 {
@@ -15,8 +15,7 @@ input_error()
 
 find_files()
 {
-    #find /pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/*/${ANADIR} -name "*Ana*Tuple*.root" -printf "%p\n" | sort > Playlists/pl_${DATAFOLDER}_Merged.dat
-    find /minerva/data/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/*/${ANADIR} -name "*Ana*Tuple*.root" -printf "%p\n" | sort > Playlists/pl_${DATAFOLDER}_Merged.dat
+    find /pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/*/${ANADIR} -name "*Ana*Tuple*.root" -printf "%p\n" | sort > Playlists/pl_${DATAFOLDER}_Merged.dat
 }
 
 

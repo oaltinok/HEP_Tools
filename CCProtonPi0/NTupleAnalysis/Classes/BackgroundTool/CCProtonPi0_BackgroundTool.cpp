@@ -11,8 +11,8 @@ CCProtonPi0_BackgroundTool::CCProtonPi0_BackgroundTool(bool isModeReduce) : CCPr
     if(isModeReduce){
         cout<<"\tNTuple Reduce Mode -- Will not create Text Files"<<endl;
     }else{
-        OpenTextFile();
-    
+        OpenTextFiles();
+
         initBackgrounds();
     }
     cout<<"Done!"<<endl;
@@ -25,6 +25,13 @@ void CCProtonPi0_BackgroundTool::initBackgrounds()
     initSingleBackground(bckg_SinglePi0, "SinglePi0");
     initSingleBackground(bckg_MultiPi0, "MultiPi0");
     initSingleBackground(bckg_Total_WithPi0, "TotalWithPi0");
+
+    // Background Type Compact
+    initSingleBackground(bckg_compact_WithPi0,"With Pi0");
+    initSingleBackground(bckg_compact_QELike,"QE Like");
+    initSingleBackground(bckg_compact_SinglePiPlus,"Single Pi Plus");
+    initSingleBackground(bckg_compact_Other,"Other");
+    initSingleBackground(bckg_compact_Total,"Total");
 
     // Background Type
     initSingleBackground(bckg_NC, "NC");
@@ -40,11 +47,16 @@ void CCProtonPi0_BackgroundTool::initBackgrounds()
     initSingleBackground(bckg_Total, "Total");
 }
 
-void CCProtonPi0_BackgroundTool::initSingleBackground(Background &b, string input_name)
+void CCProtonPi0_BackgroundTool::initSingleBackground(vector<Background> &b, string input_name)
 {
-    b.name = input_name;
-    b.nAll = 0.0;
-    b.nWithMichel = 0.0;
+    Background temp;
+    temp.name = input_name;
+    temp.nAll = 0.0;
+    temp.nWithMichel = 0.0;
+
+    for(int i = 0; i < nTables; ++i){
+        b.push_back(temp);
+    }
 }
 
 void CCProtonPi0_BackgroundTool::updateBackground(Background &b, bool withMichel)
@@ -56,48 +68,121 @@ void CCProtonPi0_BackgroundTool::updateBackground(Background &b, bool withMichel
     if(withMichel) b.nWithMichel++;
 }
 
-void CCProtonPi0_BackgroundTool::fillBackgroundWithPi0(bool NoPi0, bool SinglePi0, bool MultiPi0, bool withMichel)
+
+void CCProtonPi0_BackgroundTool::fillBackgroundCompact(bool WithPi0, bool QELike, bool SinglePiPlus, bool Other)
 {
+    // ----------------------------------------------------------------------------------
+    // Fill Table 0 for Inclusive
+    // ----------------------------------------------------------------------------------
+    int ind = 0;
     // Update Total Background
-    updateBackground(bckg_Total_WithPi0,withMichel);
+    updateBackground(bckg_compact_Total[ind]);
 
     // Update Each Background
-    if (NoPi0) updateBackground(bckg_NoPi0,withMichel);
-    else if (SinglePi0) updateBackground(bckg_SinglePi0,withMichel);
-    else if (MultiPi0) updateBackground(bckg_MultiPi0,withMichel);
+    if (WithPi0) updateBackground(bckg_compact_WithPi0[ind]);
+    else if (QELike) updateBackground(bckg_compact_QELike[ind]);
+    else if (SinglePiPlus) updateBackground(bckg_compact_SinglePiPlus[ind]);
+    else if (Other) updateBackground(bckg_compact_Other[ind]);
+    else cout<<"WARNING! No BackgroundCompact Found"<<endl;
+
+    // ----------------------------------------------------------------------------------
+    // Fill Table nTracks for Topology Dependency
+    // ----------------------------------------------------------------------------------
+    ind = nTracks;
+    // Update Total Background
+    updateBackground(bckg_compact_Total[ind]);
+
+    // Update Each Background
+    if (WithPi0) updateBackground(bckg_compact_WithPi0[ind]);
+    else if (QELike) updateBackground(bckg_compact_QELike[ind]);
+    else if (SinglePiPlus) updateBackground(bckg_compact_SinglePiPlus[ind]);
+    else if (Other) updateBackground(bckg_compact_Other[ind]);
+    else cout<<"WARNING! No BackgroundCompact Found"<<endl;
+}
+
+void CCProtonPi0_BackgroundTool::fillBackgroundWithPi0(bool NoPi0, bool SinglePi0, bool MultiPi0, bool withMichel)
+{
+    // ----------------------------------------------------------------------------------
+    // Fill Table 0 for Inclusive
+    // ----------------------------------------------------------------------------------
+    int ind = 0;
+    // Update Total Background
+    updateBackground(bckg_Total_WithPi0[ind],withMichel);
+
+    // Update Each Background
+    if (NoPi0) updateBackground(bckg_NoPi0[ind],withMichel);
+    else if (SinglePi0) updateBackground(bckg_SinglePi0[ind],withMichel);
+    else if (MultiPi0) updateBackground(bckg_MultiPi0[ind],withMichel);
+    else cout<<"WARNING! No BackgroundWithPi0 Found"<<endl;
+
+    // ----------------------------------------------------------------------------------
+    // Fill Table nTracks for Topology Dependency
+    // ----------------------------------------------------------------------------------
+    ind = nTracks;
+    // Update Total Background
+    updateBackground(bckg_Total_WithPi0[ind],withMichel);
+
+    // Update Each Background
+    if (NoPi0) updateBackground(bckg_NoPi0[ind],withMichel);
+    else if (SinglePi0) updateBackground(bckg_SinglePi0[ind],withMichel);
+    else if (MultiPi0) updateBackground(bckg_MultiPi0[ind],withMichel);
     else cout<<"WARNING! No BackgroundWithPi0 Found"<<endl;
 }
 
 void CCProtonPi0_BackgroundTool::fillBackground(bool NC, bool AntiNeutrino, bool QELike, bool SingleChargedPion, bool SingleChargedPion_ChargeExchanged, bool DoublePionWithPi0, bool DoublePionWithoutPi0,  bool MultiPionWithPi0, bool MultiPionWithoutPi0, bool Other, bool withMichel)
 {
+    // ----------------------------------------------------------------------------------
+    // Fill Table 0 for Inclusive
+    // ----------------------------------------------------------------------------------
+    int ind = 0;
     // Update Total Background
-    updateBackground(bckg_Total,withMichel);
-    
+    updateBackground(bckg_Total[ind],withMichel);
+
     // Update Each Background
-    if (NC) updateBackground(bckg_NC,withMichel);
-    else if (AntiNeutrino) updateBackground(bckg_AntiNeutrino,withMichel);
-    else if (QELike) updateBackground(bckg_QELike,withMichel);
-    else if (SingleChargedPion) updateBackground(bckg_SingleChargedPion,withMichel);
-    else if (SingleChargedPion_ChargeExchanged) updateBackground(bckg_SingleChargedPion_ChargeExchanged,withMichel);
-    else if (DoublePionWithPi0) updateBackground(bckg_DoublePionWithPi0,withMichel);
-    else if (DoublePionWithoutPi0) updateBackground(bckg_DoublePionWithoutPi0,withMichel);
-    else if (MultiPionWithPi0) updateBackground(bckg_MultiPionWithPi0,withMichel);
-    else if (MultiPionWithoutPi0) updateBackground(bckg_MultiPionWithoutPi0,withMichel);
-    else if (Other) updateBackground(bckg_Other,withMichel);
+    if (NC) updateBackground(bckg_NC[ind],withMichel);
+    else if (AntiNeutrino) updateBackground(bckg_AntiNeutrino[ind],withMichel);
+    else if (QELike) updateBackground(bckg_QELike[ind],withMichel);
+    else if (SingleChargedPion) updateBackground(bckg_SingleChargedPion[ind],withMichel);
+    else if (SingleChargedPion_ChargeExchanged) updateBackground(bckg_SingleChargedPion_ChargeExchanged[ind],withMichel);
+    else if (DoublePionWithPi0) updateBackground(bckg_DoublePionWithPi0[ind],withMichel);
+    else if (DoublePionWithoutPi0) updateBackground(bckg_DoublePionWithoutPi0[ind],withMichel);
+    else if (MultiPionWithPi0) updateBackground(bckg_MultiPionWithPi0[ind],withMichel);
+    else if (MultiPionWithoutPi0) updateBackground(bckg_MultiPionWithoutPi0[ind],withMichel);
+    else if (Other) updateBackground(bckg_Other[ind],withMichel);
+    else cout<<"WARNING! No Background Type Found!"<<endl;
+
+    // ----------------------------------------------------------------------------------
+    // Fill Table nTracks for Topology Dependency
+    // ----------------------------------------------------------------------------------
+    ind = nTracks;
+    // Update Total Background
+    updateBackground(bckg_Total[ind],withMichel);
+
+    // Update Each Background
+    if (NC) updateBackground(bckg_NC[ind],withMichel);
+    else if (AntiNeutrino) updateBackground(bckg_AntiNeutrino[ind],withMichel);
+    else if (QELike) updateBackground(bckg_QELike[ind],withMichel);
+    else if (SingleChargedPion) updateBackground(bckg_SingleChargedPion[ind],withMichel);
+    else if (SingleChargedPion_ChargeExchanged) updateBackground(bckg_SingleChargedPion_ChargeExchanged[ind],withMichel);
+    else if (DoublePionWithPi0) updateBackground(bckg_DoublePionWithPi0[ind],withMichel);
+    else if (DoublePionWithoutPi0) updateBackground(bckg_DoublePionWithoutPi0[ind],withMichel);
+    else if (MultiPionWithPi0) updateBackground(bckg_MultiPionWithPi0[ind],withMichel);
+    else if (MultiPionWithoutPi0) updateBackground(bckg_MultiPionWithoutPi0[ind],withMichel);
+    else if (Other) updateBackground(bckg_Other[ind],withMichel);
     else cout<<"WARNING! No Background Type Found!"<<endl;
 }
 
 void CCProtonPi0_BackgroundTool::writeBackgroundTableHeader()
 {
-    textFile<<std::left;
-    
-    // Table Header
-    textFile.width(40); textFile<< "Background Type";
-    textFile.width(16); textFile<< "N(Events)"; 
-    textFile.width(16); textFile<< "Percent"; 
-    //textFile.width(16); textFile<< "N(WithMichel)"; 
-    //textFile.width(16); textFile<< "Percent"; 
-    textFile<<endl;
+    for (int i = 0; i < nTables; ++i){
+        textFile[i]<<std::left;
+
+        // Table Header
+        textFile[i].width(40); textFile[i]<<"Background Type";
+        textFile[i].width(16); textFile[i]<<"N(Events)"; 
+        textFile[i].width(16); textFile[i]<<"Percent"; 
+        textFile[i]<<endl;
+    }
 }
 
 
@@ -108,7 +193,14 @@ void CCProtonPi0_BackgroundTool::formBackgroundVectors()
     BackgroundWithPi0Vector.push_back(bckg_SinglePi0);
     BackgroundWithPi0Vector.push_back(bckg_MultiPi0);
     BackgroundWithPi0Vector.push_back(bckg_Total_WithPi0);
-    
+
+    // Background Type Compact
+    BackgroundCompactVector.push_back(bckg_compact_WithPi0);
+    BackgroundCompactVector.push_back(bckg_compact_QELike);
+    BackgroundCompactVector.push_back(bckg_compact_SinglePiPlus);
+    BackgroundCompactVector.push_back(bckg_compact_Other);
+    BackgroundCompactVector.push_back(bckg_compact_Total);
+
     // Background Type
     BackgroundTypeVector.push_back(bckg_NC);
     BackgroundTypeVector.push_back(bckg_AntiNeutrino);
@@ -128,21 +220,23 @@ double CCProtonPi0_BackgroundTool::calcPercent(double nEvents, double nBase)
     return (nEvents / nBase * 100.0);
 }
 
-void CCProtonPi0_BackgroundTool::writeBackgroundTableRows(vector< Background > &bckgVector)
+void CCProtonPi0_BackgroundTool::writeBackgroundTableRows(vector< vector<Background> > &bckgVector)
 {
-    // Write Background With Pi0
-    for (unsigned int i = 0; i < bckgVector.size(); i++){
-        Background temp = bckgVector[i];
+    for (unsigned int i = 0; i < bckgVector.size(); ++i){
+        vector<Background> temp = bckgVector[i];
 
-        textFile.width(40); textFile<<temp.name;  
-        textFile.width(16); textFile<<temp.nAll;    
-        textFile.width(16); textFile<<calcPercent(temp.nAll,bckg_Total.nAll);    
-        //textFile.width(16); textFile<<temp.nWithMichel;   
-        //textFile.width(16); textFile<<calcPercent(temp.nWithMichel,bckg_Total.nWithMichel);    
-        textFile<<endl;
+        for (int j = 0; j < nTables; ++j){
+            textFile[j].width(40); textFile[j]<<temp[j].name;  
+            textFile[j].width(16); textFile[j]<<temp[j].nAll;    
+            textFile[j].width(16); textFile[j]<<calcPercent(temp[j].nAll, bckg_Total[j].nAll);    
+            textFile[j]<<endl;
+        }
     }
 
-    textFile<<endl;
+    // Add an empty line after each background type
+    for (int j = 0; j < nTables; ++j){
+        textFile[j]<<endl;
+    }
 }
 
 void CCProtonPi0_BackgroundTool::writeBackgroundTable()
@@ -152,29 +246,33 @@ void CCProtonPi0_BackgroundTool::writeBackgroundTable()
     cout<<">> Writing "<<fileName<<endl;
 
     writeBackgroundTableHeader();
+    writeBackgroundTableRows(BackgroundCompactVector);
     writeBackgroundTableRows(BackgroundWithPi0Vector);
     writeBackgroundTableRows(BackgroundTypeVector);
 }
 
-void CCProtonPi0_BackgroundTool::OpenTextFile()
+void CCProtonPi0_BackgroundTool::OpenTextFiles()
 {
     // Open Background Files
-    fileName = Folder_List::output + Folder_List::textOut + "BackgroundTable.txt";
+    fileName[0] = Folder_List::output + Folder_List::textOut + "BackgroundTable_All.txt";
+    fileName[1] = Folder_List::output + Folder_List::textOut + "BackgroundTable_1Track.txt";
+    fileName[2] = Folder_List::output + Folder_List::textOut + "BackgroundTable_2Track.txt";
 
-    textFile.open( fileName.c_str() );
-    if( !textFile.is_open() ){
-        cerr<<"Cannot open output text file: "<<fileName<<endl;
-        exit(1);
-    }else{
-        cout<<"\t"<<fileName<<endl;
+    for (int i = 0; i < nTables; ++i){
+        OpenTextFile(fileName[i], textFile[i]);
     }
 }
 
 CCProtonPi0_BackgroundTool::~CCProtonPi0_BackgroundTool()
 {
-    textFile.close(); 
+    for (int i = 0; i < nTables; ++i){
+        textFile[i].close(); 
+    }
 }
 
-
+void CCProtonPi0_BackgroundTool::set_nTracks(int input)
+{
+    nTracks = input;
+}
 
 #endif

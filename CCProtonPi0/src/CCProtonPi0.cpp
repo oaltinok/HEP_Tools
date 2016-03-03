@@ -236,8 +236,11 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleTruthBranch("pi0_KE",SENTINEL);
     declareDoubleTruthBranch("proton_P",SENTINEL);
     declareDoubleTruthBranch("muon_theta",SENTINEL);
+    declareDoubleTruthBranch("muon_theta_beam",SENTINEL);
     declareDoubleTruthBranch("pi0_theta",SENTINEL);
+    declareDoubleTruthBranch("pi0_theta_beam",SENTINEL);
     declareDoubleTruthBranch("proton_theta",SENTINEL);
+    declareDoubleTruthBranch("proton_theta_beam",SENTINEL);
 
     declareIntTruthBranch("pi0_status", -9 );
     declareIntTruthBranch("pi0_Mother", -9 );
@@ -274,6 +277,12 @@ StatusCode CCProtonPi0::initialize()
     declareBoolTruthBranch("isBckg_MultiPi0");
 
     // Background Types
+    declareBoolTruthBranch("isBckg_Compact_WithPi0");
+    declareBoolTruthBranch("isBckg_Compact_QELike");
+    declareBoolTruthBranch("isBckg_Compact_SinglePiPlus");
+    declareBoolTruthBranch("isBckg_Compact_Other");
+    
+    // Background Types All
     declareIntTruthBranch("Bckg_nOther", -1);
     declareIntTruthBranch("Bckg_nPiCharged", -1);
     declareIntTruthBranch("Bckg_nPiCharged_ChargeExchanged", -1);
@@ -487,8 +496,8 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("muon_phi_beam", 0.0);
     declareDoubleEventBranch("muon_theta", 0.0);
     declareDoubleEventBranch("muon_theta_beam", 0.0);
-    declareDoubleEventBranch("muon_theta_biasUp", 0.0);
-    declareDoubleEventBranch("muon_theta_biasDown", 0.0); 
+    declareDoubleEventBranch("muon_theta_beam_biasUp", 0.0);
+    declareDoubleEventBranch("muon_theta_beam_biasDown", 0.0); 
     declareDoubleEventBranch("muon_muScore", -1.0);
     declareDoubleEventBranch("muon_qp", 99.0);
     declareDoubleEventBranch("muon_qpqpe", 99.0);
@@ -553,6 +562,8 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("pi0_invMass_Old", SENTINEL);
     declareDoubleEventBranch("pi0_theta", SENTINEL);
     declareDoubleEventBranch("pi0_theta_beam", SENTINEL);
+    declareDoubleEventBranch("pi0_theta_beam_biasUp", SENTINEL);
+    declareDoubleEventBranch("pi0_theta_beam_biasDown", SENTINEL);
     declareDoubleEventBranch("pi0_phi",   SENTINEL);
     declareDoubleEventBranch("pi0_phi_beam",   SENTINEL);
     declareDoubleEventBranch("pi0_openingAngle",  SENTINEL);
@@ -1302,6 +1313,7 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     }else{
         // Two Different Backround Sets
         tagBackground(truthEvent);
+        tagBackground_Compact(truthEvent);
         tagBackgroundWithPi0(truthEvent);
     }
 
@@ -1473,8 +1485,8 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     double muon_theta = muon_4p.theta();
     double muon_phi_beam = m_coordSysTool->phiWRTBeam(muon_4p);
     double muon_theta_beam = m_coordSysTool->thetaWRTBeam(muon_4p);
-    double muon_theta_biasUp = m_coordSysTool->thetaWRTBeam(muon_4p,m_beamAngleBias) - muon_theta_beam;
-    double muon_theta_biasDown = m_coordSysTool->thetaWRTBeam(muon_4p, -1.0*m_beamAngleBias) - muon_theta_beam;
+    double muon_theta_beam_biasUp = m_coordSysTool->thetaWRTBeam(muon_4p,m_beamAngleBias) - muon_theta_beam;
+    double muon_theta_beam_biasDown = m_coordSysTool->thetaWRTBeam(muon_4p, -1.0*m_beamAngleBias) - muon_theta_beam;
 
     // Muon Score
     double muon_muScore = m_MuonParticle->score();
@@ -1542,8 +1554,8 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("muon_phi_beam",muon_phi_beam);
     event->setDoubleData("muon_theta",muon_theta);
     event->setDoubleData("muon_theta_beam",muon_theta_beam);
-    event->setDoubleData("muon_theta_biasUp",muon_theta_biasUp);
-    event->setDoubleData("muon_theta_biasDown",muon_theta_biasDown);
+    event->setDoubleData("muon_theta_beam_biasUp",muon_theta_beam_biasUp);
+    event->setDoubleData("muon_theta_beam_biasDown",muon_theta_beam_biasDown);
     event->setDoubleData("muon_muScore", muon_muScore);
     event->setDoubleData("muon_qp",muon_qp );
     event->setDoubleData("muon_qpqpe",muon_qpqpe);
@@ -2281,6 +2293,8 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
 
     // Get Angles wrt Beam Coordinates
     double pi0_theta_beam = m_coordSysTool->thetaWRTBeam(pi0_4P);
+    double pi0_theta_beam_biasUp = m_coordSysTool->thetaWRTBeam(pi0_4P,m_beamAngleBias) - pi0_theta_beam;
+    double pi0_theta_beam_biasDown = m_coordSysTool->thetaWRTBeam(pi0_4P,-1.0*m_beamAngleBias) - pi0_theta_beam;
     double pi0_phi_beam = m_coordSysTool->phiWRTBeam(pi0_4P);
     double gamma1_theta_beam = m_coordSysTool->thetaWRTBeam(gamma1_4P);
     double gamma1_phi_beam = m_coordSysTool->phiWRTBeam(gamma1_4P);
@@ -2327,6 +2341,8 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("pi0_P", pi0_P);
     event->setDoubleData("pi0_KE", pi0_KE);
     event->setDoubleData("pi0_theta_beam", pi0_theta_beam);
+    event->setDoubleData("pi0_theta_beam_biasUp", pi0_theta_beam_biasUp);
+    event->setDoubleData("pi0_theta_beam_biasDown", pi0_theta_beam_biasDown);
     event->setDoubleData("pi0_phi_beam", pi0_phi_beam);
     event->setDoubleData("pi0_theta", pi0_theta);
     event->setDoubleData("pi0_phi", pi0_phi);

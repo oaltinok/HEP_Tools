@@ -70,6 +70,8 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
             continue;
         }
 
+        UpdateSignalDef();
+        
         // Count Signal and Background
         if (truth_isSignal){
             FillSignalHistograms();
@@ -80,6 +82,12 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
         if (truth_isBckg_NoPi0) nBckg_NoPi0++;
         else if (truth_isBckg_SinglePi0) nBckg_SinglePi0++;
         else if (truth_isBckg_MultiPi0) nBckg_MultiPi0++;
+
+        // Background Types Compact
+        if (truth_isBckg_Compact_WithPi0) nBckg_Compact_WithPi0++;
+        else if (truth_isBckg_Compact_QELike) nBckg_Compact_QELike++;
+        else if (truth_isBckg_Compact_SinglePiPlus) nBckg_Compact_SinglePiPlus++;
+        else if (truth_isBckg_Compact_Other) nBckg_Compact_Other++;
 
         // Background Types
         if (truth_isBckg_NC) nBckg_NC++;
@@ -93,6 +101,7 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
         else if (truth_isBckg_MultiPionWithoutPi0) nBckg_MultiPion_WithoutPi0++;
         else if (truth_isBckg_Other) nBckg_Other++;
         else if (truth_isFidVol && !truth_isSignal) std::cout<<"WARNING! No Background Type"<<std::endl;
+    
     }
 
     // Add Other Error Bands and Fill With CV
@@ -105,9 +114,11 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 void CCProtonPi0_TruthAnalyzer::writeTextFile() 
 {
     double totalBackgroundWithPi0 = nBckg_NoPi0 + nBckg_SinglePi0 + nBckg_MultiPi0;
+    double totalBackground_Compact = nBckg_Compact_WithPi0 + nBckg_Compact_QELike + nBckg_Compact_SinglePiPlus + nBckg_Compact_Other;
     double totalBackground = nBckg_NC + nBckg_AntiNeutrino + nBckg_QELike + nBckg_SingleChargedPion + nBckg_SingleChargedPion_ChargeExchanged + nBckg_DoublePion_WithPi0 + nBckg_DoublePion_WithoutPi0 + nBckg_MultiPion_WithPi0 + nBckg_MultiPion_WithoutPi0 + nBckg_Other;
     double totalEvents1 = nSignal + totalBackgroundWithPi0;
-    double totalEvents2 = nSignal + totalBackground;
+    double totalEvents2 = nSignal + totalBackground_Compact;
+    double totalEvents3 = nSignal + totalBackground;
 
     // Formatting for Text Output
     textFile<<std::fixed;
@@ -119,6 +130,11 @@ void CCProtonPi0_TruthAnalyzer::writeTextFile()
     textFile<<"nNoFidVol = "<<nNoFidVol<<" "<<GetPercent(nAll,nNoFidVol)<<"%"<<std::endl;
     textFile<<"================================================================"<<std::endl;
     textFile<<"nSignal = "<<nSignal<<" "<<GetPercent(nFidVol,nSignal)<<"%"<<std::endl;
+    textFile<<"----------------------------------------------------------------"<<std::endl;
+    textFile<<"nBckg_WithPi0 = "<<nBckg_Compact_WithPi0<<" "<<GetPercent(nFidVol,nBckg_Compact_WithPi0)<<"%"<<std::endl;
+    textFile<<"nBckg_QELike = "<<nBckg_Compact_QELike<<" "<<GetPercent(nFidVol,nBckg_Compact_QELike)<<"%"<<std::endl;
+    textFile<<"nBckg_SinglePiPlus = "<<nBckg_Compact_SinglePiPlus<<" "<<GetPercent(nFidVol,nBckg_Compact_SinglePiPlus)<<"%"<<std::endl;
+    textFile<<"nBckg_Other = "<<nBckg_Compact_Other<<" "<<GetPercent(nFidVol,nBckg_Compact_Other)<<"%"<<std::endl;
     textFile<<"----------------------------------------------------------------"<<std::endl;
     textFile<<"nBckg_NoPi0 = "<<nBckg_NoPi0<<" "<<GetPercent(nFidVol,nBckg_NoPi0)<<"%"<<std::endl;
     textFile<<"nBckg_SinglePi0 = "<<nBckg_SinglePi0<<" "<<GetPercent(nFidVol,nBckg_SinglePi0)<<"%"<<std::endl;
@@ -137,7 +153,8 @@ void CCProtonPi0_TruthAnalyzer::writeTextFile()
     textFile<<"----------------------------------------------------------------"<<std::endl;
 
     textFile<<"Total Signal & Background With Pi0 = "<<totalEvents1<<" "<<GetPercent(nFidVol,totalEvents1)<<"%"<<std::endl;
-    textFile<<"Total Signal & Background = "<<totalEvents2<<" "<<GetPercent(nFidVol,totalEvents2)<<"%"<<std::endl;
+    textFile<<"Total Signal & Background Compact = "<<totalEvents2<<" "<<GetPercent(nFidVol,totalEvents2)<<"%"<<std::endl;
+    textFile<<"Total Signal & Background = "<<totalEvents3<<" "<<GetPercent(nFidVol,totalEvents3)<<"%"<<std::endl;
 
     textFile.close();
 }
@@ -182,6 +199,12 @@ void CCProtonPi0_TruthAnalyzer::resetCounters()
     nBckg_NoPi0 = 0.0;
     nBckg_SinglePi0 = 0.0;
     nBckg_MultiPi0 = 0.0;
+
+    // Background Types Compact
+    nBckg_Compact_WithPi0 = 0.0;
+    nBckg_Compact_QELike = 0.0;
+    nBckg_Compact_SinglePiPlus = 0.0;
+    nBckg_Compact_Other = 0.0;
 
     // Background Types
     nBckg_NC = 0.0;
@@ -372,6 +395,21 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
     FillHistogram(pi0_theta_mc_truth_all_signal, truth_pi0_theta * rad_to_deg);
     FillHistogram(neutrino_E_mc_truth_all_signal, mc_incomingE * MeV_to_GeV);
     FillHistogram(QSq_mc_truth_all_signal, mc_Q2 * MeVSq_to_GeVSq);
+}
+
+void CCProtonPi0_TruthAnalyzer::UpdateSignalDef()
+{
+    // Signal Definition with Neutrino Energy
+    if (truth_isSignal){
+        bool isEnu_inRange = mc_incomingE >= min_Enu && mc_incomingE <= max_Enu; 
+        truth_isSignal = isEnu_inRange;
+        // If event no longer a signal due to Enu Range -- it is background
+        if (!truth_isSignal){
+            truth_isBckg_Compact_WithPi0 = true;
+            truth_isBckg_SinglePi0 = true;
+            truth_isBckg_Other = true;
+        }
+    }
 }
 
 void CCProtonPi0_TruthAnalyzer::writeHistograms()

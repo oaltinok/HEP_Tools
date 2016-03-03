@@ -80,17 +80,13 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     //--------------------------------------------------------------------------
     int t_current = truthEvent->current();
     int t_neutrinoPDG = truthEvent->incoming();
-    double Enu = truthEvent->incomingEnergy();
-    const double min_Enu = 2000;    // MeV 
-    const double max_Enu = 20000;   // MeV
 
     bool isFidVol = truthEvent->filtertaglist()->isFilterTagTrue("isFidVol");
     bool isCCNeutrino = (t_current == 1 && t_neutrinoPDG == PDG::nu_mu);
     bool isFSGood = (N_pi0 == 1 && N_other == 0);
-    bool isEnuInRange = (Enu >= min_Enu) && (Enu <= max_Enu); 
 
     bool isSignal = false;
-    if(isFidVol && isCCNeutrino && isFSGood && isEnuInRange){
+    if(isFidVol && isCCNeutrino && isFSGood){
         isSignal = true;
         debug()<<"Found a Signal Event!"<<endmsg;
     }
@@ -98,6 +94,99 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal", isSignal );
 
     return isSignal;
+}
+// Compact Background Types
+//      QE Like
+//      Single Charge Pion
+//      Background With Pi0
+//      Other
+void CCProtonPi0::tagBackground_Compact(Minerva::GenMinInteraction* truthEvent) const
+{
+    Minerva::TG4Trajectories::iterator it_mcpart;
+    Minerva::TG4Trajectories* trajects = NULL;
+    if( exist<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default ) ) {
+        trajects = get<Minerva::TG4Trajectories>( Minerva::TG4TrajectoryLocation::Default );
+    } else {
+        warning() << "Could not get TG4Trajectories from " << Minerva::TG4TrajectoryLocation::Default << endmsg;
+        return;
+    }
+
+    // just to make sure
+    if( !trajects ) return;
+
+    std::vector<int> primary_Pi0_ID;
+    std::vector<int> primary_particle_ID;
+    int particle_PDG = 0;
+    int particle_ID = 0;
+    int mother_ID = 0;
+
+    // Counters
+    int nAntiMuon = 0;
+    int nNucleon = 0;
+    int nPiPlus = 0;
+    int nPiMinus = 0;
+    int nPiZero = 0;
+    int nOther = 0;
+
+    // Loop over Primary Trajectories
+    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+
+        // Skip NonPrimary Trajectories
+        if ( (*it_mcpart)->GetProcessName() != "Primary") continue;
+
+        particle_PDG = (*it_mcpart)->GetPDGCode();
+        particle_ID = (*it_mcpart)->GetTrackId();
+        primary_particle_ID.push_back(particle_ID);
+
+        // Count Primary Particles
+        if ( particle_PDG == PDG::muon ) continue;
+        else if ( particle_PDG == -(PDG::muon)) nAntiMuon++;
+        else if ( (particle_PDG == PDG::proton) || (particle_PDG == PDG::neutron) ) nNucleon++;
+        else if ( particle_PDG == PDG::pi ) nPiPlus++;
+        else if ( particle_PDG == -(PDG::pi) ) nPiMinus++;
+        else if ( particle_PDG == PDG::pi0 ){
+            nPiZero++;
+            primary_Pi0_ID.push_back(particle_ID);
+        } else nOther++;
+    }
+
+    // Loop over Secondary Trajectories to Check Secondary Pi0
+    for (it_mcpart = trajects->begin(); it_mcpart != trajects->end(); ++it_mcpart) {
+
+        // Skip Primary Trajectories
+        if ( (*it_mcpart)->GetProcessName() == "Primary") continue;
+
+        particle_PDG = (*it_mcpart)->GetPDGCode();
+        mother_ID = (*it_mcpart)->GetParentId();
+
+        // Loop over only Secondary Particles
+        if ( isMotherPrimary(primary_particle_ID, mother_ID) ){
+            // Check Trajectory Mother is NOT a Primary Pi0 - Scattering
+            if ( particle_PDG == PDG::pi0 && !isMotherPrimary(primary_Pi0_ID, mother_ID) ){
+                nPiZero++;
+            }
+        }
+    }
+
+    // Set Background Type
+    bool WithPi0 = false;
+    bool QELike = false;
+    bool SinglePiPlus = false;
+    bool Other = false;
+    
+    // -------------------------------------------------------------------------
+    // Background Types 
+    // -------------------------------------------------------------------------
+    if (nAntiMuon > 0) Other = true;
+    else if (nPiZero > 0) WithPi0 = true;
+    else if (nNucleon > 0 && nPiPlus == 0 && nPiMinus == 0 && nOther == 0) QELike = true;
+    else if (nPiPlus > 0 && nPiMinus == 0 && nOther == 0) SinglePiPlus = true;
+    else Other = true;
+
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_Compact_WithPi0", WithPi0);
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_Compact_QELike", QELike);
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_Compact_SinglePiPlus", SinglePiPlus );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_Compact_Other", Other);
 }
 
 void CCProtonPi0::tagBackgroundWithPi0(Minerva::GenMinInteraction* truthEvent) const
@@ -589,11 +678,14 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
     
     double muon_P;
     double muon_theta;
+    double muon_theta_beam;
     double pi0_P;
     double pi0_KE;
     double pi0_theta;
+    double pi0_theta_beam;
     double proton_P;
     double proton_theta;
+    double proton_theta_beam;
 
     // Loop Vars
     Gaudi::LorentzVector temp_4P;
@@ -613,6 +705,7 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
         if (particle_PDG == PDG::muon){
             muon_P = temp_4P.P();
             muon_theta = temp_4P.theta();
+            muon_theta_beam = m_coordSysTool->thetaWRTBeam(temp_4P);
             muon_4P[0] = temp_4P.px();  
             muon_4P[1] = temp_4P.py(); 
             muon_4P[2] = temp_4P.pz(); 
@@ -623,6 +716,7 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
             pi0_P = temp_4P.P();
             pi0_KE = temp_4P.E()-MinervaUnits::M_pi0;
             pi0_theta = temp_4P.theta();
+            pi0_theta_beam = m_coordSysTool->thetaWRTBeam(temp_4P);
             pi0_4P[0] = temp_4P.px();  
             pi0_4P[1] = temp_4P.py(); 
             pi0_4P[2] = temp_4P.pz(); 
@@ -631,6 +725,7 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
         }else if ((particle_PDG == PDG::proton) && (max_protonE < temp_4P.E()) ){
             proton_P = temp_4P.P();
             proton_theta = temp_4P.theta();
+            proton_theta_beam = m_coordSysTool->thetaWRTBeam(temp_4P);
             proton_4P[0] = temp_4P.px();  
             proton_4P[1] = temp_4P.py(); 
             proton_4P[2] = temp_4P.pz(); 
@@ -650,8 +745,11 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
     truthEvent->setDoubleData("pi0_KE", pi0_KE);
     truthEvent->setDoubleData("proton_P", proton_P);
     truthEvent->setDoubleData("muon_theta", muon_theta);
+    truthEvent->setDoubleData("muon_theta_beam", muon_theta_beam);
     truthEvent->setDoubleData("pi0_theta", pi0_theta);
+    truthEvent->setDoubleData("pi0_theta_beam", pi0_theta_beam);
     truthEvent->setDoubleData("proton_theta", proton_theta);
+    truthEvent->setDoubleData("proton_theta_beam", proton_theta_beam);
 }
 
 void CCProtonPi0::setSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInteraction *truthEvent, int &Pi0_ID) const

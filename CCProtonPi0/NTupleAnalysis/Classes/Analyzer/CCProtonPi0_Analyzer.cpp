@@ -14,7 +14,7 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
-    nMaxEvents = 100000;
+    nMaxEvents = 5000;
 
     // Initialize Flux File if it is MC 
     if (m_isMC){
@@ -23,6 +23,13 @@ void CCProtonPi0_Analyzer::specifyRunTime()
         new_flux::get().calc_weights();
     }
  
+    npi0 = 0;
+    npiplus = 0;
+    nproton = 0;
+    nneutron = 0;
+    nmuon = 0;
+    other = 0;
+
     // Control Flow
     isDataAnalysis  = true;
     isScanRun = true;
@@ -35,9 +42,6 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     applyPhotonDistance = true;
     minPhotonDistance_1 = 14; //cm
     minPhotonDistance_2 = 0; //cm
-
-    applyBeamEnergy = true;
-    max_beamEnergy = 20.0; // GeV
 
     min_Pi0_invMass = 60.0;
     max_Pi0_invMass = 200.0;
@@ -105,11 +109,14 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         // Progress Message on Terminal
         if (jentry%50000 == 0) cout<<"\tEntry "<<jentry<<endl;
 
+
         if (applyMaxEvents && jentry == nMaxEvents){
             cout<<"\tReached Event Limit!"<<endl;
             break;
         }
 
+        UpdateSignalDef();
+        
         Calc_WeightFromSystematics();
 
         CorrectEMShowerCalibration();
@@ -178,6 +185,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             break;
         }
        
+        UpdateSignalDef();
         CorrectNTupleVariables();
 
         if (!truth_isSignal){
@@ -191,6 +199,9 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         // Fill Background Branches for Background Events
         //----------------------------------------------------------------------
         if(m_isMC && !truth_isSignal) {
+            if (nProtonCandidates == 0) bckgTool.set_nTracks(1);
+            else bckgTool.set_nTracks(2);
+            bckgTool.fillBackgroundCompact(truth_isBckg_Compact_WithPi0, truth_isBckg_Compact_QELike, truth_isBckg_Compact_SinglePiPlus, truth_isBckg_Compact_Other);                                    
             bckgTool.fillBackgroundWithPi0(truth_isBckg_NoPi0, truth_isBckg_SinglePi0, truth_isBckg_MultiPi0, truth_isBckg_withMichel);                                    
             bckgTool.fillBackground(truth_isBckg_NC, truth_isBckg_AntiNeutrino, truth_isBckg_QELike, truth_isBckg_SingleChargedPion,truth_isBckg_SingleChargedPion_ChargeExchanged, truth_isBckg_DoublePionWithPi0, truth_isBckg_DoublePionWithoutPi0, truth_isBckg_MultiPionWithPi0, truth_isBckg_MultiPionWithoutPi0, truth_isBckg_Other, truth_isBckg_withMichel);                                    
         }
@@ -230,6 +241,14 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
+
+    cout<<npi0<<endl;
+    cout<<npiplus<<endl;
+    cout<<nproton<<endl;
+    cout<<nneutron<<endl;
+    cout<<nmuon<<endl;
+    cout<<other<<endl;
+
 }
 
 
@@ -748,7 +767,8 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_neutrinoE,CCProtonPi0_neutrino_E * MeV_to_GeV);
     else FillHistogram(cutList.hCut_2Track_neutrinoE,CCProtonPi0_neutrino_E * MeV_to_GeV); 
 
-    if ( applyBeamEnergy && ((CCProtonPi0_neutrino_E * MeV_to_GeV) > max_beamEnergy)) return false;
+    bool isEnu_inRange = CCProtonPi0_neutrino_E >= min_Enu && CCProtonPi0_neutrino_E <= max_Enu;
+    if ( !isEnu_inRange ) return false;
 
     cutList.nCut_beamEnergy.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_beamEnergy.increment(truth_isSignal, study1, study2);
@@ -759,9 +779,10 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // ------------------------------------------------------------------------
     fill_BackgroundSubtractionHists();
 
+    FillInvMass_TruthMatch();
     FillHistogram(cutList.hCut_pi0invMass, pi0_invMass);
     FillHistogram(cutList.hCut_pi0invMass_Old, pi0_invMass_Old);
-  
+
     if (nProtonCandidates == 0){
         FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
         FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
@@ -1437,12 +1458,8 @@ void CCProtonPi0_Analyzer::FillHistogram(vector<MnvH1D*> &hist, double var)
             // Fill Background
             hist[2]->Fill(var, cvweight); // Always Fill ind == 2 -- All Background
 
-            // Fill Background with Pi0
-            int ind = GetBackgroundWithPi0Ind();
-            hist[ind]->Fill(var, cvweight);
-
             // Fill Background Type
-            ind = GetBackgroundTypeInd();
+            int ind = GetBackgroundTypeInd();
             hist[ind]->Fill(var, cvweight);
         }
     }
@@ -1554,24 +1571,6 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_Genie(MnvH2D* h, double var1, doubl
     h->FillVertErrorBand("GENIE_VecFFCCQEshape"    ,var1, var2, truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   , cvweight);
 }
 
-int CCProtonPi0_Analyzer::GetBackgroundWithPi0Ind()
-{
-    // Check For Signal
-    if (truth_isSignal){
-        cout<<"WARNING! Signal Event requested Background Ind! - Returning -1"<<endl;
-        return -1;
-    }
-
-    // Background With Pi0
-    if (truth_isBckg_NoPi0) return 3;
-    else if (truth_isBckg_SinglePi0) return 4;
-    else if (truth_isBckg_MultiPi0) return 5;
-    else{
-        cout<<"WARNING! No Background Type Found - Returning -1"<<endl;
-        return -1;
-    }
-}
-
 int CCProtonPi0_Analyzer::GetBackgroundTypeInd()
 {
     // Check For Signal
@@ -1580,17 +1579,10 @@ int CCProtonPi0_Analyzer::GetBackgroundTypeInd()
         return -1;
     }
 
-    // Background With Pi0
-    if (truth_isBckg_NC) return 6;
-    else if (truth_isBckg_AntiNeutrino) return 7;
-    else if (truth_isBckg_QELike) return 8;
-    else if (truth_isBckg_SingleChargedPion) return 9;
-    else if (truth_isBckg_SingleChargedPion_ChargeExchanged) return 10;
-    else if (truth_isBckg_DoublePionWithPi0) return 11;
-    else if (truth_isBckg_DoublePionWithoutPi0) return 12;
-    else if (truth_isBckg_MultiPionWithPi0) return 13;
-    else if (truth_isBckg_MultiPionWithoutPi0) return 14;
-    else if (truth_isBckg_Other) return 15;
+    if (truth_isBckg_Compact_WithPi0) return 3;
+    else if (truth_isBckg_Compact_QELike) return 4;
+    else if (truth_isBckg_Compact_SinglePiPlus) return 5;
+    else if (truth_isBckg_Compact_Other) return 6;
     else{
         cout<<"WARNING! No Background Type Found - Returning -1"<<endl;
         return -1;
@@ -1669,6 +1661,47 @@ void CCProtonPi0_Analyzer::AddErrorBands_Data()
     AddVertErrorBands_Data(muon.muon_P_all);
     AddVertErrorBands_Data(muon.muon_theta_all);
     AddVertErrorBands_Data(interaction.QSq_all);
+}
+
+
+void CCProtonPi0_Analyzer::UpdateSignalDef()
+{
+    // Signal Definition with Neutrino Energy
+    if (m_isMC && truth_isSignal){
+        bool isEnu_inRange = mc_incomingE >= min_Enu && mc_incomingE <= max_Enu; 
+        truth_isSignal = isEnu_inRange;
+        // If event no longer a signal due to Enu Range -- it is background
+        if (!truth_isSignal){
+            truth_isBckg_Compact_WithPi0 = true;
+            truth_isBckg_SinglePi0 = true;
+            truth_isBckg_Other = true;
+        }
+    }
+}
+
+
+void CCProtonPi0_Analyzer::FillInvMass_TruthMatch()
+{
+    int pdg;
+    if (truth_blob1_evis_total_truth > truth_blob2_evis_total_truth){
+        pdg = truth_blob1_evis_most_pdg;
+    }else{
+        pdg = truth_blob2_evis_most_pdg;
+    }
+
+    if (truth_isSignal){
+        if (pdg == 111) FillHistogram(cutList.signal_invMass_pizero, pi0_invMass);
+        else if (pdg == 211) FillHistogram(cutList.signal_invMass_piplus, pi0_invMass);
+        else if (pdg == 2212) FillHistogram(cutList.signal_invMass_proton, pi0_invMass);
+        else if (pdg == 2112) FillHistogram(cutList.signal_invMass_neutron, pi0_invMass);
+        else FillHistogram(cutList.signal_invMass_other, pi0_invMass);
+    }else{
+        if (pdg == 111) FillHistogram(cutList.background_invMass_pizero, pi0_invMass);
+        else if (pdg == 211) FillHistogram(cutList.background_invMass_piplus, pi0_invMass);
+        else if (pdg == 2212) FillHistogram(cutList.background_invMass_proton, pi0_invMass);
+        else if (pdg == 2112) FillHistogram(cutList.background_invMass_neutron, pi0_invMass);
+        else FillHistogram(cutList.background_invMass_other, pi0_invMass);
+    }
 }
 
 #endif //CCProtonPi0_Analyzer_cpp

@@ -42,7 +42,7 @@ class CCProtonPi0_NTupleAnalysis
        
         std::string ana_folder;
         // Constants 
-        static const int nHistograms = 16;
+        static const int nHistograms = 7;
         static const int nTopologies = 2;
         static const int n_universe = 100;
 
@@ -52,6 +52,8 @@ class CCProtonPi0_NTupleAnalysis
         static const double MeVSq_to_GeVSq;
         static const double mm_to_cm;
         static const double rad_to_deg;
+        static const double min_Enu;
+        static const double max_Enu;
 
         void OpenTextFile(std::string file_name, std::ofstream &file);
         

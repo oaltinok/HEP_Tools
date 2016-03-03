@@ -1,27 +1,26 @@
-CCPROTONPI0_V="v2_63"
+CCPROTONPI0_V="v2_64"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Signal Definition Changed
-		Added min neutrino Energy = 2 GeV
-		Acceptance: No events having energy less than 2GeV
+	Removed Neutrino Energy requirement from Signal Definition
+		Applying in NTupleAnalysis Stage
 
-	Fixed truth_pi0_KE variable
-		was writing pi0_P on it
-
-	Fixed Angles
-		was using angles wrt Beam
-		_theta and _phi are in Lab Frame
-		_theta_beam and _phi_beam are in Beam Frame
-
-	Collected Shower Recovery variables under new Study
-		Use StudyShowerRecovery in options file
-	
-	Collected Unused Energy Truth Matching under new Study
-		Use StudyUnusedEnergy in options file
+	Background Classification Improved
+		Added a more Compact Classification
+			BckgWithPi0
+			QELike
+			SinglePiPlus
+			Other
 
 -------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
+	GetSignalDef()
+		Applies Neutrino Energy requirement
 
+	BackgroundTool Improved
+		Different Tables for different topologies
+		Added latest background types
+
+	Truth Match Plots for Invariant Mass
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

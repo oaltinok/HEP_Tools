@@ -381,6 +381,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::ProngVect& prongs ) const;
         void setVertexData(Minerva::PhysicsEvent* event ) const;
         void tagBackground(Minerva::GenMinInteraction* truthEvent) const;
+        void tagBackground_Compact(Minerva::GenMinInteraction* truthEvent) const;
         void tagBackgroundWithPi0(Minerva::GenMinInteraction* truthEvent) const;
         void tagPrimaryMuon(Minerva::PhysicsEvent *event) const;
         void writeBackgroundType(Minerva::GenMinInteraction* truthEvent) const;

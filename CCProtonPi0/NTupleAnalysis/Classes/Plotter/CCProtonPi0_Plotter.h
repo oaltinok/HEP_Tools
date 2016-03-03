@@ -116,6 +116,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // Other Plots 
         void plotGENIEXSec();
         void plotOtherStudies();
+        void plot_InvMass_TruthMatch_Stacked(bool isSignal, bool isStacked);
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
         void plot_stacked_pi0_P();
@@ -146,7 +147,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
-        void DrawStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
 
         // Data vs MC
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
@@ -159,7 +159,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
-        void DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
 
         // Other
         void DrawBackgroundSubtraction(bool isMC);
@@ -171,7 +170,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
         // Helper
         void FormTObjArray_BckgType(TFile* f_mc, std::string var_name, TObjArray* mc_hists, double &hist_max, double &bin_width); 
-        void FormTObjArray_BckgWithPi0(TFile* f_mc, std::string var_name, TObjArray* mc_hists, double &hist_max, double &bin_width); 
         void AddNormBox(MnvPlotter* plotter, bool isPOTNorm, double mc_ratio);
         void SaveRecoRatioPoints(rootDir& dir, std::string var_name, std::string plotDir);
         void Save2DHistPoints(rootDir& dir, std::string var_name, std::string plotDir);     

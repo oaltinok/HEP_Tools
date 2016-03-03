@@ -31,8 +31,10 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_BackgroundTool(bool isModeReduce);
         ~CCProtonPi0_BackgroundTool();
         
+        void set_nTracks(int input);
         void writeBackgroundTable();
         void fillBackgroundWithPi0(bool NoPi0, bool SinglePi0, bool MultiPi0, bool withMichel);
+        void fillBackgroundCompact(bool WithPi0, bool QELike, bool SinglePiPlus, bool Other);
         
         void fillBackground(bool NC,
                             bool AntiNeutrino,
@@ -46,39 +48,49 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
                             bool Other,
                             bool withMichel);
     private:
-        string fileName;
-        ofstream textFile;
+        static const int nTables = 3;
+        int nTracks;
+        string fileName[nTables];
+        ofstream textFile[nTables];
         
-        vector< Background > BackgroundWithPi0Vector;
-        vector< Background > BackgroundTypeVector;
+        vector< vector<Background> > BackgroundWithPi0Vector;
+        vector< vector<Background> > BackgroundCompactVector;
+        vector< vector<Background> > BackgroundTypeVector;
        
         // Background with Pi0
-        Background bckg_NoPi0;
-        Background bckg_SinglePi0;
-        Background bckg_MultiPi0;
-        Background bckg_Total_WithPi0;
-        
-        // Background Types 
-        Background bckg_NC;
-        Background bckg_AntiNeutrino;
-        Background bckg_QELike;
-        Background bckg_SingleChargedPion;
-        Background bckg_SingleChargedPion_ChargeExchanged;
-        Background bckg_DoublePionWithPi0;
-        Background bckg_DoublePionWithoutPi0;
-        Background bckg_MultiPionWithPi0;
-        Background bckg_MultiPionWithoutPi0;
-        Background bckg_Other;
-        Background bckg_Total;
+        vector<Background> bckg_NoPi0;
+        vector<Background> bckg_SinglePi0;
+        vector<Background> bckg_MultiPi0;
+        vector<Background> bckg_Total_WithPi0;
+       
+        // Background Types Compact
+        vector<Background> bckg_compact_WithPi0;
+        vector<Background> bckg_compact_QELike;
+        vector<Background> bckg_compact_SinglePiPlus;
+        vector<Background> bckg_compact_Other;
+        vector<Background> bckg_compact_Total;
 
-        void updateBackground(Background &b, bool withMichel);
+        // Background Types 
+        vector<Background> bckg_NC;
+        vector<Background> bckg_AntiNeutrino;
+        vector<Background> bckg_QELike;
+        vector<Background> bckg_SingleChargedPion;
+        vector<Background> bckg_SingleChargedPion_ChargeExchanged;
+        vector<Background> bckg_DoublePionWithPi0;
+        vector<Background> bckg_DoublePionWithoutPi0;
+        vector<Background> bckg_MultiPionWithPi0;
+        vector<Background> bckg_MultiPionWithoutPi0;
+        vector<Background> bckg_Other;
+        vector<Background> bckg_Total;
+
+        void updateBackground(Background &b, bool withMichel = false);
         double calcPercent(double nEvents, double nBase);
         void formBackgroundVectors();
         void initBackgrounds();
-        void initSingleBackground(Background &b, string name);
+        void initSingleBackground(vector<Background> &b, string name);
         void writeBackgroundTableHeader();
-        void writeBackgroundTableRows(vector< Background > &bckgVector);
-        void OpenTextFile();
+        void writeBackgroundTableRows(vector< vector<Background> > &bckgVector);
+        void OpenTextFiles();
 
 };
 

@@ -27,7 +27,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
         }
        
         use_nTrueSignal = true;
-        nTrueSignal = 238015;
+        nTrueSignal = 231186;
         
         SetCutNames();
         OpenTextFiles(isMC);
@@ -223,6 +223,48 @@ void CCProtonPi0_CutList::initHistograms()
     pi0_invMass_1Track = new TH1D("pi0_invMass_1Track","#pi^{0} Invariant Mass 1 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     pi0_invMass_2Track = new TH1D("pi0_invMass_2Track","#pi^{0} Invariant Mass 2 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
 
+    // Pi0 Invariant Mass - Truth Match
+    signal_invMass_pizero = new TH1D("signal_invMass_pizero","#pi^{0} Invariant Mass - Most PDG: pizero",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    signal_invMass_pizero->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    signal_invMass_pizero->GetYaxis()->SetTitle("N(Events)");
+
+    signal_invMass_piplus = new TH1D("signal_invMass_piplus","#pi^{0} Invariant Mass - Most PDG: piplus",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    signal_invMass_piplus->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    signal_invMass_piplus->GetYaxis()->SetTitle("N(Events)");
+
+    signal_invMass_proton = new TH1D("signal_invMass_proton","#pi^{0} Invariant Mass - Most PDG: proton",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    signal_invMass_proton->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    signal_invMass_proton->GetYaxis()->SetTitle("N(Events)");
+
+    signal_invMass_neutron = new TH1D("signal_invMass_neutron","#pi^{0} Invariant Mass - Most PDG: neutron",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    signal_invMass_neutron->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    signal_invMass_neutron->GetYaxis()->SetTitle("N(Events)");
+
+    signal_invMass_other = new TH1D("signal_invMass_other","#pi^{0} Invariant Mass - Most PDG: other",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    signal_invMass_other->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    signal_invMass_other->GetYaxis()->SetTitle("N(Events)");
+
+    background_invMass_pizero = new TH1D("background_invMass_pizero","#pi^{0} Invariant Mass - Most PDG: pizero",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    background_invMass_pizero->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    background_invMass_pizero->GetYaxis()->SetTitle("N(Events)");
+
+    background_invMass_piplus = new TH1D("background_invMass_piplus","#pi^{0} Invariant Mass - Most PDG: piplus",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    background_invMass_piplus->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    background_invMass_piplus->GetYaxis()->SetTitle("N(Events)");
+
+    background_invMass_proton = new TH1D("background_invMass_proton","#pi^{0} Invariant Mass - Most PDG: proton",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    background_invMass_proton->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    background_invMass_proton->GetYaxis()->SetTitle("N(Events)");
+
+    background_invMass_neutron = new TH1D("background_invMass_neutron","#pi^{0} Invariant Mass - Most PDG: neutron",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    background_invMass_neutron->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    background_invMass_neutron->GetYaxis()->SetTitle("N(Events)");
+
+    background_invMass_other = new TH1D("background_invMass_other","#pi^{0} Invariant Mass - Most PDG: other",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    background_invMass_other->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    background_invMass_other->GetYaxis()->SetTitle("N(Events)");
+
+    // Pi0 Invariant Mass - Background Subtraction
     invMass_all = new MnvH1D("invMass_all","Data #pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     invMass_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
     invMass_all->GetYaxis()->SetTitle("N(Events)");
@@ -568,6 +610,18 @@ void CCProtonPi0_CutList::writeHistograms()
     
     pi0_invMass_1Track->Write();
     pi0_invMass_2Track->Write();
+    
+    signal_invMass_pizero->Write();
+    signal_invMass_piplus->Write();
+    signal_invMass_proton->Write();
+    signal_invMass_neutron->Write();
+    signal_invMass_other->Write();
+ 
+    background_invMass_pizero->Write();
+    background_invMass_piplus->Write();
+    background_invMass_proton->Write();
+    background_invMass_neutron->Write();
+    background_invMass_other->Write();
 
     invMass_all->Write();
     invMass_mc_reco_all->Write();

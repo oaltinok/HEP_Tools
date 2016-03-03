@@ -12,7 +12,6 @@ using namespace PlotUtils;
 void CCProtonPi0_Plotter::DrawStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
 {
     DrawStackedMC_BckgAll(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
-    //DrawStackedMC_BckgWithPi0(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
     DrawStackedMC_BckgType(dir, var_name, plotDir, nCutArrows, cutArrow1, cutArrow2);
 }
 
@@ -22,16 +21,13 @@ void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, 
     // POT Normalized Plots 
     // ------------------------------------------------------------------------
     DrawDataStackedMC_BckgAll(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
-    DrawDataStackedMC_BckgWithPi0(dir, var_name,plotDir, true, nCutArrows,  cutArrow1, cutArrow2);
     DrawDataStackedMC_BckgType(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
 
     // ------------------------------------------------------------------------
     // Area Normalized Plots 
     // ------------------------------------------------------------------------
     DrawDataStackedMC_BckgAll(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
-    DrawDataStackedMC_BckgWithPi0(dir, var_name,plotDir, false, nCutArrows,  cutArrow1, cutArrow2);
     DrawDataStackedMC_BckgType(dir, var_name,plotDir, false, nCutArrows, cutArrow1, cutArrow2);
-
 }
 
 void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
@@ -139,6 +135,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
 
     std::string var;
     double hist_max = 0;
+    double max_bin;
     double bin_width;
 
     // ------------------------------------------------------------------------
@@ -146,7 +143,6 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
     // ------------------------------------------------------------------------
     var = Form("%s_%d",var_name.c_str(),0);
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
-
     // ------------------------------------------------------------------------
     // Fill TObjArray - For MC Histograms
     // ------------------------------------------------------------------------
@@ -175,6 +171,11 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
     plotter->AddHistoTitle(data[0].GetTitle());
     AddNormBox(plotter, isPOTNorm, mc_ratio);
 
+    // Get Line Heights from Data
+    max_bin = data->GetMaximumBin();
+    hist_max = data->GetBinContent(max_bin)*1.2;
+    bin_width = data->GetBinWidth(1);
+
     // If Cut Histogram - Add Cut Arrows
     if (nCutArrows == 1){
         AddCutArrow(plotter, cutArrow1, hist_max, bin_width);
@@ -182,70 +183,28 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
         AddCutArrow(plotter, cutArrow1, hist_max, bin_width);
         AddCutArrow(plotter, cutArrow2, hist_max, bin_width);
     }
+
+    // Add Pi0 InvMass Line
+    std::size_t found = var_name.find("invMass");
+    if (found != std::string::npos){
+        TLine pi0Mass;
+        pi0Mass.SetLineWidth(2);
+        pi0Mass.SetLineColor(kBlue);
+        pi0Mass.DrawLine(134.98,0,134.98,hist_max);
+    }
+
+    // Add Delta+ InvMass Line
+    if (    var_name.compare("deltaInvMass") == 0 ||
+            var_name.compare("W_Calc") == 0 ){
+        TLine deltaMass;
+        deltaMass.SetLineWidth(2);
+        deltaMass.SetLineColor(kBlue);
+        deltaMass.DrawLine(1.232,0,1.232,hist_max);
+    }
+
 
     // Print Plot
     c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_Type_",norm_label.c_str(),".png"), "png");
-
-    delete c;
-    delete plotter;
-}
-
-void CCProtonPi0_Plotter::DrawDataStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
-{
-    std::string rootDir_data = dir.data;
-    std::string rootDir_mc = dir.mc;
-
-    TFile* f_data = new TFile(rootDir_data.c_str());
-    TFile* f_mc = new TFile(rootDir_mc.c_str());
-
-    std::string var;
-    double hist_max = 0;
-    double bin_width;
-
-    // ------------------------------------------------------------------------
-    // Get Data Histogram
-    // ------------------------------------------------------------------------
-    var = Form("%s_%d",var_name.c_str(),0);
-    MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
-
-    // ------------------------------------------------------------------------
-    // Fill TObjArray - For MC Histograms
-    // ------------------------------------------------------------------------
-    TObjArray* mc_hists = new TObjArray;
-    FormTObjArray_BckgWithPi0(f_mc, var_name, mc_hists, hist_max, bin_width);
-
-    // ------------------------------------------------------------------------
-    // MC Normalization 
-    // ------------------------------------------------------------------------
-    var = Form("%s_%d",var_name.c_str(),0);
-    MnvH1D* mc_all = (MnvH1D*)f_mc->Get(var.c_str()); 
-    std::string norm_label; 
-    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc_all);
-
-    // ------------------------------------------------------------------------
-    // Plot 
-    // ------------------------------------------------------------------------
-    TCanvas* c = new TCanvas("c","c",1280,800);
-    MnvPlotter* plotter = new MnvPlotter();
-    ApplyStyle(plotter);
-    //plotter->axis_minimum = 0.1;
-    plotter->axis_minimum = 0.0;
-    plotter->DrawDataStackedMC(data,mc_hists,mc_ratio ,"TR","Data",0);
-
-    // If Cut Histogram - Add Cut Arrows
-    if (nCutArrows == 1){
-        AddCutArrow(plotter, cutArrow1, hist_max, bin_width);
-    }else if (nCutArrows == 2){
-        AddCutArrow(plotter, cutArrow1, hist_max, bin_width);
-        AddCutArrow(plotter, cutArrow2, hist_max, bin_width);
-    }
-
-    // Add Plot Labels
-    plotter->AddHistoTitle(data[0].GetTitle());
-    AddNormBox(plotter, isPOTNorm, mc_ratio);
-
-    // Print Plot
-    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_Pi0_",norm_label.c_str(),".png"), "png");
 
     delete c;
     delete plotter;
@@ -805,7 +764,7 @@ void CCProtonPi0_Plotter::AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, d
 {
     double cut_location = cutArrow.cut_location;
     double ymin = 0;
-    double ymax = hist_max + hist_max*0.1;
+    double ymax = hist_max;
     std::string arrow_direction = cutArrow.arrow_direction;
 
     plotter->AddCutArrow(cut_location, ymin, ymax, arrow_length, arrow_direction); 
@@ -960,60 +919,6 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgType(rootDir &dir, std::string var_n
 
     // Print Plot
     c->Print(Form("%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_Type_",".png"), "png");
-
-    delete c;
-    delete plotter;
-}
-
-void CCProtonPi0_Plotter::DrawStackedMC_BckgWithPi0(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
-{
-    std::string rootDir_mc = dir.mc;
-
-    TFile* f_mc = new TFile(rootDir_mc.c_str());
-
-    double hist_max = 0;
-    double bin_width;
-
-    // ------------------------------------------------------------------------
-    // Fill TObjArray - For MC Histograms
-    // ------------------------------------------------------------------------
-    TObjArray* mc_hists = new TObjArray;
-    FormTObjArray_BckgWithPi0(f_mc, var_name, mc_hists, hist_max, bin_width);
-
-    // ------------------------------------------------------------------------
-    // Plot 
-    // ------------------------------------------------------------------------
-    TCanvas* c = new TCanvas("c","c",1280,800);
-    MnvPlotter* plotter = new MnvPlotter();
-    ApplyStyle(plotter);
-    //plotter->axis_minimum = 0.1;
-    plotter->axis_minimum = 0.0;
-    plotter->DrawStackedMC(mc_hists,1,"TR",0);
-
-    // Add Plot Labels
-    std::string var = Form("%s_%d",var_name.c_str(),0);
-    MnvH1D* temp = (MnvH1D*)f_mc->Get(var.c_str());
-    plotter->AddHistoTitle(temp->GetTitle());
-
-    // Add Pi0 InvMass Line
-    std::size_t found = var_name.find("invMass");
-    if (found != std::string::npos){
-        TLine pi0Mass;
-        pi0Mass.SetLineWidth(2);
-        pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,hist_max);
-    }
-
-    // If Cut Histogram - Add Cut Arrows
-    if (nCutArrows == 1){
-        AddCutArrow(plotter, cutArrow1, hist_max, bin_width);
-    }else if (nCutArrows == 2){
-        AddCutArrow(plotter, cutArrow1, hist_max, bin_width);
-        AddCutArrow(plotter, cutArrow2, hist_max, bin_width);
-    }
-
-    // Print Plot
-    c->Print(Form("%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_Pi0_",".png"), "png");
 
     delete c;
     delete plotter;
@@ -1252,8 +1157,18 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     temp->SetFillColor(kGreen);
     mc_hists->Add(temp);
 
+    // Get Bckg: WithPi0
+    var = Form("%s_%d",var_name.c_str(),3);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Bckg: #pi^{0} + X");
+    max_bin = temp->GetMaximumBin();
+    hist_max = hist_max + temp->GetBinContent(max_bin);
+    temp->SetLineColor(kRed);
+    temp->SetFillColor(kRed);
+    mc_hists->Add(temp);
+
     // Get Bckg: QELike
-    var = Form("%s_%d",var_name.c_str(),8);
+    var = Form("%s_%d",var_name.c_str(),4);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Bckg: QELike");
     max_bin = temp->GetMaximumBin();
@@ -1262,88 +1177,18 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     temp->SetFillColor(kOrange);
     mc_hists->Add(temp);
 
-    // Get Bckg: SingleChargedPion
-    var = Form("%s_%d",var_name.c_str(),9);
+    // Get Bckg: SinglePiPlus
+    var = Form("%s_%d",var_name.c_str(),5);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: SingleChargedPion");
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kRed);
-    temp->SetFillColor(kRed);
-    mc_hists->Add(temp);
-
-    // Get Bckg: SingleChargedPion Charge Exchanged
-    var = Form("%s_%d",var_name.c_str(),10);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: SingleChargedPion_ChargeExc");
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kTeal);
-    temp->SetFillColor(kTeal);
-    mc_hists->Add(temp);
-
-    // Get Bckg: DoublePionWithPi0
-    var = Form("%s_%d",var_name.c_str(),11);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: DoublePionWithPi0");
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kMagenta);
-    temp->SetFillColor(kMagenta);
-    mc_hists->Add(temp);
-
-    // Get Bckg: DoublePionWithoutPi0
-    var = Form("%s_%d",var_name.c_str(),12);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: DoublePionWithoutPi0");
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kYellow);
-    temp->SetFillColor(kYellow);
-    mc_hists->Add(temp);
-
-    // Get Bckg: MultiPionWithPi0
-    var = Form("%s_%d",var_name.c_str(),13);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: MultiPionWithPi0");
+    temp->SetTitle("Bckg: 1#pi^{+}");
     max_bin = temp->GetMaximumBin();
     hist_max = hist_max + temp->GetBinContent(max_bin);
     temp->SetLineColor(kBlue);
     temp->SetFillColor(kBlue);
     mc_hists->Add(temp);
 
-    // Get Bckg: MultiPionWithoutPi0
-    var = Form("%s_%d",var_name.c_str(),14);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: MultiPionWithoutPi0");
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kBlack);
-    temp->SetFillColor(kBlack);
-    mc_hists->Add(temp);
-
-    // Get Bckg: NC
-    var = Form("%s_%d",var_name.c_str(),6);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: NC");
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kGray);
-    temp->SetFillColor(kGray);
-    mc_hists->Add(temp);
-
-    // Get Bckg: AntiNeutrino
-    var = Form("%s_%d",var_name.c_str(),7);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: AntiNeutrino");
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kGray);
-    temp->SetFillColor(kGray);
-    mc_hists->Add(temp);
-
     // Get Bckg: Other
-    var = Form("%s_%d",var_name.c_str(),15);
+    var = Form("%s_%d",var_name.c_str(),6);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Bckg: Other");
     max_bin = temp->GetMaximumBin();
@@ -1352,54 +1197,6 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     temp->SetFillColor(kGray);
     mc_hists->Add(temp);
 
-}
-
-void CCProtonPi0_Plotter::FormTObjArray_BckgWithPi0(TFile* f_mc, std::string var_name, TObjArray* mc_hists, double &hist_max, double &bin_width) 
-{
-    std::string var;
-    double max_bin;
-    MnvH1D* temp;
-
-    // Get Signal
-    var = Form("%s_%d",var_name.c_str(),1);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Signal");
-    bin_width = temp->GetBinWidth(1);
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kGreen);
-    temp->SetFillColor(kGreen);
-    mc_hists->Add(temp);
-
-    // Get Bckg: NoPi0
-    var = Form("%s_%d",var_name.c_str(),3);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: NoPi0");
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kYellow);
-    temp->SetFillColor(kYellow);
-    mc_hists->Add(temp);
-
-    // Get Bckg: SinglePi0
-    var = Form("%s_%d",var_name.c_str(),4);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: SinglePi0");
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kRed);
-    temp->SetFillColor(kRed);
-    mc_hists->Add(temp);
-
-    // Get Bckg: MultiPi0
-    var = Form("%s_%d",var_name.c_str(),5);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: MultiPi0");
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kBlue);
-    temp->SetFillColor(kBlue);
-    mc_hists->Add(temp);
 }
 
 void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)

@@ -32,17 +32,17 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     //  Data vs MC
     //--------------------------------------------------------------------------
-    plotInteraction_DataMC();
+    //plotInteraction_DataMC();
     //plotMuon_DataMC();
     //plotProton_DataMC();
     //plotPion_DataMC();
-    //plotCutHistograms_DataMC();
+    plotCutHistograms_DataMC();
     //plotPi0Blob_DataMC();
 
     //--------------------------------------------------------------------------
     //  MC Only
     //--------------------------------------------------------------------------
-    plotInteraction_MCOnly();
+    //plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
     //plotPion_MCOnly();
@@ -81,8 +81,8 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter() : CCProtonPi0_NTupleAnalysis()
     //--------------------------------------------------------------------------
     // Set POT -- Run getPOT_MC() and getPOT_Data() Functions once to get POT
     //--------------------------------------------------------------------------
-    data_POT = 9.58472e+19; 
-    mc_POT = 9.42219e+20;
+    data_POT = 9.60557e+19; 
+    mc_POT = 9.40687e+20;
     POT_Ratio_data_mc = data_POT/mc_POT;
 
     std::cout<<"POT Data = "<<data_POT<<std::endl;
@@ -1175,12 +1175,15 @@ void CCProtonPi0_Plotter::plotCutHistograms_DataMC()
     //CutArrow Michel(1,"L"); 
     //DrawDataStackedMC(rootDir_CutHists,"hCut_Michel",plotDir,1, Michel);
 
+   
+    plot_InvMass_TruthMatch_Stacked(true,true);
+    plot_InvMass_TruthMatch_Stacked(true,false);
+    plot_InvMass_TruthMatch_Stacked(false,true);
+    plot_InvMass_TruthMatch_Stacked(false,false);
     CutArrow pi0invMass_min(60,"R"); 
     CutArrow pi0invMass_max(200,"L"); 
     DrawSignalMC(rootDir_CutHists,"hCut_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
-    //DrawSignalMC(rootDir_CutHists,"hCut_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
     DrawDataStackedMC(rootDir_CutHists,"hCut_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
-    DrawDataStackedMC(rootDir_CutHists,"hCut_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
 
     // ------------------------------------------------------------------------
     // 1 Track
@@ -1241,6 +1244,107 @@ void CCProtonPi0_Plotter::plotCutHistograms_DataMC()
     //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_deltaInvMass",plotDir);
 
     std::cout<<"Plotting CutHistograms Data vs MC Finished!"<<std::endl;
+}
+
+void CCProtonPi0_Plotter::plot_InvMass_TruthMatch_Stacked(bool isSignal, bool isStacked)
+{
+    std::cout<<"Plottting InvMass Truth Match"<<std::endl;
+    
+    if (isSignal) std::cout<<"\tSignal";
+    else std::cout<<"\tBackground";
+   
+    if (isStacked) std::cout<<" - Stacked"<<std::endl;
+    else std::cout<<" - Non Stacked"<<std::endl;
+
+    std::string root_dir = rootDir_CutHists.mc;
+    std::string plotDir = Folder_List::plotDir_CutHists;
+    std::string var;
+    std::string type;
+    if (isSignal) type = "signal_";
+    else type = "background_";
+    
+    TFile* f_Root = new TFile(root_dir.c_str());
+    TCanvas* c1 = new TCanvas("c","c",1280,800);
+    THStack *hs = new THStack("hs","m_{#gamma#gamma} with Truth Match");
+   
+    var = type + "invMass_pizero";
+    TH1D* h_pizero = (TH1D*)f_Root->Get(var.c_str());
+    h_pizero->SetFillColor(kGreen);
+    h_pizero->SetMarkerColor(kGreen);
+
+    var = type + "invMass_piplus";
+    TH1D* h_piplus = (TH1D*)f_Root->Get(var.c_str());
+    h_piplus->SetFillColor(kRed);
+    h_piplus->SetMarkerColor(kRed);
+
+    var = type + "invMass_proton";
+    TH1D* h_proton = (TH1D*)f_Root->Get(var.c_str());
+    h_proton->SetFillColor(kOrange);
+    h_proton->SetMarkerColor(kOrange);
+
+    var = type + "invMass_neutron";
+    TH1D* h_neutron = (TH1D*)f_Root->Get(var.c_str());
+    h_neutron->SetFillColor(kBlue);
+    h_neutron->SetMarkerColor(kBlue);
+
+    var = type + "invMass_other";
+    TH1D* h_other = (TH1D*)f_Root->Get(var.c_str());
+    h_other->SetFillColor(kGray);
+    h_other->SetMarkerColor(kGray);
+
+
+    hs->Add(h_pizero);
+    hs->Add(h_piplus);
+    hs->Add(h_proton);
+    hs->Add(h_neutron);
+    hs->Add(h_other);
+    if (isStacked) hs->Draw();
+    else hs->Draw("nostack");
+    hs->GetXaxis()->SetTitle("m_{#gamma#gamma} [MeV]");
+    hs->GetYaxis()->SetTitle("N(Events)");
+
+    // Add Legend
+    TLegend *legend = new TLegend(0.7,0.68,0.9,0.9);  
+    legend->AddEntry(h_pizero, "#pi^{0}", "f");
+    legend->AddEntry(h_piplus, "#pi^{+}", "f");
+    legend->AddEntry(h_proton, "proton", "f");
+    legend->AddEntry(h_neutron, "neutron", "f");
+    legend->AddEntry(h_other, "other", "f");
+    legend->SetTextSize(0.05);
+    legend->Draw();
+
+    // Add Pi0 InvMass Lines
+    double hist_max;
+    if (isStacked) hist_max = hs->GetMaximum();
+    else hist_max = h_pizero->GetMaximum();
+    TLine pi0Mass;
+    pi0Mass.SetLineWidth(2);
+    pi0Mass.SetLineColor(kBlue);
+    pi0Mass.DrawLine(134.98,0,134.98,hist_max);
+
+    TLine pi0Mass_min;
+    pi0Mass_min.SetLineWidth(2);
+    pi0Mass_min.SetLineColor(kBlack);
+    pi0Mass_min.DrawLine(60.0,0,60.0,hist_max);
+
+    TLine pi0Mass_max;
+    pi0Mass_max.SetLineWidth(2);
+    pi0Mass_max.SetLineColor(kBlack);
+    pi0Mass_max.DrawLine(200.0,0,200.0,hist_max);
+
+  
+    std::string plot_type;
+    std::string out_name;
+    if (isStacked) plot_type = "_Stacked";
+    else plot_type = "";
+    out_name = plotDir + type + "invMass_TruthMatch" + plot_type + ".png"; 
+
+    c1->Print(out_name.c_str(),"png");
+
+    delete f_Root;
+    delete hs;
+    delete legend;
+    delete c1;
 }
 
 void CCProtonPi0_Plotter::plot_mc_w_Stacked()

@@ -126,7 +126,20 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         // Pi0 Invariant Mass
         TH1D* pi0_invMass_1Track;
         TH1D* pi0_invMass_2Track;
-
+        
+        // Pi0 Invariant Mass - Truth Match
+        TH1D* signal_invMass_pizero;
+        TH1D* signal_invMass_piplus;
+        TH1D* signal_invMass_proton;
+        TH1D* signal_invMass_neutron;
+        TH1D* signal_invMass_other;
+ 
+        TH1D* background_invMass_pizero;
+        TH1D* background_invMass_piplus;
+        TH1D* background_invMass_proton;
+        TH1D* background_invMass_neutron;
+        TH1D* background_invMass_other;
+      
         // Background Subtraction
         MnvH1D* invMass_all;
         MnvH1D* invMass_mc_reco_all;
