@@ -81,8 +81,8 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter() : CCProtonPi0_NTupleAnalysis()
     //--------------------------------------------------------------------------
     // Set POT -- Run getPOT_MC() and getPOT_Data() Functions once to get POT
     //--------------------------------------------------------------------------
-    data_POT = 9.60557e+19; 
-    mc_POT = 9.40687e+20;
+    data_POT = 3.33009e+20; 
+    mc_POT = 2.73881e+21;
     POT_Ratio_data_mc = data_POT/mc_POT;
 
     std::cout<<"POT Data = "<<data_POT<<std::endl;
@@ -1202,10 +1202,8 @@ void CCProtonPi0_Plotter::plotCutHistograms_DataMC()
     //DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_gamma2ConvDist",plotDir, 1, gamma2_ConvDist_1Track);
     //DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_gamma2ConvDist",plotDir);
 
-    //DrawSignalMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
-    //DrawSignalMC(rootDir_CutHists,"hCut_1Track_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
-    //DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
-    //DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawSignalMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
 
     //CutArrow neutrinoE_1Track(20,"L"); 
     //DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_neutrinoE",plotDir, 1, neutrinoE_1Track);
@@ -1227,10 +1225,8 @@ void CCProtonPi0_Plotter::plotCutHistograms_DataMC()
     //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_gamma2ConvDist",plotDir, 1, gamma2_ConvDist_2Track);
     //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_gamma2ConvDist",plotDir);
 
-    //DrawSignalMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
-    //DrawSignalMC(rootDir_CutHists,"hCut_2Track_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
-    //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
-    //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_pi0invMass_Old",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawSignalMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
+    DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
 
     //CutArrow neutrinoE_2Track(20,"L"); 
     //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_neutrinoE",plotDir, 1, neutrinoE_2Track);

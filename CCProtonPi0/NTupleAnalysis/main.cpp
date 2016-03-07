@@ -27,6 +27,7 @@ main.cpp
 // Include Required Classes
 #include "Classes/Analyzer/CCProtonPi0_Analyzer.h"
 #include "Classes/CrossSection/CCProtonPi0_CrossSection.h"
+#include "Classes/SideBandTool/CCProtonPi0_SideBandTool.h"
 #include "Classes/Plotter/CCProtonPi0_Plotter.h"
 #include "Cintex/Cintex.h"
 
@@ -39,6 +40,7 @@ const string runOption_Run = "run";
 const string runOption_Plot = "plot";
 const string runOption_Reduce = "reduce";
 const string runOption_CrossSection = "calc";
+const string runOption_FitSideBand = "fit";
 
 const string typeOption_mc = "mc";
 const string typeOption_data = "data";
@@ -46,6 +48,7 @@ const string typeOption_data = "data";
 int GetMode(int argc, char* argv[]);
 void showInputError(char *argv[]);
 void Plot();
+void FitSideBands();
 void Reduce(string playlist, bool isMC);
 void Analyze(string playlist, bool isMC);
 void Calculate_CrossSection(bool isMC);
@@ -73,7 +76,7 @@ int main(int argc, char *argv[] )
     if ( nMode < 0) isMC = true;
     else isMC = false;
 
-    if (nMode != 10){
+    if (nMode != 10 || nMode != 20){
         if (isMC){
             cout<<"MC Playlists Selected!\n"<<endl;
             pl_reduce = "Input/Playlists/pl_MC_Merged.dat"; 
@@ -91,6 +94,7 @@ int main(int argc, char *argv[] )
     else if ( abs(nMode) == 2) Analyze(pl_analyze, isMC);
     else if ( abs(nMode) == 3) Calculate_CrossSection(isMC);
     else if ( nMode == 10) Plot();
+    else if ( nMode == 20) FitSideBands();
     else{
         cout<<"Problem on Mode!, Returning"<<endl;
         return 0;
@@ -148,14 +152,23 @@ void Plot()
     plotter.plotHistograms();
 }
 
+void FitSideBands()
+{
+    cout<<"======================================================================"<<endl;
+    cout<<"Fitting Side Bands..."<<endl;
+    cout<<"======================================================================"<<endl;
+    CCProtonPi0_SideBandTool sb_tool;
+    sb_tool.Fit();
+}
+
 /*
- *  -1   Error
- *  0   Reduce MC
- *  1   Reduce Data
- *  2   Analyze MC
- *  3   Analyze Data
- *  4   Plot
- */
+ *  1   reduce
+ *  2   run
+ *  3   calculate cross section
+ *  10  plot
+ *  20  fit side band
+ *   
+*/
 int GetMode(int argc, char* argv[])
 {
     // argc can only be 2 or 3
@@ -164,6 +177,7 @@ int GetMode(int argc, char* argv[])
     std::string runSelect = argv[1];
     if (argc == 2){
         if (runSelect.compare(runOption_Plot) == 0) return 10;
+        else if (runSelect.compare(runOption_FitSideBand) == 0) return 20;
         else return 0;
     }
      
@@ -211,6 +225,8 @@ void showInputError(char *argv[])
     cout<<"\t"<<argv[0]<<" "<<runOption_CrossSection<<" "<<typeOption_data<<"\n"<<endl;
     cout<<"Correct Syntax for Plotting"<<endl;
     cout<<"\t"<<argv[0]<<" "<<runOption_Plot<<"\n"<<endl;
+    cout<<"Correct Syntax for Fitting SideBands"<<endl;
+    cout<<"\t"<<argv[0]<<" "<<runOption_FitSideBand<<"\n"<<endl;
     cout<<"----------------------------------------------------------------------"<<endl;
 }
 

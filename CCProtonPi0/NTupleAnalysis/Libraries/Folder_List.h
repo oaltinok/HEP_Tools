@@ -67,6 +67,16 @@ namespace Folder_List
     const std::string rootDir_Flux_new = rootOut + Flux + "fhc_flux_constrained.root";
     const std::string rootDir_Flux_old = rootOut + Flux + "eroica-mipp-off-flux-nuint-minerva1-minerva13C.root";
     const std::string rootDir_GENIEXSec = rootOut + GENIEXSec + "GENIEXSec.root";
+   
+    // Set Side Band ROOT Dirs;
+    const std::string rootDir_sideBand_Michel_mc = rootOut + MC + analyzed + "CutHistograms_Michel.root";
+    const std::string rootDir_sideBand_Michel_data = rootOut + Data + analyzed + "CutHistograms_Michel.root";
+    
+    const std::string rootDir_sideBand_pID_mc = rootOut + MC + analyzed + "CutHistograms_pID.root";
+    const std::string rootDir_sideBand_pID_data = rootOut + Data + analyzed + "CutHistograms_pID.root";
+    
+    const std::string rootDir_sideBand_LowInvMass_mc = rootOut + MC + analyzed + "CutHistograms_LowInvMass.root";
+    const std::string rootDir_sideBand_LowInvMass_data = rootOut + Data + analyzed + "CutHistograms_LowInvMass.root";
     
     // Set MC Root Dir;
     const std::string rootDir_CrossSection_mc = rootOut + MC + analyzed + "CrossSection.root";

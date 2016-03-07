@@ -102,12 +102,7 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
         hCut_pi0invMass.push_back(temp);
-        
-        temp = new MnvH1D( Form("%s_%d","hCut_pi0invMass_Old",i),"Reconstructed Pi0 Invariant Mass All -- Old",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
-        hCut_pi0invMass_Old.push_back(temp);
-
+       
         // --------------------------------------------------------------------
         // 1 Track
         // --------------------------------------------------------------------
@@ -140,11 +135,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
         hCut_1Track_pi0invMass.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","hCut_1Track_pi0invMass_Old",i),"Reconstructed Pi0 Invariant Mass Old",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
-        hCut_1Track_pi0invMass_Old.push_back(temp);
         
         temp = new MnvH1D( Form("%s_%d","hCut_1Track_neutrinoE",i),"Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
@@ -183,11 +173,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
         hCut_2Track_pi0invMass.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","hCut_2Track_pi0invMass_Old",i),"Reconstructed Pi0 Invariant Mass Old",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
-        hCut_2Track_pi0invMass_Old.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_2Track_neutrinoE",i),"Reconstructed Beam Energy",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Beam Energy [GeV]");
@@ -578,14 +563,12 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_nProtonCandidates[i]->Write();
         hCut_nShowerCandidates[i]->Write();
         hCut_pi0invMass[i]->Write();
-        hCut_pi0invMass_Old[i]->Write();
         
         // 1 Track
         hCut_1Track_nShowerCandidates[i]->Write();
         hCut_1Track_eVis_nuclearTarget[i]->Write();
         hCut_1Track_eVis_other[i]->Write();
         hCut_1Track_pi0invMass[i]->Write();
-        hCut_1Track_pi0invMass_Old[i]->Write();
         hCut_1Track_gamma1ConvDist[i]->Write();
         hCut_1Track_gamma2ConvDist[i]->Write();
         hCut_1Track_neutrinoE[i]->Write();
@@ -595,7 +578,6 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_2Track_eVis_nuclearTarget[i]->Write();
         hCut_2Track_eVis_other[i]->Write();
         hCut_2Track_pi0invMass[i]->Write();
-        hCut_2Track_pi0invMass_Old[i]->Write();
         hCut_2Track_gamma1ConvDist[i]->Write();
         hCut_2Track_gamma2ConvDist[i]->Write();
         hCut_2Track_neutrinoE[i]->Write();

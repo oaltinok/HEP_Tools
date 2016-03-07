@@ -1,4 +1,23 @@
 ===============================================================================
+v2_65
+CCProtonPi0 Updates:
+	No Major Changes
+-------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	Three Side Bands:
+		Events with Michel Electron
+		2 Track Events with Low Proton Score
+		Events in Low Inv Mass Region before Shower Quality cut
+
+	New Class: SideBandTool
+		Uses TFractionFitter to fit Background on Side Bands to Data
+		Initial Commit Features:
+			Calculates fraction of each background in Data
+			Writes out a table as a comparison to MC Ratios vs Fit Ratios
+			
+	MINOS Correction for Every Playlist Implemented
+
+===============================================================================
 v2_64
 CCProtonPi0 Updates:
 	Removed Neutrino Energy requirement from Signal Definition

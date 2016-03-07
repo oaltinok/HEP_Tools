@@ -1146,17 +1146,6 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     double max_bin;
     MnvH1D* temp;
 
-    // Get Signal
-    var = Form("%s_%d",var_name.c_str(),1);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Signal");
-    bin_width = temp->GetBinWidth(1);
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kGreen);
-    temp->SetFillColor(kGreen);
-    mc_hists->Add(temp);
-
     // Get Bckg: WithPi0
     var = Form("%s_%d",var_name.c_str(),3);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
@@ -1195,6 +1184,17 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     hist_max = hist_max + temp->GetBinContent(max_bin);
     temp->SetLineColor(kGray);
     temp->SetFillColor(kGray);
+    mc_hists->Add(temp);
+
+    // Get Signal
+    var = Form("%s_%d",var_name.c_str(),1);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Signal");
+    bin_width = temp->GetBinWidth(1);
+    max_bin = temp->GetMaximumBin();
+    hist_max = hist_max + temp->GetBinContent(max_bin);
+    temp->SetLineColor(kGreen);
+    temp->SetFillColor(kGreen);
     mc_hists->Add(temp);
 
 }

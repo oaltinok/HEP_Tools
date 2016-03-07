@@ -23,18 +23,17 @@ void CCProtonPi0_Analyzer::specifyRunTime()
         new_flux::get().calc_weights();
     }
  
-    npi0 = 0;
-    npiplus = 0;
-    nproton = 0;
-    nneutron = 0;
-    nmuon = 0;
-    other = 0;
-
     // Control Flow
     isDataAnalysis  = true;
     isScanRun = true;
     writeFSParticleMomentum = false;
-   
+
+    // Side Band Control
+    NoSideBand = false;
+    sideBand_Michel = false;
+    sideBand_PID = false;
+    sideBand_LowInvMass = true;
+
     // Event Selections
     applyProtonScore = true;
     minProtonScore_LLR = -10.0;
@@ -241,16 +240,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
-
-    cout<<npi0<<endl;
-    cout<<npiplus<<endl;
-    cout<<nproton<<endl;
-    cout<<nneutron<<endl;
-    cout<<nmuon<<endl;
-    cout<<other<<endl;
-
 }
-
 
 //------------------------------------------------------------------------------
 //  Constructor
@@ -263,8 +253,7 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
     pi0(isModeReduce, isMC),
     pi0Blob(isModeReduce, isMC),
     bckgTool(isModeReduce),
-    cutList(isModeReduce, isMC),
-    normalizer("Eroica","minerva1")
+    cutList(isModeReduce, isMC)
 {   
     cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
 
@@ -606,20 +595,21 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // ------------------------------------------------------------------------
     // Michel Cuts
     // ------------------------------------------------------------------------
-    if( Cut_Vertex_Michel_Exist == 1 || Cut_EndPoint_Michel_Exist == 1 || Cut_secEndPoint_Michel_Exist == 1 ){
+    bool isMichelEvent = (Cut_Vertex_Michel_Exist == 1) || (Cut_EndPoint_Michel_Exist == 1) || (Cut_secEndPoint_Michel_Exist == 1);
+    if( isMichelEvent){
         FillHistogram(cutList.hCut_Michel,1);
     }else{
         FillHistogram(cutList.hCut_Michel,0);
     } 
-    if( Cut_Vertex_Michel_Exist == 1) return false;
+    if( Cut_Vertex_Michel_Exist == 1 && !sideBand_Michel ) return false;
     cutList.nCut_Vertex_Michel_Exist.increment(truth_isSignal, study1, study2);
 
-    if( Cut_EndPoint_Michel_Exist == 1) return false;
+    if( Cut_EndPoint_Michel_Exist == 1 && !sideBand_Michel) return false;
     cutList.nCut_EndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
 
-    if( Cut_secEndPoint_Michel_Exist == 1) return false;
+    if( Cut_secEndPoint_Michel_Exist == 1 && !sideBand_Michel) return false;
     cutList.nCut_secEndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
-
+    
     // After Michel I try to save far tracks which changes the Number of Vertices
     // Check nVertices
     FillHistogram(cutList.hCut_nVertices, vtx_total_count);
@@ -657,11 +647,15 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // ------------------------------------------------------------------------
     // Apply Proton Score to All Proton Candidates
     // ------------------------------------------------------------------------
+    bool isPionTrack = false;
     if (nProtonCandidates > 0){
         for( int i = 0; i < nProtonCandidates; i++){
             if ( applyProtonScore ){
                 FillHistogram(cutList.hCut_2Track_protonScore_LLR,all_protons_LLRScore[i]);
-                if ( all_protons_LLRScore[i] < minProtonScore_LLR ) return false;
+                if ( all_protons_LLRScore[i] < minProtonScore_LLR ){
+                    if(!sideBand_PID) return false;
+                    else isPionTrack = true;
+                }
             }
         }
         cutList.nCut_2Track_ProtonScore.increment(truth_isSignal, study1, study2);
@@ -743,7 +737,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) cutList.nCut_1Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Photon2DistanceLow.increment(truth_isSignal, study1, study2);
 
-
     // Gamma Comparison
     if (truth_isSignal){
         FillHistogram(cutList.signal_gamma_E_cos_openingAngle, (gamma1_E+gamma2_E)*MeV_to_GeV, pi0_cos_openingAngle);
@@ -753,6 +746,19 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         FillHistogram(cutList.bckg_E_cosTheta_convLength, (gamma1_E+gamma2_E)*MeV_to_GeV, pi0_cos_openingAngle, (gamma1_dist_vtx+gamma2_dist_vtx)*0.1);
     }
 
+    // Fill Invariant Mass Histograms
+    if (!NoSideBand && sideBand_LowInvMass){
+        FillInvMass_TruthMatch();
+        FillHistogram(cutList.hCut_pi0invMass, pi0_invMass);
+
+        if (nProtonCandidates == 0){
+            FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
+            FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
+        }else{ 
+            FillHistogram(cutList.pi0_invMass_2Track, pi0_invMass);
+            FillHistogram(cutList.hCut_2Track_pi0invMass, pi0_invMass);
+        }
+    }
     // ------------------------------------------------------------------------
     // Low Gamma Energies AND Small Opening Angle Cut 
     // ------------------------------------------------------------------------
@@ -779,19 +785,19 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // ------------------------------------------------------------------------
     fill_BackgroundSubtractionHists();
 
-    FillInvMass_TruthMatch();
-    FillHistogram(cutList.hCut_pi0invMass, pi0_invMass);
-    FillHistogram(cutList.hCut_pi0invMass_Old, pi0_invMass_Old);
+    // Fill Invariant Mass Histograms
+    //if (NoSideBand || isMichelEvent){
+    //    FillInvMass_TruthMatch();
+    //    FillHistogram(cutList.hCut_pi0invMass, pi0_invMass);
 
-    if (nProtonCandidates == 0){
-        FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
-        FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
-        FillHistogram(cutList.hCut_1Track_pi0invMass_Old,pi0_invMass_Old);
-    }else{ 
-        FillHistogram(cutList.pi0_invMass_2Track, pi0_invMass);
-        FillHistogram(cutList.hCut_2Track_pi0invMass, pi0_invMass);
-        FillHistogram(cutList.hCut_2Track_pi0invMass_Old, pi0_invMass_Old); 
-    }
+    //    if (nProtonCandidates == 0){
+    //        FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
+    //        FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
+    //    }else{ 
+    //        FillHistogram(cutList.pi0_invMass_2Track, pi0_invMass);
+    //        FillHistogram(cutList.hCut_2Track_pi0invMass, pi0_invMass);
+    //    }
+    //}
     if( pi0_invMass < min_Pi0_invMass || pi0_invMass > max_Pi0_invMass ) return false;
     cutList.nCut_Pi0_invMass.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Pi0_invMass.increment(truth_isSignal, study1, study2);
@@ -1467,15 +1473,13 @@ void CCProtonPi0_Analyzer::FillHistogram(vector<MnvH1D*> &hist, double var)
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_MuonTracking(MnvH1D* h, double var)
 {
-    double correctionErr = normalizer.GetCorrectionErr(CCProtonPi0_minos_trk_p);
-    assert(correctionErr < 1.0);
+    double correctionErr = GetMINOSCorrectionErr();
     h->FillVertErrorBand("MuonTracking", var, 1-correctionErr, 1+correctionErr, cvweight);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_MuonTracking(MnvH2D* h, double var1, double var2)
 {
-    double correctionErr = normalizer.GetCorrectionErr(CCProtonPi0_minos_trk_p);
-    assert(correctionErr < 1.0);
+    double correctionErr = GetMINOSCorrectionErr();
     h->FillVertErrorBand("MuonTracking", var1, var2, 1-correctionErr, 1+correctionErr, cvweight);
 }
 
@@ -1646,7 +1650,7 @@ void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
         cvweight = new_flux::get().get_cvweight(enu0);
         
         // Update cvweight with MINOS Efficiency Correction
-        const double minos_eff_correction = normalizer.GetCorrection(CCProtonPi0_minos_trk_p);
+        const double minos_eff_correction = GetMINOSCorrection();
         cvweight *= minos_eff_correction;
     }else{
         cvweight = 1.0; 
@@ -1704,6 +1708,39 @@ void CCProtonPi0_Analyzer::FillInvMass_TruthMatch()
     }
 }
 
+
+double CCProtonPi0_Analyzer::GetMINOSCorrectionErr()
+{
+    std::string playlist = GetPlaylist();
+    MnvNormalizer normalizer("Eroica", playlist);
+    double correctionErr = normalizer.GetCorrectionErr(CCProtonPi0_minos_trk_p);
+    return correctionErr;
+}
+
+double CCProtonPi0_Analyzer::GetMINOSCorrection()
+{
+    std::string playlist = GetPlaylist();
+    MnvNormalizer normalizer("Eroica", playlist);
+    double correction = normalizer.GetCorrection(CCProtonPi0_minos_trk_p);
+    return correction;
+}
+
+std::string CCProtonPi0_Analyzer::GetPlaylist()
+{
+    std::string playlist;
+    const int run = mc_run;
+    if (run >= 10200 && run <= 10249) playlist = "minerva1";
+    else if (run >= 10250 && run <= 10254) playlist = "minerva7";
+    else if (run >= 10255 && run <= 10259) playlist = "minerva9";
+    else if (run >= 12200 && run <= 12209) playlist = "minerva13A";
+    else if (run >= 12210 && run <= 12219) playlist = "minerva13B";
+    else if (run >= 13200 && run <= 13299) playlist = "minerva13C";
+    else if (run >= 14201 && run <= 14209) playlist = "minerva13D";
+    else if (run >= 14210 && run <= 14229) playlist = "minerva13E";
+    else cout<<"WARNING: NO Playlist Found!"<<endl;
+
+    return playlist;
+}
 #endif //CCProtonPi0_Analyzer_cpp
 
 

@@ -1,7 +1,8 @@
 DATATYPE=$1
-CCPROTONPI0_V="v2_62"
+CCPROTONPI0_V="v2_65"
 OTHEROPTIONS=""
-PLAYLISTS=( "minerva1" "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
+#PLAYLISTS=( "minerva1" "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
+PLAYLISTS=( "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
 
 input_error()
 {
@@ -18,7 +19,7 @@ submit_jobs()
     
     for pl in ${PLAYLISTS[@]}; do
         echo "Submitting $pl"
-        python $ana_script/ProcessAna.py --${DATATYPE} --playlist ${pl} --usecat --ana_tool CCProtonPi0 --inv eroica --dcache --outdir /minerva/data/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/${pl} ${OTHEROPTIONS}
+        python $ana_script/ProcessAna.py --${DATATYPE} --playlist ${pl} --usecat --ana_tool CCProtonPi0 --inv eroica --dcachein --dcacheout --outdir /minerva/data/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/${pl} ${OTHEROPTIONS}
     done
 
     echo "All Playlists Submitted!"

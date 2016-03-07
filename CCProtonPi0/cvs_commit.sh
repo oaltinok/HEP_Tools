@@ -1,26 +1,21 @@
-CCPROTONPI0_V="v2_64"
+CCPROTONPI0_V="v2_65"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Removed Neutrino Energy requirement from Signal Definition
-		Applying in NTupleAnalysis Stage
-
-	Background Classification Improved
-		Added a more Compact Classification
-			BckgWithPi0
-			QELike
-			SinglePiPlus
-			Other
-
+	No Major Changes
 -------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	GetSignalDef()
-		Applies Neutrino Energy requirement
+	Three Side Bands:
+		Events with Michel Electron
+		2 Track Events with Low Proton Score
+		Events in Low Inv Mass Region before Shower Quality cut
 
-	BackgroundTool Improved
-		Different Tables for different topologies
-		Added latest background types
-
-	Truth Match Plots for Invariant Mass
+	New Class: SideBandTool
+		Uses TFractionFitter to fit Background on Side Bands to Data
+		Initial Commit Features:
+			Calculates fraction of each background in Data
+			Writes out a table as a comparison to MC Ratios vs Fit Ratios
+			
+	MINOS Correction for Every Playlist Implemented
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

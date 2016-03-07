@@ -88,6 +88,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void CorrectEMShowerCalibration();
         void Calc_WeightFromSystematics();
         void AddErrorBands_Data();
+        double GetMINOSCorrectionErr();
+        double GetMINOSCorrection();
+        std::string GetPlaylist();
 
         //  Interaction Specific Functions
         void fillInteractionMC();
@@ -138,7 +141,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         CCProtonPi0_CutList cutList;
 
         // Other Variables
-        MnvNormalizer normalizer;
         bool m_isMC;
         bool isScanRun;
         bool isDataAnalysis;
@@ -148,6 +150,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool isPassedAllCuts;
         bool applyMaxEvents;
         bool applyDeltaInvMass;
+        bool NoSideBand;
+        bool sideBand_Michel;
+        bool sideBand_PID;
+        bool sideBand_LowInvMass;
         double cvweight;
         double latest_ScanID;
         double minProtonScore_LLR;
@@ -162,14 +168,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         vector<double> PDG_pi0_GrandMother;
         double counter1;
         double counter2;
-        
-        int npi0;
-        int npiplus;
-        int nproton;
-        int nneutron;
-        int nmuon;
-        int other;
-
+       
         // Pi0InvariantMass Correction
         double mean_MC_1Track;
         double mean_MC_2Track;

@@ -41,7 +41,8 @@ ALLPARTICLESCPP = $(INTERACTIONCPP) $(PARTICLECPP) $(MUONCPP) $(PROTONCPP) $(PIO
 PIDTOOLCPP = Classes/PIDTool/CCProtonPi0_PIDTool.cpp
 BACKGROUNDTOOLCPP = Classes/BackgroundTool/CCProtonPi0_BackgroundTool.cpp
 MICHELTOOLCPP = Classes/MichelTool/CCProtonPi0_MichelTool.cpp
-ALLTOOLCPP = $(BACKGROUNDTOOLCPP) 
+SIDEBANDTOOLCPP = Classes/SideBandTool/CCProtonPi0_SideBandTool.cpp
+ALLTOOLCPP = $(BACKGROUNDTOOLCPP) $(SIDEBANDTOOLCPP) 
 
 # Other Helper Classes
 BINLISTCPP = Classes/BinList/CCProtonPi0_BinList.cpp
