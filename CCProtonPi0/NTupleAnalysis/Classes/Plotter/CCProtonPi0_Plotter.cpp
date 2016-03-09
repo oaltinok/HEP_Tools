@@ -37,7 +37,6 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotProton_DataMC();
     //plotPion_DataMC();
     plotCutHistograms_DataMC();
-    //plotPi0Blob_DataMC();
 
     //--------------------------------------------------------------------------
     //  MC Only
@@ -47,7 +46,6 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotProton_MCOnly();
     //plotPion_MCOnly();
     //plotCutHistograms_MCOnly();
-    //plotPi0Blob_MCOnly();
 
     //--------------------------------------------------------------------------
     //  Plot Function Reserved for Other Studies
@@ -81,8 +79,12 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter() : CCProtonPi0_NTupleAnalysis()
     //--------------------------------------------------------------------------
     // Set POT -- Run getPOT_MC() and getPOT_Data() Functions once to get POT
     //--------------------------------------------------------------------------
-    data_POT = 3.33009e+20; 
-    mc_POT = 2.73881e+21;
+    //data_POT = 3.33009e+20; 
+    //mc_POT = 2.73881e+21;
+    data_POT = 9.60557e+19;
+    mc_POT = 9.3985e+20;
+    //data_POT = 8.95992e+19;
+    //mc_POT = 9.22553e+20;
     POT_Ratio_data_mc = data_POT/mc_POT;
 
     std::cout<<"POT Data = "<<data_POT<<std::endl;
@@ -91,72 +93,6 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter() : CCProtonPi0_NTupleAnalysis()
 
     setRootDirs(); 
 }
-
-void CCProtonPi0_Plotter::plotPi0Blob_MCOnly()
-{
-    std::cout<<"Plotting Pi0Blob MC Only"<<std::endl;
-    std::string plotDir = Folder_List::plotDir_Pi0Blob; // Plots go under Pion
-
-    // Evis Fraction 
-    DrawStackedMC(rootDir_Pi0Blob,"evis_frac_reco_pi0_true_pi0",plotDir);
-    DrawStackedMC(rootDir_Pi0Blob,"evis_frac_true_pi0_reco_all",plotDir);
-    DrawStackedMC(rootDir_Pi0Blob,"evis_frac_reco_pi0_reco_all",plotDir);
-    DrawStackedMC(rootDir_Pi0Blob,"evis_frac_reco_nonpi0_reco_all",plotDir);
-
-    // Evis By Particle
-    DrawStackedMC_GammaByPDG(rootDir_Pi0Blob,"evis",1,plotDir);
-    DrawStackedMC_GammaByPDG(rootDir_Pi0Blob,"evis",2,plotDir);
-    DrawStackedMC_GammaByPDG(rootDir_Pi0Blob,"evis",3,plotDir);
-
-    //    // Plot Truth Match - gamma 1
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_evis_most_pdg",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_evis_total_truth",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_evis_frac_pizero",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_evis_frac_piplus",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_evis_frac_piminus",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_evis_frac_proton",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_evis_frac_neutron",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_evis_frac_muon",plotDir);
-    //
-    //    // Plot Truth Match - gamma 2
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_evis_most_pdg",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_evis_total_truth",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_evis_frac_pizero",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_evis_frac_piplus",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_evis_frac_piminus",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_evis_frac_proton",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_evis_frac_neutron",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_evis_frac_muon",plotDir);
-    //    
-    //    // Total Pi0 Evis
-    //    DrawStackedMC(rootDir_Pi0Blob,"captured_evis_frac_all",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"captured_evis_frac_signal",plotDir);
-
-    //    // Blob 1 Cluster Z and Strip Numbers
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_cluster_Z",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_max_cluster_Z",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_min_cluster_Z",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_strips",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_max_strip",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_min_strip",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g1_nPlanes",plotDir);
-    //    // Blob 2 Cluster Z and Strip Numbers
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_cluster_Z",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_max_cluster_Z",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_min_cluster_Z",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_strips",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_max_strip",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_min_strip",plotDir);
-    //    DrawStackedMC(rootDir_Pi0Blob,"g2_nPlanes",plotDir);
-
-    std::cout<<"Plotting Pi0Blob MC Only Finished!"<<std::endl;
-}
-
-void CCProtonPi0_Plotter::plotPi0Blob_DataMC()
-{
-    // Do Nothing 
-}
-
 
 void CCProtonPi0_Plotter::plotCrossSection_Check()
 {
@@ -1172,8 +1108,8 @@ void CCProtonPi0_Plotter::plotCutHistograms_DataMC()
     //DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_nShowerCandidates",plotDir);
     //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_nShowerCandidates",plotDir);
 
-    //CutArrow Michel(1,"L"); 
-    //DrawDataStackedMC(rootDir_CutHists,"hCut_Michel",plotDir,1, Michel);
+    CutArrow Michel(1,"L"); 
+    DrawDataStackedMC(rootDir_CutHists,"hCut_Michel",plotDir,1, Michel);
 
    
     plot_InvMass_TruthMatch_Stacked(true,true);
@@ -1234,8 +1170,8 @@ void CCProtonPi0_Plotter::plotCutHistograms_DataMC()
     //CutArrow protonScore_pIDDiff(0.45,"R"); 
     //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_protonScore_pIDDiff",plotDir, 1, protonScore_pIDDiff);
 
-    //CutArrow protonScore_LLR(-10,"R"); 
-    //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_protonScore_LLR",plotDir, 1, protonScore_LLR);
+    CutArrow protonScore_LLR(-10,"R"); 
+    DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_protonScore_LLR",plotDir, 1, protonScore_LLR);
 
     //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_deltaInvMass",plotDir);
 
@@ -1606,7 +1542,6 @@ void CCProtonPi0_Plotter::setRootDirs()
     rootDir_Muon.mc = Folder_List::rootDir_Muon_mc;
     rootDir_Proton.mc = Folder_List::rootDir_Proton_mc;
     rootDir_Pion.mc = Folder_List::rootDir_Pion_mc;
-    rootDir_Pi0Blob.mc = Folder_List::rootDir_Pi0Blob_mc;
 
     // Set Data Root Dir
     rootDir_CutHists.data = Folder_List::rootDir_CutHists_data;
@@ -1614,7 +1549,6 @@ void CCProtonPi0_Plotter::setRootDirs()
     rootDir_Muon.data = Folder_List::rootDir_Muon_data;
     rootDir_Proton.data = Folder_List::rootDir_Proton_data;
     rootDir_Pion.data = Folder_List::rootDir_Pion_data;
-    rootDir_Pi0Blob.data = Folder_List::rootDir_Pi0Blob_data;
 }
 
 

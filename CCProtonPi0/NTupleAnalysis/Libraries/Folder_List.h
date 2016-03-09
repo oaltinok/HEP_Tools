@@ -123,7 +123,7 @@ namespace Folder_List
     const std::string plotDir_Muon = output + plotOut + "Muon/";
     const std::string plotDir_Proton = output + plotOut + "Proton/";
     const std::string plotDir_Pion = output + plotOut + "Pion/";
-    const std::string plotDir_Pi0Blob = output + plotOut + "Pi0Blob/";
+    const std::string plotDir_SideBand = output + plotOut + "SideBand/";
 }
 
 #endif 

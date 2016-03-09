@@ -20,7 +20,7 @@ Folder_List=(${DefaultText}
 DefaultPlotFolder_List=(Muon
 		Proton
 		Pion
-		Pi0Blob
+	    SideBand	
 		Interaction
         CutHists
         OtherStudies)

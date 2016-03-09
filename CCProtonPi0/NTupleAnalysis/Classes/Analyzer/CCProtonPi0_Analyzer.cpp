@@ -29,14 +29,14 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     writeFSParticleMomentum = false;
 
     // Side Band Control
-    NoSideBand = false;
+    NoSideBand = true;
     sideBand_Michel = false;
     sideBand_PID = false;
-    sideBand_LowInvMass = true;
+    sideBand_LowInvMass = false;
 
     // Event Selections
     applyProtonScore = true;
-    minProtonScore_LLR = -10.0;
+    minProtonScore_LLR = -5.0;
 
     applyPhotonDistance = true;
     minPhotonDistance_1 = 14; //cm
@@ -745,26 +745,12 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         FillHistogram(cutList.bckg_gamma_E_cos_openingAngle, (gamma1_E+gamma2_E)*MeV_to_GeV, pi0_cos_openingAngle);
         FillHistogram(cutList.bckg_E_cosTheta_convLength, (gamma1_E+gamma2_E)*MeV_to_GeV, pi0_cos_openingAngle, (gamma1_dist_vtx+gamma2_dist_vtx)*0.1);
     }
-
-    // Fill Invariant Mass Histograms
-    if (!NoSideBand && sideBand_LowInvMass){
-        FillInvMass_TruthMatch();
-        FillHistogram(cutList.hCut_pi0invMass, pi0_invMass);
-
-        if (nProtonCandidates == 0){
-            FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
-            FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
-        }else{ 
-            FillHistogram(cutList.pi0_invMass_2Track, pi0_invMass);
-            FillHistogram(cutList.hCut_2Track_pi0invMass, pi0_invMass);
-        }
-    }
     // ------------------------------------------------------------------------
     // Low Gamma Energies AND Small Opening Angle Cut 
     // ------------------------------------------------------------------------
     bool isAngleSmall = pi0_cos_openingAngle > 0.95;
     bool isEnergyLow = (gamma1_E+gamma2_E) < 400.0;
-    if (isEnergyLow && isAngleSmall) return false;
+    if (isEnergyLow && isAngleSmall && !sideBand_LowInvMass) return false;
     cutList.nCut_LowE_SmallAngle.increment(truth_isSignal, study1, study2);
 
     // ------------------------------------------------------------------------
@@ -786,18 +772,18 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     fill_BackgroundSubtractionHists();
 
     // Fill Invariant Mass Histograms
-    //if (NoSideBand || isMichelEvent){
-    //    FillInvMass_TruthMatch();
-    //    FillHistogram(cutList.hCut_pi0invMass, pi0_invMass);
+    if (NoSideBand || (sideBand_Michel && isMichelEvent) || (sideBand_PID && isPionTrack) || sideBand_LowInvMass){
+        FillInvMass_TruthMatch();
+        FillHistogram(cutList.hCut_pi0invMass, pi0_invMass);
 
-    //    if (nProtonCandidates == 0){
-    //        FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
-    //        FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
-    //    }else{ 
-    //        FillHistogram(cutList.pi0_invMass_2Track, pi0_invMass);
-    //        FillHistogram(cutList.hCut_2Track_pi0invMass, pi0_invMass);
-    //    }
-    //}
+        if (nProtonCandidates == 0){
+            FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
+            FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
+        }else{ 
+            FillHistogram(cutList.pi0_invMass_2Track, pi0_invMass);
+            FillHistogram(cutList.hCut_2Track_pi0invMass, pi0_invMass);
+        }
+    }
     if( pi0_invMass < min_Pi0_invMass || pi0_invMass > max_Pi0_invMass ) return false;
     cutList.nCut_Pi0_invMass.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Pi0_invMass.increment(truth_isSignal, study1, study2);

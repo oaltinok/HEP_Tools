@@ -285,7 +285,6 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     mc_models->Add(bckg_invMass);
 
     TFractionFitter* fitter = new TFractionFitter(data_invMass, mc_models, "Q");
-    fitter->Constrain(0, 0.0, 1.0);
     fitter->Constrain(1, 0.0, 1.0);
     
     std::cout<<"\tFitting Background Shape..."<<std::endl;

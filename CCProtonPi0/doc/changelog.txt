@@ -1,4 +1,13 @@
 ===============================================================================
+v2_66
+CCProtonPi0 Updates:
+	No Major Changes
+-------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	Improved SideBandTool
+		Added Plotting Capability for Original and Fitted Histograms
+
+===============================================================================
 v2_65
 CCProtonPi0 Updates:
 	No Major Changes

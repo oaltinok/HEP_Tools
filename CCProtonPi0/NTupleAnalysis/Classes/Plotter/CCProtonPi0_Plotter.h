@@ -73,7 +73,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         rootDir rootDir_Muon;
         rootDir rootDir_Proton;
         rootDir rootDir_Pion;
-        rootDir rootDir_Pi0Blob;
 
         // POT Stats
         double data_POT;
@@ -99,7 +98,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotMuon_DataMC();
         void plotProton_DataMC();
         void plotPion_DataMC();
-        void plotPi0Blob_DataMC();
         void plotCutHistograms_DataMC();
 
         // MC Only
@@ -107,7 +105,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotMuon_MCOnly();
         void plotProton_MCOnly();
         void plotPion_MCOnly();
-        void plotPi0Blob_MCOnly();
         void plotCutHistograms_MCOnly();
 
         // True Signal Events
