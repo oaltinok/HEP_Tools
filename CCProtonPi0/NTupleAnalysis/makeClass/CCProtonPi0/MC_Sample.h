@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Mar  1 16:08:00 2016 by ROOT version 5.34/05
+// Fri Mar 11 08:05:27 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -183,11 +183,6 @@ public :
    Double_t        gamma2_theta;
    Double_t        gamma2_theta_beam;
    Double_t        gamma2_time;
-   Double_t        michelProng_begin_Z;
-   Double_t        michelProng_distance;
-   Double_t        michelProng_end_Z;
-   Double_t        michelProng_energy;
-   Double_t        michelProng_time_diff;
    Double_t        muon_E;
    Double_t        muon_E_shift;
    Double_t        muon_KE;
@@ -262,8 +257,18 @@ public :
    Double_t        proton_theta_beam;
    Double_t        reco_eventID;
    Double_t        time;
+   Double_t        track_michelProng_begin_Z;
+   Double_t        track_michelProng_distance;
+   Double_t        track_michelProng_end_Z;
+   Double_t        track_michelProng_energy;
+   Double_t        track_michelProng_time_diff;
    Double_t        vertex_blob_evis;
    Double_t        vtx_fit_chi2;
+   Double_t        vtx_michelProng_begin_Z;
+   Double_t        vtx_michelProng_distance;
+   Double_t        vtx_michelProng_end_Z;
+   Double_t        vtx_michelProng_energy;
+   Double_t        vtx_michelProng_time_diff;
    Double_t        vtx_x;
    Double_t        vtx_y;
    Double_t        vtx_z;
@@ -274,7 +279,7 @@ public :
    Int_t           g2dedx_cluster_occupancy_sz;
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
    Int_t           nTracks_Secondary_Vtx_sz;
-   Int_t           nTracks_Secondary_Vtx[5];   //[nTracks_Secondary_Vtx_sz]
+   Int_t           nTracks_Secondary_Vtx[6];   //[nTracks_Secondary_Vtx_sz]
    Double_t        all_protons_E[10];
    Double_t        all_protons_KE[10];
    Double_t        all_protons_LLRScore[10];
@@ -303,7 +308,7 @@ public :
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[125];   //[g1dedx_rev_cluster_energy_sz]
+   Double_t        g1dedx_rev_cluster_energy[130];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
@@ -370,8 +375,10 @@ public :
    Int_t           truth_pi0_MotherStatus;
    Int_t           truth_pi0_status;
    Int_t           truth_target_material;
+   Int_t           truth_track_michel_evis_most_pdg;
    Int_t           truth_vertex_module;
    Int_t           truth_vertex_plane;
+   Int_t           truth_vtx_michel_evis_most_pdg;
    Double_t        truth_allClusters_evis_pizero;
    Double_t        truth_blob1_evis_muon;
    Double_t        truth_blob1_evis_neutron;
@@ -411,6 +418,8 @@ public :
    Double_t        truth_total_captured_evis_pizero;
    Double_t        truth_total_captured_evis_total_norm;
    Double_t        truth_total_captured_evis_total_truth;
+   Double_t        truth_track_michel_evis_total_truth;
+   Double_t        truth_vtx_michel_evis_total_truth;
    Double_t        truth_gamma1_4P[4];
    Double_t        truth_gamma1_final_pos[3];
    Double_t        truth_gamma1_init_pos[3];
@@ -606,24 +615,24 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[50];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[50];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[50];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[50];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[50];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[49];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[49];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[49];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[49];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[49];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[74];   //[mc_er_nPart]
-   Int_t           mc_er_status[74];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[74];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[74];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[74];   //[mc_er_nPart]
-   Double_t        mc_er_Px[74];   //[mc_er_nPart]
-   Double_t        mc_er_Py[74];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[74];   //[mc_er_nPart]
-   Double_t        mc_er_E[74];   //[mc_er_nPart]
-   Int_t           mc_er_FD[74];   //[mc_er_nPart]
-   Int_t           mc_er_LD[74];   //[mc_er_nPart]
-   Int_t           mc_er_mother[74];   //[mc_er_nPart]
+   Int_t           mc_er_ID[62];   //[mc_er_nPart]
+   Int_t           mc_er_status[62];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[62];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[62];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[62];   //[mc_er_nPart]
+   Double_t        mc_er_Px[62];   //[mc_er_nPart]
+   Double_t        mc_er_Py[62];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[62];   //[mc_er_nPart]
+   Double_t        mc_er_E[62];   //[mc_er_nPart]
+   Int_t           mc_er_FD[62];   //[mc_er_nPart]
+   Int_t           mc_er_LD[62];   //[mc_er_nPart]
+   Int_t           mc_er_mother[62];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
    Int_t           mc_fr_nuAncestorIDs[10];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
@@ -823,11 +832,6 @@ public :
    TBranch        *b_gamma2_theta;   //!
    TBranch        *b_gamma2_theta_beam;   //!
    TBranch        *b_gamma2_time;   //!
-   TBranch        *b_michelProng_begin_Z;   //!
-   TBranch        *b_michelProng_distance;   //!
-   TBranch        *b_michelProng_end_Z;   //!
-   TBranch        *b_michelProng_energy;   //!
-   TBranch        *b_michelProng_time_diff;   //!
    TBranch        *b_muon_E;   //!
    TBranch        *b_muon_E_shift;   //!
    TBranch        *b_muon_KE;   //!
@@ -902,8 +906,18 @@ public :
    TBranch        *b_proton_theta_beam;   //!
    TBranch        *b_reco_eventID;   //!
    TBranch        *b_time;   //!
+   TBranch        *b_track_michelProng_begin_Z;   //!
+   TBranch        *b_track_michelProng_distance;   //!
+   TBranch        *b_track_michelProng_end_Z;   //!
+   TBranch        *b_track_michelProng_energy;   //!
+   TBranch        *b_track_michelProng_time_diff;   //!
    TBranch        *b_vertex_blob_evis;   //!
    TBranch        *b_vtx_fit_chi2;   //!
+   TBranch        *b_vtx_michelProng_begin_Z;   //!
+   TBranch        *b_vtx_michelProng_distance;   //!
+   TBranch        *b_vtx_michelProng_end_Z;   //!
+   TBranch        *b_vtx_michelProng_energy;   //!
+   TBranch        *b_vtx_michelProng_time_diff;   //!
    TBranch        *b_vtx_x;   //!
    TBranch        *b_vtx_y;   //!
    TBranch        *b_vtx_z;   //!
@@ -1010,8 +1024,10 @@ public :
    TBranch        *b_truth_pi0_MotherStatus;   //!
    TBranch        *b_truth_pi0_status;   //!
    TBranch        *b_truth_target_material;   //!
+   TBranch        *b_truth_track_michel_evis_most_pdg;   //!
    TBranch        *b_truth_vertex_module;   //!
    TBranch        *b_truth_vertex_plane;   //!
+   TBranch        *b_truth_vtx_michel_evis_most_pdg;   //!
    TBranch        *b_truth_allClusters_evis_pizero;   //!
    TBranch        *b_truth_blob1_evis_muon;   //!
    TBranch        *b_truth_blob1_evis_neutron;   //!
@@ -1051,6 +1067,8 @@ public :
    TBranch        *b_truth_total_captured_evis_pizero;   //!
    TBranch        *b_truth_total_captured_evis_total_norm;   //!
    TBranch        *b_truth_total_captured_evis_total_truth;   //!
+   TBranch        *b_truth_track_michel_evis_total_truth;   //!
+   TBranch        *b_truth_vtx_michel_evis_total_truth;   //!
    TBranch        *b_truth_gamma1_4P;   //!
    TBranch        *b_truth_gamma1_final_pos;   //!
    TBranch        *b_truth_gamma1_init_pos;   //!
@@ -1335,7 +1353,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_64a.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_67.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1548,11 +1566,6 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("gamma2_theta", &gamma2_theta, &b_gamma2_theta);
    fChain->SetBranchAddress("gamma2_theta_beam", &gamma2_theta_beam, &b_gamma2_theta_beam);
    fChain->SetBranchAddress("gamma2_time", &gamma2_time, &b_gamma2_time);
-   fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);
-   fChain->SetBranchAddress("michelProng_distance", &michelProng_distance, &b_michelProng_distance);
-   fChain->SetBranchAddress("michelProng_end_Z", &michelProng_end_Z, &b_michelProng_end_Z);
-   fChain->SetBranchAddress("michelProng_energy", &michelProng_energy, &b_michelProng_energy);
-   fChain->SetBranchAddress("michelProng_time_diff", &michelProng_time_diff, &b_michelProng_time_diff);
    fChain->SetBranchAddress("muon_E", &muon_E, &b_muon_E);
    fChain->SetBranchAddress("muon_E_shift", &muon_E_shift, &b_muon_E_shift);
    fChain->SetBranchAddress("muon_KE", &muon_KE, &b_muon_KE);
@@ -1627,8 +1640,18 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("proton_theta_beam", &proton_theta_beam, &b_proton_theta_beam);
    fChain->SetBranchAddress("reco_eventID", &reco_eventID, &b_reco_eventID);
    fChain->SetBranchAddress("time", &time, &b_time);
+   fChain->SetBranchAddress("track_michelProng_begin_Z", &track_michelProng_begin_Z, &b_track_michelProng_begin_Z);
+   fChain->SetBranchAddress("track_michelProng_distance", &track_michelProng_distance, &b_track_michelProng_distance);
+   fChain->SetBranchAddress("track_michelProng_end_Z", &track_michelProng_end_Z, &b_track_michelProng_end_Z);
+   fChain->SetBranchAddress("track_michelProng_energy", &track_michelProng_energy, &b_track_michelProng_energy);
+   fChain->SetBranchAddress("track_michelProng_time_diff", &track_michelProng_time_diff, &b_track_michelProng_time_diff);
    fChain->SetBranchAddress("vertex_blob_evis", &vertex_blob_evis, &b_vertex_blob_evis);
    fChain->SetBranchAddress("vtx_fit_chi2", &vtx_fit_chi2, &b_vtx_fit_chi2);
+   fChain->SetBranchAddress("vtx_michelProng_begin_Z", &vtx_michelProng_begin_Z, &b_vtx_michelProng_begin_Z);
+   fChain->SetBranchAddress("vtx_michelProng_distance", &vtx_michelProng_distance, &b_vtx_michelProng_distance);
+   fChain->SetBranchAddress("vtx_michelProng_end_Z", &vtx_michelProng_end_Z, &b_vtx_michelProng_end_Z);
+   fChain->SetBranchAddress("vtx_michelProng_energy", &vtx_michelProng_energy, &b_vtx_michelProng_energy);
+   fChain->SetBranchAddress("vtx_michelProng_time_diff", &vtx_michelProng_time_diff, &b_vtx_michelProng_time_diff);
    fChain->SetBranchAddress("vtx_x", &vtx_x, &b_vtx_x);
    fChain->SetBranchAddress("vtx_y", &vtx_y, &b_vtx_y);
    fChain->SetBranchAddress("vtx_z", &vtx_z, &b_vtx_z);
@@ -1735,8 +1758,10 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_pi0_MotherStatus", &truth_pi0_MotherStatus, &b_truth_pi0_MotherStatus);
    fChain->SetBranchAddress("truth_pi0_status", &truth_pi0_status, &b_truth_pi0_status);
    fChain->SetBranchAddress("truth_target_material", &truth_target_material, &b_truth_target_material);
+   fChain->SetBranchAddress("truth_track_michel_evis_most_pdg", &truth_track_michel_evis_most_pdg, &b_truth_track_michel_evis_most_pdg);
    fChain->SetBranchAddress("truth_vertex_module", &truth_vertex_module, &b_truth_vertex_module);
    fChain->SetBranchAddress("truth_vertex_plane", &truth_vertex_plane, &b_truth_vertex_plane);
+   fChain->SetBranchAddress("truth_vtx_michel_evis_most_pdg", &truth_vtx_michel_evis_most_pdg, &b_truth_vtx_michel_evis_most_pdg);
    fChain->SetBranchAddress("truth_allClusters_evis_pizero", &truth_allClusters_evis_pizero, &b_truth_allClusters_evis_pizero);
    fChain->SetBranchAddress("truth_blob1_evis_muon", &truth_blob1_evis_muon, &b_truth_blob1_evis_muon);
    fChain->SetBranchAddress("truth_blob1_evis_neutron", &truth_blob1_evis_neutron, &b_truth_blob1_evis_neutron);
@@ -1776,6 +1801,8 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_total_captured_evis_pizero", &truth_total_captured_evis_pizero, &b_truth_total_captured_evis_pizero);
    fChain->SetBranchAddress("truth_total_captured_evis_total_norm", &truth_total_captured_evis_total_norm, &b_truth_total_captured_evis_total_norm);
    fChain->SetBranchAddress("truth_total_captured_evis_total_truth", &truth_total_captured_evis_total_truth, &b_truth_total_captured_evis_total_truth);
+   fChain->SetBranchAddress("truth_track_michel_evis_total_truth", &truth_track_michel_evis_total_truth, &b_truth_track_michel_evis_total_truth);
+   fChain->SetBranchAddress("truth_vtx_michel_evis_total_truth", &truth_vtx_michel_evis_total_truth, &b_truth_vtx_michel_evis_total_truth);
    fChain->SetBranchAddress("truth_gamma1_4P", truth_gamma1_4P, &b_truth_gamma1_4P);
    fChain->SetBranchAddress("truth_gamma1_final_pos", truth_gamma1_final_pos, &b_truth_gamma1_final_pos);
    fChain->SetBranchAddress("truth_gamma1_init_pos", truth_gamma1_init_pos, &b_truth_gamma1_init_pos);

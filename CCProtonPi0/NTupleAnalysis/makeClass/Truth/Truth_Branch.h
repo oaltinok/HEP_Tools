@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Mar  1 16:07:43 2016 by ROOT version 5.34/05
+// Fri Mar 11 08:05:55 2016 by ROOT version 5.34/05
 // from TChain Truth/
 //////////////////////////////////////////////////////////
 
@@ -66,8 +66,10 @@ public :
    Int_t           truth_pi0_MotherStatus;
    Int_t           truth_pi0_status;
    Int_t           truth_target_material;
+   Int_t           truth_track_michel_evis_most_pdg;
    Int_t           truth_vertex_module;
    Int_t           truth_vertex_plane;
+   Int_t           truth_vtx_michel_evis_most_pdg;
    Double_t        truth_allClusters_evis_pizero;
    Double_t        truth_blob1_evis_muon;
    Double_t        truth_blob1_evis_neutron;
@@ -107,6 +109,8 @@ public :
    Double_t        truth_total_captured_evis_pizero;
    Double_t        truth_total_captured_evis_total_norm;
    Double_t        truth_total_captured_evis_total_truth;
+   Double_t        truth_track_michel_evis_total_truth;
+   Double_t        truth_vtx_michel_evis_total_truth;
    Double_t        truth_gamma1_4P[4];
    Double_t        truth_gamma1_final_pos[3];
    Double_t        truth_gamma1_init_pos[3];
@@ -190,11 +194,11 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[192];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[192];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[192];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[192];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[192];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[198];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[198];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[198];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[198];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[198];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
    Int_t           mc_er_ID[245];   //[mc_er_nPart]
    Int_t           mc_er_status[245];   //[mc_er_nPart]
@@ -283,8 +287,10 @@ public :
    TBranch        *b_truth_pi0_MotherStatus;   //!
    TBranch        *b_truth_pi0_status;   //!
    TBranch        *b_truth_target_material;   //!
+   TBranch        *b_truth_track_michel_evis_most_pdg;   //!
    TBranch        *b_truth_vertex_module;   //!
    TBranch        *b_truth_vertex_plane;   //!
+   TBranch        *b_truth_vtx_michel_evis_most_pdg;   //!
    TBranch        *b_truth_allClusters_evis_pizero;   //!
    TBranch        *b_truth_blob1_evis_muon;   //!
    TBranch        *b_truth_blob1_evis_neutron;   //!
@@ -324,6 +330,8 @@ public :
    TBranch        *b_truth_total_captured_evis_pizero;   //!
    TBranch        *b_truth_total_captured_evis_total_norm;   //!
    TBranch        *b_truth_total_captured_evis_total_truth;   //!
+   TBranch        *b_truth_track_michel_evis_total_truth;   //!
+   TBranch        *b_truth_vtx_michel_evis_total_truth;   //!
    TBranch        *b_truth_gamma1_4P;   //!
    TBranch        *b_truth_gamma1_final_pos;   //!
    TBranch        *b_truth_gamma1_init_pos;   //!
@@ -488,7 +496,7 @@ Truth_Branch::Truth_Branch(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("Truth","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_64a.root/Truth");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_67.root/Truth");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -582,8 +590,10 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_pi0_MotherStatus", &truth_pi0_MotherStatus, &b_truth_pi0_MotherStatus);
    fChain->SetBranchAddress("truth_pi0_status", &truth_pi0_status, &b_truth_pi0_status);
    fChain->SetBranchAddress("truth_target_material", &truth_target_material, &b_truth_target_material);
+   fChain->SetBranchAddress("truth_track_michel_evis_most_pdg", &truth_track_michel_evis_most_pdg, &b_truth_track_michel_evis_most_pdg);
    fChain->SetBranchAddress("truth_vertex_module", &truth_vertex_module, &b_truth_vertex_module);
    fChain->SetBranchAddress("truth_vertex_plane", &truth_vertex_plane, &b_truth_vertex_plane);
+   fChain->SetBranchAddress("truth_vtx_michel_evis_most_pdg", &truth_vtx_michel_evis_most_pdg, &b_truth_vtx_michel_evis_most_pdg);
    fChain->SetBranchAddress("truth_allClusters_evis_pizero", &truth_allClusters_evis_pizero, &b_truth_allClusters_evis_pizero);
    fChain->SetBranchAddress("truth_blob1_evis_muon", &truth_blob1_evis_muon, &b_truth_blob1_evis_muon);
    fChain->SetBranchAddress("truth_blob1_evis_neutron", &truth_blob1_evis_neutron, &b_truth_blob1_evis_neutron);
@@ -623,6 +633,8 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_total_captured_evis_pizero", &truth_total_captured_evis_pizero, &b_truth_total_captured_evis_pizero);
    fChain->SetBranchAddress("truth_total_captured_evis_total_norm", &truth_total_captured_evis_total_norm, &b_truth_total_captured_evis_total_norm);
    fChain->SetBranchAddress("truth_total_captured_evis_total_truth", &truth_total_captured_evis_total_truth, &b_truth_total_captured_evis_total_truth);
+   fChain->SetBranchAddress("truth_track_michel_evis_total_truth", &truth_track_michel_evis_total_truth, &b_truth_track_michel_evis_total_truth);
+   fChain->SetBranchAddress("truth_vtx_michel_evis_total_truth", &truth_vtx_michel_evis_total_truth, &b_truth_vtx_michel_evis_total_truth);
    fChain->SetBranchAddress("truth_gamma1_4P", truth_gamma1_4P, &b_truth_gamma1_4P);
    fChain->SetBranchAddress("truth_gamma1_final_pos", truth_gamma1_final_pos, &b_truth_gamma1_final_pos);
    fChain->SetBranchAddress("truth_gamma1_init_pos", truth_gamma1_init_pos, &b_truth_gamma1_init_pos);

@@ -224,6 +224,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool m_DoTruthMatch;
 
         // Optional Studies
+        bool m_study_michel_electron;
         bool m_study_shower_energy;
         bool m_study_shower_recovery;
         bool m_study_unused_energy;
@@ -313,9 +314,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool AreBlobsDirectionGood(Minerva::PhysicsEvent *event) const;
         bool ConeBlobs( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const;
         bool PreFilterPi0( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const;
-        bool ShouldReconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const;
-        bool TrackEndPointHasMichels(Minerva::PhysicsEvent *event) const;
-        bool VertexHasMichels(Minerva::PhysicsEvent *event) const;
+        bool ShouldReconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent) const;
+        bool TrackEndPointHasMichels(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent) const;
+        bool VertexHasMichels(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent) const;
         bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
         bool createTrackedParticles(Minerva::PhysicsEvent *event ) const;
         bool createdAnchoredShortTracks( Minerva::PhysicsEvent* event, Minerva::Vertex* vertex, bool make_primary_short_tracks ) const;
@@ -372,7 +373,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
         void processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs) const;
         void saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int muon_ID) const;
-        void saveMichelProngToNTuple(Minerva::PhysicsEvent* event, Minerva::Prong &michelProng) const;
+        void saveMichelProngToNTuple(Minerva::PhysicsEvent* event, Minerva::Prong &michelProng, bool isVertex) const;
+        void saveMichelProngTruth(Minerva::GenMinInteraction* truthEvent, Minerva::Prong &michelProng, bool isVertex) const;
         void setBlobData(Minerva::PhysicsEvent* event, Minerva::GenMinInteraction *truthEvent) const;
         void setEventKinematics(const Minerva::PhysicsEvent *event, Minerva::NeutrinoInt* nuInt) const;
         void setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) const;

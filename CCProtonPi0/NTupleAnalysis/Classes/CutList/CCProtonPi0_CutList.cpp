@@ -27,7 +27,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
         }
        
         use_nTrueSignal = true;
-        nTrueSignal = 231027;
+        nTrueSignal = 227839;
         
         SetCutNames();
         OpenTextFiles(isMC);
@@ -207,6 +207,72 @@ void CCProtonPi0_CutList::initHistograms()
     // Pi0 Invariant Mass - Used for Correction Fit
     pi0_invMass_1Track = new TH1D("pi0_invMass_1Track","#pi^{0} Invariant Mass 1 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     pi0_invMass_2Track = new TH1D("pi0_invMass_2Track","#pi^{0} Invariant Mass 2 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    
+    // Michel Electron - Truth Match
+    michel_piplus_time_diff = new TH1D("michel_piplus_time_diff","Michel Prong Time Difference piplus",50,0.0,5000.0);
+    michel_piplus_time_diff->GetXaxis()->SetTitle("Time Difference [ns]");
+    michel_piplus_time_diff->GetYaxis()->SetTitle("N(Events)");
+
+    michel_neutron_time_diff = new TH1D("michel_neutron_time_diff","Michel Prong Time Difference neutron",50,0.0,5000.0);
+    michel_neutron_time_diff->GetXaxis()->SetTitle("Time Difference [ns]");
+    michel_neutron_time_diff->GetYaxis()->SetTitle("N(Events)");
+
+    michel_proton_time_diff = new TH1D("michel_proton_time_diff","Michel Prong Time Difference proton",50,0.0,5000.0);
+    michel_proton_time_diff->GetXaxis()->SetTitle("Time Difference [ns]");
+    michel_proton_time_diff->GetYaxis()->SetTitle("N(Events)");
+
+    michel_piminus_time_diff = new TH1D("michel_piminus_time_diff","Michel Prong Time Difference piminus",50,0.0,5000.0);
+    michel_piminus_time_diff->GetXaxis()->SetTitle("Time Difference [ns]");
+    michel_piminus_time_diff->GetYaxis()->SetTitle("N(Events)");
+
+    michel_other_time_diff = new TH1D("michel_other_time_diff","Michel Prong Time Difference other",50,0.0,5000.0);
+    michel_other_time_diff->GetXaxis()->SetTitle("Time Difference [ns]");
+    michel_other_time_diff->GetYaxis()->SetTitle("N(Events)");
+
+    // Energy
+    michel_piplus_energy = new TH1D("michel_piplus_energy","Michel Prong Energy piplus",50,0.0,100.0);
+    michel_piplus_energy->GetXaxis()->SetTitle("Energy [MeV]");
+    michel_piplus_energy->GetYaxis()->SetTitle("N(Events)");
+
+    michel_neutron_energy = new TH1D("michel_neutron_energy","Michel Prong Energy neutron",50,0.0,100.0);
+    michel_neutron_energy->GetXaxis()->SetTitle("Energy [MeV]");
+    michel_neutron_energy->GetYaxis()->SetTitle("N(Events)");
+
+    michel_proton_energy = new TH1D("michel_proton_energy","Michel Prong Energy proton",50,0.0,100.0);
+    michel_proton_energy->GetXaxis()->SetTitle("Energy [MeV]");
+    michel_proton_energy->GetYaxis()->SetTitle("N(Events)");
+
+    michel_piminus_energy = new TH1D("michel_piminus_energy","Michel Prong Energy piminus",50,0.0,100.0);
+    michel_piminus_energy->GetXaxis()->SetTitle("Energy [MeV]");
+    michel_piminus_energy->GetYaxis()->SetTitle("N(Events)");
+
+    michel_other_energy = new TH1D("michel_other_energy","Michel Prong Energy other",50,0.0,100.0);
+    michel_other_energy->GetXaxis()->SetTitle("Energy [MeV]");
+    michel_other_energy->GetYaxis()->SetTitle("N(Events)");
+
+    // Energy
+    michel_piplus_distance = new TH1D("michel_piplus_distance","Michel Prong Distance piplus",50,0.0,1000.0);
+    michel_piplus_distance->GetXaxis()->SetTitle("Distance [mm]");
+    michel_piplus_distance->GetYaxis()->SetTitle("N(Events)");
+
+    michel_neutron_distance = new TH1D("michel_neutron_distance","Michel Prong Distance neutron",50,0.0,1000.0);
+    michel_neutron_distance->GetXaxis()->SetTitle("Distance [mm]");
+    michel_neutron_distance->GetYaxis()->SetTitle("N(Events)");
+
+    michel_proton_distance = new TH1D("michel_proton_distance","Michel Prong Distance proton",50,0.0,1000.0);
+    michel_proton_distance->GetXaxis()->SetTitle("Distance [mm]");
+    michel_proton_distance->GetYaxis()->SetTitle("N(Events)");
+
+    michel_piminus_distance = new TH1D("michel_piminus_distance","Michel Prong Distance piminus",50,0.0,1000.0);
+    michel_piminus_distance->GetXaxis()->SetTitle("Distance [mm]");
+    michel_piminus_distance->GetYaxis()->SetTitle("N(Events)");
+
+    michel_other_distance = new TH1D("michel_other_distance","Michel Prong Distance other",50,0.0,1000.0);
+    michel_other_distance->GetXaxis()->SetTitle("Distance [mm]");
+    michel_other_distance->GetYaxis()->SetTitle("N(Events)");
+
+
+
 
     // Pi0 Invariant Mass - Truth Match
     signal_invMass_pizero = new TH1D("signal_invMass_pizero","#pi^{0} Invariant Mass - Most PDG: pizero",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
@@ -592,7 +658,25 @@ void CCProtonPi0_CutList::writeHistograms()
     
     pi0_invMass_1Track->Write();
     pi0_invMass_2Track->Write();
-    
+
+    michel_piplus_time_diff->Write();
+    michel_neutron_time_diff->Write();
+    michel_proton_time_diff->Write();
+    michel_piminus_time_diff->Write();
+    michel_other_time_diff->Write();
+
+    michel_piplus_energy->Write();
+    michel_neutron_energy->Write();
+    michel_proton_energy->Write();
+    michel_piminus_energy->Write();
+    michel_other_energy->Write();
+
+    michel_piplus_distance->Write();
+    michel_neutron_distance->Write();
+    michel_proton_distance->Write();
+    michel_piminus_distance->Write();
+    michel_other_distance->Write();
+
     signal_invMass_pizero->Write();
     signal_invMass_piplus->Write();
     signal_invMass_proton->Write();

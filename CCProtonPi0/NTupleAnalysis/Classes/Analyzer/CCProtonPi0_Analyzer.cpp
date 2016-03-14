@@ -54,6 +54,19 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     counter1 = 0;
     counter2 = 0;
 
+    nPiPlus = 0;
+    nPiMinus = 0;
+    nPiZero = 0;
+    nKPlus = 0;
+    nKMinus = 0;
+    nKZero = 0;
+    nAntiKZero = 0;
+    nNeutron = 0;
+    nProton = 0;
+    nLambdaZero = 0;
+    nSigmaPlus = 0;
+    nOther = 0;
+
     cvweight = 1.0;
 }
 
@@ -141,6 +154,20 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
+
+    cout<<"nPiPlus = "<<nPiPlus<<endl;
+    cout<<"nPiMinus = "<<nPiMinus<<endl;
+    cout<<"nPiZero = "<<nPiZero<<endl;
+    cout<<"nKPlus = "<<nKPlus<<endl;
+    cout<<"nKMinus = "<<nKMinus<<endl;
+    cout<<"nKZero = "<<nKZero<<endl;
+    cout<<"nAntiKZero = "<<nAntiKZero<<endl;
+    cout<<"nNeutron = "<<nNeutron<<endl;
+    cout<<"nProton = "<<nProton<<endl;
+    cout<<"nLambdaZero = "<<nLambdaZero<<endl;
+    cout<<"nSigmaPlus = "<<nSigmaPlus<<endl;
+    cout<<"nOther = "<<nOther<<endl;
+
 }
 
 
@@ -187,10 +214,6 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         UpdateSignalDef();
         CorrectNTupleVariables();
 
-        if (!truth_isSignal){
-            if (pi0_KE < 0) counter1++;
-            else counter2++;
-        }
         // Update scanFileName if running for scan
         if(isScanRun) UpdateScanFileName();
 
@@ -591,10 +614,40 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if( Cut_Muon_Charge == 1) return false;
     cutList.nCut_Muon_Charge.increment(truth_isSignal, study1, study2);
 
-
     // ------------------------------------------------------------------------
     // Michel Cuts
     // ------------------------------------------------------------------------
+    if ( Cut_Vertex_Michel_Exist == 1 && truth_track_michel_evis_most_pdg != -1){
+        if (truth_track_michel_evis_most_pdg == 211){ 
+            nPiPlus++;
+            FillHistogram(cutList.michel_piplus_time_diff, vtx_michelProng_time_diff);
+            FillHistogram(cutList.michel_piplus_energy, vtx_michelProng_energy);
+            FillHistogram(cutList.michel_piplus_distance, vtx_michelProng_distance);
+        }
+        else if (truth_track_michel_evis_most_pdg == -211){ 
+            nPiMinus++;
+            FillHistogram(cutList.michel_piminus_time_diff, vtx_michelProng_time_diff);
+            FillHistogram(cutList.michel_piminus_energy, vtx_michelProng_energy);
+            FillHistogram(cutList.michel_piminus_distance, vtx_michelProng_distance);
+        }
+        else if (truth_track_michel_evis_most_pdg == 2112){ 
+            nNeutron++;
+            FillHistogram(cutList.michel_neutron_time_diff, vtx_michelProng_time_diff);
+            FillHistogram(cutList.michel_neutron_energy, vtx_michelProng_energy);
+            FillHistogram(cutList.michel_neutron_distance, vtx_michelProng_distance);
+        }else if (truth_track_michel_evis_most_pdg == 2212){ 
+            nProton++;
+            FillHistogram(cutList.michel_proton_time_diff, vtx_michelProng_time_diff);
+            FillHistogram(cutList.michel_proton_energy, vtx_michelProng_energy);
+            FillHistogram(cutList.michel_proton_distance, vtx_michelProng_distance);
+            cout<<mc_run<<" "<<mc_subrun<<" "<<ev_gate<<" "<<slice_numbers[0]<<endl;
+        }else{ 
+            nOther++;
+            FillHistogram(cutList.michel_other_time_diff, vtx_michelProng_time_diff);
+            FillHistogram(cutList.michel_other_energy, vtx_michelProng_energy);
+            FillHistogram(cutList.michel_other_distance, vtx_michelProng_distance);
+        }
+    }
     bool isMichelEvent = (Cut_Vertex_Michel_Exist == 1) || (Cut_EndPoint_Michel_Exist == 1) || (Cut_secEndPoint_Michel_Exist == 1);
     if( isMichelEvent){
         FillHistogram(cutList.hCut_Michel,1);
@@ -603,6 +656,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     } 
     if( Cut_Vertex_Michel_Exist == 1 && !sideBand_Michel ) return false;
     cutList.nCut_Vertex_Michel_Exist.increment(truth_isSignal, study1, study2);
+
 
     if( Cut_EndPoint_Michel_Exist == 1 && !sideBand_Michel) return false;
     cutList.nCut_EndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
@@ -680,8 +734,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         FillHistogram(cutList.hCut_2Track_eVis_other,preFilter_evis_TotalExceptNuclearTarget);
     }
 
-    if (preFilter_evis_TotalExceptNuclearTarget > 1500 && truth_isSignal )  counter1++;
-    if (preFilter_evis_TotalExceptNuclearTarget > 2000 && truth_isSignal )  counter2++;
     if( Cut_PreFilter_Pi0 == 1) return false;
     cutList.nCut_PreFilter_Pi0.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_PreFilter_Pi0.increment(truth_isSignal, study1, study2);

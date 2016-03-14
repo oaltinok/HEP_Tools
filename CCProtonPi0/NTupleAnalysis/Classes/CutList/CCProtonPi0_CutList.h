@@ -123,7 +123,26 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         // Pi0 Invariant Mass
         TH1D* pi0_invMass_1Track;
         TH1D* pi0_invMass_2Track;
-        
+       
+        // Michel Electron - Truth Match
+        TH1D* michel_piplus_time_diff;
+        TH1D* michel_neutron_time_diff;
+        TH1D* michel_proton_time_diff;
+        TH1D* michel_piminus_time_diff;
+        TH1D* michel_other_time_diff;
+
+        TH1D* michel_piplus_energy;
+        TH1D* michel_neutron_energy;
+        TH1D* michel_proton_energy;
+        TH1D* michel_piminus_energy;
+        TH1D* michel_other_energy;
+
+        TH1D* michel_piplus_distance;
+        TH1D* michel_neutron_distance;
+        TH1D* michel_proton_distance;
+        TH1D* michel_piminus_distance;
+        TH1D* michel_other_distance;
+
         // Pi0 Invariant Mass - Truth Match
         TH1D* signal_invMass_pizero;
         TH1D* signal_invMass_piplus;

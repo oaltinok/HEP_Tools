@@ -63,6 +63,7 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
     declareProperty("BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian);
 
     // Optional Studies
+    declareProperty("StudyMichelElectron", m_study_michel_electron = false);
     declareProperty("StudyShowerEnergy", m_study_shower_energy = false);
     declareProperty("StudyShowerRecovery", m_study_shower_recovery = false);
     declareProperty("StudyUnusedEnergy", m_study_unused_energy = false);
@@ -357,13 +358,6 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch("vtx_fit_converged",-1);
     declareDoubleEventBranch("vtx_fit_chi2", -1);
     declareContainerDoubleEventBranch("fit_vtx", 3, -1);
-
-    // Michel Prong  
-    declareDoubleEventBranch( "michelProng_distance", -1.0);
-    declareDoubleEventBranch( "michelProng_energy", -1.0);
-    declareDoubleEventBranch( "michelProng_time_diff", -1.0);
-    declareDoubleEventBranch( "michelProng_end_Z", -1.0);
-    declareDoubleEventBranch( "michelProng_begin_Z", -1.0);
 
     // Discard Far Tracks  - Update nTracks
     declareIntEventBranch("nTracks", -1);
@@ -672,6 +666,29 @@ StatusCode CCProtonPi0::initialize()
     // ------------------------------------------------------------------------
     // OPTIONAL STUDY BRANCHES
     // ------------------------------------------------------------------------
+    if (m_study_michel_electron){ 
+        // Reco Values 
+        declareDoubleEventBranch( "vtx_michelProng_distance", -1.0);
+        declareDoubleEventBranch( "vtx_michelProng_energy", -1.0);
+        declareDoubleEventBranch( "vtx_michelProng_time_diff", -1.0);
+        declareDoubleEventBranch( "vtx_michelProng_end_Z", -1.0);
+        declareDoubleEventBranch( "vtx_michelProng_begin_Z", -1.0);
+
+        declareDoubleEventBranch( "track_michelProng_distance", -1.0);
+        declareDoubleEventBranch( "track_michelProng_energy", -1.0);
+        declareDoubleEventBranch( "track_michelProng_time_diff", -1.0);
+        declareDoubleEventBranch( "track_michelProng_end_Z", -1.0);
+        declareDoubleEventBranch( "track_michelProng_begin_Z", -1.0);
+
+        // Truth Values
+        declareIntTruthBranch("vtx_michel_evis_most_pdg", -1);
+        declareDoubleTruthBranch("vtx_michel_evis_total_truth", -1.0);
+        
+        declareIntTruthBranch("track_michel_evis_most_pdg", -1);
+        declareDoubleTruthBranch("track_michel_evis_total_truth", -1.0);
+    }
+
+    
     if (m_study_unused_energy){
         // ------------------------------------------------------------------------       
         // Unused Clusters Visible Energy
@@ -978,8 +995,8 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //==========================================================================
     debug()<<"START: Michel Electron Search"<<endmsg;
 
-    bool has_michel_vertex = VertexHasMichels(event);
-    bool has_michel_trackend = TrackEndPointHasMichels(event);
+    bool has_michel_vertex = VertexHasMichels(event, truthEvent);
+    bool has_michel_trackend = TrackEndPointHasMichels(event, truthEvent);
 
     if (m_removeEvents_withMichel && has_michel_vertex ){
         if( m_keepAfter_michel_cuts ) return interpretFailEvent(event); 
@@ -3676,13 +3693,37 @@ double CCProtonPi0::calcDistance(  double x1, double y1, double z1,
     return d;   
 }
 
-void CCProtonPi0::saveMichelProngToNTuple(Minerva::PhysicsEvent* event, Minerva::Prong &michelProng) const
+void CCProtonPi0::saveMichelProngToNTuple(Minerva::PhysicsEvent* event, Minerva::Prong &michelProng, bool isVertex) const
 {
-    event->setDoubleData("michelProng_distance",michelProng.getDoubleData("distance"));
-    event->setDoubleData("michelProng_energy",michelProng.getDoubleData("energy"));
-    event->setDoubleData("michelProng_time_diff",michelProng.getDoubleData("time_diff"));
-    event->setDoubleData("michelProng_end_Z",michelProng.getDoubleData("edz"));
-    event->setDoubleData("michelProng_begin_Z",michelProng.getDoubleData("bgz"));
+    if (isVertex){
+        event->setDoubleData("vtx_michelProng_distance",michelProng.getDoubleData("distance"));
+        event->setDoubleData("vtx_michelProng_energy",michelProng.getDoubleData("energy"));
+        event->setDoubleData("vtx_michelProng_time_diff",michelProng.getDoubleData("time_diff"));
+        event->setDoubleData("vtx_michelProng_end_Z",michelProng.getDoubleData("edz"));
+        event->setDoubleData("vtx_michelProng_begin_Z",michelProng.getDoubleData("bgz"));
+    }else{
+        event->setDoubleData("track_michelProng_distance",michelProng.getDoubleData("distance"));
+        event->setDoubleData("track_michelProng_energy",michelProng.getDoubleData("energy"));
+        event->setDoubleData("track_michelProng_time_diff",michelProng.getDoubleData("time_diff"));
+        event->setDoubleData("track_michelProng_end_Z",michelProng.getDoubleData("edz"));
+        event->setDoubleData("track_michelProng_begin_Z",michelProng.getDoubleData("bgz"));
+    }
+}
+
+void CCProtonPi0::saveMichelProngTruth(Minerva::GenMinInteraction* truthEvent, Minerva::Prong &michelProng, bool isVertex) const
+{
+    SmartRefVector<Minerva::IDCluster> michelClusters = michelProng.getAllIDClusters();
+    
+    DigitVectorTruthInfo michelInfo;
+    michelInfo.ParseTruth(michelClusters, fTrajectoryMap);
+
+    if (isVertex){
+        truthEvent->setIntData("vtx_michel_evis_most_pdg", michelInfo.GetMostEvisPdg());
+        truthEvent->setDoubleData("vtx_michel_evis_total_truth", michelInfo.GetTotalTruthEnergy());
+    }else{
+        truthEvent->setIntData("track_michel_evis_most_pdg", michelInfo.GetMostEvisPdg());
+        truthEvent->setDoubleData("track_michel_evis_total_truth", michelInfo.GetTotalTruthEnergy());
+    }
 }
 
 //---------------------------------------------------------------------------------------
@@ -4162,7 +4203,7 @@ void CCProtonPi0::tagPrimaryMuon(Minerva::PhysicsEvent *event) const
     event->setTime( m_recoTimeTool->prongBestTime(m_MuonProng) );
 }
 
-bool CCProtonPi0::VertexHasMichels(Minerva::PhysicsEvent *event) const
+bool CCProtonPi0::VertexHasMichels(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent) const
 {
     Minerva::Prong vtx_michel_prong;
     SmartRef<Minerva::Vertex> vertex = event->interactionVertex();
@@ -4171,7 +4212,10 @@ bool CCProtonPi0::VertexHasMichels(Minerva::PhysicsEvent *event) const
 
     if (foundMichel) {
         debug()<<"Found a Michel Electron!"<<endmsg;
-        saveMichelProngToNTuple(event,vtx_michel_prong);
+        if (m_study_michel_electron){
+            saveMichelProngToNTuple(event, vtx_michel_prong, true);
+            if(truthEvent) saveMichelProngTruth(truthEvent, vtx_michel_prong, true);
+        }
         event->setIntData("Cut_Vertex_Michel_Exist",1);
         return true;
     }else{
@@ -4180,7 +4224,7 @@ bool CCProtonPi0::VertexHasMichels(Minerva::PhysicsEvent *event) const
     }
 }
 
-bool CCProtonPi0::TrackEndPointHasMichels(Minerva::PhysicsEvent *event) const
+bool CCProtonPi0::TrackEndPointHasMichels(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent) const
 {
     // Get All Prongs to search for end point michels
     ProngVect primaryProngs = event->primaryProngs();
@@ -4220,9 +4264,10 @@ bool CCProtonPi0::TrackEndPointHasMichels(Minerva::PhysicsEvent *event) const
 
         if (foundMichel){
             debug()<<"Found an End Point Michel Electron!"<<endmsg;
-
-            saveMichelProngToNTuple(event,michelProng);
-
+            if (m_study_michel_electron){
+                saveMichelProngToNTuple(event, michelProng, false);
+                if(truthEvent) saveMichelProngTruth(truthEvent, michelProng, false);
+            }
             event->setIntData("Cut_EndPoint_Michel_Exist",1);
             return true;
         }
@@ -4236,9 +4281,10 @@ bool CCProtonPi0::TrackEndPointHasMichels(Minerva::PhysicsEvent *event) const
                 foundMichel = m_michelTrkTool->findMichel( current_end_vtx, michelProng);
                 if (foundMichel) {
                     debug()<<"Found a Secondary End Point Michel Electron!"<<endmsg;
-
-                    saveMichelProngToNTuple(event,michelProng);
-
+                    if (m_study_michel_electron){
+                        saveMichelProngToNTuple(event, michelProng, false);
+                        if(truthEvent) saveMichelProngTruth(truthEvent, michelProng, false);
+                    }
                     event->setIntData("Cut_secEndPoint_Michel_Exist",1);
                     return true;
                 }

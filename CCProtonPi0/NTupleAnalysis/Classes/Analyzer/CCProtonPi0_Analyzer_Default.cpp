@@ -207,11 +207,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("gamma2_theta", &gamma2_theta, &b_gamma2_theta);
     fChain->SetBranchAddress("gamma2_theta_beam", &gamma2_theta_beam, &b_gamma2_theta_beam);
     fChain->SetBranchAddress("gamma2_time", &gamma2_time, &b_gamma2_time);
-    fChain->SetBranchAddress("michelProng_begin_Z", &michelProng_begin_Z, &b_michelProng_begin_Z);
-    fChain->SetBranchAddress("michelProng_distance", &michelProng_distance, &b_michelProng_distance);
-    fChain->SetBranchAddress("michelProng_end_Z", &michelProng_end_Z, &b_michelProng_end_Z);
-    fChain->SetBranchAddress("michelProng_energy", &michelProng_energy, &b_michelProng_energy);
-    fChain->SetBranchAddress("michelProng_time_diff", &michelProng_time_diff, &b_michelProng_time_diff);
     fChain->SetBranchAddress("muon_E", &muon_E, &b_muon_E);
     fChain->SetBranchAddress("muon_E_shift", &muon_E_shift, &b_muon_E_shift);
     fChain->SetBranchAddress("muon_KE", &muon_KE, &b_muon_KE);
@@ -286,8 +281,18 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("proton_theta_beam", &proton_theta_beam, &b_proton_theta_beam);
     fChain->SetBranchAddress("reco_eventID", &reco_eventID, &b_reco_eventID);
     fChain->SetBranchAddress("time", &time, &b_time);
+    fChain->SetBranchAddress("track_michelProng_begin_Z", &track_michelProng_begin_Z, &b_track_michelProng_begin_Z);
+    fChain->SetBranchAddress("track_michelProng_distance", &track_michelProng_distance, &b_track_michelProng_distance);
+    fChain->SetBranchAddress("track_michelProng_end_Z", &track_michelProng_end_Z, &b_track_michelProng_end_Z);
+    fChain->SetBranchAddress("track_michelProng_energy", &track_michelProng_energy, &b_track_michelProng_energy);
+    fChain->SetBranchAddress("track_michelProng_time_diff", &track_michelProng_time_diff, &b_track_michelProng_time_diff);
     fChain->SetBranchAddress("vertex_blob_evis", &vertex_blob_evis, &b_vertex_blob_evis);
     fChain->SetBranchAddress("vtx_fit_chi2", &vtx_fit_chi2, &b_vtx_fit_chi2);
+    fChain->SetBranchAddress("vtx_michelProng_begin_Z", &vtx_michelProng_begin_Z, &b_vtx_michelProng_begin_Z);
+    fChain->SetBranchAddress("vtx_michelProng_distance", &vtx_michelProng_distance, &b_vtx_michelProng_distance);
+    fChain->SetBranchAddress("vtx_michelProng_end_Z", &vtx_michelProng_end_Z, &b_vtx_michelProng_end_Z);
+    fChain->SetBranchAddress("vtx_michelProng_energy", &vtx_michelProng_energy, &b_vtx_michelProng_energy);
+    fChain->SetBranchAddress("vtx_michelProng_time_diff", &vtx_michelProng_time_diff, &b_vtx_michelProng_time_diff);
     fChain->SetBranchAddress("vtx_x", &vtx_x, &b_vtx_x);
     fChain->SetBranchAddress("vtx_y", &vtx_y, &b_vtx_y);
     fChain->SetBranchAddress("vtx_z", &vtx_z, &b_vtx_z);
@@ -395,8 +400,10 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("truth_pi0_MotherStatus", &truth_pi0_MotherStatus, &b_truth_pi0_MotherStatus);
         fChain->SetBranchAddress("truth_pi0_status", &truth_pi0_status, &b_truth_pi0_status);
         fChain->SetBranchAddress("truth_target_material", &truth_target_material, &b_truth_target_material);
+        fChain->SetBranchAddress("truth_track_michel_evis_most_pdg", &truth_track_michel_evis_most_pdg, &b_truth_track_michel_evis_most_pdg);
         fChain->SetBranchAddress("truth_vertex_module", &truth_vertex_module, &b_truth_vertex_module);
         fChain->SetBranchAddress("truth_vertex_plane", &truth_vertex_plane, &b_truth_vertex_plane);
+        fChain->SetBranchAddress("truth_vtx_michel_evis_most_pdg", &truth_vtx_michel_evis_most_pdg, &b_truth_vtx_michel_evis_most_pdg);
         fChain->SetBranchAddress("truth_allClusters_evis_pizero", &truth_allClusters_evis_pizero, &b_truth_allClusters_evis_pizero);
         fChain->SetBranchAddress("truth_blob1_evis_muon", &truth_blob1_evis_muon, &b_truth_blob1_evis_muon);
         fChain->SetBranchAddress("truth_blob1_evis_neutron", &truth_blob1_evis_neutron, &b_truth_blob1_evis_neutron);
@@ -436,6 +443,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("truth_total_captured_evis_pizero", &truth_total_captured_evis_pizero, &b_truth_total_captured_evis_pizero);
         fChain->SetBranchAddress("truth_total_captured_evis_total_norm", &truth_total_captured_evis_total_norm, &b_truth_total_captured_evis_total_norm);
         fChain->SetBranchAddress("truth_total_captured_evis_total_truth", &truth_total_captured_evis_total_truth, &b_truth_total_captured_evis_total_truth);
+        fChain->SetBranchAddress("truth_track_michel_evis_total_truth", &truth_track_michel_evis_total_truth, &b_truth_track_michel_evis_total_truth);
+        fChain->SetBranchAddress("truth_vtx_michel_evis_total_truth", &truth_vtx_michel_evis_total_truth, &b_truth_vtx_michel_evis_total_truth);
         fChain->SetBranchAddress("truth_gamma1_4P", truth_gamma1_4P, &b_truth_gamma1_4P);
         fChain->SetBranchAddress("truth_gamma1_final_pos", truth_gamma1_final_pos, &b_truth_gamma1_final_pos);
         fChain->SetBranchAddress("truth_gamma1_init_pos", truth_gamma1_init_pos, &b_truth_gamma1_init_pos);
@@ -679,13 +688,14 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("mc_wgt_Norm", &mc_wgt_Norm, &b_mc_wgt_Norm);
         fChain->SetBranchAddress("mc_wgt_ppfx1_Total_sz", &mc_wgt_ppfx1_Total_sz, &b_mc_wgt_ppfx1_Total_sz);
         fChain->SetBranchAddress("mc_wgt_ppfx1_Total", mc_wgt_ppfx1_Total, &b_mc_wgt_ppfx1_Total);
-    } 
+    }
     fChain->SetBranchAddress("n_prongs", &n_prongs, &b_n_prongs);
     fChain->SetBranchAddress("prong_nParticles", prong_nParticles, &b_prong_nParticles);
     fChain->SetBranchAddress("prong_part_score", prong_part_score, &b_prong_part_score);
     fChain->SetBranchAddress("prong_part_mass", prong_part_mass, &b_prong_part_mass);
     fChain->SetBranchAddress("prong_part_charge", prong_part_charge, &b_prong_part_charge);
     fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
+
 
 }
 

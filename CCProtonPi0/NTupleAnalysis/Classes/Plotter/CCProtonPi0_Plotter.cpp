@@ -36,7 +36,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotMuon_DataMC();
     //plotProton_DataMC();
     //plotPion_DataMC();
-    plotCutHistograms_DataMC();
+    //plotCutHistograms_DataMC();
 
     //--------------------------------------------------------------------------
     //  MC Only
@@ -51,7 +51,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  Plot Function Reserved for Other Studies
     //--------------------------------------------------------------------------
     //SavePi0InvMassPoints();
-    //plotOtherStudies();
+    plotOtherStudies();
     //plotGENIEXSec();
 
 }
@@ -174,66 +174,12 @@ void CCProtonPi0_Plotter::plotCrossSection_Check()
 void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
-    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    //std::string plotDir = Folder_List::plotDir_OtherStudies;
 
-    DrawBackgroundSubtraction(true);
-    DrawBackgroundSubtraction(false);
-
-
-//    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
-//    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
-//    MnvH1D* mc;
-//    MnvH1D* data;
-//
-//    // Pi0 Momentum 
-//    mc = (MnvH1D*)f_xsec_mc->Get("invMass_mc_reco_all");
-//    data = (MnvH1D*)f_xsec_data->Get("invMass_all"); 
-//    DrawDataMC(data,mc,"invMass_Data_MC",plotDir);
-//    Draw1DHist(rootDir_CrossSection,"invMass_mc_reco_signal",plotDir);
-//    Draw1DHist(rootDir_CrossSection,"data_fit_result",plotDir);
-//    
-    //DrawErrorSummary(data,"invMass_Data",plotDir);
-    //DrawErrorSummary(mc,"invMass_MC",plotDir);
-
-
-    //CutArrow pi0invMass_min(60,"R"); 
-    //CutArrow pi0invMass_max(200,"L"); 
-    //DrawDataStackedMC(rootDir_CutHists,"hCut_pi0invMass",plotDir, 2, pi0invMass_min, pi0invMass_max);
-
-  
-    //TFile* f_mc = new TFile(rootDir_Muon.mc.c_str());
-    //TFile* f_data = new TFile(rootDir_Muon.data.c_str());
-    //DrawDataStackedMC(rootDir_Muon,"P",plotDir);
-    //DrawStackedMC(rootDir_Muon,"P",plotDir);
-    //    
-    //    
-//    TFile* f_data = new TFile(rootDir_Muon.data.c_str());
-//    TFile* f_mc= new TFile(rootDir_Muon.mc.c_str());
-//    MnvH1D* hist;
-//
-//    TFile* f_data = new TFile(rootDir_Muon.data.c_str());
-//    TFile* f_mc= new TFile(rootDir_Muon.mc.c_str());
-//    MnvH1D* hist;
-//
-//    hist = (MnvH1D*)f_data->Get("muon_P_all");
-//    DrawErrorSummary(hist,"muon_P_all",plotDir);
-//
-//    hist = (MnvH1D*)f_mc->Get("muon_P_mc_reco_all");
-//    DrawErrorSummary(hist,"muon_P_mc_reco_all",plotDir);
-//
-//    hist = (MnvH1D*)f_mc->Get("muon_P_mc_reco_signal");
-//    DrawErrorSummary(hist,"muon_P_mc_reco_signal",plotDir);
-//
-//    hist = (MnvH1D*)f_mc->Get("muon_P_mc_reco_bckg");
-//    DrawErrorSummary(hist,"muon_P_mc_reco_bckg",plotDir);
-//
-//    hist = (MnvH1D*)f_mc->Get("muon_P_mc_truth_signal");
-//    DrawErrorSummary(hist,"muon_P_mc_truth_signal",plotDir);
-//
-//    MnvH1D* data = (MnvH1D*)f_data->Get("muon_P_all");
-//    MnvH1D* mc = (MnvH1D*)f_mc->Get("muon_P_mc_reco_all");
-//    DrawDataMC(data,mc,"muon_P_data_MC",plotDir);
-//
+    plot_Michel_TruthMatch("time_diff");
+    plot_Michel_TruthMatch("energy");
+    plot_Michel_TruthMatch("distance");
+    
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
 
@@ -1279,6 +1225,75 @@ void CCProtonPi0_Plotter::plot_InvMass_TruthMatch_Stacked(bool isSignal, bool is
     delete c1;
 }
 
+void CCProtonPi0_Plotter::plot_Michel_TruthMatch(std::string var)
+{
+    // mc_w written during reduce - Its Histogram is with Cut Hists
+    std::string root_dir = rootDir_CutHists.mc;
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    std::cout<<"\nPlottting Stacked Michel Truth Match"<<std::endl;
+
+    TFile* f_Root = new TFile(root_dir.c_str());
+    TCanvas* c1 = new TCanvas("c","c",1280,800);
+    THStack *hs = new THStack("hs","Michel Electron Truth Match");
+    
+    std::string var_name = "michel_piplus_" + var;
+    TH1D* h_piplus = (TH1D*)f_Root->Get(var_name.c_str());
+    h_piplus->SetFillColor(kGreen);
+    h_piplus->SetFillStyle(3001);
+
+    var_name = "michel_neutron_" + var;
+    TH1D* h_neutron = (TH1D*)f_Root->Get(var_name.c_str());
+    h_neutron->SetFillColor(kRed);
+    h_neutron->SetFillStyle(3001);
+
+    var_name = "michel_proton_" + var;
+    TH1D* h_proton = (TH1D*)f_Root->Get(var_name.c_str());
+    h_proton->SetFillColor(kBlue);
+    h_proton->SetFillStyle(3001);
+
+    var_name = "michel_piminus_" + var;
+    TH1D* h_piminus = (TH1D*)f_Root->Get(var_name.c_str());
+    h_piminus->SetFillColor(kMagenta);
+    h_piminus->SetFillStyle(3001);
+
+    var_name = "michel_other_" + var;
+    TH1D* h_other = (TH1D*)f_Root->Get(var_name.c_str());
+    h_other->SetFillColor(kGray);
+    h_other->SetFillStyle(3001);
+
+    // Add Legend
+    TLegend *legend = new TLegend(0.7,0.68,0.9,0.9);  
+    legend->AddEntry(h_other, "other", "f");
+    legend->AddEntry(h_piminus, "#pi^{-}", "f");
+    legend->AddEntry(h_proton, "proton", "f");
+    legend->AddEntry(h_neutron, "neutron", "f");
+    legend->AddEntry(h_piplus, "#pi^{+}", "f");
+
+    hs->Add(h_piplus);
+    hs->Add(h_neutron);
+    hs->Add(h_proton);
+    hs->Add(h_piminus);
+    hs->Add(h_other);
+    hs->Draw();
+  
+    std::cout<<h_piplus->GetXaxis()->GetTitle()<<std::endl;
+    std::cout<<h_piplus->GetYaxis()->GetTitle()<<std::endl;
+    
+    hs->GetXaxis()->SetTitle(h_piplus->GetXaxis()->GetTitle());
+    hs->GetYaxis()->SetTitle(h_piplus->GetYaxis()->GetTitle());
+
+    legend->Draw();
+
+    std::string plot_name = "TruthMatch_michel_" + var_name + ".png";
+    c1->Print(Form("%s%s",plotDir.c_str(),plot_name.c_str()),"png");
+
+    delete f_Root;
+    delete hs;
+    delete legend;
+    delete c1;
+}
+
 void CCProtonPi0_Plotter::plot_mc_w_Stacked()
 {
     // mc_w written during reduce - Its Histogram is with Cut Hists
@@ -1286,6 +1301,7 @@ void CCProtonPi0_Plotter::plot_mc_w_Stacked()
     std::string plotDir = Folder_List::plotDir_Interaction;
 
     std::cout<<"\nPlottting Stacked mc_w"<<std::endl;
+
 
     TFile* f_Root = new TFile(root_dir.c_str());
     TCanvas* c1 = new TCanvas();

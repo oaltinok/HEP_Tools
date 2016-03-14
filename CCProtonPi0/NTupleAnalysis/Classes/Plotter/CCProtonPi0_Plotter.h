@@ -114,6 +114,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotGENIEXSec();
         void plotOtherStudies();
         void plot_InvMass_TruthMatch_Stacked(bool isSignal, bool isStacked);
+        void plot_Michel_TruthMatch(std::string var);
         void plot_mc_w_Stacked();
         void plot_final_mc_w_Stacked();
         void plot_stacked_pi0_P();
