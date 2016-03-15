@@ -37,7 +37,6 @@ class CCProtonPi0_Muon : public CCProtonPi0_Particle
         MnvH2D* muon_theta_response;
        
     private:
-        CCProtonPi0_SingleBin bin_muonTheta;
 };
 
 #endif

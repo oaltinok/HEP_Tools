@@ -75,8 +75,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         rootDir rootDir_Pion;
 
         // POT Stats
-        double data_POT;
-        double mc_POT;
         double POT_Ratio_data_mc;
 
         void setRootDirs();
@@ -90,6 +88,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotBackgroundEstimated();
         void plotEfficiencyCorrected();
         void plotUnfolded();
+        void plotIntegratedFlux();
         void plotCrossSection();
         void plotCrossSection_Check();
 

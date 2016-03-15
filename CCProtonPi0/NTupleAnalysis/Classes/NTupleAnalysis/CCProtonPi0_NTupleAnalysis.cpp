@@ -7,13 +7,18 @@ using namespace PlotUtils;
 
 // Initialize Constants
 const std::string CCProtonPi0_NTupleAnalysis::version = "v2_67b";
+
+const double CCProtonPi0_NTupleAnalysis::data_POT = 9.58813e+19;
+const double CCProtonPi0_NTupleAnalysis::mc_POT = 9.28902e+20;
+
+const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
+const double CCProtonPi0_NTupleAnalysis::max_Enu = 20000; // MeV
+
 const double CCProtonPi0_NTupleAnalysis::SENTINEL = -9.9;
 const double CCProtonPi0_NTupleAnalysis::MeV_to_GeV = pow(10,-3);
 const double CCProtonPi0_NTupleAnalysis::MeVSq_to_GeVSq = pow(10,-6);
 const double CCProtonPi0_NTupleAnalysis::mm_to_cm = pow(10,-1);
 const double CCProtonPi0_NTupleAnalysis::rad_to_deg = 180.0/M_PI;
-const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
-const double CCProtonPi0_NTupleAnalysis::max_Enu = 20000; // MeV
 
 CCProtonPi0_NTupleAnalysis::CCProtonPi0_NTupleAnalysis()
 {

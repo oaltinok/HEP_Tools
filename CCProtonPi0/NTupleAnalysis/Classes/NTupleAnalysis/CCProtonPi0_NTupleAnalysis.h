@@ -47,6 +47,8 @@ class CCProtonPi0_NTupleAnalysis
         static const int n_universe = 100;
 
         static const std::string version;
+        static const double data_POT;
+        static const double mc_POT;
         static const double SENTINEL;
         static const double MeV_to_GeV; 
         static const double MeVSq_to_GeVSq;

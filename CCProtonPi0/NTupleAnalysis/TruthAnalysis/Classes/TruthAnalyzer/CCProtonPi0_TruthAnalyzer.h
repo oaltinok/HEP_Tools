@@ -19,6 +19,7 @@
 #include "Cintex/Cintex.h"
 #include "../../../Libraries/Folder_List.h"
 #include "../../../Classes/NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
+#include "../../../Classes/BinList/CCProtonPi0_BinList.h"
 
 using namespace PlotUtils;
 
@@ -40,6 +41,8 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
     private :
         TFile* f;
         std::string rootDir;
+
+        CCProtonPi0_BinList binList;
 
         void FillVertErrorBand_Flux(MnvH1D* h, double var);
         void FillVertErrorBand_Genie(MnvH1D* h, double var);

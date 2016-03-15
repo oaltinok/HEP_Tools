@@ -21,6 +21,42 @@
 
 using namespace PlotUtils;
 
+struct XSec
+{
+    std::string name;
+    bool isEv;
+    
+    // Style
+    std::string plot_title;
+    std::string plot_xlabel;
+    std::string plot_ylabel;
+    
+    double bin_width;
+    double quote_width;
+    double scale;
+
+    // ROOT Files
+    TFile* f_data;
+    TFile* f_mc;
+
+    // Data Histograms
+    MnvH1D* all;
+    MnvH1D* bckg_subtracted;
+    MnvH1D* bckg_estimated;
+    MnvH1D* unfolded;
+    MnvH1D* efficiency_corrected;
+    MnvH1D* integrated_flux;
+    MnvH1D* xsec;
+
+    // MC Truth Histograms 
+    MnvH1D* mc_truth_all_signal;
+    MnvH1D* mc_truth_signal;
+    MnvH1D* mc_reco_signal;
+    MnvH1D* mc_reco_bckg;
+    MnvH2D* response;
+    MnvH1D* eff;
+};
+
 class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
 {
     public:
@@ -34,163 +70,48 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         double max_invMass;
         double N_Background_Data;
         double Uncertainity_Bckg;
-        double data_POT;
-        double mc_POT;
 
         // Pi0 Invariant Mass
-        TH1F* fit_result;
+        TH1D* fit_result;
         MnvH1D* invMass_all;
         MnvH1D* invMass_mc_reco_signal;
         MnvH1D* invMass_mc_reco_bckg;
 
-        // --------------------------------------------------------------------
-        // Muon Momentum
-        // --------------------------------------------------------------------
-        // Data
-        MnvH1D* muon_P_all;
-        MnvH1D* muon_P_bckg_subtracted;
-        MnvH1D* muon_P_bckg_estimated;
-        MnvH1D* muon_P_unfolded;
-        MnvH1D* muon_P_efficiency_corrected;
-        MnvH1D* muon_P_integrated_flux;
-        MnvH1D* muon_P_xsec;
-        // MC Truth 
-        MnvH1D* muon_P_mc_truth_all_signal;
-        MnvH1D* muon_P_mc_truth_signal;
-        MnvH1D* muon_P_mc_reco_signal;
-        MnvH1D* muon_P_mc_reco_bckg;
-        MnvH2D* muon_P_response;
-        MnvH1D* muon_P_eff;
-
-        // --------------------------------------------------------------------
-        // Muon Theta 
-        // --------------------------------------------------------------------
-        // Data
-        MnvH1D* muon_theta_all;
-        MnvH1D* muon_theta_bckg_subtracted;
-        MnvH1D* muon_theta_bckg_estimated;
-        MnvH1D* muon_theta_unfolded;
-        MnvH1D* muon_theta_efficiency_corrected;
-        MnvH1D* muon_theta_integrated_flux;
-        MnvH1D* muon_theta_xsec;
-        // MC Truth 
-        MnvH1D* muon_theta_mc_truth_all_signal;
-        MnvH1D* muon_theta_mc_truth_signal;
-        MnvH1D* muon_theta_mc_reco_signal;
-        MnvH1D* muon_theta_mc_reco_bckg;
-        MnvH2D* muon_theta_response;
-        MnvH1D* muon_theta_eff;
-
-        // --------------------------------------------------------------------
-        // Pi0 Momentum 
-        // --------------------------------------------------------------------
-        // Data
-        MnvH1D* pi0_P_all;
-        MnvH1D* pi0_P_bckg_subtracted;
-        MnvH1D* pi0_P_bckg_estimated;
-        MnvH1D* pi0_P_unfolded;
-        MnvH1D* pi0_P_efficiency_corrected;
-        MnvH1D* pi0_P_integrated_flux;
-        MnvH1D* pi0_P_xsec;
-        // MC Truth
-        MnvH1D* pi0_P_mc_truth_all_signal;
-        MnvH1D* pi0_P_mc_truth_signal;
-        MnvH1D* pi0_P_mc_reco_signal;
-        MnvH1D* pi0_P_mc_reco_bckg;
-        MnvH2D* pi0_P_response;
-        MnvH1D* pi0_P_eff;
- 
-        // --------------------------------------------------------------------
-        // Pi0 Kinetic Energy 
-        // --------------------------------------------------------------------
-        // Data
-        MnvH1D* pi0_KE_all;
-        MnvH1D* pi0_KE_bckg_subtracted;
-        MnvH1D* pi0_KE_bckg_estimated;
-        MnvH1D* pi0_KE_unfolded;
-        MnvH1D* pi0_KE_efficiency_corrected;
-        MnvH1D* pi0_KE_integrated_flux;
-        MnvH1D* pi0_KE_xsec;
-        // MC Truth
-        MnvH1D* pi0_KE_mc_truth_all_signal;
-        MnvH1D* pi0_KE_mc_truth_signal;
-        MnvH1D* pi0_KE_mc_reco_signal;
-        MnvH1D* pi0_KE_mc_reco_bckg;
-        MnvH2D* pi0_KE_response;
-        MnvH1D* pi0_KE_eff;
- 
-        // --------------------------------------------------------------------
-        // Pi0 Theta 
-        // --------------------------------------------------------------------
-        // Data
-        MnvH1D* pi0_theta_all;
-        MnvH1D* pi0_theta_bckg_subtracted;
-        MnvH1D* pi0_theta_bckg_estimated;
-        MnvH1D* pi0_theta_unfolded;
-        MnvH1D* pi0_theta_efficiency_corrected;
-        MnvH1D* pi0_theta_integrated_flux;
-        MnvH1D* pi0_theta_xsec;
-        // MC Truth
-        MnvH1D* pi0_theta_mc_truth_all_signal;
-        MnvH1D* pi0_theta_mc_truth_signal;
-        MnvH1D* pi0_theta_mc_reco_signal;
-        MnvH1D* pi0_theta_mc_reco_bckg;
-        MnvH2D* pi0_theta_response;
-        MnvH1D* pi0_theta_eff;
- 
-        // --------------------------------------------------------------------
-        // QSq 
-        // --------------------------------------------------------------------
-        // Data
-        MnvH1D* QSq_all;
-        MnvH1D* QSq_bckg_subtracted;
-        MnvH1D* QSq_bckg_estimated;
-        MnvH1D* QSq_unfolded;
-        MnvH1D* QSq_efficiency_corrected;
-        MnvH1D* QSq_integrated_flux;
-        MnvH1D* QSq_xsec;
-        // MC Truth
-        MnvH1D* QSq_mc_truth_all_signal;
-        MnvH1D* QSq_mc_truth_signal;
-        MnvH1D* QSq_mc_reco_signal;
-        MnvH1D* QSq_mc_reco_bckg;
-        MnvH2D* QSq_response;
-        MnvH1D* QSq_eff;
-     
+        XSec muon_P;
+        XSec muon_theta;
+        XSec pi0_P;
+        XSec pi0_KE;
+        XSec pi0_theta;
+        XSec QSq;
+        
+         
         // ROOT Files    
         TFile* f_out;
         TFile* f_truth;
         TFile* f_data_cutHists;
-        TFile* f_data_interaction;
-        TFile* f_data_muon;
-        TFile* f_data_pi0;
         TFile* f_mc_cutHists;
-        TFile* f_mc_interaction;
-        TFile* f_mc_muon;
-        TFile* f_mc_pi0;
         
         std::string rootDir_out;
         std::string rootDir_flux;
 
         // Functions
-        void Calc_CrossSection_muon_P();
-        void Calc_CrossSection_muon_theta();
-        void Calc_CrossSection_pi0_P();
-        void Calc_CrossSection_pi0_KE();
-        void Calc_CrossSection_pi0_theta();
-        void Calc_CrossSection_QSq();
-        void Style_muon_P();
-        void Style_muon_theta();
-        void Style_pi0_P();
-        void Style_pi0_KE();
-        void Style_pi0_theta();
-        void Style_QSq();
+        void Calc_CrossSection(XSec &var);
+        void Style_XSec(XSec &var);
         void Calc_Normalized_NBackground();
         void NormalizeHistogram(MnvH1D* h);
         double Integrate_SignalRegion(TH1D* h);
-        void writeHistograms();
         void OpenRootFiles();
+        void writeHistograms();
+        void writeHistograms(XSec &var);
         void initHistograms();
+        void initHistograms(XSec &var);
+        void initXSecs();
+        void init_muon_P();
+        void init_muon_theta();
+        void init_pi0_P();
+        void init_pi0_KE();
+        void init_pi0_theta();
+        void init_QSq();
         MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name);
         MnvH1D* Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name);
         MnvH1D* Efficiency_Divide(MnvH1D* unfolded, MnvH1D* eff, std::string var_name);
@@ -198,7 +119,6 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         MnvH1D* Calc_FinalCrossSection(MnvH1D* data_efficiency_corrected, MnvH1D* integrated_flux, std::string var_name);
         MnvH1D* calc_flux( MnvH1D* mnvh1d_template,          // Template histogram to copy the binning for the flux histogram 
                 const std::string& flux_filename, // The flux file name
-                bool enu_cut,                     // whether to apply the enu cut
                 bool isEv,                        // if this variable is Enu since it is treated differently
                 bool __reweight_flux = false,     // whether to do the flux reweight study
                 double __reweight_emin = 0.0,     // lower bound of the reweighted region 

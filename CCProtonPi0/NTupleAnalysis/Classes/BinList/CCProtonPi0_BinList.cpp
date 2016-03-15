@@ -14,10 +14,13 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     // -------------------------------------------------------------------------
     //     Initialization
     //--------------------------------------------------------------------------
+    muon_P.setBin(18,1.0,10.0);
+    muon_theta.setBin(12,0.0,25.0);
     pi0_P.setBin(17,0.0,1.7);
     pi0_KE.setBin(17,0.0,1.7);
     pi0_theta.setBin(18, 0.0, 180.0);
     QSq.setBin(40,0.0,4.0);
+    beamE.setBin(20,0,20.0);
     
     // Standard Bins
     true_false.setBin(2,0.0,2.0);
@@ -47,7 +50,6 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
 
  
     // Event Kinematics Bins
-    beamE.setBin(20,0,20.0);
     beamE_Diff_True.setBin(100,1.5,7.5);
     beamE_Diff.setBin(100,-3,3);
     q2.setBin(40,0.0,4.0);

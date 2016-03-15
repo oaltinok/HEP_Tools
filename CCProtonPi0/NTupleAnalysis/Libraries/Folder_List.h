@@ -111,6 +111,7 @@ namespace Folder_List
     const std::string plotDir_ErrorSummary = "ErrorSummary/";
     const std::string plotDir_CrossSection = "CrossSection/";
     const std::string plotDir_Original = "Original/";
+    const std::string plotDir_IntegratedFlux = "IntegratedFlux/";
     const std::string plotDir_BackgroundEstimated = "BackgroundEstimated/";
     const std::string plotDir_BackgroundSubtracted = "BackgroundSubtracted/";
     const std::string plotDir_Unfolding = "Unfolded/";

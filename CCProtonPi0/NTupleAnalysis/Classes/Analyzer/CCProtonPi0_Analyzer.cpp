@@ -640,7 +640,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
             FillHistogram(cutList.michel_proton_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_proton_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_proton_distance, vtx_michelProng_distance);
-            cout<<mc_run<<" "<<mc_subrun<<" "<<ev_gate<<" "<<slice_numbers[0]<<endl;
         }else{ 
             nOther++;
             FillHistogram(cutList.michel_other_time_diff, vtx_michelProng_time_diff);

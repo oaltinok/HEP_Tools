@@ -26,7 +26,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotBackgroundSubtracted();
     //plotUnfolded();
     //plotEfficiencyCorrected();
-    //plotCrossSection();
+    plotIntegratedFlux();
+    plotCrossSection();
     //plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
@@ -51,7 +52,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  Plot Function Reserved for Other Studies
     //--------------------------------------------------------------------------
     //SavePi0InvMassPoints();
-    plotOtherStudies();
+    //plotOtherStudies();
     //plotGENIEXSec();
 
 }
@@ -79,12 +80,6 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter() : CCProtonPi0_NTupleAnalysis()
     //--------------------------------------------------------------------------
     // Set POT -- Run getPOT_MC() and getPOT_Data() Functions once to get POT
     //--------------------------------------------------------------------------
-    //data_POT = 3.33009e+20; 
-    //mc_POT = 2.73881e+21;
-    data_POT = 9.60557e+19;
-    mc_POT = 9.3985e+20;
-    //data_POT = 8.95992e+19;
-    //mc_POT = 9.22553e+20;
     POT_Ratio_data_mc = data_POT/mc_POT;
 
     std::cout<<"POT Data = "<<data_POT<<std::endl;
@@ -247,6 +242,69 @@ void CCProtonPi0_Plotter::plotErrorSummary()
     DrawDataMC(data,mc,"pi0_P_data_MC",plotDir);
 
     std::cout<<"Plotting Error Summary Finished!"<<std::endl;
+}
+
+void CCProtonPi0_Plotter::plotIntegratedFlux()
+{
+    std::cout<<"Plotting Integrated Flux..."<<std::endl;
+    std::string plotDir;
+ 
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+    MnvH1D* mc;
+    MnvH1D* data;
+
+    // QSq 
+    plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_IntegratedFlux;
+    mc = (MnvH1D*)f_xsec_mc->Get("QSq_integrated_flux");
+    data = (MnvH1D*)f_xsec_data->Get("QSq_integrated_flux"); 
+    DrawDataMC(data,mc,"QSq_data_MC",plotDir);
+    DrawErrorSummary(data,"QSq_integrated_flux",plotDir);
+    DrawErrorSummary(mc,"QSq_mc_integrated_flux",plotDir);
+
+    // Pi0 Momentum 
+    plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_IntegratedFlux;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_P_integrated_flux");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_P_integrated_flux"); 
+    DrawDataMC(data,mc,"pi0_P_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_P_integrated_flux",plotDir);
+    DrawErrorSummary(mc,"pi0_P_mc_integrated_flux",plotDir);
+
+    // Pi0 Kinetic Energy
+    plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_IntegratedFlux;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_KE_integrated_flux");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_KE_integrated_flux"); 
+    DrawDataMC(data,mc,"pi0_KE_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_KE_integrated_flux",plotDir);
+    DrawErrorSummary(mc,"pi0_KE_mc_integrated_flux",plotDir);
+
+    // Pi0 Theta 
+    plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_IntegratedFlux;
+    mc = (MnvH1D*)f_xsec_mc->Get("pi0_theta_integrated_flux");
+    data = (MnvH1D*)f_xsec_data->Get("pi0_theta_integrated_flux"); 
+    DrawDataMC(data,mc,"pi0_theta_data_MC",plotDir);
+    DrawErrorSummary(data,"pi0_theta_integrated_flux",plotDir);
+    DrawErrorSummary(mc,"pi0_theta_mc_integrated_flux",plotDir);
+
+    // Muon Momentum
+    plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_IntegratedFlux;
+    mc = (MnvH1D*)f_xsec_mc->Get("muon_P_integrated_flux");
+    data = (MnvH1D*)f_xsec_data->Get("muon_P_integrated_flux"); 
+    DrawDataMC(data,mc,"muon_P_data_MC",plotDir);
+    DrawErrorSummary(data,"muon_P_integrated_flux",plotDir);
+    DrawErrorSummary(mc,"muon_P_mc_integrated_flux",plotDir);
+
+    // Muon Theta 
+    plotDir = Folder_List::xsec_muon_theta + Folder_List::plotDir_IntegratedFlux;
+    mc = (MnvH1D*)f_xsec_mc->Get("muon_theta_integrated_flux");
+    data = (MnvH1D*)f_xsec_data->Get("muon_theta_integrated_flux"); 
+    DrawDataMC(data,mc,"muon_theta_data_MC",plotDir);
+    DrawErrorSummary(data,"muon_theta_integrated_flux",plotDir);
+    DrawErrorSummary(mc,"muon_theta_mc_integrated_flux",plotDir);
+
+    delete f_xsec_mc;
+    delete f_xsec_data;
+    std::cout<<"Plotting Original Data Finished!"<<std::endl;
 }
 
 void CCProtonPi0_Plotter::plotOriginalData()

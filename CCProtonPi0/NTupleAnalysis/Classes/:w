@@ -13,6 +13,9 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
     min_invMass = 60; // MeV
     max_invMass = 200; // MeV
     
+    data_POT = 9.44854e+19;   
+    mc_POT = 9.0182e+20;
+    
     m_isMC = isMC;
 
     OpenRootFiles();
@@ -25,13 +28,15 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
 {
     Calc_Normalized_NBackground();
     
-    Calc_CrossSection(muon_P);   
-    Calc_CrossSection(muon_theta);   
-    Calc_CrossSection(pi0_P);   
-    Calc_CrossSection(pi0_KE);   
-    Calc_CrossSection(pi0_theta);   
-    Calc_CrossSection(QSq);   
+    Calc_CrossSection_muon_P();   
+    Calc_CrossSection_muon_theta();   
     
+    Calc_CrossSection_pi0_P();   
+    Calc_CrossSection_pi0_KE();   
+    Calc_CrossSection_pi0_theta();   
+    
+    Calc_CrossSection_QSq();   
+
     writeHistograms();
 }
 
@@ -97,8 +102,10 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
         std::cerr<<"\t\tFit Error!"<<std::endl;
     }
     
-    fit_result  = new TH1D (*(TH1D*)fitter->GetPlot());
+    fit_result  = new TH1F (*(TH1F*)fitter->GetPlot());
     fit_result->SetName("data_fit_result"); 
+    //std::string plotDir = Folder_List::plotDir_OtherStudies;
+
 
     Double_t N_Data = data_invMass->Integral();
     Double_t f0 =     0.0; // fittted signal fraction
@@ -274,7 +281,8 @@ MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_correct
 {
     std::cout<<"Integrating Flux for "<<var_name<<std::endl;
     
-    MnvH1D* integrated_flux = calc_flux(data_efficiency_corrected, rootDir_flux, isEv);
+    bool apply_Enu_cut = false;
+    MnvH1D* integrated_flux = calc_flux(data_efficiency_corrected, rootDir_flux, apply_Enu_cut, isEv);
     
     std::string hist_name = var_name + "_integrated_flux";
     integrated_flux->SetName(hist_name.c_str());
@@ -300,7 +308,7 @@ MnvH1D* CCProtonPi0_CrossSection::Calc_FinalCrossSection(MnvH1D* data_efficiency
 
     //fiducial is modules 27-79 inclusive
     int nplanes = 2 * ( 79 - 27 + 1 );
-    double n_atoms    = TargetUtils::Get().GetTrackerNCarbonAtoms(nplanes, m_isMC, 850.0);
+    double n_atoms    = TargetUtils::Get().GetTrackerNCarbonAtoms( nplanes, m_isMC, 850.0 );
     double n_nucleons = TargetUtils::Get().GetTrackerNNucleons(nplanes, m_isMC, 850.0);
 
     std::cout << "Number of C atoms   (1e30): " << n_atoms/1e30 << std::endl;

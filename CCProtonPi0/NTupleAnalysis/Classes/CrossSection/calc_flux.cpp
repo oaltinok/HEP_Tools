@@ -4,7 +4,6 @@
 #include <PlotUtils/TargetUtils.h>
 
 #include "CCProtonPi0_CrossSection.h"
-#include "constants.h"
 #include "integrate.h"
 #include "piecewise_delta_flux.h"
 #include "smooth_delta_flux.h"
@@ -33,7 +32,6 @@ namespace {
 
 MnvH1D* CCProtonPi0_CrossSection::calc_flux( MnvH1D* mnvh1d_template,          // Template histogram to copy the binning for the flux histogram 
                    const std::string& flux_filename, // The flux file name
-                   bool enu_cut,                     // whether to apply the enu cut
                    bool isEv,                        // if this variable is Enu since it is treated differently
                    bool __reweight_flux ,     // whether to do the flux reweight study
                    double __reweight_emin,     // lower bound of the reweighted region 
@@ -43,17 +41,11 @@ MnvH1D* CCProtonPi0_CrossSection::calc_flux( MnvH1D* mnvh1d_template,          /
                    bool flux_piecewise_curve)
 {
     
-        // Effectively the whole neutrino spectrum
-    double E_min = 0.0;
-    double E_max = 20.0;
+    // Effectively the whole neutrino spectrum
+    double E_min = min_Enu * MeV_to_GeV ;
+    double E_max = max_Enu * MeV_to_GeV ;
 
-        // Apply the neutrino energy cut if 'enu_cut' is TRUE
-    if (enu_cut) {
-        E_min = constants().emin;  // GeV
-        E_max = constants().emax;  // GeV
-    }
-
-    const int n_universe = constants().n_universe;
+    const int n_universe = 100.0;
  
     std::cout << " Using flux file: " << flux_filename << std::endl;
     TFile* flux_file = new TFile(flux_filename.c_str(), "READ" );
@@ -68,22 +60,25 @@ MnvH1D* CCProtonPi0_CrossSection::calc_flux( MnvH1D* mnvh1d_template,          /
     }
     
     assert(mnvh1d_flux_original);
-    std::cout << "Print the flux (0-15 GeV)" << std::endl;
-    for (int i = 1; ; ++i) { break;
-        double low_edge  = mnvh1d_flux_original->GetBinLowEdge(i);
-        double high_edge = mnvh1d_flux_original->GetBinLowEdge(i) + mnvh1d_flux_original->GetBinWidth(i);
-        double content = mnvh1d_flux_original->GetBinContent(i);
-        std::cout << "\t" << setw(8)
-                  << Form("%2.2f", low_edge)
-                  << " - "
-                  << Form("%2.2f", high_edge)
-                  << setw(15) << Form("%.4e",content)
-                  << std::endl;
+    bool debug = false;
+    if (debug){
+        std::cout<<"Print the flux between "<<E_min<<" "<<E_max<<" GeV"<<std::endl;
+        for (int i = 1; ; ++i) {
+            double low_edge  = mnvh1d_flux_original->GetBinLowEdge(i);
+            double high_edge = mnvh1d_flux_original->GetBinLowEdge(i) + mnvh1d_flux_original->GetBinWidth(i);
+            double content = mnvh1d_flux_original->GetBinContent(i);
 
-        if (high_edge > 15.0) break;
-        
+            if (low_edge >= E_min){
+                std::cout << "\t" << setw(8)
+                    << Form("%2.2f", low_edge)
+                    << " - "
+                    << Form("%2.2f", high_edge)
+                    << setw(15) << Form("%.4e",content)
+                    << std::endl;
+            }
+            if (high_edge > E_max) break;
+        }
     }
-    
     if (mnvh1d_flux_original->GetXaxis()->GetXmin() > E_min ||
         mnvh1d_flux_original->GetXaxis()->GetXmax() < E_max) {
         
@@ -95,7 +90,7 @@ MnvH1D* CCProtonPi0_CrossSection::calc_flux( MnvH1D* mnvh1d_template,          /
         
     }
         
-        // make an integrated flux histogram with the same bins as the eff. corrected distribution
+    // make an integrated flux histogram with the same bins as the eff. corrected distribution
     MnvH1D* mnvh1d_flux_integrated = (MnvH1D*) mnvh1d_template->Clone( "flux_integrated" );
     mnvh1d_flux_integrated->Reset();
     mnvh1d_flux_integrated->ClearAllErrorBands();

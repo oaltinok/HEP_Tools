@@ -37,6 +37,7 @@ XSecPlotList=(Original
         BackgroundSubtracted
         Unfolded
         EfficiencyCorrected
+        IntegratedFlux 
         CrossSection
         ErrorSummary 
         Check)
