@@ -2,119 +2,10 @@
 
 using namespace PlotUtils;
 
-void CCProtonPi0_SideBandTool::Fit()
-{
-    Fit(Michel);
-    Fit(pID);
-    Fit(LowInvMass, true, 1, 3);
-}
-
-void CCProtonPi0_SideBandTool::Fit(SideBand &sb, bool isLimitedFit, int first_bin, int last_bin)
-{
-    std::cout<<"Fitting Side Band: "<<sb.name<<std::endl;
-
-    // Crate TObjArray
-    TObjArray* mc_models = new TObjArray(5);
-    mc_models->Add(sb.signal[0]);
-    mc_models->Add(sb.WithPi0[0]);
-    mc_models->Add(sb.QELike[0]);
-    mc_models->Add(sb.SinglePiPlus[0]);
-    mc_models->Add(sb.Other[0]);
-
-    // Fit data and mc_models
-    TFractionFitter* fitter = new TFractionFitter(sb.data, mc_models, "Q");
-    // Constrain Fractions [0,1]
-    fitter->Constrain(0,0.0,1.0);
-    fitter->Constrain(1,0.0,1.0);
-    fitter->Constrain(2,0.0,1.0);
-    fitter->Constrain(3,0.0,1.0);
-    fitter->Constrain(4,0.0,1.0);
-
-    if (isLimitedFit){
-        fitter->SetRangeX(first_bin, last_bin);
-    }
-
-    Int_t status = fitter->Fit();
-
-    if (status != 0) {
-        std::cout<<"\tFit Error!"<<std::endl;
-        return;
-    }
-
-    sb.fit = new TH1D (*(TH1D*)fitter->GetPlot());
-    
-    // Fit Results
-    double total = 0;
-    double total_err = 0;
-    Double_t f;                         // Fraction
-    Double_t f_err;                     // Fraction Error
-    fitter->GetResult(0, f, f_err);     // access fitted value and uncertainty for parameter 1
-    sb.fr_signal[1] = f;
-    sb.fr_signal[2] = sb.fr_signal[1]/sb.fr_signal[0];
-    sb.fr_signal[3] = f_err;
-    total += f;
-    total_err += f_err;
-
-    fitter->GetResult(1, f, f_err);
-    sb.fr_WithPi0[1] = f;
-    sb.fr_WithPi0[2] = sb.fr_WithPi0[1]/sb.fr_WithPi0[0];
-    sb.fr_WithPi0[3] = f_err; 
-    total += f;
-    total_err += f_err;
-   
-    fitter->GetResult(2, f, f_err); 
-    sb.fr_QELike[1] = f;
-    sb.fr_QELike[2] = sb.fr_QELike[1]/sb.fr_QELike[0];
-    sb.fr_QELike[3] = f_err;  
-    total += f;
-    total_err += f_err;
-    
-    fitter->GetResult(3, f, f_err); 
-    sb.fr_SinglePiPlus[1] = f;
-    sb.fr_SinglePiPlus[2] = sb.fr_SinglePiPlus[1]/sb.fr_SinglePiPlus[0];
-    sb.fr_SinglePiPlus[3] = f_err;  
-    total += f;
-    total_err += f_err;
-    
-    fitter->GetResult(4, f, f_err);
-    sb.fr_Other[1] = f;
-    sb.fr_Other[2] = sb.fr_Other[1]/sb.fr_Other[0];
-    sb.fr_Other[3] = f_err;  
-    total += f;
-    total_err += f_err;
-  
-    sb.fr_Total[1] = total;
-    sb.fr_Total[2] = 0;
-    sb.fr_Total[3] = total_err;
-
-    PrintFitResults(sb);
-  
-    ApplyFitResults(sb);
-    
-    // Plot Fit Results
-    for (int i = 0; i < 2; ++i){
-        Plot(sb, i, true);
-        Plot(sb, i, false);
-    }
-  
-    delete fitter;
-    std::cout<<"Done!"<<std::endl;
-}
-
 CCProtonPi0_SideBandTool::CCProtonPi0_SideBandTool() : CCProtonPi0_NTupleAnalysis()
 {
-    std::cout<<"Initializing CCProtonPi0_SideBandTool"<<std::endl;
-
-    double data_POT = 3.33009e+20; 
-    double mc_POT = 2.73881e+21;
-    POT_ratio = data_POT/mc_POT;
-
-    OpenTextFile();
     OpenRootFiles();
     initSideBands();
-
-    std::cout<<"Done!"<<std::endl;
-    std::cout<<std::endl;
 }
 
 void CCProtonPi0_SideBandTool::OpenRootFiles()
@@ -150,7 +41,6 @@ void CCProtonPi0_SideBandTool::initSideBands()
     GetTH1D(Michel.f_mc, Michel.QELike[0], "hCut_pi0invMass_4");   
     GetTH1D(Michel.f_mc, Michel.SinglePiPlus[0], "hCut_pi0invMass_5");   
     GetTH1D(Michel.f_mc, Michel.Other[0], "hCut_pi0invMass_6");   
-    CalcMCRatios(Michel);
 
     SetNames(pID, "pID");
     GetTH1D(pID.f_data, pID.data, "hCut_pi0invMass_0");   
@@ -160,7 +50,6 @@ void CCProtonPi0_SideBandTool::initSideBands()
     GetTH1D(pID.f_mc, pID.QELike[0], "hCut_pi0invMass_4");   
     GetTH1D(pID.f_mc, pID.SinglePiPlus[0], "hCut_pi0invMass_5");   
     GetTH1D(pID.f_mc, pID.Other[0], "hCut_pi0invMass_6");   
-    CalcMCRatios(pID);
 
     SetNames(LowInvMass, "LowInvMass");
     GetTH1D(LowInvMass.f_data, LowInvMass.data, "hCut_pi0invMass_0");   
@@ -170,7 +59,6 @@ void CCProtonPi0_SideBandTool::initSideBands()
     GetTH1D(LowInvMass.f_mc, LowInvMass.QELike[0], "hCut_pi0invMass_4");   
     GetTH1D(LowInvMass.f_mc, LowInvMass.SinglePiPlus[0], "hCut_pi0invMass_5");   
     GetTH1D(LowInvMass.f_mc, LowInvMass.Other[0], "hCut_pi0invMass_6");   
-    CalcMCRatios(LowInvMass, true, 1, 3);
 }
 
 void CCProtonPi0_SideBandTool::GetTH1D(TFile* f, TH1D* &h, std::string var_name)
@@ -192,77 +80,28 @@ void CCProtonPi0_SideBandTool::SetNames(SideBand &sb, std::string name)
     sb.model_names[5] = "Total";
 }
 
-void CCProtonPi0_SideBandTool::CalcMCRatios(SideBand &sb, bool isLimited, int first_bin, int last_bin)
-{
-    // If the Integral is NOT Limited then integrate over ALL bins
-    if (!isLimited){
-        first_bin = 1;
-        last_bin = sb.signal[0]->GetNbinsX();
-    }
-
-    double signal = sb.signal[0]->Integral(first_bin, last_bin);
-    double WithPi0 = sb.WithPi0[0]->Integral(first_bin, last_bin);
-    double QELike = sb.QELike[0]->Integral(first_bin, last_bin);
-    double SinglePiPlus = sb.SinglePiPlus[0]->Integral(first_bin, last_bin);
-    double Other = sb.Other[0]->Integral(first_bin, last_bin);
-    
-    double total = signal + WithPi0 + QELike + SinglePiPlus + Other;
-
-    double r_signal = signal / total;
-    double r_WithPi0 = WithPi0 / total;
-    double r_QELike = QELike / total;
-    double r_SinglePiPlus = SinglePiPlus / total;
-    double r_Other = Other / total;
-
-    sb.fr_signal[0] = r_signal;
-    sb.fr_WithPi0[0] = r_WithPi0;
-    sb.fr_QELike[0] = r_QELike;
-    sb.fr_SinglePiPlus[0] = r_SinglePiPlus;
-    sb.fr_Other[0] = r_Other;
-    sb.fr_Total[0] = 1.0;
-}
-
-void CCProtonPi0_SideBandTool::PrintFitResults(SideBand &sb)
-{
-    using namespace std;
-    textFile<<left;
-    textFile<<setw(16)<<"Type"; 
-    textFile<<setw(16)<<"MC Ratio"; 
-    textFile<<setw(16)<<"Fit Ratio"; 
-    textFile<<setw(16)<<"Fit/MC"; 
-    textFile<<setw(16)<<"Error"; 
-    textFile<<endl; 
-
-    textFile<<setw(16)<<sb.model_names[0]; PrintRatio(sb.fr_signal);
-    textFile<<setw(16)<<sb.model_names[1]; PrintRatio(sb.fr_WithPi0);
-    textFile<<setw(16)<<sb.model_names[2]; PrintRatio(sb.fr_QELike);
-    textFile<<setw(16)<<sb.model_names[3]; PrintRatio(sb.fr_SinglePiPlus);
-    textFile<<setw(16)<<sb.model_names[4]; PrintRatio(sb.fr_Other);
-    textFile<<setw(16)<<sb.model_names[5]; PrintRatio(sb.fr_Total);
-    
-    textFile<<endl;
-}
-
-void CCProtonPi0_SideBandTool::PrintRatio(double ratio[])
-{
-    using namespace std;
-    textFile<<left;
-    textFile<<setw(16)<<setprecision(3)<<ratio[0];
-    textFile<<setw(16)<<setprecision(3)<<ratio[1];
-    textFile<<setw(16)<<setprecision(3)<<ratio[2];
-    textFile<<setw(16)<<setprecision(3)<<ratio[3];
-    textFile<<endl;
-}
-
-void CCProtonPi0_SideBandTool::OpenTextFile()
-{
-    fileName = Folder_List::output + Folder_List::textOut + "SideBandTables.txt";
-    CCProtonPi0_NTupleAnalysis::OpenTextFile(fileName, textFile);
-}
-
 CCProtonPi0_SideBandTool::~CCProtonPi0_SideBandTool()
 {
-    textFile.close();
+
+}
+
+void CCProtonPi0_SideBandTool::Plot()
+{
+    Plot(Michel);
+    Plot(pID);
+    Plot(LowInvMass);
+}
+
+void CCProtonPi0_SideBandTool::Plot(SideBand &sb)
+{
+    std::cout<<"Plotting "<<sb.name<<std::endl;
+    // Original 
+    Plot(sb, 0, true);
+    Plot(sb, 0, false);
+    
+    // Modified
+    Plot(sb, 1, true);
+    Plot(sb, 1, false);
 }
 
 void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
@@ -270,7 +109,7 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
     std::string type;
     if (ind == 0) type = "Original";
     else type = "Modified";
-    
+
     std::string norm;
     if (isArea) norm = "Area";
     else norm = "POT";
@@ -278,7 +117,7 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
 
     TCanvas* c = new TCanvas("c","c",1280,800);
     THStack* hs = new THStack("hs",plot_title.c_str());
-   
+
     // Get & Scale MC Models
     ColorHists(sb);
     double mc_ratio = GetMCScaleRatio(sb, isArea);
@@ -293,7 +132,7 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
     h_QELike->Scale(mc_ratio);
     h_SinglePiPlus->Scale(mc_ratio);
     h_Other->Scale(mc_ratio);
-    
+
     // Plot MC Models
     hs->Add(h_WithPi0);  
     hs->Add(h_QELike);  
@@ -308,13 +147,9 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
     // Plot Data
     sb.data->Draw("SAME E1 X0");
 
-    // Plot Fit
-    sb.fit->Draw("SAME E1");
-
     // Add Legend
     TLegend *legend = new TLegend(0.7,0.68,0.9,0.9);  
     legend->AddEntry(sb.data, "Data");
-    legend->AddEntry(sb.fit, "Fit Result");
     legend->AddEntry(h_signal, "Signal", "f");
     legend->AddEntry(h_Other, "Bckg: Other", "f");
     legend->AddEntry(h_SinglePiPlus, "Bckg: 1 #pi^{+}", "f");
@@ -341,13 +176,23 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
     pi0Mass_max.SetLineColor(kBlack);
     pi0Mass_max.DrawLine(200.0,0,200.0,hist_max);
 
+
+    // Add Text Box
+    TLatex text;
+    text.SetTextSize(0.03);
+    text.SetNDC();
+    text.DrawText(0.7, 0.6, Form("%s%3.2f", "#chi^{2} = ", ChiSq));
+    text.DrawText(0.7, 0.55, Form("%s%3.2f", "wgt(WithPi0) = ", wgt_WithPi0));
+    text.DrawText(0.7, 0.50, Form("%s%3.2f", "wgt(QELike) = ", wgt_QELike));
+    text.DrawText(0.7, 0.45, Form("%s%3.2f", "wgt(SinglePiPlus) = ", wgt_SinglePiPlus));
+
     // Plot Output
     std::string plotDir = Folder_List::plotDir_SideBand;
     std::string out_name;
     out_name = plotDir + sb.name + "_" + type + "_" + norm + ".png"; 
 
     c->Print(out_name.c_str(),"png");
-   
+
     delete legend;
     delete hs;
     delete c;
@@ -359,16 +204,16 @@ void CCProtonPi0_SideBandTool::ColorHists(SideBand &sb)
     for (int i = 0; i < 2; ++i){
         sb.signal[i]->SetFillColor(kGreen);
         sb.signal[i]->SetFillStyle(3001);
-        
+
         sb.WithPi0[i]->SetFillColor(kRed);
         sb.WithPi0[i]->SetFillStyle(3001);
-        
+
         sb.QELike[i]->SetFillColor(kOrange);
         sb.QELike[i]->SetFillStyle(3001);
-        
+
         sb.SinglePiPlus[i]->SetFillColor(kBlue);
         sb.SinglePiPlus[i]->SetFillStyle(3001);
-        
+
         sb.Other[i]->SetFillColor(kGray);
         sb.Other[i]->SetFillStyle(3001);
     }
@@ -380,11 +225,6 @@ void CCProtonPi0_SideBandTool::ColorHists(SideBand &sb)
     sb.data->SetLineWidth(1);
     sb.data->SetLineColor(kBlack);
     sb.data->SetFillStyle(0);
-    
-    // Fit
-    sb.fit->SetLineColor(kMagenta);
-    sb.fit->SetLineWidth(3);
-    sb.fit->SetFillStyle(0);
 }
 
 double CCProtonPi0_SideBandTool::GetMCScaleRatio(SideBand &sb, bool isArea)
@@ -401,23 +241,36 @@ double CCProtonPi0_SideBandTool::GetMCScaleRatio(SideBand &sb, bool isArea)
     return mc_ratio;
 }
 
+void CCProtonPi0_SideBandTool::ApplyFitResults(double chisq, double w_WithPi0, double w_QELike, double w_SinglePiPlus )
+{
+    ChiSq = chisq;
+    wgt_WithPi0 = w_WithPi0;
+    wgt_QELike = w_QELike;
+    wgt_SinglePiPlus = w_SinglePiPlus;
+
+    ApplyFitResults();
+}
+
+void CCProtonPi0_SideBandTool::ApplyFitResults()
+{
+    ApplyFitResults(Michel);
+    ApplyFitResults(pID);
+    ApplyFitResults(LowInvMass);
+}
 
 void CCProtonPi0_SideBandTool::ApplyFitResults(SideBand &sb)
 {
+    std::cout<<"Applying Fit Result to "<<sb.name<<std::endl;
     // Clone Original Histograms
     sb.signal[1] = new TH1D (*sb.signal[0]);
     sb.WithPi0[1] = new TH1D (*sb.WithPi0[0]);
     sb.QELike[1] = new TH1D (*sb.QELike[0]);
     sb.SinglePiPlus[1] = new TH1D (*sb.SinglePiPlus[0]);
     sb.Other[1] = new TH1D (*sb.Other[0]);
-    
+
     // Scale 
-    sb.signal[1]->Scale(sb.fr_signal[1]/sb.fr_signal[0]);
-    sb.WithPi0[1]->Scale(sb.fr_WithPi0[1]/sb.fr_WithPi0[0]);
-    sb.QELike[1]->Scale(sb.fr_QELike[1]/sb.fr_QELike[0]);
-    sb.SinglePiPlus[1]->Scale(sb.fr_SinglePiPlus[1]/sb.fr_SinglePiPlus[0]);
-    sb.Other[1]->Scale(sb.fr_Other[1]/sb.fr_Other[0]);
+    sb.WithPi0[1]->Scale(wgt_WithPi0);
+    sb.QELike[1]->Scale(wgt_QELike);
+    sb.SinglePiPlus[1]->Scale(wgt_SinglePiPlus);
 }
-
-
 

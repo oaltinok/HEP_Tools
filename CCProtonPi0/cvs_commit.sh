@@ -1,20 +1,12 @@
-CCPROTONPI0_V="v2_68"
+CCPROTONPI0_V="v2_69"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
 	No Major Changes
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	Many Design Improvements
-
-	data_POT & mc_POT are now constants in Base Class (CCProtonPi0_NTupleAnalysis)
-
-	CrossSection Class Updates
-		Using struct to contain all required data structures for a cross section variable
-		Flux integration corrected using minimum and maximum Enu
-		
-	Binning information for Cross Section Variables centralized
-		BinList class contains binning information for all cross section variables
-		TruthAnalysis and Particle Classes uses BinList to get binning
+	SideBandTool Updated
+		Using TMinuit to fit Side Bands simultaneously 
+		TMinuit is used under main.cpp and SideBandTool is used to apply fit results and plottting
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

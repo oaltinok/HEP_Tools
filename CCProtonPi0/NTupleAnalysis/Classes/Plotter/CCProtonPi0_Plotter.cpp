@@ -80,11 +80,9 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter() : CCProtonPi0_NTupleAnalysis()
     //--------------------------------------------------------------------------
     // Set POT -- Run getPOT_MC() and getPOT_Data() Functions once to get POT
     //--------------------------------------------------------------------------
-    POT_Ratio_data_mc = data_POT/mc_POT;
-
     std::cout<<"POT Data = "<<data_POT<<std::endl;
     std::cout<<"POT MC = "<<mc_POT<<std::endl;
-    std::cout<<"POT Ratio = "<<POT_Ratio_data_mc<<std::endl;
+    std::cout<<"POT Ratio = "<<POT_ratio<<std::endl;
 
     setRootDirs(); 
 }

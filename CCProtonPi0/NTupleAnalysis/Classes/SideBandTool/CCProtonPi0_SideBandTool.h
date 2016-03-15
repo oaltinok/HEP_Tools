@@ -11,7 +11,9 @@
 #include "TLatex.h"
 #include "TLegend.h"
 #include "TStyle.h"
+#include "TLatex.h"
 #include "TLine.h"
+#include "TMinuit.h"
 
 using namespace PlotUtils;
 
@@ -21,17 +23,6 @@ struct SideBand
 {
     std::string name;
     std::string model_names[nModels];  
-
-    // 0 Ratio from MC 
-    // 1 Ratio from Fit
-    // 2 MC/Fit
-    // 3 Error 
-    double fr_signal[4];
-    double fr_WithPi0[4];
-    double fr_QELike[4];
-    double fr_SinglePiPlus[4];
-    double fr_Other[4];
-    double fr_Total[4];
 
     TH1D* data; 
     TH1D* mc_total; 
@@ -55,32 +46,32 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
     public:
         CCProtonPi0_SideBandTool();
         ~CCProtonPi0_SideBandTool();
-        void Fit();
-
-    private:
-        double POT_ratio;
-
+        
+        void ApplyFitResults(double chisq, double w_WithPi0, double w_QELike, double w_SinglePiPlus);
+        void Plot();
+        
         SideBand Michel;
         SideBand pID;
         SideBand LowInvMass;
 
+    private:
+        double ChiSq;
+        double wgt_WithPi0;
+        double wgt_QELike;
+        double wgt_SinglePiPlus;
+
         void OpenRootFiles();
         void initSideBands();
         void SetNames(SideBand &sb, std::string name);
-        void CalcMCRatios(SideBand &sb, bool isLimited = false, int first_bin = 1, int last_bin = 1);
         void GetTH1D(TFile* f, TH1D* &h, std::string var_name);
-        void Fit(SideBand &sb, bool isLimitedFit = false, int first_bin = 1, int last_bin = 1);
-        void PrintFitResults(SideBand &sb);
-        void PrintRatio(double ratio[]);
-        void OpenTextFile();
+        void ApplyFitResults();
         void ApplyFitResults(SideBand &sb);
 
         // Plot Functions
+        void Plot(SideBand &sb);
+        void Plot(SideBand &sb, int ind, bool isArea);
         void ColorHists(SideBand &sb);
         double GetMCScaleRatio(SideBand &sb, bool isArea);
-        void Plot(SideBand &sb, int ind, bool isArea);
-        std::string fileName;
-        ofstream textFile;
 };
 
 

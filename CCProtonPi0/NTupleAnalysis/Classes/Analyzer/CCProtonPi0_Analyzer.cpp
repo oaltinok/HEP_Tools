@@ -617,29 +617,30 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // ------------------------------------------------------------------------
     // Michel Cuts
     // ------------------------------------------------------------------------
-    if ( Cut_Vertex_Michel_Exist == 1 && truth_track_michel_evis_most_pdg != -1){
-        if (truth_track_michel_evis_most_pdg == 211){ 
+    if ( Cut_Vertex_Michel_Exist == 1 && truth_vtx_michel_evis_most_pdg != -1){
+        if (truth_vtx_michel_evis_most_pdg == 211){ 
             nPiPlus++;
             FillHistogram(cutList.michel_piplus_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_piplus_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_piplus_distance, vtx_michelProng_distance);
         }
-        else if (truth_track_michel_evis_most_pdg == -211){ 
+        else if (truth_vtx_michel_evis_most_pdg == -211){ 
             nPiMinus++;
             FillHistogram(cutList.michel_piminus_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_piminus_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_piminus_distance, vtx_michelProng_distance);
         }
-        else if (truth_track_michel_evis_most_pdg == 2112){ 
+        else if (truth_vtx_michel_evis_most_pdg == 2112){ 
             nNeutron++;
             FillHistogram(cutList.michel_neutron_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_neutron_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_neutron_distance, vtx_michelProng_distance);
-        }else if (truth_track_michel_evis_most_pdg == 2212){ 
+        }else if (truth_vtx_michel_evis_most_pdg == 2212){ 
             nProton++;
             FillHistogram(cutList.michel_proton_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_proton_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_proton_distance, vtx_michelProng_distance);
+            cout<<mc_run<<" "<<mc_subrun<<" "<<ev_gate<<" "<<mc_incomingE<<endl;
         }else{ 
             nOther++;
             FillHistogram(cutList.michel_other_time_diff, vtx_michelProng_time_diff);

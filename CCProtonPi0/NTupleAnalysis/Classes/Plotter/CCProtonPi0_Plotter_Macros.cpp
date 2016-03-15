@@ -1025,7 +1025,7 @@ double CCProtonPi0_Plotter::GetMCNormalization(std::string &norm_label, bool isP
 {
     double mc_ratio;
     if (isPOTNorm){
-        mc_ratio = POT_Ratio_data_mc;
+        mc_ratio = POT_ratio;
         norm_label = "POT";
     }else{
         //mc_ratio = mc->GetAreaNormFactor(data); // Includes Overflow Bins
