@@ -7,8 +7,11 @@
 # ==============================================================================
 
 # Main File and its executable
-MAINCPP = main.cpp
 MAINEXE = main.exe
+MAINCPP = main.cpp
+MINUITFUNCSCPP = src/Minuit_Functions.cpp
+MAINFUNCSCPP = src/Main_Functions.cpp
+ALLMAINCPP = $(MAINCPP) $(MINUITFUNCSCPP) $(MAINFUNCSCPP)
 
 # Class: Base Class
 NTUPLEANALYSISCPP = Classes/NTupleAnalysis/CCProtonPi0_NTupleAnalysis.cpp
@@ -54,7 +57,7 @@ CUTSTATCPP = Classes/Cut/CCProtonPi0_CutStat.cpp
 ALLOTHERCPP = $(BINLISTCPP) $(SINGLEBINCPP) $(CUTLISTCPP) $(CUTCPP) $(CUTSTATCPP)
 
 # ALL Classes Required for the Package
-ALLCPP = $(MAINCPP) $(NTUPLEANALYSISCPP) $(ALLANALYZERCPP) $(ALLCROSSSECTIONCPP) $(ALLPARTICLESCPP) $(ALLTOOLCPP) $(ALLOTHERCPP) $(ALLPLOTTERCPP) 
+ALLCPP = $(ALLMAINCPP) $(NTUPLEANALYSISCPP) $(ALLANALYZERCPP) $(ALLCROSSSECTIONCPP) $(ALLPARTICLESCPP) $(ALLTOOLCPP) $(ALLOTHERCPP) $(ALLPLOTTERCPP)
 
 # PlotUtils from MINERvA Framework
 INCLUDES += -I$(PLOTUTILSROOT)/ -I$(UNFOLDUTILSROOT)/

@@ -640,7 +640,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
             FillHistogram(cutList.michel_proton_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_proton_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_proton_distance, vtx_michelProng_distance);
-            cout<<mc_run<<" "<<mc_subrun<<" "<<ev_gate<<" "<<mc_incomingE<<endl;
+            writeScanFile();
         }else{ 
             nOther++;
             FillHistogram(cutList.michel_other_time_diff, vtx_michelProng_time_diff);
@@ -997,7 +997,7 @@ void CCProtonPi0_Analyzer::writeScanFile()
         const string other        = "&slice=-1&filetype=dst";
         //http://minerva05.fnal.gov/Arachne/arachne.html?det=MV&recoVer=v10r6p13&run=3596&subrun=6&gate=597&slice=7
         roundupText<<arachne_html<<scanFileName<<entryString<<truth_eventID<<other<<" ";
-        roundupText<<ev_subrun<<" ^ "<<ev_gate<<" ^ "<<truth_isGamma1_conv_inside<<" ^ "<<truth_isGamma2_conv_inside<<endl;
+        roundupText<<mc_run<<" ^ "<<mc_subrun<<" ^ "<<ev_gate<<" ^ "<<mc_incomingE<<endl;
     }else{
         cout<<"WARNING! ScanRun is NOT Activated! Are you sure what you are doing?"<<endl;    
     }

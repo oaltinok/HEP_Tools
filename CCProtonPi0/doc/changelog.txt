@@ -1,4 +1,14 @@
 ===================================================================================================
+v2_70
+CCProtonPi0 Updates:
+	No Major Changes
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	Improved main.cpp design
+		Moved main function definitions to src/Main_Functions.cpp
+		Moved Minuit function definitions to src/Minuit_Functions.cpp
+
+===================================================================================================
 v2_69
 CCProtonPi0 Updates:
 	No Major Changes

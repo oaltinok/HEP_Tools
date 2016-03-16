@@ -1,3 +1,5 @@
+#ifndef CCProtonPi0_NTupleAnalysis_h
+#define CCProtonPi0_NTupleAnalysis_h
 /*
 ================================================================================
 Class: CCProtonPi0_NTupleAnalysis
@@ -7,10 +9,6 @@ Class: CCProtonPi0_NTupleAnalysis
     Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 ================================================================================
 */
-
-#ifndef CCProtonPi0_NTupleAnalysis_h
-#define CCProtonPi0_NTupleAnalysis_h
-
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
