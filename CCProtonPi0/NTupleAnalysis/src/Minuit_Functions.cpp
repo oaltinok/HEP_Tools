@@ -47,12 +47,18 @@ void calc_ChiSq(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t if
     (void) iflag;
 
     double ChiSq = 0;
-    
+
+    // Calculate ChiSq for Michel for ALL Bins
+    //ChiSq += calc_ChiSq_SideBand(sbtool.Michel, par);
+   
     // Calculate ChiSq for pID for ALL Bins
     ChiSq += calc_ChiSq_SideBand(sbtool.pID, par);
 
-    // Calculate ChiSq for Low Inv Mass Region for first 3 bins
-    ChiSq += calc_ChiSq_SideBand(sbtool.LowInvMass, par, true, 1, 3);
+    // Calculate ChiSq for Low Inv Mass Region for first 6 bins
+    ChiSq += calc_ChiSq_SideBand(sbtool.LowInvMass, par, true, 1, 6);
+ 
+    // Calculate ChiSq for High Inv Mass Region for last 30 bins
+    ChiSq += calc_ChiSq_SideBand(sbtool.HighInvMass, par, true, 21, 50);
     
     f = ChiSq;
     return;

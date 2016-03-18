@@ -69,6 +69,9 @@ namespace Folder_List
     const std::string rootDir_GENIEXSec = rootOut + GENIEXSec + "GENIEXSec.root";
    
     // Set Side Band ROOT Dirs;
+    const std::string rootDir_sideBand_Original_mc = rootOut + MC + analyzed + "CutHistograms_Original.root";
+    const std::string rootDir_sideBand_Original_data = rootOut + Data + analyzed + "CutHistograms_Original.root";
+
     const std::string rootDir_sideBand_Michel_mc = rootOut + MC + analyzed + "CutHistograms_Michel.root";
     const std::string rootDir_sideBand_Michel_data = rootOut + Data + analyzed + "CutHistograms_Michel.root";
     
@@ -77,6 +80,10 @@ namespace Folder_List
     
     const std::string rootDir_sideBand_LowInvMass_mc = rootOut + MC + analyzed + "CutHistograms_LowInvMass.root";
     const std::string rootDir_sideBand_LowInvMass_data = rootOut + Data + analyzed + "CutHistograms_LowInvMass.root";
+     
+    const std::string rootDir_sideBand_HighInvMass_mc = rootOut + MC + analyzed + "CutHistograms_Original.root";
+    const std::string rootDir_sideBand_HighInvMass_data = rootOut + Data + analyzed + "CutHistograms_Original.root";
+
     
     // Set MC Root Dir;
     const std::string rootDir_CrossSection_mc = rootOut + MC + analyzed + "CrossSection.root";

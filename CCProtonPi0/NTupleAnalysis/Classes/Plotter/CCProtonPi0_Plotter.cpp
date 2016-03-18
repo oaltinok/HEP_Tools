@@ -26,15 +26,15 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotBackgroundSubtracted();
     //plotUnfolded();
     //plotEfficiencyCorrected();
-    plotIntegratedFlux();
-    plotCrossSection();
+    //plotIntegratedFlux();
+    //plotCrossSection();
     //plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
     //  Data vs MC
     //--------------------------------------------------------------------------
     //plotInteraction_DataMC();
-    //plotMuon_DataMC();
+    plotMuon_DataMC();
     //plotProton_DataMC();
     //plotPion_DataMC();
     //plotCutHistograms_DataMC();
@@ -1110,8 +1110,8 @@ void CCProtonPi0_Plotter::plotCutHistograms_DataMC()
     //DrawDataStackedMC(rootDir_CutHists,"hCut_1Track_nShowerCandidates",plotDir);
     //DrawDataStackedMC(rootDir_CutHists,"hCut_2Track_nShowerCandidates",plotDir);
 
-    CutArrow Michel(1,"L"); 
-    DrawDataStackedMC(rootDir_CutHists,"hCut_Michel",plotDir,1, Michel);
+    //CutArrow Michel(1,"L"); 
+    //DrawDataStackedMC(rootDir_CutHists,"hCut_Michel",plotDir,1, Michel);
 
    
     plot_InvMass_TruthMatch_Stacked(true,true);

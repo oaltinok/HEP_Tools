@@ -1,8 +1,8 @@
 DATATYPE=$1
-CCPROTONPI0_V="v2_67b"
+CCPROTONPI0_V="v2_70"
 FINDSCRIPT="/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p7/Tools/ProductionScripts/pot_scripts/FindAnaFilesWithoutMeta.py"
-#PLAYLISTS=( "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
-PLAYLISTS=( "minerva1" );
+PLAYLISTS=( "minerva1" "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
+#PLAYLISTS=( "minerva1" );
 
 input_error()
 {

@@ -42,7 +42,8 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     double hist_max = 0;
     double max_bin;
     double bin_width;
-
+    double area_mc = 0;
+    
     // ------------------------------------------------------------------------
     // Get Data Histogram
     // ------------------------------------------------------------------------
@@ -51,6 +52,14 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     max_bin = data->GetMaximumBin();
     hist_max = (hist_max + data->GetBinContent(max_bin))*1.2;
     bin_width = data->GetBinWidth(1);
+
+    // ------------------------------------------------------------------------
+    // MC Normalization 
+    // ------------------------------------------------------------------------
+    var = Form("%s_%d",var_name.c_str(),0);
+    MnvH1D* mc_all = (MnvH1D*)f_mc->Get(var.c_str()); 
+    std::string norm_label; 
+    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc_all);
 
     // ------------------------------------------------------------------------
     // Fill TObjArray - For MC Histograms
@@ -63,20 +72,14 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Background");
     mc_hists->Add(temp);
-
+    area_mc += temp->Integral() * mc_ratio;
+    
     // Get Signal
     var = Form("%s_%d",var_name.c_str(),1);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Signal");
     mc_hists->Add(temp);
-
-    // ------------------------------------------------------------------------
-    // MC Normalization 
-    // ------------------------------------------------------------------------
-    var = Form("%s_%d",var_name.c_str(),0);
-    MnvH1D* mc_all = (MnvH1D*)f_mc->Get(var.c_str()); 
-    std::string norm_label; 
-    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc_all);
+    area_mc += temp->Integral() * mc_ratio;
 
     // ------------------------------------------------------------------------
     // Plot 
@@ -113,10 +116,15 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     if (    var_name.compare("deltaInvMass") == 0 ||
             var_name.compare("W_Calc") == 0 ){
         TLine deltaMass;
-        deltaMass.SetLineWidth(2);
         deltaMass.SetLineColor(kBlue);
         deltaMass.DrawLine(1.232,0,1.232,hist_max);
     }
+
+    // Add Areas
+    const double y_pos = 0.88;
+    const double text_size = 0.03;
+    double area_data = data->Integral();
+    plotter->AddPlotLabel(Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc),0.3,y_pos,text_size,kBlue); 
 
     // Print Plot
     c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all_",norm_label.c_str(),".png"), "png");
@@ -137,17 +145,12 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
     double hist_max = 0;
     double max_bin;
     double bin_width;
-
+    
     // ------------------------------------------------------------------------
     // Get Data Histogram
     // ------------------------------------------------------------------------
     var = Form("%s_%d",var_name.c_str(),0);
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
-    // ------------------------------------------------------------------------
-    // Fill TObjArray - For MC Histograms
-    // ------------------------------------------------------------------------
-    TObjArray* mc_hists = new TObjArray;
-    FormTObjArray_BckgType(f_mc, var_name, mc_hists, hist_max, bin_width);
 
     // ------------------------------------------------------------------------
     // MC Normalization 
@@ -156,6 +159,13 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
     MnvH1D* mc_all = (MnvH1D*)f_mc->Get(var.c_str()); 
     std::string norm_label; 
     double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc_all);
+
+    // ------------------------------------------------------------------------
+    // Fill TObjArray - For MC Histograms
+    // ------------------------------------------------------------------------
+    TObjArray* mc_hists = new TObjArray;
+    double area_mc = FormTObjArray_BckgType(f_mc, var_name, mc_hists, hist_max, bin_width);
+
 
     // ------------------------------------------------------------------------
     // Plot 
@@ -201,6 +211,13 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
         deltaMass.SetLineColor(kBlue);
         deltaMass.DrawLine(1.232,0,1.232,hist_max);
     }
+
+    // Add Areas
+    const double y_pos = 0.88;
+    const double text_size = 0.03;
+    double area_data = data->Integral();
+    area_mc = area_mc * mc_ratio;
+    plotter->AddPlotLabel(Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc),0.3,y_pos,text_size,kBlue); 
 
 
     // Print Plot
@@ -1140,9 +1157,10 @@ void CCProtonPi0_Plotter::DrawEfficiencyCurve(rootDir& dir, std::string var_name
 }
 
 
-void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_name, TObjArray* mc_hists, double &hist_max, double &bin_width) 
+double CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_name, TObjArray* mc_hists, double &hist_max, double &bin_width) 
 {
     std::string var;
+    double area_mc = 0;
     double max_bin;
     MnvH1D* temp;
 
@@ -1155,6 +1173,7 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     temp->SetLineColor(kRed);
     temp->SetFillColor(kRed);
     mc_hists->Add(temp);
+    area_mc += temp->Integral();
 
     // Get Bckg: QELike
     var = Form("%s_%d",var_name.c_str(),4);
@@ -1165,6 +1184,7 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     temp->SetLineColor(kOrange);
     temp->SetFillColor(kOrange);
     mc_hists->Add(temp);
+    area_mc += temp->Integral();
 
     // Get Bckg: SinglePiPlus
     var = Form("%s_%d",var_name.c_str(),5);
@@ -1175,6 +1195,7 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     temp->SetLineColor(kBlue);
     temp->SetFillColor(kBlue);
     mc_hists->Add(temp);
+    area_mc += temp->Integral();
 
     // Get Bckg: Other
     var = Form("%s_%d",var_name.c_str(),6);
@@ -1185,6 +1206,7 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     temp->SetLineColor(kGray);
     temp->SetFillColor(kGray);
     mc_hists->Add(temp);
+    area_mc += temp->Integral();
 
     // Get Signal
     var = Form("%s_%d",var_name.c_str(),1);
@@ -1196,7 +1218,9 @@ void CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_na
     temp->SetLineColor(kGreen);
     temp->SetFillColor(kGreen);
     mc_hists->Add(temp);
+    area_mc += temp->Integral();
 
+    return area_mc;
 }
 
 void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)

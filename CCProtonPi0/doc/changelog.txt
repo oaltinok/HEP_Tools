@@ -1,4 +1,14 @@
 ===================================================================================================
+v2_71
+CCProtonPi0 Updates:
+	No Major Changes
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	SideBandTool Improved
+		Added new side band: High Inv Mass
+		Creating detailed plots with ChiSq Information
+
+===================================================================================================
 v2_70
 CCProtonPi0 Updates:
 	No Major Changes

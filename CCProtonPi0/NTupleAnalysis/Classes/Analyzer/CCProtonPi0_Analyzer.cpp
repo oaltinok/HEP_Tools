@@ -25,12 +25,12 @@ void CCProtonPi0_Analyzer::specifyRunTime()
  
     // Control Flow
     isDataAnalysis  = true;
-    isScanRun = true;
+    isScanRun = false;
     writeFSParticleMomentum = false;
 
     // Side Band Control
-    NoSideBand = true;
-    sideBand_Michel = false;
+    NoSideBand = false;
+    sideBand_Michel = true;
     sideBand_PID = false;
     sideBand_LowInvMass = false;
 
@@ -640,7 +640,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
             FillHistogram(cutList.michel_proton_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_proton_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_proton_distance, vtx_michelProng_distance);
-            writeScanFile();
         }else{ 
             nOther++;
             FillHistogram(cutList.michel_other_time_diff, vtx_michelProng_time_diff);

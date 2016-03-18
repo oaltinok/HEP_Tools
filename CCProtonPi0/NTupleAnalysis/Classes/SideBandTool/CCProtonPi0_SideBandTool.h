@@ -11,7 +11,6 @@
 #include "TLatex.h"
 #include "TLegend.h"
 #include "TStyle.h"
-#include "TLatex.h"
 #include "TLine.h"
 #include "TMinuit.h"
 
@@ -50,9 +49,11 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
         void ApplyFitResults(double chisq, double w_WithPi0, double w_QELike, double w_SinglePiPlus);
         void Plot();
         
+        SideBand Original;
         SideBand Michel;
         SideBand pID;
         SideBand LowInvMass;
+        SideBand HighInvMass;
 
     private:
         double ChiSq;
@@ -72,6 +73,7 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
         void Plot(SideBand &sb, int ind, bool isArea);
         void ColorHists(SideBand &sb);
         double GetMCScaleRatio(SideBand &sb, bool isArea);
+        double calc_ChiSq(SideBand &sb, int ind, bool isArea);
 };
 
 
