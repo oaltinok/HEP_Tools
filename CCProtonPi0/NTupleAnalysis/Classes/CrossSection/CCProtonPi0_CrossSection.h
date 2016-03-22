@@ -84,7 +84,6 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         XSec pi0_theta;
         XSec QSq;
         
-         
         // ROOT Files    
         TFile* f_out;
         TFile* f_truth;

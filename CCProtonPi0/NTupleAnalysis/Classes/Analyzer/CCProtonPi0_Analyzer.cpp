@@ -29,8 +29,8 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     writeFSParticleMomentum = false;
 
     // Side Band Control
-    NoSideBand = false;
-    sideBand_Michel = true;
+    NoSideBand = true;
+    sideBand_Michel = false;
     sideBand_PID = false;
     sideBand_LowInvMass = false;
 
@@ -1353,21 +1353,21 @@ void CCProtonPi0_Analyzer::fill_muon_theta()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithDefaultErrors(muon.muon_theta_mc_reco_all, muon_theta * TMath::RadToDeg());
+        FillHistogramWithDefaultErrors(muon.muon_theta_mc_reco_all, muon_theta_beam * TMath::RadToDeg());
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithDefaultErrors(muon.muon_theta_mc_truth_signal, truth_muon_theta * TMath::RadToDeg());
+            FillHistogramWithDefaultErrors(muon.muon_theta_mc_truth_signal, truth_muon_theta_beam * TMath::RadToDeg());
             // MC Reco Signal
-            FillHistogramWithDefaultErrors(muon.muon_theta_mc_reco_signal, muon_theta * TMath::RadToDeg());
+            FillHistogramWithDefaultErrors(muon.muon_theta_mc_reco_signal, muon_theta_beam * TMath::RadToDeg());
             // MC Reco vs True -- Response
-            FillHistogramWithDefaultErrors(muon.muon_theta_response, muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg());
+            FillHistogramWithDefaultErrors(muon.muon_theta_response, muon_theta_beam * TMath::RadToDeg(), truth_muon_theta_beam * TMath::RadToDeg());
         }else{
             // MC Reco Background
-            FillHistogramWithDefaultErrors(muon.muon_theta_mc_reco_bckg, muon_theta * TMath::RadToDeg());
+            FillHistogramWithDefaultErrors(muon.muon_theta_mc_reco_bckg, muon_theta_beam * TMath::RadToDeg());
         }
     }else{
         // Data
-        FillHistogram(muon.muon_theta_all, muon_theta * TMath::RadToDeg());
+        FillHistogram(muon.muon_theta_all, muon_theta_beam * TMath::RadToDeg());
     }
 }
 
@@ -1419,21 +1419,21 @@ void CCProtonPi0_Analyzer::fill_pi0_theta()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_reco_all, pi0_theta * TMath::RadToDeg());
+        FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_reco_all, pi0_theta_beam * TMath::RadToDeg());
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_truth_signal, truth_pi0_theta  * TMath::RadToDeg());
+            FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_truth_signal, truth_pi0_theta_beam  * TMath::RadToDeg());
             // MC Reco Signal
-            FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_reco_signal, pi0_theta * TMath::RadToDeg());
+            FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_reco_signal, pi0_theta_beam * TMath::RadToDeg());
             // MC Reco vs True -- Response
-            FillHistogramWithDefaultErrors(pi0.pi0_theta_response, pi0_theta * TMath::RadToDeg(), truth_pi0_theta * TMath::RadToDeg());
+            FillHistogramWithDefaultErrors(pi0.pi0_theta_response, pi0_theta_beam * TMath::RadToDeg(), truth_pi0_theta_beam * TMath::RadToDeg());
         }else{
             // MC Reco Background
-            FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_reco_bckg, pi0_theta * TMath::RadToDeg());
+            FillHistogramWithDefaultErrors(pi0.pi0_theta_mc_reco_bckg, pi0_theta_beam * TMath::RadToDeg());
         }
     }else{
         // Data
-        FillHistogram(pi0.pi0_theta_all, pi0_theta * TMath::RadToDeg());
+        FillHistogram(pi0.pi0_theta_all, pi0_theta_beam * TMath::RadToDeg());
     }
 }
 

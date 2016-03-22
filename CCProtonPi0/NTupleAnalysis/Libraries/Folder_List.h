@@ -103,6 +103,12 @@ namespace Folder_List
     const std::string rootDir_Pion_data = rootOut + Data + analyzed + "Pion.root";
     const std::string rootDir_Pi0Blob_data = rootOut + Data + analyzed + "Pi0Blob.root";
 
+    // Unfolding Study
+    const std::string rootDir_Pion_Train = rootOut + MC + analyzed + "Pion_Sample.root";
+    const std::string rootDir_Pion_Sample = rootOut + MC + analyzed + "Pion_Train.root";
+    const std::string rootDir_Muon_Train = rootOut + MC + analyzed + "Muon_Sample.root";
+    const std::string rootDir_Muon_Sample = rootOut + MC + analyzed + "Muon_Train.root";
+
     //-------------------------------------------------------------------------
     // Plot Dirs
     //-------------------------------------------------------------------------

@@ -34,7 +34,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  Data vs MC
     //--------------------------------------------------------------------------
     //plotInteraction_DataMC();
-    plotMuon_DataMC();
+    //plotMuon_DataMC();
     //plotProton_DataMC();
     //plotPion_DataMC();
     //plotCutHistograms_DataMC();
@@ -54,7 +54,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //SavePi0InvMassPoints();
     //plotOtherStudies();
     //plotGENIEXSec();
-
+    UnfoldingStudy();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -1669,5 +1669,30 @@ void CCProtonPi0_Plotter::plotGENIEXSec()
 
     std::cout<<"Done!"<<std::endl;
 }
+
+void CCProtonPi0_Plotter::UnfoldingStudy()
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    
+    UnfoldingStudy_muon_P();
+    UnfoldingStudy_muon_theta();
+    
+    UnfoldingStudy_pi0_P();
+    UnfoldingStudy_pi0_theta();
+
+
+    // Plot Migration Histograms
+    rootDir pi0_Train;
+    rootDir muon_Train;
+    pi0_Train.mc = Folder_List::rootDir_Pion_Train;
+    muon_Train.mc = Folder_List::rootDir_Muon_Train;
+
+    DrawNormalizedMigrationHistogram(muon_Train,"muon_P_response",plotDir);
+    DrawNormalizedMigrationHistogram(muon_Train,"muon_theta_response",plotDir);
+    DrawNormalizedMigrationHistogram(pi0_Train,"pi0_P_response",plotDir);
+    DrawNormalizedMigrationHistogram(pi0_Train,"pi0_theta_response",plotDir);
+
+}
+
 #endif
 

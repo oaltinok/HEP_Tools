@@ -6,7 +6,7 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v2_70";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v2_70_Sample";
 
 const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33534e+20;
 const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.7414e+21;

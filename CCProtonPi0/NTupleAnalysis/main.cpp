@@ -58,7 +58,7 @@ int main(int argc, char *argv[] )
     if (nMode != 10 || nMode != 20){
         if (isMC){
             cout<<"MC Playlists Selected!\n"<<endl;
-            pl_reduce = "Input/Playlists/pl_MC_Merged.dat"; 
+            pl_reduce = "Input/Playlists/pl_MC_Merged_Sample.dat"; 
             pl_analyze = "Input/Playlists/pl_MC_Reduced.dat"; 
         }else{
             cout<<"Data Playlists Selected!\n"<<endl;

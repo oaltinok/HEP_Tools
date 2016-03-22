@@ -1,29 +1,29 @@
-nAll = 60173423.00
-nFidVol = 12945629.00 21.51%
-nNoFidVol = 47227794.00 78.49%
+nAll = 31709473.00
+nFidVol = 6463409.00 20.38%
+nNoFidVol = 25246064.00 79.62%
 ================================================================
-nSignal = 684452.00 5.29%
+nSignal = 341888.00 5.29%
 ----------------------------------------------------------------
-nBckg_WithPi0 = 6087472.00 47.02%
-nBckg_QELike = 1538123.00 11.88%
-nBckg_SinglePiPlus = 1833965.00 14.17%
-nBckg_Other = 2801617.00 21.64%
+nBckg_WithPi0 = 3037182.00 46.99%
+nBckg_QELike = 767904.00 11.88%
+nBckg_SinglePiPlus = 915797.00 14.17%
+nBckg_Other = 1400638.00 21.67%
 ----------------------------------------------------------------
-nBckg_NoPi0 = 5765439.00 44.54%
-nBckg_SinglePi0 = 3119670.00 24.10%
-nBckg_MultiPi0 = 3376068.00 26.08%
+nBckg_NoPi0 = 2880064.00 44.56%
+nBckg_SinglePi0 = 1555397.00 24.06%
+nBckg_MultiPi0 = 1686060.00 26.09%
 ----------------------------------------------------------------
-nBckg_NC = 3415401.00 26.38%
-nBckg_AntiNeutrino = 741833.00 5.73%
-nBckg_QELike = 1591014.00 12.29%
-nBckg_SingleChargedPion = 1882348.00 14.54%
-nBckg_SingleChargedPion_ChargeExchanged = 361026.00 2.79%
-nBckg_DoublePion_WithPi0 = 979561.00 7.57%
-nBckg_DoublePion_WithoutPi0 = 320601.00 2.48%
-nBckg_MultiPion_WithPi0 = 1613509.00 12.46%
-nBckg_MultiPion_WithoutPi0 = 163275.00 1.26%
-nBckg_Other = 1192609.00 9.21%
+nBckg_NC = 1704728.00 26.38%
+nBckg_AntiNeutrino = 371429.00 5.75%
+nBckg_QELike = 794205.00 12.29%
+nBckg_SingleChargedPion = 940085.00 14.54%
+nBckg_SingleChargedPion_ChargeExchanged = 179887.00 2.78%
+nBckg_DoublePion_WithPi0 = 488486.00 7.56%
+nBckg_DoublePion_WithoutPi0 = 160183.00 2.48%
+nBckg_MultiPion_WithPi0 = 805503.00 12.46%
+nBckg_MultiPion_WithoutPi0 = 81468.00 1.26%
+nBckg_Other = 595547.00 9.21%
 ----------------------------------------------------------------
-Total Signal & Background With Pi0 = 12945629.00 100.00%
-Total Signal & Background Compact = 12945629.00 100.00%
-Total Signal & Background = 12945629.00 100.00%
+Total Signal & Background With Pi0 = 6463409.00 100.00%
+Total Signal & Background Compact = 6463409.00 100.00%
+Total Signal & Background = 6463409.00 100.00%

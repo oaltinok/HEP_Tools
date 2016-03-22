@@ -31,9 +31,11 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 #include <PlotUtils/MnvPlotter.h>
 #include <PlotUtils/MnvFluxConstraint.h>
 #include <PlotUtils/POTCounter.h>
+#include <MinervaUnfold/MnvUnfold.h>
 #include "Cintex/Cintex.h"
 
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
+#include "../BinList/CCProtonPi0_BinList.h"
 
 using namespace PlotUtils;
 
@@ -171,6 +173,21 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void SaveRecoRatioPoints(rootDir& dir, std::string var_name, std::string plotDir);
         void Save2DHistPoints(rootDir& dir, std::string var_name, std::string plotDir);     
         double GetMCNormalization(std::string &norm_label, bool isPOTNorm, MnvH1D* data, MnvH1D* mc);
+
+        // Unfolding Study
+        void UnfoldingStudy();
+        void UnfoldingStudy_muon_P();
+        void UnfoldingStudy_muon_theta();
+        void UnfoldingStudy_pi0_P();
+        void UnfoldingStudy_pi0_theta();
+        void init_UnfoldingHistograms(std::vector<MnvH1D*> &unfolded, std::vector<MnvH1D*> &error, std::vector<MnvH1D*> &diff);
+        MnvH1D* CalcUnfoldingError(MnvH1D* diff, MnvH1D* truth);
+        MnvH1D*  CalcUnfoldingDiff(MnvH1D* unfolded, MnvH1D* truth);
+        void FillUnfoldingHistograms(MnvH1D* &unfolded, MnvH1D* &error, MnvH1D* &diff, MnvH2D* response, MnvH1D* mc_reco, MnvH1D* mc_true, int niter);
+        void StyleUnfoldingHistograms(std::vector<MnvH1D*> &hists);
+        void PlotUnfolding_Unfolded(std::vector<MnvH1D*> &hists, MnvH1D* truth, std::string var_name);
+        void PlotUnfolding_Error(std::vector<MnvH1D*> &hists, std::string var_name);
+        void PlotUnfolding_Diff(std::vector<MnvH1D*> &hists, std::string var_name);
 };
 
 #endif

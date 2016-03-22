@@ -1330,15 +1330,12 @@ void CCProtonPi0_Plotter::DrawNormalizedMigrationHistogram(rootDir &dir, std::st
     // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
     ApplyStyle(plotter);
-    //plotter->axis_minimum = 0.1;
-    plotter->axis_minimum = 0.0;
     plotter->DrawNormalizedMigrationHistogram(hist2D);
 
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
 
     delete c;
     delete plotter;
-    delete hist2D;
     delete f;
 }
 
