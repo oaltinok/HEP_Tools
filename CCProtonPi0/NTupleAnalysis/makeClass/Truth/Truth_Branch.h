@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Mar 11 08:05:55 2016 by ROOT version 5.34/05
+// Thu Mar 24 08:41:09 2016 by ROOT version 5.34/05
 // from TChain Truth/
 //////////////////////////////////////////////////////////
 
@@ -22,7 +22,6 @@ public :
 
    // Declaration of leaf types
    Double_t        eventID;
-   Bool_t          truth_has_physics_event;
    Bool_t          truth_isGamma1_conv_inside;
    Bool_t          truth_isGamma2_conv_inside;
    Bool_t          truth_isSignal;
@@ -243,7 +242,6 @@ public :
 
    // List of branches
    TBranch        *b_eventID;   //!
-   TBranch        *b_truth_has_physics_event;   //!
    TBranch        *b_truth_isGamma1_conv_inside;   //!
    TBranch        *b_truth_isGamma2_conv_inside;   //!
    TBranch        *b_truth_isSignal;   //!
@@ -496,7 +494,7 @@ Truth_Branch::Truth_Branch(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("Truth","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_67.root/Truth");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_73.root/Truth");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -546,7 +544,6 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetMakeClass(1);
 
    fChain->SetBranchAddress("eventID", &eventID, &b_eventID);
-   fChain->SetBranchAddress("truth_has_physics_event", &truth_has_physics_event, &b_truth_has_physics_event);
    fChain->SetBranchAddress("truth_isGamma1_conv_inside", &truth_isGamma1_conv_inside, &b_truth_isGamma1_conv_inside);
    fChain->SetBranchAddress("truth_isGamma2_conv_inside", &truth_isGamma2_conv_inside, &b_truth_isGamma2_conv_inside);
    fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);

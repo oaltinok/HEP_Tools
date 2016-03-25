@@ -179,6 +179,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void UnfoldingStudy_muon_P();
         void UnfoldingStudy_muon_theta();
         void UnfoldingStudy_pi0_P();
+        void UnfoldingStudy_pi0_KE();
         void UnfoldingStudy_pi0_theta();
         void init_UnfoldingHistograms(std::vector<MnvH1D*> &unfolded, std::vector<MnvH1D*> &error, std::vector<MnvH1D*> &diff);
         MnvH1D* CalcUnfoldingError(MnvH1D* diff, MnvH1D* truth);
@@ -188,6 +189,8 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void PlotUnfolding_Unfolded(std::vector<MnvH1D*> &hists, MnvH1D* truth, std::string var_name);
         void PlotUnfolding_Error(std::vector<MnvH1D*> &hists, std::string var_name);
         void PlotUnfolding_Diff(std::vector<MnvH1D*> &hists, std::string var_name);
+        void PlotUnfolding_TruthComparison();
+        void PlotUnfolding_Migration();
 };
 
 #endif

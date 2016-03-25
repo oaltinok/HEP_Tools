@@ -43,9 +43,9 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  MC Only
     //--------------------------------------------------------------------------
     //plotInteraction_MCOnly();
-    //plotMuon_MCOnly();
+    plotMuon_MCOnly();
     //plotProton_MCOnly();
-    //plotPion_MCOnly();
+    plotPion_MCOnly();
     //plotCutHistograms_MCOnly();
 
     //--------------------------------------------------------------------------
@@ -54,12 +54,12 @@ void CCProtonPi0_Plotter::plotHistograms()
     //SavePi0InvMassPoints();
     //plotOtherStudies();
     //plotGENIEXSec();
-    UnfoldingStudy();
+    //UnfoldingStudy();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
 {
-    std::string playlist = "Input/Playlists/pl_MC_Merged.dat"; 
+    std::string playlist = "Input/Playlists/pl_MC_Merged_Sample.dat"; 
     POTCounter pot_counter;
     double total_pot = pot_counter.getPOTfromPlaylist(playlist);
 
@@ -68,7 +68,8 @@ void CCProtonPi0_Plotter::getPOT_MC()
 
 void CCProtonPi0_Plotter::getPOT_Data()
 {
-    std::string playlist = "Input/Playlists/pl_Data_Merged.dat"; 
+    std::string playlist = "Input/Playlists/pl_MC_Merged_Train.dat"; 
+    //std::string playlist = "Input/Playlists/pl_Data_Merged.dat"; 
     POTCounter pot_counter;
     double total_pot = pot_counter.getPOTfromPlaylist(playlist);
 
@@ -808,13 +809,17 @@ void CCProtonPi0_Plotter::plotMuon_MCOnly()
     std::cout<<"Plotting Muon MC Only"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Muon;
 
+    //DrawSignalMC(rootDir_Muon, "P", plotDir);
+    //DrawStackedMC(rootDir_Muon, "P", plotDir);
+    //DrawSignalMC(rootDir_Muon, "theta", plotDir);
+    
     Draw1DHist(rootDir_Muon,"P_error",plotDir);
     Draw1DHist(rootDir_Muon,"E_error",plotDir);
-    Draw1DHist(rootDir_Muon,"E_Diff",plotDir);
+    Draw1DHist(rootDir_Muon,"theta_error",plotDir);
+    //Draw1DHist(rootDir_Muon,"E_Diff",plotDir);
     
-    DrawNormalizedMigrationHistogram(rootDir_Muon,"response_P",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Muon,"response_theta",plotDir);
-
+    //Draw2DHist(rootDir_Muon,"reco_P_true_P",plotDir);
+    
     std::cout<<"Plotting Muon MC Only Finished!\n"<<std::endl;
 
 }
@@ -913,16 +918,16 @@ void CCProtonPi0_Plotter::plotPion_DataMC()
     //DrawDataMC(rootDir_Pion,"invMass",plotDir);
     //DrawDataMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
 
-    DrawDataStackedMC(rootDir_Pion,"gamma1_E",plotDir);
-    DrawDataStackedMC(rootDir_Pion,"gamma1_theta",plotDir);
-    DrawDataStackedMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
+    //DrawDataStackedMC(rootDir_Pion,"gamma1_E",plotDir);
+    //DrawDataStackedMC(rootDir_Pion,"gamma1_theta",plotDir);
+    //DrawDataStackedMC(rootDir_Pion,"gamma1_ConvLength",plotDir);
 
-    DrawDataStackedMC(rootDir_Pion,"gamma2_E",plotDir);
-    DrawDataStackedMC(rootDir_Pion,"gamma2_theta",plotDir);
-    DrawDataStackedMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
+    //DrawDataStackedMC(rootDir_Pion,"gamma2_E",plotDir);
+    //DrawDataStackedMC(rootDir_Pion,"gamma2_theta",plotDir);
+    //DrawDataStackedMC(rootDir_Pion,"gamma2_ConvLength",plotDir);
 
-    DrawDataStackedMC(rootDir_Pion,"invMass",plotDir);
-    DrawDataStackedMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
+    //DrawDataStackedMC(rootDir_Pion,"invMass",plotDir);
+    //DrawDataStackedMC(rootDir_Pion,"photonEnergy_Asymmetry",plotDir);
 
     std::cout<<"Plotting Pion Data vs MC Finished!\n"<<std::endl;
 }
@@ -951,23 +956,26 @@ void CCProtonPi0_Plotter::plotPion_True()
 //    Draw2DHist(rootDir_Pion,"bckg_signal_diff_convLength",plotDir);
 
     // Momentum
-    Draw2DHist(rootDir_Pion,"reco_P_true_P",plotDir);
+    //Draw2DHist(rootDir_Pion,"reco_P_true_P",plotDir);
     Draw1DHist(rootDir_Pion,"P_error",plotDir);
-    Draw1DHist(rootDir_Pion,"P_Diff",plotDir);
+    //Draw1DHist(rootDir_Pion,"P_Diff",plotDir);
     
     // Energy
-    Draw2DHist(rootDir_Pion,"reco_E_true_E",plotDir);
+    //Draw2DHist(rootDir_Pion,"reco_E_true_E",plotDir);
     Draw1DHist(rootDir_Pion,"E_error",plotDir);
-    Draw1DHist(rootDir_Pion,"E_Diff",plotDir);
-    Draw1DHist(rootDir_Pion,"E_true",plotDir);
-    Draw1DHist(rootDir_Pion,"E_reco",plotDir);
+    //Draw1DHist(rootDir_Pion,"E_Diff",plotDir);
+    //Draw1DHist(rootDir_Pion,"E_true",plotDir);
+    //Draw1DHist(rootDir_Pion,"E_reco",plotDir);
  
     // Kinetic Energy
-    Draw2DHist(rootDir_Pion,"reco_KE_true_KE",plotDir);
+    //Draw2DHist(rootDir_Pion,"reco_KE_true_KE",plotDir);
     Draw1DHist(rootDir_Pion,"KE_error",plotDir);
-    Draw1DHist(rootDir_Pion,"KE_Diff",plotDir);
-    Draw1DHist(rootDir_Pion,"KE_true",plotDir);
-    Draw1DHist(rootDir_Pion,"KE_reco",plotDir);
+    //Draw1DHist(rootDir_Pion,"KE_Diff",plotDir);
+    //Draw1DHist(rootDir_Pion,"KE_true",plotDir);
+    //Draw1DHist(rootDir_Pion,"KE_reco",plotDir);
+    
+    // Theta
+    Draw1DHist(rootDir_Pion,"theta_error",plotDir);
 
     std::cout<<"Plotting Pion True Finished!\n"<<std::endl;
 }
@@ -984,7 +992,7 @@ void CCProtonPi0_Plotter::plotStandardHistograms(rootDir &dir, std::string plotD
 
     //DrawDataStackedMC(dir, "E", plotDir);
     DrawDataStackedMC(dir, "P", plotDir);
-    //DrawDataStackedMC(dir, "KE", plotDir);
+    DrawDataStackedMC(dir, "KE", plotDir);
     DrawDataStackedMC(dir, "theta", plotDir);
     DrawDataStackedMC(dir, "phi", plotDir);
 }
@@ -1672,26 +1680,16 @@ void CCProtonPi0_Plotter::plotGENIEXSec()
 
 void CCProtonPi0_Plotter::UnfoldingStudy()
 {
-    std::string plotDir = Folder_List::plotDir_OtherStudies;
     
     UnfoldingStudy_muon_P();
     UnfoldingStudy_muon_theta();
-    
     UnfoldingStudy_pi0_P();
+    UnfoldingStudy_pi0_KE();
     UnfoldingStudy_pi0_theta();
 
-
-    // Plot Migration Histograms
-    rootDir pi0_Train;
-    rootDir muon_Train;
-    pi0_Train.mc = Folder_List::rootDir_Pion_Train;
-    muon_Train.mc = Folder_List::rootDir_Muon_Train;
-
-    DrawNormalizedMigrationHistogram(muon_Train,"muon_P_response",plotDir);
-    DrawNormalizedMigrationHistogram(muon_Train,"muon_theta_response",plotDir);
-    DrawNormalizedMigrationHistogram(pi0_Train,"pi0_P_response",plotDir);
-    DrawNormalizedMigrationHistogram(pi0_Train,"pi0_theta_response",plotDir);
-
+    PlotUnfolding_TruthComparison();
+    PlotUnfolding_Migration();
+   
 }
 
 #endif

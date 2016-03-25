@@ -103,7 +103,6 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
 
         // Declaration of leaf types
         Double_t        eventID;
-        Bool_t          truth_has_physics_event;
         Bool_t          truth_isGamma1_conv_inside;
         Bool_t          truth_isGamma2_conv_inside;
         Bool_t          truth_isSignal;
@@ -324,7 +323,6 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
 
         // List of branches
         TBranch        *b_eventID;   //!
-        TBranch        *b_truth_has_physics_event;   //!
         TBranch        *b_truth_isGamma1_conv_inside;   //!
         TBranch        *b_truth_isGamma2_conv_inside;   //!
         TBranch        *b_truth_isSignal;   //!

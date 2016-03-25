@@ -21,6 +21,22 @@ class CCProtonPi0_BinList
     public:
         CCProtonPi0_BinList();
   
+        // Variable Bins
+        static const double a_muon_P[];
+        static const int size_muon_P;
+        
+        static const double a_muon_theta[];
+        static const int size_muon_theta;
+
+        static const double a_pi0_P[];
+        static const int size_pi0_P;
+
+        static const double a_pi0_KE[];
+        static const int size_pi0_KE;
+
+        static const double a_pi0_theta[];
+        static const int size_pi0_theta;
+
         // Cross Section Variables
         CCProtonPi0_SingleBin muon_P;
         CCProtonPi0_SingleBin muon_theta;

@@ -9,6 +9,21 @@
 
 using namespace std;
 
+const double CCProtonPi0_BinList::a_muon_P[] = {1, 2, 2.5, 3, 3.5, 4, 5, 7, 10};
+const int CCProtonPi0_BinList::size_muon_P = 8;
+
+const double CCProtonPi0_BinList::a_muon_theta[] = {0, 2, 4, 6, 8, 10, 12, 16, 20, 25};
+const int CCProtonPi0_BinList::size_muon_theta = 9;
+
+const double CCProtonPi0_BinList::a_pi0_P[] = {0, 0.05, 0.15, 0.25, 0.40, 0.55, 0.75, 1, 1.40};
+const int CCProtonPi0_BinList::size_pi0_P = 8;
+
+const double CCProtonPi0_BinList::a_pi0_KE[] = {0, 0.05, 0.15, 0.25, 0.40, 0.55, 0.75, 1, 1.40};
+const int CCProtonPi0_BinList::size_pi0_KE = 8;
+
+const double CCProtonPi0_BinList::a_pi0_theta[] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 120, 180};
+const int CCProtonPi0_BinList::size_pi0_theta = 11;
+
 CCProtonPi0_BinList::CCProtonPi0_BinList()
 {
     // -------------------------------------------------------------------------
@@ -16,7 +31,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     //--------------------------------------------------------------------------
     pi0_invMass.setBin(50,0.0,500.0);
     muon_P.setBin(18,1.0,10.0);
-    muon_theta.setBin(12,0.0,25.0);
+    muon_theta.setBin(25,0.0,25.0);
     pi0_P.setBin(17,0.0,1.7);
     pi0_KE.setBin(17,0.0,1.7);
     pi0_theta.setBin(18, 0.0, 180.0);

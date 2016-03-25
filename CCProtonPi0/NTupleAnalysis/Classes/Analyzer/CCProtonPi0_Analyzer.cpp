@@ -402,7 +402,6 @@ void CCProtonPi0_Analyzer::getPi0Family()
 void CCProtonPi0_Analyzer::fillData()
 {          
     // Fill Cross Section Variables
-
     fill_pi0_P();
     fill_pi0_KE();
     fill_pi0_theta();
@@ -1117,8 +1116,7 @@ void CCProtonPi0_Analyzer::fillPi0MC()
 
         // Pi0 Momentum
         double pi0_reco_P = pi0_P * MeV_to_GeV;
-        double pi0_true_P = HEP_Functions::calcMomentum(truth_pi0_4P[0],truth_pi0_4P[1],truth_pi0_4P[2]);
-        pi0_true_P = pi0_true_P * MeV_to_GeV; 
+        double pi0_true_P = truth_pi0_P * MeV_to_GeV;
         double pi0_P_error = Data_Functions::getError(pi0_true_P, pi0_reco_P);
         double pi0_P_Diff = pi0_reco_P - pi0_true_P;
 
@@ -1138,11 +1136,8 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         FillHistogram(pi0.E_error, error_E);
         FillHistogram(pi0.E_Diff, reco_E-true_E);
 
-        const double M_pi0 = 134.98;
         double reco_KE = pi0_KE * MeV_to_GeV;
-        double true_KE = (truth_pi0_4P[3] - M_pi0) * MeV_to_GeV; 
-        //double reco_KE = pi0_KE * MeV_to_GeV;
-        //double true_KE = truth_pi0_KE * MeV_to_GeV; 
+        double true_KE = truth_pi0_KE * MeV_to_GeV; 
         double error_KE = Data_Functions::getError(true_KE, reco_KE);
 
         FillHistogram(pi0.KE_true, true_KE);
@@ -1150,6 +1145,13 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         FillHistogram(pi0.reco_KE_true_KE, reco_KE,true_KE);
         FillHistogram(pi0.KE_error, error_KE);
         FillHistogram(pi0.KE_Diff, reco_KE-true_KE);
+    
+        // Pi0 Theta
+        double reco_theta = pi0_theta_beam * TMath::RadToDeg();
+        double true_theta = truth_pi0_theta_beam * TMath::RadToDeg();
+        double error_theta = Data_Functions::getError(true_theta, reco_theta);
+
+        FillHistogram(pi0.theta_error, error_theta);
     }
 
     // Gamma Comparison
@@ -1273,8 +1275,7 @@ void CCProtonPi0_Analyzer::fillMuonMC()
     if(truth_isSignal){ 
         // Momentum
         double reco_P = muon_P * MeV_to_GeV;
-        double true_P = HEP_Functions::calcMomentum(truth_muon_4P[0],truth_muon_4P[1],truth_muon_4P[2]);
-        true_P = true_P * MeV_to_GeV;
+        double true_P = truth_muon_P * MeV_to_GeV;
         double error_P = Data_Functions::getError(true_P, reco_P);
 
         FillHistogram(muon.reco_P_true_P, reco_P,true_P);
@@ -1289,8 +1290,12 @@ void CCProtonPi0_Analyzer::fillMuonMC()
         FillHistogram(muon.E_error, error_E);
         FillHistogram(muon.E_Diff, reco_E-true_E);
 
-        // Response
+        // Theta
+        double reco_theta = muon_theta_beam * TMath::RadToDeg();
+        double true_theta = truth_muon_theta_beam * TMath::RadToDeg();
+        double error_theta = Data_Functions::getError(true_theta, reco_theta);
 
+        FillHistogram(muon.theta_error, error_theta);
     }
 }
 

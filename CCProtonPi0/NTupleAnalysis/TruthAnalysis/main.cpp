@@ -18,7 +18,7 @@ int main()
 
     TH1::AddDirectory(false);
     
-    string playlist = "../Input/Playlists/pl_MC_Merged_Sample.dat";
+    string playlist = "../Input/Playlists/pl_MC_Merged.dat";
     CCProtonPi0_TruthAnalyzer t;
     t.Loop(playlist);
     

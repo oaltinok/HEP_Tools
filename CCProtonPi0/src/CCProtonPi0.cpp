@@ -199,7 +199,6 @@ StatusCode CCProtonPi0::initialize()
     m_odDet = m_GeomUtilSvc->getODDet();
 
     // declare common branches
-    declareCommonPhysicsAnaBranches();
     declareMinosMuonBranches();
     declareGenieWeightBranches();
 
@@ -1155,7 +1154,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
 
     ColorUnusedIDClusters(event);
     SaveEventTime(event);
-    fillCommonPhysicsAnaBranches( event );
 
     //--------------------------------------------------------------------------
     // Call the interpretEvent function.
@@ -1419,8 +1417,6 @@ StatusCode CCProtonPi0::interpretFailEvent( Minerva::PhysicsEvent* event ) const
     nuInts.push_back( nuInt );
     markEvent(event);
     addInteractionHyp(event,nuInts);
-    fillCommonPhysicsAnaBranches(event);
-    fillNuMIBranches(event);
 
     return StatusCode::SUCCESS;
 }
@@ -1504,7 +1500,7 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     double muon_theta_beam = m_coordSysTool->thetaWRTBeam(muon_4p);
     double muon_theta_beam_biasUp = m_coordSysTool->thetaWRTBeam(muon_4p,m_beamAngleBias) - muon_theta_beam;
     double muon_theta_beam_biasDown = m_coordSysTool->thetaWRTBeam(muon_4p, -1.0*m_beamAngleBias) - muon_theta_beam;
-
+  
     // Muon Score
     double muon_muScore = m_MuonParticle->score();
 
@@ -1553,6 +1549,9 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     // Fill Muon Branches
     //--------------------------------------------------------------------------
 
+    
+    debug()<<"Muon Theta = "<<muon_theta<<" "<<muon_theta_beam<<endmsg;
+
     event->setIntData("muon_hasMinosMatchTrack", is_minos_track );
     event->setIntData("muon_hasMinosMatchStub", is_minos_stub );
     event->setIntData("muon_minervaTrack_types", muon_minervaTrack_types);
@@ -1569,15 +1568,16 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("muon_KE",muon_KE);
     event->setDoubleData("muon_phi",muon_phi);
     event->setDoubleData("muon_phi_beam",muon_phi_beam);
-    event->setDoubleData("muon_theta",muon_theta);
-    event->setDoubleData("muon_theta_beam",muon_theta_beam);
-    event->setDoubleData("muon_theta_beam_biasUp",muon_theta_beam_biasUp);
-    event->setDoubleData("muon_theta_beam_biasDown",muon_theta_beam_biasDown);
+    event->setDoubleData("muon_theta", muon_theta);
+    event->setDoubleData("muon_theta_beam", muon_theta_beam);
+    event->setDoubleData("muon_theta_beam_biasUp", muon_theta_beam_biasUp);
+    event->setDoubleData("muon_theta_beam_biasDown", muon_theta_beam_biasDown);
     event->setDoubleData("muon_muScore", muon_muScore);
     event->setDoubleData("muon_qp",muon_qp );
     event->setDoubleData("muon_qpqpe",muon_qpqpe);
     event->setDoubleData("muon_E_shift",muon_E_shift);
 
+    debug()<<"Muon Theta = "<<event->getDoubleData("muon_theta")<<" "<<event->getDoubleData("muon_theta_beam")<<endmsg;
 
     return true;
 }

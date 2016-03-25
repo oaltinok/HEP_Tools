@@ -238,13 +238,13 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     // ------------------------------------------------------------------------
     // Muon Variables
     // ------------------------------------------------------------------------
-    muon_P_mc_truth_all_signal = new MnvH1D( "muon_P_mc_truth_all_signal","Muon Momentum for Signal Events",binList.muon_P.get_nBins(), binList.muon_P.get_min(), binList.muon_P.get_max());
+    muon_P_mc_truth_all_signal = new MnvH1D( "muon_P_mc_truth_all_signal","Muon Momentum for Signal Events",binList.size_muon_P, binList.a_muon_P);
     muon_P_mc_truth_all_signal->GetXaxis()->SetTitle("Momentum [GeV]");
     muon_P_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(muon_P_mc_truth_all_signal);
     AddVertErrorBand_Genie(muon_P_mc_truth_all_signal);
 
-    muon_theta_mc_truth_all_signal = new MnvH1D( "muon_theta_mc_truth_all_signal","Pi0 Muon Theta for Signal Events",binList.muon_theta.get_nBins(), binList.muon_theta.get_min(), binList.muon_theta.get_max());
+    muon_theta_mc_truth_all_signal = new MnvH1D( "muon_theta_mc_truth_all_signal","Pi0 Muon Theta for Signal Events",binList.size_muon_theta, binList.a_muon_theta);
     muon_theta_mc_truth_all_signal->GetXaxis()->SetTitle("Theta");
     muon_theta_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(muon_theta_mc_truth_all_signal);

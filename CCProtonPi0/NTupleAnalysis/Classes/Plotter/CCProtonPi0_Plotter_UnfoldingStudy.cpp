@@ -112,6 +112,60 @@ void CCProtonPi0_Plotter::UnfoldingStudy_muon_P()
     std::cout<<"Unfolding Study Finished!\n"<<std::endl;
 }
 
+void CCProtonPi0_Plotter::UnfoldingStudy_pi0_KE()
+{
+    std::cout<<"Unfolding Study for pi0_KE"<<std::endl;
+    
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    
+    // Use Different MC Samples to do the study
+    // Train -- MC for Response Matrix
+    // Sample -- MC for reco and truth Values
+    rootDir Train;
+    rootDir Sample;
+    Train.mc = Folder_List::rootDir_Pion_Train;
+    Sample.mc = Folder_List::rootDir_Pion_Sample;
+    
+    TFile* f_Train = new TFile(Train.mc.c_str());
+    TFile* f_Sample = new TFile(Sample.mc.c_str());
+    
+    // Init Histograms Based on Pi0 Momentum
+    MnvH2D* response = new MnvH2D(*(MnvH2D*)f_Train->Get("pi0_KE_response")); 
+    MnvH1D* mc_reco = new MnvH1D(*(MnvH1D*)f_Sample->Get("pi0_KE_mc_reco_signal")); 
+    MnvH1D* mc_true = new MnvH1D(*(MnvH1D*)f_Sample->Get("pi0_KE_mc_truth_signal")); 
+
+    std::vector<MnvH1D*> unfolded;
+    std::vector<MnvH1D*> error;
+    std::vector<MnvH1D*> diff;
+    init_UnfoldingHistograms(unfolded, error, diff);
+ 
+    // 0 Iteration -- Original
+    unfolded[0] = mc_reco;
+    diff[0] = CalcUnfoldingDiff(unfolded[0], mc_true);
+    error[0] = CalcUnfoldingError(unfolded[0], mc_true);
+ 
+    // Fill Histograms with Different N(Iterations)
+    for(int i = 1; i <= max_iter; ++i){
+        FillUnfoldingHistograms(unfolded[i], error[i], diff[i], response, mc_reco, mc_true, i);
+    }
+
+    StyleUnfoldingHistograms(unfolded);
+    StyleUnfoldingHistograms(error);
+    StyleUnfoldingHistograms(diff);
+
+    PlotUnfolding_Unfolded(unfolded, mc_true, "pi0_KE");
+    PlotUnfolding_Error(error, "pi0_KE");
+    PlotUnfolding_Diff(diff, "pi0_KE");
+
+    delete response;
+    delete mc_reco;
+    delete mc_true;
+    delete f_Train;
+    delete f_Sample;
+    
+    std::cout<<"Unfolding Study Finished!\n"<<std::endl;
+}
+
 void CCProtonPi0_Plotter::UnfoldingStudy_pi0_P()
 {
     std::cout<<"Unfolding Study for pi0_P"<<std::endl;
@@ -290,6 +344,8 @@ void CCProtonPi0_Plotter::PlotUnfolding_Unfolded(std::vector<MnvH1D*> &hists, Mn
     truth->SetFillStyle(0);
     truth->SetLineWidth(3);
     truth->SetLineColor(1);
+    double norm_bin_width = truth->GetNormBinWidth();
+    truth->Scale(norm_bin_width, "width");
     hs->Add(truth);
     legend->AddEntry(truth, "Truth", "LP");
 
@@ -378,7 +434,7 @@ void CCProtonPi0_Plotter::PlotUnfolding_Diff(std::vector<MnvH1D*> &hists, std::s
         legend->AddEntry(hists[i], Form("%s%d","N(Iterations) = ",i),"L");
         hs->Add(hists[i]);
     }
-
+    
     hs->Draw("nostack HIST");
     legend->Draw();
 
@@ -406,12 +462,78 @@ void CCProtonPi0_Plotter::PlotUnfolding_Diff(std::vector<MnvH1D*> &hists, std::s
     delete c1;
 }
 
+void CCProtonPi0_Plotter::PlotUnfolding_Migration()
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    // Sample is Data
+    // Train is MC
+    rootDir pi0;
+    rootDir muon;
+    pi0.mc = Folder_List::rootDir_Pion_Train;
+    muon.mc = Folder_List::rootDir_Muon_Train;
+
+    // Plot Migration Histograms
+    DrawNormalizedMigrationHistogram(muon, "muon_P_response", plotDir);
+    DrawNormalizedMigrationHistogram(muon, "muon_theta_response", plotDir);
+    DrawNormalizedMigrationHistogram(pi0, "pi0_P_response", plotDir);
+    DrawNormalizedMigrationHistogram(pi0, "pi0_KE_response", plotDir);
+    DrawNormalizedMigrationHistogram(pi0, "pi0_theta_response", plotDir);
+}
+
+void CCProtonPi0_Plotter::PlotUnfolding_TruthComparison()
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    
+    // Sample is Data
+    // Train is MC
+    rootDir pi0;
+    rootDir muon;
+    pi0.data = Folder_List::rootDir_Pion_Sample;
+    pi0.mc = Folder_List::rootDir_Pion_Train;
+    muon.data = Folder_List::rootDir_Muon_Sample;
+    muon.mc = Folder_List::rootDir_Muon_Train;
+
+    TFile* f_muon_mc = new TFile(muon.mc.c_str());
+    TFile* f_muon_data = new TFile(muon.data.c_str());
+    TFile* f_pi0_mc = new TFile(pi0.mc.c_str());
+    TFile* f_pi0_data = new TFile(pi0.data.c_str());
+
+    MnvH1D* data = (MnvH1D*)f_muon_data->Get("muon_P_mc_truth_signal");
+    MnvH1D* mc= (MnvH1D*)f_muon_mc->Get("muon_P_mc_truth_signal");
+    DrawDataMC(data, mc, "muon_P_truth_comparison", plotDir);
+ 
+    data = (MnvH1D*)f_muon_data->Get("muon_theta_mc_truth_signal");
+    mc= (MnvH1D*)f_muon_mc->Get("muon_theta_mc_truth_signal");
+    DrawDataMC(data, mc, "muon_theta_truth_comparison", plotDir);
+  
+    data = (MnvH1D*)f_pi0_data->Get("pi0_P_mc_truth_signal");
+    mc= (MnvH1D*)f_pi0_mc->Get("pi0_P_mc_truth_signal");
+    DrawDataMC(data, mc, "pi0_P_truth_comparison", plotDir);
+   
+    data = (MnvH1D*)f_pi0_data->Get("pi0_KE_mc_truth_signal");
+    mc= (MnvH1D*)f_pi0_mc->Get("pi0_KE_mc_truth_signal");
+    DrawDataMC(data, mc, "pi0_KE_truth_comparison", plotDir);
+    
+    data = (MnvH1D*)f_pi0_data->Get("pi0_theta_mc_truth_signal");
+    mc= (MnvH1D*)f_pi0_mc->Get("pi0_theta_mc_truth_signal");
+    DrawDataMC(data, mc, "pi0_theta_truth_comparison", plotDir);
+    
+    delete f_muon_mc;
+    delete f_muon_data;
+    delete f_pi0_mc;
+    delete f_pi0_data;
+}
+
 void CCProtonPi0_Plotter::StyleUnfoldingHistograms(std::vector<MnvH1D*> &hists)
 {
     // Common Style for All Histograms
     for (int i = 0; i <=max_iter; ++i){
         hists[i]->SetFillStyle(0);            
         hists[i]->SetLineWidth(2);
+
+        // Normalize to Bin Width
+        double norm_bin_width = hists[i]->GetNormBinWidth();
+        hists[i]->Scale(norm_bin_width, "width");
     }
    
     // Unique Style 

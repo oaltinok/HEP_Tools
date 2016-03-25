@@ -30,14 +30,17 @@ class CCProtonPi0_Particle : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> theta;
         std::vector<MnvH1D*> phi;
 
-        TH2D* reco_P_true_P;
+        TH1D* theta_error;
+        TH1D* KE_error;
         TH1D* P_error;
-        TH1D* P_Diff;
+        TH1D* E_error;
 
+        TH2D* reco_P_true_P;
+        TH1D* P_Diff;
+    
         TH2D* reco_E_true_E;
         TH1D* E_true;
         TH1D* E_reco;
-        TH1D* E_error;
         TH1D* E_Diff;
 
         // Bins for Histograms

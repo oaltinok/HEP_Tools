@@ -346,7 +346,8 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     TFile* f_mc = new TFile(rootDir_mc.c_str());
     TFile* f_data = new TFile(rootDir_data.c_str());
 
-    std::string var = Form("%s_%d",var_name.c_str(),0);
+    //std::string var = Form("%s_%d",var_name.c_str(),0);
+    std::string var = var_name;
 
     // POT Normalized
     MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
@@ -357,7 +358,6 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     mc = (MnvH1D*)f_mc->Get(var.c_str());
     data = (MnvH1D*)f_data->Get(var.c_str()); 
     DrawDataMC(data, mc, var_name, plotDir, false);
-
 }
 
 void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir)
@@ -393,10 +393,20 @@ void CCProtonPi0_Plotter::DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std:
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
 
-    plotter->DrawDataMC(data, mc, mc_ratio, "TR", false);
+    MnvH1D* tempData = new MnvH1D(*data);
+    MnvH1D* tempMC = new MnvH1D(*mc);
+
+    // Normalize to Bin Width
+    double norm_bin_width = tempData->GetNormBinWidth();
+    tempData->Scale(norm_bin_width,"width");
+
+    norm_bin_width = tempMC->GetNormBinWidth();
+    tempMC->Scale(norm_bin_width,"width");
+
+    plotter->DrawDataMC(tempData, tempMC, mc_ratio, "TR", false);
 
     // Add Plot Labels
-    plotter->AddHistoTitle(data[0].GetTitle());
+    plotter->AddHistoTitle(data->GetTitle());
     AddNormBox(plotter, isPOTNorm, mc_ratio);
 
     // Add Areas
@@ -411,9 +421,12 @@ void CCProtonPi0_Plotter::DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std:
 
     delete c;
     delete plotter;
+    delete tempData;
+    delete tempMC;
 
     DrawDataMCRatio_CrossSection(data,mc,var_name,plotDir,isPOTNorm);
 }
+
 void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm)
 {
     // ------------------------------------------------------------------------
@@ -428,7 +441,17 @@ void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_n
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
 
-    plotter->DrawDataMC(data, mc, mc_ratio, "TR", false);
+    MnvH1D* tempData = new MnvH1D(*data);
+    MnvH1D* tempMC = new MnvH1D(*mc);
+
+    // Normalize to Bin Width
+    double norm_bin_width = tempData->GetNormBinWidth();
+    tempData->Scale(norm_bin_width,"width");
+
+    norm_bin_width = tempMC->GetNormBinWidth();
+    tempMC->Scale(norm_bin_width,"width");
+
+    plotter->DrawDataMC(tempData, tempMC, mc_ratio, "TR", false);
 
     // Add Plot Labels
     plotter->AddHistoTitle(data[0].GetTitle());
@@ -455,6 +478,8 @@ void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_n
 
     delete c;
     delete plotter;
+    delete tempData;
+    delete tempMC;
 
     DrawDataMCRatio(data,mc,var_name,plotDir,isPOTNorm);
 }
@@ -552,13 +577,15 @@ void CCProtonPi0_Plotter::DrawMnvH1D(rootDir& dir, std::string var_name, std::st
     TCanvas* c = new TCanvas("c","c",1280,800);
 
     // Plot Options
-    hist1D->SetLineColor(kBlack);
-    hist1D->SetLineWidth(2);
-    hist1D->SetMarkerStyle(21);
-    //hist1D->SetFillColor(kRed);
-    //hist1D->SetFillStyle(3010);
+    hist1D->SetLineColor(kRed);
+    hist1D->SetLineWidth(3);
+    hist1D->SetFillColor(kRed);
+    hist1D->SetFillStyle(3010);
 
-    hist1D->Draw();
+    double norm_bin_width = hist1D->GetNormBinWidth();
+    hist1D->Scale(norm_bin_width,"width");
+
+    hist1D->Draw("HIST");
     gPad->Update();
     gStyle->SetOptStat(111111); 
 
@@ -1249,7 +1276,14 @@ void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::
     temp->SetLineColor(kGreen);
     temp->SetFillColor(kGreen);
 
-    // Get Stats
+    std::cout<<"DrawSignalMC"<<std::endl;
+    int nBins = temp->GetNbinsX();
+    for(int i = 1; i <= nBins; ++i){
+        std::cout<<i<<" "<<temp->GetBinContent(i)<<std::endl;
+    }
+    std::cout<<"Integral = "<<temp->Integral("width")<<std::endl;
+
+    // Get Stat1s
     double nSignal = temp->GetEntries(); 
     max_bin = temp->GetMaximumBin();
     hist_max = hist_max + temp->GetBinContent(max_bin);
