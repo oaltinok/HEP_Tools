@@ -28,9 +28,11 @@ class CCProtonPi0_Particle : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> P;
         std::vector<MnvH1D*> KE;
         std::vector<MnvH1D*> theta;
+        std::vector<MnvH1D*> cos_theta;
         std::vector<MnvH1D*> phi;
 
         TH1D* theta_error;
+        TH1D* cos_theta_error;
         TH1D* KE_error;
         TH1D* P_error;
         TH1D* E_error;

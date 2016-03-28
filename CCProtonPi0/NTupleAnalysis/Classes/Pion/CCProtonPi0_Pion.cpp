@@ -63,8 +63,8 @@ void CCProtonPi0_Pion::initHistograms()
         gamma1_E.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","gamma1_theta",i),"Reconstructed Leading Photon Theta",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#gamma_{1}} [Degree]");
-        temp->GetYaxis()->SetTitle(Form("Events / %3.1f [Degree]",binList.angle.get_width()));
+        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#gamma_{1}} [degree]");
+        temp->GetYaxis()->SetTitle(Form("Events / %3.1f [degree]",binList.angle.get_width()));
         gamma1_theta.push_back(temp);
 
         // Secondary Photon
@@ -79,8 +79,8 @@ void CCProtonPi0_Pion::initHistograms()
         gamma2_E.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","gamma2_theta",i),"Reconstructed Secondary Photon Theta",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#gamma_{2}} [Degree]");
-        temp->GetYaxis()->SetTitle(Form("Events / %3.1f [Degree]",binList.angle.get_width()));
+        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#gamma_{2}} [degree]");
+        temp->GetYaxis()->SetTitle(Form("Events / %3.1f [degree]",binList.angle.get_width()));
         gamma2_theta.push_back(temp);
 
         // Other
@@ -116,13 +116,13 @@ void CCProtonPi0_Pion::initHistograms()
         KE.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","theta",i),"Reconstructed Pion Theta", binList.size_pi0_theta, binList.a_pi0_theta);
-        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [Degree]");
-        temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [Degree]",binList.angle.get_width()));
+        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
+        temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [degree]",binList.angle.get_width()));
         theta.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","phi",i),"Reconstructed Pion Phi",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed #phi_{#pi^{0}} [Degree]");
-        temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [Degree]",binList.angle.get_width()));
+        temp->GetXaxis()->SetTitle("Reconstructed #phi_{#pi^{0}} [degree]");
+        temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [degree]",binList.angle.get_width()));
         phi.push_back(temp);
     }
 
@@ -188,32 +188,32 @@ void CCProtonPi0_Pion::initHistograms()
 
     //Pi0 Theta 
     pi0_theta_all = new MnvH1D( "pi0_theta_all","Data All #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_all->GetXaxis()->SetTitle("#theta_{#pi^{0}} [GeV]");
+    pi0_theta_all->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
     pi0_theta_all->GetYaxis()->SetTitle("N(Events)");
 
     pi0_theta_mc_reco_all = new MnvH1D( "pi0_theta_mc_reco_all","MC Reco All #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_mc_reco_all->GetXaxis()->SetTitle("#theta_{#pi^{0}} [GeV]");
+    pi0_theta_mc_reco_all->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
     pi0_theta_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_theta_mc_reco_all);
     
     pi0_theta_mc_truth_signal = new MnvH1D( "pi0_theta_mc_truth_signal","MC Truth Signal #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_mc_truth_signal->GetXaxis()->SetTitle("#theta_{#pi^{0}} [GeV]");
+    pi0_theta_mc_truth_signal->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
     pi0_theta_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_theta_mc_truth_signal);
 
     pi0_theta_mc_reco_signal = new MnvH1D( "pi0_theta_mc_reco_signal","MC Reconstructed Signal #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_mc_reco_signal->GetXaxis()->SetTitle("#theta_{#pi^{0}} [GeV]");
+    pi0_theta_mc_reco_signal->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
     pi0_theta_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_theta_mc_reco_signal);
 
     pi0_theta_mc_reco_bckg = new MnvH1D( "pi0_theta_mc_reco_bckg","MC Reconstructed Background #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_mc_reco_bckg->GetXaxis()->SetTitle("#theta_{#pi^{0}} [GeV]");
+    pi0_theta_mc_reco_bckg->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
     pi0_theta_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_theta_mc_reco_bckg);
 
     pi0_theta_response = new MnvH2D( "pi0_theta_response","Theta for Signal Events", binList.size_pi0_theta, binList.a_pi0_theta, binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_response->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [GeV]");
-    pi0_theta_response->GetYaxis()->SetTitle("True #theta_{#pi^{0}} [GeV]");
+    pi0_theta_response->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
+    pi0_theta_response->GetYaxis()->SetTitle("True #theta_{#pi^{0}} [degree]");
     AddVertErrorBands_MC(pi0_theta_response);
 
     // Truth Energy - Gamma 1

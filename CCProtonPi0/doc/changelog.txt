@@ -1,4 +1,28 @@
 ===================================================================================================
+v2_74
+CCProtonPi0 Updates:
+	No Major Changes	
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	Global EM Energy Correction
+		Correcting ALL MC Reconstructed Variables calculated by EM Energy Calibration
+			Correction Factor = ~1.08
+
+	Improved Unfolding Study
+		Added Muon cos(theta)
+		Plotting Statistical Errors after each iteration
+		Plotting function arguments converted to const
+
+===================================================================================================
+v2_73a
+CCProtonPi0 Updates:
+	No Major Changes	
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	Added missing CCProtonPi0_CrossSection_Styles.cpp
+		Forgot to add on CVS
+
+===================================================================================================
 v2_73
 CCProtonPi0 Updates:
 	Removed NuMIBRanches

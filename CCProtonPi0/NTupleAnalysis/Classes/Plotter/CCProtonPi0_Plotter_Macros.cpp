@@ -393,6 +393,8 @@ void CCProtonPi0_Plotter::DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std:
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
 
+    printBins(mc, var_name);
+
     MnvH1D* tempData = new MnvH1D(*data);
     MnvH1D* tempMC = new MnvH1D(*mc);
 
@@ -1276,13 +1278,6 @@ void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::
     temp->SetLineColor(kGreen);
     temp->SetFillColor(kGreen);
 
-    std::cout<<"DrawSignalMC"<<std::endl;
-    int nBins = temp->GetNbinsX();
-    for(int i = 1; i <= nBins; ++i){
-        std::cout<<i<<" "<<temp->GetBinContent(i)<<std::endl;
-    }
-    std::cout<<"Integral = "<<temp->Integral("width")<<std::endl;
-
     // Get Stat1s
     double nSignal = temp->GetEntries(); 
     max_bin = temp->GetMaximumBin();
@@ -1494,6 +1489,20 @@ void CCProtonPi0_Plotter::DrawBackgroundSubtraction(bool isMC)
     delete plotter;
 }
 
+void CCProtonPi0_Plotter::printBins(const MnvH1D* hist, const std::string var_name)
+{
+    std::cout<<std::left;
+    std::cout<<"Printing Bin Content for "<<var_name<<std::endl;
+    std::cout.width(12); std::cout<<"BinLowEdge";
+    std::cout.width(12); std::cout<<"Content"<<std::endl;
+
+    int nBins = hist->GetNbinsX();
+    for (int i = 1; i <= nBins; ++i){
+        std::cout.width(12); std::cout<<hist->GetBinLowEdge(i);
+        std::cout.width(12); std::cout<<hist->GetBinContent(i);
+        std::cout<<std::endl;
+    }
+}
 
 #endif
 

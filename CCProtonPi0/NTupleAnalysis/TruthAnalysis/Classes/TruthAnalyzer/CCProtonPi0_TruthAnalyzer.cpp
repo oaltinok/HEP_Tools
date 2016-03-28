@@ -253,19 +253,19 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     // ------------------------------------------------------------------------
     // Pi0 Variables
     // ------------------------------------------------------------------------
-    pi0_P_mc_truth_all_signal = new MnvH1D( "pi0_P_mc_truth_all_signal","Pi0 Momentum for Signal Events",binList.pi0_P.get_nBins(), binList.pi0_P.get_min(), binList.pi0_P.get_max());
+    pi0_P_mc_truth_all_signal = new MnvH1D( "pi0_P_mc_truth_all_signal","Pi0 Momentum for Signal Events",binList.size_pi0_P, binList.a_pi0_P);
     pi0_P_mc_truth_all_signal->GetXaxis()->SetTitle("Momentum [GeV]");
     pi0_P_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(pi0_P_mc_truth_all_signal);
     AddVertErrorBand_Genie(pi0_P_mc_truth_all_signal);
 
-    pi0_KE_mc_truth_all_signal = new MnvH1D( "pi0_KE_mc_truth_all_signal","Pi0 Kinetic Energy for Signal Events",binList.pi0_KE.get_nBins(), binList.pi0_KE.get_min(), binList.pi0_KE.get_max());
+    pi0_KE_mc_truth_all_signal = new MnvH1D( "pi0_KE_mc_truth_all_signal","Pi0 Kinetic Energy for Signal Events",binList.size_pi0_KE, binList.a_pi0_KE);
     pi0_KE_mc_truth_all_signal->GetXaxis()->SetTitle("Kinetic Energy [GeV]");
     pi0_KE_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(pi0_KE_mc_truth_all_signal);
     AddVertErrorBand_Genie(pi0_KE_mc_truth_all_signal);
 
-    pi0_theta_mc_truth_all_signal = new MnvH1D( "pi0_theta_mc_truth_all_signal","Theta for Signal Events",binList.pi0_theta.get_nBins(), binList.pi0_theta.get_min(), binList.pi0_theta.get_max());
+    pi0_theta_mc_truth_all_signal = new MnvH1D( "pi0_theta_mc_truth_all_signal","Theta for Signal Events",binList.size_pi0_theta, binList.a_pi0_theta);
     pi0_theta_mc_truth_all_signal->GetXaxis()->SetTitle("Theta");
     pi0_theta_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(pi0_theta_mc_truth_all_signal);

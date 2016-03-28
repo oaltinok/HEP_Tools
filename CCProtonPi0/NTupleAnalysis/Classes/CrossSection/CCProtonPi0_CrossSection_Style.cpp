@@ -125,7 +125,7 @@ void CCProtonPi0_CrossSection::init_QSq()
     QSq.name = "QSq";
     QSq.isEv = false;
 
-    QSq.plot_title = "Differential Cross Section for #Q^{2}";
+    QSq.plot_title = "Differential Cross Section for Q^{2}";
     QSq.plot_xlabel = "Q^{2} [GeV^{2}]";
     QSq.plot_ylabel = "d#sigma/dQ^{2} (10^{-40} cm^{2}/nucleon/GeV^{2})";
 

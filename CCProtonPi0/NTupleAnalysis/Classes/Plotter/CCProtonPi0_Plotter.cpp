@@ -43,9 +43,9 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  MC Only
     //--------------------------------------------------------------------------
     //plotInteraction_MCOnly();
-    plotMuon_MCOnly();
+    //plotMuon_MCOnly();
     //plotProton_MCOnly();
-    plotPion_MCOnly();
+    //plotPion_MCOnly();
     //plotCutHistograms_MCOnly();
 
     //--------------------------------------------------------------------------
@@ -54,7 +54,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //SavePi0InvMassPoints();
     //plotOtherStudies();
     //plotGENIEXSec();
-    //UnfoldingStudy();
+    UnfoldingStudy();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -168,11 +168,9 @@ void CCProtonPi0_Plotter::plotCrossSection_Check()
 void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
-    //std::string plotDir = Folder_List::plotDir_OtherStudies;
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
 
-    plot_Michel_TruthMatch("time_diff");
-    plot_Michel_TruthMatch("energy");
-    plot_Michel_TruthMatch("distance");
+    DrawNormalizedMigrationHistogram(rootDir_Muon, "theta_theta_test", plotDir);
     
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
@@ -811,11 +809,15 @@ void CCProtonPi0_Plotter::plotMuon_MCOnly()
 
     //DrawSignalMC(rootDir_Muon, "P", plotDir);
     //DrawStackedMC(rootDir_Muon, "P", plotDir);
+    //DrawStackedMC(rootDir_Muon, "theta", plotDir);
     //DrawSignalMC(rootDir_Muon, "theta", plotDir);
+    //DrawStackedMC(rootDir_Muon, "cos_theta", plotDir);
+    //DrawSignalMC(rootDir_Muon, "cos_theta", plotDir);
     
-    Draw1DHist(rootDir_Muon,"P_error",plotDir);
-    Draw1DHist(rootDir_Muon,"E_error",plotDir);
-    Draw1DHist(rootDir_Muon,"theta_error",plotDir);
+    //Draw1DHist(rootDir_Muon,"P_error",plotDir);
+    //Draw1DHist(rootDir_Muon,"E_error",plotDir);
+    //Draw1DHist(rootDir_Muon,"theta_error",plotDir);
+    //Draw1DHist(rootDir_Muon,"cos_theta_error",plotDir);
     //Draw1DHist(rootDir_Muon,"E_Diff",plotDir);
     
     //Draw2DHist(rootDir_Muon,"reco_P_true_P",plotDir);
@@ -1683,13 +1685,13 @@ void CCProtonPi0_Plotter::UnfoldingStudy()
     
     UnfoldingStudy_muon_P();
     UnfoldingStudy_muon_theta();
+    UnfoldingStudy_muon_cos_theta();
     UnfoldingStudy_pi0_P();
     UnfoldingStudy_pi0_KE();
     UnfoldingStudy_pi0_theta();
 
-    PlotUnfolding_TruthComparison();
-    PlotUnfolding_Migration();
-   
+    //PlotUnfolding_TruthComparison();
+    //PlotUnfolding_Migration();
 }
 
 #endif

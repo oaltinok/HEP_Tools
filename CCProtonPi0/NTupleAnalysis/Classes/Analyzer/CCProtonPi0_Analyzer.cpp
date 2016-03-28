@@ -213,6 +213,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
        
         UpdateSignalDef();
         CorrectNTupleVariables();
+        CorrectEMShowerCalibration();
 
         // Update scanFileName if running for scan
         if(isScanRun) UpdateScanFileName();
@@ -407,6 +408,7 @@ void CCProtonPi0_Analyzer::fillData()
     fill_pi0_theta();
     fill_muon_P();
     fill_muon_theta();
+    fill_muon_cos_theta();
     fill_QSq();
 
     // Fill Reconstructed Information
@@ -1296,6 +1298,20 @@ void CCProtonPi0_Analyzer::fillMuonMC()
         double error_theta = Data_Functions::getError(true_theta, reco_theta);
 
         FillHistogram(muon.theta_error, error_theta);
+
+        // Cosine Theta
+        double reco_cos_theta = cos(muon_theta_beam);
+        double true_cos_theta = cos(truth_muon_theta_beam);
+        double error_cos_theta = Data_Functions::getError(true_cos_theta, reco_cos_theta);
+
+        FillHistogram(muon.cos_theta_error, error_cos_theta);
+    
+        FillHistogramWithDefaultErrors(muon.theta_theta_test, muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg());
+        failText<<muon_theta * TMath::RadToDeg()<<" ";
+        failText<<truth_muon_theta * TMath::RadToDeg()<<" ";
+        failText<<muon_theta_beam * TMath::RadToDeg()<<" ";
+        failText<<truth_muon_theta_beam * TMath::RadToDeg()<<" ";
+        failText<<endl;
     }
 }
 
@@ -1376,6 +1392,28 @@ void CCProtonPi0_Analyzer::fill_muon_theta()
     }
 }
 
+void CCProtonPi0_Analyzer::fill_muon_cos_theta() 
+{
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithDefaultErrors(muon.muon_cos_theta_mc_reco_all, cos(muon_theta_beam));
+        if (truth_isSignal){
+            // MC Truth Signal
+            FillHistogramWithDefaultErrors(muon.muon_cos_theta_mc_truth_signal, cos(truth_muon_theta_beam));
+            // MC Reco Signal
+            FillHistogramWithDefaultErrors(muon.muon_cos_theta_mc_reco_signal, cos(muon_theta_beam));
+            // MC Reco vs True -- Response
+            FillHistogramWithDefaultErrors(muon.muon_cos_theta_response, cos(muon_theta_beam), cos(truth_muon_theta_beam));
+        }else{
+            // MC Reco Background
+            FillHistogramWithDefaultErrors(muon.muon_cos_theta_mc_reco_bckg, cos(muon_theta_beam));
+        }
+    }else{
+        // Data
+        FillHistogram(muon.muon_cos_theta_all, cos(muon_theta_beam));
+    }
+}
+
 void CCProtonPi0_Analyzer::fill_pi0_P() 
 {
     if (m_isMC){
@@ -1447,7 +1485,8 @@ void CCProtonPi0_Analyzer::fillMuonReco()
     FillHistogram(muon.E, muon_E * MeV_to_GeV);
     FillHistogram(muon.P, muon_P * MeV_to_GeV);
     FillHistogram(muon.KE, muon_KE * MeV_to_GeV);
-    FillHistogram(muon.theta, muon_theta * TMath::RadToDeg());
+    FillHistogram(muon.theta, muon_theta_beam * TMath::RadToDeg());
+    FillHistogram(muon.cos_theta, cos(muon_theta_beam));
     FillHistogram(muon.phi, muon_phi * TMath::RadToDeg());
 }
 
@@ -1678,9 +1717,34 @@ void CCProtonPi0_Analyzer::CorrectNTupleVariables()
 
 void CCProtonPi0_Analyzer::CorrectEMShowerCalibration()
 {
+    // Correct MC -- Do not change Data
     if (m_isMC){
-        double c = 134.98/125;
-        pi0_invMass = pi0_invMass*c;
+        const double correction = 134.98/125;
+        // Pi0 Variables
+        pi0_invMass *= correction;
+        pi0_E *= correction;
+        pi0_E_Cal *= correction;
+        pi0_P *= correction;
+        pi0_KE *= correction;
+        pi0_px *= correction;
+        pi0_py *= correction;
+        pi0_pz *= correction;
+
+        // gamma1 
+        gamma1_E *= correction;
+        gamma1_E_Old *= correction;
+        gamma1_P *= correction;
+        gamma1_px *= correction;
+        gamma1_py *= correction;
+        gamma1_pz *= correction;
+
+        // gamma2 
+        gamma2_E *= correction;
+        gamma2_E_Old *= correction;
+        gamma2_P *= correction;
+        gamma2_px *= correction;
+        gamma2_py *= correction;
+        gamma2_pz *= correction;
     }
 }
 

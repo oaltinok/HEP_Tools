@@ -59,6 +59,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fill_QSq();
         void fill_muon_P();
         void fill_muon_theta();
+        void fill_muon_cos_theta();
         void fill_pi0_P();
         void fill_pi0_KE();
         void fill_pi0_theta();

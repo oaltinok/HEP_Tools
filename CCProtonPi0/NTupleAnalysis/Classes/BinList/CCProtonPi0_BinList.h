@@ -40,6 +40,7 @@ class CCProtonPi0_BinList
         // Cross Section Variables
         CCProtonPi0_SingleBin muon_P;
         CCProtonPi0_SingleBin muon_theta;
+        CCProtonPi0_SingleBin muon_cos_theta;
         CCProtonPi0_SingleBin pi0_P;
         CCProtonPi0_SingleBin pi0_KE;
         CCProtonPi0_SingleBin pi0_theta;
