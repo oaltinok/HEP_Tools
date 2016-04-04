@@ -178,6 +178,8 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        truth_michelPion_length;
         Double_t        truth_muon_P;
         Double_t        truth_muon_theta;
+        Double_t        truth_muon_thetaX_beam;
+        Double_t        truth_muon_thetaY_beam;
         Double_t        truth_muon_theta_beam;
         Double_t        truth_pi0_KE;
         Double_t        truth_pi0_P;
@@ -274,11 +276,11 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        mc_initNucVec[4];
         Double_t        mc_primFSLepton[4];
         Int_t           mc_nFSPart;
-        Double_t        mc_FSPartPx[198];   //[mc_nFSPart]
-        Double_t        mc_FSPartPy[198];   //[mc_nFSPart]
-        Double_t        mc_FSPartPz[198];   //[mc_nFSPart]
-        Double_t        mc_FSPartE[198];   //[mc_nFSPart]
-        Int_t           mc_FSPartPDG[198];   //[mc_nFSPart]
+        Double_t        mc_FSPartPx[190];   //[mc_nFSPart]
+        Double_t        mc_FSPartPy[190];   //[mc_nFSPart]
+        Double_t        mc_FSPartPz[190];   //[mc_nFSPart]
+        Double_t        mc_FSPartE[190];   //[mc_nFSPart]
+        Int_t           mc_FSPartPDG[190];   //[mc_nFSPart]
         Int_t           mc_er_nPart;
         Int_t           mc_er_ID[245];   //[mc_er_nPart]
         Int_t           mc_er_status[245];   //[mc_er_nPart]
@@ -293,7 +295,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Int_t           mc_er_LD[245];   //[mc_er_nPart]
         Int_t           mc_er_mother[245];   //[mc_er_nPart]
         Int_t           mc_fr_nNuAncestorIDs;
-        Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
+        Int_t           mc_fr_nuAncestorIDs[12];   //[mc_fr_nNuAncestorIDs]
         Int_t           mc_fr_nuParentID;
         Int_t           mc_fr_decMode;
         Double_t        mc_fr_primProtonVtx[3];
@@ -306,6 +308,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        mc_cvweight_totalFlux;
         Double_t        mc_cvweight_totalXsec;
         Double_t        mc_ppfx1_cvweight;
+        Double_t        mc_hornCurrent_cvweight;
         Double_t        mc_gen1_cvweight_total;
         Double_t        gen1_wgt;
         Double_t        mc_gen1_cvweight_totalFlux;
@@ -398,6 +401,8 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_michelPion_length;   //!
         TBranch        *b_truth_muon_P;   //!
         TBranch        *b_truth_muon_theta;   //!
+        TBranch        *b_truth_muon_thetaX_beam;   //!
+        TBranch        *b_truth_muon_thetaY_beam;   //!
         TBranch        *b_truth_muon_theta_beam;   //!
         TBranch        *b_truth_pi0_KE;   //!
         TBranch        *b_truth_pi0_P;   //!
@@ -526,6 +531,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_mc_cvweight_totalFlux;   //!
         TBranch        *b_mc_cvweight_totalXsec;   //!
         TBranch        *b_mc_ppfx1_cvweight;   //!
+        TBranch        *b_mc_hornCurrent_cvweight;   //!
         TBranch        *b_mc_gen1_cvweight_total;   //!
         TBranch        *b_gen1_wgt;   //!
         TBranch        *b_mc_gen1_cvweight_totalFlux;   //!

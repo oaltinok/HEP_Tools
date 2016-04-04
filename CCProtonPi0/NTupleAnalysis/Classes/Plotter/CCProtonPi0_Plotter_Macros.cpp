@@ -1361,7 +1361,7 @@ void CCProtonPi0_Plotter::DrawNormalizedMigrationHistogram(rootDir &dir, std::st
     ApplyStyle(plotter);
     plotter->DrawNormalizedMigrationHistogram(hist2D);
 
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_migration.png"), "png");
 
     delete c;
     delete plotter;

@@ -35,6 +35,7 @@ CCProtonPi0_Pion::CCProtonPi0_Pion(bool isModeReduce, bool isMC) : CCProtonPi0_P
         bin_photonConvLength.setBin(50,0.0,100.0);
         bin_photonP.setBin(20,0.0,1.0);
         bin_photonEnergy_Asymmetry.setBin(100,0.0,1.0);
+        bin_theta_Diff.setBin(40,-5.0,5.0);
         
         initHistograms();   
     }
@@ -125,6 +126,10 @@ void CCProtonPi0_Pion::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Pions / %3.1f [degree]",binList.angle.get_width()));
         phi.push_back(temp);
     }
+
+    theta_Diff = new TH1D( "theta_Diff","Difference on #pi^{0} Theta",bin_theta_Diff.get_nBins(), bin_theta_Diff.get_min(), bin_theta_Diff.get_max() );
+    theta_Diff->GetXaxis()->SetTitle("#theta_{Reco}-#theta_{True} [degree]");
+    theta_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_theta_Diff.get_width()));
 
     // Cross Section Variables
     pi0_P_all = new MnvH1D( "pi0_P_all","Data All P_{#pi^{0}}",binList.size_pi0_P, binList.a_pi0_P);
@@ -429,6 +434,7 @@ void CCProtonPi0_Pion::writeHistograms()
     KE_reco->Write();
     KE_Diff->Write();
 
+    theta_Diff->Write();
 
     f->Close();
 }

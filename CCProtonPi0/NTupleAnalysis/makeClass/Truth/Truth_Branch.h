@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Mar 24 08:41:09 2016 by ROOT version 5.34/05
+// Thu Mar 31 10:19:37 2016 by ROOT version 5.34/05
 // from TChain Truth/
 //////////////////////////////////////////////////////////
 
@@ -97,6 +97,8 @@ public :
    Double_t        truth_michelPion_length;
    Double_t        truth_muon_P;
    Double_t        truth_muon_theta;
+   Double_t        truth_muon_thetaX_beam;
+   Double_t        truth_muon_thetaY_beam;
    Double_t        truth_muon_theta_beam;
    Double_t        truth_pi0_KE;
    Double_t        truth_pi0_P;
@@ -193,11 +195,11 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[198];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[198];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[198];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[198];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[198];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[190];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[190];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[190];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[190];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[190];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
    Int_t           mc_er_ID[245];   //[mc_er_nPart]
    Int_t           mc_er_status[245];   //[mc_er_nPart]
@@ -212,7 +214,7 @@ public :
    Int_t           mc_er_LD[245];   //[mc_er_nPart]
    Int_t           mc_er_mother[245];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[12];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -225,6 +227,7 @@ public :
    Double_t        mc_cvweight_totalFlux;
    Double_t        mc_cvweight_totalXsec;
    Double_t        mc_ppfx1_cvweight;
+   Double_t        mc_hornCurrent_cvweight;
    Double_t        mc_gen1_cvweight_total;
    Double_t        gen1_wgt;
    Double_t        mc_gen1_cvweight_totalFlux;
@@ -317,6 +320,8 @@ public :
    TBranch        *b_truth_michelPion_length;   //!
    TBranch        *b_truth_muon_P;   //!
    TBranch        *b_truth_muon_theta;   //!
+   TBranch        *b_truth_muon_thetaX_beam;   //!
+   TBranch        *b_truth_muon_thetaY_beam;   //!
    TBranch        *b_truth_muon_theta_beam;   //!
    TBranch        *b_truth_pi0_KE;   //!
    TBranch        *b_truth_pi0_P;   //!
@@ -445,6 +450,7 @@ public :
    TBranch        *b_mc_cvweight_totalFlux;   //!
    TBranch        *b_mc_cvweight_totalXsec;   //!
    TBranch        *b_mc_ppfx1_cvweight;   //!
+   TBranch        *b_mc_hornCurrent_cvweight;   //!
    TBranch        *b_mc_gen1_cvweight_total;   //!
    TBranch        *b_gen1_wgt;   //!
    TBranch        *b_mc_gen1_cvweight_totalFlux;   //!
@@ -494,7 +500,7 @@ Truth_Branch::Truth_Branch(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("Truth","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_73.root/Truth");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_74a.root/Truth");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -619,6 +625,8 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_michelPion_length", &truth_michelPion_length, &b_truth_michelPion_length);
    fChain->SetBranchAddress("truth_muon_P", &truth_muon_P, &b_truth_muon_P);
    fChain->SetBranchAddress("truth_muon_theta", &truth_muon_theta, &b_truth_muon_theta);
+   fChain->SetBranchAddress("truth_muon_thetaX_beam", &truth_muon_thetaX_beam, &b_truth_muon_thetaX_beam);
+   fChain->SetBranchAddress("truth_muon_thetaY_beam", &truth_muon_thetaY_beam, &b_truth_muon_thetaY_beam);
    fChain->SetBranchAddress("truth_muon_theta_beam", &truth_muon_theta_beam, &b_truth_muon_theta_beam);
    fChain->SetBranchAddress("truth_pi0_KE", &truth_pi0_KE, &b_truth_pi0_KE);
    fChain->SetBranchAddress("truth_pi0_P", &truth_pi0_P, &b_truth_pi0_P);
@@ -747,6 +755,7 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("mc_cvweight_totalFlux", &mc_cvweight_totalFlux, &b_mc_cvweight_totalFlux);
    fChain->SetBranchAddress("mc_cvweight_totalXsec", &mc_cvweight_totalXsec, &b_mc_cvweight_totalXsec);
    fChain->SetBranchAddress("mc_ppfx1_cvweight", &mc_ppfx1_cvweight, &b_mc_ppfx1_cvweight);
+   fChain->SetBranchAddress("mc_hornCurrent_cvweight", &mc_hornCurrent_cvweight, &b_mc_hornCurrent_cvweight);
    fChain->SetBranchAddress("mc_gen1_cvweight_total", &mc_gen1_cvweight_total, &b_mc_gen1_cvweight_total);
    fChain->SetBranchAddress("gen1_wgt", &gen1_wgt, &b_gen1_wgt);
    fChain->SetBranchAddress("mc_gen1_cvweight_totalFlux", &mc_gen1_cvweight_totalFlux, &b_mc_gen1_cvweight_totalFlux);

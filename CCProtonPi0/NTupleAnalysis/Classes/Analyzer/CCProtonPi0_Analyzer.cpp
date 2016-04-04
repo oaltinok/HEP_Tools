@@ -54,19 +54,11 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     counter1 = 0;
     counter2 = 0;
 
-    nPiPlus = 0;
-    nPiMinus = 0;
-    nPiZero = 0;
-    nKPlus = 0;
-    nKMinus = 0;
-    nKZero = 0;
-    nAntiKZero = 0;
-    nNeutron = 0;
-    nProton = 0;
-    nLambdaZero = 0;
-    nSigmaPlus = 0;
-    nOther = 0;
-
+    nMINOS_contained = 0;
+    nMINOS_OK = 0;
+    nUsed_range = 0;
+    nUsed_curvature = 0;
+    
     cvweight = 1.0;
 }
 
@@ -154,20 +146,6 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
-
-    cout<<"nPiPlus = "<<nPiPlus<<endl;
-    cout<<"nPiMinus = "<<nPiMinus<<endl;
-    cout<<"nPiZero = "<<nPiZero<<endl;
-    cout<<"nKPlus = "<<nKPlus<<endl;
-    cout<<"nKMinus = "<<nKMinus<<endl;
-    cout<<"nKZero = "<<nKZero<<endl;
-    cout<<"nAntiKZero = "<<nAntiKZero<<endl;
-    cout<<"nNeutron = "<<nNeutron<<endl;
-    cout<<"nProton = "<<nProton<<endl;
-    cout<<"nLambdaZero = "<<nLambdaZero<<endl;
-    cout<<"nSigmaPlus = "<<nSigmaPlus<<endl;
-    cout<<"nOther = "<<nOther<<endl;
-
 }
 
 
@@ -212,8 +190,6 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         }
        
         UpdateSignalDef();
-        CorrectNTupleVariables();
-        CorrectEMShowerCalibration();
 
         // Update scanFileName if running for scan
         if(isScanRun) UpdateScanFileName();
@@ -264,6 +240,11 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     //--------------------------------------------------------------------------
     cout<<"counter1 = "<<counter1<<endl;
     cout<<"counter2 = "<<counter2<<endl;
+    
+    cout<<"nMINOS_contained = "<<nMINOS_contained<<endl;
+    cout<<"nMINOS_OK = "<<nMINOS_OK<<endl;
+    cout<<"nUsed_range = "<<nUsed_range<<endl;
+    cout<<"nUsed_curvature = "<<nUsed_curvature<<endl;
 }
 
 //------------------------------------------------------------------------------
@@ -620,29 +601,24 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // ------------------------------------------------------------------------
     if ( Cut_Vertex_Michel_Exist == 1 && truth_vtx_michel_evis_most_pdg != -1){
         if (truth_vtx_michel_evis_most_pdg == 211){ 
-            nPiPlus++;
             FillHistogram(cutList.michel_piplus_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_piplus_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_piplus_distance, vtx_michelProng_distance);
         }
         else if (truth_vtx_michel_evis_most_pdg == -211){ 
-            nPiMinus++;
             FillHistogram(cutList.michel_piminus_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_piminus_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_piminus_distance, vtx_michelProng_distance);
         }
         else if (truth_vtx_michel_evis_most_pdg == 2112){ 
-            nNeutron++;
             FillHistogram(cutList.michel_neutron_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_neutron_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_neutron_distance, vtx_michelProng_distance);
         }else if (truth_vtx_michel_evis_most_pdg == 2212){ 
-            nProton++;
             FillHistogram(cutList.michel_proton_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_proton_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_proton_distance, vtx_michelProng_distance);
         }else{ 
-            nOther++;
             FillHistogram(cutList.michel_other_time_diff, vtx_michelProng_time_diff);
             FillHistogram(cutList.michel_other_energy, vtx_michelProng_energy);
             FillHistogram(cutList.michel_other_distance, vtx_michelProng_distance);
@@ -1062,7 +1038,6 @@ void CCProtonPi0_Analyzer::fillProtonMC()
         double true_P = HEP_Functions::calcMomentum(truth_proton_4P[0],truth_proton_4P[1],truth_proton_4P[2]);
         true_P = true_P * MeV_to_GeV;
         double error_P = (reco_P - true_P) / true_P;
-
         FillHistogram(proton.reco_P_true_P, reco_P,true_P);
         FillHistogram(proton.P_error, error_P);
 
@@ -1070,10 +1045,20 @@ void CCProtonPi0_Analyzer::fillProtonMC()
         double reco_E = proton_E * MeV_to_GeV;
         double true_E = truth_proton_4P[3] * MeV_to_GeV; 
         double error_E = Data_Functions::getError(true_E, reco_E);
-
         FillHistogram(proton.reco_E_true_E, reco_E,true_E);
         FillHistogram(proton.E_error, error_E);
         FillHistogram(proton.E_Diff, reco_E-true_E);
+   
+        // Proton Theta
+        double reco_theta = proton_theta_beam * TMath::RadToDeg();
+        double true_theta = truth_proton_theta_beam * TMath::RadToDeg();
+        double error_theta = Data_Functions::getError(true_theta, reco_theta);
+
+        if (reco_theta < 25){
+            FillHistogram(proton.theta_error, error_theta);
+            FillHistogram(proton.theta_Diff, reco_theta-true_theta);
+            FillHistogramWithDefaultErrors(proton.theta_theta_test, proton_theta_beam * TMath::RadToDeg(), truth_proton_theta_beam * TMath::RadToDeg());
+        }
     }
 }
 
@@ -1154,6 +1139,7 @@ void CCProtonPi0_Analyzer::fillPi0MC()
         double error_theta = Data_Functions::getError(true_theta, reco_theta);
 
         FillHistogram(pi0.theta_error, error_theta);
+        FillHistogram(pi0.theta_Diff, reco_theta-true_theta);
     }
 
     // Gamma Comparison
@@ -1298,20 +1284,43 @@ void CCProtonPi0_Analyzer::fillMuonMC()
         double error_theta = Data_Functions::getError(true_theta, reco_theta);
 
         FillHistogram(muon.theta_error, error_theta);
+        FillHistogram(muon.theta_Diff, reco_theta-true_theta);
 
+        // thetaX
+        double reco_thetaX = muon_thetaX_beam;
+        double true_thetaX = truth_muon_thetaX_beam;
+        FillHistogram(muon.thetaX_Diff, reco_thetaX-true_thetaX);
+        FillHistogram(muon.thetaX_thetaX_test, reco_thetaX, true_thetaX);
+ 
+        // thetaY
+        double reco_thetaY = muon_thetaY_beam;
+        double true_thetaY = truth_muon_thetaY_beam;
+        FillHistogram(muon.thetaY_Diff, reco_thetaY-true_thetaY);
+        FillHistogram(muon.thetaY_thetaY_test, reco_thetaY, true_thetaY);
+        
         // Cosine Theta
         double reco_cos_theta = cos(muon_theta_beam);
         double true_cos_theta = cos(truth_muon_theta_beam);
         double error_cos_theta = Data_Functions::getError(true_cos_theta, reco_cos_theta);
 
         FillHistogram(muon.cos_theta_error, error_cos_theta);
-    
-        FillHistogramWithDefaultErrors(muon.theta_theta_test, muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg());
-        failText<<muon_theta * TMath::RadToDeg()<<" ";
-        failText<<truth_muon_theta * TMath::RadToDeg()<<" ";
-        failText<<muon_theta_beam * TMath::RadToDeg()<<" ";
-        failText<<truth_muon_theta_beam * TMath::RadToDeg()<<" ";
-        failText<<endl;
+ 
+        FillHistogramWithDefaultErrors(muon.theta_theta_test, muon_theta_beam * TMath::RadToDeg(), truth_muon_theta_beam * TMath::RadToDeg());
+        
+        counter1++;
+        if (CCProtonPi0_minos_trk_is_contained == 1) nMINOS_contained++;
+        if (CCProtonPi0_minos_trk_is_ok == 1) nMINOS_OK++;
+        if (CCProtonPi0_minos_used_range == 1) nUsed_range++;
+        if (CCProtonPi0_minos_used_curvature == 1) nUsed_curvature++;
+
+        //failText<<CCProtonPi0_minos_used_range<<" ";
+        //failText<<CCProtonPi0_minos_used_curvature<<" ";
+        //failText<<CCProtonPi0_minos_trk_is_contained<<" ";
+        //failText<<CCProtonPi0_minos_trk_is_ok<<endl;
+        //failText<<muon_theta_beam * TMath::RadToDeg()<<" ";
+        //failText<<truth_muon_theta_beam * TMath::RadToDeg()<<" ";
+        //failText<<calc_theta * TMath::RadToDeg()<<" ";
+        //failText<<endl;
     }
 }
 
@@ -1847,6 +1856,22 @@ std::string CCProtonPi0_Analyzer::GetPlaylist()
 
     return playlist;
 }
+
+double CCProtonPi0_Analyzer::Calc_MuonCosTheta()
+{
+    double P_muon = truth_muon_P;
+    double P_beam = HEP_Functions::calcMomentum(mc_incomingPartVec[0],mc_incomingPartVec[1],mc_incomingPartVec[2]);
+    double dot_product = 0.0;
+
+    for (int i = 0; i < 3; ++i){
+        dot_product += truth_muon_4P[i]*mc_incomingPartVec[i];
+    }
+
+    double cos_theta = dot_product / (P_muon * P_beam);
+    return cos_theta;
+}
+
+
 #endif //CCProtonPi0_Analyzer_cpp
 
 

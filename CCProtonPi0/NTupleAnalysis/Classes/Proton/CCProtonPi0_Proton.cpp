@@ -32,6 +32,7 @@ CCProtonPi0_Proton::CCProtonPi0_Proton(bool isModeReduce, bool isMC) : CCProtonP
         bin_KE.setBin(20, 0.0, 2.0);
         bin_trackLength.setBin(25,0.0,250.0);
         bin_trackKinked.setBin(2,0.0,2.0);
+        bin_theta_Diff.setBin(40,-5.0,5.0);
         
         initHistograms();        
     }
@@ -85,7 +86,20 @@ void CCProtonPi0_Proton::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Protons / %3.1f [Degree]",binList.angle.get_width()));
         phi.push_back(temp); 
     }
-    
+
+    theta_theta_test = new MnvH2D( "theta_theta_test","Signal Progon Angle", binList.proton_theta.get_nBins(), binList.proton_theta.get_min(), binList.proton_theta.get_max(),binList.proton_theta.get_nBins(), binList.proton_theta.get_min(), binList.proton_theta.get_max() );
+    theta_theta_test->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [degree]");
+    theta_theta_test->GetYaxis()->SetTitle("True #theta_{#mu} [degree]");
+    AddVertErrorBands_MC(theta_theta_test);
+ 
+    theta_error = new TH1D( "theta_error","Error on cos(theta)",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
+    theta_error->GetXaxis()->SetTitle("(#theta_{Reco}-#theta_{True})/#theta_{True}");
+    theta_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+ 
+    theta_Diff = new TH1D( "theta_Diff","Difference on Proton Theta",bin_theta_Diff.get_nBins(), bin_theta_Diff.get_min(), bin_theta_Diff.get_max() );
+    theta_Diff->GetXaxis()->SetTitle("#theta_{Reco}-#theta_{True} [degree]");
+    theta_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_theta_Diff.get_width()));
+
     reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed Proton Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(), bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
     reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{p} [GeV]");
     reco_P_true_P->GetYaxis()->SetTitle("True P_{p} [GeV]");
@@ -122,7 +136,11 @@ void CCProtonPi0_Proton::writeHistograms()
         theta[i]->Write();
         phi[i]->Write();
     }
-    
+
+    theta_theta_test->Write();
+    theta_error->Write();
+    theta_Diff->Write();
+
     reco_P_true_P->Write();
     P_error->Write();
 

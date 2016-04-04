@@ -21,6 +21,11 @@ class CCProtonPi0_Muon : public CCProtonPi0_Particle
         void writeHistograms();
 
         MnvH2D* theta_theta_test;
+        MnvH2D* thetaX_thetaX_test;
+        MnvH2D* thetaY_thetaY_test;
+
+        TH1D* thetaX_Diff;
+        TH1D* thetaY_Diff;
 
         // Muon Momentum 
         MnvH1D* muon_P_all;
@@ -45,7 +50,10 @@ class CCProtonPi0_Muon : public CCProtonPi0_Particle
         MnvH1D* muon_cos_theta_mc_reco_bckg;
         MnvH1D* muon_cos_theta_mc_truth_signal;
         MnvH2D* muon_cos_theta_response;
+
     private:
+        CCProtonPi0_SingleBin bin_thetaX_Diff;
+        CCProtonPi0_SingleBin bin_thetaY_Diff;
 };
 
 #endif

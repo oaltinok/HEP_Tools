@@ -1,17 +1,12 @@
-CCPROTONPI0_V="v2_74"
+CCPROTONPI0_V="v2_75"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	No Major Changes	
+	Added muon_thetaX and muon_thetaY
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:	
-	Global EM Energy Correction
-		Correcting ALL MC Reconstructed Variables calculated by EM Energy Calibration
-			Correction Factor = ~1.08
-
-	Improved Unfolding Study
-		Added Muon cos(theta)
-		Plotting Statistical Errors after each iteration
-		Plotting function arguments converted to const
+	EMShowerCalibration Applied only once which is on reduce stage
+		Once it is corrected on <reduce stage>, corrected values will be written to NTuple
+		No need to correct again in <analysis stage>
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

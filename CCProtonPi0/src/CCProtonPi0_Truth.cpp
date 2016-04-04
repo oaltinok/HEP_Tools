@@ -679,6 +679,8 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
     double muon_P;
     double muon_theta;
     double muon_theta_beam;
+    double muon_thetaX_beam;
+    double muon_thetaY_beam;
     double pi0_P;
     double pi0_KE;
     double pi0_theta;
@@ -706,6 +708,8 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
             muon_P = temp_4P.P();
             muon_theta = temp_4P.theta();
             muon_theta_beam = m_coordSysTool->thetaWRTBeam(temp_4P);
+            muon_thetaX_beam = m_coordSysTool->thetaXWRTBeam(temp_4P);
+            muon_thetaY_beam = m_coordSysTool->thetaYWRTBeam(temp_4P);
             muon_4P[0] = temp_4P.px();  
             muon_4P[1] = temp_4P.py(); 
             muon_4P[2] = temp_4P.pz(); 
@@ -746,6 +750,8 @@ void CCProtonPi0::setSignal_PrimaryTrajectoryKinematics(Minerva::GenMinInteracti
     truthEvent->setDoubleData("proton_P", proton_P);
     truthEvent->setDoubleData("muon_theta", muon_theta);
     truthEvent->setDoubleData("muon_theta_beam", muon_theta_beam);
+    truthEvent->setDoubleData("muon_thetaX_beam", muon_thetaX_beam);
+    truthEvent->setDoubleData("muon_thetaY_beam", muon_thetaY_beam);
     truthEvent->setDoubleData("pi0_theta", pi0_theta);
     truthEvent->setDoubleData("pi0_theta_beam", pi0_theta_beam);
     truthEvent->setDoubleData("proton_theta", proton_theta);

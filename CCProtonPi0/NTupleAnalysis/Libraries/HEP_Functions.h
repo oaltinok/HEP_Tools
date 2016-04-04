@@ -12,7 +12,6 @@ Namespace: HEP_Functions
         > HEP_Functions::calcEnergy(momentum,restMass);
     
     Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
-    Last Revision:  2014_06_19
 ================================================================================
 */
 
@@ -45,7 +44,7 @@ inline double calcDistance( double x1, double y1, double z1,
                 (z1-z2)*(z1-z2));
     return d;
 }
-    
+   
 }
 
 #endif

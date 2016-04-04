@@ -116,6 +116,8 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_michelPion_length", &truth_michelPion_length, &b_truth_michelPion_length);
     fChain->SetBranchAddress("truth_muon_P", &truth_muon_P, &b_truth_muon_P);
     fChain->SetBranchAddress("truth_muon_theta", &truth_muon_theta, &b_truth_muon_theta);
+    fChain->SetBranchAddress("truth_muon_thetaX_beam", &truth_muon_thetaX_beam, &b_truth_muon_thetaX_beam);
+    fChain->SetBranchAddress("truth_muon_thetaY_beam", &truth_muon_thetaY_beam, &b_truth_muon_thetaY_beam);
     fChain->SetBranchAddress("truth_muon_theta_beam", &truth_muon_theta_beam, &b_truth_muon_theta_beam);
     fChain->SetBranchAddress("truth_pi0_KE", &truth_pi0_KE, &b_truth_pi0_KE);
     fChain->SetBranchAddress("truth_pi0_P", &truth_pi0_P, &b_truth_pi0_P);
@@ -244,6 +246,7 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("mc_cvweight_totalFlux", &mc_cvweight_totalFlux, &b_mc_cvweight_totalFlux);
     fChain->SetBranchAddress("mc_cvweight_totalXsec", &mc_cvweight_totalXsec, &b_mc_cvweight_totalXsec);
     fChain->SetBranchAddress("mc_ppfx1_cvweight", &mc_ppfx1_cvweight, &b_mc_ppfx1_cvweight);
+    fChain->SetBranchAddress("mc_hornCurrent_cvweight", &mc_hornCurrent_cvweight, &b_mc_hornCurrent_cvweight);
     fChain->SetBranchAddress("mc_gen1_cvweight_total", &mc_gen1_cvweight_total, &b_mc_gen1_cvweight_total);
     fChain->SetBranchAddress("gen1_wgt", &gen1_wgt, &b_gen1_wgt);
     fChain->SetBranchAddress("mc_gen1_cvweight_totalFlux", &mc_gen1_cvweight_totalFlux, &b_mc_gen1_cvweight_totalFlux);

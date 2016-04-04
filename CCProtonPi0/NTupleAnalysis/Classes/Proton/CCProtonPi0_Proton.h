@@ -24,7 +24,9 @@ class CCProtonPi0_Proton : public CCProtonPi0_Particle
         CCProtonPi0_Proton(bool isModeReduce, bool isMC);
         void initHistograms();
         void writeHistograms();
-    
+
+        MnvH2D* theta_theta_test;
+
     private:
         CCProtonPi0_SingleBin bin_trackLength;
         CCProtonPi0_SingleBin bin_trackKinked;

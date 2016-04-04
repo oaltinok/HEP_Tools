@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Mar 24 08:34:40 2016 by ROOT version 5.34/05
+// Thu Mar 31 09:48:35 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -202,6 +202,8 @@ public :
    Double_t        truth_michelPion_length;
    Double_t        truth_muon_P;
    Double_t        truth_muon_theta;
+   Double_t        truth_muon_thetaX_beam;
+   Double_t        truth_muon_thetaY_beam;
    Double_t        truth_muon_theta_beam;
    Double_t        truth_pi0_KE;
    Double_t        truth_pi0_P;
@@ -415,6 +417,8 @@ public :
    Double_t        muon_qpqpe;
    Double_t        muon_roadUpstreamEnergy;
    Double_t        muon_theta;
+   Double_t        muon_thetaX_beam;
+   Double_t        muon_thetaY_beam;
    Double_t        muon_theta_beam;
    Double_t        muon_theta_beam_biasDown;
    Double_t        muon_theta_beam_biasUp;
@@ -490,7 +494,7 @@ public :
    Int_t           g2dedx_cluster_occupancy_sz;
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
    Int_t           nTracks_Secondary_Vtx_sz;
-   Int_t           nTracks_Secondary_Vtx[6];   //[nTracks_Secondary_Vtx_sz]
+   Int_t           nTracks_Secondary_Vtx[5];   //[nTracks_Secondary_Vtx_sz]
    Double_t        all_protons_E[10];
    Double_t        all_protons_KE[10];
    Double_t        all_protons_LLRScore[10];
@@ -519,11 +523,11 @@ public :
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
    Int_t           g1dedx_rev_cluster_energy_sz;
-   Double_t        g1dedx_rev_cluster_energy[130];   //[g1dedx_rev_cluster_energy_sz]
+   Double_t        g1dedx_rev_cluster_energy[127];   //[g1dedx_rev_cluster_energy_sz]
    Int_t           g2dedx_cluster_energy_sz;
    Double_t        g2dedx_cluster_energy[6];   //[g2dedx_cluster_energy_sz]
    Int_t           g2dedx_rev_cluster_energy_sz;
-   Double_t        g2dedx_rev_cluster_energy[105];   //[g2dedx_rev_cluster_energy_sz]
+   Double_t        g2dedx_rev_cluster_energy[91];   //[g2dedx_rev_cluster_energy_sz]
    Double_t        gamma1_direction[3];
    Double_t        gamma1_vertex[3];
    Double_t        gamma2_direction[3];
@@ -586,24 +590,24 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[49];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[49];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[49];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[49];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[49];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[40];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[40];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[40];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[40];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[40];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[62];   //[mc_er_nPart]
-   Int_t           mc_er_status[62];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[62];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[62];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[62];   //[mc_er_nPart]
-   Double_t        mc_er_Px[62];   //[mc_er_nPart]
-   Double_t        mc_er_Py[62];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[62];   //[mc_er_nPart]
-   Double_t        mc_er_E[62];   //[mc_er_nPart]
-   Int_t           mc_er_FD[62];   //[mc_er_nPart]
-   Int_t           mc_er_LD[62];   //[mc_er_nPart]
-   Int_t           mc_er_mother[62];   //[mc_er_nPart]
+   Int_t           mc_er_ID[53];   //[mc_er_nPart]
+   Int_t           mc_er_status[53];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[53];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[53];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[53];   //[mc_er_nPart]
+   Double_t        mc_er_Px[53];   //[mc_er_nPart]
+   Double_t        mc_er_Py[53];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[53];   //[mc_er_nPart]
+   Double_t        mc_er_E[53];   //[mc_er_nPart]
+   Int_t           mc_er_FD[53];   //[mc_er_nPart]
+   Int_t           mc_er_LD[53];   //[mc_er_nPart]
+   Int_t           mc_er_mother[53];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
    Int_t           mc_fr_nuAncestorIDs[10];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
@@ -618,6 +622,7 @@ public :
    Double_t        mc_cvweight_totalFlux;
    Double_t        mc_cvweight_totalXsec;
    Double_t        mc_ppfx1_cvweight;
+   Double_t        mc_hornCurrent_cvweight;
    Double_t        mc_gen1_cvweight_total;
    Double_t        gen1_wgt;
    Double_t        mc_gen1_cvweight_totalFlux;
@@ -822,6 +827,8 @@ public :
    TBranch        *b_truth_michelPion_length;   //!
    TBranch        *b_truth_muon_P;   //!
    TBranch        *b_truth_muon_theta;   //!
+   TBranch        *b_truth_muon_thetaX_beam;   //!
+   TBranch        *b_truth_muon_thetaY_beam;   //!
    TBranch        *b_truth_muon_theta_beam;   //!
    TBranch        *b_truth_pi0_KE;   //!
    TBranch        *b_truth_pi0_P;   //!
@@ -1035,6 +1042,8 @@ public :
    TBranch        *b_muon_qpqpe;   //!
    TBranch        *b_muon_roadUpstreamEnergy;   //!
    TBranch        *b_muon_theta;   //!
+   TBranch        *b_muon_thetaX_beam;   //!
+   TBranch        *b_muon_thetaY_beam;   //!
    TBranch        *b_muon_theta_beam;   //!
    TBranch        *b_muon_theta_beam_biasDown;   //!
    TBranch        *b_muon_theta_beam_biasUp;   //!
@@ -1238,6 +1247,7 @@ public :
    TBranch        *b_mc_cvweight_totalFlux;   //!
    TBranch        *b_mc_cvweight_totalXsec;   //!
    TBranch        *b_mc_ppfx1_cvweight;   //!
+   TBranch        *b_mc_hornCurrent_cvweight;   //!
    TBranch        *b_mc_gen1_cvweight_total;   //!
    TBranch        *b_gen1_wgt;   //!
    TBranch        *b_mc_gen1_cvweight_totalFlux;   //!
@@ -1295,7 +1305,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_73.root/CCProtonPi0");
+      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_74a.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1527,6 +1537,8 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_michelPion_length", &truth_michelPion_length, &b_truth_michelPion_length);
    fChain->SetBranchAddress("truth_muon_P", &truth_muon_P, &b_truth_muon_P);
    fChain->SetBranchAddress("truth_muon_theta", &truth_muon_theta, &b_truth_muon_theta);
+   fChain->SetBranchAddress("truth_muon_thetaX_beam", &truth_muon_thetaX_beam, &b_truth_muon_thetaX_beam);
+   fChain->SetBranchAddress("truth_muon_thetaY_beam", &truth_muon_thetaY_beam, &b_truth_muon_thetaY_beam);
    fChain->SetBranchAddress("truth_muon_theta_beam", &truth_muon_theta_beam, &b_truth_muon_theta_beam);
    fChain->SetBranchAddress("truth_pi0_KE", &truth_pi0_KE, &b_truth_pi0_KE);
    fChain->SetBranchAddress("truth_pi0_P", &truth_pi0_P, &b_truth_pi0_P);
@@ -1740,6 +1752,8 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("muon_qpqpe", &muon_qpqpe, &b_muon_qpqpe);
    fChain->SetBranchAddress("muon_roadUpstreamEnergy", &muon_roadUpstreamEnergy, &b_muon_roadUpstreamEnergy);
    fChain->SetBranchAddress("muon_theta", &muon_theta, &b_muon_theta);
+   fChain->SetBranchAddress("muon_thetaX_beam", &muon_thetaX_beam, &b_muon_thetaX_beam);
+   fChain->SetBranchAddress("muon_thetaY_beam", &muon_thetaY_beam, &b_muon_thetaY_beam);
    fChain->SetBranchAddress("muon_theta_beam", &muon_theta_beam, &b_muon_theta_beam);
    fChain->SetBranchAddress("muon_theta_beam_biasDown", &muon_theta_beam_biasDown, &b_muon_theta_beam_biasDown);
    fChain->SetBranchAddress("muon_theta_beam_biasUp", &muon_theta_beam_biasUp, &b_muon_theta_beam_biasUp);
@@ -1943,6 +1957,7 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("mc_cvweight_totalFlux", &mc_cvweight_totalFlux, &b_mc_cvweight_totalFlux);
    fChain->SetBranchAddress("mc_cvweight_totalXsec", &mc_cvweight_totalXsec, &b_mc_cvweight_totalXsec);
    fChain->SetBranchAddress("mc_ppfx1_cvweight", &mc_ppfx1_cvweight, &b_mc_ppfx1_cvweight);
+   fChain->SetBranchAddress("mc_hornCurrent_cvweight", &mc_hornCurrent_cvweight, &b_mc_hornCurrent_cvweight);
    fChain->SetBranchAddress("mc_gen1_cvweight_total", &mc_gen1_cvweight_total, &b_mc_gen1_cvweight_total);
    fChain->SetBranchAddress("gen1_wgt", &gen1_wgt, &b_gen1_wgt);
    fChain->SetBranchAddress("mc_gen1_cvweight_totalFlux", &mc_gen1_cvweight_totalFlux, &b_mc_gen1_cvweight_totalFlux);

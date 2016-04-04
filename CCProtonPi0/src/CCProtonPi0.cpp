@@ -237,6 +237,8 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleTruthBranch("proton_P",SENTINEL);
     declareDoubleTruthBranch("muon_theta",SENTINEL);
     declareDoubleTruthBranch("muon_theta_beam",SENTINEL);
+    declareDoubleTruthBranch("muon_thetaX_beam",SENTINEL);
+    declareDoubleTruthBranch("muon_thetaY_beam",SENTINEL);
     declareDoubleTruthBranch("pi0_theta",SENTINEL);
     declareDoubleTruthBranch("pi0_theta_beam",SENTINEL);
     declareDoubleTruthBranch("proton_theta",SENTINEL);
@@ -489,6 +491,8 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("muon_phi_beam", 0.0);
     declareDoubleEventBranch("muon_theta", 0.0);
     declareDoubleEventBranch("muon_theta_beam", 0.0);
+    declareDoubleEventBranch("muon_thetaX_beam", 0.0);
+    declareDoubleEventBranch("muon_thetaY_beam", 0.0);
     declareDoubleEventBranch("muon_theta_beam_biasUp", 0.0);
     declareDoubleEventBranch("muon_theta_beam_biasDown", 0.0); 
     declareDoubleEventBranch("muon_muScore", -1.0);
@@ -1498,6 +1502,8 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     double muon_theta = muon_4p.theta();
     double muon_phi_beam = m_coordSysTool->phiWRTBeam(muon_4p);
     double muon_theta_beam = m_coordSysTool->thetaWRTBeam(muon_4p);
+    double muon_thetaX_beam = m_coordSysTool->thetaXWRTBeam(muon_4p);
+    double muon_thetaY_beam = m_coordSysTool->thetaYWRTBeam(muon_4p);
     double muon_theta_beam_biasUp = m_coordSysTool->thetaWRTBeam(muon_4p,m_beamAngleBias) - muon_theta_beam;
     double muon_theta_beam_biasDown = m_coordSysTool->thetaWRTBeam(muon_4p, -1.0*m_beamAngleBias) - muon_theta_beam;
   
@@ -1570,6 +1576,8 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("muon_phi_beam",muon_phi_beam);
     event->setDoubleData("muon_theta", muon_theta);
     event->setDoubleData("muon_theta_beam", muon_theta_beam);
+    event->setDoubleData("muon_thetaX_beam", muon_thetaX_beam);
+    event->setDoubleData("muon_thetaY_beam", muon_thetaY_beam);
     event->setDoubleData("muon_theta_beam_biasUp", muon_theta_beam_biasUp);
     event->setDoubleData("muon_theta_beam_biasDown", muon_theta_beam_biasDown);
     event->setDoubleData("muon_muScore", muon_muScore);

@@ -48,6 +48,9 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin beamE;
       
         // Standard Bins
+        CCProtonPi0_SingleBin proton_theta;
+        CCProtonPi0_SingleBin muon_thetaX;
+        CCProtonPi0_SingleBin muon_thetaY;
         CCProtonPi0_SingleBin true_false;
         CCProtonPi0_SingleBin error;
         CCProtonPi0_SingleBin ratio;

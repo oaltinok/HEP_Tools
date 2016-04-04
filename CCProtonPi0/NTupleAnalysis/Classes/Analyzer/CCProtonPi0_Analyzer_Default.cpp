@@ -226,6 +226,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("truth_michelPion_length", &truth_michelPion_length, &b_truth_michelPion_length);
         fChain->SetBranchAddress("truth_muon_P", &truth_muon_P, &b_truth_muon_P);
         fChain->SetBranchAddress("truth_muon_theta", &truth_muon_theta, &b_truth_muon_theta);
+        fChain->SetBranchAddress("truth_muon_thetaX_beam", &truth_muon_thetaX_beam, &b_truth_muon_thetaX_beam);
+        fChain->SetBranchAddress("truth_muon_thetaY_beam", &truth_muon_thetaY_beam, &b_truth_muon_thetaY_beam);
         fChain->SetBranchAddress("truth_muon_theta_beam", &truth_muon_theta_beam, &b_truth_muon_theta_beam);
         fChain->SetBranchAddress("truth_pi0_KE", &truth_pi0_KE, &b_truth_pi0_KE);
         fChain->SetBranchAddress("truth_pi0_P", &truth_pi0_P, &b_truth_pi0_P);
@@ -286,7 +288,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("truth_muon_4P", truth_muon_4P, &b_truth_muon_4P);
         fChain->SetBranchAddress("truth_pi0_4P", truth_pi0_4P, &b_truth_pi0_4P);
         fChain->SetBranchAddress("truth_proton_4P", truth_proton_4P, &b_truth_proton_4P);
-    } 
+    }
     fChain->SetBranchAddress("physEvtNum", &physEvtNum, &b_physEvtNum);
     fChain->SetBranchAddress("n_hyps", &n_hyps, &b_n_hyps);
     fChain->SetBranchAddress("processType", &processType, &b_processType);
@@ -440,6 +442,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("muon_qpqpe", &muon_qpqpe, &b_muon_qpqpe);
     fChain->SetBranchAddress("muon_roadUpstreamEnergy", &muon_roadUpstreamEnergy, &b_muon_roadUpstreamEnergy);
     fChain->SetBranchAddress("muon_theta", &muon_theta, &b_muon_theta);
+    fChain->SetBranchAddress("muon_thetaX_beam", &muon_thetaX_beam, &b_muon_thetaX_beam);
+    fChain->SetBranchAddress("muon_thetaY_beam", &muon_thetaY_beam, &b_muon_thetaY_beam);
     fChain->SetBranchAddress("muon_theta_beam", &muon_theta_beam, &b_muon_theta_beam);
     fChain->SetBranchAddress("muon_theta_beam_biasDown", &muon_theta_beam_biasDown, &b_muon_theta_beam_biasDown);
     fChain->SetBranchAddress("muon_theta_beam_biasUp", &muon_theta_beam_biasUp, &b_muon_theta_beam_biasUp);
@@ -644,6 +648,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("mc_cvweight_totalFlux", &mc_cvweight_totalFlux, &b_mc_cvweight_totalFlux);
         fChain->SetBranchAddress("mc_cvweight_totalXsec", &mc_cvweight_totalXsec, &b_mc_cvweight_totalXsec);
         fChain->SetBranchAddress("mc_ppfx1_cvweight", &mc_ppfx1_cvweight, &b_mc_ppfx1_cvweight);
+        fChain->SetBranchAddress("mc_hornCurrent_cvweight", &mc_hornCurrent_cvweight, &b_mc_hornCurrent_cvweight);
         fChain->SetBranchAddress("mc_gen1_cvweight_total", &mc_gen1_cvweight_total, &b_mc_gen1_cvweight_total);
         fChain->SetBranchAddress("gen1_wgt", &gen1_wgt, &b_gen1_wgt);
         fChain->SetBranchAddress("mc_gen1_cvweight_totalFlux", &mc_gen1_cvweight_totalFlux, &b_mc_gen1_cvweight_totalFlux);
@@ -665,7 +670,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("prong_part_mass", prong_part_mass, &b_prong_part_mass);
     fChain->SetBranchAddress("prong_part_charge", prong_part_charge, &b_prong_part_charge);
     fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
-
 
 
 
