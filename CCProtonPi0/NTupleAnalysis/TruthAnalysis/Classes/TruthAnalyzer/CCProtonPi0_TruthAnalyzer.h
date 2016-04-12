@@ -150,6 +150,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Int_t           truth_vertex_module;
         Int_t           truth_vertex_plane;
         Int_t           truth_vtx_michel_evis_most_pdg;
+        Int_t           truth_vtx_michel_large_evis_most_pdg;
         Double_t        truth_allClusters_evis_pizero;
         Double_t        truth_blob1_evis_muon;
         Double_t        truth_blob1_evis_neutron;
@@ -193,11 +194,14 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        truth_total_captured_evis_total_truth;
         Double_t        truth_track_michel_evis_total_truth;
         Double_t        truth_vtx_michel_evis_total_truth;
+        Double_t        truth_vtx_michel_large_evis_total_truth;
         Double_t        truth_gamma1_4P[4];
         Double_t        truth_gamma1_final_pos[3];
+        Double_t        truth_gamma1_final_pos_estimated[3];
         Double_t        truth_gamma1_init_pos[3];
         Double_t        truth_gamma2_4P[4];
         Double_t        truth_gamma2_final_pos[3];
+        Double_t        truth_gamma2_final_pos_estimated[3];
         Double_t        truth_gamma2_init_pos[3];
         Int_t           genie_wgt_n_shifts;
         Double_t        truth_genie_wgt_AGKYxF1pi[7];   //[genie_wgt_n_shifts]
@@ -276,11 +280,11 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        mc_initNucVec[4];
         Double_t        mc_primFSLepton[4];
         Int_t           mc_nFSPart;
-        Double_t        mc_FSPartPx[190];   //[mc_nFSPart]
-        Double_t        mc_FSPartPy[190];   //[mc_nFSPart]
-        Double_t        mc_FSPartPz[190];   //[mc_nFSPart]
-        Double_t        mc_FSPartE[190];   //[mc_nFSPart]
-        Int_t           mc_FSPartPDG[190];   //[mc_nFSPart]
+        Double_t        mc_FSPartPx[198];   //[mc_nFSPart]
+        Double_t        mc_FSPartPy[198];   //[mc_nFSPart]
+        Double_t        mc_FSPartPz[198];   //[mc_nFSPart]
+        Double_t        mc_FSPartE[198];   //[mc_nFSPart]
+        Int_t           mc_FSPartPDG[198];   //[mc_nFSPart]
         Int_t           mc_er_nPart;
         Int_t           mc_er_ID[245];   //[mc_er_nPart]
         Int_t           mc_er_status[245];   //[mc_er_nPart]
@@ -295,7 +299,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Int_t           mc_er_LD[245];   //[mc_er_nPart]
         Int_t           mc_er_mother[245];   //[mc_er_nPart]
         Int_t           mc_fr_nNuAncestorIDs;
-        Int_t           mc_fr_nuAncestorIDs[12];   //[mc_fr_nNuAncestorIDs]
+        Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
         Int_t           mc_fr_nuParentID;
         Int_t           mc_fr_decMode;
         Double_t        mc_fr_primProtonVtx[3];
@@ -373,6 +377,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_vertex_module;   //!
         TBranch        *b_truth_vertex_plane;   //!
         TBranch        *b_truth_vtx_michel_evis_most_pdg;   //!
+        TBranch        *b_truth_vtx_michel_large_evis_most_pdg;   //!
         TBranch        *b_truth_allClusters_evis_pizero;   //!
         TBranch        *b_truth_blob1_evis_muon;   //!
         TBranch        *b_truth_blob1_evis_neutron;   //!
@@ -416,11 +421,14 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_total_captured_evis_total_truth;   //!
         TBranch        *b_truth_track_michel_evis_total_truth;   //!
         TBranch        *b_truth_vtx_michel_evis_total_truth;   //!
+        TBranch        *b_truth_vtx_michel_large_evis_total_truth;   //!
         TBranch        *b_truth_gamma1_4P;   //!
         TBranch        *b_truth_gamma1_final_pos;   //!
+        TBranch        *b_truth_gamma1_final_pos_estimated;   //!
         TBranch        *b_truth_gamma1_init_pos;   //!
         TBranch        *b_truth_gamma2_4P;   //!
         TBranch        *b_truth_gamma2_final_pos;   //!
+        TBranch        *b_truth_gamma2_final_pos_estimated;   //!
         TBranch        *b_truth_gamma2_init_pos;   //!
         TBranch        *b_genie_wgt_n_shifts;   //!
         TBranch        *b_truth_genie_wgt_AGKYxF1pi;   //!

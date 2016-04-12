@@ -5,12 +5,6 @@
 #define CCProtonPi0_cpp 1
 
 #include "CCProtonPi0.h"
-#include <AnaUtils/IMuonUtils.h>
-#include <AnaUtils/IAnalysisToolUtils.h>
-#include <AnaUtils/IDeadTimeTool.h>
-#include <AnaUtils/AnaFilterTags.h>
-#include <EnergyRecTools/ICalorimetryUtils.h>
-#include <TruthMatcher/ITruthMatcher.h>
 
 namespace
 {
@@ -2301,7 +2295,7 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
     vertex2.push_back(m_Pi0Blob2->startPoint().x());
     vertex2.push_back(m_Pi0Blob2->startPoint().y());
     vertex2.push_back(m_Pi0Blob2->startPoint().z());
-
+   
     // Calculate Distance between Gamma Vertex and Event Vertex
     double gamma1_dist_vtx = calcDistance(  vtx_position.X(), vtx_position.Y(), vtx_position.Z(),
             vertex1[0], vertex1[1], vertex1[2]);
@@ -5475,7 +5469,7 @@ std::vector<double> CCProtonPi0::EstimateShowerEndPoint(const Gaudi::LorentzVect
     // Get Angles
     double theta = shower_4P.theta(); 
     double phi = shower_4P.phi(); 
-
+    
     // Calc Rz (We know Rz from plane locations)
     double Rz = abs(max_z - init_pos[2]);
 
@@ -5500,7 +5494,7 @@ std::vector<double> CCProtonPi0::EstimateShowerEndPoint(const Gaudi::LorentzVect
 double CCProtonPi0::FindShowerMaxZ(SmartRef<Minerva::IDBlob> blob) const
 {
     double temp_max = -5;
-
+    
     SmartRefVector<Minerva::IDCluster> clusters = blob->clusters();
     for (SmartRefVector<Minerva::IDCluster>::iterator c = clusters.begin();
             c != clusters.end(); ++c) {

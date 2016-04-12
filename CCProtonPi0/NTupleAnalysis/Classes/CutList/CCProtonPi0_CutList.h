@@ -51,6 +51,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_ConeBlobs;
         CCProtonPi0_Cut nCut_BlobDirectionBad;
         CCProtonPi0_Cut nCut_Pi0_Bad;
+        CCProtonPi0_Cut nCut_Shower_Michel_Exist;
         CCProtonPi0_Cut nCut_Photon1DistanceLow;
         CCProtonPi0_Cut nCut_Photon2DistanceLow;
         CCProtonPi0_Cut nCut_LowE_SmallAngle;
@@ -118,7 +119,8 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         // MC Only Histograms
         TH1D* mc_w_DIS;
         TH1D* mc_w_RES;
-        TH1D* mc_w_CCQE;
+        TH1D* mc_Q2_DIS;
+        TH1D* mc_Q2_RES;
 
         // Pi0 Invariant Mass
         TH1D* pi0_invMass_1Track;
@@ -142,6 +144,12 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         TH1D* michel_proton_distance;
         TH1D* michel_piminus_distance;
         TH1D* michel_other_distance;
+
+        TH1D* michel_piplus_distance_z;
+        TH1D* michel_neutron_distance_z;
+        TH1D* michel_proton_distance_z;
+        TH1D* michel_piminus_distance_z;
+        TH1D* michel_other_distance_z;
 
         // Pi0 Invariant Mass - Truth Match
         TH1D* signal_invMass_pizero;

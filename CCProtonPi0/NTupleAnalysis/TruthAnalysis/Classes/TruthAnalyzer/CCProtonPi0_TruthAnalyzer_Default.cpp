@@ -88,6 +88,7 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_vertex_module", &truth_vertex_module, &b_truth_vertex_module);
     fChain->SetBranchAddress("truth_vertex_plane", &truth_vertex_plane, &b_truth_vertex_plane);
     fChain->SetBranchAddress("truth_vtx_michel_evis_most_pdg", &truth_vtx_michel_evis_most_pdg, &b_truth_vtx_michel_evis_most_pdg);
+    fChain->SetBranchAddress("truth_vtx_michel_large_evis_most_pdg", &truth_vtx_michel_large_evis_most_pdg, &b_truth_vtx_michel_large_evis_most_pdg);
     fChain->SetBranchAddress("truth_allClusters_evis_pizero", &truth_allClusters_evis_pizero, &b_truth_allClusters_evis_pizero);
     fChain->SetBranchAddress("truth_blob1_evis_muon", &truth_blob1_evis_muon, &b_truth_blob1_evis_muon);
     fChain->SetBranchAddress("truth_blob1_evis_neutron", &truth_blob1_evis_neutron, &b_truth_blob1_evis_neutron);
@@ -131,11 +132,14 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_total_captured_evis_total_truth", &truth_total_captured_evis_total_truth, &b_truth_total_captured_evis_total_truth);
     fChain->SetBranchAddress("truth_track_michel_evis_total_truth", &truth_track_michel_evis_total_truth, &b_truth_track_michel_evis_total_truth);
     fChain->SetBranchAddress("truth_vtx_michel_evis_total_truth", &truth_vtx_michel_evis_total_truth, &b_truth_vtx_michel_evis_total_truth);
+    fChain->SetBranchAddress("truth_vtx_michel_large_evis_total_truth", &truth_vtx_michel_large_evis_total_truth, &b_truth_vtx_michel_large_evis_total_truth);
     fChain->SetBranchAddress("truth_gamma1_4P", truth_gamma1_4P, &b_truth_gamma1_4P);
     fChain->SetBranchAddress("truth_gamma1_final_pos", truth_gamma1_final_pos, &b_truth_gamma1_final_pos);
+    fChain->SetBranchAddress("truth_gamma1_final_pos_estimated", truth_gamma1_final_pos_estimated, &b_truth_gamma1_final_pos_estimated);
     fChain->SetBranchAddress("truth_gamma1_init_pos", truth_gamma1_init_pos, &b_truth_gamma1_init_pos);
     fChain->SetBranchAddress("truth_gamma2_4P", truth_gamma2_4P, &b_truth_gamma2_4P);
     fChain->SetBranchAddress("truth_gamma2_final_pos", truth_gamma2_final_pos, &b_truth_gamma2_final_pos);
+    fChain->SetBranchAddress("truth_gamma2_final_pos_estimated", truth_gamma2_final_pos_estimated, &b_truth_gamma2_final_pos_estimated);
     fChain->SetBranchAddress("truth_gamma2_init_pos", truth_gamma2_init_pos, &b_truth_gamma2_init_pos);
     fChain->SetBranchAddress("genie_wgt_n_shifts", &genie_wgt_n_shifts, &b_genie_wgt_n_shifts);
     fChain->SetBranchAddress("truth_genie_wgt_AGKYxF1pi", truth_genie_wgt_AGKYxF1pi, &b_truth_genie_wgt_AGKYxF1pi);

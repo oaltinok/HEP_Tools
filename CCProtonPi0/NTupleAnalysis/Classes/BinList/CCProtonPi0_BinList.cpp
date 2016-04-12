@@ -74,7 +74,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     // Event Kinematics Bins
     beamE_Diff_True.setBin(100,1.5,7.5);
     beamE_Diff.setBin(100,-3,3);
-    q2.setBin(40,0.0,4.0);
+    Q2.setBin(40,0.0,4.0);
     w.setBin(30,0.0,3.0);
     wSq.setBin(50,0.0,5.0);
     vertex_energy.setBin(10,0.0,500.0);
@@ -88,6 +88,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     
     // Cut Histograms
     mc_w.setBin(100,0.8,3.0);
+    mc_Q2.setBin(40,0.0,4.0);
     eVis_nuclearTarget.setBin(50,0.0,25.0);
     eVis_other.setBin(60,0.0,3000.0);
     bin_photonConvLength.setBin(50,0.0,100.0);

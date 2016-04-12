@@ -14,8 +14,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     // Run only once to get the POT
     //--------------------------------------------------------------------------
-    getPOT_Data();
-    getPOT_MC();
+    //getPOT_Data();
+    //getPOT_MC();
 
     //--------------------------------------------------------------------------
     // Cross Sections
@@ -42,7 +42,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     //  MC Only
     //--------------------------------------------------------------------------
-    //plotInteraction_MCOnly();
+    plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
     //plotPion_MCOnly();
@@ -167,23 +167,12 @@ void CCProtonPi0_Plotter::plotCrossSection_Check()
 void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
-    
-    std::string plotDir = Folder_List::plotDir_Muon;
-    Draw1DHist(rootDir_Muon,"theta_Diff",plotDir);
-    Draw1DHist(rootDir_Muon,"thetaX_Diff",plotDir);
-    Draw1DHist(rootDir_Muon,"thetaY_Diff",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Muon, "theta_theta_test", plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Muon, "thetaX_thetaX_test", plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Muon, "thetaY_thetaY_test", plotDir);
-    
-    plotDir = Folder_List::plotDir_Proton;
-    Draw1DHist(rootDir_Proton,"theta_Diff",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Proton, "theta_theta_test", plotDir);
-    
-    plotDir = Folder_List::plotDir_Pion;
-    Draw1DHist(rootDir_Pion,"theta_Diff",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Pion, "pi0_theta_response", plotDir);
-    
+   
+    plot_Michel_TruthMatch("time_diff");
+    plot_Michel_TruthMatch("energy");
+    plot_Michel_TruthMatch("distance");
+    plot_Michel_TruthMatch("distance_z");
+
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
 
@@ -713,11 +702,14 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     std::cout<<"Plotting Interaction MC Only"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Interaction;
 
-    Draw1DHist(rootDir_Interaction,"QSq_True",plotDir);
-    Draw1DHist(rootDir_Interaction,"QSq_Error",plotDir);
-    Draw1DHist(rootDir_Interaction,"QSq_Diff",plotDir);
-    
-    plot_mc_w_Stacked();
+    //Draw1DHist(rootDir_Interaction,"QSq_True",plotDir);
+    //Draw1DHist(rootDir_Interaction,"QSq_Error",plotDir);
+    //Draw1DHist(rootDir_Interaction,"QSq_Diff",plotDir);
+   
+    plot_SignalKinematics_Stacked("mc_w", true);
+    plot_SignalKinematics_Stacked("mc_w", false);
+    plot_SignalKinematics_Stacked("mc_Q2", true);
+    plot_SignalKinematics_Stacked("mc_Q2", false);
     plot_final_mc_w_Stacked();
 
     //DrawStackedMC(rootDir_Interaction,"vertex_energy_1Track",plotDir);
@@ -733,14 +725,14 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     //Draw1DHist(rootDir_Interaction,"proton_true_P_1Track",plotDir);
     //Draw1DHist(rootDir_Interaction,"proton_true_KE_1Track",plotDir);
 
-    Draw1DHist(rootDir_Interaction,"Enu_True_1Track",plotDir);
-    Draw1DHist(rootDir_Interaction,"Enu_True_2Track",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_True_1Track",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_True_2Track",plotDir);
     //Draw1DHist(rootDir_Interaction,"Enu_1Track_Error",plotDir);
     //Draw1DHist(rootDir_Interaction,"Enu_2Track_Error",plotDir);
-    Draw1DHist(rootDir_Interaction,"Enu_1Track_Alt_Error",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Alt_Error",plotDir);
     //
-    Draw1DHist(rootDir_Interaction,"Enu_1Track_Diff",plotDir);
-    Draw1DHist(rootDir_Interaction,"Enu_2Track_Diff",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Diff",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_2Track_Diff",plotDir);
 
     //DrawStackedMC(rootDir_Interaction,"recovered_Pi0_P",plotDir);
     //DrawStackedMC(rootDir_Interaction,"recovered_Pi0_theta",plotDir);
@@ -1284,7 +1276,6 @@ void CCProtonPi0_Plotter::plot_InvMass_TruthMatch_Stacked(bool isSignal, bool is
     pi0Mass_max.SetLineColor(kBlack);
     pi0Mass_max.DrawLine(200.0,0,200.0,hist_max);
 
-  
     std::string plot_type;
     std::string out_name;
     if (isStacked) plot_type = "_Stacked";
@@ -1351,8 +1342,6 @@ void CCProtonPi0_Plotter::plot_Michel_TruthMatch(std::string var)
     hs->Add(h_other);
     hs->Draw();
   
-    std::cout<<h_piplus->GetXaxis()->GetTitle()<<std::endl;
-    std::cout<<h_piplus->GetYaxis()->GetTitle()<<std::endl;
     
     hs->GetXaxis()->SetTitle(h_piplus->GetXaxis()->GetTitle());
     hs->GetYaxis()->SetTitle(h_piplus->GetYaxis()->GetTitle());
@@ -1368,46 +1357,66 @@ void CCProtonPi0_Plotter::plot_Michel_TruthMatch(std::string var)
     delete c1;
 }
 
-void CCProtonPi0_Plotter::plot_mc_w_Stacked()
+void CCProtonPi0_Plotter::plot_SignalKinematics_Stacked(std::string var, bool isStacked)
 {
     // mc_w written during reduce - Its Histogram is with Cut Hists
     std::string root_dir = rootDir_CutHists.mc;
     std::string plotDir = Folder_List::plotDir_Interaction;
-
-    std::cout<<"\nPlottting Stacked mc_w"<<std::endl;
-
+    std::cout<<"\nPlottting "<<var<<std::endl;
 
     TFile* f_Root = new TFile(root_dir.c_str());
     TCanvas* c1 = new TCanvas();
     THStack *hs = new THStack("hs","TRUE Signal Events (MINOS Matched)");
     TLegend *legend = new TLegend(0.7,0.8,0.9,0.9);  
-    
+   
+    std::string var_name = var + "_DIS";
+    TH1D* h_DIS = (TH1D*)f_Root->Get(var_name.c_str());
+    h_DIS->SetFillColor(kRed);
+    h_DIS->SetLineColor(kRed);
+    h_DIS->SetLineWidth(2);
+    h_DIS->SetFillStyle(3001);
 
-    TH1D* h_mc_w_DIS = (TH1D*)f_Root->Get("mc_w_DIS");
-    h_mc_w_DIS->SetFillColor(kRed);
-    h_mc_w_DIS->SetMarkerStyle(21);
-    h_mc_w_DIS->SetMarkerColor(kRed);
+    var_name = var + "_RES";
+    TH1D* h_RES = (TH1D*)f_Root->Get(var_name.c_str());
+    h_RES->SetFillColor(kBlue);
+    h_RES->SetLineColor(kBlue);
+    h_RES->SetLineWidth(2);
+    h_RES->SetFillStyle(3001);
 
-    TH1D* h_mc_w_RES = (TH1D*)f_Root->Get("mc_w_RES");
-    h_mc_w_RES->SetFillColor(kBlue);
-    h_mc_w_RES->SetMarkerStyle(21);
-    h_mc_w_RES->SetMarkerColor(kBlue);
-
-    double nEvents = h_mc_w_DIS->GetEntries() + h_mc_w_RES->GetEntries();
+    double nEvents = h_DIS->GetEntries() + h_RES->GetEntries();
     std::cout<<"nEvents = "<<nEvents<<std::endl;
 
-    legend->AddEntry(h_mc_w_DIS , "DIS", "f");
-    legend->AddEntry(h_mc_w_RES, "RES", "f");
+    legend->AddEntry(h_DIS , "DIS", "f");
+    legend->AddEntry(h_RES, "RES", "f");
 
-    hs->Add(h_mc_w_DIS);
-    hs->Add(h_mc_w_RES);
-    hs->Draw();
-    hs->GetXaxis()->SetTitle("mc_w [GeV/c^{2}]");
-    hs->GetYaxis()->SetTitle("N(Events)");
+    hs->Add(h_DIS);
+    hs->Add(h_RES);
+    if (isStacked) hs->Draw();
+    else hs->Draw("nostack");
+
+    hs->GetXaxis()->SetTitle(h_DIS->GetXaxis()->GetTitle());
+    hs->GetYaxis()->SetTitle(h_DIS->GetYaxis()->GetTitle());
 
     legend->Draw();
 
-    c1->Print(Form("%s%s",plotDir.c_str(),"mc_w.png"),"png");
+    std::string plot_type;
+    if (isStacked) plot_type = "_Stacked.png";
+    else plot_type = ".png";
+    
+    std::string out_name = plotDir + var + plot_type; 
+    c1->Print(out_name.c_str(),"png");
+
+
+    ofstream text;
+    out_name = plotDir + var + ".txt"; 
+    text.open(out_name.c_str());
+
+    int nBins = h_RES->GetNbinsX();
+    for (int i = 1; i <= nBins; i++){
+        text<<h_RES->GetBinLowEdge(i)<<" ";
+        text<<h_RES->GetBinContent(i)<<std::endl;
+    }
+    text.close();
 
     delete f_Root;
     delete hs;

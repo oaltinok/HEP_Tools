@@ -79,7 +79,7 @@ class CCProtonPi0_BinList
          // Analysis
         CCProtonPi0_SingleBin beamE_Diff_True;
         CCProtonPi0_SingleBin beamE_Diff;
-        CCProtonPi0_SingleBin q2;
+        CCProtonPi0_SingleBin Q2;
         CCProtonPi0_SingleBin wSq;
         CCProtonPi0_SingleBin w;
         CCProtonPi0_SingleBin vertex_energy;
@@ -94,6 +94,7 @@ class CCProtonPi0_BinList
         
         // Cut Histograms
         CCProtonPi0_SingleBin mc_w;
+        CCProtonPi0_SingleBin mc_Q2;
         CCProtonPi0_SingleBin eVis_nuclearTarget;
         CCProtonPi0_SingleBin eVis_other;
         CCProtonPi0_SingleBin pi0_invMass;

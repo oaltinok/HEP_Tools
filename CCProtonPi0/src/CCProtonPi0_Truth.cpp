@@ -779,9 +779,11 @@ void CCProtonPi0::setSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInterac
     std::vector<double> gamma1_4P(4,SENTINEL);
     std::vector<double> gamma2_4P(4,SENTINEL);
     std::vector<double> gamma1_init_pos(3,SENTINEL);
-    std::vector<double> gamma1_final_pos(3,SENTINEL);
     std::vector<double> gamma2_init_pos(3,SENTINEL);
+    std::vector<double> gamma1_final_pos(3,SENTINEL);
     std::vector<double> gamma2_final_pos(3,SENTINEL);
+    std::vector<double> gamma1_final_pos_estimated(3,SENTINEL);
+    std::vector<double> gamma2_final_pos_estimated(3,SENTINEL);
     bool isGamma1_conv_inside = false;
     bool isGamma2_conv_inside = false;
 
@@ -820,6 +822,8 @@ void CCProtonPi0::setSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInterac
                 gamma1_final_pos[2] = temp_final_pos.pz(); 
                 isGamma1_conv_inside = FiducialPointTool->isFiducial(temp_final_pos.x(), temp_final_pos.y(), temp_final_pos.z(), m_recoHexApothem, m_recoUpStreamZ, m_recoDownStreamZ);
 
+                gamma1_final_pos_estimated = EstimateShowerEndPoint(temp_4P, gamma1_init_pos, gamma1_final_pos[2]);
+                
                 nGammas++;
             }else if (nGammas == 1){
                 gamma2_4P[0] = temp_4P.px();  
@@ -836,6 +840,7 @@ void CCProtonPi0::setSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInterac
                 gamma2_final_pos[2] = temp_final_pos.pz(); 
                 isGamma2_conv_inside = FiducialPointTool->isFiducial(temp_final_pos.x(), temp_final_pos.y(), temp_final_pos.z(), m_recoHexApothem, m_recoUpStreamZ, m_recoDownStreamZ);
 
+                gamma2_final_pos_estimated = EstimateShowerEndPoint(temp_4P, gamma2_init_pos, gamma2_final_pos[2]);
                 nGammas++;
             }
         }   
@@ -846,6 +851,7 @@ void CCProtonPi0::setSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInterac
         gamma1_4P.swap(gamma2_4P);
         gamma1_init_pos.swap(gamma2_init_pos);
         gamma1_final_pos.swap(gamma2_final_pos);
+        gamma1_final_pos_estimated.swap(gamma2_final_pos_estimated);
     }
 
     // Fill NTuples
@@ -855,6 +861,8 @@ void CCProtonPi0::setSignal_SecondaryTrajectoryKinematics(Minerva::GenMinInterac
     truthEvent->setContainerDoubleData("gamma2_init_pos",  gamma2_init_pos);
     truthEvent->setContainerDoubleData("gamma1_final_pos",  gamma1_final_pos);
     truthEvent->setContainerDoubleData("gamma2_final_pos",  gamma2_final_pos);
+    truthEvent->setContainerDoubleData("gamma1_final_pos_estimated",  gamma1_final_pos_estimated);
+    truthEvent->setContainerDoubleData("gamma2_final_pos_estimated",  gamma2_final_pos_estimated);
     truthEvent->filtertaglist()->setOrAddFilterTag("isGamma1_conv_inside", isGamma1_conv_inside );
     truthEvent->filtertaglist()->setOrAddFilterTag("isGamma2_conv_inside", isGamma2_conv_inside );
 }
@@ -1131,6 +1139,7 @@ void CCProtonPi0::saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int
         }
     }
 }
+
 
 #endif
 

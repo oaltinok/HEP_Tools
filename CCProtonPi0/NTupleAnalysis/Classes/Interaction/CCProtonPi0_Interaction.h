@@ -55,7 +55,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> extra_rejected_energy_2Track;
         std::vector<MnvH1D*> extra_total_energy_2Track;
 
-        // Muon Theta 
+        // QSq
         MnvH1D* QSq_all;
         MnvH1D* QSq_mc_reco_all;
         MnvH1D* QSq_mc_reco_signal;
@@ -68,15 +68,18 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         
         // Other Event Parameters 
         std::vector<MnvH1D*> deltaInvMass;
-      
+     
+
         TH1D* h_extra_muon_energy;
         TH1D* h_extra_dispersed_energy;
         TH1D* h_extra_rejected_energy;
-        
+       
         // MC Only Histograms
         TH1D* final_mc_w_DIS;
         TH1D* final_mc_w_RES;
-        TH1D* final_mc_w_CCQE;
+
+        TH1D* final_mc_Q2_DIS;
+        TH1D* final_mc_Q2_RES;
 
         // Short Proton
         TH1D* proton_true_P_1Track;

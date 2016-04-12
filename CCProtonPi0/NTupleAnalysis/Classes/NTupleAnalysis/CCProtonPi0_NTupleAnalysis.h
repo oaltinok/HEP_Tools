@@ -33,6 +33,12 @@ Class: CCProtonPi0_NTupleAnalysis
 
 using namespace PlotUtils;
 
+struct counter
+{
+    std::string name;
+    double count;
+};
+
 class CCProtonPi0_NTupleAnalysis
 {
     public:

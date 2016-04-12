@@ -54,9 +54,9 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
         Enu.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","QSq",i),"Reconstructed Q^{2}",binList.q2.get_nBins(), binList.q2.get_min(), binList.q2.get_max() );
+        temp = new MnvH1D( Form("%s_%d","QSq",i),"Reconstructed Q^{2}",binList.Q2.get_nBins(), binList.Q2.get_min(), binList.Q2.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
-        temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.q2.get_width()));
+        temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.Q2.get_width()));
         QSq.push_back(temp);    
 
         temp = new MnvH1D( Form("%s_%d","WSq",i),"Reconstructed W^{2}",binList.wSq.get_nBins(), binList.wSq.get_min(), binList.wSq.get_max() );
@@ -206,10 +206,14 @@ void CCProtonPi0_Interaction::initHistograms()
     final_mc_w_RES = new TH1D( "final_mc_w_RES","True W for RES",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
     final_mc_w_RES->GetXaxis()->SetTitle("True W for RES [GeV]");
     final_mc_w_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_w.get_width()));
+   
+    final_mc_Q2_DIS = new TH1D( "final_mc_Q2_DIS","True Q^{2} for DIS",binList.mc_Q2.get_nBins(), binList.mc_Q2.get_min(), binList.mc_Q2.get_max() );
+    final_mc_Q2_DIS->GetXaxis()->SetTitle("True Q^{2} for DIS [GeV^{2}]");
+    final_mc_Q2_DIS->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_Q2.get_width()));
     
-    final_mc_w_CCQE = new TH1D( "final_mc_w_CCQE","True W for CCQE",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
-    final_mc_w_CCQE->GetXaxis()->SetTitle("True W for CCQE [GeV]");
-    final_mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_w.get_width()));
+    final_mc_Q2_RES = new TH1D( "final_mc_Q2_RES","True Q^{2} for RES",binList.mc_Q2.get_nBins(), binList.mc_Q2.get_min(), binList.mc_Q2.get_max() );
+    final_mc_Q2_RES->GetXaxis()->SetTitle("True Q^{2} for RES [GeV^{2}]");
+    final_mc_Q2_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_Q2.get_width()));
 
     // QSq: True, Error, Diff
     QSq_True = new MnvH1D( "QSq_True","True Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
@@ -285,8 +289,7 @@ void CCProtonPi0_Interaction::initHistograms()
     h_extra_rejected_energy = new TH1D("h_extra_rejected_energy","Extra Rejected Energy",20,0.0,1000);
     h_extra_rejected_energy->GetXaxis()->SetTitle("Extra Rejected Energy [MeV]");
     h_extra_rejected_energy->GetYaxis()->SetTitle("N(Events)");
-  
-
+ 
     // Recovered Pi0
     h_recovered_Pi0_P = new TH1D("h_recovered_Pi0_P","Pi0 Momentum",17,0.0,1.7);
     h_recovered_Pi0_P->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
@@ -303,7 +306,6 @@ void CCProtonPi0_Interaction::initHistograms()
     h_original_Pi0_theta = new TH1D("h_original_Pi0_theta","Pi0 theta",90,0.0,180.0);
     h_original_Pi0_theta->GetXaxis()->SetTitle("Pi0 Theta [degree]");
     h_original_Pi0_theta->GetYaxis()->SetTitle("N(Events)");
-
 }
 
 void CCProtonPi0_Interaction::writeHistograms()
@@ -360,7 +362,10 @@ void CCProtonPi0_Interaction::writeHistograms()
     // MC Only Histograms
     final_mc_w_DIS->Write();
     final_mc_w_RES->Write();
-    final_mc_w_CCQE->Write();
+ 
+    final_mc_Q2_DIS->Write();
+    final_mc_Q2_RES->Write();
+    
     // Short Proton
     proton_true_P_1Track->Write();
     proton_true_KE_1Track->Write();

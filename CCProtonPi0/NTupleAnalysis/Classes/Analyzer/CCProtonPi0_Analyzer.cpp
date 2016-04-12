@@ -16,13 +16,6 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     applyMaxEvents = false;
     nMaxEvents = 5000;
 
-    // Initialize Flux File if it is MC 
-    if (m_isMC){
-        new_flux::get().read_oldflux_histogram(Folder_List::rootDir_Flux_old);
-        new_flux::get().read_newflux_histogram(Folder_List::rootDir_Flux_new);
-        new_flux::get().calc_weights();
-    }
- 
     // Control Flow
     isDataAnalysis  = true;
     isScanRun = false;
@@ -51,15 +44,11 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 
     latest_ScanID = 0.0;
 
-    counter1 = 0;
-    counter2 = 0;
-
-    nMINOS_contained = 0;
-    nMINOS_OK = 0;
-    nUsed_range = 0;
-    nUsed_curvature = 0;
-    
-    cvweight = 1.0;
+    // Counter Names
+    counter1.name = "N(Gamma1 Vertical) = ";
+    counter2.name = "N(Gamma2 Vertical) = ";
+    counter3.name = "N(N/A) = ";
+    counter4.name = "N(N/A) = ";
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
@@ -144,8 +133,10 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     //--------------------------------------------------------------------------
     // Counters
     //--------------------------------------------------------------------------
-    cout<<"counter1 = "<<counter1<<endl;
-    cout<<"counter2 = "<<counter2<<endl;
+    cout<<counter1.name<<counter1.count<<endl;
+    cout<<counter2.name<<counter2.count<<endl;
+    cout<<counter3.name<<counter3.count<<endl;
+    cout<<counter4.name<<counter4.count<<endl;
 }
 
 
@@ -238,13 +229,10 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     //--------------------------------------------------------------------------
     // Counters
     //--------------------------------------------------------------------------
-    cout<<"counter1 = "<<counter1<<endl;
-    cout<<"counter2 = "<<counter2<<endl;
-    
-    cout<<"nMINOS_contained = "<<nMINOS_contained<<endl;
-    cout<<"nMINOS_OK = "<<nMINOS_OK<<endl;
-    cout<<"nUsed_range = "<<nUsed_range<<endl;
-    cout<<"nUsed_curvature = "<<nUsed_curvature<<endl;
+    cout<<counter1.name<<counter1.count<<endl;
+    cout<<counter2.name<<counter2.count<<endl;
+    cout<<counter3.name<<counter3.count<<endl;
+    cout<<counter4.name<<counter4.count<<endl;
 }
 
 //------------------------------------------------------------------------------
@@ -263,6 +251,17 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
     cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
 
     m_isMC = isMC;
+
+    // Initialize Flux File if it is MC 
+    if (m_isMC){
+        new_flux::get().read_oldflux_histogram(Folder_List::rootDir_Flux_old);
+        new_flux::get().read_newflux_histogram(Folder_List::rootDir_Flux_new);
+        new_flux::get().calc_weights();
+    }
+ 
+    cvweight = 1.0;
+   
+    ResetCounters();
 
     specifyRunTime();
 
@@ -585,9 +584,9 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if( Cut_Muon_None == 1) return false;
     cutList.nCut_Muon_None.increment(truth_isSignal, study1, study2);
 
-    // Fill Truth_W for MINOS Matched Signal Events
+    // Fill Truth W & Q2 for MINOS Matched Signal Events
     if (m_isMC && truth_isSignal){ 
-        fill_mc_w(); 
+        fillSignalKinematics(); 
     }
 
     // ------------------------------------------------------------------------
@@ -599,31 +598,35 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // ------------------------------------------------------------------------
     // Michel Cuts
     // ------------------------------------------------------------------------
-    if ( Cut_Vertex_Michel_Exist == 1 && truth_vtx_michel_evis_most_pdg != -1){
+    if ( Cut_Vertex_Michel_Exist == 1 && truth_vtx_michel_large_evis_most_pdg != -1){
         if (truth_vtx_michel_evis_most_pdg == 211){ 
-            FillHistogram(cutList.michel_piplus_time_diff, vtx_michelProng_time_diff);
-            FillHistogram(cutList.michel_piplus_energy, vtx_michelProng_energy);
-            FillHistogram(cutList.michel_piplus_distance, vtx_michelProng_distance);
-        }
-        else if (truth_vtx_michel_evis_most_pdg == -211){ 
-            FillHistogram(cutList.michel_piminus_time_diff, vtx_michelProng_time_diff);
-            FillHistogram(cutList.michel_piminus_energy, vtx_michelProng_energy);
-            FillHistogram(cutList.michel_piminus_distance, vtx_michelProng_distance);
-        }
-        else if (truth_vtx_michel_evis_most_pdg == 2112){ 
-            FillHistogram(cutList.michel_neutron_time_diff, vtx_michelProng_time_diff);
-            FillHistogram(cutList.michel_neutron_energy, vtx_michelProng_energy);
-            FillHistogram(cutList.michel_neutron_distance, vtx_michelProng_distance);
+            FillHistogram(cutList.michel_piplus_time_diff, vtx_michelProng_Large_time_diff);
+            FillHistogram(cutList.michel_piplus_energy, vtx_michelProng_Large_energy);
+            FillHistogram(cutList.michel_piplus_distance, vtx_michelProng_Large_distance);
+            FillHistogram(cutList.michel_piplus_distance_z, vtx_michelProng_Large_begin_Z - vtx_z);
+        }else if (truth_vtx_michel_evis_most_pdg == -211){ 
+            FillHistogram(cutList.michel_piminus_time_diff, vtx_michelProng_Large_time_diff);
+            FillHistogram(cutList.michel_piminus_energy, vtx_michelProng_Large_energy);
+            FillHistogram(cutList.michel_piminus_distance, vtx_michelProng_Large_distance);
+            FillHistogram(cutList.michel_piminus_distance_z, vtx_michelProng_Large_begin_Z - vtx_z);
+        }else if (truth_vtx_michel_evis_most_pdg == 2112){ 
+            FillHistogram(cutList.michel_neutron_time_diff, vtx_michelProng_Large_time_diff);
+            FillHistogram(cutList.michel_neutron_energy, vtx_michelProng_Large_energy);
+            FillHistogram(cutList.michel_neutron_distance, vtx_michelProng_Large_distance);
+            FillHistogram(cutList.michel_neutron_distance_z, vtx_michelProng_Large_begin_Z - vtx_z);
         }else if (truth_vtx_michel_evis_most_pdg == 2212){ 
-            FillHistogram(cutList.michel_proton_time_diff, vtx_michelProng_time_diff);
-            FillHistogram(cutList.michel_proton_energy, vtx_michelProng_energy);
-            FillHistogram(cutList.michel_proton_distance, vtx_michelProng_distance);
+            FillHistogram(cutList.michel_proton_time_diff, vtx_michelProng_Large_time_diff);
+            FillHistogram(cutList.michel_proton_energy, vtx_michelProng_Large_energy);
+            FillHistogram(cutList.michel_proton_distance, vtx_michelProng_Large_distance);
+            FillHistogram(cutList.michel_proton_distance_z, vtx_michelProng_Large_begin_Z - vtx_z);
         }else{ 
-            FillHistogram(cutList.michel_other_time_diff, vtx_michelProng_time_diff);
-            FillHistogram(cutList.michel_other_energy, vtx_michelProng_energy);
-            FillHistogram(cutList.michel_other_distance, vtx_michelProng_distance);
+            FillHistogram(cutList.michel_other_time_diff, vtx_michelProng_Large_time_diff);
+            FillHistogram(cutList.michel_other_energy, vtx_michelProng_Large_energy);
+            FillHistogram(cutList.michel_other_distance, vtx_michelProng_Large_distance);
+            FillHistogram(cutList.michel_other_distance_z, vtx_michelProng_Large_begin_Z - vtx_z);
         }
     }
+  
     bool isMichelEvent = (Cut_Vertex_Michel_Exist == 1) || (Cut_EndPoint_Michel_Exist == 1) || (Cut_secEndPoint_Michel_Exist == 1);
     if( isMichelEvent){
         FillHistogram(cutList.hCut_Michel,1);
@@ -632,7 +635,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     } 
     if( Cut_Vertex_Michel_Exist == 1 && !sideBand_Michel ) return false;
     cutList.nCut_Vertex_Michel_Exist.increment(truth_isSignal, study1, study2);
-
 
     if( Cut_EndPoint_Michel_Exist == 1 && !sideBand_Michel) return false;
     cutList.nCut_EndPoint_Michel_Exist.increment(truth_isSignal, study1, study2);
@@ -744,6 +746,21 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     else cutList.nCut_2Track_Pi0_Bad.increment(truth_isSignal, study1, study2);
 
     // ------------------------------------------------------------------------
+    // Check for Michel Electrons at Begin & End Points of the Showers
+    // ------------------------------------------------------------------------
+    bool isGamma1_Michel = gamma1_isMichel_begin || gamma1_isMichel_end;
+    bool isGamma2_Michel = gamma2_isMichel_begin || gamma2_isMichel_end;
+    bool isShower_Michel_Exist = isGamma1_Michel || isGamma2_Michel;
+    if (isShower_Michel_Exist) return false;
+
+    // No End point for vertical showers - so use the following
+    double g1_long_dist = abs(gamma1_vertex[2] - vtx_z);
+    double g2_long_dist = abs(gamma2_vertex[2] - vtx_z);
+    if (Cut_Vertex_Large_Michel_Exist == 1 && g1_long_dist <= 125 ) return false;
+    if (Cut_Vertex_Large_Michel_Exist == 1 && g2_long_dist <= 125 ) return false;
+    cutList.nCut_Shower_Michel_Exist.increment(truth_isSignal, study1, study2);
+    
+    // ------------------------------------------------------------------------
     // Gamma1 Conv Length Cut Hist
     // ------------------------------------------------------------------------
     if (nProtonCandidates == 0) FillHistogram(cutList.hCut_1Track_gamma1ConvDist,gamma1_dist_vtx * 0.1);
@@ -817,26 +834,34 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) cutList.nCut_1Track_Pi0_invMass.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Pi0_invMass.increment(truth_isSignal, study1, study2);
 
+
     //-------------------------------------------------------------------------
     // Satisfied All Cuts
     //-------------------------------------------------------------------------
     return true;
 }
 
-void CCProtonPi0_Analyzer::fill_mc_w()
+void CCProtonPi0_Analyzer::fillSignalKinematics()
 {
-    if(mc_intType == 1) FillHistogram(cutList.mc_w_CCQE, mc_w * MeV_to_GeV);
-    if(mc_intType == 2) FillHistogram(cutList.mc_w_RES, mc_w * MeV_to_GeV);
-    if(mc_intType == 3) FillHistogram(cutList.mc_w_DIS, mc_w * MeV_to_GeV);
+    if(mc_intType == 2){ 
+        FillHistogram(cutList.mc_w_RES, mc_w * MeV_to_GeV);
+        FillHistogram(cutList.mc_Q2_RES, mc_Q2 * MeVSq_to_GeVSq);
+    }else if(mc_intType == 3){
+        FillHistogram(cutList.mc_w_DIS, mc_w * MeV_to_GeV);
+        FillHistogram(cutList.mc_Q2_DIS, mc_Q2 * MeVSq_to_GeVSq);
+    }
 }
 
 void CCProtonPi0_Analyzer::fillInteractionMC()
 {
     if(truth_isSignal){
-        if(mc_intType == 1) FillHistogram(interaction.final_mc_w_CCQE, mc_w * MeV_to_GeV);
-        if(mc_intType == 2) FillHistogram(interaction.final_mc_w_RES, mc_w * MeV_to_GeV);
-        if(mc_intType == 3) FillHistogram(interaction.final_mc_w_DIS, mc_w * MeV_to_GeV);
-
+        if(mc_intType == 2){
+            FillHistogram(interaction.final_mc_w_RES, mc_w * MeV_to_GeV);
+            FillHistogram(interaction.final_mc_Q2_RES, mc_Q2 * MeVSq_to_GeVSq);
+        }else if(mc_intType == 3) {
+            FillHistogram(interaction.final_mc_w_DIS, mc_w * MeV_to_GeV);
+            FillHistogram(interaction.final_mc_Q2_DIS, mc_Q2 * MeVSq_to_GeVSq);
+        }
         // Short Proton True Information
         if (nProtonCandidates == 0){
             double proton_mass = 938.27; // MeV
@@ -1307,20 +1332,6 @@ void CCProtonPi0_Analyzer::fillMuonMC()
  
         FillHistogramWithDefaultErrors(muon.theta_theta_test, muon_theta_beam * TMath::RadToDeg(), truth_muon_theta_beam * TMath::RadToDeg());
         
-        counter1++;
-        if (CCProtonPi0_minos_trk_is_contained == 1) nMINOS_contained++;
-        if (CCProtonPi0_minos_trk_is_ok == 1) nMINOS_OK++;
-        if (CCProtonPi0_minos_used_range == 1) nUsed_range++;
-        if (CCProtonPi0_minos_used_curvature == 1) nUsed_curvature++;
-
-        //failText<<CCProtonPi0_minos_used_range<<" ";
-        //failText<<CCProtonPi0_minos_used_curvature<<" ";
-        //failText<<CCProtonPi0_minos_trk_is_contained<<" ";
-        //failText<<CCProtonPi0_minos_trk_is_ok<<endl;
-        //failText<<muon_theta_beam * TMath::RadToDeg()<<" ";
-        //failText<<truth_muon_theta_beam * TMath::RadToDeg()<<" ";
-        //failText<<calc_theta * TMath::RadToDeg()<<" ";
-        //failText<<endl;
     }
 }
 
@@ -1871,6 +1882,13 @@ double CCProtonPi0_Analyzer::Calc_MuonCosTheta()
     return cos_theta;
 }
 
+void CCProtonPi0_Analyzer::ResetCounters()
+{
+    counter1.count = 0.0;
+    counter2.count = 0.0;
+    counter3.count = 0.0;
+    counter4.count = 0.0;
+}
 
 #endif //CCProtonPi0_Analyzer_cpp
 

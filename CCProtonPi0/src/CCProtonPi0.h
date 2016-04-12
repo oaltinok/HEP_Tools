@@ -290,8 +290,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IHoughBlob* m_idHoughBlob;
         IHoughTool* m_idHoughTool;
         IIDAnchoredBlobCreator* m_stopPointBlobTool;
-        IMichelTool* m_michelTrkTool;
-        IMichelTool* m_michelVtxTool;
+        IMichelTool* m_michelTool_Default;
+        IMichelTool* m_michelTool_Large;
         IMinervaCoordSysTool* m_coordSysTool;
         IMinervaMathTool* m_mathTool;
         IMinervaObjectAssociator* m_objectAssociator;
@@ -373,8 +373,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
         void processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs) const;
         void saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int muon_ID) const;
-        void saveMichelProngToNTuple(Minerva::PhysicsEvent* event, Minerva::Prong &michelProng, bool isVertex) const;
-        void saveMichelProngTruth(Minerva::GenMinInteraction* truthEvent, Minerva::Prong &michelProng, bool isVertex) const;
+        void saveMichelProngToNTuple(Minerva::PhysicsEvent* event, Minerva::Prong &michelProng, bool isVertex, bool isLargeSearch) const;
+        void saveMichelProngTruth(Minerva::GenMinInteraction* truthEvent, Minerva::Prong &michelProng, bool isVertex, bool isLargeSearch) const;
         void setBlobData(Minerva::PhysicsEvent* event, Minerva::GenMinInteraction *truthEvent) const;
         void setEventKinematics(const Minerva::PhysicsEvent *event, Minerva::NeutrinoInt* nuInt) const;
         void setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) const;
@@ -407,6 +407,8 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool RecoverSingleShower_View_U(SmartRefVector<Minerva::IDCluster> &usableClusters, std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event)const;
         bool RecoverSingleShower_View_V(SmartRefVector<Minerva::IDCluster> &usableClusters, std::vector<Minerva::IDBlob*> &foundBlobs, Minerva::PhysicsEvent *event)const;
         double GetTotalExtraEnergy(const Minerva::PhysicsEvent* event) const;
+        double FindShowerMaxZ(SmartRef<Minerva::IDBlob> blob) const;
+        std::vector<double> EstimateShowerEndPoint(const Gaudi::LorentzVector& shower_4P, const std::vector<double> init_pos, double max_z) const;
 
         // --------------------------------------------------------------------
         // Study: Shower Energy Functions

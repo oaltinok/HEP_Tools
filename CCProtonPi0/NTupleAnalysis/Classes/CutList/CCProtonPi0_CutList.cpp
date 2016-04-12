@@ -28,7 +28,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
        
         use_nTrueSignal = true;
         nTrueSignal = 231577;
-        //nTrueSignal = 682513;
+        //nTrueSignal = 684622;
         
         SetCutNames();
         OpenTextFiles(isMC);
@@ -200,10 +200,14 @@ void CCProtonPi0_CutList::initHistograms()
     mc_w_RES = new TH1D( "mc_w_RES","True W for RES",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
     mc_w_RES->GetXaxis()->SetTitle("True W for RES [GeV]");
     mc_w_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_w.get_width()));
+ 
+    mc_Q2_DIS = new TH1D( "mc_Q2_DIS","True Q^{2} for DIS",binList.mc_Q2.get_nBins(), binList.mc_Q2.get_min(), binList.mc_Q2.get_max() );
+    mc_Q2_DIS->GetXaxis()->SetTitle("True Q^{2} for DIS [GeV^{2}]");
+    mc_Q2_DIS->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_Q2.get_width()));
     
-    mc_w_CCQE = new TH1D( "mc_w_CCQE","True W for CCQE",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
-    mc_w_CCQE->GetXaxis()->SetTitle("True W for CCQE [GeV]");
-    mc_w_CCQE->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_w.get_width()));
+    mc_Q2_RES = new TH1D( "mc_Q2_RES","True Q^{2} for RES",binList.mc_Q2.get_nBins(), binList.mc_Q2.get_min(), binList.mc_Q2.get_max() );
+    mc_Q2_RES->GetXaxis()->SetTitle("True Q^{2} for RES [GeV^{2}]");
+    mc_Q2_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_Q2.get_width()));
 
     // Pi0 Invariant Mass - Used for Correction Fit
     pi0_invMass_1Track = new TH1D("pi0_invMass_1Track","#pi^{0} Invariant Mass 1 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
@@ -251,7 +255,7 @@ void CCProtonPi0_CutList::initHistograms()
     michel_other_energy->GetXaxis()->SetTitle("Energy [MeV]");
     michel_other_energy->GetYaxis()->SetTitle("N(Events)");
 
-    // Energy
+    // Distance 
     michel_piplus_distance = new TH1D("michel_piplus_distance","Michel Prong Distance piplus",50,0.0,1000.0);
     michel_piplus_distance->GetXaxis()->SetTitle("Distance [mm]");
     michel_piplus_distance->GetYaxis()->SetTitle("N(Events)");
@@ -272,6 +276,26 @@ void CCProtonPi0_CutList::initHistograms()
     michel_other_distance->GetXaxis()->SetTitle("Distance [mm]");
     michel_other_distance->GetYaxis()->SetTitle("N(Events)");
 
+    // Longitudinal Distance
+    michel_piplus_distance_z = new TH1D("michel_piplus_distance_z","Michel Prong Longitudinal Distance piplus",50,0.0,125.0);
+    michel_piplus_distance_z->GetXaxis()->SetTitle("Longitudinal Distance [mm]");
+    michel_piplus_distance_z->GetYaxis()->SetTitle("N(Events)");
+
+    michel_neutron_distance_z = new TH1D("michel_neutron_distance_z","Michel Prong Longitudinal Distance neutron",50,0.0,125.0);
+    michel_neutron_distance_z->GetXaxis()->SetTitle("Longitudinal Distance [mm]");
+    michel_neutron_distance_z->GetYaxis()->SetTitle("N(Events)");
+
+    michel_proton_distance_z = new TH1D("michel_proton_distance_z","Michel Prong Longitudinal Distance proton",50,0.0,125.0);
+    michel_proton_distance_z->GetXaxis()->SetTitle("Longitudinal Distance [mm]");
+    michel_proton_distance_z->GetYaxis()->SetTitle("N(Events)");
+
+    michel_piminus_distance_z = new TH1D("michel_piminus_distance_z","Michel Prong Longitudinal Distance piminus",50,0.0,125.0);
+    michel_piminus_distance_z->GetXaxis()->SetTitle("Longitudinal Distance [mm]");
+    michel_piminus_distance_z->GetYaxis()->SetTitle("N(Events)");
+
+    michel_other_distance_z = new TH1D("michel_other_distance_z","Michel Prong Longitudinal Distance other",50,0.0,125.0);
+    michel_other_distance_z->GetXaxis()->SetTitle("Longitudinal Distance [mm]");
+    michel_other_distance_z->GetYaxis()->SetTitle("N(Events)");
 
 
 
@@ -390,6 +414,7 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_ConeBlobs.set_Name("ConeBlobs");
     nCut_BlobDirectionBad.set_Name("BlobDirectionBad");
     nCut_Pi0_Bad.set_Name("Pi0_Bad");
+    nCut_Shower_Michel_Exist.set_Name("Shower_Michel_Exist");
     nCut_Photon1DistanceLow.set_Name("Photon1DistanceLow");
     nCut_Photon2DistanceLow.set_Name("Photon2DistanceLow");
     nCut_LowE_SmallAngle.set_Name("LowE_SmallAngle");
@@ -493,6 +518,7 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_All.push_back(nCut_ConeBlobs);
     nCutVector_All.push_back(nCut_BlobDirectionBad);
     nCutVector_All.push_back(nCut_Pi0_Bad);
+    nCutVector_All.push_back(nCut_Shower_Michel_Exist);
     nCutVector_All.push_back(nCut_Photon1DistanceLow);
     nCutVector_All.push_back(nCut_Photon2DistanceLow);
     nCutVector_All.push_back(nCut_LowE_SmallAngle);
@@ -655,7 +681,8 @@ void CCProtonPi0_CutList::writeHistograms()
     // MC Only
     mc_w_DIS->Write();
     mc_w_RES->Write();
-    mc_w_CCQE->Write();
+    mc_Q2_DIS->Write();
+    mc_Q2_RES->Write();
     
     pi0_invMass_1Track->Write();
     pi0_invMass_2Track->Write();
@@ -677,6 +704,12 @@ void CCProtonPi0_CutList::writeHistograms()
     michel_proton_distance->Write();
     michel_piminus_distance->Write();
     michel_other_distance->Write();
+
+    michel_piplus_distance_z->Write();
+    michel_neutron_distance_z->Write();
+    michel_proton_distance_z->Write();
+    michel_piminus_distance_z->Write();
+    michel_other_distance_z->Write();
 
     signal_invMass_pizero->Write();
     signal_invMass_piplus->Write();
