@@ -114,16 +114,6 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.vertex_z.get_width()));
         vertex_z.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","recovered_Pi0_P",i),"Recovered Pi0 Momentum", 17, 0.0, 1.7 );
-        temp->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        recovered_Pi0_P.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","recovered_Pi0_theta",i),"Recovered Pi0 theta", 90, 0.0, 180.0 );
-        temp->GetXaxis()->SetTitle("Pi0 Theta [degree]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        recovered_Pi0_theta.push_back(temp);
-
         // Extra Energy
         temp = new MnvH1D( Form("%s_%d","extra_dispersed_energy_1Track",i),"Extra Dispersed Energy 1 Track", 20, 0.0, 500.0 );
         temp->GetXaxis()->SetTitle("Extra Dispersed Energy [MeV]");
@@ -168,34 +158,63 @@ void CCProtonPi0_Interaction::initHistograms()
     }
 
     // Cross Section Variables
-    QSq_all = new MnvH1D( "QSq_all","Data All Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
-    QSq_all->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_all = new MnvH1D( "QSq_all","Data All Q^{2}", binList.size_QSq, binList.a_QSq);
+    QSq_all->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_all->GetYaxis()->SetTitle("N(Events)");
 
-    QSq_mc_truth_signal = new MnvH1D( "QSq_mc_truth_signal","MC Truth Signal Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
-    QSq_mc_truth_signal->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_mc_truth_signal = new MnvH1D( "QSq_mc_truth_signal","MC Truth Signal Q^{2}", binList.size_QSq, binList.a_QSq);
+    QSq_mc_truth_signal->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(QSq_mc_truth_signal);
 
-    QSq_mc_reco_all = new MnvH1D( "QSq_mc_reco_all","MC All Reconstructed Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
-    QSq_mc_reco_all->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_mc_reco_all = new MnvH1D( "QSq_mc_reco_all","MC All Reconstructed Q^{2}", binList.size_QSq, binList.a_QSq);
+    QSq_mc_reco_all->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(QSq_mc_reco_all);
 
-    QSq_mc_reco_signal = new MnvH1D( "QSq_mc_reco_signal","MC Reconstructed Signal Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
-    QSq_mc_reco_signal->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_mc_reco_signal = new MnvH1D( "QSq_mc_reco_signal","MC Reconstructed Signal Q^{2}", binList.size_QSq, binList.a_QSq);
+    QSq_mc_reco_signal->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(QSq_mc_reco_signal);
 
-    QSq_mc_reco_bckg = new MnvH1D( "QSq_mc_reco_bckg","MC Reconstructed Background Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
-    QSq_mc_reco_bckg->GetXaxis()->SetTitle("Q^{2} [Gev^{2}]");
+    QSq_mc_reco_bckg = new MnvH1D( "QSq_mc_reco_bckg","MC Reconstructed Background Q^{2}", binList.size_QSq, binList.a_QSq);
+    QSq_mc_reco_bckg->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(QSq_mc_reco_bckg);
 
-    QSq_response = new MnvH2D( "QSq_response","Signal Q^{2}",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max(),binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max() );
-    QSq_response->GetXaxis()->SetTitle("Reconstructed Q^{2} [Gev^{2}]");
-    QSq_response->GetYaxis()->SetTitle("True Q^{2} [Gev^{2}]");
+    QSq_response = new MnvH2D( "QSq_response","Signal Q^{2}", binList.size_QSq, binList.a_QSq, binList.size_QSq, binList.a_QSq);
+    QSq_response->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
+    QSq_response->GetYaxis()->SetTitle("True Q^{2} [GeV^{2}]");
     AddVertErrorBands_MC(QSq_response);
+
+    Enu_all = new MnvH1D( "Enu_all","Data All E_{#nu}", binList.size_Enu, binList.a_Enu);
+    Enu_all->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_all->GetYaxis()->SetTitle("N(Events)");
+
+    Enu_mc_truth_signal = new MnvH1D( "Enu_mc_truth_signal","MC Truth Signal E_{#nu}", binList.size_Enu, binList.a_Enu);
+    Enu_mc_truth_signal->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(Enu_mc_truth_signal);
+
+    Enu_mc_reco_all = new MnvH1D( "Enu_mc_reco_all","MC All Reconstructed E_{#nu}", binList.size_Enu, binList.a_Enu);
+    Enu_mc_reco_all->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(Enu_mc_reco_all);
+
+    Enu_mc_reco_signal = new MnvH1D( "Enu_mc_reco_signal","MC Reconstructed Signal E_{#nu}", binList.size_Enu, binList.a_Enu);
+    Enu_mc_reco_signal->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(Enu_mc_reco_signal);
+
+    Enu_mc_reco_bckg = new MnvH1D( "Enu_mc_reco_bckg","MC Reconstructed Background E_{#nu}", binList.size_Enu, binList.a_Enu);
+    Enu_mc_reco_bckg->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBands_MC(Enu_mc_reco_bckg);
+
+    Enu_response = new MnvH2D( "Enu_response","Signal E_{#nu}", binList.size_Enu, binList.a_Enu, binList.size_Enu, binList.a_Enu);
+    Enu_response->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
+    Enu_response->GetYaxis()->SetTitle("True E_{#nu} [GeV]");
+    AddVertErrorBands_MC(Enu_response);
 
     
     // MC Only Histograms
@@ -289,23 +308,6 @@ void CCProtonPi0_Interaction::initHistograms()
     h_extra_rejected_energy = new TH1D("h_extra_rejected_energy","Extra Rejected Energy",20,0.0,1000);
     h_extra_rejected_energy->GetXaxis()->SetTitle("Extra Rejected Energy [MeV]");
     h_extra_rejected_energy->GetYaxis()->SetTitle("N(Events)");
- 
-    // Recovered Pi0
-    h_recovered_Pi0_P = new TH1D("h_recovered_Pi0_P","Pi0 Momentum",17,0.0,1.7);
-    h_recovered_Pi0_P->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
-    h_recovered_Pi0_P->GetYaxis()->SetTitle("N(Events)");
-
-    h_recovered_Pi0_theta = new TH1D("h_recovered_Pi0_theta","Pi0 theta",90,0.0,180.0);
-    h_recovered_Pi0_theta->GetXaxis()->SetTitle("Pi0 Theta [degree]");
-    h_recovered_Pi0_theta->GetYaxis()->SetTitle("N(Events)");
-
-    h_original_Pi0_P = new TH1D("h_original_Pi0_P","Pi0 Momentum",17,0.0,1.7);
-    h_original_Pi0_P->GetXaxis()->SetTitle("Pi0 Momentum [GeV]");
-    h_original_Pi0_P->GetYaxis()->SetTitle("N(Events)");
-
-    h_original_Pi0_theta = new TH1D("h_original_Pi0_theta","Pi0 theta",90,0.0,180.0);
-    h_original_Pi0_theta->GetXaxis()->SetTitle("Pi0 Theta [degree]");
-    h_original_Pi0_theta->GetYaxis()->SetTitle("N(Events)");
 }
 
 void CCProtonPi0_Interaction::writeHistograms()
@@ -336,10 +338,6 @@ void CCProtonPi0_Interaction::writeHistograms()
         // Other Event Parameters 
         deltaInvMass[i]->Write();
 
-
-        recovered_Pi0_P[i]->Write();
-        recovered_Pi0_theta[i]->Write();
-   
         // Extra Energy
         extra_muon_energy_1Track[i]->Write();
         extra_dispersed_energy_1Track[i]->Write();
@@ -349,7 +347,6 @@ void CCProtonPi0_Interaction::writeHistograms()
         extra_dispersed_energy_2Track[i]->Write();
         extra_rejected_energy_2Track[i]->Write();
         extra_total_energy_2Track[i]->Write();
-
     }
     
     QSq_all->Write();
@@ -358,7 +355,14 @@ void CCProtonPi0_Interaction::writeHistograms()
     QSq_mc_reco_signal->Write();
     QSq_mc_reco_bckg->Write();
     QSq_response->Write();
-   
+ 
+    Enu_all->Write();
+    Enu_mc_truth_signal->Write();
+    Enu_mc_reco_all->Write();
+    Enu_mc_reco_signal->Write();
+    Enu_mc_reco_bckg->Write();
+    Enu_response->Write();
+  
     // MC Only Histograms
     final_mc_w_DIS->Write();
     final_mc_w_RES->Write();
@@ -373,12 +377,6 @@ void CCProtonPi0_Interaction::writeHistograms()
     // Ejected Nucleons
     n_ejected_nucleons_1Track->Write();
     n_ejected_nucleons_2Track->Write();
-
-    // Recovered Pi0
-    h_recovered_Pi0_P->Write();
-    h_recovered_Pi0_theta->Write();
-    h_original_Pi0_P->Write();
-    h_original_Pi0_theta->Write();
 
     //Extra Energy
     h_extra_muon_energy->Write();

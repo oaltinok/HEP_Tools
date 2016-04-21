@@ -63,12 +63,19 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         MnvH1D* QSq_mc_truth_signal;
         MnvH2D* QSq_response;
 
+        // Enu
+        MnvH1D* Enu_all;
+        MnvH1D* Enu_mc_reco_all;
+        MnvH1D* Enu_mc_reco_signal;
+        MnvH1D* Enu_mc_reco_bckg;
+        MnvH1D* Enu_mc_truth_signal;
+        MnvH2D* Enu_response;
+
         // Vertex
         std::vector<MnvH1D*> vertex_z;
         
         // Other Event Parameters 
         std::vector<MnvH1D*> deltaInvMass;
-     
 
         TH1D* h_extra_muon_energy;
         TH1D* h_extra_dispersed_energy;
@@ -89,14 +96,6 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* n_ejected_nucleons_1Track;
         TH1D* n_ejected_nucleons_2Track;
        
-        // Recovered Pi0
-        std::vector<MnvH1D*> recovered_Pi0_P;
-        std::vector<MnvH1D*> recovered_Pi0_theta;
-        TH1D* h_recovered_Pi0_P;
-        TH1D* h_original_Pi0_P;
-        TH1D* h_recovered_Pi0_theta;
-        TH1D* h_original_Pi0_theta;
-
         // QSq Truth, Error, Difference
         TH1D* QSq_True;
         TH1D* QSq_Error;

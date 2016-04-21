@@ -37,6 +37,12 @@ class CCProtonPi0_BinList
         static const double a_pi0_theta[];
         static const int size_pi0_theta;
 
+        static const double a_QSq[];
+        static const int size_QSq;
+
+        static const double a_Enu[];
+        static const int size_Enu;
+
         // Cross Section Variables
         CCProtonPi0_SingleBin muon_P;
         CCProtonPi0_SingleBin muon_theta;

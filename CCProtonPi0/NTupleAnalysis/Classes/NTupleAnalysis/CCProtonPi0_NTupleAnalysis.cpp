@@ -6,12 +6,12 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v2_76a";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v2_77";
 
-const double CCProtonPi0_NTupleAnalysis::data_POT = 9.60557e+19;
+const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33534e+20;
 //const double CCProtonPi0_NTupleAnalysis::data_POT = 1.36777e+21;
 
-const double CCProtonPi0_NTupleAnalysis::mc_POT = 9.42291e+20;
+const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.74333e+21;
 //const double CCProtonPi0_NTupleAnalysis::mc_POT = 1.37363e+21;
 
 const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
@@ -24,6 +24,12 @@ const double CCProtonPi0_NTupleAnalysis::MeV_to_GeV = pow(10,-3);
 const double CCProtonPi0_NTupleAnalysis::MeVSq_to_GeVSq = pow(10,-6);
 const double CCProtonPi0_NTupleAnalysis::mm_to_cm = pow(10,-1);
 const double CCProtonPi0_NTupleAnalysis::rad_to_deg = 180.0/M_PI;
+
+// Flux Correction
+const bool CCProtonPi0_NTupleAnalysis::applyNuEConstraint = true;
+const FluxReweighter::EPlaylist CCProtonPi0_NTupleAnalysis::default_playlist = FluxReweighter::minerva1;
+const FluxReweighter::EFluxVersion CCProtonPi0_NTupleAnalysis::new_flux = FluxReweighter::gen2thin;
+const FluxReweighter::EG4NumiVersion CCProtonPi0_NTupleAnalysis::old_flux = FluxReweighter::g4numiv5;
 
 CCProtonPi0_NTupleAnalysis::CCProtonPi0_NTupleAnalysis()
 {
@@ -265,6 +271,23 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MuonTracking(MnvH2D* h)
 {
     h->AddVertErrorBand("MuonTracking", 2);
 }
+
+std::string CCProtonPi0_NTupleAnalysis::GetPlaylist(const int run)
+{
+    std::string playlist;
+    if (run >= 10200 && run <= 10249) playlist = "minerva1";
+    else if (run >= 10250 && run <= 10254) playlist = "minerva7";
+    else if (run >= 10255 && run <= 10259) playlist = "minerva9";
+    else if (run >= 12200 && run <= 12209) playlist = "minerva13A";
+    else if (run >= 12210 && run <= 12219) playlist = "minerva13B";
+    else if (run >= 13200 && run <= 13299) playlist = "minerva13C";
+    else if (run >= 14201 && run <= 14209) playlist = "minerva13D";
+    else if (run >= 14210 && run <= 14229) playlist = "minerva13E";
+    else std::cout<<"WARNING: NO Playlist Found!"<<std::endl;
+
+    return playlist;
+}
+
 
 
 #endif

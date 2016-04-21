@@ -57,6 +57,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void Increment_nCut(vector<CCProtonPi0_Cut> &nCut, bool study1, bool study2);
         void fillData();
         void fill_BackgroundSubtractionHists();
+        void fill_Enu();
         void fill_QSq();
         void fill_muon_P();
         void fill_muon_theta();
@@ -92,7 +93,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void AddErrorBands_Data();
         double GetMINOSCorrectionErr();
         double GetMINOSCorrection();
-        std::string GetPlaylist();
+        double GetFluxWeight();
+        void UpdateFluxReweighter();
+        void ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist);
+        std::vector<double> GetFluxError();
 
         //  Interaction Specific Functions
         void fillInteractionMC();
@@ -134,6 +138,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Int_t GetEntry(Long64_t entry);
         Long64_t LoadTree(Long64_t entry);
 
+        FluxReweighter* frw;
+        bool processed_minerva7;
+        bool processed_minerva9;
+        bool processed_minerva13;
+    
         // Analysis Variables
         CCProtonPi0_Interaction interaction;
         CCProtonPi0_Muon muon;

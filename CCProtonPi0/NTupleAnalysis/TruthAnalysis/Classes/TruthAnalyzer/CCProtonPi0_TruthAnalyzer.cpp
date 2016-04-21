@@ -1,9 +1,6 @@
 #ifndef CCProtonPi0_TruthAnalyzer_cpp
 #define CCProtonPi0_TruthAnalyzer_cpp
 
-
-#include "../../../Classes/Analyzer/new_flux.h"
-
 #include "CCProtonPi0_TruthAnalyzer.h"
 
 using namespace PlotUtils;
@@ -23,18 +20,15 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
     if (!fChain) return;
     if (fChain == 0) return;
     
-    // Read Flux & Calc Weights 
-    new_flux::get().read_oldflux_histogram(Folder_List::rootDir_Flux_old);
-    new_flux::get().read_newflux_histogram(Folder_List::rootDir_Flux_new);
-    new_flux::get().calc_weights();
-
     // Disable Branches for Performance
     fChain->SetBranchStatus("*", false);
     fChain->SetBranchStatus("truth_is*", true);
     fChain->SetBranchStatus("truth_pi0_*", true);
     fChain->SetBranchStatus("truth_muon_*", true);
     fChain->SetBranchStatus("*genie_wgt_*", true);
+    fChain->SetBranchStatus("mc_run", true);
     fChain->SetBranchStatus("mc_Q2", true);
+    fChain->SetBranchStatus("mc_intType", true);
     fChain->SetBranchStatus("mc_incomingE", true);
 
     //------------------------------------------------------------------------
@@ -178,6 +172,12 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() : CCProtonPi0_NTupleAnaly
 
     std::cout<<"\tRoot File: "<<rootDir<<std::endl;
     f = new TFile(rootDir.c_str(),"RECREATE");
+ 
+    // Initialize FluxReweighter with default playlist 
+    frw = new FluxReweighter(14, applyNuEConstraint, default_playlist, new_flux, old_flux);
+    processed_minerva7 = false;
+    processed_minerva9 = false;
+    processed_minerva13 = false;
 
     initHistograms();
     
@@ -285,6 +285,10 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     QSq_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(QSq_mc_truth_all_signal);
     AddVertErrorBand_Genie(QSq_mc_truth_all_signal);
+
+    mc_Q2_signal_res = new TH1D( "mc_Q2_signal_res","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_signal_res->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_signal_res->GetYaxis()->SetTitle("N(Events)");
 }
 
 void CCProtonPi0_TruthAnalyzer::FillHistogram(MnvH1D* hist, double var)
@@ -294,11 +298,15 @@ void CCProtonPi0_TruthAnalyzer::FillHistogram(MnvH1D* hist, double var)
     FillVertErrorBand_Genie(hist, var);
 }
 
+void CCProtonPi0_TruthAnalyzer::FillHistogram(TH1D* hist, double var)
+{
+    hist->Fill(var, cvweight);
+}
+
 void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Flux(MnvH1D* h, double var)
 {
-    double enu0 = mc_incomingE/1.e3;
-    std::vector<double> random_weights = new_flux::get().get_random_weights(enu0);
-    h->FillVertErrorBand("Flux",  var, &random_weights[0],  cvweight, 1.0);
+    std::vector<double> flux_errors = GetFluxError();
+    h->FillVertErrorBand("Flux",  var, &flux_errors[0],  cvweight, 1.0);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
@@ -342,10 +350,55 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
 
 void CCProtonPi0_TruthAnalyzer::Calc_WeightFromSystematics()
 {
-    // Update cvweight with Flux
-    double enu0 = mc_incomingE * MeV_to_GeV;
-    cvweight = new_flux::get().get_cvweight(enu0);
-    //std::cout<<"cvweight = "<<cvweight<<std::endl;
+    if(mc_run >= 10250) UpdateFluxReweighter(); 
+        
+    // Replace cvweight with Flux Weight
+    cvweight = GetFluxWeight();
+}
+
+double CCProtonPi0_TruthAnalyzer::GetFluxWeight()
+{
+    double Enu = mc_incomingE * MeV_to_GeV; // true neutrino energy (GeV)
+    int nuPDG = mc_incoming; //neutrino PDG code
+
+    double flux_weight = frw->GetFluxCVWeight(Enu, nuPDG);
+
+    return flux_weight;
+}
+
+std::vector<double> CCProtonPi0_TruthAnalyzer::GetFluxError()
+{
+    double Enu = mc_incomingE * MeV_to_GeV; // true neutrino energy (GeV)
+    int nuPDG = mc_incoming; //neutrino PDG code
+
+    std::vector<double> flux_error = frw->GetFluxErrorWeights(Enu, nuPDG);
+
+    return flux_error;
+}
+
+void CCProtonPi0_TruthAnalyzer::UpdateFluxReweighter()
+{
+    std::string playlist = GetPlaylist(mc_run);
+
+    if (!processed_minerva7 && playlist.compare("minerva7") == 0){
+        std::cout<<"Playlist: minerva7"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minervaLE_FHC);
+        processed_minerva7 = true;
+    }else if (!processed_minerva9 && playlist.compare("minerva9") == 0){
+        std::cout<<"Playlist: minerva9"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minervaLE_FHC);
+        processed_minerva9 = true;
+    }else if (!processed_minerva13 && playlist.find("minerva13") != std::string::npos){
+        std::cout<<"Playlist: minerva13"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minerva13);
+        processed_minerva13 = true;
+    }
+}
+
+void CCProtonPi0_TruthAnalyzer::ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist)
+{
+    delete frw;
+    frw = new FluxReweighter(14, applyNuEConstraint, playlist, new_flux, old_flux);
 }
 
 void CCProtonPi0_TruthAnalyzer::AddOtherErrorBands_FillWithCV()
@@ -374,6 +427,7 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
     FillHistogram(pi0_theta_mc_truth_all_signal, truth_pi0_theta * rad_to_deg);
     FillHistogram(neutrino_E_mc_truth_all_signal, mc_incomingE * MeV_to_GeV);
     FillHistogram(QSq_mc_truth_all_signal, mc_Q2 * MeVSq_to_GeVSq);
+    if (mc_intType == 2) FillHistogram(mc_Q2_signal_res, mc_Q2 * MeVSq_to_GeVSq);
 }
 
 void CCProtonPi0_TruthAnalyzer::UpdateSignalDef()
@@ -402,6 +456,7 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     pi0_theta_mc_truth_all_signal->Write();
     neutrino_E_mc_truth_all_signal->Write();
     QSq_mc_truth_all_signal->Write();
+    mc_Q2_signal_res->Write();
 
     f->Close();
 }

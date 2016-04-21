@@ -37,6 +37,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         MnvH1D* pi0_theta_mc_truth_all_signal;
         MnvH1D* neutrino_E_mc_truth_all_signal;
         MnvH1D* QSq_mc_truth_all_signal;
+        TH1D* mc_Q2_signal_res;
 
     private :
         TFile* f;
@@ -56,9 +57,13 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void writeTextFile();
         void writeHistograms();
         void FillHistogram(MnvH1D *hist, double var);
+        void FillHistogram(TH1D* hist, double var);
         void FillSignalHistograms();
         void UpdateSignalDef();
-
+        double GetFluxWeight();
+        void UpdateFluxReweighter();
+        void ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist);
+        std::vector<double> GetFluxError();
 
         // Default Functions    
         void     Init(std::string playlist, TChain* fChain);
@@ -68,6 +73,11 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         // Class Variables
         std::string file_name;
         ofstream textFile;
+
+        FluxReweighter* frw;
+        bool processed_minerva7;
+        bool processed_minerva9;
+        bool processed_minerva13;
 
         // Counters
         double nAll;

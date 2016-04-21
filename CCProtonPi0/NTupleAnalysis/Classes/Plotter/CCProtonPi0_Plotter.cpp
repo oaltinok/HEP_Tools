@@ -15,7 +15,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     // Run only once to get the POT
     //--------------------------------------------------------------------------
     //getPOT_Data();
-    //getPOT_MC();
+    getPOT_MC();
 
     //--------------------------------------------------------------------------
     // Cross Sections
@@ -42,7 +42,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     //  MC Only
     //--------------------------------------------------------------------------
-    plotInteraction_MCOnly();
+    //plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
     //plotPion_MCOnly();
@@ -167,11 +167,25 @@ void CCProtonPi0_Plotter::plotCrossSection_Check()
 void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
-   
-    plot_Michel_TruthMatch("time_diff");
-    plot_Michel_TruthMatch("energy");
-    plot_Michel_TruthMatch("distance");
-    plot_Michel_TruthMatch("distance_z");
+    
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    Draw1DHist(rootDir_Truth,"mc_Q2_signal_res",plotDir);
+
+
+    TFile* f_truth = new TFile(rootDir_Truth.mc.c_str());
+    TH1D* h_RES = (TH1D*)f_truth->Get("mc_Q2_signal_res");
+
+    ofstream text;
+    std::string out_name = plotDir + "mc_Q2_signal_res.txt"; 
+    text.open(out_name.c_str());
+
+    int nBins = h_RES->GetNbinsX();
+    for (int i = 1; i <= nBins; i++){
+        text<<h_RES->GetBinLowEdge(i)<<" ";
+        text<<h_RES->GetBinContent(i)<<std::endl;
+    }
+    text.close();
 
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }

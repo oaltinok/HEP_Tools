@@ -1,4 +1,17 @@
 ===================================================================================================
+v2_77
+CCProtonPi0 Updates:
+	No Major Changes
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:	
+	Using PlotUtils/FluxReweighter for calculating Flux Weights and Systematics
+		Removed old methods based on Trungs new_flux.h file
+		Updated both Analyzer and TruthAnalyzer
+		Did NOT updated the CrossSection Flux Integration yet. (Next release)
+	Variable size binning for Q2 and Enu  
+		Bins taken from the Carrie, Trung paper
+
+===================================================================================================
 v2_76
 CCProtonPi0 Updates:
 	Changed Michel Tool usage

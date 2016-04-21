@@ -4,9 +4,6 @@
 #ifndef CCProtonPi0_Analyzer_cpp
 #define CCProtonPi0_Analyzer_cpp
 
-// Trung's Implementations
-#include "new_flux.h"
-
 #include "CCProtonPi0_Analyzer.h"
 
 using namespace std;
@@ -252,13 +249,14 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
 
     m_isMC = isMC;
 
-    // Initialize Flux File if it is MC 
+    // Initialize FluxReweighter with default playlist 
     if (m_isMC){
-        new_flux::get().read_oldflux_histogram(Folder_List::rootDir_Flux_old);
-        new_flux::get().read_newflux_histogram(Folder_List::rootDir_Flux_new);
-        new_flux::get().calc_weights();
+        frw = new FluxReweighter(14, applyNuEConstraint, default_playlist, new_flux, old_flux);
+        processed_minerva7 = false;
+        processed_minerva9 = false;
+        processed_minerva13 = false;
     }
- 
+
     cvweight = 1.0;
    
     ResetCounters();
@@ -390,6 +388,7 @@ void CCProtonPi0_Analyzer::fillData()
     fill_muon_theta();
     fill_muon_cos_theta();
     fill_QSq();
+    fill_Enu();
 
     // Fill Reconstructed Information
     fillInteractionReco();
@@ -751,7 +750,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     bool isGamma1_Michel = gamma1_isMichel_begin || gamma1_isMichel_end;
     bool isGamma2_Michel = gamma2_isMichel_begin || gamma2_isMichel_end;
     bool isShower_Michel_Exist = isGamma1_Michel || isGamma2_Michel;
-    if (isShower_Michel_Exist) return false;
+    if (isShower_Michel_Exist && !sideBand_Michel) return false;
 
     // No End point for vertical showers - so use the following
     double g1_long_dist = abs(gamma1_vertex[2] - vtx_z);
@@ -817,7 +816,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     fill_BackgroundSubtractionHists();
 
     // Fill Invariant Mass Histograms
-    if (NoSideBand || (sideBand_Michel && isMichelEvent) || (sideBand_PID && isPionTrack) || sideBand_LowInvMass){
+    if (NoSideBand || (sideBand_Michel && (isMichelEvent || isShower_Michel_Exist )) || (sideBand_PID && isPionTrack) || sideBand_LowInvMass){
         FillInvMass_TruthMatch();
         FillHistogram(cutList.hCut_pi0invMass, pi0_invMass);
 
@@ -919,6 +918,7 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
     }else{ 
         FillHistogram(interaction.Enu_2Track, CCProtonPi0_neutrino_E * MeV_to_GeV);
     }
+
     const double Mn = 939.57; //MeV
 
     double calc_WSq = -CCProtonPi0_QSq + Mn*Mn + 2*Mn*(CCProtonPi0_neutrino_E - muon_E);
@@ -951,17 +951,6 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
         // Other Event Parameters
         if (nProtonCandidates > 0){
             FillHistogram(interaction.deltaInvMass, calcDeltaInvariantMass() * MeV_to_GeV);
-        }
-
-        // Recovered Pi0
-        if (is_blobs_recovered){
-            FillHistogram(interaction.recovered_Pi0_P, pi0_P * MeV_to_GeV);
-            FillHistogram(interaction.recovered_Pi0_theta, pi0_theta * TMath::RadToDeg());
-            FillHistogram(interaction.h_recovered_Pi0_P, pi0_P * MeV_to_GeV);
-            FillHistogram(interaction.h_recovered_Pi0_theta, pi0_theta * TMath::RadToDeg());
-        }else{
-            FillHistogram(interaction.h_original_Pi0_P, pi0_P * MeV_to_GeV);
-            FillHistogram(interaction.h_original_Pi0_theta, pi0_theta * TMath::RadToDeg());
         }
 
         // Extra Energy
@@ -1346,6 +1335,28 @@ void CCProtonPi0_Analyzer::fill_BackgroundSubtractionHists()
     }
 }
 
+void CCProtonPi0_Analyzer::fill_Enu() 
+{
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithDefaultErrors(interaction.Enu_mc_reco_all, CCProtonPi0_neutrino_E * MeV_to_GeV);
+        if (truth_isSignal){
+            // MC Truth Signal
+            FillHistogramWithDefaultErrors(interaction.Enu_mc_truth_signal, mc_Q2 * MeV_to_GeV);
+            // MC Reco Signal
+            FillHistogramWithDefaultErrors(interaction.Enu_mc_reco_signal, CCProtonPi0_neutrino_E * MeV_to_GeV);
+            // MC Reco vs True -- Response
+            FillHistogramWithDefaultErrors(interaction.Enu_response, CCProtonPi0_neutrino_E * MeV_to_GeV, mc_Q2 * MeV_to_GeV);
+        }else{
+            // MC Reco Background
+            FillHistogramWithDefaultErrors(interaction.Enu_mc_reco_bckg, CCProtonPi0_neutrino_E * MeV_to_GeV);
+        }
+    }else{
+        // Data
+        FillHistogram(interaction.Enu_all, CCProtonPi0_neutrino_E * MeV_to_GeV);
+    }
+}
+
 void CCProtonPi0_Analyzer::fill_QSq() 
 {
     if (m_isMC){
@@ -1586,16 +1597,14 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_MuonTracking(MnvH2D* h, double var1
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_Flux(MnvH1D* h, double var)
 {
-    double enu0 = mc_incomingE/1.e3;
-    std::vector<double> random_weights = new_flux::get().get_random_weights(enu0);
-    h->FillVertErrorBand("Flux",  var, &random_weights[0],  cvweight, 1.0);
+    std::vector<double> flux_errors = GetFluxError();
+    h->FillVertErrorBand("Flux",  var, &flux_errors[0],  cvweight, 1.0);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_Flux(MnvH2D* h, double var1, double var2)
 {
-    double enu0 = mc_incomingE/1.e3;
-    std::vector<double> random_weights = new_flux::get().get_random_weights(enu0);
-    h->FillVertErrorBand("Flux",  var1, var2,  &random_weights[0],  cvweight, 1.0);
+    std::vector<double> flux_errors = GetFluxError();
+    h->FillVertErrorBand("Flux",  var1, var2,  &flux_errors[0],  cvweight, 1.0);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
@@ -1737,9 +1746,9 @@ void CCProtonPi0_Analyzer::CorrectNTupleVariables()
 
 void CCProtonPi0_Analyzer::CorrectEMShowerCalibration()
 {
-    // Correct MC -- Do not change Data
     if (m_isMC){
-        const double correction = 134.98/125;
+        const double correction = 134.98/125.0;
+
         // Pi0 Variables
         pi0_invMass *= correction;
         pi0_E *= correction;
@@ -1771,10 +1780,12 @@ void CCProtonPi0_Analyzer::CorrectEMShowerCalibration()
 void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
 {
     if (m_isMC){
-        // Update cvweight with Flux
-        double enu0 = mc_incomingE * MeV_to_GeV;
-        cvweight = new_flux::get().get_cvweight(enu0);
+        // No need to Update FluxReweighter for minerva1 and after minerva13
+        if(mc_run >= 10250) UpdateFluxReweighter(); 
         
+        // Replace cvweight with Flux Weight
+        cvweight = GetFluxWeight();
+
         // Update cvweight with MINOS Efficiency Correction
         const double minos_eff_correction = GetMINOSCorrection();
         cvweight *= minos_eff_correction;
@@ -1837,7 +1848,7 @@ void CCProtonPi0_Analyzer::FillInvMass_TruthMatch()
 
 double CCProtonPi0_Analyzer::GetMINOSCorrectionErr()
 {
-    std::string playlist = GetPlaylist();
+    std::string playlist = GetPlaylist(mc_run);
     MnvNormalizer normalizer("Eroica", playlist);
     double correctionErr = normalizer.GetCorrectionErr(CCProtonPi0_minos_trk_p);
     return correctionErr;
@@ -1845,27 +1856,55 @@ double CCProtonPi0_Analyzer::GetMINOSCorrectionErr()
 
 double CCProtonPi0_Analyzer::GetMINOSCorrection()
 {
-    std::string playlist = GetPlaylist();
+    std::string playlist = GetPlaylist(mc_run);
     MnvNormalizer normalizer("Eroica", playlist);
     double correction = normalizer.GetCorrection(CCProtonPi0_minos_trk_p);
     return correction;
 }
 
-std::string CCProtonPi0_Analyzer::GetPlaylist()
+double CCProtonPi0_Analyzer::GetFluxWeight()
 {
-    std::string playlist;
-    const int run = mc_run;
-    if (run >= 10200 && run <= 10249) playlist = "minerva1";
-    else if (run >= 10250 && run <= 10254) playlist = "minerva7";
-    else if (run >= 10255 && run <= 10259) playlist = "minerva9";
-    else if (run >= 12200 && run <= 12209) playlist = "minerva13A";
-    else if (run >= 12210 && run <= 12219) playlist = "minerva13B";
-    else if (run >= 13200 && run <= 13299) playlist = "minerva13C";
-    else if (run >= 14201 && run <= 14209) playlist = "minerva13D";
-    else if (run >= 14210 && run <= 14229) playlist = "minerva13E";
-    else cout<<"WARNING: NO Playlist Found!"<<endl;
+    double Enu = mc_incomingE * MeV_to_GeV; // true neutrino energy (GeV)
+    int nuPDG = mc_incoming; //neutrino PDG code
 
-    return playlist;
+    double flux_weight = frw->GetFluxCVWeight(Enu, nuPDG);
+
+    return flux_weight;
+}
+
+std::vector<double> CCProtonPi0_Analyzer::GetFluxError()
+{
+    double Enu = mc_incomingE * MeV_to_GeV; // true neutrino energy (GeV)
+    int nuPDG = mc_incoming; //neutrino PDG code
+
+    std::vector<double> flux_error = frw->GetFluxErrorWeights(Enu, nuPDG);
+
+    return flux_error;
+}
+
+void CCProtonPi0_Analyzer::UpdateFluxReweighter()
+{
+    std::string playlist = GetPlaylist(mc_run);
+
+    if (!processed_minerva7 && playlist.compare("minerva7") == 0){
+        cout<<"Playlist: minerva7"<<endl;
+        ReInitFluxReweighter(FluxReweighter::minervaLE_FHC);
+        processed_minerva7 = true;
+    }else if (!processed_minerva9 && playlist.compare("minerva9") == 0){
+        cout<<"Playlist: minerva9"<<endl;
+        ReInitFluxReweighter(FluxReweighter::minervaLE_FHC);
+        processed_minerva9 = true;
+    }else if (!processed_minerva13 && playlist.find("minerva13") != std::string::npos){
+        cout<<"Playlist: minerva13"<<endl;
+        ReInitFluxReweighter(FluxReweighter::minerva13);
+        processed_minerva13 = true;
+    }
+}
+
+void CCProtonPi0_Analyzer::ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist)
+{
+    delete frw;
+    frw = new FluxReweighter(14, applyNuEConstraint, playlist, new_flux, old_flux);
 }
 
 double CCProtonPi0_Analyzer::Calc_MuonCosTheta()
@@ -1889,6 +1928,8 @@ void CCProtonPi0_Analyzer::ResetCounters()
     counter3.count = 0.0;
     counter4.count = 0.0;
 }
+
+
 
 #endif //CCProtonPi0_Analyzer_cpp
 

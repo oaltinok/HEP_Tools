@@ -24,6 +24,7 @@ Class: CCProtonPi0_NTupleAnalysis
 #include <TFile.h>
 #include <PlotUtils/MnvH1D.h>
 #include <PlotUtils/MnvH2D.h>
+#include <PlotUtils/FluxReweighter.h>
 
 // Libraries
 #include "../../Libraries/PDG_List.h"
@@ -62,7 +63,13 @@ class CCProtonPi0_NTupleAnalysis
         static const double min_Enu;
         static const double max_Enu;
 
+        static const bool applyNuEConstraint;
+        static const enum FluxReweighter::EPlaylist default_playlist;
+        static const enum FluxReweighter::EFluxVersion new_flux;
+        static const enum FluxReweighter::EG4NumiVersion old_flux;
+
         void OpenTextFile(std::string file_name, std::ofstream &file);
+        std::string GetPlaylist(const int run);
         
         // Errors for Data
         void AddVertErrorBands_Data(MnvH1D* h);
