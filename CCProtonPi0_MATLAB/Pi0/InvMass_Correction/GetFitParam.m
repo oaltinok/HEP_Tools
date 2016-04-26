@@ -1,4 +1,4 @@
-function [fit_x, fit_y, NormChiSq, max_y, curvefit, output] = GetFitParam(x,y)
+function [fit_x, fit_y, NormChiSq, max_y, curvefit, output, CovB] = GetFitParam(x,y)
 %% Function to Calculate Fit Parameters
 % Fit following range to a Double Gaussian and 
 fit_range_min = 1;
@@ -22,12 +22,14 @@ ChiSq = CalcChiSq(y(7:21),fit_y(7:21));
 NormChiSq = ChiSq/(21-7+1);
 
 % Get Fit Curve smoother (recalculate fit_y)
-fit_x = linspace(0,275,1000);
+fit_x = linspace(0,275,10000);
 fit_y = a1.*exp(-((fit_x-b1)./c1).^2) + a2.*exp(-((fit_x-b2)./c2).^2);
 
 % Find x Value maximizes the function
 max_y = fit_x(fit_y == max(fit_y));
 
-
+J = output.Jacobian;
+MSE = (gof.rmse).^2;
+CovB = inv(J'*J)*MSE;
 
 end
