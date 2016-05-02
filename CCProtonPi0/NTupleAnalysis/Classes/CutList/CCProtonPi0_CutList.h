@@ -116,11 +116,45 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_2Track_protonScore_LLR;
         vector<MnvH1D*> hCut_2Track_deltaInvMass;
  
-        // MC Only Histograms
-        TH1D* mc_w_DIS;
-        TH1D* mc_w_RES;
-        TH1D* mc_Q2_DIS;
-        TH1D* mc_Q2_RES;
+        // Selected Signal 
+        // Signal Q2
+        TH1D* mc_Q2_QE;
+
+        TH1D* mc_Q2_RES_1232;
+        TH1D* mc_Q2_RES_1535;
+        TH1D* mc_Q2_RES_1520;
+        TH1D* mc_Q2_RES_Other;
+
+        TH1D* mc_Q2_DIS_1_pi;
+        TH1D* mc_Q2_DIS_2_pi;
+        TH1D* mc_Q2_DIS_Multi_pi;
+        TH1D* mc_Q2_DIS_Other;
+
+        // Signal incomingE
+        TH1D* mc_incomingE_QE;
+
+        TH1D* mc_incomingE_RES_1232;
+        TH1D* mc_incomingE_RES_1535;
+        TH1D* mc_incomingE_RES_1520;
+        TH1D* mc_incomingE_RES_Other;
+
+        TH1D* mc_incomingE_DIS_1_pi;
+        TH1D* mc_incomingE_DIS_2_pi;
+        TH1D* mc_incomingE_DIS_Multi_pi;
+        TH1D* mc_incomingE_DIS_Other;
+
+        // Signal w
+        TH1D* mc_w_QE;
+
+        TH1D* mc_w_RES_1232;
+        TH1D* mc_w_RES_1535;
+        TH1D* mc_w_RES_1520;
+        TH1D* mc_w_RES_Other;
+
+        TH1D* mc_w_DIS_1_pi;
+        TH1D* mc_w_DIS_2_pi;
+        TH1D* mc_w_DIS_Multi_pi;
+        TH1D* mc_w_DIS_Other;
 
         // Pi0 Invariant Mass
         TH1D* pi0_invMass_1Track;

@@ -1,5 +1,5 @@
 DATATYPE=$1
-CCPROTONPI0_V="v2_77"
+CCPROTONPI0_V="v2_78"
 OTHEROPTIONS=""
 PLAYLISTS=( "minerva1" "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
 #PLAYLISTS=( "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
@@ -16,10 +16,14 @@ submit_jobs()
 {
     echo "Submitting Jobs ..."
     echo "... CCProtonPi0 Version: ${CCPROTONPI0_V}" 
-    
+
     for pl in ${PLAYLISTS[@]}; do
         echo "Submitting $pl"
-        python $ana_script/ProcessAna.py --${DATATYPE} --playlist ${pl} --usecat --ana_tool CCProtonPi0 --inv v10r8p9 --kludge Eroica --no_verify_kludge --dcachein --dcacheout --outdir /minerva/data/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/${pl} ${OTHEROPTIONS}
+        if [ "$DATATYPE" == "mc" ]; then
+            python $ana_script/ProcessAna.py --${DATATYPE} --playlist ${pl} --usecat --ana_tool CCProtonPi0 --inv v10r8p9 --kludge Eroica --no_verify_kludge --dcachein --dcacheout --outdir /minerva/data/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/${pl} ${OTHEROPTIONS}
+        else
+            python $ana_script/ProcessAna.py --${DATATYPE} --playlist ${pl} --usecat --ana_tool CCProtonPi0 --inv eroica --dcachein --dcacheout --outdir /minerva/data/users/oaltinok/CCProtonPi0/${DATAFOLDER}/${CCPROTONPI0_V}/${pl} ${OTHEROPTIONS}
+        fi
     done
 
     echo "All Playlists Submitted!"

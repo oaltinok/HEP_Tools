@@ -26,8 +26,12 @@ class CCProtonPi0_Particle : public CCProtonPi0_NTupleAnalysis
         // Standard Histograms
         std::vector<MnvH1D*> E;
         std::vector<MnvH1D*> P;
+        std::vector<MnvH1D*> P_1Track;
+        std::vector<MnvH1D*> P_2Track;
         std::vector<MnvH1D*> KE;
         std::vector<MnvH1D*> theta;
+        std::vector<MnvH1D*> theta_1Track;
+        std::vector<MnvH1D*> theta_2Track;
         std::vector<MnvH1D*> cos_theta;
         std::vector<MnvH1D*> phi;
 

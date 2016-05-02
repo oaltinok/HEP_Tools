@@ -304,10 +304,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IVertexFitter* m_vertexFitter;
 
         //! Private Functions
-        Gaudi::LorentzVector Get_Neutrino_4P(double Enu) const;
         Minerva::IDClusterVect getClusters( Minerva::PhysicsEvent* event ) const;
-        SmartRefVector<Minerva::IDCluster> FilterInSphereClusters( Minerva::PhysicsEvent *event, const SmartRefVector<Minerva::IDCluster>& clusters, const double sphereRadius) const;
-        StatusCode HoughBlob( Minerva::PhysicsEvent *event, SmartRefVector<Minerva::IDCluster> idClusters, std::vector<Minerva::IDBlob*>& outBlobs) const;
         StatusCode ODActivity( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs ) const;
         StatusCode getNearestPlane( double z, int & module_return, int & plane_return) const;
         StatusCode interpretFailEvent( Minerva::PhysicsEvent* event ) const;
@@ -336,27 +333,15 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool vertexInFiducialVolume(Minerva::PhysicsEvent *event) const;
         bool vertexInRecoVolume(Minerva::PhysicsEvent *event) const;
         double CalcMinBlobSeparation( const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
-        double Calc_Enu_1Track(double vertex_energy, double extra_energy) const;
-        double Calc_Enu_1Track_Alt() const;
-        double Calc_Enu_2Track(double vertex_energy, double extra_energy) const;
-        double Calc_Longitudinal_Momentum(Gaudi::LorentzVector particle_4P) const;
-        double Calc_Px_wrt_Beam(Gaudi::LorentzVector particle_4P) const;
-        double Calc_Py_wrt_Beam(Gaudi::LorentzVector particle_4P) const;
-        double Calc_QSq(double Enu) const;
-        double Calc_WSq(double Enu, double QSq) const;
         double TwoParLineFitBlobVtxDistance(const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
         double calcDistance( double x1, double y1, double z1,double x2, double y2, double z2) const;
-        double getClusterEnergy( SmartRefVector<Minerva::IDCluster> clusters) const;
-        double GetVertexEnergyCalConst(double evis) const;
-        double GetVertexEnergy(const Minerva::PhysicsEvent *event) const;
-        void SaveExtraEvisLeftover(Minerva::PhysicsEvent *event) const;
+        void SaveExtraEnergyLeftover(Minerva::PhysicsEvent *event) const;
         int getMichelPion(std::vector<int>& piList, int ID ) const;
         std::pair<int,double> OneParLineFitBlob(const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
         void ApplyAttenuationCorrection(Minerva::IDBlob* blob) const;
         void Calculate_dEdx( Minerva::PhysicsEvent* event, const Minerva::IDBlob* blob, unsigned int blob_number) const;
         void ColorUnusedIDClusters(Minerva::PhysicsEvent *event) const;
         void DiscardFarTracks(Minerva::PhysicsEvent *event) const;
-        void DispersedBlob( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction *truthEvent ) const; 
         void FillTrajectoryMap() const;
         void GetMuonExtraEnergy(Minerva::PhysicsEvent *event) const;
         void MarkFoundPi0Blobs(std::vector<Minerva::IDBlob*> &foundBlobs) const;
@@ -365,10 +350,10 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void SaveTruthUnusedClusterEnergyInsideDetector(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> ecalClusters, SmartRefVector<Minerva::IDCluster> hcalClusters, SmartRefVector<Minerva::IDCluster> otherClusters) const;
         void SaveTruthClusterEnergy_FoundBlobs(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction *truthEvent) const;
         void SaveTruthUnusedClusterEnergy_NearVertex(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> vertexClusters) const;
-        void SaveTruthUnusedClusterEnergy_Dispersed(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const;
         void SaveTruthUnusedClusterEnergy_Rejected(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const;
         void setSignalKinematics(Minerva::GenMinInteraction* truthEvent) const;
         void SetVertexCount(Minerva::PhysicsEvent *event) const;
+        void SetExtraEnergyTotal(Minerva::PhysicsEvent* event) const;
         void VertexBlob( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction *truthEvent ) const;
         void correctProtonProngEnergy(  SmartRef<Minerva::Prong>& protonProng, double& p_calCorrection, double& p_visEnergyCorrection ) const;
         void processBlobs( Minerva::PhysicsEvent *event, std::vector<Minerva::IDBlob*> idBlobs) const;
@@ -376,7 +361,6 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void saveMichelProngToNTuple(Minerva::PhysicsEvent* event, Minerva::Prong &michelProng, bool isVertex, bool isLargeSearch) const;
         void saveMichelProngTruth(Minerva::GenMinInteraction* truthEvent, Minerva::Prong &michelProng, bool isVertex, bool isLargeSearch) const;
         void setBlobData(Minerva::PhysicsEvent* event, Minerva::GenMinInteraction *truthEvent) const;
-        void setEventKinematics(const Minerva::PhysicsEvent *event, Minerva::NeutrinoInt* nuInt) const;
         void setPi0GenieRecord(Minerva::GenMinInteraction* truthEvent) const;
         void setTargetMaterial(Minerva::GenMinInteraction* truthEvent) const;
         void setTrackDirection( Minerva::Track* track, Minerva::Vertex* vertex ) const;

@@ -38,6 +38,9 @@ struct counter
 {
     std::string name;
     double count;
+
+    counter():count(0.0){}
+
 };
 
 class CCProtonPi0_NTupleAnalysis
@@ -63,10 +66,19 @@ class CCProtonPi0_NTupleAnalysis
         static const double min_Enu;
         static const double max_Enu;
 
+        // Flux Reweighter
         static const bool applyNuEConstraint;
-        static const enum FluxReweighter::EPlaylist default_playlist;
         static const enum FluxReweighter::EFluxVersion new_flux;
         static const enum FluxReweighter::EG4NumiVersion old_flux;
+
+        FluxReweighter* frw;
+        bool processed_minerva1;
+        bool processed_minerva7;
+        bool processed_minerva9;
+        bool processed_minerva13;
+ 
+        void UpdateFluxReweighter(const int run);
+        void ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist);
 
         void OpenTextFile(std::string file_name, std::ofstream &file);
         std::string GetPlaylist(const int run);

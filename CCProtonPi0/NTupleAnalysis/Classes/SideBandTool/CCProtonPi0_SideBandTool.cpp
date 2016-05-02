@@ -30,18 +30,16 @@ void CCProtonPi0_SideBandTool::OpenRootFiles()
     rootDir = Folder_List::rootDir_sideBand_pID_data;
     pID.f_data = new TFile(rootDir.c_str());
 
-    rootDir = Folder_List::rootDir_sideBand_LowInvMass_mc;
-    //rootDir = Folder_List::rootDir_sideBand_HighInvMass_mc;
+    rootDir = Folder_List::rootDir_sideBand_Original_mc;
     LowInvMass.f_mc = new TFile(rootDir.c_str());
 
-    rootDir = Folder_List::rootDir_sideBand_LowInvMass_data;
-    //rootDir = Folder_List::rootDir_sideBand_HighInvMass_data;
+    rootDir = Folder_List::rootDir_sideBand_Original_data;
     LowInvMass.f_data = new TFile(rootDir.c_str());
 
-    rootDir = Folder_List::rootDir_sideBand_HighInvMass_mc;
+    rootDir = Folder_List::rootDir_sideBand_Original_mc;
     HighInvMass.f_mc = new TFile(rootDir.c_str());
 
-    rootDir = Folder_List::rootDir_sideBand_HighInvMass_data;
+    rootDir = Folder_List::rootDir_sideBand_Original_data;
     HighInvMass.f_data = new TFile(rootDir.c_str());
 }
 
@@ -130,11 +128,11 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb)
 {
     std::cout<<"Plotting "<<sb.name<<std::endl;
     // Original 
-    Plot(sb, 0, true);
+    //Plot(sb, 0, true);
     Plot(sb, 0, false);
     
     // Modified
-    Plot(sb, 1, true);
+    //Plot(sb, 1, true);
     Plot(sb, 1, false);
 }
 
@@ -148,51 +146,67 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
     if (isArea) norm = "Area";
     else norm = "POT";
     std::string plot_title = "Side Band: " + sb.name + " " + type + " " + norm + " Normalized";
-
-    TCanvas* c = new TCanvas("c","c",1280,800);
-    THStack* hs = new THStack("hs",plot_title.c_str());
-
-    // Get & Scale MC Models
+ 
+    // Get Histograms -- Use new Histograms not to change originals
     ColorHists(sb);
-    double mc_ratio = GetMCScaleRatio(sb, isArea);
+    TH1D* h_data = new TH1D (*(sb.data));
     TH1D* h_signal = new TH1D (*(sb.signal[ind]));
     TH1D* h_WithPi0 = new TH1D (*(sb.WithPi0[ind]));
     TH1D* h_QELike = new TH1D (*(sb.QELike[ind]));
     TH1D* h_SinglePiPlus = new TH1D (*(sb.SinglePiPlus[ind]));
     TH1D* h_Other = new TH1D (*(sb.Other[ind]));
+    // MC Total depend on the Modification
+    //      If Originals - take the mc_total directly
+    //      If Modified - Add all mc models;
+    TH1D* h_mc_total;
+    if (ind == 0){
+        h_mc_total = new TH1D(*(sb.mc_total));
+    }else{
+        h_mc_total = new TH1D(*h_signal);
+        h_mc_total->Add(h_WithPi0);
+        h_mc_total->Add(h_QELike);
+        h_mc_total->Add(h_SinglePiPlus);
+        h_mc_total->Add(h_Other);
+    }
 
+    // Scale MC Histograms
+    double mc_ratio = GetMCScaleRatio(sb, isArea);
+    h_mc_total->Scale(mc_ratio);
     h_signal->Scale(mc_ratio);
     h_WithPi0->Scale(mc_ratio);
     h_QELike->Scale(mc_ratio);
     h_SinglePiPlus->Scale(mc_ratio);
     h_Other->Scale(mc_ratio);
 
-    // Get MC Total Area
-    double area_mc = 0.0;
-    area_mc += h_signal->Integral();
-    area_mc += h_WithPi0->Integral();
-    area_mc += h_QELike->Integral();
-    area_mc += h_SinglePiPlus->Integral();
-    area_mc += h_Other->Integral();
-
-    // Plot MC Models
+    // Create Canvas and Divide it into two
+    TCanvas* c = new TCanvas("c","c",1280,1280);
+    
+    // Upper Pad is the Data vs MC
+    TPad *pad1 = new TPad("pad1", "pad1", 0, 0.3, 1, 1.0); 
+    pad1->SetBottomMargin(0); // Top and Bottom Plots attached
+    pad1->Draw();               
+    pad1->cd(); // pad1 is the current pad
+   
+    // Plot MC Models as THStack
+    THStack* hs = new THStack("hs",plot_title.c_str());
     hs->Add(h_WithPi0);  
     hs->Add(h_QELike);  
     hs->Add(h_SinglePiPlus);  
     hs->Add(h_Other);  
     hs->Add(h_signal);  
 
+    // Add MC Stacked 
     hs->Draw("HIST");
-    hs->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
     hs->GetYaxis()->SetTitle("N(Events)");
+    hs->GetXaxis()->SetTitle("");
+    h_data->GetXaxis()->SetTitle("");
 
-    // Plot Data
-    sb.data->Draw("SAME E1 X0");
-    double area_data = sb.data->Integral();
+    // Add Data Plot
+    h_data->Draw("SAME E1 X0");
 
     // Add Legend
     TLegend *legend = new TLegend(0.7,0.68,0.9,0.9);  
-    legend->AddEntry(sb.data, "Data");
+    legend->AddEntry(h_data, "Data");
     legend->AddEntry(h_signal, "Signal", "f");
     legend->AddEntry(h_Other, "Bckg: Other", "f");
     legend->AddEntry(h_SinglePiPlus, "Bckg: 1 #pi^{+}", "f");
@@ -202,7 +216,7 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
     legend->Draw();
 
     // Add Pi0 InvMass Lines
-    double hist_max = sb.data->GetMaximum();
+    double hist_max = h_data->GetMaximum();
     hs->SetMaximum(hist_max * 1.2);
     TLine pi0Mass;
     pi0Mass.SetLineWidth(2);
@@ -224,25 +238,81 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
         TLatex* text = new TLatex;
         text->SetTextSize(0.03);
         text->SetNDC();
-        text->DrawLatex(0.7, 0.64, "Fit Results");
-        text->DrawLatex(0.7, 0.60, Form("%s%3.2f", "Fit #chi^{2} = ", ChiSq));
-        text->DrawLatex(0.7, 0.56, Form("#color[4]{%s%3.2f}", "wgt(SinglePiPlus) = ", wgt_SinglePiPlus));
-        text->DrawLatex(0.7, 0.52, Form("%s%3.2f", "wgt(QELike) = ", wgt_QELike));
-        text->DrawLatex(0.7, 0.48, Form("#color[2]{%s%3.2f}", "wgt(WithPi0) = ", wgt_WithPi0));
+        text->DrawLatex(0.6, 0.64, Form("Fit Results with %d points, %d pars",136,3));
+        text->DrawLatex(0.6, 0.60, Form("%s%3.2f", "Fit #chi^{2} = ", ChiSq));
+        text->DrawLatex(0.6, 0.56, Form("%s%3.2f", "Fit #chi^{2}/dof= ", ChiSq/(136-3)));
+        text->DrawLatex(0.6, 0.52, Form("#color[4]{%s%3.2f}", "wgt(SinglePiPlus) = ", wgt_SinglePiPlus));
+        text->DrawLatex(0.6, 0.48, Form("%s%3.2f", "wgt(QELike) = ", wgt_QELike));
+        text->DrawLatex(0.6, 0.44, Form("#color[2]{%s%3.2f}", "wgt(WithPi0) = ", wgt_WithPi0));
         delete text;
     }
-
+    
     // Add Plot-Area and Plot-ChiSq
+    double area_data = h_data->Integral();
+    double area_mc = h_mc_total->Integral();
     TLatex* areaText = new TLatex;
     areaText->SetNDC();
     areaText->SetTextSize(0.03);
     areaText->SetTextColor(kBlue);
-    areaText->DrawLatex(0.15, 0.85,Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc));
+    areaText->DrawLatex(0.15, 0.87,Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc));
     double plot_chisq = calc_ChiSq(sb, ind, isArea);
-    areaText->DrawLatex(0.15, 0.81, Form("Plot #chi^{2} = %3.2f", plot_chisq));
+    areaText->DrawLatex(0.15, 0.83, Form("Plot #chi^{2} = %3.2f", plot_chisq));
+    areaText->DrawLatex(0.15, 0.79, Form("Plot #chi^{2}/dof = %3.2f", plot_chisq/50));
     delete areaText;
 
+    // Plot Lower Plot: Data vs MC Ratio
+    c->cd(); // Go back to default Canvas before creating 2nd Pad
+    TPad *pad2 = new TPad("pad2", "pad2", 0, 0.05, 1, 0.3);
+    pad2->SetTopMargin(0);
+    pad2->SetBottomMargin(0.2);
+    pad2->Draw();
+    pad2->cd();
+
+    // Calculate the Ratio 
+    
+    TH1D* h_data_mc_ratio = new TH1D(*(h_data));
+    h_data_mc_ratio->Divide(h_mc_total); 
+
+    // Style Ratio Plot
+    h_data_mc_ratio->SetTitle("");
+    h_data_mc_ratio->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    h_data_mc_ratio->GetYaxis()->SetTitle("N(Data)/N(MC)");
+    h_data_mc_ratio->SetLineColor(kRed);
+    h_data_mc_ratio->SetLineWidth(3);
+    h_data_mc_ratio->SetFillColor(kWhite);
+    h_data_mc_ratio->SetMinimum(0.5);
+    h_data_mc_ratio->SetMaximum(1.5);
+    h_data_mc_ratio->SetStats(0);
+
+    // Y axis ratio plot settings
+    h_data_mc_ratio->GetYaxis()->SetNdivisions(505);
+    h_data_mc_ratio->GetYaxis()->SetTitleSize(30);
+    h_data_mc_ratio->GetYaxis()->SetTitleFont(43);
+    h_data_mc_ratio->GetYaxis()->SetTitleOffset(1.55);
+    h_data_mc_ratio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h_data_mc_ratio->GetYaxis()->SetLabelSize(30);
+
+    // X axis ratio plot settings
+    h_data_mc_ratio->GetXaxis()->SetTitleSize(30);
+    h_data_mc_ratio->GetXaxis()->SetTitleFont(43);
+    h_data_mc_ratio->GetXaxis()->SetTitleOffset(4.);
+    h_data_mc_ratio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h_data_mc_ratio->GetXaxis()->SetLabelSize(30);
+
+    // Add Ratio Plot
+    h_data_mc_ratio->Draw("HIST");
+
+    // Add Ratio = 1 Line 
+    TLine ratio_1;
+    ratio_1.SetLineWidth(2);
+    ratio_1.SetLineStyle(7);
+    ratio_1.SetLineColor(kBlue);
+    ratio_1.DrawLine(0,1,500,1);
+
+
     // Plot Output
+    gStyle->SetOptStat(0); 
+    c->Update();
     std::string plotDir = Folder_List::plotDir_SideBand;
     std::string out_name;
     out_name = plotDir + sb.name + "_" + type + "_" + norm + ".png"; 
@@ -251,35 +321,9 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
 
     delete legend;
     delete hs;
+    delete pad1;
+    delete pad2;
     delete c;
-
-    // Create Another Canvas for Data MC Difference Plot
-    TCanvas* c2 = new TCanvas("c2","c2",1280,800);
-    
-    TH1D* h_data_mc_diff = new TH1D( "h_data_mc_diff","Data - MC for each bin",100,-100,100);
-    h_data_mc_diff->GetXaxis()->SetTitle("N(Data)-N(MC)");
-    h_data_mc_diff->GetYaxis()->SetTitle("N(Events)");
- 
-    for (int i = 1; i <= sb.data->GetNbinsX(); ++i){
-        double diff = sb.data->GetBinContent(i) - sb.mc_total->GetBinContent(i)*mc_ratio;
-        h_data_mc_diff->Fill(diff);
-    }
-    
-    h_data_mc_diff->SetLineColor(kRed);
-    h_data_mc_diff->SetLineWidth(3);
-    h_data_mc_diff->SetFillColor(kRed);
-    h_data_mc_diff->SetFillStyle(3010);
-
-    h_data_mc_diff->Draw("HIST");
-    gPad->Update();
-    gStyle->SetOptStat(111111); 
-
-    // Plot Output
-    out_name = plotDir + sb.name + "_" + type + "_" + norm + "Difference.png"; 
-
-    c2->Print(out_name.c_str(),"png");
-
-    delete c2;
 }
 
 void CCProtonPi0_SideBandTool::ColorHists(SideBand &sb)

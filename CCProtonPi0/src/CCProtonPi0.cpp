@@ -97,11 +97,9 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
     declareProperty("VertexSphereColor",        m_Color_VertexBlob    = 0xFA8072); //-- salmon 
 
     // VertexBlob
-    declareProperty( "SkipLowEnergyClusterVtxEnergy", fSkipLowEnergyClusterVtxEnergy = true);
-    declareProperty( "ThresholdVertexEnergy", fThresholdVertexEnergy = 1.0*CLHEP::MeV);
     declareProperty( "VertexBlobRadius", m_vertex_blob_radius = 90.0 * CLHEP::millimeter ); 
 
-    // Cone Blobs and HoughBlob
+    // ConeBlobs
     declareProperty( "RejectedClustersTime",  m_rejectedClustersTime  = 25 * CLHEP::ns );
 
     declareProperty( "ApplyAttenuationCorrection", m_ApplyAttenuationCorrection = true);
@@ -389,6 +387,7 @@ StatusCode CCProtonPi0::initialize()
 
     // VertexBlob()
     declareDoubleEventBranch("vertex_blob_evis", SENTINEL );
+    declareDoubleEventBranch("vertex_blob_energy", SENTINEL );
 
     // ConeBlobs()
     declareDoubleEventBranch("ConeBlobs_usable_evis_Tracker", SENTINEL );
@@ -468,11 +467,11 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleEventBranch("g2dedx_cluster_energy");
     declareContainerDoubleEventBranch("g2dedx_rev_cluster_energy");
 
-    // Other
-    declareDoubleEventBranch("Extra_Energy_Dispersed", SENTINEL );
+    // Extra Energy 
+    declareDoubleEventBranch("Extra_Energy_Total", SENTINEL );
     declareDoubleEventBranch("Extra_Energy_Muon", SENTINEL );
     declareDoubleEventBranch("Extra_Energy_Rejected", SENTINEL );
-    declareDoubleEventBranch("Extra_Evis_Leftover", SENTINEL);
+    declareDoubleEventBranch("Extra_Energy_Leftover", SENTINEL);
 
     // Primary Vertex
     declareIntEventBranch("vtx_module", -99);
@@ -639,15 +638,6 @@ StatusCode CCProtonPi0::initialize()
     //-------------------------------------------------------------------------
     // NeutrinoInt Branches 
     //-------------------------------------------------------------------------
-    // Event Kinematics -- Filled in setEventKinematics()
-    declareDoubleBranch( m_hypMeths, "vertex_energy", SENTINEL);
-    declareDoubleBranch( m_hypMeths, "Extra_Energy_Total", SENTINEL);
-    declareDoubleBranch( m_hypMeths, "neutrino_E", SENTINEL);
-    declareDoubleBranch( m_hypMeths, "QSq", SENTINEL);
-    declareDoubleBranch( m_hypMeths, "WSq", SENTINEL);
-    declareDoubleBranch( m_hypMeths, "neutrino_E_1Track_Alt", SENTINEL);
-    declareDoubleBranch( m_hypMeths, "QSq_1Track_Alt", SENTINEL);
-    declareDoubleBranch( m_hypMeths, "WSq_1Track_Alt", SENTINEL);
 
     // Truth Match for Prongs
     declareIntBranch(m_hypMeths,    "isMuonInsideOD",        -1);
@@ -767,18 +757,6 @@ StatusCode CCProtonPi0::initialize()
         declareIntTruthBranch("Rejected_unused_evis_most_pdg", -1);
         declareDoubleTruthBranch("Rejected_unused_evis_total_norm", -1.0);
         declareDoubleTruthBranch("Rejected_unused_evis_total_truth", -1.0);
-
-        // Dispersed Clusters -- Filled in DispersedBlob(), After Pi0 Reconstruction
-        declareIntTruthBranch("dispersed_unused_evis_most_pdg", -1);
-        declareDoubleTruthBranch("dispersed_unused_evis_total_norm", -1.0);
-        declareDoubleTruthBranch("dispersed_unused_evis_total_truth", -1.0);
-        declareDoubleTruthBranch("dispersed_unused_evis_pizero", -1.0);
-        declareDoubleTruthBranch("dispersed_unused_evis_piplus", -1.0);
-        declareDoubleTruthBranch("dispersed_unused_evis_piminus", -1.0);
-        declareDoubleTruthBranch("dispersed_unused_evis_muon", -1.0);
-        declareDoubleTruthBranch("dispersed_unused_evis_proton", -1.0);
-        declareDoubleTruthBranch("dispersed_unused_evis_neutron", -1.0);
-        declareDoubleTruthBranch("dispersed_unused_evis_gamma", -1.0);
     }
 
     if (m_study_shower_recovery){
@@ -1150,9 +1128,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         else return StatusCode::SUCCESS;  
     }
 
-    // Get Calorimetric Unused Energy after Pi0 Reconstruction
-    DispersedBlob(event, truthEvent);
-
     // Set Pi0 Kinematics
     bool pi0Filled = setPi0Data( event );
     if( !pi0Filled ){
@@ -1171,7 +1146,8 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //--------------------------------------------------------------------------
 
     // Get Extra Energy after Particle Reconstructions
-    SaveExtraEvisLeftover(event);
+    SaveExtraEnergyLeftover(event);
+    SetExtraEnergyTotal(event);
 
     // Write FS Particle Table and Event Record for Reconstructed Events
     if(truthEvent){
@@ -1265,9 +1241,6 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
             warning()<<"Prong is two primary particles!"<<endmsg;
         }
     }
-
-    // Calculate and Set Event Kinematics
-    setEventKinematics(event, nuInt);
 
     // Neutrino Interaction Vertex 
     SmartRef<Minerva::Vertex> vertex  = event->interactionVertex();   
@@ -1618,170 +1591,6 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     return true;
 }
 
-double CCProtonPi0::Calc_QSq(double Enu) const
-{
-    const double Mmu = MinervaUnits::M_mu;  // Muon Rest Mass [MeV]
-    Gaudi::LorentzVector beam_4P = Get_Neutrino_4P(Enu);
-
-    double qSq = (Mmu * Mmu) - 2 * beam_4P.Dot(m_muon_4P);
-    double QSq = -qSq;
-
-    return QSq;
-}
-
-double CCProtonPi0::Calc_WSq(double Enu, double QSq) const
-{
-    const double Mn = MinervaUnits::M_n;    // Neutron Rest Mass [MeV]
-    double Emu = m_muon_4P.E();
-
-    // Calculate WSq - Use eq. in Research Logbook page 31
-    double WSq = -QSq + std::pow(Mn,2) + 2 * (Enu - Emu) * Mn; 
-
-    return WSq;
-}
-
-double CCProtonPi0::Calc_Enu_1Track(double vertex_energy, double extra_energy) const
-{
-    debug()<<"Calculating Enu_1Track Using:"<<endmsg;
-    debug()<<"\tP4(Muon) = "<<m_muon_4P<<endmsg;
-    debug()<<"\tP4(Pi0) = "<<m_pi0_4P<<endmsg;
-    debug()<<"\tVertex Energy = "<<vertex_energy<<endmsg;
-    debug()<<"\tExtra Energy = "<<extra_energy<<endmsg;
-
-    double Enu = m_muon_4P.E() + m_pi0_4P.E() + vertex_energy + extra_energy;
-
-    debug()<<"\tNeutrino Energy = "<<Enu<<endmsg;
-
-    return Enu;
-}
-
-
-// Using Equation from DocDB: 9749 v2
-// Back-of-napkin derivations for E_nu of CC(nu, meson) reactions 
-double CCProtonPi0::Calc_Enu_1Track_Alt() const
-{
-    debug()<<"Calculating Enu_1Track_Alt Using:"<<endmsg;
-    debug()<<"\tP4(Muon) = "<<m_muon_4P<<endmsg;
-    debug()<<"\tP4(Pi0) = "<<m_pi0_4P<<endmsg;
-    debug()<<"\tT(proton) = from Transverse Momentum Balance"<<endmsg;
-
-    // Main Components
-    const double Mn = MinervaUnits::M_n;    // Neutron Rest Mass [MeV]
-    double Enu;     // Neutrino Energy
-    double TN;      // Hadron Kinetic Energy
-    double Emu = m_muon_4P.E();             
-    double Epi0 = m_pi0_4P.E();
-    double Pmu_long = Calc_Longitudinal_Momentum(m_muon_4P); 
-    double Ppi0_long = Calc_Longitudinal_Momentum(m_pi0_4P);
-    double Px_mu_wrt_Beam = Calc_Px_wrt_Beam(m_muon_4P); 
-    double Py_mu_wrt_Beam = Calc_Py_wrt_Beam(m_muon_4P); 
-    double Px_pi0_wrt_Beam = Calc_Px_wrt_Beam(m_pi0_4P); 
-    double Py_pi0_wrt_Beam = Calc_Py_wrt_Beam(m_pi0_4P); 
-
-    // TN Calculation in Parts -- TN is very long to calculate in a single Line
-    double Emu_Pmu_long = Emu - Pmu_long;
-    double Epi0_Ppi0_long = Epi0 - Ppi0_long;
-    double P_long = std::pow((Emu_Pmu_long + Epi0_Ppi0_long),2);
-    // Transverse Component (Vectoral Calculation Page 4)
-    double Pmu_trans = std::pow(Px_mu_wrt_Beam,2) + std::pow(Py_mu_wrt_Beam,2);
-    double Ppi0_trans = std::pow(Px_pi0_wrt_Beam,2) + std::pow(Py_pi0_wrt_Beam,2);
-    double Pmu_trans_Ppi0_trans = 2 * ( (Px_mu_wrt_Beam * Px_pi0_wrt_Beam) +
-            (Py_mu_wrt_Beam * Py_pi0_wrt_Beam) );
-    double P_trans = Pmu_trans + Ppi0_trans + Pmu_trans_Ppi0_trans;
-
-    // Form Hadron Kinetic Energy 
-    TN = 0.5 * (P_long + P_trans) / (Mn - Emu_Pmu_long - Epi0_Ppi0_long);
-
-    Enu = Emu + Epi0 + TN;
-
-    return Enu;
-}
-
-double CCProtonPi0::Calc_Enu_2Track(double vertex_energy, double extra_energy) const
-{
-    debug()<<"Calculating Enu_2Track Using:"<<endmsg;
-    debug()<<"\tP4(Muon) = "<<m_muon_4P<<endmsg;
-    debug()<<"\tP4(Proton) = "<<m_proton_4P<<endmsg;
-    debug()<<"\tP4(Pi0) = "<<m_pi0_4P<<endmsg;
-    debug()<<"\tVertex Energy = "<<vertex_energy<<endmsg;
-    debug()<<"\tExtra Visible Energy = "<<extra_energy<<endmsg;
-
-    double Mp = MinervaUnits::M_p; // Proton Rest Mass [MeV]
-    double Emu = m_muon_4P.E();
-    double Epi0 = m_pi0_4P.E();
-    double KEproton = m_proton_4P.E() - Mp;
-
-    // Calculate Enu -- Use eq. in Research Log Book page 29
-    double Enu = Emu + Epi0 + KEproton + vertex_energy + extra_energy;
-
-    debug()<<"\tNeutrino Energy = "<<Enu<<endmsg;
-
-    return Enu;
-}
-
-double CCProtonPi0::Calc_Longitudinal_Momentum(Gaudi::LorentzVector particle_4P) const
-{
-    double Theta_wrt_Beam = m_coordSysTool->thetaWRTBeam(particle_4P);
-    double P_long = particle_4P.P() * std::cos(Theta_wrt_Beam);
-    return P_long;
-}
-
-double CCProtonPi0::Calc_Px_wrt_Beam(Gaudi::LorentzVector particle_4P) const
-{
-    double Theta_wrt_Beam = m_coordSysTool->thetaWRTBeam(particle_4P);
-    double Phi_wrt_Beam = m_coordSysTool->phiWRTBeam(particle_4P);
-    double Px_wrt_Beam = particle_4P.P() * std::sin(Theta_wrt_Beam) * std::cos(Phi_wrt_Beam); 
-    return Px_wrt_Beam;
-}
-
-double CCProtonPi0::Calc_Py_wrt_Beam(Gaudi::LorentzVector particle_4P) const
-{
-    double Theta_wrt_Beam = m_coordSysTool->thetaWRTBeam(particle_4P);
-    double Phi_wrt_Beam = m_coordSysTool->phiWRTBeam(particle_4P);
-    double Py_wrt_Beam = particle_4P.P() * std::sin(Theta_wrt_Beam) * std::sin(Phi_wrt_Beam); 
-    return Py_wrt_Beam;
-}
-
-//==============================================================================
-// Calculates and Set Event Kinematics
-//      Uses 4-Momentum of Final State Particles
-//==============================================================================
-void CCProtonPi0::setEventKinematics(const Minerva::PhysicsEvent* event, Minerva::NeutrinoInt* nuInt) const
-{
-    double vertex_energy = GetVertexEnergy(event);
-    double extra_energy = GetTotalExtraEnergy(event);
-    double Enu;    
-    double QSq;
-    double WSq;
-
-    // Enu Calculation depends on Proton Reconstruction 
-    if (m_ProtonParticles.size() == 0) Enu = Calc_Enu_1Track(vertex_energy, extra_energy);
-    else Enu = Calc_Enu_2Track(vertex_energy, extra_energy);
-
-    QSq = Calc_QSq(Enu); 
-    WSq = Calc_WSq(Enu, QSq);
-
-    // Fill NTuples
-    nuInt->setDoubleData("Vertex_Energy",vertex_energy);
-    nuInt->setDoubleData("Extra_Energy_Total",extra_energy);
-    nuInt->setDoubleData("neutrino_E",Enu);
-    nuInt->setDoubleData("QSq",QSq);
-    nuInt->setDoubleData("WSq",WSq);
-
-
-    // Calculate Enu Alternatively for 1 Track
-    // Estimate Proton KE from Transverse Momentum Balance
-    if (m_ProtonParticles.size() == 0){
-        double Enu_Alt = Calc_Enu_1Track_Alt();   
-        double QSq_Alt = Calc_QSq(Enu_Alt); 
-        double WSq_Alt = Calc_WSq(Enu_Alt, QSq_Alt);
-
-        nuInt->setDoubleData("neutrino_E_1Track_Alt",Enu_Alt);
-        nuInt->setDoubleData("QSq_1Track_Alt",QSq_Alt);
-        nuInt->setDoubleData("WSq_1Track_Alt",WSq_Alt);
-    }
-
-}
 
 //==============================================================================
 // Find the plane nearest to a point
@@ -2679,17 +2488,19 @@ void CCProtonPi0::setTrackProngTruth( Minerva::NeutrinoInt* neutrino, Minerva::P
 //<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
 //==============================================================================
-//  VertexBlob
+//  VertexBlob 
 //==============================================================================
 void CCProtonPi0::VertexBlob(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction *truthEvent) const
 {
     SmartRefVector<Minerva::IDCluster> unusedClusters; 
     unusedClusters = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
+    SmartRef<Minerva::Vertex> vertex  = event->interactionVertex();   
 
     double evis = 0.0;
+    double energy = 0.0;
 
-    // Get VertexBlob 
-    SmartRefVector<Minerva::IDCluster> VertexBlobClusters = FilterInSphereClusters(event, unusedClusters, m_vertex_blob_radius);
+    // Find Unused Clusters inside Vertex Blob Radius 
+    SmartRefVector<Minerva::IDCluster> VertexBlobClusters = m_extraEnergyTool->getIDClustersInRadiusFromVertex( unusedClusters, vertex, m_vertex_blob_radius); 
 
     if (!VertexBlobClusters.empty()) {
 
@@ -2700,71 +2511,19 @@ void CCProtonPi0::VertexBlob(Minerva::PhysicsEvent *event, Minerva::GenMinIntera
         addObject( event, VertexSphereBlob );
         m_hitTagger->applyColorTag( VertexSphereBlob, m_Color_VertexBlob );
 
-        // Get VertexBlob Energy
+        // Get VertexBlob Visible & Calibrated Energy
         evis = VertexSphereBlob->energy();
+        energy = m_extraEnergyTool->getCorrectedIDEnergy( VertexBlobClusters, 1.0);
 
+        debug()<<"Vertex Evis = "<<evis<<endmsg;
+        debug()<<"Vertex Energy = "<<energy<<endmsg;
         if (truthEvent && m_study_unused_energy){
             SaveTruthUnusedClusterEnergy_NearVertex(truthEvent, VertexBlobClusters);
         }
     } 
-
+    
     event->setDoubleData("vertex_blob_evis", evis);
-}
-
-//==============================================================================
-//  FilterInSphereClusters()
-//==============================================================================
-SmartRefVector<Minerva::IDCluster> CCProtonPi0::FilterInSphereClusters( Minerva::PhysicsEvent *event, const SmartRefVector<Minerva::IDCluster>& clusters, const double sphereRadius) const
-{
-
-    // Get Interaction Vertex
-    SmartRef<Minerva::Vertex> vertex  = event->interactionVertex();   
-    const Gaudi::XYZPoint& vtx_position = vertex->position();
-    const double x0 = vtx_position.X();
-    const double y0 = vtx_position.Y();
-    const double z0 = vtx_position.Z();
-    double u0 = m_mathTool->calcUfromXY(x0,y0);
-    double v0 = m_mathTool->calcVfromXY(x0,y0);
-
-    SmartRefVector<Minerva::IDCluster> sphereClusters;
-    SmartRefVector<Minerva::IDCluster>::const_iterator c;
-
-    // Loop over all INPUT clusters
-    // Find the clusters stays inside the sphere with given radius
-    // Fill sphereClusters 
-    for (c = clusters.begin(); c != clusters.end(); ++c) {
-        const double energy = (*c)->energy();
-        const double z      = (*c)->z();
-        const double t      = (*c)->position();
-        /* Skip low-energy clusters, normal MIP cluster has 1.7*2 MeV = 3.4 MeV */
-        if (fSkipLowEnergyClusterVtxEnergy && energy < fThresholdVertexEnergy) continue;
-
-        /* Tranverse position: X,U,or V */
-        double t0  = 0.0; 
-        switch ((*c)->view()) {
-            case Minerva::IDCluster::X:
-                t0 = x0;
-                break;
-
-            case Minerva::IDCluster::U:
-                t0 = u0;
-                break;
-
-            case Minerva::IDCluster::V:
-                t0 = v0;
-                break;
-
-            default:
-                warning() << "Invalid view" << endmsg;
-                exit(1);
-        }
-
-        // Distance from this cluster to the primary vertex
-        double radius = sqrt(pow(z-z0,2) + pow(t-t0,2));
-        if (radius < sphereRadius) sphereClusters.push_back(*c);
-    }
-
-    return sphereClusters;
+    event->setDoubleData("vertex_blob_energy", energy);
 }
 
 //==============================================================================
@@ -2985,91 +2744,6 @@ void CCProtonPi0::setBlobData(Minerva::PhysicsEvent* event, Minerva::GenMinInter
         SaveSCALHits_Improved(event, m_Pi0Blob2, 2);
         SaveSCAL_minZ_Info(event,m_Pi0Blob2,2); 
     }
-}
-
-//==============================================================================
-//  HoughBlob
-//==============================================================================
-StatusCode CCProtonPi0::HoughBlob(Minerva::PhysicsEvent *event, SmartRefVector<Minerva::IDCluster> idClusters, std::vector<Minerva::IDBlob*>& outBlobs) const
-{
-    const Gaudi::XYZPoint& vtx_position = event->interactionVertex()->position();
-
-    SmartRefVector<Minerva::IDCluster> idClusViewX, idClusViewU, idClusViewV;
-    SmartRefVector<Minerva::IDCluster>::iterator it_clus;
-
-    if ( !m_idHoughBlob->GetViewClustersAboveThreshold( idClusters, idClusViewX, Minerva::IDCluster::X, 0 )) return StatusCode::FAILURE;
-    m_idHoughBlob->GetViewClustersAboveThreshold( idClusters, idClusViewU, Minerva::IDCluster::U, 0 );
-    m_idHoughBlob->GetViewClustersAboveThreshold( idClusters, idClusViewV, Minerva::IDCluster::V, 0 );
-
-    double r, theta, spX, spZ;
-    std::vector<Minerva::IDBlob*> idBlobs;
-
-    for ( int i = 0; i < 3; i++){
-
-        Minerva::IDBlob *idBlob = new Minerva::IDBlob;
-        SmartRefVector<Minerva::IDCluster> idHTSeed;
-        Gaudi::XYZPoint ref(0,0,0);// energetic cluster position
-
-        if ( !m_idHoughTool->GetReference( idClusViewX, ref ) ) break;
-        debug() << " Pass Get Reference" << endmsg; 
-
-        if ( !m_idHoughTool->Hough2D( idClusViewX, r, theta, ref, vtx_position ) ) break;
-        debug() << " Pass Get Hough2d" << endmsg;   
-
-        if ( !m_idHoughBlob->Create2dHTSeed( idClusViewX, idHTSeed, r, theta, ref, spX, spZ ) ) break;
-        debug() << " Pass Get Create2dHT " << endmsg;   
-
-        Gaudi::XYZPoint startpoint(spX, 0, spZ);
-        Gaudi::XYZVector direction(-1/tan(theta*CLHEP::pi/180),0,1);
-
-        if ( !m_idHoughBlob->PseudoCone(idHTSeed, idClusViewX, direction, vtx_position ) ) continue;
-        debug() << " Pass PseudoCone " << endmsg;
-
-        if ( !m_idHoughBlob->XUVMatch(idHTSeed, idClusViewU, idClusViewV, 50 ) ) continue;
-        debug() << " Pass XUV Match - First " << endmsg;    
-
-        if ( !m_idHoughBlob->isPhoton(idHTSeed, vtx_position) ) continue;
-
-        idBlob->add( idHTSeed );
-        debug() << " Added idBlob with size " << idHTSeed.size() << endmsg;
-
-        idBlobs.push_back(idBlob);
-    }
-
-    if ( idBlobs.empty() ) return StatusCode::FAILURE;
-
-    std::vector<Minerva::IDBlob*>::iterator itBlob;
-    for (itBlob = idBlobs.begin(); itBlob != idBlobs.end(); ++itBlob ){
-        Minerva::IDBlob *blobTemp = new Minerva::IDBlob;
-        SmartRefVector<Minerva::IDCluster> idSeed = (*itBlob)->clusters();
-        if ( !m_idHoughBlob->XUVMatch( idSeed, idClusViewU, idClusViewV, 120 ) ) continue;
-        blobTemp->add(idSeed);
-        double Uclusters = blobTemp->nclusters(Minerva::IDCluster::U);
-        double Vclusters = blobTemp->nclusters(Minerva::IDCluster::V);
-        debug() << *itBlob << " " << Uclusters << " U clusters; " << Vclusters << " V clusters " << endmsg;
-        (*itBlob)->clear();
-        if ( Uclusters != .0 || Vclusters != .0 ) {
-            debug() << *itBlob << " inserting to FinalBlobs " << endmsg;
-            (*itBlob)->add(idSeed);
-            m_idHoughBlob->GetStartPosition( *itBlob, vtx_position, true );
-            m_idHoughBlob->GetDirection( *itBlob, vtx_position );
-            outBlobs.push_back(*itBlob);
-        }
-    }
-
-    for ( it_clus = idClusViewX.begin(); it_clus != idClusViewX.end(); it_clus++ )
-        m_idHoughBlob->AddClusterInsideCone( *it_clus, outBlobs, vtx_position );
-
-    for ( it_clus = idClusViewU.begin(); it_clus != idClusViewU.end(); it_clus++ )
-        m_idHoughBlob->AddClusterInsideCone( *it_clus, outBlobs, vtx_position );
-
-    for ( it_clus = idClusViewV.begin(); it_clus != idClusViewV.end(); it_clus++ )
-        m_idHoughBlob->AddClusterInsideCone( *it_clus, outBlobs, vtx_position );
-
-
-    debug() << " Hough Transform is done! " << endmsg;
-
-    return StatusCode::SUCCESS;
 }
 
 //==============================================================================
@@ -4489,7 +4163,6 @@ void CCProtonPi0::GetMuonExtraEnergy(Minerva::PhysicsEvent *event) const
         addObject( event, muonBlob );
     }
 
-    debug()<<"Extra_Energy_Muon = "<<muon_blob_energy<<endmsg;
     event->setDoubleData( "Extra_Energy_Muon", muon_blob_energy );
 
     DigitVectorTruthInfo info;
@@ -4751,23 +4424,6 @@ void CCProtonPi0::SaveTruthUnusedClusterEnergy_Rejected(Minerva::GenMinInteracti
 }
 
 
-void CCProtonPi0::SaveTruthUnusedClusterEnergy_Dispersed(Minerva::GenMinInteraction *truthEvent, SmartRefVector<Minerva::IDCluster> clusters) const
-{
-    DigitVectorTruthInfo dispersedInfo;
-    dispersedInfo.ParseTruth(clusters,fTrajectoryMap);
-
-    truthEvent->setIntData("dispersed_unused_evis_most_pdg", dispersedInfo.GetMostEvisPdg());
-    truthEvent->setDoubleData("dispersed_unused_evis_total_norm", dispersedInfo.GetTotalNormEnergy());
-    truthEvent->setDoubleData("dispersed_unused_evis_total_truth", dispersedInfo.GetTotalTruthEnergy());
-    truthEvent->setDoubleData("dispersed_unused_evis_pizero", dispersedInfo.GetEdepByPdg(PDG::pi0));
-    truthEvent->setDoubleData("dispersed_unused_evis_piplus", dispersedInfo.GetEdepByPdg(PDG::pi));
-    truthEvent->setDoubleData("dispersed_unused_evis_piminus", dispersedInfo.GetEdepByPdg(-(PDG::pi)));
-    truthEvent->setDoubleData("dispersed_unused_evis_muon", dispersedInfo.GetEdepByPdg(PDG::muon));
-    truthEvent->setDoubleData("dispersed_unused_evis_proton", dispersedInfo.GetEdepByPdg(PDG::proton));
-    truthEvent->setDoubleData("dispersed_unused_evis_neutron", dispersedInfo.GetEdepByPdg(PDG::neutron));
-    truthEvent->setDoubleData("dispersed_unused_evis_gamma", dispersedInfo.GetEdepByPdg(PDG::gamma));
-}
-
 void CCProtonPi0::MarkFoundPi0Blobs(std::vector<Minerva::IDBlob*> &foundBlobs) const
 {
     if (foundBlobs.size() == 1){
@@ -4782,48 +4438,6 @@ void CCProtonPi0::MarkFoundPi0Blobs(std::vector<Minerva::IDBlob*> &foundBlobs) c
             m_hitTagger->applyColorTag( (foundBlobs)[i], m_Color_GammaOtherProng ); // orange 
         }
     }
-}
-
-
-//=======================================================================
-//  DispersedBlob
-//=======================================================================
-void CCProtonPi0::DispersedBlob( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction *truthEvent ) const
-{
-    //  --  Dispersed blob
-    double dispersed_energy = 0;
-
-    Minerva::IDBlob* dispersedBlob = new Minerva::IDBlob();
-    SmartRefVector<Minerva::IDCluster> unusedClusters
-        = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
-    SmartRefVector<Minerva::IDCluster> dispersedClusters;
-    SmartRefVector<Minerva::IDCluster>::iterator it_clus;
-
-    for ( it_clus = unusedClusters.begin(); it_clus != unusedClusters.end(); it_clus++){
-        if ( (*it_clus)->pe()/(*it_clus)->iddigs() <= 3 ) continue; 
-        dispersedClusters.push_back(*it_clus);
-    }
-
-    if (!dispersedClusters.empty()) {
-        m_blobUtils->insertIDClusters( dispersedClusters, dispersedBlob, Minerva::IDBlob::DispersedIDBlobPatRec );
-        double dummy1 = 0.0;
-        double dummy2 = 0.0;
-        double dummy3 = 0.0;
-        double dummy4 = 0.0;
-        m_idHoughBlob->getBlobEnergyTime_Old(dispersedBlob,dispersed_energy,dummy1,dummy2,dummy3,dummy4);
-        debug()<< "Adding dispersed blob with " << dispersedBlob->nclusters()
-            << " clusters; Dispersed energy = "  << dispersed_energy << endmsg;
-        addObject( event, dispersedBlob );
-
-        if (truthEvent && m_study_unused_energy){
-            SaveTruthUnusedClusterEnergy_Dispersed(truthEvent, dispersedClusters);
-        }
-    }
-
-    debug()<<"Extra_Energy_Dispersed = "<<dispersed_energy<<endmsg;
-
-    event->setDoubleData( "Extra_Energy_Dispersed", dispersed_energy );
-
 }
 
 int CCProtonPi0::GetMCHitPDG(const SmartRef<Minerva::MCHit> mc_hit) const
@@ -4884,59 +4498,15 @@ int CCProtonPi0::GetPDGfromVector(std::vector<int> &all_pdg) const
     }
 }
 
-void CCProtonPi0::SaveExtraEvisLeftover(Minerva::PhysicsEvent *event) const
+void CCProtonPi0::SaveExtraEnergyLeftover(Minerva::PhysicsEvent *event) const
 {
     // Get All UnusedClusters    
-    SmartRefVector<Minerva::IDCluster> unusedClusters; 
-    unusedClusters = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
+    SmartRefVector<Minerva::IDCluster> unusedClusters_Leftover; 
+    unusedClusters_Leftover = event->select<Minerva::IDCluster>("Unused","!LowActivity&!XTalkCandidate");
 
-    debug()<<"N(Unused) to Get Extra Energy = "<<unusedClusters.size()<<endmsg;
+    double extra_energy = m_extraEnergyTool->getCorrectedIDEnergy( unusedClusters_Leftover, 1.0);   
 
-    SmartRefVector<Minerva::IDCluster> Clusters = FilterInSphereClusters(event, unusedClusters, 300);
-    double extra_evis = getClusterEnergy(Clusters);
-
-    event->setDoubleData("Extra_Evis_Leftover", extra_evis);
-}
-
-double CCProtonPi0::getClusterEnergy( SmartRefVector<Minerva::IDCluster> clusters) const
-{
-    SmartRefVector<Minerva::IDCluster>::iterator c;
-
-    double total_energy = 0.0;
-    for (c = clusters.begin(); c != clusters.end(); ++c){
-        total_energy += (*c)->energy();
-    }
-
-    return total_energy;
-}
-
-double CCProtonPi0::GetVertexEnergyCalConst(double evis) const
-{
-    double cal_const;
-
-    if (m_ProtonParticles.size() > 0){
-        cal_const = 0.91;
-    }else{
-        // Values determined from MC Study
-        double min_cal_const = 1.82;
-        double m = -0.001442;
-        double c = 1.964;
-        cal_const = m*evis + c;
-
-        // We have negative slope, limit min value
-        if (cal_const < min_cal_const) cal_const = min_cal_const;
-    }
-
-    return cal_const;
-}
-
-double CCProtonPi0::GetVertexEnergy(const Minerva::PhysicsEvent *event) const
-{
-    double vertex_evis = event->getDoubleData("vertex_blob_evis");
-    double cal_const = GetVertexEnergyCalConst(vertex_evis);
-    double vertex_energy = vertex_evis * cal_const;
-
-    return vertex_energy;
+    event->setDoubleData("Extra_Energy_Leftover", extra_energy);
 }
 
 void CCProtonPi0::FillUsableClusters(SmartRefVector<Minerva::IDCluster> &usableClusters, Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const
@@ -5009,7 +4579,6 @@ void CCProtonPi0::ProcessRejectedClusters(SmartRefVector<Minerva::IDCluster> &re
     if (truthEvent && m_study_unused_energy){
         SaveTruthUnusedClusterEnergy_Rejected(truthEvent, rejectedClusters);
     }
-
     double rejected_energy = 0.0;
 
     //storing rejected id Clusters
@@ -5017,19 +4586,14 @@ void CCProtonPi0::ProcessRejectedClusters(SmartRefVector<Minerva::IDCluster> &re
 
     if (!rejectedClusters.empty()) {
         m_blobUtils->insertIDClusters(rejectedClusters, rejectedBlob, Minerva::IDBlob::DispersedIDBlobPatRec );
-        double dummy1 = 0.0;
-        double dummy2 = 0.0;
-        double dummy3 = 0.0;
-        double dummy4 = 0.0;
-        m_idHoughBlob->getBlobEnergyTime_Old(rejectedBlob, rejected_energy, dummy1, dummy2, dummy3, dummy4);
-        debug()<<"rejectedBlob N(Clusters) = " << rejectedBlob->nclusters()<<endmsg;
-        debug()<<"rejectedBlob Energy = "  <<rejected_energy<<endmsg;
         addObject( event, rejectedBlob );
         m_hitTagger->applyColorTag( rejectedBlob, m_Color_RejectedBlob ); // red
+    
+        rejected_energy = m_extraEnergyTool->getCorrectedIDEnergy( rejectedClusters, 1.0);
     }
 
-    debug()<<"Extra_Energy_Rejected = "<<rejected_energy<<endmsg;
     event->setDoubleData( "Extra_Energy_Rejected", rejected_energy);
+
 }
 
 
@@ -5445,29 +5009,22 @@ bool CCProtonPi0::RecoverSingleShower_View_V(SmartRefVector<Minerva::IDCluster> 
 }
 
 
-double CCProtonPi0::GetTotalExtraEnergy(const Minerva::PhysicsEvent* event) const
+void CCProtonPi0::SetExtraEnergyTotal(Minerva::PhysicsEvent* event) const
 {
-    double extra_energy = 0.0;
-    extra_energy += event->getDoubleData("Extra_Energy_Dispersed");
-    extra_energy += event->getDoubleData("Extra_Energy_Muon"); 
-    extra_energy += event->getDoubleData("Extra_Energy_Rejected"); 
+    double muon = event->getDoubleData("Extra_Energy_Muon"); 
+    double rejected = event->getDoubleData("Extra_Energy_Rejected"); 
+    double leftover = event->getDoubleData("Extra_Energy_Leftover");
 
-    return extra_energy;
+    double total = muon + rejected + leftover;
+
+    debug()<<"Extra_Energy_Muon = "<<muon<<endmsg;
+    debug()<<"Extra_Energy_Rejected = "<<rejected<<endmsg;
+    debug()<<"Extra_Energy_Leftover = "<<leftover<<endmsg;
+    debug()<<"Extra_Energy_Total = "<<total<<endmsg;
+    
+    event->setDoubleData("Extra_Energy_Total", total);
 }
 
-
-Gaudi::LorentzVector CCProtonPi0::Get_Neutrino_4P(double Enu) const
-{
-    const double theta = MinervaUnits::numi_beam_angle_rad;
-
-    double Px = 0.0;
-    double Py = Enu*sin(theta);
-    double Pz = Enu*cos(theta); 
-
-    Gaudi::LorentzVector beam_4P(Px,Py,Pz,Enu);
-
-    return beam_4P;
-}
 
 
 std::vector<double> CCProtonPi0::EstimateShowerEndPoint(const Gaudi::LorentzVector& shower_4P, const std::vector<double> init_pos, double max_z) const

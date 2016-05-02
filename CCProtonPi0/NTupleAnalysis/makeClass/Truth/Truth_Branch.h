@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Apr 12 08:45:02 2016 by ROOT version 5.34/05
+// Sun May  1 11:34:13 2016 by ROOT version 5.34/05
 // from TChain Truth/
 //////////////////////////////////////////////////////////
 
@@ -199,26 +199,26 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[198];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[198];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[198];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[198];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[198];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[152];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[152];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[152];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[152];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[152];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[245];   //[mc_er_nPart]
-   Int_t           mc_er_status[245];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[245];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[245];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[245];   //[mc_er_nPart]
-   Double_t        mc_er_Px[245];   //[mc_er_nPart]
-   Double_t        mc_er_Py[245];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[245];   //[mc_er_nPart]
-   Double_t        mc_er_E[245];   //[mc_er_nPart]
-   Int_t           mc_er_FD[245];   //[mc_er_nPart]
-   Int_t           mc_er_LD[245];   //[mc_er_nPart]
-   Int_t           mc_er_mother[245];   //[mc_er_nPart]
+   Int_t           mc_er_ID[181];   //[mc_er_nPart]
+   Int_t           mc_er_status[181];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[181];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[181];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[181];   //[mc_er_nPart]
+   Double_t        mc_er_Px[181];   //[mc_er_nPart]
+   Double_t        mc_er_Py[181];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[181];   //[mc_er_nPart]
+   Double_t        mc_er_E[181];   //[mc_er_nPart]
+   Int_t           mc_er_FD[181];   //[mc_er_nPart]
+   Int_t           mc_er_LD[181];   //[mc_er_nPart]
+   Int_t           mc_er_mother[181];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
-   Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
+   Int_t           mc_fr_nuAncestorIDs[8];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
    Int_t           mc_fr_decMode;
    Double_t        mc_fr_primProtonVtx[3];
@@ -508,7 +508,7 @@ Truth_Branch::Truth_Branch(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("Truth","");
-      chain->Add("/minerva/data/users/oaltinok/NTupleAnalysis/MC/Merged/mc_minerva1_v2_76a.root/Truth");
+      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_78/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/Truth");
       tree = chain;
 #endif // SINGLE_TREE
 

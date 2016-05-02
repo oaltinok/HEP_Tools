@@ -44,7 +44,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     pi0_KE.setBin(17,0.0,1.7);
     pi0_theta.setBin(18, 0.0, 180.0);
     QSq.setBin(40,0.0,4.0);
-    beamE.setBin(20,0,20.0);
+    beamE.setBin(40,1,10.0);
     
     // Standard Bins
     muon_theta.setBin(12,0.0,25.0);
@@ -75,17 +75,17 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     kE.setBin(50,1,5);
     pi0_evis_pdg.setBin(80,0,300);
     digit_E.setBin(50,0,50);
-
  
     // Event Kinematics Bins
     beamE_Diff_True.setBin(100,1.5,7.5);
     beamE_Diff.setBin(100,-3,3);
+    QSq_Diff.setBin(100,-1,1);
     Q2.setBin(40,0.0,4.0);
-    w.setBin(30,0.0,3.0);
-    wSq.setBin(50,0.0,5.0);
-    vertex_energy.setBin(10,0.0,500.0);
-    vertex_evis.setBin(10,0.0,500.0);
-    extra_energy.setBin(50,0.0,20.0);
+    w.setBin(100,0.0,3.0);
+    wSq.setBin(30,-1.0,5.0);
+    vertex_energy.setBin(20,0.0,500.0);
+    vertex_evis.setBin(20,0.0,500.0);
+    extra_energy.setBin(20,0.0,500.0);
     short_proton_P.setBin(50,0.0,1000.0);
     short_proton_KE.setBin(50,0.0,500.0);
     
@@ -93,7 +93,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     UnusedE.setBin(20,0.0,1000.0);
     
     // Cut Histograms
-    mc_w.setBin(100,0.8,3.0);
+    mc_w.setBin(100,0.0,3.0);
     mc_Q2.setBin(40,0.0,4.0);
     eVis_nuclearTarget.setBin(50,0.0,25.0);
     eVis_other.setBin(60,0.0,3000.0);

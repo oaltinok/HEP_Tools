@@ -72,7 +72,9 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         double Uncertainity_Bckg;
 
         // Pi0 Invariant Mass
-        TH1D* fit_result;
+        TH1D* invMass_fit_result;
+        TH1D* invMass_fit_bckg;
+        TH1D* invMass_fit_signal;
         MnvH1D* invMass_all;
         MnvH1D* invMass_mc_reco_signal;
         MnvH1D* invMass_mc_reco_bckg;

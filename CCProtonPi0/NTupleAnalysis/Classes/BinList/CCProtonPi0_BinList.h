@@ -85,6 +85,7 @@ class CCProtonPi0_BinList
          // Analysis
         CCProtonPi0_SingleBin beamE_Diff_True;
         CCProtonPi0_SingleBin beamE_Diff;
+        CCProtonPi0_SingleBin QSq_Diff;
         CCProtonPi0_SingleBin Q2;
         CCProtonPi0_SingleBin wSq;
         CCProtonPi0_SingleBin w;

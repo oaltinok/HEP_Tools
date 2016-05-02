@@ -49,11 +49,20 @@ void CCProtonPi0_Muon::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV] ",bin_E.get_width()));
         E.push_back(temp);
 
-        //temp = new MnvH1D( Form("%s_%d","P",i),"Reconstructed Muon Momentum",binList.muon_P.get_nBins(), binList.muon_P.get_min(), binList.muon_P.get_max());
         temp = new MnvH1D( Form("%s_%d","P",i),"Reconstructed Muon Momentum",binList.size_muon_P, binList.a_muon_P);
         temp->GetXaxis()->SetTitle("Reconstructed P_{#mu} [GeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
         P.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","P_1Track",i),"Reconstructed Muon Momentum 1Track",binList.size_muon_P, binList.a_muon_P);
+        temp->GetXaxis()->SetTitle("Reconstructed P{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        P_1Track.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","P_2Track",i),"Reconstructed Muon Momentum 2Track",binList.size_muon_P, binList.a_muon_P);
+        temp->GetXaxis()->SetTitle("Reconstructed P{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        P_2Track.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","KE",i),"Reconstructed Muon Kinetic Energy",bin_KE.get_nBins(), bin_KE.get_min(), bin_KE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed T_{#mu} [GeV]");
@@ -64,6 +73,16 @@ void CCProtonPi0_Muon::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [Degree]");
         temp->GetYaxis()->SetTitle("N(events)");
         theta.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","theta_1Track",i),"Reconstructed Muon Theta 1Track",binList.size_muon_theta, binList.a_muon_theta);
+        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [Degree]");
+        temp->GetYaxis()->SetTitle("N(events)");
+        theta_1Track.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","theta_2Track",i),"Reconstructed Muon Theta 2Track",binList.size_muon_theta, binList.a_muon_theta);
+        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [Degree]");
+        temp->GetYaxis()->SetTitle("N(events)");
+        theta_2Track.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","cos_theta",i),"Reconstructed Muon cos(#theta)",binList.muon_cos_theta.get_nBins(), binList.muon_cos_theta.get_min(), binList.muon_cos_theta.get_max());
         temp->GetXaxis()->SetTitle("Reconstructed cos(#theta_{#mu})");
@@ -236,8 +255,12 @@ void CCProtonPi0_Muon::writeHistograms()
     for (int i = 0; i < nHistograms; i++){
         E[i]->Write();
         P[i]->Write();
+        P_1Track[i]->Write();
+        P_2Track[i]->Write();
         KE[i]->Write();
         theta[i]->Write();
+        theta_1Track[i]->Write();
+        theta_2Track[i]->Write();
         cos_theta[i]->Write();
         phi[i]->Write();
     }

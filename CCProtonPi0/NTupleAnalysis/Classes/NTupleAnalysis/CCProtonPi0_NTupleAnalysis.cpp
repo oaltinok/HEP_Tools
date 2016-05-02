@@ -6,14 +6,10 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v2_77";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v2_78";
 
-const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33534e+20;
-//const double CCProtonPi0_NTupleAnalysis::data_POT = 1.36777e+21;
-
-const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.74333e+21;
-//const double CCProtonPi0_NTupleAnalysis::mc_POT = 1.37363e+21;
-
+const double CCProtonPi0_NTupleAnalysis::data_POT = 3.32519e+20;
+const double CCProtonPi0_NTupleAnalysis::mc_POT = 1.93902e+21;
 const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
 
 const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
@@ -27,7 +23,6 @@ const double CCProtonPi0_NTupleAnalysis::rad_to_deg = 180.0/M_PI;
 
 // Flux Correction
 const bool CCProtonPi0_NTupleAnalysis::applyNuEConstraint = true;
-const FluxReweighter::EPlaylist CCProtonPi0_NTupleAnalysis::default_playlist = FluxReweighter::minerva1;
 const FluxReweighter::EFluxVersion CCProtonPi0_NTupleAnalysis::new_flux = FluxReweighter::gen2thin;
 const FluxReweighter::EG4NumiVersion CCProtonPi0_NTupleAnalysis::old_flux = FluxReweighter::g4numiv5;
 
@@ -35,6 +30,12 @@ CCProtonPi0_NTupleAnalysis::CCProtonPi0_NTupleAnalysis()
 {
     // Required for MINERvA Framework Classes
     ROOT::Cintex::Cintex::Enable();
+    
+    frw = NULL;
+    processed_minerva1 = false;
+    processed_minerva7 = false;
+    processed_minerva9 = false;
+    processed_minerva13 = false;
 }
 
 void CCProtonPi0_NTupleAnalysis::OpenTextFile(std::string file_name, std::ofstream &file)
@@ -288,6 +289,34 @@ std::string CCProtonPi0_NTupleAnalysis::GetPlaylist(const int run)
     return playlist;
 }
 
+void CCProtonPi0_NTupleAnalysis::UpdateFluxReweighter(int run)
+{
+    std::string playlist = GetPlaylist(run);
+
+    if (!processed_minerva1 && playlist.compare("minerva1") == 0){
+        std::cout<<"Playlist: minerva1"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minerva1);
+        processed_minerva1 = true;
+    }else if (!processed_minerva7 && playlist.compare("minerva7") == 0){
+        std::cout<<"Playlist: minerva7"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minervaLE_FHC);
+        processed_minerva7 = true;
+    }else if (!processed_minerva9 && playlist.compare("minerva9") == 0){
+        std::cout<<"Playlist: minerva9"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minervaLE_FHC);
+        processed_minerva9 = true;
+    }else if (!processed_minerva13 && playlist.find("minerva13") != std::string::npos){
+        std::cout<<"Playlist: minerva13"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minerva13);
+        processed_minerva13 = true;
+    }
+}
+
+void CCProtonPi0_NTupleAnalysis::ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist)
+{
+    if(frw != NULL) delete frw;
+    frw = new FluxReweighter(14, applyNuEConstraint, playlist, new_flux, old_flux);
+}
 
 
 #endif

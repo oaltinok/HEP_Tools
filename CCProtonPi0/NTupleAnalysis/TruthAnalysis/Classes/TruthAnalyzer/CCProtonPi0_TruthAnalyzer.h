@@ -30,6 +30,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         ~CCProtonPi0_TruthAnalyzer();
         void Loop(std::string playlist);
 
+        // Cross Section Variables
         MnvH1D* muon_P_mc_truth_all_signal;
         MnvH1D* pi0_P_mc_truth_all_signal;
         MnvH1D* pi0_KE_mc_truth_all_signal;
@@ -37,7 +38,46 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         MnvH1D* pi0_theta_mc_truth_all_signal;
         MnvH1D* neutrino_E_mc_truth_all_signal;
         MnvH1D* QSq_mc_truth_all_signal;
-        TH1D* mc_Q2_signal_res;
+
+        // Signal Q2
+        TH1D* mc_Q2_QE;
+
+        TH1D* mc_Q2_RES_1232;
+        TH1D* mc_Q2_RES_1535;
+        TH1D* mc_Q2_RES_1520;
+        TH1D* mc_Q2_RES_Other;
+
+        TH1D* mc_Q2_DIS_1_pi;
+        TH1D* mc_Q2_DIS_2_pi;
+        TH1D* mc_Q2_DIS_Multi_pi;
+        TH1D* mc_Q2_DIS_Other;
+
+        // Signal incomingE
+        TH1D* mc_incomingE_QE;
+
+        TH1D* mc_incomingE_RES_1232;
+        TH1D* mc_incomingE_RES_1535;
+        TH1D* mc_incomingE_RES_1520;
+        TH1D* mc_incomingE_RES_Other;
+
+        TH1D* mc_incomingE_DIS_1_pi;
+        TH1D* mc_incomingE_DIS_2_pi;
+        TH1D* mc_incomingE_DIS_Multi_pi;
+        TH1D* mc_incomingE_DIS_Other;
+
+        // Signal w
+        TH1D* mc_w_QE;
+
+        TH1D* mc_w_RES_1232;
+        TH1D* mc_w_RES_1535;
+        TH1D* mc_w_RES_1520;
+        TH1D* mc_w_RES_Other;
+
+        TH1D* mc_w_DIS_1_pi;
+        TH1D* mc_w_DIS_2_pi;
+        TH1D* mc_w_DIS_Multi_pi;
+        TH1D* mc_w_DIS_Other;
+
 
     private :
         TFile* f;
@@ -50,20 +90,22 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void Calc_WeightFromSystematics();
         void AddOtherErrorBands_FillWithCV();
         void AddErrorBands_FillWithCV(MnvH1D* hist);
-        double GetPercent(double nAll, double nOther);
+        double GetPercent(counter nAll, counter nOther);
         void initHistograms();
         void openTextFiles();
         void resetCounters();
         void writeTextFile();
+        void WriteCounter(counter Counter, counter PercentBase);
         void writeHistograms();
         void FillHistogram(MnvH1D *hist, double var);
         void FillHistogram(TH1D* hist, double var);
         void FillSignalHistograms();
         void UpdateSignalDef();
         double GetFluxWeight();
-        void UpdateFluxReweighter();
-        void ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist);
         std::vector<double> GetFluxError();
+        int Get_nFS_pions();
+        bool isMother_DIS_Fragment(int ind);
+        void PrintEventRecord();
 
         // Default Functions    
         void     Init(std::string playlist, TChain* fChain);
@@ -74,36 +116,23 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         std::string file_name;
         ofstream textFile;
 
-        FluxReweighter* frw;
-        bool processed_minerva7;
-        bool processed_minerva9;
-        bool processed_minerva13;
-
         // Counters
-        double nAll;
-        double nFidVol;
-        double nNoFidVol;
-        double nSignal;
-        // Background With Pi0
-        double nBckg_NoPi0;
-        double nBckg_SinglePi0;
-        double nBckg_MultiPi0;
-        // Background Types Compact
-        double nBckg_Compact_WithPi0;
-        double nBckg_Compact_QELike;
-        double nBckg_Compact_SinglePiPlus;
-        double nBckg_Compact_Other;
-        // Background Types
-        double nBckg_NC;
-        double nBckg_AntiNeutrino;
-        double nBckg_QELike;
-        double nBckg_SingleChargedPion;
-        double nBckg_SingleChargedPion_ChargeExchanged;
-        double nBckg_DoublePion_WithPi0;
-        double nBckg_DoublePion_WithoutPi0;
-        double nBckg_MultiPion_WithPi0;
-        double nBckg_MultiPion_WithoutPi0;
-        double nBckg_Other;
+        counter nAll;
+        counter nFidVol;
+        counter nNoFidVol;
+        counter nFidVol_Signal;
+        counter nFidVol_Bckg;
+
+        // Signal Type
+        counter nQE;
+        counter nRES_1232;
+        counter nRES_1535;
+        counter nRES_1520;
+        counter nRES_Other;
+        counter nDIS_1_pi;
+        counter nDIS_2_pi;
+        counter nDIS_Multi_pi;
+        counter nDIS_Other;
 
         double cvweight;
 
@@ -290,26 +319,26 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        mc_initNucVec[4];
         Double_t        mc_primFSLepton[4];
         Int_t           mc_nFSPart;
-        Double_t        mc_FSPartPx[198];   //[mc_nFSPart]
-        Double_t        mc_FSPartPy[198];   //[mc_nFSPart]
-        Double_t        mc_FSPartPz[198];   //[mc_nFSPart]
-        Double_t        mc_FSPartE[198];   //[mc_nFSPart]
-        Int_t           mc_FSPartPDG[198];   //[mc_nFSPart]
+        Double_t        mc_FSPartPx[152];   //[mc_nFSPart]
+        Double_t        mc_FSPartPy[152];   //[mc_nFSPart]
+        Double_t        mc_FSPartPz[152];   //[mc_nFSPart]
+        Double_t        mc_FSPartE[152];   //[mc_nFSPart]
+        Int_t           mc_FSPartPDG[152];   //[mc_nFSPart]
         Int_t           mc_er_nPart;
-        Int_t           mc_er_ID[245];   //[mc_er_nPart]
-        Int_t           mc_er_status[245];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucX[245];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucY[245];   //[mc_er_nPart]
-        Double_t        mc_er_posInNucZ[245];   //[mc_er_nPart]
-        Double_t        mc_er_Px[245];   //[mc_er_nPart]
-        Double_t        mc_er_Py[245];   //[mc_er_nPart]
-        Double_t        mc_er_Pz[245];   //[mc_er_nPart]
-        Double_t        mc_er_E[245];   //[mc_er_nPart]
-        Int_t           mc_er_FD[245];   //[mc_er_nPart]
-        Int_t           mc_er_LD[245];   //[mc_er_nPart]
-        Int_t           mc_er_mother[245];   //[mc_er_nPart]
+        Int_t           mc_er_ID[181];   //[mc_er_nPart]
+        Int_t           mc_er_status[181];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucX[181];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucY[181];   //[mc_er_nPart]
+        Double_t        mc_er_posInNucZ[181];   //[mc_er_nPart]
+        Double_t        mc_er_Px[181];   //[mc_er_nPart]
+        Double_t        mc_er_Py[181];   //[mc_er_nPart]
+        Double_t        mc_er_Pz[181];   //[mc_er_nPart]
+        Double_t        mc_er_E[181];   //[mc_er_nPart]
+        Int_t           mc_er_FD[181];   //[mc_er_nPart]
+        Int_t           mc_er_LD[181];   //[mc_er_nPart]
+        Int_t           mc_er_mother[181];   //[mc_er_nPart]
         Int_t           mc_fr_nNuAncestorIDs;
-        Int_t           mc_fr_nuAncestorIDs[13];   //[mc_fr_nNuAncestorIDs]
+        Int_t           mc_fr_nuAncestorIDs[8];   //[mc_fr_nNuAncestorIDs]
         Int_t           mc_fr_nuParentID;
         Int_t           mc_fr_decMode;
         Double_t        mc_fr_primProtonVtx[3];

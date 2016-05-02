@@ -29,6 +29,7 @@ CCProtonPi0_Proton::CCProtonPi0_Proton(bool isModeReduce, bool isMC) : CCProtonP
         bin_E.setBin(25, 0.5 ,3.0);
         bin_E_Diff.setBin(100, -0.1,0.1);
         bin_P.setBin(20, 0.0, 2.0);
+        bin_P_Diff.setBin(100, -0.1,0.1);
         bin_KE.setBin(20, 0.0, 2.0);
         bin_trackLength.setBin(25,0.0,250.0);
         bin_trackKinked.setBin(2,0.0,2.0);
@@ -87,10 +88,10 @@ void CCProtonPi0_Proton::initHistograms()
         phi.push_back(temp); 
     }
 
-    theta_theta_test = new MnvH2D( "theta_theta_test","Signal Progon Angle", binList.proton_theta.get_nBins(), binList.proton_theta.get_min(), binList.proton_theta.get_max(),binList.proton_theta.get_nBins(), binList.proton_theta.get_min(), binList.proton_theta.get_max() );
-    theta_theta_test->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [degree]");
-    theta_theta_test->GetYaxis()->SetTitle("True #theta_{#mu} [degree]");
-    AddVertErrorBands_MC(theta_theta_test);
+    proton_theta_response = new MnvH2D( "proton_theta_response","Signal Proton Angle", binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max(),binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
+    proton_theta_response->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [degree]");
+    proton_theta_response->GetYaxis()->SetTitle("True #theta_{#mu} [degree]");
+    AddVertErrorBands_MC(proton_theta_response);
  
     theta_error = new TH1D( "theta_error","Error on cos(theta)",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     theta_error->GetXaxis()->SetTitle("(#theta_{Reco}-#theta_{True})/#theta_{True}");
@@ -100,13 +101,18 @@ void CCProtonPi0_Proton::initHistograms()
     theta_Diff->GetXaxis()->SetTitle("#theta_{Reco}-#theta_{True} [degree]");
     theta_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_theta_Diff.get_width()));
 
-    reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed Proton Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(), bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
-    reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{p} [GeV]");
-    reco_P_true_P->GetYaxis()->SetTitle("True P_{p} [GeV]");
+    proton_P_response = new MnvH2D( "proton_P_response","True vs Reconstructed Proton Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(), bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
+    proton_P_response->GetXaxis()->SetTitle("Reconstructed P_{p} [GeV]");
+    proton_P_response->GetYaxis()->SetTitle("True P_{p} [GeV]");
+    AddVertErrorBands_MC(proton_P_response);
 
     P_error = new TH1D( "P_error","Error on Proton Momentum",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     P_error->GetXaxis()->SetTitle("(P_{Reco}-P_{True})/P_{True}");
     P_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
+
+    P_Diff = new TH1D( "P_Diff","Difference on Proton Energy",bin_P_Diff.get_nBins(), bin_P_Diff.get_min(), bin_P_Diff.get_max() );
+    P_Diff->GetXaxis()->SetTitle("E_{Reco}-E_{True} [GeV]");
+    P_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_P_Diff.get_width()));
 
     reco_E_true_E = new TH2D( "reco_E_true_E","True vs Reconstructed Proton Energy",bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max(), bin_E.get_nBins(), bin_E.get_min(), bin_E.get_max());
     reco_E_true_E->GetXaxis()->SetTitle("Reconstructed E_{p} [GeV]");
@@ -137,17 +143,18 @@ void CCProtonPi0_Proton::writeHistograms()
         phi[i]->Write();
     }
 
-    theta_theta_test->Write();
+    proton_theta_response->Write();
     theta_error->Write();
     theta_Diff->Write();
 
-    reco_P_true_P->Write();
+    proton_P_response->Write();
     P_error->Write();
 
     reco_E_true_E->Write();
     E_error->Write();
 
     E_Diff->Write();
+    P_Diff->Write();
 
     f->Close();
 }

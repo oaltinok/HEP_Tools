@@ -8,6 +8,7 @@
 #include "TCanvas.h"
 #include "TPad.h"
 #include "THStack.h"
+#include "TGaxis.h"
 #include "TLatex.h"
 #include "TLegend.h"
 #include "TStyle.h"

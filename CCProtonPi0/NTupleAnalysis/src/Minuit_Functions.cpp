@@ -49,7 +49,7 @@ void calc_ChiSq(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t if
     double ChiSq = 0;
 
     // Calculate ChiSq for Michel for ALL Bins
-    //ChiSq += calc_ChiSq_SideBand(sbtool.Michel, par);
+    ChiSq += calc_ChiSq_SideBand(sbtool.Michel, par);
    
     // Calculate ChiSq for pID for ALL Bins
     ChiSq += calc_ChiSq_SideBand(sbtool.pID, par);

@@ -1,29 +1,19 @@
-nAll = 42456357.00
-nFidVol = 9153177.00 21.56%
-nNoFidVol = 33303180.00 78.44%
-================================================================
-nSignal = 483753.00 5.29%
-----------------------------------------------------------------
-nBckg_WithPi0 = 4302844.00 47.01%
-nBckg_QELike = 1087443.00 11.88%
-nBckg_SinglePiPlus = 1297152.00 14.17%
-nBckg_Other = 1981985.00 21.65%
-----------------------------------------------------------------
-nBckg_NoPi0 = 4078131.00 44.55%
-nBckg_SinglePi0 = 2205536.00 24.10%
-nBckg_MultiPi0 = 2385757.00 26.06%
-----------------------------------------------------------------
-nBckg_NC = 2414214.00 26.38%
-nBckg_AntiNeutrino = 524394.00 5.73%
-nBckg_QELike = 1125077.00 12.29%
-nBckg_SingleChargedPion = 1331093.00 14.54%
-nBckg_SingleChargedPion_ChargeExchanged = 254816.00 2.78%
-nBckg_DoublePion_WithPi0 = 692872.00 7.57%
-nBckg_DoublePion_WithoutPi0 = 226860.00 2.48%
-nBckg_MultiPion_WithPi0 = 1140650.00 12.46%
-nBckg_MultiPion_WithoutPi0 = 115463.00 1.26%
-nBckg_Other = 843985.00 9.22%
-----------------------------------------------------------------
-Total Signal & Background With Pi0 = 9153177.00 100.00%
-Total Signal & Background Compact = 9153177.00 100.00%
-Total Signal & Background = 9153177.00 100.00%
+nAll	42430044.0	100.0
+nFidVol	9145642.0	21.6
+nNoFidVol	33284402.0	78.4
+
+nFidVol_Signal	483386.0	5.3
+nFidVol_Bckg	8662256.0	94.7
+
+nQuasi_Elastic	7238.0	1.5
+
+nSignal_RES_Delta	129976.0	26.9
+nSignal_RES_1535	24817.0	5.1
+nSignal_RES_1520	26403.0	5.5
+nSignal_RES_Other	39139.0	8.1
+
+nSignal_DIS_1pi	202904.0	42.0
+nSignal_DIS_2pi	48456.0	10.0
+nSignal_DIS_Multi_pi	4453.0	0.9
+nSignal_DIS_Other	0.0	0.0
+

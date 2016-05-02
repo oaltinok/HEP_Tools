@@ -80,6 +80,12 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     TH1D* signal_invMass = new TH1D(invMass_mc_reco_signal->GetCVHistoWithStatError());
     TH1D* bckg_invMass = new TH1D(invMass_mc_reco_bckg->GetCVHistoWithStatError());
     
+    invMass_fit_signal = new TH1D(*data_invMass); // Start as data hist (will subtract bckg to get correct signal data)
+    invMass_fit_signal->SetName("invMass_fit_signal");
+    
+    invMass_fit_bckg = new TH1D(*bckg_invMass);
+    invMass_fit_bckg->SetName("invMass_bckg");
+
     // ------------------------------------------------------------------------
     // Estimate Background using TFractionFitter
     // ------------------------------------------------------------------------
@@ -97,8 +103,8 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
         std::cerr<<"\t\tFit Error!"<<std::endl;
     }
     
-    fit_result  = new TH1D (*(TH1D*)fitter->GetPlot());
-    fit_result->SetName("data_fit_result"); 
+    invMass_fit_result  = new TH1D (*(TH1D*)fitter->GetPlot());
+    invMass_fit_result->SetName("data_fit_result"); 
 
     Double_t N_Data = data_invMass->Integral();
     Double_t f0 =     0.0; // fittted signal fraction
@@ -117,12 +123,13 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     std::cout<<"\t\tBackground Fraction = "<<f1<<" Error = "<<f1_err<<" Uncertainity = "<<rf1<<std::endl;
 
     if (status == 0) {
-        TH1D* fitted_background = (TH1D*) bckg_invMass->Clone("fitted_bkg");
-        double area = fitted_background->Integral();
+        double area = invMass_fit_bckg->Integral();
         double total_fitted_background = f1 * N_Data; // Total N(Bckg) in Data
         std::cout<<"\tAll Events in Data (Whole Spectrum) = "<<N_Data<<std::endl;
         std::cout<<"\tBackground in Data (Whole Spectrum) = "<<total_fitted_background<<std::endl;
-        fitted_background->Scale(total_fitted_background/area); 
+        invMass_fit_bckg->Scale(total_fitted_background/area); 
+        // Subtract scaled bckg hist from data hist
+        invMass_fit_signal->Add(invMass_fit_bckg,-1); 
 
             // this calculation overestimates the number of background events
             // in the lower and upper bins
@@ -130,12 +137,14 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
 
             // integrate the number of background events correctly
             // notice the mass range, not bin range
+        N_Background_Data = Integrate_SignalRegion(invMass_fit_bckg);
+        double N_Signal_Data = Integrate_SignalRegion(invMass_fit_signal);
         double N_All_Data = Integrate_SignalRegion(data_invMass);
-        N_Background_Data = Integrate_SignalRegion(fitted_background);
 
         std::cout<<std::endl;
         std::cout<<"\tAll Events in Data (Signal Region) = "<<N_All_Data<<std::endl; 
         std::cout<<"\tBackground in Data (Signal Region) = "<<N_Background_Data<<std::endl; 
+        std::cout<<"\tSignal in Data (Signal Region) = "<<N_Signal_Data<<std::endl; 
     }
 
     delete mc_models;
@@ -420,7 +429,9 @@ void CCProtonPi0_CrossSection::writeHistograms()
     f_out->cd();
     
     // Pi0 Invariant Mass
-    fit_result->Write();
+    invMass_fit_result->Write();
+    invMass_fit_bckg->Write();
+    invMass_fit_signal->Write();
     invMass_all->Write();
     invMass_mc_reco_signal->Write();
     invMass_mc_reco_bckg->Write();

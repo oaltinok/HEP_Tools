@@ -25,7 +25,8 @@ class CCProtonPi0_Proton : public CCProtonPi0_Particle
         void initHistograms();
         void writeHistograms();
 
-        MnvH2D* theta_theta_test;
+        MnvH2D* proton_theta_response;
+        MnvH2D* proton_P_response;
 
     private:
         CCProtonPi0_SingleBin bin_trackLength;

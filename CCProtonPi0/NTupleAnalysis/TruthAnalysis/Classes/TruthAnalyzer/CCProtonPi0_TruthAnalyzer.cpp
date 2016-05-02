@@ -9,7 +9,7 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 {
     // Control Flow
     bool applyMaxEvents = false;
-    double nMaxEvents = 100000;
+    double nMaxEvents = 1000000;
 
     //------------------------------------------------------------------------
     // Create chain
@@ -28,8 +28,16 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
     fChain->SetBranchStatus("*genie_wgt_*", true);
     fChain->SetBranchStatus("mc_run", true);
     fChain->SetBranchStatus("mc_Q2", true);
+    fChain->SetBranchStatus("mc_w", true);
     fChain->SetBranchStatus("mc_intType", true);
+    fChain->SetBranchStatus("mc_resID", true);
     fChain->SetBranchStatus("mc_incomingE", true);
+    fChain->SetBranchStatus("mc_nFSPart", true);
+    fChain->SetBranchStatus("mc_FSPartPDG", true);
+    fChain->SetBranchStatus("mc_er_nPart", true);
+    fChain->SetBranchStatus("mc_er_ID", true);
+    fChain->SetBranchStatus("mc_er_status", true);
+    fChain->SetBranchStatus("mc_er_mother", true);
 
     //------------------------------------------------------------------------
     // Loop over Chain
@@ -57,45 +65,23 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
             break;
         }
 
-        nAll++;
-        if (truth_isFidVol) nFidVol++;
+        nAll.count++;
+        if (truth_isFidVol) nFidVol.count++;
         else{
-            nNoFidVol++;
+            nNoFidVol.count++;
             continue;
         }
 
         UpdateSignalDef();
         
-        // Count Signal and Background
+        // Count Signal and Background inside Fiducial Volume
+        if (truth_isSignal) nFidVol_Signal.count++;
+        else nFidVol_Bckg.count++;
+
+        // Count Signal Type & Fill Histograms
         if (truth_isSignal){
             FillSignalHistograms();
-            nSignal++;
         }
-
-        // Background With Pi0
-        if (truth_isBckg_NoPi0) nBckg_NoPi0++;
-        else if (truth_isBckg_SinglePi0) nBckg_SinglePi0++;
-        else if (truth_isBckg_MultiPi0) nBckg_MultiPi0++;
-
-        // Background Types Compact
-        if (truth_isBckg_Compact_WithPi0) nBckg_Compact_WithPi0++;
-        else if (truth_isBckg_Compact_QELike) nBckg_Compact_QELike++;
-        else if (truth_isBckg_Compact_SinglePiPlus) nBckg_Compact_SinglePiPlus++;
-        else if (truth_isBckg_Compact_Other) nBckg_Compact_Other++;
-
-        // Background Types
-        if (truth_isBckg_NC) nBckg_NC++;
-        else if (truth_isBckg_AntiNeutrino) nBckg_AntiNeutrino++;
-        else if (truth_isBckg_QELike) nBckg_QELike++;
-        else if (truth_isBckg_SingleChargedPion) nBckg_SingleChargedPion++;
-        else if (truth_isBckg_SingleChargedPion_ChargeExchanged) nBckg_SingleChargedPion_ChargeExchanged++;
-        else if (truth_isBckg_DoublePionWithPi0) nBckg_DoublePion_WithPi0++;
-        else if (truth_isBckg_DoublePionWithoutPi0) nBckg_DoublePion_WithoutPi0++;
-        else if (truth_isBckg_MultiPionWithPi0) nBckg_MultiPion_WithPi0++;
-        else if (truth_isBckg_MultiPionWithoutPi0) nBckg_MultiPion_WithoutPi0++;
-        else if (truth_isBckg_Other) nBckg_Other++;
-        else if (truth_isFidVol && !truth_isSignal) std::cout<<"WARNING! No Background Type"<<std::endl;
-    
     }
 
     // Add Other Error Bands and Fill With CV
@@ -107,55 +93,48 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 
 void CCProtonPi0_TruthAnalyzer::writeTextFile() 
 {
-    double totalBackgroundWithPi0 = nBckg_NoPi0 + nBckg_SinglePi0 + nBckg_MultiPi0;
-    double totalBackground_Compact = nBckg_Compact_WithPi0 + nBckg_Compact_QELike + nBckg_Compact_SinglePiPlus + nBckg_Compact_Other;
-    double totalBackground = nBckg_NC + nBckg_AntiNeutrino + nBckg_QELike + nBckg_SingleChargedPion + nBckg_SingleChargedPion_ChargeExchanged + nBckg_DoublePion_WithPi0 + nBckg_DoublePion_WithoutPi0 + nBckg_MultiPion_WithPi0 + nBckg_MultiPion_WithoutPi0 + nBckg_Other;
-    double totalEvents1 = nSignal + totalBackgroundWithPi0;
-    double totalEvents2 = nSignal + totalBackground_Compact;
-    double totalEvents3 = nSignal + totalBackground;
-
     // Formatting for Text Output
     textFile<<std::fixed;
-    textFile<<std::setprecision(2);
+    textFile<<std::setprecision(1);
 
-    // Write to Text File
-    textFile<<"nAll = "<<nAll<<std::endl;
-    textFile<<"nFidVol = "<<nFidVol<<" "<<GetPercent(nAll,nFidVol)<<"%"<<std::endl;
-    textFile<<"nNoFidVol = "<<nNoFidVol<<" "<<GetPercent(nAll,nNoFidVol)<<"%"<<std::endl;
-    textFile<<"================================================================"<<std::endl;
-    textFile<<"nSignal = "<<nSignal<<" "<<GetPercent(nFidVol,nSignal)<<"%"<<std::endl;
-    textFile<<"----------------------------------------------------------------"<<std::endl;
-    textFile<<"nBckg_WithPi0 = "<<nBckg_Compact_WithPi0<<" "<<GetPercent(nFidVol,nBckg_Compact_WithPi0)<<"%"<<std::endl;
-    textFile<<"nBckg_QELike = "<<nBckg_Compact_QELike<<" "<<GetPercent(nFidVol,nBckg_Compact_QELike)<<"%"<<std::endl;
-    textFile<<"nBckg_SinglePiPlus = "<<nBckg_Compact_SinglePiPlus<<" "<<GetPercent(nFidVol,nBckg_Compact_SinglePiPlus)<<"%"<<std::endl;
-    textFile<<"nBckg_Other = "<<nBckg_Compact_Other<<" "<<GetPercent(nFidVol,nBckg_Compact_Other)<<"%"<<std::endl;
-    textFile<<"----------------------------------------------------------------"<<std::endl;
-    textFile<<"nBckg_NoPi0 = "<<nBckg_NoPi0<<" "<<GetPercent(nFidVol,nBckg_NoPi0)<<"%"<<std::endl;
-    textFile<<"nBckg_SinglePi0 = "<<nBckg_SinglePi0<<" "<<GetPercent(nFidVol,nBckg_SinglePi0)<<"%"<<std::endl;
-    textFile<<"nBckg_MultiPi0 = "<<nBckg_MultiPi0<<" "<<GetPercent(nFidVol,nBckg_MultiPi0)<<"%"<<std::endl;
-    textFile<<"----------------------------------------------------------------"<<std::endl;
-    textFile<<"nBckg_NC = "<<nBckg_NC<<" "<<GetPercent(nFidVol,nBckg_NC)<<"%"<<std::endl;
-    textFile<<"nBckg_AntiNeutrino = "<<nBckg_AntiNeutrino<<" "<<GetPercent(nFidVol,nBckg_AntiNeutrino)<<"%"<<std::endl;
-    textFile<<"nBckg_QELike = "<<nBckg_QELike<<" "<<GetPercent(nFidVol,nBckg_QELike)<<"%"<<std::endl;
-    textFile<<"nBckg_SingleChargedPion = "<<nBckg_SingleChargedPion<<" "<<GetPercent(nFidVol,nBckg_SingleChargedPion)<<"%"<<std::endl;
-    textFile<<"nBckg_SingleChargedPion_ChargeExchanged = "<<nBckg_SingleChargedPion_ChargeExchanged<<" "<<GetPercent(nFidVol,nBckg_SingleChargedPion_ChargeExchanged)<<"%"<<std::endl;
-    textFile<<"nBckg_DoublePion_WithPi0 = "<<nBckg_DoublePion_WithPi0<<" "<<GetPercent(nFidVol,nBckg_DoublePion_WithPi0)<<"%"<<std::endl;
-    textFile<<"nBckg_DoublePion_WithoutPi0 = "<<nBckg_DoublePion_WithoutPi0<<" "<<GetPercent(nFidVol,nBckg_DoublePion_WithoutPi0)<<"%"<<std::endl;
-    textFile<<"nBckg_MultiPion_WithPi0 = "<<nBckg_MultiPion_WithPi0<<" "<<GetPercent(nFidVol,nBckg_MultiPion_WithPi0)<<"%"<<std::endl;
-    textFile<<"nBckg_MultiPion_WithoutPi0 = "<<nBckg_MultiPion_WithoutPi0<<" "<<GetPercent(nFidVol,nBckg_MultiPion_WithoutPi0)<<"%"<<std::endl;
-    textFile<<"nBckg_Other = "<<nBckg_Other<<" "<<GetPercent(nFidVol,nBckg_Other)<<"%"<<std::endl;
-    textFile<<"----------------------------------------------------------------"<<std::endl;
+    // All Events
+    WriteCounter(nAll, nAll);
+    WriteCounter(nFidVol, nAll);
+    WriteCounter(nNoFidVol, nAll);
+    textFile<<std::endl;
 
-    textFile<<"Total Signal & Background With Pi0 = "<<totalEvents1<<" "<<GetPercent(nFidVol,totalEvents1)<<"%"<<std::endl;
-    textFile<<"Total Signal & Background Compact = "<<totalEvents2<<" "<<GetPercent(nFidVol,totalEvents2)<<"%"<<std::endl;
-    textFile<<"Total Signal & Background = "<<totalEvents3<<" "<<GetPercent(nFidVol,totalEvents3)<<"%"<<std::endl;
+    // Events inside Fiducial Volume
+    WriteCounter(nFidVol_Signal, nFidVol);
+    WriteCounter(nFidVol_Bckg, nFidVol);
+    textFile<<std::endl;
+ 
+    // Signal Types
+    WriteCounter(nQE, nFidVol_Signal);
+    textFile<<std::endl;
 
+    WriteCounter(nRES_1232, nFidVol_Signal);
+    WriteCounter(nRES_1535, nFidVol_Signal);
+    WriteCounter(nRES_1520, nFidVol_Signal);
+    WriteCounter(nRES_Other, nFidVol_Signal);
+    textFile<<std::endl;
+   
+    WriteCounter(nDIS_1_pi, nFidVol_Signal);
+    WriteCounter(nDIS_2_pi, nFidVol_Signal);
+    WriteCounter(nDIS_Multi_pi, nFidVol_Signal);
+    WriteCounter(nDIS_Other, nFidVol_Signal);
+    textFile<<std::endl;
+   
     textFile.close();
 }
 
-double CCProtonPi0_TruthAnalyzer::GetPercent(double nAll, double nOther)
+void CCProtonPi0_TruthAnalyzer::WriteCounter(counter Counter, counter PercentBase)
 {
-    double percent = (nOther/nAll) * 100;
+    textFile<<Counter.name<<"\t"<<Counter.count<<"\t"<<GetPercent(PercentBase,Counter)<<std::endl;
+}
+
+double CCProtonPi0_TruthAnalyzer::GetPercent(counter nAll, counter nOther)
+{
+    double percent = (nOther.count/nAll.count) * 100;
     return percent;
 }
 
@@ -173,12 +152,6 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() : CCProtonPi0_NTupleAnaly
     std::cout<<"\tRoot File: "<<rootDir<<std::endl;
     f = new TFile(rootDir.c_str(),"RECREATE");
  
-    // Initialize FluxReweighter with default playlist 
-    frw = new FluxReweighter(14, applyNuEConstraint, default_playlist, new_flux, old_flux);
-    processed_minerva7 = false;
-    processed_minerva9 = false;
-    processed_minerva13 = false;
-
     initHistograms();
     
     openTextFiles();
@@ -190,33 +163,25 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() : CCProtonPi0_NTupleAnaly
 
 void CCProtonPi0_TruthAnalyzer::resetCounters() 
 {
-    nAll = 0.0;
-    nFidVol = 0.0;
-    nNoFidVol = 0.0;
-    nSignal = 0.0;
+    nAll.name = "nAll";
+    nFidVol.name = "nFidVol";
+    nNoFidVol.name = "nNoFidVol";
+    
+    nFidVol_Signal.name = "nFidVol_Signal";
+    nFidVol_Bckg.name = "nFidVol_Bckg";
 
-    // Background With Pi0
-    nBckg_NoPi0 = 0.0;
-    nBckg_SinglePi0 = 0.0;
-    nBckg_MultiPi0 = 0.0;
-
-    // Background Types Compact
-    nBckg_Compact_WithPi0 = 0.0;
-    nBckg_Compact_QELike = 0.0;
-    nBckg_Compact_SinglePiPlus = 0.0;
-    nBckg_Compact_Other = 0.0;
-
-    // Background Types
-    nBckg_NC = 0.0;
-    nBckg_AntiNeutrino = 0.0;
-    nBckg_QELike = 0.0;
-    nBckg_SingleChargedPion = 0.0;
-    nBckg_SingleChargedPion_ChargeExchanged = 0.0;
-    nBckg_DoublePion_WithPi0 = 0.0;
-    nBckg_DoublePion_WithoutPi0 = 0.0;
-    nBckg_MultiPion_WithPi0 = 0.0;
-    nBckg_MultiPion_WithoutPi0 = 0.0;
-    nBckg_Other = 0.0;
+    // Signal Type
+    nQE.name = "nQuasi_Elastic";
+    
+    nRES_1232.name = "nSignal_RES_Delta";
+    nRES_1535.name = "nSignal_RES_1535";
+    nRES_1520.name = "nSignal_RES_1520";
+    nRES_Other.name = "nSignal_RES_Other";
+    
+    nDIS_1_pi.name = "nSignal_DIS_1pi";
+    nDIS_2_pi.name = "nSignal_DIS_2pi";
+    nDIS_Multi_pi.name = "nSignal_DIS_Multi_pi";
+    nDIS_Other.name = "nSignal_DIS_Other";
 }
 
 
@@ -286,9 +251,123 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     AddVertErrorBand_Flux(QSq_mc_truth_all_signal);
     AddVertErrorBand_Genie(QSq_mc_truth_all_signal);
 
-    mc_Q2_signal_res = new TH1D( "mc_Q2_signal_res","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
-    mc_Q2_signal_res->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_signal_res->GetYaxis()->SetTitle("N(Events)");
+    // ------------------------------------------------------------------------
+    // Signal Q2
+    // ------------------------------------------------------------------------
+    mc_Q2_QE = new TH1D("mc_Q2_QE","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_QE->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_QE->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_RES_1232 = new TH1D("mc_Q2_RES_1232","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_1232->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_RES_1232->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_RES_1535 = new TH1D("mc_Q2_RES_1535","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_1535->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_RES_1535->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_RES_1520 = new TH1D("mc_Q2_RES_1520","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_1520->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_RES_1520->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_RES_Other = new TH1D("mc_Q2_RES_Other","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_RES_Other->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_DIS_1_pi = new TH1D("mc_Q2_DIS_1_pi","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_1_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_DIS_2_pi = new TH1D("mc_Q2_DIS_2_pi","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_2_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_DIS_Multi_pi = new TH1D("mc_Q2_DIS_Multi_pi","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_Multi_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_DIS_Other = new TH1D("mc_Q2_DIS_Other","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+
+    // ------------------------------------------------------------------------
+    // Signal incomingE
+    // ------------------------------------------------------------------------
+    mc_incomingE_QE = new TH1D("mc_incomingE_QE","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_QE->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_QE->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_RES_1232 = new TH1D("mc_incomingE_RES_1232","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_1232->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_RES_1232->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_RES_1535 = new TH1D("mc_incomingE_RES_1535","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_1535->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_RES_1535->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_RES_1520 = new TH1D("mc_incomingE_RES_1520","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_1520->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_RES_1520->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_RES_Other = new TH1D("mc_incomingE_RES_Other","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_RES_Other->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_DIS_1_pi = new TH1D("mc_incomingE_DIS_1_pi","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_1_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_DIS_2_pi = new TH1D("mc_incomingE_DIS_2_pi","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_2_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_DIS_Multi_pi = new TH1D("mc_incomingE_DIS_Multi_pi","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_Multi_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_DIS_Other = new TH1D("mc_incomingE_DIS_Other","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+
+    // ------------------------------------------------------------------------
+    // Signal w
+    // ------------------------------------------------------------------------
+    mc_w_QE = new TH1D("mc_w_QE","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_QE->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_QE->GetYaxis()->SetTitle("N(Events)");
+ 
+    mc_w_RES_1232 = new TH1D("mc_w_RES_1232","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_RES_1232->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_RES_1232->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_RES_1535 = new TH1D("mc_w_RES_1535","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_RES_1535->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_RES_1535->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_RES_1520 = new TH1D("mc_w_RES_1520","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_RES_1520->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_RES_1520->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_RES_Other = new TH1D("mc_w_RES_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_RES_Other->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_RES_Other->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_DIS_1_pi = new TH1D("mc_w_DIS_1_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_DIS_1_pi->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_DIS_2_pi = new TH1D("mc_w_DIS_2_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_DIS_2_pi->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_DIS_Multi_pi = new TH1D("mc_w_DIS_Multi_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_DIS_Multi_pi->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_DIS_Other = new TH1D("mc_w_DIS_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_DIS_Other->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+
 }
 
 void CCProtonPi0_TruthAnalyzer::FillHistogram(MnvH1D* hist, double var)
@@ -350,7 +429,7 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
 
 void CCProtonPi0_TruthAnalyzer::Calc_WeightFromSystematics()
 {
-    if(mc_run >= 10250) UpdateFluxReweighter(); 
+    UpdateFluxReweighter(mc_run); 
         
     // Replace cvweight with Flux Weight
     cvweight = GetFluxWeight();
@@ -376,31 +455,6 @@ std::vector<double> CCProtonPi0_TruthAnalyzer::GetFluxError()
     return flux_error;
 }
 
-void CCProtonPi0_TruthAnalyzer::UpdateFluxReweighter()
-{
-    std::string playlist = GetPlaylist(mc_run);
-
-    if (!processed_minerva7 && playlist.compare("minerva7") == 0){
-        std::cout<<"Playlist: minerva7"<<std::endl;
-        ReInitFluxReweighter(FluxReweighter::minervaLE_FHC);
-        processed_minerva7 = true;
-    }else if (!processed_minerva9 && playlist.compare("minerva9") == 0){
-        std::cout<<"Playlist: minerva9"<<std::endl;
-        ReInitFluxReweighter(FluxReweighter::minervaLE_FHC);
-        processed_minerva9 = true;
-    }else if (!processed_minerva13 && playlist.find("minerva13") != std::string::npos){
-        std::cout<<"Playlist: minerva13"<<std::endl;
-        ReInitFluxReweighter(FluxReweighter::minerva13);
-        processed_minerva13 = true;
-    }
-}
-
-void CCProtonPi0_TruthAnalyzer::ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist)
-{
-    delete frw;
-    frw = new FluxReweighter(14, applyNuEConstraint, playlist, new_flux, old_flux);
-}
-
 void CCProtonPi0_TruthAnalyzer::AddOtherErrorBands_FillWithCV()
 {
     AddErrorBands_FillWithCV(muon_P_mc_truth_all_signal);
@@ -420,6 +474,8 @@ void CCProtonPi0_TruthAnalyzer::AddErrorBands_FillWithCV(MnvH1D* hist)
 void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
 {
     Calc_WeightFromSystematics();
+
+    // Cross Section Variables
     FillHistogram(muon_P_mc_truth_all_signal, truth_muon_P * MeV_to_GeV);
     FillHistogram(muon_theta_mc_truth_all_signal, truth_muon_theta * rad_to_deg);
     FillHistogram(pi0_P_mc_truth_all_signal, truth_pi0_P * MeV_to_GeV);
@@ -427,7 +483,61 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
     FillHistogram(pi0_theta_mc_truth_all_signal, truth_pi0_theta * rad_to_deg);
     FillHistogram(neutrino_E_mc_truth_all_signal, mc_incomingE * MeV_to_GeV);
     FillHistogram(QSq_mc_truth_all_signal, mc_Q2 * MeVSq_to_GeVSq);
-    if (mc_intType == 2) FillHistogram(mc_Q2_signal_res, mc_Q2 * MeVSq_to_GeVSq);
+    
+    // Signal Characteristics
+    if (mc_intType == 1){
+        nQE.count++;
+        FillHistogram(mc_Q2_QE, mc_Q2 * MeVSq_to_GeVSq);
+        FillHistogram(mc_incomingE_QE, mc_incomingE * MeV_to_GeV);
+        FillHistogram(mc_w_QE, mc_w * MeV_to_GeV);
+    }else if (mc_intType == 2){
+        if (mc_resID == 0){ 
+            nRES_1232.count++; 
+            FillHistogram(mc_Q2_RES_1232, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_incomingE_RES_1232, mc_incomingE * MeV_to_GeV);
+            FillHistogram(mc_w_RES_1232, mc_w * MeV_to_GeV);
+        }else if (mc_resID == 1){
+            nRES_1535.count++; 
+            FillHistogram(mc_Q2_RES_1535, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_incomingE_RES_1535, mc_incomingE * MeV_to_GeV);
+            FillHistogram(mc_w_RES_1535, mc_w * MeV_to_GeV);
+        }else if (mc_resID == 2){
+            nRES_1520.count++; 
+            FillHistogram(mc_Q2_RES_1520, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_incomingE_RES_1520, mc_incomingE * MeV_to_GeV);
+            FillHistogram(mc_w_RES_1520, mc_w * MeV_to_GeV);
+        }else{
+            nRES_Other.count++; 
+            FillHistogram(mc_Q2_RES_Other, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_incomingE_RES_Other, mc_incomingE * MeV_to_GeV);
+            FillHistogram(mc_w_RES_Other, mc_w * MeV_to_GeV);
+        }
+    }else if (mc_intType == 3){
+        int nFS_pions = Get_nFS_pions();
+        if (nFS_pions == 1){
+            nDIS_1_pi.count++;
+            FillHistogram(mc_Q2_DIS_1_pi, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_incomingE_DIS_1_pi, mc_incomingE * MeV_to_GeV);
+            FillHistogram(mc_w_DIS_1_pi, mc_w * MeV_to_GeV);
+        }else if (nFS_pions == 2){
+            nDIS_2_pi.count++;
+            FillHistogram(mc_Q2_DIS_2_pi, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_incomingE_DIS_2_pi, mc_incomingE * MeV_to_GeV);
+            FillHistogram(mc_w_DIS_2_pi, mc_w * MeV_to_GeV);
+        }else if (nFS_pions > 2){
+            nDIS_Multi_pi.count++;
+            FillHistogram(mc_Q2_DIS_Multi_pi, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_incomingE_DIS_Multi_pi, mc_incomingE * MeV_to_GeV);
+            FillHistogram(mc_w_DIS_Multi_pi, mc_w * MeV_to_GeV);
+        }else{
+            nDIS_Other.count++;
+            FillHistogram(mc_Q2_DIS_Other, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_incomingE_DIS_Other, mc_incomingE * MeV_to_GeV);
+            FillHistogram(mc_w_DIS_Other, mc_w * MeV_to_GeV);
+        }
+    }else{
+        std::cout<<"WARNING! Signal Event with different interaction Type!"<<std::endl;
+    }
 }
 
 void CCProtonPi0_TruthAnalyzer::UpdateSignalDef()
@@ -445,10 +555,40 @@ void CCProtonPi0_TruthAnalyzer::UpdateSignalDef()
     }
 }
 
+int CCProtonPi0_TruthAnalyzer::Get_nFS_pions()
+{
+    int nFS_pions = 0;
+
+    for (int i = 0; i < mc_er_nPart; ++i){
+        if (std::abs(mc_er_ID[i]) == 211 || mc_er_ID[i] == 111){
+            if (isMother_DIS_Fragment(i)) nFS_pions++;
+        }
+    }
+
+    return nFS_pions;
+}
+
+bool CCProtonPi0_TruthAnalyzer::isMother_DIS_Fragment(int ind)
+{
+    int mother_ind = mc_er_mother[ind];
+
+    if (mc_er_status[mother_ind] == 12) return true;
+    else return false;
+}
+
+void CCProtonPi0_TruthAnalyzer::PrintEventRecord()
+{
+    std::cout<<"-------------"<<std::endl;
+    for (int i = 0; i < mc_er_nPart; ++i){
+        std::cout<<mc_er_ID[i]<<" "<<mc_er_status[i]<<" "<<mc_er_mother[i]<<std::endl;
+    }
+}
+
 void CCProtonPi0_TruthAnalyzer::writeHistograms()
 {
     f->cd();
 
+    // Cross Section Variables
     muon_P_mc_truth_all_signal->Write();
     muon_theta_mc_truth_all_signal->Write();
     pi0_P_mc_truth_all_signal->Write();
@@ -456,8 +596,44 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     pi0_theta_mc_truth_all_signal->Write();
     neutrino_E_mc_truth_all_signal->Write();
     QSq_mc_truth_all_signal->Write();
-    mc_Q2_signal_res->Write();
 
+    // Signal Q2
+    mc_Q2_QE->Write();
+    mc_Q2_RES_1232->Write();
+    mc_Q2_RES_1535->Write();
+    mc_Q2_RES_1520->Write();
+    mc_Q2_RES_Other->Write();
+   
+    mc_Q2_DIS_1_pi->Write();
+    mc_Q2_DIS_2_pi->Write();
+    mc_Q2_DIS_Multi_pi->Write();
+    mc_Q2_DIS_Other->Write();
+ 
+    // Signal incomingE
+    mc_incomingE_QE->Write();
+    mc_incomingE_RES_1232->Write();
+    mc_incomingE_RES_1535->Write();
+    mc_incomingE_RES_1520->Write();
+    mc_incomingE_RES_Other->Write();
+   
+    mc_incomingE_DIS_1_pi->Write();
+    mc_incomingE_DIS_2_pi->Write();
+    mc_incomingE_DIS_Multi_pi->Write();
+    mc_incomingE_DIS_Other->Write();
+ 
+    // Signal w
+    mc_w_QE->Write();
+    mc_w_RES_1232->Write();
+    mc_w_RES_1535->Write();
+    mc_w_RES_1520->Write();
+    mc_w_RES_Other->Write();
+   
+    mc_w_DIS_1_pi->Write();
+    mc_w_DIS_2_pi->Write();
+    mc_w_DIS_Multi_pi->Write();
+    mc_w_DIS_Other->Write();
+  
+    
     f->Close();
 }
 

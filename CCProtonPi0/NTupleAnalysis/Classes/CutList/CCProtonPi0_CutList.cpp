@@ -15,8 +15,8 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
     if(isModeReduce){
         // File Locations
         if (isMC) rootDir = Folder_List::rootDir_CutHists_mc;
-        else rootDir = Folder_List::rootDir_CutHists_data;
-        
+        else rootDir = Folder_List::rootDir_CutHists_data;       
+
         cout<<"\tRoot File: "<<rootDir<<endl;
 
         // Create Root File 
@@ -28,7 +28,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
        
         use_nTrueSignal = true;
         //nTrueSignal = 231577;
-        nTrueSignal = 483753;
+        nTrueSignal = 483386;
         
         SetCutNames();
         OpenTextFiles(isMC);
@@ -192,22 +192,122 @@ void CCProtonPi0_CutList::initHistograms()
 
     }
 
-    // MC Only Histograms
-    mc_w_DIS = new TH1D( "mc_w_DIS","True W for DIS",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
-    mc_w_DIS->GetXaxis()->SetTitle("True W for DIS [GeV]");
-    mc_w_DIS->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_w.get_width()));
-    
-    mc_w_RES = new TH1D( "mc_w_RES","True W for RES",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max() );
-    mc_w_RES->GetXaxis()->SetTitle("True W for RES [GeV]");
-    mc_w_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_w.get_width()));
+    // ------------------------------------------------------------------------
+    // Signal Q2
+    // ------------------------------------------------------------------------
+    mc_Q2_QE = new TH1D("mc_Q2_QE","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_QE->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_QE->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_RES_1232 = new TH1D("mc_Q2_RES_1232","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_1232->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_RES_1232->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_RES_1535 = new TH1D("mc_Q2_RES_1535","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_1535->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_RES_1535->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_RES_1520 = new TH1D("mc_Q2_RES_1520","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_1520->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_RES_1520->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_RES_Other = new TH1D("mc_Q2_RES_Other","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_RES_Other->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_DIS_1_pi = new TH1D("mc_Q2_DIS_1_pi","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_1_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_DIS_2_pi = new TH1D("mc_Q2_DIS_2_pi","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_2_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_DIS_Multi_pi = new TH1D("mc_Q2_DIS_Multi_pi","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_Multi_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_Q2_DIS_Other = new TH1D("mc_Q2_DIS_Other","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+
+    // ------------------------------------------------------------------------
+    // Signal incomingE
+    // ------------------------------------------------------------------------
+    mc_incomingE_QE = new TH1D("mc_incomingE_QE","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_QE->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_QE->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_RES_1232 = new TH1D("mc_incomingE_RES_1232","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_1232->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_RES_1232->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_RES_1535 = new TH1D("mc_incomingE_RES_1535","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_1535->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_RES_1535->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_RES_1520 = new TH1D("mc_incomingE_RES_1520","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_1520->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_RES_1520->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_RES_Other = new TH1D("mc_incomingE_RES_Other","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_RES_Other->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_DIS_1_pi = new TH1D("mc_incomingE_DIS_1_pi","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_1_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_DIS_2_pi = new TH1D("mc_incomingE_DIS_2_pi","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_2_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_DIS_Multi_pi = new TH1D("mc_incomingE_DIS_Multi_pi","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_Multi_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_incomingE_DIS_Other = new TH1D("mc_incomingE_DIS_Other","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+
+    // ------------------------------------------------------------------------
+    // Signal w
+    // ------------------------------------------------------------------------
+    mc_w_QE = new TH1D("mc_w_QE","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_QE->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_QE->GetYaxis()->SetTitle("N(Events)");
  
-    mc_Q2_DIS = new TH1D( "mc_Q2_DIS","True Q^{2} for DIS",binList.mc_Q2.get_nBins(), binList.mc_Q2.get_min(), binList.mc_Q2.get_max() );
-    mc_Q2_DIS->GetXaxis()->SetTitle("True Q^{2} for DIS [GeV^{2}]");
-    mc_Q2_DIS->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_Q2.get_width()));
-    
-    mc_Q2_RES = new TH1D( "mc_Q2_RES","True Q^{2} for RES",binList.mc_Q2.get_nBins(), binList.mc_Q2.get_min(), binList.mc_Q2.get_max() );
-    mc_Q2_RES->GetXaxis()->SetTitle("True Q^{2} for RES [GeV^{2}]");
-    mc_Q2_RES->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.mc_Q2.get_width()));
+    mc_w_RES_1232 = new TH1D("mc_w_RES_1232","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_RES_1232->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_RES_1232->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_RES_1535 = new TH1D("mc_w_RES_1535","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_RES_1535->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_RES_1535->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_RES_1520 = new TH1D("mc_w_RES_1520","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_RES_1520->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_RES_1520->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_RES_Other = new TH1D("mc_w_RES_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_RES_Other->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_RES_Other->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_DIS_1_pi = new TH1D("mc_w_DIS_1_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_DIS_1_pi->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_DIS_2_pi = new TH1D("mc_w_DIS_2_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_DIS_2_pi->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_DIS_Multi_pi = new TH1D("mc_w_DIS_Multi_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_DIS_Multi_pi->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+
+    mc_w_DIS_Other = new TH1D("mc_w_DIS_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_DIS_Other->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_DIS_Other->GetYaxis()->SetTitle("N(Events)");
 
     // Pi0 Invariant Mass - Used for Correction Fit
     pi0_invMass_1Track = new TH1D("pi0_invMass_1Track","#pi^{0} Invariant Mass 1 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
@@ -678,12 +778,6 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_2Track_deltaInvMass[i]->Write();
     }
 
-    // MC Only
-    mc_w_DIS->Write();
-    mc_w_RES->Write();
-    mc_Q2_DIS->Write();
-    mc_Q2_RES->Write();
-    
     pi0_invMass_1Track->Write();
     pi0_invMass_2Track->Write();
 
@@ -739,6 +833,42 @@ void CCProtonPi0_CutList::writeHistograms()
     signal_E_cosTheta_convLength->Write();
     bckg_E_cosTheta_convLength->Write();
     bckg_signal_diff_E_cosTheta_convLength->Write();
+
+    // Signal Q2
+    mc_Q2_QE->Write();
+    mc_Q2_RES_1232->Write();
+    mc_Q2_RES_1535->Write();
+    mc_Q2_RES_1520->Write();
+    mc_Q2_RES_Other->Write();
+   
+    mc_Q2_DIS_1_pi->Write();
+    mc_Q2_DIS_2_pi->Write();
+    mc_Q2_DIS_Multi_pi->Write();
+    mc_Q2_DIS_Other->Write();
+ 
+    // Signal incomingE
+    mc_incomingE_QE->Write();
+    mc_incomingE_RES_1232->Write();
+    mc_incomingE_RES_1535->Write();
+    mc_incomingE_RES_1520->Write();
+    mc_incomingE_RES_Other->Write();
+   
+    mc_incomingE_DIS_1_pi->Write();
+    mc_incomingE_DIS_2_pi->Write();
+    mc_incomingE_DIS_Multi_pi->Write();
+    mc_incomingE_DIS_Other->Write();
+ 
+    // Signal w
+    mc_w_QE->Write();
+    mc_w_RES_1232->Write();
+    mc_w_RES_1535->Write();
+    mc_w_RES_1520->Write();
+    mc_w_RES_Other->Write();
+   
+    mc_w_DIS_1_pi->Write();
+    mc_w_DIS_2_pi->Write();
+    mc_w_DIS_Multi_pi->Write();
+    mc_w_DIS_Other->Write();
 
     f->Close();
 }

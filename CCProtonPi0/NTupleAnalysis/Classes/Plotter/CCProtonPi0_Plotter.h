@@ -116,8 +116,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotOtherStudies();
         void plot_InvMass_TruthMatch_Stacked(bool isSignal, bool isStacked);
         void plot_Michel_TruthMatch(std::string var);
-        void plot_SignalKinematics_Stacked(std::string var, bool isStacked);
-        void plot_final_mc_w_Stacked();
+        void plot_SignalKinematics(std::string var, std::string type, bool isStacked);
         void plot_stacked_pi0_P();
         void plot_stacked_pi0_theta();
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
@@ -133,6 +132,9 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // --------------------------------------------------------------------
         // Default
         void DrawMnvH1D(rootDir& dir, std::string var_name, std::string plotDir);
+        void DrawMnvH1D(MnvH1D* hist1D, std::string var_name, std::string plotDir);
+        void Draw1DHist(TH1* hist1D, std::string var_name, std::string plotDir, bool isLogScale = false);
+
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
         void Draw1DHist_Threshold(rootDir &dir, std::string var_name, std::string plotDir, double threshold = 0, bool isLogScale = false);
         void Draw2DHist(rootDir& dir, std::string var_name, std::string plotDir, double threshold = 0);
@@ -173,7 +175,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void SaveRecoRatioPoints(rootDir& dir, std::string var_name, std::string plotDir);
         void Save2DHistPoints(rootDir& dir, std::string var_name, std::string plotDir);     
         double GetMCNormalization(std::string &norm_label, bool isPOTNorm, MnvH1D* data, MnvH1D* mc);
-        void printBins(const MnvH1D* hist, const std::string var_name);
+        void printBins(const TH1* hist, const std::string var_name);
 
         // Unfolding Study
         void UnfoldingStudy();
