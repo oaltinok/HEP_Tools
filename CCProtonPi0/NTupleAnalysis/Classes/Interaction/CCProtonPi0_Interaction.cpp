@@ -233,6 +233,10 @@ void CCProtonPi0_Interaction::initHistograms()
     AddVertErrorBands_MC(Enu_response);
 
     // QSq Error, Diff
+    WSq_QSq_Diff = new TH2D( "WSq_QSq_Diff","Q^{2} Difference vs W^{2}",binList.wSq.get_nBins(), binList.wSq.get_min(), binList.wSq.get_max(),binList.QSq_Diff.get_nBins(), binList.QSq_Diff.get_min(), binList.QSq_Diff.get_max() );
+    WSq_QSq_Diff->GetXaxis()->SetTitle("W^{2} [GeV^{2}]");
+    WSq_QSq_Diff->GetYaxis()->SetTitle("Q^{2}_{Reco} - Q^{2}_{True} [GeV^{2}]");
+
     QSq_1Track_response = new MnvH2D( "QSq_1Track_response","Signal Q^{2} 1Track", binList.size_QSq, binList.a_QSq, binList.size_QSq, binList.a_QSq);
     QSq_1Track_response->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
     QSq_1Track_response->GetYaxis()->SetTitle("True Q^{2} [GeV^{2}]");
@@ -374,9 +378,9 @@ void CCProtonPi0_Interaction::initHistograms()
     mc_Q2_DIS_Multi_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_Other = new TH1D("mc_Q2_DIS_Other","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
-    mc_Q2_DIS_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+    mc_Q2_Non_RES = new TH1D("mc_Q2_Non_RES","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_Non_RES->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal incomingE
@@ -413,9 +417,9 @@ void CCProtonPi0_Interaction::initHistograms()
     mc_incomingE_DIS_Multi_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_Other = new TH1D("mc_incomingE_DIS_Other","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
-    mc_incomingE_DIS_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+    mc_incomingE_Non_RES = new TH1D("mc_incomingE_Non_RES","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_Non_RES->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal w
@@ -452,49 +456,49 @@ void CCProtonPi0_Interaction::initHistograms()
     mc_w_DIS_Multi_pi->GetXaxis()->SetTitle("W [GeV]");
     mc_w_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_DIS_Other = new TH1D("mc_w_DIS_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_DIS_Other->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+    mc_w_Non_RES = new TH1D("mc_w_Non_RES","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
 
     // ------------------------------------------------------------------------
     // Signal w
     // ------------------------------------------------------------------------
-    reco_w_QE = new TH1D("reco_w_QE","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    reco_w_QE = new TH1D("reco_w_QE","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     reco_w_QE->GetXaxis()->SetTitle("W [GeV]");
     reco_w_QE->GetYaxis()->SetTitle("N(Events)");
  
-    reco_w_RES_1232 = new TH1D("reco_w_RES_1232","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    reco_w_RES_1232 = new TH1D("reco_w_RES_1232","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     reco_w_RES_1232->GetXaxis()->SetTitle("W [GeV]");
     reco_w_RES_1232->GetYaxis()->SetTitle("N(Events)");
 
-    reco_w_RES_1535 = new TH1D("reco_w_RES_1535","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    reco_w_RES_1535 = new TH1D("reco_w_RES_1535","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     reco_w_RES_1535->GetXaxis()->SetTitle("W [GeV]");
     reco_w_RES_1535->GetYaxis()->SetTitle("N(Events)");
 
-    reco_w_RES_1520 = new TH1D("reco_w_RES_1520","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    reco_w_RES_1520 = new TH1D("reco_w_RES_1520","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     reco_w_RES_1520->GetXaxis()->SetTitle("W [GeV]");
     reco_w_RES_1520->GetYaxis()->SetTitle("N(Events)");
 
-    reco_w_RES_Other = new TH1D("reco_w_RES_Other","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    reco_w_RES_Other = new TH1D("reco_w_RES_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     reco_w_RES_Other->GetXaxis()->SetTitle("W [GeV]");
     reco_w_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    reco_w_DIS_1_pi = new TH1D("reco_w_DIS_1_pi","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    reco_w_DIS_1_pi = new TH1D("reco_w_DIS_1_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     reco_w_DIS_1_pi->GetXaxis()->SetTitle("W [GeV]");
     reco_w_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
 
-    reco_w_DIS_2_pi = new TH1D("reco_w_DIS_2_pi","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    reco_w_DIS_2_pi = new TH1D("reco_w_DIS_2_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     reco_w_DIS_2_pi->GetXaxis()->SetTitle("W [GeV]");
     reco_w_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
 
-    reco_w_DIS_Multi_pi = new TH1D("reco_w_DIS_Multi_pi","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    reco_w_DIS_Multi_pi = new TH1D("reco_w_DIS_Multi_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     reco_w_DIS_Multi_pi->GetXaxis()->SetTitle("W [GeV]");
     reco_w_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    reco_w_DIS_Other = new TH1D("reco_w_DIS_Other","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
-    reco_w_DIS_Other->GetXaxis()->SetTitle("W [GeV]");
-    reco_w_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+    reco_w_Non_RES = new TH1D("reco_w_Non_RES","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
+    reco_w_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
 }
 
@@ -568,6 +572,7 @@ void CCProtonPi0_Interaction::writeHistograms()
     h_extra_rejected_energy->Write();
     
     // QSq Truth, Error, Difference
+    WSq_QSq_Diff->Write();
     QSq_1Track_response->Write();
     QSq_2Track_response->Write();
     
@@ -601,7 +606,7 @@ void CCProtonPi0_Interaction::writeHistograms()
     mc_Q2_DIS_1_pi->Write();
     mc_Q2_DIS_2_pi->Write();
     mc_Q2_DIS_Multi_pi->Write();
-    mc_Q2_DIS_Other->Write();
+    mc_Q2_Non_RES->Write();
  
     // Signal incomingE
     mc_incomingE_QE->Write();
@@ -613,7 +618,7 @@ void CCProtonPi0_Interaction::writeHistograms()
     mc_incomingE_DIS_1_pi->Write();
     mc_incomingE_DIS_2_pi->Write();
     mc_incomingE_DIS_Multi_pi->Write();
-    mc_incomingE_DIS_Other->Write();
+    mc_incomingE_Non_RES->Write();
  
     // Signal w
     mc_w_QE->Write();
@@ -625,7 +630,7 @@ void CCProtonPi0_Interaction::writeHistograms()
     mc_w_DIS_1_pi->Write();
     mc_w_DIS_2_pi->Write();
     mc_w_DIS_Multi_pi->Write();
-    mc_w_DIS_Other->Write();
+    mc_w_Non_RES->Write();
 
     // Signal reco w
     reco_w_QE->Write();
@@ -637,7 +642,7 @@ void CCProtonPi0_Interaction::writeHistograms()
     reco_w_DIS_1_pi->Write();
     reco_w_DIS_2_pi->Write();
     reco_w_DIS_Multi_pi->Write();
-    reco_w_DIS_Other->Write();
+    reco_w_Non_RES->Write();
 
     f->Close();
 }

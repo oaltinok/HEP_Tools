@@ -190,6 +190,51 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.deltaInvMass.get_width()));
         hCut_2Track_deltaInvMass.push_back(temp);
 
+        // --------------------------------------------------------------------
+        // Side Bands
+        // --------------------------------------------------------------------
+        temp = new MnvH1D( Form("%s_%d","SideBand_muon_P",i),"Muon Momentum",binList.size_muon_P, binList.a_muon_P);
+        temp->GetXaxis()->SetTitle("Muon Momentum [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        AddVertErrorBands_MC(temp);
+        SideBand_muon_P.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","SideBand_muon_theta",i),"Muon Theta",binList.size_muon_theta, binList.a_muon_theta);
+        temp->GetXaxis()->SetTitle("Muon Theta [degree]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        AddVertErrorBands_MC(temp);
+        SideBand_muon_theta.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","SideBand_pi0_P",i),"#pi^{0} Momentum",binList.size_pi0_P, binList.a_pi0_P);
+        temp->GetXaxis()->SetTitle("#pi^{0} Momentum [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        AddVertErrorBands_MC(temp);
+        SideBand_pi0_P.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","SideBand_pi0_KE",i),"#pi^{0} Kinetic Energy",binList.size_pi0_KE, binList.a_pi0_KE);
+        temp->GetXaxis()->SetTitle("#pi^{0} Kinetic Energy [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        AddVertErrorBands_MC(temp);
+        SideBand_pi0_KE.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","SideBand_pi0_theta",i),"#pi^{0} Theta",binList.size_pi0_theta, binList.a_pi0_theta);
+        temp->GetXaxis()->SetTitle("#pi^{0} Theta [degree]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        AddVertErrorBands_MC(temp);
+        SideBand_pi0_theta.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","SideBand_neutrino_E",i),"Neutrino Energy",binList.size_Enu, binList.a_Enu);
+        temp->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        AddVertErrorBands_MC(temp);
+        SideBand_neutrino_E.push_back(temp);
+            
+        temp = new MnvH1D( Form("%s_%d","SideBand_QSq",i),"Q^{2}",binList.size_QSq, binList.a_QSq);
+        temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        AddVertErrorBands_MC(temp);
+        SideBand_QSq.push_back(temp);
+
     }
 
     // ------------------------------------------------------------------------
@@ -227,9 +272,9 @@ void CCProtonPi0_CutList::initHistograms()
     mc_Q2_DIS_Multi_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_Other = new TH1D("mc_Q2_DIS_Other","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
-    mc_Q2_DIS_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+    mc_Q2_Non_RES = new TH1D("mc_Q2_Non_RES","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_Non_RES->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal incomingE
@@ -266,9 +311,9 @@ void CCProtonPi0_CutList::initHistograms()
     mc_incomingE_DIS_Multi_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_Other = new TH1D("mc_incomingE_DIS_Other","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
-    mc_incomingE_DIS_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+    mc_incomingE_Non_RES = new TH1D("mc_incomingE_Non_RES","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_Non_RES->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal w
@@ -305,9 +350,9 @@ void CCProtonPi0_CutList::initHistograms()
     mc_w_DIS_Multi_pi->GetXaxis()->SetTitle("W [GeV]");
     mc_w_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_DIS_Other = new TH1D("mc_w_DIS_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_DIS_Other->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+    mc_w_Non_RES = new TH1D("mc_w_Non_RES","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
     // Pi0 Invariant Mass - Used for Correction Fit
     pi0_invMass_1Track = new TH1D("pi0_invMass_1Track","#pi^{0} Invariant Mass 1 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
@@ -776,6 +821,15 @@ void CCProtonPi0_CutList::writeHistograms()
         hCut_2Track_neutrinoE[i]->Write();
         hCut_2Track_protonScore_LLR[i]->Write();
         hCut_2Track_deltaInvMass[i]->Write();
+
+        // Side Bands
+        SideBand_muon_P[i]->Write();
+        SideBand_muon_theta[i]->Write();
+        SideBand_pi0_P[i]->Write();
+        SideBand_pi0_KE[i]->Write();
+        SideBand_pi0_theta[i]->Write();
+        SideBand_neutrino_E[i]->Write();
+        SideBand_QSq[i]->Write();
     }
 
     pi0_invMass_1Track->Write();
@@ -844,7 +898,7 @@ void CCProtonPi0_CutList::writeHistograms()
     mc_Q2_DIS_1_pi->Write();
     mc_Q2_DIS_2_pi->Write();
     mc_Q2_DIS_Multi_pi->Write();
-    mc_Q2_DIS_Other->Write();
+    mc_Q2_Non_RES->Write();
  
     // Signal incomingE
     mc_incomingE_QE->Write();
@@ -856,7 +910,7 @@ void CCProtonPi0_CutList::writeHistograms()
     mc_incomingE_DIS_1_pi->Write();
     mc_incomingE_DIS_2_pi->Write();
     mc_incomingE_DIS_Multi_pi->Write();
-    mc_incomingE_DIS_Other->Write();
+    mc_incomingE_Non_RES->Write();
  
     // Signal w
     mc_w_QE->Write();
@@ -868,7 +922,7 @@ void CCProtonPi0_CutList::writeHistograms()
     mc_w_DIS_1_pi->Write();
     mc_w_DIS_2_pi->Write();
     mc_w_DIS_Multi_pi->Write();
-    mc_w_DIS_Other->Write();
+    mc_w_Non_RES->Write();
 
     f->Close();
 }

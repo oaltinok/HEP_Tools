@@ -93,6 +93,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* n_ejected_nucleons_2Track;
        
         // QSq Error, Difference
+        TH2D* WSq_QSq_Diff;
         MnvH2D* QSq_1Track_response;
         MnvH2D* QSq_2Track_response;
 
@@ -128,7 +129,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_Q2_DIS_1_pi;
         TH1D* mc_Q2_DIS_2_pi;
         TH1D* mc_Q2_DIS_Multi_pi;
-        TH1D* mc_Q2_DIS_Other;
+        TH1D* mc_Q2_Non_RES;
 
         // Signal incomingE
         TH1D* mc_incomingE_QE;
@@ -141,7 +142,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_incomingE_DIS_1_pi;
         TH1D* mc_incomingE_DIS_2_pi;
         TH1D* mc_incomingE_DIS_Multi_pi;
-        TH1D* mc_incomingE_DIS_Other;
+        TH1D* mc_incomingE_Non_RES;
 
         // Signal w
         TH1D* mc_w_QE;
@@ -154,7 +155,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_w_DIS_1_pi;
         TH1D* mc_w_DIS_2_pi;
         TH1D* mc_w_DIS_Multi_pi;
-        TH1D* mc_w_DIS_Other;
+        TH1D* mc_w_Non_RES;
 
         // Signal reco w
         TH1D* reco_w_QE;
@@ -167,7 +168,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* reco_w_DIS_1_pi;
         TH1D* reco_w_DIS_2_pi;
         TH1D* reco_w_DIS_Multi_pi;
-        TH1D* reco_w_DIS_Other;
+        TH1D* reco_w_Non_RES;
 
     private:
         void initHistograms();

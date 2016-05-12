@@ -12,8 +12,8 @@ nSignal_RES_1535	24817.0	5.1
 nSignal_RES_1520	26403.0	5.5
 nSignal_RES_Other	39139.0	8.1
 
-nSignal_DIS_1pi	202904.0	42.0
-nSignal_DIS_2pi	48456.0	10.0
-nSignal_DIS_Multi_pi	4453.0	0.9
-nSignal_DIS_Other	0.0	0.0
+nSignal_DIS_1pi	110972.0	23.0
+nSignal_DIS_2pi	29146.0	6.0
+nSignal_DIS_Multi_pi	3650.0	0.8
+nSignal_Non_RES	112045.0	23.2
 

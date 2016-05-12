@@ -78,6 +78,12 @@ namespace Folder_List
     const std::string rootDir_sideBand_pID_mc = rootOut + MC + analyzed + "CutHistograms_pID.root";
     const std::string rootDir_sideBand_pID_data = rootOut + Data + analyzed + "CutHistograms_pID.root";
     
+    const std::string rootDir_sideBand_LowInvMass_mc = rootOut + MC + analyzed + "CutHistograms_LowInvMass.root";
+    const std::string rootDir_sideBand_LowInvMass_data = rootOut + Data + analyzed + "CutHistograms_LowInvMass.root";
+     
+    const std::string rootDir_sideBand_HighInvMass_mc = rootOut + MC + analyzed + "CutHistograms_HighInvMass.root";
+    const std::string rootDir_sideBand_HighInvMass_data = rootOut + Data + analyzed + "CutHistograms_HighInvMass.root";
+    
     // Set MC Root Dir;
     const std::string rootDir_CrossSection_mc = rootOut + MC + analyzed + "CrossSection.root";
     const std::string rootDir_CutHists_mc = rootOut + MC + analyzed + "CutHistograms.root";

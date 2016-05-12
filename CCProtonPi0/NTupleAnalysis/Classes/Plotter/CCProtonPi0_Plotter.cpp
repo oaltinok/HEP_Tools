@@ -723,38 +723,38 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
   
     plot_SignalKinematics("reco_w", "selected", true);
  
+    //DrawSignalMC(rootDir_Interaction, "W_1Track", plotDir);
+    //DrawSignalMC(rootDir_Interaction, "W_2Track", plotDir);
+    //DrawSignalMC(rootDir_Interaction, "deltaInvMass", plotDir);
 
-//    DrawSignalMC(rootDir_Interaction, "W_1Track", plotDir);
-//    DrawSignalMC(rootDir_Interaction, "W_2Track", plotDir);
-//    DrawSignalMC(rootDir_Interaction, "deltaInvMass", plotDir);
-//
-//    Draw1DHist(rootDir_Interaction,"proton_true_P_1Track",plotDir);
-//    Draw1DHist(rootDir_Interaction,"proton_true_KE_1Track",plotDir);
-//    Draw1DHist(rootDir_Interaction,"proton_true_theta_1Track",plotDir);
-//
-//    DrawNormalizedMigrationHistogram(rootDir_Interaction, "QSq_response", plotDir);
-//    DrawNormalizedMigrationHistogram(rootDir_Interaction, "QSq_1Track_response", plotDir);
-//    DrawNormalizedMigrationHistogram(rootDir_Interaction, "QSq_2Track_response", plotDir);
-//
-//    DrawNormalizedMigrationHistogram(rootDir_Interaction, "Enu_response", plotDir);
-//    DrawNormalizedMigrationHistogram(rootDir_Interaction, "Enu_1Track_response", plotDir);
-//    DrawNormalizedMigrationHistogram(rootDir_Interaction, "Enu_2Track_response", plotDir);
-//    
-//    Draw1DHist(rootDir_Interaction,"QSq_Error",plotDir);
-//    Draw1DHist(rootDir_Interaction,"QSq_1Track_Error",plotDir);
-//    Draw1DHist(rootDir_Interaction,"QSq_2Track_Error",plotDir);
-//
-//    Draw1DHist(rootDir_Interaction,"QSq_Diff",plotDir);
-//    Draw1DHist(rootDir_Interaction,"QSq_1Track_Diff",plotDir);
-//    Draw1DHist(rootDir_Interaction,"QSq_2Track_Diff",plotDir);
-//
-//    Draw1DHist(rootDir_Interaction,"Enu_Error",plotDir);
-//    Draw1DHist(rootDir_Interaction,"Enu_1Track_Error",plotDir);
-//    Draw1DHist(rootDir_Interaction,"Enu_2Track_Error",plotDir);
-//    
-//    Draw1DHist(rootDir_Interaction,"Enu_Diff",plotDir);
-//    Draw1DHist(rootDir_Interaction,"Enu_1Track_Diff",plotDir);
-//    Draw1DHist(rootDir_Interaction,"Enu_2Track_Diff",plotDir);
+    //Draw2DHist(rootDir_Interaction,"WSq_QSq_Diff",plotDir);
+    //Draw1DHist(rootDir_Interaction,"proton_true_P_1Track",plotDir);
+    //Draw1DHist(rootDir_Interaction,"proton_true_KE_1Track",plotDir);
+    //Draw1DHist(rootDir_Interaction,"proton_true_theta_1Track",plotDir);
+
+    //DrawNormalizedMigrationHistogram(rootDir_Interaction, "QSq_response", plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Interaction, "QSq_1Track_response", plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Interaction, "QSq_2Track_response", plotDir);
+
+    //DrawNormalizedMigrationHistogram(rootDir_Interaction, "Enu_response", plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Interaction, "Enu_1Track_response", plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Interaction, "Enu_2Track_response", plotDir);
+    //
+    //Draw1DHist(rootDir_Interaction,"QSq_Error",plotDir);
+    //Draw1DHist(rootDir_Interaction,"QSq_1Track_Error",plotDir);
+    //Draw1DHist(rootDir_Interaction,"QSq_2Track_Error",plotDir);
+
+    //Draw1DHist(rootDir_Interaction,"QSq_Diff",plotDir);
+    //Draw1DHist(rootDir_Interaction,"QSq_1Track_Diff",plotDir);
+    //Draw1DHist(rootDir_Interaction,"QSq_2Track_Diff",plotDir);
+
+    //Draw1DHist(rootDir_Interaction,"Enu_Error",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Error",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_2Track_Error",plotDir);
+    //
+    //Draw1DHist(rootDir_Interaction,"Enu_Diff",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_1Track_Diff",plotDir);
+    //Draw1DHist(rootDir_Interaction,"Enu_2Track_Diff",plotDir);
 
 
     //Draw1DHist(rootDir_Interaction,"n_ejected_nucleons_1Track",plotDir);
@@ -1421,6 +1421,13 @@ void CCProtonPi0_Plotter::plot_SignalKinematics(std::string var, std::string typ
     h_RES_Other->SetLineWidth(2);
     h_RES_Other->SetFillStyle(3001);
 
+    var_name = var + "_Non_RES";
+    TH1D* h_Non_Res = (TH1D*)f_Root->Get(var_name.c_str());
+    h_Non_Res->SetFillColor(kMagenta);
+    h_Non_Res->SetLineColor(kMagenta);
+    h_Non_Res->SetLineWidth(2);
+    h_Non_Res->SetFillStyle(3001);
+
     var_name = var + "_DIS_1_pi";
     TH1D* h_DIS_1_pi = (TH1D*)f_Root->Get(var_name.c_str());
     h_DIS_1_pi->SetFillColor(kAzure);
@@ -1446,6 +1453,7 @@ void CCProtonPi0_Plotter::plot_SignalKinematics(std::string var, std::string typ
     legend->AddEntry(h_RES_1535, "RES: N(1535)", "f");
     legend->AddEntry(h_RES_1520, "RES: N(1520)", "f");
     legend->AddEntry(h_RES_Other, "RES: Other", "f");
+    legend->AddEntry(h_Non_Res, "Non Res", "f");
     legend->AddEntry(h_DIS_1_pi, "DIS: 1 #pi", "f");
     legend->AddEntry(h_DIS_2_pi, "DIS: 2 #pi", "f");
     legend->AddEntry(h_DIS_Multi_pi, "DIS: Multi #pi", "f");
@@ -1455,6 +1463,7 @@ void CCProtonPi0_Plotter::plot_SignalKinematics(std::string var, std::string typ
     hs->Add(h_DIS_Multi_pi);
     hs->Add(h_DIS_2_pi);
     hs->Add(h_DIS_1_pi);
+    hs->Add(h_Non_Res);
     hs->Add(h_RES_Other);
     hs->Add(h_RES_1520);
     hs->Add(h_RES_1535);

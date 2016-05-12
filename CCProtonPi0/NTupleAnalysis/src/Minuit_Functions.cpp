@@ -2,7 +2,16 @@
 
 using namespace std;
 
-CCProtonPi0_SideBandTool sbtool;
+std::string var_name = "SideBand_muon_P";
+//std::string var_name = "SideBand_muon_theta";
+//std::string var_name = "SideBand_pi0_P";
+//std::string var_name = "SideBand_pi0_KE";
+//std::string var_name = "SideBand_pi0_theta";
+//std::string var_name = "SideBand_neutrino_E";
+//std::string var_name = "SideBand_QSq";
+//std::string var_name = "hCut_pi0invMass";
+
+CCProtonPi0_SideBandTool sbtool(var_name);
 
 double calc_ChiSq_SideBand(SideBand &sb, Double_t *par, bool isPartial = false, int min_bin = 1, int max_bin = 1)
 {
@@ -20,7 +29,8 @@ double calc_ChiSq_SideBand(SideBand &sb, Double_t *par, bool isPartial = false, 
 
     for (int i = 1; i <= max_bin; ++i) {
         double nData = sb.data->GetBinContent(i);
-        
+        if (nData == 0) continue;
+
         // Do not use Signal and Other in Fit
         double nSignal = sb.signal[0]->GetBinContent(i) * sbtool.POT_ratio;
         double nOther = sb.Other[0]->GetBinContent(i) * sbtool.POT_ratio;
@@ -54,12 +64,22 @@ void calc_ChiSq(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t if
     // Calculate ChiSq for pID for ALL Bins
     ChiSq += calc_ChiSq_SideBand(sbtool.pID, par);
 
-    // Calculate ChiSq for Low Inv Mass Region for first 6 bins
-    ChiSq += calc_ChiSq_SideBand(sbtool.LowInvMass, par, true, 1, 6);
- 
-    // Calculate ChiSq for High Inv Mass Region for last 30 bins
-    ChiSq += calc_ChiSq_SideBand(sbtool.HighInvMass, par, true, 21, 50);
-    
+    // Calculate ChiSq for Low Inv Mass 
+    //      Inv Mass itself for first 6 bins
+    if (var_name.compare("hCut_pi0invMass") == 0){
+        ChiSq += calc_ChiSq_SideBand(sbtool.LowInvMass, par, true, 1, 6);
+    }else{
+        ChiSq += calc_ChiSq_SideBand(sbtool.LowInvMass, par);
+    }
+
+    // Calculate ChiSq for High Inv Mass
+    //      Inv Mass itself for last 30 bins
+    if (var_name.compare("hCut_pi0invMass") == 0){
+        ChiSq += calc_ChiSq_SideBand(sbtool.HighInvMass, par, true, 21, 50);
+    }else{
+        ChiSq += calc_ChiSq_SideBand(sbtool.HighInvMass, par);
+    }
+
     f = ChiSq;
     return;
 }
@@ -129,7 +149,7 @@ void FitMinuit()
     //*-*                    3= full accurate covariance matrix
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     
-    sbtool.ApplyFitResults(min_ChiSq, fParamVal[0],fParamVal[1],fParamVal[2]);
+    sbtool.ApplyFitResults(min_ChiSq, fParamVal, fParamErr);
     sbtool.Plot();
     
     std::cout << "\n";

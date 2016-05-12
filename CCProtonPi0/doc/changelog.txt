@@ -1,4 +1,20 @@
 ===================================================================================================
+v2_79
+CCProtonPi0 Updates:
+	No Major Changes
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	SideBandTool Improved
+		Using MnvH1Ds instead of TH1Ds
+			MnvH1Ds contains errors
+			TH1Ds are created inside Plot function
+		
+		Added DrawDataMCWithErrorBand function
+		
+		Removed a bug which connects TFile and MnvH1Ds in different SideBands
+			Removed the bug using h->SetDirectory(NULL);	
+
+===================================================================================================
 v2_78
 CCProtonPi0 Updates:
 	Calculations for Neutrino Energy, QSq, WSq are removed from reconstruction stage

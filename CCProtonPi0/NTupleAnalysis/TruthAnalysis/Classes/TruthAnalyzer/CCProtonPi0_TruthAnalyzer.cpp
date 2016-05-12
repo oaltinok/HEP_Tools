@@ -121,7 +121,7 @@ void CCProtonPi0_TruthAnalyzer::writeTextFile()
     WriteCounter(nDIS_1_pi, nFidVol_Signal);
     WriteCounter(nDIS_2_pi, nFidVol_Signal);
     WriteCounter(nDIS_Multi_pi, nFidVol_Signal);
-    WriteCounter(nDIS_Other, nFidVol_Signal);
+    WriteCounter(nNon_RES, nFidVol_Signal);
     textFile<<std::endl;
    
     textFile.close();
@@ -181,7 +181,7 @@ void CCProtonPi0_TruthAnalyzer::resetCounters()
     nDIS_1_pi.name = "nSignal_DIS_1pi";
     nDIS_2_pi.name = "nSignal_DIS_2pi";
     nDIS_Multi_pi.name = "nSignal_DIS_Multi_pi";
-    nDIS_Other.name = "nSignal_DIS_Other";
+    nNon_RES.name = "nSignal_Non_RES";
 }
 
 
@@ -239,13 +239,13 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     // ------------------------------------------------------------------------
     // Neutrino Energy & Q2
     // ------------------------------------------------------------------------
-    neutrino_E_mc_truth_all_signal = new MnvH1D( "neutrino_E_mc_truth_all_signal","Neutrino Energy for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    neutrino_E_mc_truth_all_signal = new MnvH1D( "neutrino_E_mc_truth_all_signal","Neutrino Energy for Signal Events",binList.size_Enu, binList.a_Enu);
     neutrino_E_mc_truth_all_signal->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
     neutrino_E_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(neutrino_E_mc_truth_all_signal);
     AddVertErrorBand_Genie(neutrino_E_mc_truth_all_signal);
 
-    QSq_mc_truth_all_signal = new MnvH1D( "QSq_mc_truth_all_signal","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    QSq_mc_truth_all_signal = new MnvH1D( "QSq_mc_truth_all_signal","Q^{2} for Signal Events",binList.size_QSq, binList.a_QSq);
     QSq_mc_truth_all_signal->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(QSq_mc_truth_all_signal);
@@ -286,9 +286,9 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     mc_Q2_DIS_Multi_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_Other = new TH1D("mc_Q2_DIS_Other","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
-    mc_Q2_DIS_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+    mc_Q2_Non_RES = new TH1D("mc_Q2_Non_RES","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_Non_RES->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal incomingE
@@ -325,9 +325,9 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     mc_incomingE_DIS_Multi_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_Other = new TH1D("mc_incomingE_DIS_Other","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
-    mc_incomingE_DIS_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+    mc_incomingE_Non_RES = new TH1D("mc_incomingE_Non_RES","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_Non_RES->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal w
@@ -364,9 +364,9 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     mc_w_DIS_Multi_pi->GetXaxis()->SetTitle("W [GeV]");
     mc_w_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_DIS_Other = new TH1D("mc_w_DIS_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_DIS_Other->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_DIS_Other->GetYaxis()->SetTitle("N(Events)");
+    mc_w_Non_RES = new TH1D("mc_w_Non_RES","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
 }
 
@@ -514,7 +514,12 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
         }
     }else if (mc_intType == 3){
         int nFS_pions = Get_nFS_pions();
-        if (nFS_pions == 1){
+        if (mc_w*MeV_to_GeV < 1.7 ){
+            nNon_RES.count++;
+            FillHistogram(mc_Q2_Non_RES, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_incomingE_Non_RES, mc_incomingE * MeV_to_GeV);
+            FillHistogram(mc_w_Non_RES, mc_w * MeV_to_GeV);
+        }else if (nFS_pions == 1){
             nDIS_1_pi.count++;
             FillHistogram(mc_Q2_DIS_1_pi, mc_Q2 * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_DIS_1_pi, mc_incomingE * MeV_to_GeV);
@@ -529,11 +534,6 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
             FillHistogram(mc_Q2_DIS_Multi_pi, mc_Q2 * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_DIS_Multi_pi, mc_incomingE * MeV_to_GeV);
             FillHistogram(mc_w_DIS_Multi_pi, mc_w * MeV_to_GeV);
-        }else{
-            nDIS_Other.count++;
-            FillHistogram(mc_Q2_DIS_Other, mc_Q2 * MeVSq_to_GeVSq);
-            FillHistogram(mc_incomingE_DIS_Other, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_DIS_Other, mc_w * MeV_to_GeV);
         }
     }else{
         std::cout<<"WARNING! Signal Event with different interaction Type!"<<std::endl;
@@ -607,7 +607,7 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     mc_Q2_DIS_1_pi->Write();
     mc_Q2_DIS_2_pi->Write();
     mc_Q2_DIS_Multi_pi->Write();
-    mc_Q2_DIS_Other->Write();
+    mc_Q2_Non_RES->Write();
  
     // Signal incomingE
     mc_incomingE_QE->Write();
@@ -619,7 +619,7 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     mc_incomingE_DIS_1_pi->Write();
     mc_incomingE_DIS_2_pi->Write();
     mc_incomingE_DIS_Multi_pi->Write();
-    mc_incomingE_DIS_Other->Write();
+    mc_incomingE_Non_RES->Write();
  
     // Signal w
     mc_w_QE->Write();
@@ -631,7 +631,7 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     mc_w_DIS_1_pi->Write();
     mc_w_DIS_2_pi->Write();
     mc_w_DIS_Multi_pi->Write();
-    mc_w_DIS_Other->Write();
+    mc_w_Non_RES->Write();
   
     
     f->Close();

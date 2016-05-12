@@ -50,7 +50,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_Q2_DIS_1_pi;
         TH1D* mc_Q2_DIS_2_pi;
         TH1D* mc_Q2_DIS_Multi_pi;
-        TH1D* mc_Q2_DIS_Other;
+        TH1D* mc_Q2_Non_RES;
 
         // Signal incomingE
         TH1D* mc_incomingE_QE;
@@ -63,7 +63,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_incomingE_DIS_1_pi;
         TH1D* mc_incomingE_DIS_2_pi;
         TH1D* mc_incomingE_DIS_Multi_pi;
-        TH1D* mc_incomingE_DIS_Other;
+        TH1D* mc_incomingE_Non_RES;
 
         // Signal w
         TH1D* mc_w_QE;
@@ -76,7 +76,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_w_DIS_1_pi;
         TH1D* mc_w_DIS_2_pi;
         TH1D* mc_w_DIS_Multi_pi;
-        TH1D* mc_w_DIS_Other;
+        TH1D* mc_w_Non_RES;
 
 
     private :
@@ -132,7 +132,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         counter nDIS_1_pi;
         counter nDIS_2_pi;
         counter nDIS_Multi_pi;
-        counter nDIS_Other;
+        counter nNon_RES;
 
         double cvweight;
 

@@ -95,7 +95,14 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_nProtonCandidates;
         vector<MnvH1D*> hCut_nShowerCandidates;
         vector<MnvH1D*> hCut_pi0invMass;
-        
+        vector<MnvH1D*> SideBand_muon_P;
+        vector<MnvH1D*> SideBand_muon_theta;
+        vector<MnvH1D*> SideBand_pi0_P;
+        vector<MnvH1D*> SideBand_pi0_KE;
+        vector<MnvH1D*> SideBand_pi0_theta;
+        vector<MnvH1D*> SideBand_neutrino_E;
+        vector<MnvH1D*> SideBand_QSq;
+
         // 1Track
         vector<MnvH1D*> hCut_1Track_nShowerCandidates;
         vector<MnvH1D*> hCut_1Track_eVis_nuclearTarget;
@@ -128,7 +135,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_Q2_DIS_1_pi;
         TH1D* mc_Q2_DIS_2_pi;
         TH1D* mc_Q2_DIS_Multi_pi;
-        TH1D* mc_Q2_DIS_Other;
+        TH1D* mc_Q2_Non_RES;
 
         // Signal incomingE
         TH1D* mc_incomingE_QE;
@@ -141,7 +148,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_incomingE_DIS_1_pi;
         TH1D* mc_incomingE_DIS_2_pi;
         TH1D* mc_incomingE_DIS_Multi_pi;
-        TH1D* mc_incomingE_DIS_Other;
+        TH1D* mc_incomingE_Non_RES;
 
         // Signal w
         TH1D* mc_w_QE;
@@ -154,7 +161,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_w_DIS_1_pi;
         TH1D* mc_w_DIS_2_pi;
         TH1D* mc_w_DIS_Multi_pi;
-        TH1D* mc_w_DIS_Other;
+        TH1D* mc_w_Non_RES;
 
         // Pi0 Invariant Mass
         TH1D* pi0_invMass_1Track;

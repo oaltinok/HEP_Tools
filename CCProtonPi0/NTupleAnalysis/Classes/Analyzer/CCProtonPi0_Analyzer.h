@@ -112,6 +112,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TLorentzVector Get_Neutrino_4P(const double Enu) const;
         double Calc_WSq(const double Enu, const double QSq) const;
         void Calc_EventKinematics();
+        void fill_SideBand_InvMass();
+        void fill_SideBand_Other();
 
         //  Muon Specific Functions
         void fillMuonMC();
@@ -170,9 +172,16 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool isPassedAllCuts;
         bool applyMaxEvents;
         bool applyDeltaInvMass;
+        bool isMichelEvent;
+        bool isShower_Michel_Exist;
+        bool isPionTrack; 
+        bool isLowInvMassEvent; 
+        bool isHighInvMassEvent; 
         bool NoSideBand;
         bool sideBand_Michel;
         bool sideBand_PID;
+        bool sideBand_LowInvMass;
+        bool sideBand_HighInvMass;
         double cvweight;
         double latest_ScanID;
         double minProtonScore_LLR;
