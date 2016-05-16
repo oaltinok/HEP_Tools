@@ -29,7 +29,7 @@ void CCProtonPi0_CrossSection::init_muon_theta()
     muon_theta.name = "muon_theta";
     muon_theta.isEv = false;
  
-    muon_theta.plot_title = "Differential Cross Section for theta_{#mu}";
+    muon_theta.plot_title = "Differential Cross Section for #theta_{#mu}";
     muon_theta.plot_xlabel = "Muon Angle [degree]";
     muon_theta.plot_ylabel = "d#sigma/d#theta_{#mu} (10^{-40} cm^{2}/nucleon/degree)";
 

@@ -568,6 +568,12 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("gamma2_direction", gamma2_direction, &b_gamma2_direction);
     fChain->SetBranchAddress("gamma2_end_vertex", gamma2_end_vertex, &b_gamma2_end_vertex);
     fChain->SetBranchAddress("gamma2_vertex", gamma2_vertex, &b_gamma2_vertex);
+    fChain->SetBranchAddress("muon_thetaX_allNodes_sz", &muon_thetaX_allNodes_sz, &b_muon_thetaX_allNodes_sz);
+    fChain->SetBranchAddress("muon_thetaX_allNodes", muon_thetaX_allNodes, &b_muon_thetaX_allNodes);
+    fChain->SetBranchAddress("muon_thetaY_allNodes_sz", &muon_thetaY_allNodes_sz, &b_muon_thetaY_allNodes_sz);
+    fChain->SetBranchAddress("muon_thetaY_allNodes", muon_thetaY_allNodes, &b_muon_thetaY_allNodes);
+    fChain->SetBranchAddress("muon_theta_allNodes_sz", &muon_theta_allNodes_sz, &b_muon_theta_allNodes_sz);
+    fChain->SetBranchAddress("muon_theta_allNodes", muon_theta_allNodes, &b_muon_theta_allNodes);
     fChain->SetBranchAddress("od_distanceBlobTower_sz", &od_distanceBlobTower_sz, &b_od_distanceBlobTower_sz);
     fChain->SetBranchAddress("od_distanceBlobTower", od_distanceBlobTower, &b_od_distanceBlobTower);
     fChain->SetBranchAddress("od_idBlobTime_sz", &od_idBlobTime_sz, &b_od_idBlobTime_sz);
@@ -681,7 +687,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("prong_part_mass", prong_part_mass, &b_prong_part_mass);
     fChain->SetBranchAddress("prong_part_charge", prong_part_charge, &b_prong_part_charge);
     fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
-
 }
 
 CCProtonPi0_Analyzer::~CCProtonPi0_Analyzer()

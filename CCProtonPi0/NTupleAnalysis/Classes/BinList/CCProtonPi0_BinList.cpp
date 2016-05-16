@@ -9,8 +9,8 @@
 
 using namespace std;
 
-const double CCProtonPi0_BinList::a_muon_P[] = {1, 2, 2.5, 3, 3.5, 4, 5, 7, 10};
-const int CCProtonPi0_BinList::size_muon_P = 8;
+const double CCProtonPi0_BinList::a_muon_P[] = {0, 1, 2, 2.5, 3, 3.5, 4, 5, 7, 10};
+const int CCProtonPi0_BinList::size_muon_P = 9;
 
 const double CCProtonPi0_BinList::a_muon_theta[] = {0, 2, 4, 6, 8, 10, 12, 16, 20, 25};
 const int CCProtonPi0_BinList::size_muon_theta = 9;

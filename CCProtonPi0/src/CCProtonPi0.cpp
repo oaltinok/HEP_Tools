@@ -507,6 +507,9 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("muon_qp", 99.0);
     declareDoubleEventBranch("muon_qpqpe", 99.0);
     declareDoubleEventBranch("muon_E_shift", 0.0);
+    declareContainerDoubleEventBranch( "muon_theta_allNodes" );
+    declareContainerDoubleEventBranch( "muon_thetaX_allNodes" );
+    declareContainerDoubleEventBranch( "muon_thetaY_allNodes" );
 
     // Proton Kinematics -- Filled in setProtonData()
     declareIntEventBranch("nProtonCandidates", -1);
@@ -1508,6 +1511,24 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     double muon_theta_beam_biasUp = m_coordSysTool->thetaWRTBeam(muon_4p,m_beamAngleBias) - muon_theta_beam;
     double muon_theta_beam_biasDown = m_coordSysTool->thetaWRTBeam(muon_4p, -1.0*m_beamAngleBias) - muon_theta_beam;
 
+    // Get Theta in All Track Nodes
+    Minerva::Track* muonTrack = m_MuonProng->minervaTracks()[0];
+    std::vector<double> thetaNodes;
+    std::vector<double> thetaXNodes;
+    std::vector<double> thetaYNodes;
+
+    for(uint i = 0; i < muonTrack->nNodes(); i++){
+        const Minerva::Node* node = muonTrack->nodes()[i];
+        double ax = node->state().ax();
+        double ay = node->state().ay();
+        double theta = m_coordSysTool->thetaWRTBeam( ax, ay, 1 );
+        double thetaX = m_coordSysTool->thetaXWRTBeam( ax, ay, 1 );
+        double thetaY = m_coordSysTool->thetaYWRTBeam( ay, 1 );
+        thetaNodes.push_back(theta);
+        thetaXNodes.push_back(thetaX);
+        thetaYNodes.push_back(thetaY);
+    }
+
     // Muon Score
     double muon_muScore = m_MuonParticle->score();
 
@@ -1555,10 +1576,6 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     //--------------------------------------------------------------------------
     // Fill Muon Branches
     //--------------------------------------------------------------------------
-
-
-    debug()<<"Muon Theta = "<<muon_theta<<" "<<muon_theta_beam<<endmsg;
-
     event->setIntData("muon_hasMinosMatchTrack", is_minos_track );
     event->setIntData("muon_hasMinosMatchStub", is_minos_stub );
     event->setIntData("muon_minervaTrack_types", muon_minervaTrack_types);
@@ -1585,8 +1602,9 @@ bool CCProtonPi0::setMuonData( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("muon_qp",muon_qp );
     event->setDoubleData("muon_qpqpe",muon_qpqpe);
     event->setDoubleData("muon_E_shift",muon_E_shift);
-
-    debug()<<"Muon Theta = "<<event->getDoubleData("muon_theta")<<" "<<event->getDoubleData("muon_theta_beam")<<endmsg;
+    event->setContainerDoubleData("muon_theta_allNodes", thetaNodes);
+    event->setContainerDoubleData("muon_thetaX_allNodes", thetaXNodes);
+    event->setContainerDoubleData("muon_thetaY_allNodes", thetaYNodes);
 
     return true;
 }

@@ -5,51 +5,8 @@ using namespace PlotUtils;
 CCProtonPi0_SideBandTool::CCProtonPi0_SideBandTool(std::string var) : CCProtonPi0_NTupleAnalysis()
 {
     var_name = var;
-    OpenRootFiles_Test();
+    OpenRootFiles();
     initSideBands();
-}
-
-void CCProtonPi0_SideBandTool::OpenRootFiles_Test()
-{
-    std::string rootDir;
-
-    rootDir = Folder_List::rootDir_sideBand_Michel_mc;
-    Michel.f_mc = new TFile(rootDir.c_str());
-
-    rootDir = Folder_List::rootDir_sideBand_Michel_data;
-    Michel.f_data = new TFile(rootDir.c_str());
- 
-    rootDir = Folder_List::rootDir_sideBand_pID_mc;
-    pID.f_mc = new TFile(rootDir.c_str());
-
-    rootDir = Folder_List::rootDir_sideBand_pID_data;
-    pID.f_data = new TFile(rootDir.c_str());
-
-    rootDir = Folder_List::rootDir_sideBand_LowInvMass_mc;
-    LowInvMass.f_mc = new TFile(rootDir.c_str());
-
-    rootDir = Folder_List::rootDir_sideBand_LowInvMass_data;
-    LowInvMass.f_data = new TFile(rootDir.c_str());
-
-    // Get Original Files
-    rootDir = Folder_List::rootDir_sideBand_Original_mc;
-    std::cout<<rootDir<<std::endl;
-    Original.f_mc = new TFile(rootDir.c_str());
-
-    rootDir = Folder_List::rootDir_sideBand_Original_data;
-    std::cout<<rootDir<<std::endl;
-    Original.f_data = new TFile(rootDir.c_str());
-
-    // Get High Inv Mass Files
-  
-    rootDir = Folder_List::rootDir_sideBand_HighInvMass_mc;
-    std::cout<<rootDir<<std::endl;
-    HighInvMass.f_mc = new TFile(rootDir.c_str());
-    
-    rootDir = Folder_List::rootDir_sideBand_HighInvMass_data;
-    std::cout<<rootDir<<std::endl;
-    HighInvMass.f_data = new TFile(rootDir.c_str());
-
 }
 
 void CCProtonPi0_SideBandTool::OpenRootFiles()
@@ -94,7 +51,6 @@ void CCProtonPi0_SideBandTool::OpenRootFiles()
     }else{
         rootDir = Folder_List::rootDir_sideBand_HighInvMass_data;
     }
-    std::cout<<rootDir.c_str()<<std::endl;
     HighInvMass.f_data = new TFile(rootDir.c_str());
 
     rootDir = Folder_List::rootDir_sideBand_Original_mc;
@@ -117,76 +73,52 @@ void CCProtonPi0_SideBandTool::initSideBands()
     std::string var;
 
     var = var_name + "_0";
-    GetMnvH1D(Original.f_data, Original.data, var);   
-    GetMnvH1D(Michel.f_data, Michel.data, var);   
-    GetMnvH1D(pID.f_data, pID.data, var);   
-    GetMnvH1D(LowInvMass.f_data, LowInvMass.data, var);   
-    GetMnvH1D(HighInvMass.f_data, HighInvMass.data, var);
+    Original.data = GetMnvH1D(Original.f_data, var);   
+    Michel.data = GetMnvH1D(Michel.f_data, var);   
+    pID.data = GetMnvH1D(pID.f_data, var);   
+    LowInvMass.data = GetMnvH1D(LowInvMass.f_data, var);   
+    HighInvMass.data = GetMnvH1D(HighInvMass.f_data, var);
 
-    GetMnvH1D(Original.f_mc, Original.mc_total, var);   
-    GetMnvH1D(Michel.f_mc, Michel.mc_total, var);   
-    GetMnvH1D(pID.f_mc, pID.mc_total, var);   
-    GetMnvH1D(LowInvMass.f_mc, LowInvMass.mc_total, var);
-    GetMnvH1D(HighInvMass.f_mc, HighInvMass.mc_total, var);
-
-    int nBins = Original.data->GetNbinsX();
-    std::cout<<"data"<<std::endl;
-    for (int i = 1; i < nBins; ++i){
-        std::cout<<Original.data->GetBinContent(i)<<" "<<HighInvMass.data->GetBinContent(i)<<std::endl;
-    }
-
-    std::cout<<"mc_total"<<std::endl;
-    for (int i = 1; i < nBins; ++i){
-        std::cout<<Original.mc_total->GetBinContent(i)<<" "<<HighInvMass.mc_total->GetBinContent(i)<<std::endl;
-    }
-
+    Original.mc_total = GetMnvH1D(Original.f_mc, var);   
+    Michel.mc_total = GetMnvH1D(Michel.f_mc, var);   
+    pID.mc_total = GetMnvH1D(pID.f_mc, var);   
+    LowInvMass.mc_total = GetMnvH1D(LowInvMass.f_mc, var);   
+    HighInvMass.mc_total = GetMnvH1D(HighInvMass.f_mc, var);
 
     var = var_name + "_1";
-    GetMnvH1D(Original.f_mc, Original.signal[0], var);   
-    GetMnvH1D(Michel.f_mc, Michel.signal[0], var);   
-    GetMnvH1D(pID.f_mc, pID.signal[0], var);   
-    GetMnvH1D(LowInvMass.f_mc, LowInvMass.signal[0], var);   
-    GetMnvH1D(HighInvMass.f_mc, HighInvMass.signal[0], var);   
- 
-    std::cout<<"signal[0]"<<std::endl;
-    for (int i = 1; i < nBins; ++i){
-        std::cout<<Original.signal[0]->GetBinContent(i)<<" "<<HighInvMass.signal[0]->GetBinContent(i)<<std::endl;
-    }
-   
+    Original.signal[0] = GetMnvH1D(Original.f_mc, var);   
+    Michel.signal[0] = GetMnvH1D(Michel.f_mc, var);   
+    pID.signal[0] = GetMnvH1D(pID.f_mc, var);   
+    LowInvMass.signal[0] = GetMnvH1D(LowInvMass.f_mc, var);   
+    HighInvMass.signal[0] = GetMnvH1D(HighInvMass.f_mc, var);
+  
     var = var_name + "_3";
-    GetMnvH1D(Original.f_mc, Original.WithPi0[0], var);   
-    GetMnvH1D(Michel.f_mc, Michel.WithPi0[0], var);   
-    GetMnvH1D(pID.f_mc, pID.WithPi0[0], var);   
-    GetMnvH1D(LowInvMass.f_mc, LowInvMass.WithPi0[0], var);   
-    GetMnvH1D(HighInvMass.f_mc, HighInvMass.WithPi0[0], var);   
+    Original.WithPi0[0] = GetMnvH1D(Original.f_mc, var);   
+    Michel.WithPi0[0] = GetMnvH1D(Michel.f_mc, var);   
+    pID.WithPi0[0] = GetMnvH1D(pID.f_mc, var);   
+    LowInvMass.WithPi0[0] = GetMnvH1D(LowInvMass.f_mc, var);   
+    HighInvMass.WithPi0[0] = GetMnvH1D(HighInvMass.f_mc, var);
 
     var = var_name + "_4";
-    GetMnvH1D(Original.f_mc, Original.QELike[0], var);   
-    GetMnvH1D(Michel.f_mc, Michel.QELike[0], var);   
-    GetMnvH1D(pID.f_mc, pID.QELike[0], var);   
-    GetMnvH1D(LowInvMass.f_mc, LowInvMass.QELike[0], var);   
-    GetMnvH1D(HighInvMass.f_mc, HighInvMass.QELike[0], var);   
+    Original.QELike[0] = GetMnvH1D(Original.f_mc, var);   
+    Michel.QELike[0] = GetMnvH1D(Michel.f_mc, var);   
+    pID.QELike[0] = GetMnvH1D(pID.f_mc, var);   
+    LowInvMass.QELike[0] = GetMnvH1D(LowInvMass.f_mc, var);   
+    HighInvMass.QELike[0] = GetMnvH1D(HighInvMass.f_mc, var);
    
     var = var_name + "_5";
-    GetMnvH1D(Original.f_mc, Original.SinglePiPlus[0], var);   
-    GetMnvH1D(Michel.f_mc, Michel.SinglePiPlus[0], var);   
-    GetMnvH1D(pID.f_mc, pID.SinglePiPlus[0], var);   
-    GetMnvH1D(LowInvMass.f_mc, LowInvMass.SinglePiPlus[0], var);   
-    GetMnvH1D(HighInvMass.f_mc, HighInvMass.SinglePiPlus[0], var);   
-    
+    Original.SinglePiPlus[0] = GetMnvH1D(Original.f_mc, var);   
+    Michel.SinglePiPlus[0] = GetMnvH1D(Michel.f_mc, var);   
+    pID.SinglePiPlus[0] = GetMnvH1D(pID.f_mc, var);   
+    LowInvMass.SinglePiPlus[0] = GetMnvH1D(LowInvMass.f_mc, var);   
+    HighInvMass.SinglePiPlus[0] = GetMnvH1D(HighInvMass.f_mc, var);
+   
     var = var_name + "_6";
-    GetMnvH1D(Original.f_mc, Original.Other[0], var);   
-    GetMnvH1D(Michel.f_mc, Michel.Other[0], var);   
-    GetMnvH1D(pID.f_mc, pID.Other[0], var);   
-    GetMnvH1D(LowInvMass.f_mc, LowInvMass.Other[0], var);   
-    GetMnvH1D(HighInvMass.f_mc, HighInvMass.Other[0], var);   
- 
-}
-
-void CCProtonPi0_SideBandTool::GetMnvH1D(TFile* f, MnvH1D* &h, std::string var_name)
-{
-    h = new MnvH1D( * dynamic_cast<MnvH1D*>(f->Get(var_name.c_str())) );
-    h->SetDirectory(NULL);
+    Original.Other[0] = GetMnvH1D(Original.f_mc, var);   
+    Michel.Other[0] = GetMnvH1D(Michel.f_mc, var);   
+    pID.Other[0] = GetMnvH1D(pID.f_mc, var);   
+    LowInvMass.Other[0] = GetMnvH1D(LowInvMass.f_mc, var);   
+    HighInvMass.Other[0] = GetMnvH1D(HighInvMass.f_mc, var);
 }
 
 void CCProtonPi0_SideBandTool::SetNames(SideBand &sb, std::string name)
@@ -207,17 +139,18 @@ CCProtonPi0_SideBandTool::~CCProtonPi0_SideBandTool()
 
 void CCProtonPi0_SideBandTool::Plot()
 {
-    //Plot(Original);
-    //Plot(Michel);
-    //Plot(pID);
-    //Plot(LowInvMass);
-    //Plot(HighInvMass);
-    
+    Plot(Original);
+    Plot(Michel);
+    Plot(pID);
+    Plot(LowInvMass);
+    Plot(HighInvMass);
+   
+    std::cout<<"Plotting Data MC With Error Band"<<std::endl;
     DrawDataMCWithErrorBand(Original);
-    //DrawDataMCWithErrorBand(Michel);
-    //DrawDataMCWithErrorBand(pID);
-    //DrawDataMCWithErrorBand(LowInvMass);
-    //DrawDataMCWithErrorBand(HighInvMass);
+    DrawDataMCWithErrorBand(Michel);
+    DrawDataMCWithErrorBand(pID);
+    DrawDataMCWithErrorBand(LowInvMass);
+    DrawDataMCWithErrorBand(HighInvMass);
 
 }
 
@@ -354,7 +287,6 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind, bool isArea)
     
     // Add Plot-Area and Plot-ChiSq
     double area_data = h_data->Integral("width");
-    std::cout<<area_data<<std::endl;
     double area_mc = h_mc_total->Integral("width");
     TLatex* areaText = new TLatex;
     areaText->SetNDC();
@@ -526,7 +458,6 @@ double CCProtonPi0_SideBandTool::calc_ChiSq(SideBand &sb, int ind, bool isArea)
     for (int i = 1; i <= sb.data->GetNbinsX(); ++i){
         // Get N(Events) in Single Bin
         double data = sb.data->GetBinContent(i);
-        std::cout<<data<<" ";
         if (data == 0) continue;
         double signal = sb.signal[ind]->GetBinContent(i);
         double WithPi0 = sb.WithPi0[ind]->GetBinContent(i);
@@ -540,7 +471,6 @@ double CCProtonPi0_SideBandTool::calc_ChiSq(SideBand &sb, int ind, bool isArea)
         double delta = pow((data-MC_total),2) / data;
         chi_sq += delta;
     }
-    std::cout<<std::endl;
     return chi_sq;
 }
 
@@ -555,28 +485,28 @@ void CCProtonPi0_SideBandTool::DrawDataMCWithErrorBand(SideBand &sb)
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,1280);
 
-    plotter->DrawErrorSummary(h_mc_total);
-    //plotter->DrawDataMCWithErrorBand(h_data, h_mc_total, mc_ratio, "TR", false, NULL, NULL,false,true);
-//
-//    MnvH1D* h_signal = new MnvH1D(*(sb.signal[1]));
-//    MnvH1D* h_WithPi0 = new MnvH1D(*(sb.WithPi0[1]));
-//    MnvH1D* h_QELike = new MnvH1D(*(sb.QELike[1]));
-//    MnvH1D* h_SinglePiPlus = new MnvH1D(*(sb.SinglePiPlus[1]));
-//    MnvH1D* h_Other = new MnvH1D(*(sb.Other[1]));
-//    MnvH1D* h_mc_total2 = new MnvH1D(*h_signal);
-//    h_mc_total2->Add(h_WithPi0);
-//    h_mc_total2->Add(h_QELike);
-//    h_mc_total2->Add(h_SinglePiPlus);
-//    h_mc_total2->Add(h_Other);
-//    
-//    double norm_bin_width = h_mc_total2->GetNormBinWidth();
-//    h_mc_total2->Scale(mc_ratio);
-//    h_mc_total2->Scale(norm_bin_width,"width");
-//    h_mc_total2->SetLineWidth(3);
-//    h_mc_total2->SetLineColor(kBlue);
-//    h_mc_total2->SetFillColor(kWhite);
-//
-//    h_mc_total2->Draw("HIST SAME");
+    //plotter->DrawErrorSummary(h_mc_total);
+    plotter->DrawDataMCWithErrorBand(h_data, h_mc_total, mc_ratio, "TR", false, NULL, NULL,false,true);
+
+    MnvH1D* h_signal = new MnvH1D(*(sb.signal[1]));
+    MnvH1D* h_WithPi0 = new MnvH1D(*(sb.WithPi0[1]));
+    MnvH1D* h_QELike = new MnvH1D(*(sb.QELike[1]));
+    MnvH1D* h_SinglePiPlus = new MnvH1D(*(sb.SinglePiPlus[1]));
+    MnvH1D* h_Other = new MnvH1D(*(sb.Other[1]));
+    MnvH1D* h_mc_total2 = new MnvH1D(*h_signal);
+    h_mc_total2->Add(h_WithPi0);
+    h_mc_total2->Add(h_QELike);
+    h_mc_total2->Add(h_SinglePiPlus);
+    h_mc_total2->Add(h_Other);
+    
+    double norm_bin_width = h_mc_total2->GetNormBinWidth();
+    h_mc_total2->Scale(mc_ratio);
+    h_mc_total2->Scale(norm_bin_width,"width");
+    h_mc_total2->SetLineWidth(3);
+    h_mc_total2->SetLineColor(kBlue);
+    h_mc_total2->SetFillColor(kWhite);
+
+    h_mc_total2->Draw("HIST SAME");
 
     // Plot Output
     std::string plotDir = Folder_List::plotDir_SideBand;

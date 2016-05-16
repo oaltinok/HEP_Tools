@@ -90,7 +90,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotBackgroundEstimated();
         void plotEfficiencyCorrected();
         void plotUnfolded();
-        void plotIntegratedFlux();
+        void plotFluxIntegrated();
         void plotCrossSection();
         void plotCrossSection_Check();
 
@@ -112,6 +112,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotPion_True();
 
         // Other Plots 
+        void PlotFluxHistograms();
         void plotGENIEXSec();
         void plotOtherStudies();
         void plot_InvMass_TruthMatch_Stacked(bool isSignal, bool isStacked);
@@ -151,12 +152,9 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
         // Data vs MC
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
-        void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir);
-        void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
-        void DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir);
-        void DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
-        void DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
-        void DrawDataMCRatio_CrossSection(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm);
+        void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec = false);
+        void DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);
+        void DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());

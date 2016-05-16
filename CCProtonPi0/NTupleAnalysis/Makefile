@@ -30,8 +30,7 @@ ALLANALYZERCPP = $(ANALYZERCPP) $(ANALYZERDEFAULTCPP)
 # Class: CrossSection
 CROSSSECTIONCPP = Classes/CrossSection/CCProtonPi0_CrossSection.cpp
 CROSSSECTIONSTYLECPP = Classes/CrossSection/CCProtonPi0_CrossSection_Style.cpp
-CALCFLUXCPP = Classes/CrossSection/calc_flux.cpp
-ALLCROSSSECTIONCPP = $(CROSSSECTIONCPP) $(CROSSSECTIONSTYLECPP) $(CALCFLUXCPP)
+ALLCROSSSECTIONCPP = $(CROSSSECTIONCPP) $(CROSSSECTIONSTYLECPP)
 
 # Class: Interaction, Particle and Particle SubClasses
 INTERACTIONCPP = Classes/Interaction/CCProtonPi0_Interaction.cpp

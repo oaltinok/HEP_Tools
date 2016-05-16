@@ -61,6 +61,7 @@ class CCProtonPi0_NTupleAnalysis
         static const double SENTINEL;
         static const double MeV_to_GeV; 
         static const double MeVSq_to_GeVSq;
+        static const double mSq_to_cmSq; 
         static const double mm_to_cm;
         static const double rad_to_deg;
         static const double min_Enu;
@@ -72,6 +73,7 @@ class CCProtonPi0_NTupleAnalysis
         static const enum FluxReweighter::EG4NumiVersion old_flux;
 
         FluxReweighter* frw;
+        bool frw_DefaultInit;
         bool processed_minerva1;
         bool processed_minerva7;
         bool processed_minerva9;
@@ -82,28 +84,36 @@ class CCProtonPi0_NTupleAnalysis
 
         void OpenTextFile(std::string file_name, std::ofstream &file);
         std::string GetPlaylist(const int run);
-        
+       
+        // Returns a "new" MnvH1D or MnvH2D 
+        MnvH1D* GetMnvH1D(TFile* f, std::string var_name);
+        MnvH2D* GetMnvH2D(TFile* f, std::string var_name);
+
         // Errors for Data
-        void AddVertErrorBands_Data(MnvH1D* h);
-        void AddVertErrorBandAndFillWithCV_Flux(MnvH1D* h);
-        void AddVertErrorBandAndFillWithCV_Genie(MnvH1D* h);
-        void AddVertErrorBandAndFillWithCV_MuonTracking(MnvH1D* h);
-        
-        void AddVertErrorBands_Data(MnvH2D* h);
-        void AddVertErrorBandAndFillWithCV_Flux(MnvH2D* h);
-        void AddVertErrorBandAndFillWithCV_Genie(MnvH2D* h);
-        void AddVertErrorBandAndFillWithCV_MuonTracking(MnvH2D* h);
+        template<class MnvHistoType>
+        void AddVertErrorBands_Data(MnvHistoType* h);
+
+        template<class MnvHistoType>
+        void AddVertErrorBandAndFillWithCV_Flux(MnvHistoType* h);
+
+        template<class MnvHistoType>
+        void AddVertErrorBandAndFillWithCV_Genie(MnvHistoType* h);
+
+        template<class MnvHistoType>
+        void AddVertErrorBandAndFillWithCV_MuonTracking(MnvHistoType* h);
 
         // Errors for MC
-        void AddVertErrorBands_MC(MnvH1D* h);
-        void AddVertErrorBand_Flux(MnvH1D* h);
-        void AddVertErrorBand_Genie(MnvH1D* h);
-        void AddVertErrorBand_MuonTracking(MnvH1D* h);
-
-        void AddVertErrorBands_MC(MnvH2D* h);
-        void AddVertErrorBand_Flux(MnvH2D* h);
-        void AddVertErrorBand_Genie(MnvH2D* h);
-        void AddVertErrorBand_MuonTracking(MnvH2D* h);
+        template<class MnvHistoType>
+        void AddVertErrorBands_MC(MnvHistoType* h);
+        
+        template<class MnvHistoType>
+        void AddVertErrorBand_Flux(MnvHistoType* h);
+        
+        template<class MnvHistoType>
+        void AddVertErrorBand_Genie(MnvHistoType* h);
+        
+        template<class MnvHistoType>
+        void AddVertErrorBand_MuonTracking(MnvHistoType* h);
 
     private:
 };

@@ -68,10 +68,8 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
         double err_SinglePiPlus;
 
         void OpenRootFiles();
-        void OpenRootFiles_Test();
         void initSideBands();
         void SetNames(SideBand &sb, std::string name);
-        void GetMnvH1D(TFile* f, MnvH1D* &h, std::string var_name);
         void ApplyFitResults();
         void ApplyFitResults(SideBand &sb);
 

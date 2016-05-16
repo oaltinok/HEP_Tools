@@ -45,7 +45,7 @@ struct XSec
     MnvH1D* bckg_estimated;
     MnvH1D* unfolded;
     MnvH1D* efficiency_corrected;
-    MnvH1D* integrated_flux;
+    MnvH1D* flux_integrated;
     MnvH1D* xsec;
 
     // MC Truth Histograms 
@@ -70,6 +70,10 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         double max_invMass;
         double N_Background_Data;
         double Uncertainity_Bckg;
+
+        // Flux File
+        MnvH1D* h_flux_minervaLE_FHC;
+        double flux_integral;
 
         // Pi0 Invariant Mass
         TH1D* invMass_fit_result;
@@ -116,19 +120,8 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name);
         MnvH1D* Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name);
         MnvH1D* Efficiency_Divide(MnvH1D* unfolded, MnvH1D* eff, std::string var_name);
-        MnvH1D* Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name, bool isEv);
-        MnvH1D* Calc_FinalCrossSection(MnvH1D* data_efficiency_corrected, MnvH1D* integrated_flux, std::string var_name);
-        MnvH1D* calc_flux( MnvH1D* mnvh1d_template,          // Template histogram to copy the binning for the flux histogram 
-                const std::string& flux_filename, // The flux file name
-                bool isEv,                        // if this variable is Enu since it is treated differently
-                bool __reweight_flux = false,     // whether to do the flux reweight study
-                double __reweight_emin = 0.0,     // lower bound of the reweighted region 
-                double __reweight_emax = 0.0,     // upper bound of the reweighted region
-                double __reweight_amount = 0.0,   // amount to reweight
-                bool flux_smooth_curve = false,   // reweight the flux over full neutrino energy range
-                bool flux_piecewise_curve = false);
-
-
+        MnvH1D* Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name);
+        MnvH1D* Calc_FinalCrossSection(MnvH1D* flux_integrated, std::string var_name);
 };
 
 

@@ -46,10 +46,10 @@ void CCProtonPi0_CrossSection::Calc_CrossSection(XSec &var)
     var.efficiency_corrected = Efficiency_Divide(var.unfolded, var.eff, var.name);   
 
     // Integrate Flux
-    var.integrated_flux = Integrate_Flux(var.efficiency_corrected, var.name, var.isEv);
+    var.flux_integrated = Integrate_Flux(var.efficiency_corrected, var.name);
     
     // Calculate Final Cross Section
-    var.xsec= Calc_FinalCrossSection(var.efficiency_corrected, var.integrated_flux, var.name); 
+    var.xsec = Calc_FinalCrossSection(var.flux_integrated, var.name); 
  
     Style_XSec(var);
     std::cout<<"Done!"<<std::endl;
@@ -279,28 +279,27 @@ MnvH1D* CCProtonPi0_CrossSection::Efficiency_Divide(MnvH1D* unfolded, MnvH1D* ef
     return efficiency_corrected;
 }
 
-MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name, bool isEv)
+MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name)
 {
     std::cout<<"Integrating Flux for "<<var_name<<std::endl;
-    
-    MnvH1D* integrated_flux = calc_flux(data_efficiency_corrected, rootDir_flux, isEv);
-    
-    std::string hist_name = var_name + "_integrated_flux";
-    integrated_flux->SetName(hist_name.c_str());
+
+    MnvH1D* flux_integrated = new MnvH1D (*data_efficiency_corrected); 
+   
+    std::string hist_name = var_name + "_flux_integrated";
+    flux_integrated->SetName(hist_name.c_str());
+
+    flux_integrated->Scale(1/flux_integral);
 
     std::cout<<"Done!"<<std::endl;
 
-    return integrated_flux;
+    return flux_integrated;
 }
 
-MnvH1D* CCProtonPi0_CrossSection::Calc_FinalCrossSection(MnvH1D* data_efficiency_corrected, MnvH1D* integrated_flux, std::string var_name)
+MnvH1D* CCProtonPi0_CrossSection::Calc_FinalCrossSection(MnvH1D* flux_integrated, std::string var_name)
 {
-    MnvH1D* h_xs = new MnvH1D(*data_efficiency_corrected);
+    MnvH1D* h_xs = new MnvH1D(*flux_integrated);
     std::string hist_name = var_name + "_xsec";
     h_xs->SetName(hist_name.c_str());
-
-    // Divide the efficiency corrected distribution by the integrated flux
-    h_xs->Divide(data_efficiency_corrected, integrated_flux);
 
     // Set POT
     double pot;
@@ -360,12 +359,22 @@ void CCProtonPi0_CrossSection::OpenRootFiles()
 
 void CCProtonPi0_CrossSection::initHistograms()
 {
-    // Pi0 Invariant Mass
-    if (m_isMC) invMass_all = new MnvH1D(*(MnvH1D*)f_mc_cutHists->Get("invMass_mc_reco_all"));
-    else invMass_all = new MnvH1D(*(MnvH1D*)f_data_cutHists->Get("invMass_all"));
+    // Get Reweighted Flux Histogram
+    // Use minervaLE_FHC because I compared others and all are almost same
+    // Integral of this is the average
+    delete frw;
+    frw = new FluxReweighter(14, applyNuEConstraint, FluxReweighter::minervaLE_FHC, new_flux, old_flux);
+    h_flux_minervaLE_FHC = new MnvH1D (*(frw->GetFluxReweighted(14)));
+    flux_integral = h_flux_minervaLE_FHC->Integral(4,30,"width");
+    flux_integral = flux_integral/mSq_to_cmSq; // Convert from per mSq to per cmSq 
+    std::cout<<"Signal Region Flux Integral = "<<flux_integral<<std::endl; 
 
-    invMass_mc_reco_signal = new MnvH1D(*(MnvH1D*)f_mc_cutHists->Get("invMass_mc_reco_signal")); 
-    invMass_mc_reco_bckg  = new MnvH1D(*(MnvH1D*)f_mc_cutHists->Get("invMass_mc_reco_bckg")); 
+    // Pi0 Invariant Mass
+    if (m_isMC) invMass_all = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_all");
+    else invMass_all = GetMnvH1D(f_data_cutHists, "invMass_all");
+
+    invMass_mc_reco_signal = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_signal");
+    invMass_mc_reco_bckg = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_bckg");
 }
 
 void CCProtonPi0_CrossSection::initHistograms(XSec &var)
@@ -374,24 +383,24 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
     
     if (m_isMC){ 
         hist_name = var.name + "_mc_reco_all";
-        var.all = new MnvH1D(*(MnvH1D*)var.f_mc->Get(hist_name.c_str())); 
+        var.all = GetMnvH1D(var.f_mc, hist_name);
     }else{ 
         hist_name = var.name + "_all";
-        var.all = new MnvH1D(*(MnvH1D*)var.f_data->Get(hist_name.c_str())); 
+        var.all = GetMnvH1D(var.f_data, hist_name);
     }    
 
     hist_name = var.name + "_mc_reco_signal";
-    var.mc_reco_signal = new MnvH1D(*(MnvH1D*)var.f_mc->Get(hist_name.c_str())); 
+    var.mc_reco_signal = GetMnvH1D(var.f_mc, hist_name);
 
     hist_name = var.name + "_mc_reco_bckg";
-    var.mc_reco_bckg = new MnvH1D(*(MnvH1D*)var.f_mc->Get(hist_name.c_str())); 
+    var.mc_reco_bckg = GetMnvH1D(var.f_mc, hist_name);
 
     // All Signal is on Truth File
     hist_name = var.name + "_mc_truth_all_signal";
-    var.mc_truth_all_signal = new MnvH1D(*(MnvH1D*)f_truth->Get(hist_name.c_str())); 
+    var.mc_truth_all_signal = GetMnvH1D(f_truth, hist_name);
     
     hist_name = var.name + "_mc_truth_signal";
-    var.mc_truth_signal = new MnvH1D(*(MnvH1D*)var.f_mc->Get(hist_name.c_str())); 
+    var.mc_truth_signal = GetMnvH1D(var.f_mc, hist_name);
 
     hist_name = var.name + "_eff"; 
     var.eff = new MnvH1D(*var.mc_truth_signal);
@@ -399,7 +408,7 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
     var.eff->Divide(var.mc_truth_signal, var.mc_truth_all_signal);
 
     hist_name = var.name + "_response";
-    var.response = new MnvH2D(*(MnvH2D*)var.f_mc->Get(hist_name.c_str())); 
+    var.response = GetMnvH2D(var.f_mc, hist_name);
 }
 
 void CCProtonPi0_CrossSection::writeHistograms(XSec &var)
@@ -411,7 +420,7 @@ void CCProtonPi0_CrossSection::writeHistograms(XSec &var)
     var.bckg_estimated->Write();
     var.unfolded->Write();
     var.efficiency_corrected->Write();
-    var.integrated_flux->Write();
+    var.flux_integrated->Write();
    
     // MC Truth Histograms
     var.mc_truth_all_signal->Write();

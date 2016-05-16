@@ -746,6 +746,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        gamma2_direction[3];
         Double_t        gamma2_end_vertex[3];
         Double_t        gamma2_vertex[3];
+        Int_t           muon_thetaX_allNodes_sz;
+        Double_t        muon_thetaX_allNodes[153];   //[muon_thetaX_allNodes_sz]
+        Int_t           muon_thetaY_allNodes_sz;
+        Double_t        muon_thetaY_allNodes[153];   //[muon_thetaY_allNodes_sz]
+        Int_t           muon_theta_allNodes_sz;
+        Double_t        muon_theta_allNodes[153];   //[muon_theta_allNodes_sz]
         Int_t           od_distanceBlobTower_sz;
         Double_t        od_distanceBlobTower[2];   //[od_distanceBlobTower_sz]
         Int_t           od_idBlobTime_sz;
@@ -1380,6 +1386,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_gamma2_direction;   //!
         TBranch        *b_gamma2_end_vertex;   //!
         TBranch        *b_gamma2_vertex;   //!
+        TBranch        *b_muon_thetaX_allNodes_sz;   //!
+        TBranch        *b_muon_thetaX_allNodes;   //!
+        TBranch        *b_muon_thetaY_allNodes_sz;   //!
+        TBranch        *b_muon_thetaY_allNodes;   //!
+        TBranch        *b_muon_theta_allNodes_sz;   //!
+        TBranch        *b_muon_theta_allNodes;   //!
         TBranch        *b_od_distanceBlobTower_sz;   //!
         TBranch        *b_od_distanceBlobTower;   //!
         TBranch        *b_od_idBlobTime_sz;   //!

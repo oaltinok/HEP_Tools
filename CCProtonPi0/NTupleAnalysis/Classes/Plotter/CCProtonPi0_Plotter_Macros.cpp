@@ -360,23 +360,15 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     DrawDataMC(data, mc, var_name, plotDir, false);
 }
 
-void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir)
+void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec)
 {
     // POT Normalized
-    DrawDataMC(data, mc, var_name, plotDir, true);
+    DrawDataMC_WithRatio(data, mc, var_name, plotDir, true, isXSec);
     // Area Normalized
-    DrawDataMC(data, mc, var_name, plotDir, false);
+    DrawDataMC_WithRatio(data, mc, var_name, plotDir, false, isXSec);
 }
 
-void CCProtonPi0_Plotter::DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir)
-{
-    // POT Normalized
-    DrawDataMC_CrossSection(data, mc, var_name, plotDir, true);
-    // Area Normalized
-    DrawDataMC_CrossSection(data, mc, var_name, plotDir, false);
-}
-
-void CCProtonPi0_Plotter::DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm)
+void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec)
 {
     // ------------------------------------------------------------------------
     // MC Normalization 
@@ -385,15 +377,18 @@ void CCProtonPi0_Plotter::DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std:
     double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc);
 
     // Cross Section Calculation Already Includes POT Normalization
-    if (isPOTNorm) mc_ratio = 1.0;
+    if (isXSec && isPOTNorm) mc_ratio = 1.0;
 
     // ------------------------------------------------------------------------
     // Plot 
     // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
+    TCanvas* c = new TCanvas("c","c",1280,1280);
 
-    printBins(mc, var_name);
+    TPad *pad1 = new TPad("pad1", "pad1", 0, 0.3, 1, 1.0); 
+    pad1->SetBottomMargin(0); // Top and Bottom Plots attached
+    pad1->Draw();               
+    pad1->cd(); // pad1 is the current pad
 
     MnvH1D* tempData = new MnvH1D(*data);
     MnvH1D* tempMC = new MnvH1D(*mc);
@@ -414,79 +409,86 @@ void CCProtonPi0_Plotter::DrawDataMC_CrossSection(MnvH1D* data, MnvH1D* mc, std:
     // Add Areas
     const double y_pos = 0.88;
     const double text_size = 0.03;
-    double area_data = data->Integral();
-    double area_mc = mc->Integral() * mc_ratio;
+    double area_data = data->Integral("width");
+    double area_mc = mc->Integral("width") * mc_ratio;
     plotter->AddPlotLabel(Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc),0.3,y_pos,text_size,kBlue); 
 
-    // Print Plot
-    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_",norm_label.c_str(),".png"), "png");
+    // Plot Lower Plot: Data vs MC Ratio
+    c->cd(); // Go back to default Canvas before creating 2nd Pad
+    TPad *pad2 = new TPad("pad2", "pad2", 0, 0.05, 1, 0.3);
+    pad2->SetTopMargin(0);
+    pad2->SetBottomMargin(0.2);
+    pad2->Draw();
+    pad2->cd();
 
+    // Calculate the Ratio 
+    TH1D* h_data = new TH1D(tempData->GetCVHistoWithStatError());
+    TH1D* h_mc_total = new TH1D(tempMC->GetCVHistoWithStatError());
+    // Scale Histograms
+    h_data->Scale(1,"width");
+    h_mc_total->Scale(mc_ratio,"width");
+    
+    TH1D* h_data_mc_ratio = new TH1D(*h_data);
+    h_data_mc_ratio->Divide(h_mc_total); 
+
+    // Style Ratio Plot
+    h_data_mc_ratio->SetTitle("");
+    h_data_mc_ratio->GetXaxis()->SetTitle(h_mc_total->GetXaxis()->GetTitle());
+    h_data_mc_ratio->GetYaxis()->SetTitle("Data/MC");
+    h_data_mc_ratio->SetLineColor(kBlue);
+    h_data_mc_ratio->SetLineWidth(3);
+    h_data_mc_ratio->SetFillColor(kWhite);
+    h_data_mc_ratio->SetMinimum(0.5);
+    h_data_mc_ratio->SetMaximum(1.5);
+    h_data_mc_ratio->SetStats(0);
+
+    // Y axis ratio plot settings
+    h_data_mc_ratio->GetYaxis()->SetNdivisions(505);
+    h_data_mc_ratio->GetYaxis()->SetTitleSize(30);
+    h_data_mc_ratio->GetYaxis()->SetTitleFont(43);
+    h_data_mc_ratio->GetYaxis()->SetTitleOffset(1.55);
+    h_data_mc_ratio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h_data_mc_ratio->GetYaxis()->SetLabelSize(30);
+
+    // X axis ratio plot settings
+    h_data_mc_ratio->GetXaxis()->SetTitleSize(30);
+    h_data_mc_ratio->GetXaxis()->SetTitleFont(43);
+    h_data_mc_ratio->GetXaxis()->SetTitleOffset(4.);
+    h_data_mc_ratio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h_data_mc_ratio->GetXaxis()->SetLabelSize(30);
+
+    // Add Ratio Plot
+    h_data_mc_ratio->Draw("HIST");
+
+    // Add Ratio = 1 Line 
+    TLine ratio_1;
+    ratio_1.SetLineWidth(2);
+    ratio_1.SetLineStyle(7);
+    ratio_1.SetLineColor(kBlack);
+    double line_min = h_data->GetBinLowEdge(1);
+    double line_max = h_data->GetBinLowEdge(h_data->GetNbinsX()+1);
+    ratio_1.DrawLine(line_min,1,line_max,1);
+
+    // Plot Output
+    gStyle->SetOptStat(0); 
+    c->Update();
+    std::string out_name;
+    out_name = plotDir + var_name + "_" + norm_label + ".png"; 
+
+    c->Print(out_name.c_str(),"png");
+
+    delete pad1;
+    delete pad2;
     delete c;
     delete plotter;
     delete tempData;
     delete tempMC;
-
-    DrawDataMCRatio_CrossSection(data,mc,var_name,plotDir,isPOTNorm);
+    delete h_data;
+    delete h_mc_total;
+    delete h_data_mc_ratio;
 }
 
-void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm)
-{
-    // ------------------------------------------------------------------------
-    // MC Normalization 
-    // ------------------------------------------------------------------------
-    std::string norm_label; 
-    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc);
-
-    // ------------------------------------------------------------------------
-    // Plot 
-    // ------------------------------------------------------------------------
-    MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
-
-    MnvH1D* tempData = new MnvH1D(*data);
-    MnvH1D* tempMC = new MnvH1D(*mc);
-
-    // Normalize to Bin Width
-    double norm_bin_width = tempData->GetNormBinWidth();
-    tempData->Scale(norm_bin_width,"width");
-
-    norm_bin_width = tempMC->GetNormBinWidth();
-    tempMC->Scale(norm_bin_width,"width");
-
-    plotter->DrawDataMC(tempData, tempMC, mc_ratio, "TR", false);
-
-    // Add Plot Labels
-    plotter->AddHistoTitle(data[0].GetTitle());
-    AddNormBox(plotter, isPOTNorm, mc_ratio);
-
-    // Add Areas
-    const double y_pos = 0.88;
-    const double text_size = 0.03;
-    double area_data = data->Integral();
-    double area_mc = mc->Integral() * mc_ratio;
-    plotter->AddPlotLabel(Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc),0.3,y_pos,text_size,kBlue); 
-
-    // Add Pi0 InvMass Line
-    std::size_t found = var_name.find("invMass");
-    if (found != std::string::npos){
-        TLine pi0Mass;
-        pi0Mass.SetLineWidth(2);
-        pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,3200);
-    }
-
-    // Print Plot
-    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_",norm_label.c_str(),".png"), "png");
-
-    delete c;
-    delete plotter;
-    delete tempData;
-    delete tempMC;
-
-    DrawDataMCRatio(data,mc,var_name,plotDir,isPOTNorm);
-}
-
-void CCProtonPi0_Plotter::DrawDataMCRatio_CrossSection(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm)
+void CCProtonPi0_Plotter::DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec)
 {
     // ------------------------------------------------------------------------
     // MC Normalization 
@@ -495,34 +497,7 @@ void CCProtonPi0_Plotter::DrawDataMCRatio_CrossSection(MnvH1D* data, MnvH1D* mc,
     double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc);
 
     // Cross Section Calculation Already Includes POT Normalization
-    if (isPOTNorm) mc_ratio = 1.0;
-
-    // ------------------------------------------------------------------------
-    // Plot
-    // ------------------------------------------------------------------------
-    MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
-
-    plotter->DrawDataMCRatio(data, mc, mc_ratio);
-
-    // Add Plot Labels
-    plotter->AddHistoTitle(data[0].GetTitle());
-    AddNormBox(plotter, isPOTNorm, mc_ratio);
-
-    // Print Plot
-    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_ratio_",norm_label.c_str(),".png"), "png");
-
-    delete c;
-    delete plotter;
-}
-
-void CCProtonPi0_Plotter::DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm)
-{
-    // ------------------------------------------------------------------------
-    // MC Normalization 
-    // ------------------------------------------------------------------------
-    std::string norm_label; 
-    double mc_ratio = GetMCNormalization(norm_label, isPOTNorm, data, mc);
+    if (isXSec && isPOTNorm) mc_ratio = 1.0;
 
     // ------------------------------------------------------------------------
     // Plot
@@ -1076,8 +1051,8 @@ double CCProtonPi0_Plotter::GetMCNormalization(std::string &norm_label, bool isP
         norm_label = "POT";
     }else{
         //mc_ratio = mc->GetAreaNormFactor(data); // Includes Overflow Bins
-        double area_data = data->Integral();
-        double area_mc = mc->Integral();
+        double area_data = data->Integral("width");
+        double area_mc = mc->Integral("width");
         mc_ratio = area_data/area_mc;
         norm_label = "Area";
     }
