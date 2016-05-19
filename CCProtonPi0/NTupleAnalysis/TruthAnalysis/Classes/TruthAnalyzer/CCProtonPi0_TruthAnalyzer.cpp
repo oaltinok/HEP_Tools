@@ -239,17 +239,23 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     // ------------------------------------------------------------------------
     // Neutrino Energy & Q2
     // ------------------------------------------------------------------------
-    neutrino_E_mc_truth_all_signal = new MnvH1D( "neutrino_E_mc_truth_all_signal","Neutrino Energy for Signal Events",binList.size_Enu, binList.a_Enu);
-    neutrino_E_mc_truth_all_signal->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
-    neutrino_E_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
-    AddVertErrorBand_Flux(neutrino_E_mc_truth_all_signal);
-    AddVertErrorBand_Genie(neutrino_E_mc_truth_all_signal);
+    Enu_mc_truth_all_signal = new MnvH1D( "Enu_mc_truth_all_signal","Neutrino Energy for Signal Events",binList.size_Enu, binList.a_Enu);
+    Enu_mc_truth_all_signal->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
+    Enu_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBand_Flux(Enu_mc_truth_all_signal);
+    AddVertErrorBand_Genie(Enu_mc_truth_all_signal);
 
     QSq_mc_truth_all_signal = new MnvH1D( "QSq_mc_truth_all_signal","Q^{2} for Signal Events",binList.size_QSq, binList.a_QSq);
     QSq_mc_truth_all_signal->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(QSq_mc_truth_all_signal);
     AddVertErrorBand_Genie(QSq_mc_truth_all_signal);
+
+    W_mc_truth_all_signal = new MnvH1D( "W_mc_truth_all_signal","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    W_mc_truth_all_signal->GetXaxis()->SetTitle("W [GeV]");
+    W_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
+    AddVertErrorBand_Flux(W_mc_truth_all_signal);
+    AddVertErrorBand_Genie(W_mc_truth_all_signal);
 
     // ------------------------------------------------------------------------
     // Signal Q2
@@ -373,8 +379,8 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
 void CCProtonPi0_TruthAnalyzer::FillHistogram(MnvH1D* hist, double var)
 {
     hist->Fill(var, cvweight);
-    FillVertErrorBand_Flux(hist, var);
-    FillVertErrorBand_Genie(hist, var);
+    //FillVertErrorBand_Flux(hist, var);
+    //FillVertErrorBand_Genie(hist, var);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillHistogram(TH1D* hist, double var)
@@ -462,8 +468,9 @@ void CCProtonPi0_TruthAnalyzer::AddOtherErrorBands_FillWithCV()
     AddErrorBands_FillWithCV(pi0_P_mc_truth_all_signal);
     AddErrorBands_FillWithCV(pi0_KE_mc_truth_all_signal);
     AddErrorBands_FillWithCV(pi0_theta_mc_truth_all_signal);
-    AddErrorBands_FillWithCV(neutrino_E_mc_truth_all_signal);
+    AddErrorBands_FillWithCV(Enu_mc_truth_all_signal);
     AddErrorBands_FillWithCV(QSq_mc_truth_all_signal);
+    AddErrorBands_FillWithCV(W_mc_truth_all_signal);
 }
 
 void CCProtonPi0_TruthAnalyzer::AddErrorBands_FillWithCV(MnvH1D* hist)
@@ -481,8 +488,9 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
     FillHistogram(pi0_P_mc_truth_all_signal, truth_pi0_P * MeV_to_GeV);
     FillHistogram(pi0_KE_mc_truth_all_signal, truth_pi0_KE * MeV_to_GeV);
     FillHistogram(pi0_theta_mc_truth_all_signal, truth_pi0_theta * rad_to_deg);
-    FillHistogram(neutrino_E_mc_truth_all_signal, mc_incomingE * MeV_to_GeV);
+    FillHistogram(Enu_mc_truth_all_signal, mc_incomingE * MeV_to_GeV);
     FillHistogram(QSq_mc_truth_all_signal, mc_Q2 * MeVSq_to_GeVSq);
+    FillHistogram(W_mc_truth_all_signal, mc_w * MeV_to_GeV);
     
     // Signal Characteristics
     if (mc_intType == 1){
@@ -594,8 +602,9 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     pi0_P_mc_truth_all_signal->Write();
     pi0_KE_mc_truth_all_signal->Write();
     pi0_theta_mc_truth_all_signal->Write();
-    neutrino_E_mc_truth_all_signal->Write();
+    Enu_mc_truth_all_signal->Write();
     QSq_mc_truth_all_signal->Write();
+    W_mc_truth_all_signal->Write();
 
     // Signal Q2
     mc_Q2_QE->Write();

@@ -121,7 +121,7 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         tree->Fill();
     }
     
-    if (!m_isMC) AddVertErrorBands_Data(cutList.invMass_all);
+    //if (!m_isMC) AddVertErrorBands_Data(cutList.invMass_all);
     
     cutList.writeCutTable();
     cutList.writeHistograms();
@@ -1292,13 +1292,7 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
     FillHistogram(pi0.KE, pi0_KE * MeV_to_GeV);
     FillHistogram(pi0.theta, pi0_theta * TMath::RadToDeg());
     FillHistogram(pi0.phi, pi0_phi * TMath::RadToDeg());
-    if (nProtonCandidates == 0){
-        FillHistogram(pi0.P_1Track, pi0_P * MeV_to_GeV);
-        FillHistogram(pi0.theta_1Track, pi0_theta * TMath::RadToDeg());
-    }else{
-        FillHistogram(pi0.P_2Track, pi0_P * MeV_to_GeV);
-        FillHistogram(pi0.theta_2Track, pi0_theta * TMath::RadToDeg());
-    }
+
 }
 
 void CCProtonPi0_Analyzer::fillMuonMC()
@@ -1328,18 +1322,6 @@ void CCProtonPi0_Analyzer::fillMuonMC()
 
         FillHistogram(muon.theta_error, error_theta);
         FillHistogram(muon.theta_Diff, reco_theta-true_theta);
-
-        // thetaX
-        double reco_thetaX = muon_thetaX_beam;
-        double true_thetaX = truth_muon_thetaX_beam;
-        FillHistogram(muon.thetaX_Diff, reco_thetaX-true_thetaX);
-        FillHistogram(muon.thetaX_thetaX_test, reco_thetaX, true_thetaX);
- 
-        // thetaY
-        double reco_thetaY = muon_thetaY_beam;
-        double true_thetaY = truth_muon_thetaY_beam;
-        FillHistogram(muon.thetaY_Diff, reco_thetaY-true_thetaY);
-        FillHistogram(muon.thetaY_thetaY_test, reco_thetaY, true_thetaY);
         
         // Cosine Theta
         double reco_cos_theta = cos(muon_theta_beam);
@@ -1347,9 +1329,6 @@ void CCProtonPi0_Analyzer::fillMuonMC()
         double error_cos_theta = Data_Functions::getError(true_cos_theta, reco_cos_theta);
 
         FillHistogram(muon.cos_theta_error, error_cos_theta);
- 
-        FillHistogramWithDefaultErrors(muon.theta_theta_test, muon_theta_beam * TMath::RadToDeg(), truth_muon_theta_beam * TMath::RadToDeg());
-        
     }
 }
 
@@ -1433,10 +1412,7 @@ void CCProtonPi0_Analyzer::fill_muon_P()
 void CCProtonPi0_Analyzer::fill_muon_theta() 
 {
     // Get Muon Theta From Nodes
-    double reco_muon_theta;
-    if (muon_theta_allNodes_sz >= 19) reco_muon_theta = muon_theta_allNodes[19];
-    else if (muon_theta_allNodes_sz >= 9) reco_muon_theta = muon_theta_allNodes[9];
-    else reco_muon_theta = muon_theta_beam;
+    double reco_muon_theta = GetCorrectedMuonTheta();
 
     if (m_isMC){
         // MC Reco All
@@ -1548,19 +1524,15 @@ void CCProtonPi0_Analyzer::fill_pi0_theta()
 
 void CCProtonPi0_Analyzer::fillMuonReco()
 {
+    // Get Muon Theta From Nodes
+    double reco_muon_theta = GetCorrectedMuonTheta();
+
     FillHistogram(muon.E, muon_E * MeV_to_GeV);
     FillHistogram(muon.P, muon_P * MeV_to_GeV);
     FillHistogram(muon.KE, muon_KE * MeV_to_GeV);
-    FillHistogram(muon.theta, muon_theta_beam * TMath::RadToDeg());
-    FillHistogram(muon.cos_theta, cos(muon_theta_beam));
+    FillHistogram(muon.theta, reco_muon_theta * TMath::RadToDeg());
+    FillHistogram(muon.cos_theta, cos(reco_muon_theta));
     FillHistogram(muon.phi, muon_phi * TMath::RadToDeg());
-    if (nProtonCandidates == 0){
-        FillHistogram(muon.P_1Track, muon_P * MeV_to_GeV);
-        FillHistogram(muon.theta_1Track, muon_P * MeV_to_GeV);
-    }else{
-        FillHistogram(muon.P_2Track, muon_P * MeV_to_GeV);
-        FillHistogram(muon.theta_2Track, muon_P * MeV_to_GeV);
-    }
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(TH1D* hist, double var)
@@ -1581,9 +1553,9 @@ void CCProtonPi0_Analyzer::FillHistogram(TH3D* hist, double var1, double var2, d
 void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors(MnvH1D* hist, double var)
 {
     hist->Fill(var, cvweight);
-    FillVertErrorBand_Flux(hist, var);
-    FillVertErrorBand_Genie(hist, var);
-    FillVertErrorBand_MuonTracking(hist, var);
+    //FillVertErrorBand_Flux(hist, var);
+    //FillVertErrorBand_Genie(hist, var);
+    //FillVertErrorBand_MuonTracking(hist, var);
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(MnvH1D* hist, double var)
@@ -1594,9 +1566,9 @@ void CCProtonPi0_Analyzer::FillHistogram(MnvH1D* hist, double var)
 void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors(MnvH2D* hist, double var1, double var2)
 {
     hist->Fill(var1,var2, cvweight);
-    FillVertErrorBand_Flux(hist, var1, var2);
-    FillVertErrorBand_Genie(hist, var1, var2);
-    FillVertErrorBand_MuonTracking(hist, var1, var2);
+    //FillVertErrorBand_Flux(hist, var1, var2);
+    //FillVertErrorBand_Genie(hist, var1, var2);
+    //FillVertErrorBand_MuonTracking(hist, var1, var2);
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(MnvH2D* hist, double var1, double var2)
@@ -1969,15 +1941,18 @@ double CCProtonPi0_Analyzer::Calc_Enu() const
     return Enu;
 }
 
-double CCProtonPi0_Analyzer::Calc_QSq(const double Enu) const
+double CCProtonPi0_Analyzer::Calc_QSq(const double Enu) 
 {
     const double Mmu = 105.66;  // Muon Rest Mass [MeV]
-    TLorentzVector beam_4P = Get_Neutrino_4P(Enu);
-    TLorentzVector muon_4P(muon_px, muon_py, muon_pz, muon_E);
+    //TLorentzVector beam_4P = Get_Neutrino_4P(Enu);
+    //TLorentzVector muon_4P(muon_px, muon_py, muon_pz, muon_E);
 
-    double qSq = (Mmu * Mmu) - 2 * beam_4P.Dot(muon_4P);
-    double QSq = -qSq;
-
+    //double qSq = (Mmu * Mmu) - 2 * beam_4P.Dot(muon_4P);
+    //double QSq = -qSq;
+    
+    
+    double muon_corrected_theta = GetCorrectedMuonTheta(); 
+    double QSq = 2*Enu*(muon_E - muon_P*cos(muon_corrected_theta))-(Mmu*Mmu);
     return QSq;
 }
 
@@ -2214,6 +2189,17 @@ void CCProtonPi0_Analyzer::fill_SideBand_Other()
     }
 }
 
+double CCProtonPi0_Analyzer::GetCorrectedMuonTheta()
+{
+    double corrected_theta;
+
+    if (muon_theta_allNodes_sz >= 28) corrected_theta = muon_theta_allNodes[28];
+    else if (muon_theta_allNodes_sz >= 19) corrected_theta = muon_theta_allNodes[19];
+    else if (muon_theta_allNodes_sz >= 9) corrected_theta = muon_theta_allNodes[9];
+    else corrected_theta = muon_theta_beam;
+
+    return corrected_theta;
+}
 
 
 #endif //CCProtonPi0_Analyzer_cpp

@@ -84,14 +84,23 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void getPOT_Data();
 
         // Cross Section Plots
-        void plotErrorSummary();
+        bool plot_muon_P;
+        bool plot_muon_theta;
+        bool plot_pi0_P;
+        bool plot_pi0_KE;
+        bool plot_pi0_theta;
+        bool plot_QSq;
+        bool plot_Enu;
+
+        void PlotXSecVar(std::string var_name, std::string data_var, std::string mc_var, std::string plotDir, std::string plotName);
+        void plotCrossSection();
         void plotOriginalData();
         void plotBackgroundSubtracted();
         void plotBackgroundEstimated();
         void plotEfficiencyCorrected();
         void plotUnfolded();
         void plotFluxIntegrated();
-        void plotCrossSection();
+        void plotXSec();
         void plotCrossSection_Check();
 
         // Data vs MC
@@ -112,7 +121,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotPion_True();
 
         // Other Plots 
-        void PlotFluxHistograms();
         void plotGENIEXSec();
         void plotOtherStudies();
         void plot_InvMass_TruthMatch_Stacked(bool isSignal, bool isStacked);
@@ -127,6 +135,16 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void ApplyStyle_Errors(MnvPlotter* plotter);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, double hist_max, double arrow_length);
         void SavePi0InvMassPoints();
+        void NormalizeToNormBinWidth(MnvH1D* hist);
+        
+        // Flux Study
+        double GetFluxHistContent(MnvH1D* hist, double low1, double low2);
+        double Integrate(MnvH1D* hist, int start, int end);
+        void PlotFluxHistograms();
+        void PlotFluxComparison(std::string plotDir);
+        void PlotFluxRatio(std::string plotDir);
+        void PlotFluxRebinned(std::string plotDir);
+        void PlotFluxRebinned(MnvH1D* original, MnvH1D* rebinned, std::string plotDir);
 
         // --------------------------------------------------------------------
         // Plottting Macros - Implemented in CCProtonPi0_Plotter_Macros.cpp

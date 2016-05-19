@@ -14,6 +14,7 @@
 
 // Classes
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
+#include "../BinList/CCProtonPi0_BinList.h"
 #include "TObjArray.h"
 #include "TFractionFitter.h"
 #include <MinervaUnfold/MnvUnfold.h>
@@ -64,6 +65,8 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void Calc_CrossSections();
     
     private:
+        CCProtonPi0_BinList binList;
+
         bool m_isMC;
         int iteration;
         double min_invMass;
@@ -73,6 +76,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
 
         // Flux File
         MnvH1D* h_flux_minervaLE_FHC;
+        MnvH1D* h_flux_rebinned;
         double flux_integral;
 
         // Pi0 Invariant Mass
@@ -89,6 +93,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         XSec pi0_KE;
         XSec pi0_theta;
         XSec QSq;
+        XSec Enu;
         
         // ROOT Files    
         TFile* f_out;
@@ -97,7 +102,6 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         TFile* f_mc_cutHists;
         
         std::string rootDir_out;
-        std::string rootDir_flux;
 
         // Functions
         void Calc_CrossSection(XSec &var);
@@ -105,11 +109,13 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void Calc_Normalized_NBackground();
         void NormalizeHistogram(MnvH1D* h);
         double Integrate_SignalRegion(TH1D* h);
+        double GetFluxHistContent(MnvH1D* hist, double low1, double low2);
         void OpenRootFiles();
         void writeHistograms();
         void writeHistograms(XSec &var);
         void initHistograms();
         void initHistograms(XSec &var);
+        void initFluxHistograms();
         void initXSecs();
         void init_muon_P();
         void init_muon_theta();
@@ -117,6 +123,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void init_pi0_KE();
         void init_pi0_theta();
         void init_QSq();
+        void init_Enu();
         MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name);
         MnvH1D* Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name);
         MnvH1D* Efficiency_Divide(MnvH1D* unfolded, MnvH1D* eff, std::string var_name);

@@ -31,6 +31,7 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection(pi0_KE);   
     Calc_CrossSection(pi0_theta);   
     Calc_CrossSection(QSq);   
+    Calc_CrossSection(Enu);   
     
     writeHistograms();
 }
@@ -64,6 +65,9 @@ void CCProtonPi0_CrossSection::Style_XSec(XSec &var)
     var.xsec->GetYaxis()->SetTitle(var.plot_ylabel.c_str());
     
     // Scale Cross Section Result to match with Label
+    var.bin_width = var.xsec->GetNormBinWidth();
+    var.quote_width = 1.0; // per Unit (degree, GeV, GeV^2 etc...) 
+    var.scale = var.quote_width/var.bin_width; 
     var.xsec->Scale(var.scale);
 }
 
@@ -287,9 +291,16 @@ MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_correct
    
     std::string hist_name = var_name + "_flux_integrated";
     flux_integrated->SetName(hist_name.c_str());
+    flux_integrated->SetTitle("Flux Integrated Data");
 
-    flux_integrated->Scale(1/flux_integral);
-
+    // Divide by total integral except Enu
+    // Enu divided bin by bin
+    if (var_name.compare("Enu") == 0 ){
+        std::cout<<"Flux Integration for Neutrino Energy!"<<std::endl; 
+        flux_integrated->Divide(data_efficiency_corrected,h_flux_rebinned);
+    }else{
+        flux_integrated->Scale(1/flux_integral);
+    }
     std::cout<<"Done!"<<std::endl;
 
     return flux_integrated;
@@ -332,13 +343,11 @@ void CCProtonPi0_CrossSection::initXSecs()
     init_pi0_KE();
     init_pi0_theta();
     init_QSq();
+    init_Enu();
 }
 
 void CCProtonPi0_CrossSection::OpenRootFiles()
 {
-    // Flux File
-    rootDir_flux = Folder_List::rootDir_Flux_new;
-
     // Output File
     if (m_isMC) rootDir_out = Folder_List::rootDir_CrossSection_mc;
     else rootDir_out = Folder_List::rootDir_CrossSection_data;
@@ -359,22 +368,52 @@ void CCProtonPi0_CrossSection::OpenRootFiles()
 
 void CCProtonPi0_CrossSection::initHistograms()
 {
-    // Get Reweighted Flux Histogram
-    // Use minervaLE_FHC because I compared others and all are almost same
-    // Integral of this is the average
-    delete frw;
-    frw = new FluxReweighter(14, applyNuEConstraint, FluxReweighter::minervaLE_FHC, new_flux, old_flux);
-    h_flux_minervaLE_FHC = new MnvH1D (*(frw->GetFluxReweighted(14)));
-    flux_integral = h_flux_minervaLE_FHC->Integral(4,30,"width");
-    flux_integral = flux_integral/mSq_to_cmSq; // Convert from per mSq to per cmSq 
-    std::cout<<"Signal Region Flux Integral = "<<flux_integral<<std::endl; 
-
+    initFluxHistograms();
+    
     // Pi0 Invariant Mass
     if (m_isMC) invMass_all = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_all");
     else invMass_all = GetMnvH1D(f_data_cutHists, "invMass_all");
 
     invMass_mc_reco_signal = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_signal");
     invMass_mc_reco_bckg = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_bckg");
+}
+
+void CCProtonPi0_CrossSection::initFluxHistograms()
+{
+    std::cout<<"Test"<<std::endl;
+    // Get Reweighted Flux Histogram
+    // Use minervaLE_FHC because I compared others and all are almost same
+    // Integral of this is the average
+    delete frw;
+    frw = new FluxReweighter(14, applyNuEConstraint, FluxReweighter::minervaLE_FHC, new_flux, old_flux);
+    h_flux_minervaLE_FHC = new MnvH1D (*(frw->GetFluxReweighted(14)));
+    h_flux_minervaLE_FHC->SetName("h_flux_minervaLE_FHC");
+    h_flux_minervaLE_FHC->Scale(1/mSq_to_cmSq); // Our measurement scale is cm2
+    flux_integral = h_flux_minervaLE_FHC->Integral(4,30,"width");
+    std::cout<<"Signal Region Flux Integral = "<<flux_integral<<std::endl; 
+   
+    // Get Rebinned Flux for Neutrino Energy
+    h_flux_rebinned = new MnvH1D( "h_flux_rebinned","Flux (rebinned)", binList.size_Enu, binList.a_Enu);
+    h_flux_rebinned->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    h_flux_rebinned->GetYaxis()->SetTitle("#nu_{#mu} s/cm^{2}/P.O.T./GeV");
+    AddVertErrorBands_MC(h_flux_rebinned);
+
+    int nBins = h_flux_rebinned->GetNbinsX();
+    for (int i = 1; i <= nBins; i++){
+        double low = h_flux_rebinned->GetBinLowEdge(i);
+        double up = h_flux_rebinned->GetBinLowEdge(i+1);
+        double content = GetFluxHistContent(h_flux_minervaLE_FHC,low,up);
+
+        h_flux_rebinned->SetBinContent(i,content);
+    }
+
+    // Scale Rebinned Flux Histogram
+    double norm_bin_width = h_flux_minervaLE_FHC->GetNormBinWidth();
+    for (int i = 1; i <= nBins; i++){
+        double content = h_flux_rebinned->GetBinContent(i);
+        double bin_width = h_flux_rebinned->GetBinWidth(i);
+        h_flux_rebinned->SetBinContent(i,content*(norm_bin_width/bin_width));
+    }
 }
 
 void CCProtonPi0_CrossSection::initHistograms(XSec &var)
@@ -411,6 +450,23 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
     var.response = GetMnvH2D(var.f_mc, hist_name);
 }
 
+double CCProtonPi0_CrossSection::GetFluxHistContent(MnvH1D* hist, double low1, double low2)
+{
+    //std::cout<<"low = "<<low1<<" up = "<<low2<<std::endl;
+    double total = 0.0;
+    int nBins = hist->GetNbinsX();
+    for (int i = 1; i <= nBins; ++i){
+        double current_low = hist->GetBinLowEdge(i); 
+        if (current_low < low1) continue;
+        if (current_low == low2) break;
+        total += hist->GetBinContent(i);
+        //std::cout<<i<<std::endl;
+    }
+
+    //std::cout<<"Total = "<<total<<std::endl;
+    return total;
+}
+
 void CCProtonPi0_CrossSection::writeHistograms(XSec &var)
 {
     // Data Histograms
@@ -436,7 +492,10 @@ void CCProtonPi0_CrossSection::writeHistograms()
     std::cout<<">> Writing "<<rootDir_out<<std::endl;
    
     f_out->cd();
-    
+
+    h_flux_minervaLE_FHC->Write();
+    h_flux_rebinned->Write();
+
     // Pi0 Invariant Mass
     invMass_fit_result->Write();
     invMass_fit_bckg->Write();
@@ -451,6 +510,7 @@ void CCProtonPi0_CrossSection::writeHistograms()
     writeHistograms(pi0_KE);
     writeHistograms(pi0_theta);
     writeHistograms(QSq);
+    writeHistograms(Enu);
 
     f_out->Close();
 }

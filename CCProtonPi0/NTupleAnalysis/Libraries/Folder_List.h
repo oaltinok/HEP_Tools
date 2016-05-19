@@ -112,6 +112,7 @@ namespace Folder_List
     // Plot Dirs
     //-------------------------------------------------------------------------
     // CrossSection Plot Dirs
+    const std::string xsec_Enu = output + plotOut + "xsec_Enu/";
     const std::string xsec_QSq = output + plotOut + "xsec_QSq/";
     const std::string xsec_muon_P = output + plotOut + "xsec_muon_P/";
     const std::string xsec_muon_theta = output + plotOut + "xsec_muon_theta/";
@@ -126,7 +127,7 @@ namespace Folder_List
     const std::string plotDir_FluxIntegrated = "FluxIntegrated/";
     const std::string plotDir_BackgroundEstimated = "BackgroundEstimated/";
     const std::string plotDir_BackgroundSubtracted = "BackgroundSubtracted/";
-    const std::string plotDir_Unfolding = "Unfolded/";
+    const std::string plotDir_Unfolded = "Unfolded/";
     const std::string plotDir_Efficiency = "EfficiencyCorrected/";
 
     // Default Plot Dirs

@@ -111,16 +111,6 @@ void CCProtonPi0_Pion::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         P.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","P_1Track",i),"Reconstructed Pion Momentum 1Track",binList.size_pi0_P, binList.a_pi0_P);
-        temp->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        P_1Track.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","P_2Track",i),"Reconstructed Pion Momentum 2Track",binList.size_pi0_P, binList.a_pi0_P);
-        temp->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        P_2Track.push_back(temp);
-
         temp = new MnvH1D( Form("%s_%d","KE",i),"Reconstructed Pion Kinetic Energy",binList.size_pi0_KE, binList.a_pi0_KE);
         temp->GetXaxis()->SetTitle("Reconstructed T_{#pi^{0}} [GeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
@@ -130,16 +120,6 @@ void CCProtonPi0_Pion::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
         temp->GetYaxis()->SetTitle("N(Events)");
         theta.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","theta_1Track",i),"Reconstructed Pion Theta 1Track", binList.size_pi0_theta, binList.a_pi0_theta);
-        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        theta_1Track.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","theta_2Track",i),"Reconstructed Pion Theta 2Track", binList.size_pi0_theta, binList.a_pi0_theta);
-        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        theta_2Track.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","phi",i),"Reconstructed Pion Phi",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed #phi_{#pi^{0}} [degree]");
@@ -385,12 +365,8 @@ void CCProtonPi0_Pion::writeHistograms()
         // Standard Histograms
         E[i]->Write();
         P[i]->Write();
-        P_1Track[i]->Write();
-        P_2Track[i]->Write();
         KE[i]->Write();
         theta[i]->Write();
-        theta_1Track[i]->Write();
-        theta_2Track[i]->Write();
         phi[i]->Write();
     }
 

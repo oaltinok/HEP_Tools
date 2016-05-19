@@ -108,7 +108,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         int GetEjectedNucleonCount();
         double GetVertexEnergy();
         double Calc_Enu() const;
-        double Calc_QSq(const double Enu) const;
+        double Calc_QSq(const double Enu);
         TLorentzVector Get_Neutrino_4P(const double Enu) const;
         double Calc_WSq(const double Enu, const double QSq) const;
         void Calc_EventKinematics();
@@ -119,6 +119,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fillMuonMC();
         void fillMuonReco();
         double Calc_MuonCosTheta();
+        double GetCorrectedMuonTheta();
 
         //  Proton Specific Functions
         void fillProtonMC();

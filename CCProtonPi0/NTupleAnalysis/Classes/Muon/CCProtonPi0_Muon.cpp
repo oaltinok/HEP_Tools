@@ -28,8 +28,6 @@ CCProtonPi0_Muon::CCProtonPi0_Muon(bool isModeReduce, bool isMC) : CCProtonPi0_P
         bin_E.setBin(10,0.0,10.0);
         bin_E_Diff.setBin(100,-1.0,1.0);
         bin_theta_Diff.setBin(40,-5.0,5.0);
-        bin_thetaX_Diff.setBin(40,-0.1,0.1);
-        bin_thetaY_Diff.setBin(40,-0.1,0.1);
         bin_KE.setBin(100,0.0,10.0);
         
         initHistograms();
@@ -54,16 +52,6 @@ void CCProtonPi0_Muon::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         P.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","P_1Track",i),"Reconstructed Muon Momentum 1Track",binList.size_muon_P, binList.a_muon_P);
-        temp->GetXaxis()->SetTitle("Reconstructed P{#mu} [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        P_1Track.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","P_2Track",i),"Reconstructed Muon Momentum 2Track",binList.size_muon_P, binList.a_muon_P);
-        temp->GetXaxis()->SetTitle("Reconstructed P{#mu} [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        P_2Track.push_back(temp);
-
         temp = new MnvH1D( Form("%s_%d","KE",i),"Reconstructed Muon Kinetic Energy",bin_KE.get_nBins(), bin_KE.get_min(), bin_KE.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed T_{#mu} [GeV]");
         temp->GetYaxis()->SetTitle(Form("Muons / %3.1f [GeV]",bin_KE.get_width()));
@@ -73,16 +61,6 @@ void CCProtonPi0_Muon::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [Degree]");
         temp->GetYaxis()->SetTitle("N(events)");
         theta.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","theta_1Track",i),"Reconstructed Muon Theta 1Track",binList.size_muon_theta, binList.a_muon_theta);
-        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [Degree]");
-        temp->GetYaxis()->SetTitle("N(events)");
-        theta_1Track.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","theta_2Track",i),"Reconstructed Muon Theta 2Track",binList.size_muon_theta, binList.a_muon_theta);
-        temp->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [Degree]");
-        temp->GetYaxis()->SetTitle("N(events)");
-        theta_2Track.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","cos_theta",i),"Reconstructed Muon cos(#theta)",binList.muon_cos_theta.get_nBins(), binList.muon_cos_theta.get_min(), binList.muon_cos_theta.get_max());
         temp->GetXaxis()->SetTitle("Reconstructed cos(#theta_{#mu})");
@@ -94,21 +72,6 @@ void CCProtonPi0_Muon::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Muons / %3.1f [Degree]",binList.angle.get_width()));
         phi.push_back(temp);
     }
-
-    theta_theta_test = new MnvH2D( "theta_theta_test","Signal Muon Angle", binList.muon_theta.get_nBins(), binList.muon_theta.get_min(), binList.muon_theta.get_max(),binList.muon_theta.get_nBins(), binList.muon_theta.get_min(), binList.muon_theta.get_max() );
-    theta_theta_test->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [degree]");
-    theta_theta_test->GetYaxis()->SetTitle("True #theta_{#mu} [degree]");
-    AddVertErrorBands_MC(theta_theta_test);
-
-    thetaX_thetaX_test = new MnvH2D( "thetaX_thetaX_test","Signal Muon Angle", binList.muon_thetaX.get_nBins(), binList.muon_thetaX.get_min(), binList.muon_thetaX.get_max(),binList.muon_thetaX.get_nBins(), binList.muon_thetaX.get_min(), binList.muon_thetaX.get_max() );
-    thetaX_thetaX_test->GetXaxis()->SetTitle("Reconstructed thetaX_{#mu} [degree]");
-    thetaX_thetaX_test->GetYaxis()->SetTitle("True thetaX_{#mu} [degree]");
-    AddVertErrorBands_MC(thetaX_thetaX_test);
-
-    thetaY_thetaY_test = new MnvH2D( "thetaY_thetaY_test","Signal Muon Angle", binList.muon_thetaY.get_nBins(), binList.muon_thetaY.get_min(), binList.muon_thetaY.get_max(),binList.muon_thetaY.get_nBins(), binList.muon_thetaY.get_min(), binList.muon_thetaY.get_max() );
-    thetaY_thetaY_test->GetXaxis()->SetTitle("Reconstructed thetaY_{#mu} [degree]");
-    thetaY_thetaY_test->GetYaxis()->SetTitle("True thetaY_{#mu} [degree]");
-    AddVertErrorBands_MC(thetaY_thetaY_test);
 
     // Error Histograms
     P_error = new TH1D( "P_error","Error on Muon Momentum",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
@@ -134,14 +97,6 @@ void CCProtonPi0_Muon::initHistograms()
     theta_Diff = new TH1D( "theta_Diff","Difference on Muon Theta",bin_theta_Diff.get_nBins(), bin_theta_Diff.get_min(), bin_theta_Diff.get_max() );
     theta_Diff->GetXaxis()->SetTitle("#theta_{Reco}-#theta_{True} [degree]");
     theta_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_theta_Diff.get_width()));
-
-    thetaX_Diff = new TH1D( "thetaX_Diff","Difference on Muon Theta",bin_thetaX_Diff.get_nBins(), bin_thetaX_Diff.get_min(), bin_thetaX_Diff.get_max() );
-    thetaX_Diff->GetXaxis()->SetTitle("thetaX_{Reco}-thetaX_{True} [degree]");
-    thetaX_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_thetaX_Diff.get_width()));
-
-    thetaY_Diff = new TH1D( "thetaY_Diff","Difference on Muon Theta",bin_thetaY_Diff.get_nBins(), bin_thetaY_Diff.get_min(), bin_thetaY_Diff.get_max() );
-    thetaY_Diff->GetXaxis()->SetTitle("thetaY_{Reco}-thetaY_{True} [degree]");
-    thetaY_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_thetaY_Diff.get_width()));
 
     reco_P_true_P = new TH2D( "reco_P_true_P","True vs Reconstructed Muon Momentum",binList.size_muon_P, binList.a_muon_P,binList.size_muon_P, binList.a_muon_P);
     reco_P_true_P->GetXaxis()->SetTitle("Reconstructed P_{#mu} [GeV]");
@@ -255,19 +210,11 @@ void CCProtonPi0_Muon::writeHistograms()
     for (int i = 0; i < nHistograms; i++){
         E[i]->Write();
         P[i]->Write();
-        P_1Track[i]->Write();
-        P_2Track[i]->Write();
         KE[i]->Write();
         theta[i]->Write();
-        theta_1Track[i]->Write();
-        theta_2Track[i]->Write();
         cos_theta[i]->Write();
         phi[i]->Write();
     }
-
-    theta_theta_test->Write();
-    thetaX_thetaX_test->Write();
-    thetaY_thetaY_test->Write();
 
     P_error->Write();
     E_error->Write();
@@ -280,8 +227,6 @@ void CCProtonPi0_Muon::writeHistograms()
 
     E_Diff->Write();
     theta_Diff->Write();
-    thetaX_Diff->Write();
-    thetaY_Diff->Write();
 
     muon_P_all->Write();
     muon_P_mc_truth_signal->Write();

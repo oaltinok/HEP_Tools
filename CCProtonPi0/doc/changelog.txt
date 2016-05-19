@@ -1,4 +1,18 @@
 ===================================================================================================
+v2_81
+CCProtonPi0 Updates:
+	No Major Changes
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	CrossSection
+		Added Neutrino Energy
+			Total Cross section calculation does not use flux integral
+			Flux Integration done bin by bin
+	
+	Plotter
+		Modularity improved for Cross Section Plots
+
+===================================================================================================
 v2_80
 CCProtonPi0 Updates:
 	Added Muon Theta from All Nodes

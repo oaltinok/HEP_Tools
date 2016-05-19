@@ -309,7 +309,8 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     plotter->AddHistoTitle(hist->GetTitle());
 
     // Print Plot
-    c->Print(Form("%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_Errors",".png"), "png");
+    std::string out_name = plotDir + "Errors_" + var_name + ".png";
+    c->Print(out_name.c_str(), "png");
 
     delete c;
     delete plotter;
@@ -392,14 +393,11 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
 
     MnvH1D* tempData = new MnvH1D(*data);
     MnvH1D* tempMC = new MnvH1D(*mc);
-
-    // Normalize to Bin Width
-    double norm_bin_width = tempData->GetNormBinWidth();
-    tempData->Scale(norm_bin_width,"width");
-
-    norm_bin_width = tempMC->GetNormBinWidth();
-    tempMC->Scale(norm_bin_width,"width");
-
+    
+    // Normalize to Norm Bin Width
+    NormalizeToNormBinWidth(tempData);
+    NormalizeToNormBinWidth(tempMC);
+    
     plotter->DrawDataMC(tempData, tempMC, mc_ratio, "TR", false);
 
     // Add Plot Labels
@@ -425,8 +423,7 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     TH1D* h_data = new TH1D(tempData->GetCVHistoWithStatError());
     TH1D* h_mc_total = new TH1D(tempMC->GetCVHistoWithStatError());
     // Scale Histograms
-    h_data->Scale(1,"width");
-    h_mc_total->Scale(mc_ratio,"width");
+    h_mc_total->Scale(mc_ratio);
     
     TH1D* h_data_mc_ratio = new TH1D(*h_data);
     h_data_mc_ratio->Divide(h_mc_total); 
@@ -1050,7 +1047,6 @@ double CCProtonPi0_Plotter::GetMCNormalization(std::string &norm_label, bool isP
         mc_ratio = POT_ratio;
         norm_label = "POT";
     }else{
-        //mc_ratio = mc->GetAreaNormFactor(data); // Includes Overflow Bins
         double area_data = data->Integral("width");
         double area_mc = mc->Integral("width");
         mc_ratio = area_data/area_mc;
@@ -1474,12 +1470,17 @@ void CCProtonPi0_Plotter::printBins(const TH1* hist, const std::string var_name)
 
     int nBins = hist->GetNbinsX();
     for (int i = 1; i <= nBins; ++i){
-        std::cout.width(12); std::cout<<hist->GetBinCenter(i);
+        std::cout.width(12); std::cout<<hist->GetBinLowEdge(i);
         std::cout.width(12); std::cout<<hist->GetBinContent(i);
         std::cout<<std::endl;
     }
 }
 
+void CCProtonPi0_Plotter::NormalizeToNormBinWidth(MnvH1D* hist)
+{
+    double norm_bin_width = hist->GetNormBinWidth();
+    hist->Scale(norm_bin_width,"width");
+}
 
 #endif
 
