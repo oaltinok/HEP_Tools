@@ -52,12 +52,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
 
     private:
         //  Runtime and CCProtonPi0_Analyzer Functions
-        void ResetCounters();
         void UpdateSignalDef();
         bool getCutStatistics();
         void Increment_nCut(vector<CCProtonPi0_Cut> &nCut, bool study1, bool study2);
         void fillData();
         void fill_BackgroundSubtractionHists();
+        void fill_W();
         void fill_Enu();
         void fill_QSq();
         void fill_muon_P();
@@ -95,6 +95,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double GetMINOSCorrectionErr();
         double GetMINOSCorrection();
         double GetFluxWeight();
+        void GetDeltaPolarization();
+        void GetDeltaTransverse();
+        TVector3 GetNeutrinoCrossMuon(bool isTruth);
+        TLorentzVector GetDelta4P(bool isTruth);
         std::vector<double> GetFluxError();
 
         //  Interaction Specific Functions
@@ -107,11 +111,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double calcDeltaInvariantMass();
         int GetEjectedNucleonCount();
         double GetVertexEnergy();
-        double Calc_Enu() const;
-        double Calc_QSq(const double Enu);
+        double Calc_Enu();
         TLorentzVector Get_Neutrino_4P(const double Enu) const;
-        double Calc_WSq(const double Enu, const double QSq) const;
         void Calc_EventKinematics();
+        void Calc_EventKinematics_Truth();
         void fill_SideBand_InvMass();
         void fill_SideBand_Other();
 
@@ -158,9 +161,13 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         CCProtonPi0_BackgroundTool bckgTool;
         CCProtonPi0_CutList cutList;
         double m_Enu;
+        double m_Enu_Truth;
         double m_QSq;
+        double m_QSq_Truth;
         double m_WSq;
+        double m_WSq_Truth;
         double m_W;
+        double m_W_Truth;
 
         // Other Variables
         bool m_isMC;
@@ -326,6 +333,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Bool_t          truth_isGamma1_conv_inside;
         Bool_t          truth_isGamma2_conv_inside;
         Bool_t          truth_isSignal;
+        Bool_t          truth_isSignal_Out;
         Bool_t          truth_isFidVol;
         Bool_t          truth_isNC;
         Bool_t          truth_ReconstructEvent;
@@ -966,6 +974,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_truth_isGamma1_conv_inside;   //!
         TBranch        *b_truth_isGamma2_conv_inside;   //!
         TBranch        *b_truth_isSignal;   //!
+        TBranch        *b_truth_isSignal_Out;   //!
         TBranch        *b_truth_isFidVol;   //!
         TBranch        *b_truth_isNC;   //!
         TBranch        *b_truth_ReconstructEvent;   //!
@@ -1504,6 +1513,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_prong_part_mass;   //!
         TBranch        *b_prong_part_charge;   //!
         TBranch        *b_prong_part_pid;   //!
+        TBranch        *b_prong_part_E;   //!
+        TBranch        *b_prong_part_pos;   //!
 
 };
 

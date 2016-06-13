@@ -1,4 +1,14 @@
 ===================================================================================================
+v2_82
+CCProtonPi0 Updates:
+	No Major Changes
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	Minor Improvements & Modifications for Unique Plots
+
+	Moved common functions to Base Class (NTupleAnalysis)
+
+===================================================================================================
 v2_81
 CCProtonPi0 Updates:
 	No Major Changes

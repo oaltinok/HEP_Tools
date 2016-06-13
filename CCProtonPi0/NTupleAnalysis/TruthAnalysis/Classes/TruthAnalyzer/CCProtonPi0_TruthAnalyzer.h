@@ -119,10 +119,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
 
         // Counters
         counter nAll;
-        counter nFidVol;
-        counter nNoFidVol;
-        counter nFidVol_Signal;
-        counter nFidVol_Bckg;
+        counter nSignal;
+        counter nSignal_Out;
+        counter nBckg;
 
         // Signal Type
         counter nQE;
@@ -146,6 +145,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Bool_t          truth_isGamma1_conv_inside;
         Bool_t          truth_isGamma2_conv_inside;
         Bool_t          truth_isSignal;
+        Bool_t          truth_isSignal_Out;
         Bool_t          truth_isFidVol;
         Bool_t          truth_isNC;
         Bool_t          truth_ReconstructEvent;
@@ -373,6 +373,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_isGamma1_conv_inside;   //!
         TBranch        *b_truth_isGamma2_conv_inside;   //!
         TBranch        *b_truth_isSignal;   //!
+        TBranch        *b_truth_isSignal_Out;   //!
         TBranch        *b_truth_isFidVol;   //!
         TBranch        *b_truth_isNC;   //!
         TBranch        *b_truth_ReconstructEvent;   //!
@@ -594,6 +595,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_mc_wgt_Norm;   //!
         TBranch        *b_mc_wgt_ppfx1_Total_sz;   //!
         TBranch        *b_mc_wgt_ppfx1_Total;   //!
+
 
 };
 

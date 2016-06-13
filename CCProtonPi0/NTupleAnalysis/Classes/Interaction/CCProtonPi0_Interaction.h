@@ -73,12 +73,28 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         MnvH1D* Enu_mc_truth_signal;
         MnvH2D* Enu_response;
 
+        // W
+        MnvH1D* W_all;
+        MnvH1D* W_mc_reco_all;
+        MnvH1D* W_mc_reco_signal;
+        MnvH1D* W_mc_reco_bckg;
+        MnvH1D* W_mc_truth_signal;
+        MnvH2D* W_response;
+
         // Vertex
         std::vector<MnvH1D*> vertex_z;
         
         // Other Event Parameters 
         std::vector<MnvH1D*> deltaInvMass;
 
+        // Delta Resonance
+        MnvH1D* Polarization_data;
+        MnvH1D* Polarization_mc;
+        
+        MnvH1D* DeltaTransverse_data;
+        MnvH1D* DeltaTransverse_mc;
+        MnvH2D* DeltaTransverse_mc_res;
+        
         TH1D* h_extra_muon_energy;
         TH1D* h_extra_leftover_energy;
         TH1D* h_extra_rejected_energy;
@@ -117,6 +133,10 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* Enu_1Track_Diff;
         TH1D* Enu_2Track_Diff;
 
+        // W: Error, Difference
+        TH1D* W_Error;
+        TH1D* W_Diff;
+
         // Selected Signal 
         // Signal Q2
         TH1D* mc_Q2_QE;
@@ -131,6 +151,19 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_Q2_DIS_Multi_pi;
         TH1D* mc_Q2_Non_RES;
 
+        // Signal Truth Q2
+        TH1D* truth_QSq_QE;
+
+        TH1D* truth_QSq_RES_1232;
+        TH1D* truth_QSq_RES_1535;
+        TH1D* truth_QSq_RES_1520;
+        TH1D* truth_QSq_RES_Other;
+
+        TH1D* truth_QSq_DIS_1_pi;
+        TH1D* truth_QSq_DIS_2_pi;
+        TH1D* truth_QSq_DIS_Multi_pi;
+        TH1D* truth_QSq_Non_RES;
+
         // Signal incomingE
         TH1D* mc_incomingE_QE;
 
@@ -144,6 +177,19 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_incomingE_DIS_Multi_pi;
         TH1D* mc_incomingE_Non_RES;
 
+        // Signal Truth incomingE
+        TH1D* truth_Enu_QE;
+
+        TH1D* truth_Enu_RES_1232;
+        TH1D* truth_Enu_RES_1535;
+        TH1D* truth_Enu_RES_1520;
+        TH1D* truth_Enu_RES_Other;
+
+        TH1D* truth_Enu_DIS_1_pi;
+        TH1D* truth_Enu_DIS_2_pi;
+        TH1D* truth_Enu_DIS_Multi_pi;
+        TH1D* truth_Enu_Non_RES;
+
         // Signal w
         TH1D* mc_w_QE;
 
@@ -156,6 +202,19 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* mc_w_DIS_2_pi;
         TH1D* mc_w_DIS_Multi_pi;
         TH1D* mc_w_Non_RES;
+
+        // Signal w
+        TH1D* truth_w_QE;
+
+        TH1D* truth_w_RES_1232;
+        TH1D* truth_w_RES_1535;
+        TH1D* truth_w_RES_1520;
+        TH1D* truth_w_RES_Other;
+
+        TH1D* truth_w_DIS_1_pi;
+        TH1D* truth_w_DIS_2_pi;
+        TH1D* truth_w_DIS_Multi_pi;
+        TH1D* truth_w_Non_RES;
 
         // Signal reco w
         TH1D* reco_w_QE;

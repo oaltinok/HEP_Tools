@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon May 16 07:55:09 2016 by ROOT version 5.34/05
+// Wed May 25 08:52:34 2016 by ROOT version 5.34/05
 // from TChain Truth/
 //////////////////////////////////////////////////////////
 
@@ -25,6 +25,7 @@ public :
    Bool_t          truth_isGamma1_conv_inside;
    Bool_t          truth_isGamma2_conv_inside;
    Bool_t          truth_isSignal;
+   Bool_t          truth_isSignal_Out;
    Bool_t          truth_isFidVol;
    Bool_t          truth_isNC;
    Bool_t          truth_ReconstructEvent;
@@ -252,6 +253,7 @@ public :
    TBranch        *b_truth_isGamma1_conv_inside;   //!
    TBranch        *b_truth_isGamma2_conv_inside;   //!
    TBranch        *b_truth_isSignal;   //!
+   TBranch        *b_truth_isSignal_Out;   //!
    TBranch        *b_truth_isFidVol;   //!
    TBranch        *b_truth_isNC;   //!
    TBranch        *b_truth_ReconstructEvent;   //!
@@ -508,7 +510,7 @@ Truth_Branch::Truth_Branch(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("Truth","");
-      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_80/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/Truth");
+      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_81/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/Truth");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -561,6 +563,7 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_isGamma1_conv_inside", &truth_isGamma1_conv_inside, &b_truth_isGamma1_conv_inside);
    fChain->SetBranchAddress("truth_isGamma2_conv_inside", &truth_isGamma2_conv_inside, &b_truth_isGamma2_conv_inside);
    fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
+   fChain->SetBranchAddress("truth_isSignal_Out", &truth_isSignal_Out, &b_truth_isSignal_Out);
    fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
    fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
    fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);

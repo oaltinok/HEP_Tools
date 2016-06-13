@@ -114,6 +114,7 @@ namespace Folder_List
     // CrossSection Plot Dirs
     const std::string xsec_Enu = output + plotOut + "xsec_Enu/";
     const std::string xsec_QSq = output + plotOut + "xsec_QSq/";
+    const std::string xsec_W = output + plotOut + "xsec_W/";
     const std::string xsec_muon_P = output + plotOut + "xsec_muon_P/";
     const std::string xsec_muon_theta = output + plotOut + "xsec_muon_theta/";
     const std::string xsec_pi0_P = output + plotOut + "xsec_pi0_P/";

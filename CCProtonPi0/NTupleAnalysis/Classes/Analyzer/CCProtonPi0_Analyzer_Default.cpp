@@ -146,6 +146,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("truth_isGamma1_conv_inside", &truth_isGamma1_conv_inside, &b_truth_isGamma1_conv_inside);
         fChain->SetBranchAddress("truth_isGamma2_conv_inside", &truth_isGamma2_conv_inside, &b_truth_isGamma2_conv_inside);
         fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
+        fChain->SetBranchAddress("truth_isSignal_Out", &truth_isSignal_Out, &b_truth_isSignal_Out);
         fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
         fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
         fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);
@@ -284,7 +285,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("truth_muon_4P", truth_muon_4P, &b_truth_muon_4P);
         fChain->SetBranchAddress("truth_pi0_4P", truth_pi0_4P, &b_truth_pi0_4P);
         fChain->SetBranchAddress("truth_proton_4P", truth_proton_4P, &b_truth_proton_4P);
-    }
+    } 
     fChain->SetBranchAddress("physEvtNum", &physEvtNum, &b_physEvtNum);
     fChain->SetBranchAddress("n_hyps", &n_hyps, &b_n_hyps);
     fChain->SetBranchAddress("processType", &processType, &b_processType);
@@ -687,6 +688,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("prong_part_mass", prong_part_mass, &b_prong_part_mass);
     fChain->SetBranchAddress("prong_part_charge", prong_part_charge, &b_prong_part_charge);
     fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
+
 }
 
 CCProtonPi0_Analyzer::~CCProtonPi0_Analyzer()

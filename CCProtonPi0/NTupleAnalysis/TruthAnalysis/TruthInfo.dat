@@ -1,19 +1,18 @@
-nAll	47741030.0	100.0
-nFidVol	10438373.0	21.9
-nNoFidVol	37302657.0	78.1
+nAll	47732060.0	100.0
 
-nFidVol_Signal	551955.0	5.3
-nFidVol_Bckg	9886418.0	94.7
+nSignal	395324.0	0.8
+nSignal_Out	2824601.0	5.9
+nBckg	47336736.0	99.2
 
-nQuasi_Elastic	8304.0	1.5
+nQuasi_Elastic	4072.0	1.0
 
-nSignal_RES_Delta	148299.0	26.9
-nSignal_RES_1535	28287.0	5.1
-nSignal_RES_1520	30003.0	5.4
-nSignal_RES_Other	44652.0	8.1
+nSignal_RES_Delta	129706.0	32.8
+nSignal_RES_1535	23065.0	5.8
+nSignal_RES_1520	23760.0	6.0
+nSignal_RES_Other	31978.0	8.1
 
-nSignal_DIS_1pi	126841.0	23.0
-nSignal_DIS_2pi	33208.0	6.0
-nSignal_DIS_Multi_pi	4191.0	0.8
-nSignal_Non_RES	128170.0	23.2
+nSignal_DIS_1pi	70310.0	17.8
+nSignal_DIS_2pi	19767.0	5.0
+nSignal_DIS_Multi_pi	2688.0	0.7
+nSignal_Non_RES	89978.0	22.8
 

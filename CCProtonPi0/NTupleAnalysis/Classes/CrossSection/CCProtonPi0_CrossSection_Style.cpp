@@ -17,6 +17,8 @@ void CCProtonPi0_CrossSection::init_muon_P()
     muon_P.f_mc = new TFile(rootDir.c_str());
 
     initHistograms(muon_P);
+
+    muon_P.smallest_bin_width = GetSmallestBinWidth(muon_P.all);
 }
 
 void CCProtonPi0_CrossSection::init_muon_theta()
@@ -36,6 +38,8 @@ void CCProtonPi0_CrossSection::init_muon_theta()
     muon_theta.f_mc = new TFile(rootDir.c_str());
 
     initHistograms(muon_theta);
+    
+    muon_theta.smallest_bin_width = GetSmallestBinWidth(muon_theta.all);
 }
 
 void CCProtonPi0_CrossSection::init_pi0_P()
@@ -55,6 +59,8 @@ void CCProtonPi0_CrossSection::init_pi0_P()
     pi0_P.f_mc = new TFile(rootDir.c_str());
 
     initHistograms(pi0_P);
+    
+    pi0_P.smallest_bin_width = GetSmallestBinWidth(pi0_P.all);
 }
 
 void CCProtonPi0_CrossSection::init_pi0_KE()
@@ -74,6 +80,8 @@ void CCProtonPi0_CrossSection::init_pi0_KE()
     pi0_KE.f_mc = new TFile(rootDir.c_str());
 
     initHistograms(pi0_KE);
+
+    pi0_KE.smallest_bin_width = GetSmallestBinWidth(pi0_KE.all);
 }
 
 void CCProtonPi0_CrossSection::init_pi0_theta()
@@ -93,6 +101,29 @@ void CCProtonPi0_CrossSection::init_pi0_theta()
     pi0_theta.f_mc = new TFile(rootDir.c_str());
 
     initHistograms(pi0_theta);
+
+    pi0_theta.smallest_bin_width = GetSmallestBinWidth(pi0_theta.all);
+}
+
+void CCProtonPi0_CrossSection::init_W()
+{
+    W.name = "W";
+    W.isEv = false;
+
+    W.plot_title = "Differential Cross Section for W";
+    W.plot_xlabel = "W [GeV]";
+    W.plot_ylabel = "d#sigma/dW (10^{-40} cm^{2}/nucleon/GeV)";
+
+    // ROOT Files
+    std::string rootDir = Folder_List::rootDir_Interaction_data;
+    W.f_data = new TFile(rootDir.c_str());
+    
+    rootDir = Folder_List::rootDir_Interaction_mc;
+    W.f_mc = new TFile(rootDir.c_str());
+
+    initHistograms(W);
+
+    W.smallest_bin_width = GetSmallestBinWidth(W.all);
 }
 
 void CCProtonPi0_CrossSection::init_QSq()
@@ -112,6 +143,8 @@ void CCProtonPi0_CrossSection::init_QSq()
     QSq.f_mc = new TFile(rootDir.c_str());
 
     initHistograms(QSq);
+
+    QSq.smallest_bin_width = GetSmallestBinWidth(QSq.all);
 }
 
 void CCProtonPi0_CrossSection::init_Enu()
@@ -131,4 +164,8 @@ void CCProtonPi0_CrossSection::init_Enu()
     Enu.f_mc = new TFile(rootDir.c_str());
 
     initHistograms(Enu);
+
+    Enu.smallest_bin_width = GetSmallestBinWidth(Enu.all);
 }
+
+

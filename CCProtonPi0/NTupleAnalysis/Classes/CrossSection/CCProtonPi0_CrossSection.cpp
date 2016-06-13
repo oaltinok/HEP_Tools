@@ -31,6 +31,7 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection(pi0_KE);   
     Calc_CrossSection(pi0_theta);   
     Calc_CrossSection(QSq);   
+    Calc_CrossSection(W);   
     Calc_CrossSection(Enu);   
     
     writeHistograms();
@@ -64,11 +65,12 @@ void CCProtonPi0_CrossSection::Style_XSec(XSec &var)
     var.xsec->GetXaxis()->SetTitle(var.plot_xlabel.c_str());
     var.xsec->GetYaxis()->SetTitle(var.plot_ylabel.c_str());
     
-    // Scale Cross Section Result to match with Label
-    var.bin_width = var.xsec->GetNormBinWidth();
-    var.quote_width = 1.0; // per Unit (degree, GeV, GeV^2 etc...) 
-    var.scale = var.quote_width/var.bin_width; 
-    var.xsec->Scale(var.scale);
+    // Scale Cross Section Result to match with Label  
+    var.xsec->SetNormBinWidth(var.smallest_bin_width);
+    double norm_bin_width = var.xsec->GetNormBinWidth();
+    double quote_width = 1.0; // per Unit (degree, GeV, GeV^2 etc...) 
+    double scale = quote_width/norm_bin_width; 
+    var.xsec->Scale(scale);
 }
 
 void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
@@ -252,6 +254,11 @@ MnvH1D* CCProtonPi0_CrossSection::Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* r
     std::cout<<"\tNumber of iteratons = "<<iteration<<std::endl;
     // Use MnvUnfold to Unfold Data
     MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted, RooUnfold::kBayes, iteration, true);
+//
+//    // Remove Low Momentum Muons (less than 1 GeV) 
+//    if (var_name.compare("muon_P") == 0){
+//        unfolded->SetBinContent(1,0.0);
+//    }
 
     // Set Name of the Histogram
     std::string hist_name = var_name + "_unfolded";
@@ -297,7 +304,7 @@ MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_correct
     // Enu divided bin by bin
     if (var_name.compare("Enu") == 0 ){
         std::cout<<"Flux Integration for Neutrino Energy!"<<std::endl; 
-        flux_integrated->Divide(data_efficiency_corrected,h_flux_rebinned);
+        flux_integrated->Divide(data_efficiency_corrected, h_flux_rebinned);
     }else{
         flux_integrated->Scale(1/flux_integral);
     }
@@ -328,7 +335,7 @@ MnvH1D* CCProtonPi0_CrossSection::Calc_FinalCrossSection(MnvH1D* flux_integrated
     h_xs->Scale(1/pot);
     h_xs->Scale(1/n_nucleons);
 
-    h_xs->Scale(1e40); // to quote xs in 1-e40, 1e-42 for theta;
+    h_xs->Scale(1e40); // to quote xs in 1-e40;
 
     return h_xs;
 }
@@ -343,6 +350,7 @@ void CCProtonPi0_CrossSection::initXSecs()
     init_pi0_KE();
     init_pi0_theta();
     init_QSq();
+    init_W();
     init_Enu();
 }
 
@@ -403,16 +411,8 @@ void CCProtonPi0_CrossSection::initFluxHistograms()
         double low = h_flux_rebinned->GetBinLowEdge(i);
         double up = h_flux_rebinned->GetBinLowEdge(i+1);
         double content = GetFluxHistContent(h_flux_minervaLE_FHC,low,up);
-
-        h_flux_rebinned->SetBinContent(i,content);
-    }
-
-    // Scale Rebinned Flux Histogram
-    double norm_bin_width = h_flux_minervaLE_FHC->GetNormBinWidth();
-    for (int i = 1; i <= nBins; i++){
-        double content = h_flux_rebinned->GetBinContent(i);
         double bin_width = h_flux_rebinned->GetBinWidth(i);
-        h_flux_rebinned->SetBinContent(i,content*(norm_bin_width/bin_width));
+        h_flux_rebinned->SetBinContent(i,content/bin_width);
     }
 }
 
@@ -452,38 +452,72 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
 
 double CCProtonPi0_CrossSection::GetFluxHistContent(MnvH1D* hist, double low1, double low2)
 {
-    //std::cout<<"low = "<<low1<<" up = "<<low2<<std::endl;
+    std::cout<<"low = "<<low1<<" up = "<<low2<<std::endl;
     double total = 0.0;
     int nBins = hist->GetNbinsX();
     for (int i = 1; i <= nBins; ++i){
         double current_low = hist->GetBinLowEdge(i); 
         if (current_low < low1) continue;
         if (current_low == low2) break;
-        total += hist->GetBinContent(i);
-        //std::cout<<i<<std::endl;
+        total += hist->GetBinContent(i)*hist->GetBinWidth(i);
+        std::cout<<i<<std::endl;
     }
 
-    //std::cout<<"Total = "<<total<<std::endl;
+    std::cout<<"Total = "<<total<<std::endl;
     return total;
+}
+
+double CCProtonPi0_CrossSection::GetSmallestBinWidth(MnvH1D* hist)
+{
+    double smallest = 99999999;
+    int nBins = hist->GetNbinsX();
+    for (int i = 0; i <= nBins; ++i){
+        double current = hist->GetBinWidth(i);
+        if (current < smallest) smallest = current;
+    }
+
+    return smallest;
 }
 
 void CCProtonPi0_CrossSection::writeHistograms(XSec &var)
 {
     // Data Histograms
     var.xsec->Write();
+    
+    var.all->SetNormBinWidth(var.smallest_bin_width);
     var.all->Write();
+    
+    var.bckg_subtracted->SetNormBinWidth(var.smallest_bin_width);
     var.bckg_subtracted->Write();
+
+    var.bckg_estimated->SetNormBinWidth(var.smallest_bin_width);
     var.bckg_estimated->Write();
+
+    var.unfolded->SetNormBinWidth(var.smallest_bin_width);
     var.unfolded->Write();
+
+    var.efficiency_corrected->SetNormBinWidth(var.smallest_bin_width);
     var.efficiency_corrected->Write();
+
+    var.flux_integrated->SetNormBinWidth(var.smallest_bin_width);
     var.flux_integrated->Write();
    
     // MC Truth Histograms
+    var.mc_truth_all_signal->SetNormBinWidth(var.smallest_bin_width);
     var.mc_truth_all_signal->Write();
+
+    var.mc_truth_signal->SetNormBinWidth(var.smallest_bin_width);
     var.mc_truth_signal->Write();
+
+    var.mc_reco_signal->SetNormBinWidth(var.smallest_bin_width);
     var.mc_reco_signal->Write();
+    
+    var.mc_reco_bckg->SetNormBinWidth(var.smallest_bin_width);
     var.mc_reco_bckg->Write();
+
+    var.eff->SetNormBinWidth(var.smallest_bin_width);
     var.eff->Write();
+
     var.response->Write();
 }
 
@@ -510,6 +544,7 @@ void CCProtonPi0_CrossSection::writeHistograms()
     writeHistograms(pi0_KE);
     writeHistograms(pi0_theta);
     writeHistograms(QSq);
+    writeHistograms(W);
     writeHistograms(Enu);
 
     f_out->Close();

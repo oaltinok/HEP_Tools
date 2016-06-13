@@ -1,8 +1,8 @@
 DATATYPE=$1
-CCPROTONPI0_V="v2_80"
+CCPROTONPI0_V="v2_81a"
 OTHEROPTIONS=""
-PLAYLISTS=( "minerva1" "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
-#PLAYLISTS=( "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
+#PLAYLISTS=( "minerva1" "minerva7" "minerva9" "minerva13A" "minerva13B" "minerva13C" "minerva13D" "minerva13E" )
+PLAYLISTS=( "minerva1" )
 
 input_error()
 {

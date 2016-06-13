@@ -272,6 +272,7 @@ StatusCode CCProtonPi0::initialize()
     // Signal and Background
     // ------------------------------------------------------------------------
     declareBoolTruthBranch("isSignal");
+    declareBoolTruthBranch("isSignal_Out");
     declareBoolTruthBranch("isFidVol");
     declareBoolTruthBranch("isNC");
     declareBoolTruthBranch("ReconstructEvent");
@@ -1306,17 +1307,8 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
         return StatusCode::SUCCESS;
     }
 
-    //--------------------------------------------------------------------------
-    // Decide To Reconstruct Event or NOT
-    //--------------------------------------------------------------------------
-
-    // Return immediately - If True Vertex is NOT inside Fid Volume
-    if ( !isTrueVertexFiducial(truthEvent) ){ 
-        debug() <<"Do NOT Reconstruct Event - True vtx is not in Fiducial Volume!" << endmsg;
-        truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", false );
-        return StatusCode::SUCCESS;
-    }  
-
+    isTrueVertexFiducial(truthEvent);
+    
     //--------------------------------------------------------------------------
     // Fill GENIE Weight Branches
     //--------------------------------------------------------------------------
@@ -1370,12 +1362,6 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     //    Set ReconstructEvent true to Reconstruct All Events
     //--------------------------------------------------------------------------
     truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", true );
-    //     if ( truthEvent->filtertaglist()->isFilterTagTrue("isBckg_withMichel") ){
-    //         debug()<<"Event with True Michel - Will Analyze the Event..."<<endmsg;
-    //         truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", true );
-    //     }else{
-    //         truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", false );    
-    //     }
 
     return StatusCode::SUCCESS;
 }

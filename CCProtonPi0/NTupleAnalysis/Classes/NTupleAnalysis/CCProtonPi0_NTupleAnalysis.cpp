@@ -6,14 +6,15 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v2_80";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v2_81";
 
-const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33458e+20;
-const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.2185e+21;
+const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33534e+20;
+const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.21774e+21;
 const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
 
 const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
 const double CCProtonPi0_NTupleAnalysis::max_Enu = 20000; // MeV
+const double CCProtonPi0_NTupleAnalysis::max_W = 140000; // MeV
 
 const double CCProtonPi0_NTupleAnalysis::SENTINEL = -9.9;
 const double CCProtonPi0_NTupleAnalysis::MeV_to_GeV = pow(10,-3);
@@ -253,6 +254,81 @@ void CCProtonPi0_NTupleAnalysis::ReInitFluxReweighter(enum FluxReweighter::EPlay
     frw = new FluxReweighter(14, applyNuEConstraint, playlist, new_flux, old_flux);
 }
 
+void CCProtonPi0_NTupleAnalysis::printBins(const TH1* hist, const std::string var_name, bool useLowEdge)
+{
+    std::cout<<std::left;
+    std::cout<<"Printing Bin Content for "<<var_name<<std::endl;
+    if (useLowEdge){
+        std::cout.width(12); std::cout<<"BinLowEdge";
+    }else{
+        std::cout.width(12); std::cout<<"BinCenter";
+    }
+    std::cout.width(12); std::cout<<"Content";
+    std::cout.width(12); std::cout<<"Percent"<<std::endl;
 
+    double nEntries = hist->Integral();
+    double total = 0;
+    int nBins = hist->GetNbinsX();
+    for (int i = 1; i <= nBins; ++i){
+        double content = hist->GetBinContent(i);
+        total += content;
+        if (useLowEdge){
+            std::cout.width(12); std::cout<<hist->GetBinLowEdge(i);
+        }else{
+            std::cout.width(12); std::cout<<hist->GetBinCenter(i);
+        }
+        std::cout.width(12); std::cout<<content;
+        std::cout.width(12); std::cout<<content/nEntries*100;
+        std::cout<<std::endl;
+    }
+
+    std::cout.width(12); std::cout<<"Total";
+    std::cout.width(12); std::cout<<total;
+    std::cout.width(12); std::cout<<total/nEntries*100;
+    std::cout<<std::endl;
+    
+}
+
+bool CCProtonPi0_NTupleAnalysis::IsWLow(double true_W)
+{
+    if (true_W <= max_W) return true;
+    else return false;
+}
+
+bool CCProtonPi0_NTupleAnalysis::IsEnuInRange(double true_Enu)
+{
+    if (true_Enu >= min_Enu && true_Enu <= max_Enu) return true;
+    else return false;
+}
+
+double CCProtonPi0_NTupleAnalysis::Calc_Enu_Truth(double muon_E, double proton_E, double pi0_E)
+{
+    double Enu;
+    const double proton_mass = 938.27; //MeV
+    double proton_KE = proton_E - proton_mass;
+   
+    Enu = muon_E + proton_KE + pi0_E; 
+
+    return Enu;
+}
+
+double CCProtonPi0_NTupleAnalysis::Calc_QSq(double Enu, double muon_E, double muon_P, double muon_angle_beam) 
+{
+    const double Mmu = 105.66;  // Muon Rest Mass [MeV]
+
+    double QSq = 2*Enu*(muon_E - muon_P*cos(muon_angle_beam))-(Mmu*Mmu);
+
+    return QSq;
+}
+
+double CCProtonPi0_NTupleAnalysis::Calc_WSq(double Enu, double QSq, double muon_E)
+{
+    const double Mn = 939.57;    // Neutron Rest Mass [MeV]
+
+    // Calculate WSq - Use eq. in Research Logbook page 31
+    double WSq = Mn*Mn + 2*Mn*(Enu - muon_E) - QSq; 
+
+    return WSq;
+}
 #endif
 

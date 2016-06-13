@@ -25,6 +25,7 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
     fChain->SetBranchStatus("truth_is*", true);
     fChain->SetBranchStatus("truth_pi0_*", true);
     fChain->SetBranchStatus("truth_muon_*", true);
+    fChain->SetBranchStatus("truth_proton_*", true);
     fChain->SetBranchStatus("*genie_wgt_*", true);
     fChain->SetBranchStatus("mc_run", true);
     fChain->SetBranchStatus("mc_Q2", true);
@@ -66,17 +67,14 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
         }
 
         nAll.count++;
-        if (truth_isFidVol) nFidVol.count++;
-        else{
-            nNoFidVol.count++;
-            continue;
-        }
 
         UpdateSignalDef();
+       
+        if (truth_isSignal_Out) nSignal_Out.count++;
         
         // Count Signal and Background inside Fiducial Volume
-        if (truth_isSignal) nFidVol_Signal.count++;
-        else nFidVol_Bckg.count++;
+        if (truth_isSignal) nSignal.count++;
+        else nBckg.count++;
 
         // Count Signal Type & Fill Histograms
         if (truth_isSignal){
@@ -99,29 +97,28 @@ void CCProtonPi0_TruthAnalyzer::writeTextFile()
 
     // All Events
     WriteCounter(nAll, nAll);
-    WriteCounter(nFidVol, nAll);
-    WriteCounter(nNoFidVol, nAll);
     textFile<<std::endl;
 
     // Events inside Fiducial Volume
-    WriteCounter(nFidVol_Signal, nFidVol);
-    WriteCounter(nFidVol_Bckg, nFidVol);
+    WriteCounter(nSignal, nAll);
+    WriteCounter(nSignal_Out, nAll);
+    WriteCounter(nBckg, nAll);
     textFile<<std::endl;
  
     // Signal Types
-    WriteCounter(nQE, nFidVol_Signal);
+    WriteCounter(nQE, nSignal);
     textFile<<std::endl;
 
-    WriteCounter(nRES_1232, nFidVol_Signal);
-    WriteCounter(nRES_1535, nFidVol_Signal);
-    WriteCounter(nRES_1520, nFidVol_Signal);
-    WriteCounter(nRES_Other, nFidVol_Signal);
+    WriteCounter(nRES_1232, nSignal);
+    WriteCounter(nRES_1535, nSignal);
+    WriteCounter(nRES_1520, nSignal);
+    WriteCounter(nRES_Other, nSignal);
     textFile<<std::endl;
    
-    WriteCounter(nDIS_1_pi, nFidVol_Signal);
-    WriteCounter(nDIS_2_pi, nFidVol_Signal);
-    WriteCounter(nDIS_Multi_pi, nFidVol_Signal);
-    WriteCounter(nNon_RES, nFidVol_Signal);
+    WriteCounter(nDIS_1_pi, nSignal);
+    WriteCounter(nDIS_2_pi, nSignal);
+    WriteCounter(nDIS_Multi_pi, nSignal);
+    WriteCounter(nNon_RES, nSignal);
     textFile<<std::endl;
    
     textFile.close();
@@ -164,11 +161,10 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() : CCProtonPi0_NTupleAnaly
 void CCProtonPi0_TruthAnalyzer::resetCounters() 
 {
     nAll.name = "nAll";
-    nFidVol.name = "nFidVol";
-    nNoFidVol.name = "nNoFidVol";
     
-    nFidVol_Signal.name = "nFidVol_Signal";
-    nFidVol_Bckg.name = "nFidVol_Bckg";
+    nSignal.name = "nSignal";
+    nSignal_Out.name = "nSignal_Out";
+    nBckg.name = "nBckg";
 
     // Signal Type
     nQE.name = "nQuasi_Elastic";
@@ -482,15 +478,22 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
 {
     Calc_WeightFromSystematics();
 
+    double Enu_Truth = Calc_Enu_Truth(truth_muon_4P[3], truth_proton_4P[3], truth_pi0_4P[3]);
+    double QSq_Truth = Calc_QSq(Enu_Truth, truth_muon_4P[3], truth_muon_P, truth_muon_theta_beam);
+    double WSq_Truth = Calc_WSq(Enu_Truth, QSq_Truth, truth_muon_4P[3]);
+    double W_Truth;
+    if (WSq_Truth > 0) W_Truth = sqrt(WSq_Truth);
+    else W_Truth = -1;
+
     // Cross Section Variables
     FillHistogram(muon_P_mc_truth_all_signal, truth_muon_P * MeV_to_GeV);
     FillHistogram(muon_theta_mc_truth_all_signal, truth_muon_theta * rad_to_deg);
     FillHistogram(pi0_P_mc_truth_all_signal, truth_pi0_P * MeV_to_GeV);
     FillHistogram(pi0_KE_mc_truth_all_signal, truth_pi0_KE * MeV_to_GeV);
     FillHistogram(pi0_theta_mc_truth_all_signal, truth_pi0_theta * rad_to_deg);
-    FillHistogram(Enu_mc_truth_all_signal, mc_incomingE * MeV_to_GeV);
-    FillHistogram(QSq_mc_truth_all_signal, mc_Q2 * MeVSq_to_GeVSq);
-    FillHistogram(W_mc_truth_all_signal, mc_w * MeV_to_GeV);
+    FillHistogram(Enu_mc_truth_all_signal, Enu_Truth * MeV_to_GeV);
+    FillHistogram(QSq_mc_truth_all_signal, QSq_Truth * MeVSq_to_GeVSq);
+    FillHistogram(W_mc_truth_all_signal, W_Truth * MeV_to_GeV);
     
     // Signal Characteristics
     if (mc_intType == 1){
@@ -552,8 +555,9 @@ void CCProtonPi0_TruthAnalyzer::UpdateSignalDef()
 {
     // Signal Definition with Neutrino Energy
     if (truth_isSignal){
-        bool isEnu_inRange = mc_incomingE >= min_Enu && mc_incomingE <= max_Enu; 
-        truth_isSignal = isEnu_inRange;
+        bool isEnu_inRange = IsEnuInRange(mc_incomingE);
+        bool isW_inRange = IsWLow(mc_w);
+        truth_isSignal = isEnu_inRange && isW_inRange;
         // If event no longer a signal due to Enu Range -- it is background
         if (!truth_isSignal){
             truth_isBckg_Compact_WithPi0 = true;

@@ -66,6 +66,16 @@ class CCProtonPi0_NTupleAnalysis
         static const double rad_to_deg;
         static const double min_Enu;
         static const double max_Enu;
+        static const double max_W;
+        static const double max_muon_angle;
+
+        // Event Kinematics 
+        bool IsWLow(double true_W);
+        bool IsEnuInRange(double true_Enu);
+
+        double Calc_Enu_Truth(double muon_E, double proton_E, double pi0_E);
+        double Calc_QSq(double Enu, double muon_E, double muon_P, double muon_angle_beam); 
+        double Calc_WSq(double Enu, double QSq, double muon_E);
 
         // Flux Reweighter
         static const bool applyNuEConstraint;
@@ -84,6 +94,7 @@ class CCProtonPi0_NTupleAnalysis
 
         void OpenTextFile(std::string file_name, std::ofstream &file);
         std::string GetPlaylist(const int run);
+        void printBins(const TH1* hist, const std::string var_name, bool useLowEdge = true);
        
         // Returns a "new" MnvH1D or MnvH2D 
         MnvH1D* GetMnvH1D(TFile* f, std::string var_name);

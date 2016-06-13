@@ -27,8 +27,8 @@ const int CCProtonPi0_BinList::size_pi0_theta = 11;
 const double CCProtonPi0_BinList::a_QSq[] = {0, 0.10, 0.25, 0.40, 0.60, 0.85, 1.15, 1.55, 2.0};
 const int CCProtonPi0_BinList::size_QSq = 8;
 
-const double CCProtonPi0_BinList::a_Enu[] = {0, 1.5, 2.0, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0, 10.0};
-const int CCProtonPi0_BinList::size_Enu = 9;
+const double CCProtonPi0_BinList::a_Enu[] = {0, 1.5, 2.0, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0, 20.0};
+const int CCProtonPi0_BinList::size_Enu = 12;
 
 CCProtonPi0_BinList::CCProtonPi0_BinList()
 {
@@ -79,6 +79,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     // Event Kinematics Bins
     beamE_Diff_True.setBin(100,1.5,7.5);
     beamE_Diff.setBin(100,-3,3);
+    W_Diff.setBin(100,-1,1);
     QSq_Diff.setBin(100,-1,1);
     Q2.setBin(40,0.0,4.0);
     w.setBin(30,0.0,3.0);

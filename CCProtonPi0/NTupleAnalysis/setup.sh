@@ -30,6 +30,7 @@ VariableList=(xsec_pi0_P
         xsec_pi0_theta
         xsec_QSq
         xsec_Enu
+        xsec_W
         xsec_muon_P
         xsec_muon_theta)
 

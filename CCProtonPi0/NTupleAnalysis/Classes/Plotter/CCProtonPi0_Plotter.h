@@ -90,6 +90,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         bool plot_pi0_KE;
         bool plot_pi0_theta;
         bool plot_QSq;
+        bool plot_W;
         bool plot_Enu;
 
         void PlotXSecVar(std::string var_name, std::string data_var, std::string mc_var, std::string plotDir, std::string plotName);
@@ -102,6 +103,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotFluxIntegrated();
         void plotXSec();
         void plotCrossSection_Check();
+        void plotCrossSection_Check(std::string var_name, std::string plotDir);
 
         // Data vs MC
         void plotInteraction_DataMC();
@@ -118,14 +120,20 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotCutHistograms_MCOnly();
 
         // True Signal Events
-        void plotPion_True();
+        void plotTruth_Pion();
+        void plotTruth_Enu();
+        void plotTruth_QSq();
+        void plotTruth_W();
+        void plotTruth_ShortProton();
 
         // Other Plots 
+        void PlotTotalEnuXSec();
         void plotGENIEXSec();
         void plotOtherStudies();
         void plot_InvMass_TruthMatch_Stacked(bool isSignal, bool isStacked);
         void plot_Michel_TruthMatch(std::string var);
         void plot_SignalKinematics(std::string var, std::string type, bool isStacked);
+        void plot_SignalKinematics();
         void plot_stacked_pi0_P();
         void plot_stacked_pi0_theta();
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
@@ -136,6 +144,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, double hist_max, double arrow_length);
         void SavePi0InvMassPoints();
         void NormalizeToNormBinWidth(MnvH1D* hist);
+        double GetSmallestBinWidth(MnvH1D* hist);
         
         // Flux Study
         double GetFluxHistContent(MnvH1D* hist, double low1, double low2);
@@ -178,6 +187,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
 
         // Other
+        void PlotDelta();
         void DrawBackgroundSubtraction(bool isMC);
         void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir);
         void DrawTGraph(rootDir &dir, std::string var_name, std::string plotDir);
@@ -191,7 +201,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void SaveRecoRatioPoints(rootDir& dir, std::string var_name, std::string plotDir);
         void Save2DHistPoints(rootDir& dir, std::string var_name, std::string plotDir);     
         double GetMCNormalization(std::string &norm_label, bool isPOTNorm, MnvH1D* data, MnvH1D* mc);
-        void printBins(const TH1* hist, const std::string var_name);
 
         // Unfolding Study
         void UnfoldingStudy();

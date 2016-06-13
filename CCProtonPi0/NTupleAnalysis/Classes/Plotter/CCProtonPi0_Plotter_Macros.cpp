@@ -20,8 +20,8 @@ void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, 
     // ------------------------------------------------------------------------
     // POT Normalized Plots 
     // ------------------------------------------------------------------------
-    //DrawDataStackedMC_BckgAll(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
-    DrawDataStackedMC_BckgType(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
+    DrawDataStackedMC_BckgAll(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
+    //DrawDataStackedMC_BckgType(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
 
     // ------------------------------------------------------------------------
     // Area Normalized Plots 
@@ -371,6 +371,8 @@ void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_n
 
 void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec)
 {
+    std::cout<<"Plotting for "<<var_name<<std::endl;
+
     // ------------------------------------------------------------------------
     // MC Normalization 
     // ------------------------------------------------------------------------
@@ -397,7 +399,19 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     // Normalize to Norm Bin Width
     NormalizeToNormBinWidth(tempData);
     NormalizeToNormBinWidth(tempMC);
-    
+
+    //printBins(tempData,"data",false);
+    //printBins(tempMC,"MC",true);
+
+    // ------------------------------------------------------------------------
+    // Neutrino Energy Comparison Only
+    //tempData->SetMaximum(80);
+    //tempMC->SetMaximum(80);
+    //tempData->GetXaxis()->SetRangeUser(0,10);
+    //tempMC->GetXaxis()->SetRangeUser(0,10);
+    // ------------------------------------------------------------------------
+
+
     plotter->DrawDataMC(tempData, tempMC, mc_ratio, "TR", false);
 
     // Add Plot Labels
@@ -410,6 +424,14 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     double area_data = data->Integral("width");
     double area_mc = mc->Integral("width") * mc_ratio;
     plotter->AddPlotLabel(Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc),0.3,y_pos,text_size,kBlue); 
+
+
+    // Add X = 0 Line 
+    TLine line_0;
+    line_0.SetLineWidth(2);
+    line_0.SetLineStyle(7);
+    line_0.SetLineColor(kBlue);
+    line_0.DrawLine(0,0,0,250);
 
     // Plot Lower Plot: Data vs MC Ratio
     c->cd(); // Go back to default Canvas before creating 2nd Pad
@@ -465,6 +487,7 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     double line_min = h_data->GetBinLowEdge(1);
     double line_max = h_data->GetBinLowEdge(h_data->GetNbinsX()+1);
     ratio_1.DrawLine(line_min,1,line_max,1);
+    //ratio_1.DrawLine(line_min,1,10,1);
 
     // Plot Output
     gStyle->SetOptStat(0); 
@@ -555,16 +578,16 @@ void CCProtonPi0_Plotter::DrawMnvH1D(MnvH1D* hist1D, std::string var_name, std::
     gStyle->SetOptStat(111111); 
 
     // Find Peak
-    //double max_bin_location = hist1D->GetBinCenter(max_bin);
-    //TLatex text;
-    //text.SetNDC();
-    //text.SetTextSize(0.03);
-    //text.DrawLatex(0.15,0.85,Form("%s%3.2f", "Peak at ",max_bin_location));
+    int max_bin = hist1D->GetMaximumBin();
+    double max_bin_location = hist1D->GetBinCenter(max_bin);
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+    text.DrawLatex(0.15,0.85,Form("%s%3.2f", "Peak at ",max_bin_location));
 
     // Add Pi0 InvMass Line
     std::size_t found = var_name.find("invMass");
     if (found != std::string::npos){
-        int max_bin = hist1D->GetMaximumBin();
         int max_value = hist1D->GetBinContent(max_bin);
         TLine pi0Mass;
         pi0Mass.SetLineWidth(2);
@@ -601,7 +624,7 @@ void CCProtonPi0_Plotter::Draw1DHist(rootDir& dir, std::string var_name, std::st
     else root_dir = dir.mc;
 
     TFile* f = new TFile(root_dir.c_str());
-    TH1D* hist1D = (TH1D*)f->Get(var_name.c_str());
+    TH1D* hist1D = new TH1D( * dynamic_cast<TH1D*>(f->Get(var_name.c_str())) );
 
     Draw1DHist(hist1D, var_name, plotDir, isLogScale);
 
@@ -613,6 +636,8 @@ void CCProtonPi0_Plotter::Draw1DHist(TH1* hist1D, std::string var_name, std::str
     // Create Canvas
     TCanvas* c = new TCanvas("c","c",1280,800);
     if(isLogScale) c->SetLogy();
+
+    hist1D->Scale(1,"width");
 
     // Plot Options
     hist1D->SetLineColor(kRed);
@@ -641,7 +666,6 @@ void CCProtonPi0_Plotter::Draw1DHist(TH1* hist1D, std::string var_name, std::str
         pi0Mass.SetLineColor(kBlue);
         pi0Mass.DrawLine(134.98,0,134.98,max_value);
     }
-
 
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
     delete c;
@@ -727,12 +751,12 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
     hist2D->Draw("colz");
     gPad->Update();
 
-    double line_min = hist2D->GetXaxis()->GetBinLowEdge(1);
-    double line_max = hist2D->GetXaxis()->GetBinLowEdge(nBinsX);
-    TLine xy;
-    xy.SetLineWidth(2);
-    xy.SetLineColor(kBlack);
-    xy.DrawLine(line_min,line_min,line_max,line_max);
+    //double line_min = hist2D->GetXaxis()->GetBinLowEdge(1);
+    //double line_max = hist2D->GetXaxis()->GetBinLowEdge(nBinsX);
+    //TLine xy;
+    //xy.SetLineWidth(2);
+    //xy.SetLineColor(kBlack);
+    //xy.DrawLine(line_min,line_min,line_max,line_max);
 
     //TLine fit;
     //fit.SetLineWidth(2);
@@ -1461,25 +1485,22 @@ void CCProtonPi0_Plotter::DrawBackgroundSubtraction(bool isMC)
     delete plotter;
 }
 
-void CCProtonPi0_Plotter::printBins(const TH1* hist, const std::string var_name)
-{
-    std::cout<<std::left;
-    std::cout<<"Printing Bin Content for "<<var_name<<std::endl;
-    std::cout.width(12); std::cout<<"BinLowEdge";
-    std::cout.width(12); std::cout<<"Content"<<std::endl;
-
-    int nBins = hist->GetNbinsX();
-    for (int i = 1; i <= nBins; ++i){
-        std::cout.width(12); std::cout<<hist->GetBinLowEdge(i);
-        std::cout.width(12); std::cout<<hist->GetBinContent(i);
-        std::cout<<std::endl;
-    }
-}
-
 void CCProtonPi0_Plotter::NormalizeToNormBinWidth(MnvH1D* hist)
 {
     double norm_bin_width = hist->GetNormBinWidth();
     hist->Scale(norm_bin_width,"width");
+}
+
+double CCProtonPi0_Plotter::GetSmallestBinWidth(MnvH1D* hist)
+{
+    double smallest = 99999999;
+    int nBins = hist->GetNbinsX();
+    for (int i = 0; i <= nBins; ++i){
+        double current = hist->GetBinWidth(i);
+        if (current < smallest) smallest = current;
+    }
+
+    return smallest;
 }
 
 #endif

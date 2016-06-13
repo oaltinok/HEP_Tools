@@ -8,7 +8,7 @@
 
 bool CCProtonPi0::isTrueVertexFiducial(Minerva::GenMinInteraction* truthEvent) const
 {
-    bool isFidVol = FiducialPointTool->isFiducial(truthEvent, m_fidHexApothem, m_fidUpStreamZ, m_fidDownStreamZ );
+    bool isFidVol = FiducialPointTool->isFiducial(truthEvent, m_fidHexApothem+25, m_fidUpStreamZ-25, m_fidDownStreamZ+25 );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isFidVol", isFidVol );
     return isFidVol;
 }
@@ -50,6 +50,7 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     int N_pi0       = 0;
     int N_muon      = 0;
     int N_other     = 0;
+    double muon_theta_beam = 0;
 
     // Get Number of Final State Particles
     N_FSParticles = pri_trajectories.size();
@@ -59,8 +60,11 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
         if (  particle_PDG == PDG::proton ) N_proton++;
         else if ( particle_PDG == PDG::neutron ) N_neutron++;
         else if ( particle_PDG == PDG::pi0 ) N_pi0++;
-        else if ( particle_PDG == PDG::muon ) N_muon++;
-        else{
+        else if ( particle_PDG == PDG::muon ){
+            N_muon++;
+            Gaudi::LorentzVector muon_4p = (*it_mcpart)->GetInitialMomentum();
+            muon_theta_beam = m_coordSysTool->thetaWRTBeam(muon_4p)*TMath::RadToDeg();
+        }else{
             N_other++;
             debug()<<"tagSignal Other PDG = "<<particle_PDG<<endmsg;
         }
@@ -82,16 +86,16 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     int t_neutrinoPDG = truthEvent->incoming();
 
     bool isFidVol = truthEvent->filtertaglist()->isFilterTagTrue("isFidVol");
+    bool isMINOS = muon_theta_beam <= 25.0;
     bool isCCNeutrino = (t_current == 1 && t_neutrinoPDG == PDG::nu_mu);
     bool isFSGood = (N_pi0 == 1 && N_other == 0);
 
-    bool isSignal = false;
-    if(isFidVol && isCCNeutrino && isFSGood){
-        isSignal = true;
-        debug()<<"Found a Signal Event!"<<endmsg;
-    }
+    bool isSignal = isCCNeutrino && isFSGood && isFidVol && isMINOS;
+    bool isSignal_Out = isCCNeutrino && isFSGood;
 
+    debug()<<"isMINOS = "<<isMINOS<<" "<<muon_theta_beam<<endmsg;
     truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal", isSignal );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal_Out", isSignal_Out );
 
     return isSignal;
 }
@@ -173,11 +177,13 @@ void CCProtonPi0::tagBackground_Compact(Minerva::GenMinInteraction* truthEvent) 
     bool QELike = false;
     bool SinglePiPlus = false;
     bool Other = false;
-    
+    bool isSignal_Out = truthEvent->filtertaglist()->isFilterTagTrue("isSignal_Out");
+
     // -------------------------------------------------------------------------
     // Background Types 
     // -------------------------------------------------------------------------
-    if (nAntiMuon > 0) Other = true;
+    if (isSignal_Out) Other = true;
+    else if (nAntiMuon > 0) Other = true;
     else if (nPiZero > 0) WithPi0 = true;
     else if (nNucleon > 0 && nPiPlus == 0 && nPiMinus == 0 && nOther == 0) QELike = true;
     else if (nPiPlus > 0 && nPiMinus == 0 && nOther == 0) SinglePiPlus = true;
@@ -253,6 +259,7 @@ void CCProtonPi0::tagBackgroundWithPi0(Minerva::GenMinInteraction* truthEvent) c
     bool NoPi0 = false;
     bool SinglePi0 = false;
     bool MultiPi0 = false;
+   
     if (nPi0_Total == 0) NoPi0 = true;
     if (nPi0_Total == 1) SinglePi0 = true;
     if (nPi0_Total > 1) MultiPi0 = true;
@@ -356,8 +363,10 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
     bool isMultiPionWithPi0 = false;
     bool isMultiPionWithoutPi0 = false;
     bool isOther = false;
+    bool isSignal_Out = truthEvent->filtertaglist()->isFilterTagTrue("isSignal_Out");
 
-    if (isNC) ; // Do Nothing
+    if (isSignal_Out) isOther = true;
+    else if (isNC) ; // Do Nothing
     else if (nAntiMuon == 1) isAntiNeutrino = true;
     else if (nOther > 0) isOther = true;
     else if (nPiZero == 0 && nPiCharged == 0) isQELike = true;

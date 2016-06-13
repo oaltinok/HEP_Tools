@@ -31,10 +31,8 @@ struct XSec
     std::string plot_title;
     std::string plot_xlabel;
     std::string plot_ylabel;
-    
-    double bin_width;
-    double quote_width;
-    double scale;
+
+    double smallest_bin_width;
 
     // ROOT Files
     TFile* f_data;
@@ -93,6 +91,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         XSec pi0_KE;
         XSec pi0_theta;
         XSec QSq;
+        XSec W;
         XSec Enu;
         
         // ROOT Files    
@@ -110,6 +109,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void NormalizeHistogram(MnvH1D* h);
         double Integrate_SignalRegion(TH1D* h);
         double GetFluxHistContent(MnvH1D* hist, double low1, double low2);
+        double GetSmallestBinWidth(MnvH1D* hist);
         void OpenRootFiles();
         void writeHistograms();
         void writeHistograms(XSec &var);
@@ -122,6 +122,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void init_pi0_P();
         void init_pi0_KE();
         void init_pi0_theta();
+        void init_W();
         void init_QSq();
         void init_Enu();
         MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name);
