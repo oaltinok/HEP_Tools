@@ -20,11 +20,29 @@ using namespace PlotUtils;
 
 static const int nModels = 6;
 
+struct XSec_Var
+{
+    std::string name;
+
+    MnvH1D* data; 
+    MnvH1D* mc_total; 
+
+    // 2 Hists for MC Models
+    //      ind = 0 for original
+    //      ind = 1 for modified according to fit
+    MnvH1D* signal[2];
+    MnvH1D* WithPi0[2];
+    MnvH1D* QELike[2];
+    MnvH1D* SinglePiPlus[2];
+    MnvH1D* Other[2];
+};
+
 struct SideBand
 {
     std::string name;
     std::string model_names[nModels];  
 
+    // Fit Variable
     MnvH1D* data; 
     MnvH1D* mc_total; 
     TH1D* fit; // Hist for fit
@@ -38,14 +56,30 @@ struct SideBand
     MnvH1D* SinglePiPlus[2];
     MnvH1D* Other[2];
 
-    TFile* f_mc;
-    TFile* f_data;
+    XSec_Var muon_P;
+    XSec_Var muon_theta;
+    XSec_Var pi0_P;
+    XSec_Var pi0_KE;
+    XSec_Var pi0_theta;
+    XSec_Var neutrino_E;
+    XSec_Var QSq;
+    XSec_Var W;
+    
+    // File for Fit Variable
+    TFile* f_mc_fit;
+    TFile* f_data_fit;
+
+    // File for XSec Variable
+    TFile* f_mc_var;
+    TFile* f_data_var;
+
 };
+
 
 class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
 {
     public:
-        CCProtonPi0_SideBandTool(std::string var);
+        CCProtonPi0_SideBandTool();
         ~CCProtonPi0_SideBandTool();
         
         void ApplyFitResults(double chisq, double par_values[3], double par_errors[3]);
@@ -69,17 +103,22 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
 
         void OpenRootFiles();
         void initSideBands();
+        void initSideBand_FitHistograms(SideBand &sb);
+        void initSideBand_XSecHistograms(SideBand& sb);
+        void initSideBand_XSecHistograms(SideBand& sb, XSec_Var& xsec_var, std::string name);
         void SetNames(SideBand &sb, std::string name);
         void ApplyFitResults();
         void ApplyFitResults(SideBand &sb);
+        void ApplyFitResults(XSec_Var &xsec_var);
 
         // Plot Functions
         void DrawDataMCWithErrorBand(SideBand &sb);
         void Plot(SideBand &sb);
-        void Plot(SideBand &sb, int ind, bool isArea);
-        void ColorHists(SideBand &sb);
-        double GetMCScaleRatio(SideBand &sb, bool isArea);
-        double calc_ChiSq(SideBand &sb, int ind, bool isArea);
+        void Plot(SideBand &sb, int ind);
+        void Plot(SideBand &sb, XSec_Var &xsec_var, int ind, std::string var_name);
+        void Plot(int ind, std::string sb_name, std::string var_name, MnvH1D* data, MnvH1D* mc_total, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other);
+        void ColorHists(MnvH1D* data, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other);
+        double calc_ChiSq(MnvH1D* data, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other);
 
         std::string var_name;
 };

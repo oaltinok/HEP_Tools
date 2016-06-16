@@ -21,7 +21,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, 
     // POT Normalized Plots 
     // ------------------------------------------------------------------------
     DrawDataStackedMC_BckgAll(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
-    //DrawDataStackedMC_BckgType(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
+    DrawDataStackedMC_BckgType(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
 
     // ------------------------------------------------------------------------
     // Area Normalized Plots 
@@ -425,14 +425,6 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     double area_mc = mc->Integral("width") * mc_ratio;
     plotter->AddPlotLabel(Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc),0.3,y_pos,text_size,kBlue); 
 
-
-    // Add X = 0 Line 
-    TLine line_0;
-    line_0.SetLineWidth(2);
-    line_0.SetLineStyle(7);
-    line_0.SetLineColor(kBlue);
-    line_0.DrawLine(0,0,0,250);
-
     // Plot Lower Plot: Data vs MC Ratio
     c->cd(); // Go back to default Canvas before creating 2nd Pad
     TPad *pad2 = new TPad("pad2", "pad2", 0, 0.05, 1, 0.3);
@@ -813,6 +805,7 @@ void CCProtonPi0_Plotter::AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, d
     plotter->AddCutArrow(cut_location, ymin, ymax, arrow_length, arrow_direction); 
 }
 
+
 void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows, CutArrow cutArrow1, CutArrow cutArrow2)
 {
     std::string rootDir_mc = dir.mc;
@@ -961,7 +954,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgType(rootDir &dir, std::string var_n
     }
 
     // Print Plot
-    c->Print(Form("%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_Type_",".png"), "png");
+    c->Print(Form("%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_Type",".png"), "png");
 
     delete c;
     delete plotter;

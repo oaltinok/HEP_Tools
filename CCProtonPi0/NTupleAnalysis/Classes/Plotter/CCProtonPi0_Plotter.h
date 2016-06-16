@@ -31,6 +31,7 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 #include <PlotUtils/MnvPlotter.h>
 #include <PlotUtils/MnvFluxConstraint.h>
 #include <PlotUtils/POTCounter.h>
+#include <PlotUtils/TargetUtils.h>
 #include <MinervaUnfold/MnvUnfold.h>
 #include "Cintex/Cintex.h"
 

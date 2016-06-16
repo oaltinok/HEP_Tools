@@ -63,6 +63,7 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         cout<<"File already exists! Exiting!..."<<endl;
         exit(1);
     }
+
     // Create Chain and Initialize
     TChain* fChain = new TChain("CCProtonPi0");
     Init(playlist, fChain);
@@ -854,6 +855,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
 
     if( isLowInvMassEvent && !sideBand_LowInvMass) return false;
     if( isHighInvMassEvent && !sideBand_HighInvMass) return false;
+
     cutList.nCut_Pi0_invMass.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Pi0_invMass.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_Pi0_invMass.increment(truth_isSignal, study1, study2);
@@ -869,6 +871,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         FillHistogram(cutList.SideBand_pi0_theta, pi0_theta_beam*TMath::RadToDeg());
         FillHistogram(cutList.SideBand_neutrino_E, m_Enu*MeV_to_GeV);
         FillHistogram(cutList.SideBand_QSq, m_QSq*MeVSq_to_GeVSq);
+        FillHistogram(cutList.SideBand_W, m_W*MeV_to_GeV);
     }else{
         fill_SideBand_Other();
     }
@@ -953,6 +956,8 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
 
 void CCProtonPi0_Analyzer::fillInteractionReco()
 {
+    FillHistogram(interaction.CV_weight, cvweight);
+    
     //GetDeltaPolarization();
     GetDeltaTransverse();
 
@@ -1856,9 +1861,9 @@ void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
         
         // Apply Background Constraints
         if (applyBckgConstraints){
-            if (truth_isBckg_Compact_WithPi0) cvweight *= 0.90;
-            else if (truth_isBckg_Compact_QELike) cvweight *= 0.89;
-            else if (truth_isBckg_Compact_SinglePiPlus) cvweight *= 0.97;
+            if (truth_isBckg_Compact_WithPi0) cvweight *= 0.89;
+            else if (truth_isBckg_Compact_QELike) cvweight *= 0.85;
+            else if (truth_isBckg_Compact_SinglePiPlus) cvweight *= 0.94;
         }
     }else{
         cvweight = 1.0; 
@@ -2235,6 +2240,7 @@ void CCProtonPi0_Analyzer::fill_SideBand_Other()
         FillHistogram(cutList.SideBand_pi0_theta, pi0_theta_beam*TMath::RadToDeg());
         FillHistogram(cutList.SideBand_neutrino_E, m_Enu*MeV_to_GeV);
         FillHistogram(cutList.SideBand_QSq, m_QSq*MeVSq_to_GeVSq);
+        FillHistogram(cutList.SideBand_W, m_W*MeV_to_GeV);
     }
 }
 
@@ -2303,7 +2309,7 @@ void CCProtonPi0_Analyzer::GetDeltaTransverse()
 {
     if (nProtonCandidates > 0){
         if (m_W > 1000 && m_W < 1400 ){
-            double delta_transverse_reco;
+            double delta_transverse_reco = 0;
             if (m_isMC && truth_isSignal && mc_intType == 2 && mc_resID == 0){
                 TVector3 unit_beam_muon_reco = GetNeutrinoCrossMuon(false);
 

@@ -34,6 +34,11 @@ void CCProtonPi0_Interaction::initHistograms()
     MnvH1D* temp = NULL;
 
     for (int i = 0; i < nHistograms; i++){
+        temp = new MnvH1D( Form("%s_%d","CV_weight",i),"Central Value Weights", 50,0.5,1.5);
+        temp->GetXaxis()->SetTitle("Central Value Weights");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        CV_weight.push_back(temp);
+
         temp = new MnvH1D( Form("%s_%d","Enu",i),"Reconstructed Beam Energy - All Events", binList.size_Enu, binList.a_Enu);
         temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - All Events [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
@@ -688,6 +693,7 @@ void CCProtonPi0_Interaction::writeHistograms()
     f->cd();
 
     for (int i = 0; i < nHistograms; i++){
+        CV_weight[i]->Write();
         // Event Kinematics
         Enu[i]->Write();
         Enu_1Track[i]->Write();

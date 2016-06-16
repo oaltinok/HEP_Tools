@@ -20,7 +20,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
         cout<<"\tRoot File: "<<rootDir<<endl;
 
         // Create Root File 
-        f = new TFile(rootDir.c_str(),"CREATE");
+        f = new TFile(rootDir.c_str(),"RECREATE");
         if (!f->IsOpen()){
             cout<<"File already exists! Exiting!..."<<endl;
             exit(1);
@@ -234,6 +234,12 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBands_MC(temp);
         SideBand_QSq.push_back(temp);
+            
+        temp = new MnvH1D( Form("%s_%d","SideBand_W",i),"W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+        temp->GetXaxis()->SetTitle("W [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        AddVertErrorBands_MC(temp);
+        SideBand_W.push_back(temp);
 
     }
 
@@ -830,6 +836,7 @@ void CCProtonPi0_CutList::writeHistograms()
         SideBand_pi0_theta[i]->Write();
         SideBand_neutrino_E[i]->Write();
         SideBand_QSq[i]->Write();
+        SideBand_W[i]->Write();
     }
 
     pi0_invMass_1Track->Write();

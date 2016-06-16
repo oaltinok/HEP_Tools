@@ -20,13 +20,13 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     // Cross Sections
     //--------------------------------------------------------------------------
-    //plotCrossSection();
-    //plotCrossSection_Check();
+    plotCrossSection();
+    plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
     //  Data vs MC
     //--------------------------------------------------------------------------
-    plotInteraction_DataMC();
+    //plotInteraction_DataMC();
     //plotMuon_DataMC();
     //plotProton_DataMC();
     //plotPion_DataMC();
@@ -159,10 +159,16 @@ void CCProtonPi0_Plotter::plotCrossSection_Check()
 void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
-
     std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    rootDir rootDir_SB;
+    rootDir_SB.data = Folder_List::rootDir_sideBand_Original_data;
+    rootDir_SB.mc = Folder_List::rootDir_sideBand_Original_mc;
+    
+    DrawDataStackedMC(rootDir_SB,"SideBand_muon_P",plotDir);
+
     //DrawNormalizedMigrationHistogram(rootDir_Muon,"muon_theta_response",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Interaction,"QSq_response",plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Interaction,"QSq_response",plotDir);
     
     //PlotFluxHistograms();
     
@@ -744,7 +750,7 @@ void CCProtonPi0_Plotter::plotInteraction_DataMC()
     std::cout<<"Plotting Interaction Data vs MC"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Interaction;
 
-    PlotDelta();
+    //PlotDelta();
     //Draw1DHist(rootDir_Interaction, "Polarization_mc", plotDir);
     //Draw1DHist(rootDir_Interaction, "Polarization_data", plotDir);
 
@@ -757,6 +763,7 @@ void CCProtonPi0_Plotter::plotInteraction_DataMC()
     //DrawDataMC(rootDir_Interaction,"W",plotDir);
     //DrawDataMC(rootDir_Interaction,"deltaInvMass",plotDir);
 
+    DrawStackedMC(rootDir_Interaction,"CV_weight",plotDir);
     //DrawDataStackedMC(rootDir_Interaction,"Enu_1Track",plotDir);
     //DrawDataStackedMC(rootDir_Interaction,"Enu_2Track",plotDir);
     //DrawDataStackedMC(rootDir_Interaction,"Enu",plotDir);

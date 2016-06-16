@@ -2,16 +2,7 @@
 
 using namespace std;
 
-std::string var_name = "SideBand_muon_P";
-//std::string var_name = "SideBand_muon_theta";
-//std::string var_name = "SideBand_pi0_P";
-//std::string var_name = "SideBand_pi0_KE";
-//std::string var_name = "SideBand_pi0_theta";
-//std::string var_name = "SideBand_neutrino_E";
-//std::string var_name = "SideBand_QSq";
-//std::string var_name = "hCut_pi0invMass";
-
-CCProtonPi0_SideBandTool sbtool(var_name);
+CCProtonPi0_SideBandTool sbtool;
 
 double calc_ChiSq_SideBand(SideBand &sb, Double_t *par, bool isPartial = false, int min_bin = 1, int max_bin = 1)
 {
@@ -66,19 +57,11 @@ void calc_ChiSq(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t if
 
     // Calculate ChiSq for Low Inv Mass 
     //      Inv Mass itself for first 6 bins
-    if (var_name.compare("hCut_pi0invMass") == 0){
-        ChiSq += calc_ChiSq_SideBand(sbtool.LowInvMass, par, true, 1, 6);
-    }else{
-        ChiSq += calc_ChiSq_SideBand(sbtool.LowInvMass, par);
-    }
-
+    ChiSq += calc_ChiSq_SideBand(sbtool.LowInvMass, par, true, 1, 6);
+    
     // Calculate ChiSq for High Inv Mass
     //      Inv Mass itself for last 30 bins
-    if (var_name.compare("hCut_pi0invMass") == 0){
-        ChiSq += calc_ChiSq_SideBand(sbtool.HighInvMass, par, true, 21, 50);
-    }else{
-        ChiSq += calc_ChiSq_SideBand(sbtool.HighInvMass, par);
-    }
+    ChiSq += calc_ChiSq_SideBand(sbtool.HighInvMass, par, true, 21, 50);
 
     f = ChiSq;
     return;

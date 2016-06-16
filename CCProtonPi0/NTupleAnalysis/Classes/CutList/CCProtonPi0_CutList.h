@@ -102,6 +102,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> SideBand_pi0_theta;
         vector<MnvH1D*> SideBand_neutrino_E;
         vector<MnvH1D*> SideBand_QSq;
+        vector<MnvH1D*> SideBand_W;
 
         // 1Track
         vector<MnvH1D*> hCut_1Track_nShowerCandidates;

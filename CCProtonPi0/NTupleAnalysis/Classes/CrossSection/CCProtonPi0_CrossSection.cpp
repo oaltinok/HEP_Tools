@@ -325,12 +325,13 @@ MnvH1D* CCProtonPi0_CrossSection::Calc_FinalCrossSection(MnvH1D* flux_integrated
     else pot = data_POT;
 
     //fiducial is modules 27-79 inclusive
-    int nplanes = 2 * ( 79 - 27 + 1 );
-    double n_atoms    = TargetUtils::Get().GetTrackerNCarbonAtoms(nplanes, m_isMC, 850.0);
-    double n_nucleons = TargetUtils::Get().GetTrackerNNucleons(nplanes, m_isMC, 850.0);
+    double det_mass     = TargetUtils::Get().GetTrackerMass(5991.37, 8363.92, m_isMC, 850.0);
+    double n_atoms      = TargetUtils::Get().GetTrackerNCarbonAtoms(5991.37, 8363.92, m_isMC, 850.0);
+    double n_nucleons   = TargetUtils::Get().GetTrackerNNucleons(5991.37, 8363.92, m_isMC, 850.0);
 
-    std::cout << "Number of C atoms   (1e30): " << n_atoms/1e30 << std::endl;
-    std::cout << "Number of neutrons: (1e30): " << n_nucleons/1e30 << std::endl;
+    std::cout<<"Detector Mass         = "<<det_mass<<std::endl;
+    std::cout<<"Number of C atoms     = "<<n_atoms/1e30<<std::endl;
+    std::cout<<"Number of Nucleons    = "<<n_nucleons/1e30<<std::endl;
 
     h_xs->Scale(1/pot);
     h_xs->Scale(1/n_nucleons);
@@ -388,7 +389,6 @@ void CCProtonPi0_CrossSection::initHistograms()
 
 void CCProtonPi0_CrossSection::initFluxHistograms()
 {
-    std::cout<<"Test"<<std::endl;
     // Get Reweighted Flux Histogram
     // Use minervaLE_FHC because I compared others and all are almost same
     // Integral of this is the average
@@ -452,7 +452,6 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
 
 double CCProtonPi0_CrossSection::GetFluxHistContent(MnvH1D* hist, double low1, double low2)
 {
-    std::cout<<"low = "<<low1<<" up = "<<low2<<std::endl;
     double total = 0.0;
     int nBins = hist->GetNbinsX();
     for (int i = 1; i <= nBins; ++i){
@@ -460,10 +459,7 @@ double CCProtonPi0_CrossSection::GetFluxHistContent(MnvH1D* hist, double low1, d
         if (current_low < low1) continue;
         if (current_low == low2) break;
         total += hist->GetBinContent(i)*hist->GetBinWidth(i);
-        std::cout<<i<<std::endl;
     }
-
-    std::cout<<"Total = "<<total<<std::endl;
     return total;
 }
 

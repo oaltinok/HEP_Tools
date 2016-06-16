@@ -1,4 +1,17 @@
 ===================================================================================================
+v2_83
+CCProtonPi0 Updates:
+	No Major Changes
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	New Background Constraints with repeated Side Band Study
+		
+	SideBandTool Improvements
+	 	Included Cross Section Variables
+		Now using only pi0_InvMass as fit parameters
+		Design changes to accommodate new XSec Variables and Plotting
+
+===================================================================================================
 v2_82
 CCProtonPi0 Updates:
 	No Major Changes
