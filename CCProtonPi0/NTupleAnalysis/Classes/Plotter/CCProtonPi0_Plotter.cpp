@@ -20,14 +20,14 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     // Cross Sections
     //--------------------------------------------------------------------------
-    plotCrossSection();
-    plotCrossSection_Check();
+    //plotCrossSection();
+    //plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
     //  Data vs MC
     //--------------------------------------------------------------------------
     //plotInteraction_DataMC();
-    //plotMuon_DataMC();
+    plotMuon_DataMC();
     //plotProton_DataMC();
     //plotPion_DataMC();
     //plotCutHistograms_DataMC();

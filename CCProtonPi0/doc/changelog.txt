@@ -1,4 +1,16 @@
 ===================================================================================================
+v2_84
+CCProtonPi0 Updates:
+	No Major Changes
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	CrossSection Improved
+		New Background Estimate Method
+			In new method, dont use TFractionFitter just use MC shape
+			MC shape already fitted in SideBand Studies
+			Background Estimate using TFractionFitter top of Side Band Constraints is optional
+
+===================================================================================================
 v2_83
 CCProtonPi0 Updates:
 	No Major Changes

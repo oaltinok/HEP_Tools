@@ -16,7 +16,7 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     // Control Flow
     isDataAnalysis  = true;
     isScanRun = false;
-    applyBckgConstraints = true;
+    applyBckgConstraints = false;
     writeFSParticleMomentum = false;
 
     // Side Band Control

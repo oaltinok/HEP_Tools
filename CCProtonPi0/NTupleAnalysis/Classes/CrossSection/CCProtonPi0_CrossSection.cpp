@@ -15,6 +15,11 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
     
     m_isMC = isMC;
 
+    // Use TFractionFitter to estimate N(Background) in Data
+    // I used SideBand Constraints to get MC Data agreement already
+    // I do not need TFractionFitter -- But if you insist you can use
+    useTFractionFitter = false;
+    
     OpenRootFiles();
     initHistograms();
     initXSecs();
@@ -23,8 +28,12 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
 
 void CCProtonPi0_CrossSection::Calc_CrossSections()
 {
-    Calc_Normalized_NBackground();
-    
+    if (useTFractionFitter){
+        Calc_Normalized_NBackground_TFractionFitter();
+    }else{
+        Calc_Normalized_NBackground();
+    }
+
     Calc_CrossSection(muon_P);   
     Calc_CrossSection(muon_theta);   
     Calc_CrossSection(pi0_P);   
@@ -73,9 +82,9 @@ void CCProtonPi0_CrossSection::Style_XSec(XSec &var)
     var.xsec->Scale(scale);
 }
 
-void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
+void CCProtonPi0_CrossSection::Calc_Normalized_NBackground_TFractionFitter()
 {
-    std::cout<<"\nCalculating N(Background) in Data"<<std::endl;
+    std::cout<<"\nCalculating N(Background) in Data using TFractionFitter"<<std::endl;
    
     // ------------------------------------------------------------------------
     // Get Histograms
@@ -123,10 +132,10 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
 
     double rf0 = 1.e2 * f0_err/f0;
     double rf1 = 1.e2 * f1_err/f1;
-    Uncertainity_Bckg = rf1;
+    Uncertainty_Bckg = rf1;
     std::cout<<"\tFit Results:"<<std::endl;
-    std::cout<<"\t\tSignal Fraction = "<<f0<<" Error = "<<f0_err<<" Uncertainity = "<<rf0<<std::endl;
-    std::cout<<"\t\tBackground Fraction = "<<f1<<" Error = "<<f1_err<<" Uncertainity = "<<rf1<<std::endl;
+    std::cout<<"\t\tSignal Fraction = "<<f0<<" Error = "<<f0_err<<" Uncertainty = "<<rf0<<std::endl;
+    std::cout<<"\t\tBackground Fraction = "<<f1<<" Error = "<<f1_err<<" Uncertainty = "<<rf1<<std::endl;
 
     if (status == 0) {
         double area = invMass_fit_bckg->Integral();
@@ -155,6 +164,57 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
 
     delete mc_models;
     delete fitter;
+}
+
+void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
+{
+    std::cout<<"\nCalculating N(Background) in Data"<<std::endl;
+   
+    // ------------------------------------------------------------------------
+    // Get Histograms
+    // ------------------------------------------------------------------------
+  
+    // Get TH1D from MnvH1D
+    TH1D* data_invMass = new TH1D(invMass_all->GetCVHistoWithStatError());
+    TH1D* bckg_invMass = new TH1D(invMass_mc_reco_bckg->GetCVHistoWithStatError());
+   
+    // Create New Histograms for Scaling
+    invMass_fit_signal = new TH1D(*data_invMass); // Start as data hist (will subtract bckg to get correct signal data)
+    invMass_fit_signal->SetName("invMass_fit_signal");
+    
+    invMass_fit_bckg = new TH1D(*bckg_invMass);
+    invMass_fit_bckg->SetName("invMass_bckg");
+    
+    // Scale MC Background Histogram if we are using Data
+    if (!m_isMC){
+        invMass_fit_bckg->Scale(POT_ratio);    
+    }
+ 
+    // Get N(Events)
+    double total_data   = data_invMass->Integral();
+    double total_bckg   = invMass_fit_bckg->Integral();
+
+    std::cout<<"\tAll Events in Data (Whole Spectrum) = "<<total_data<<std::endl;
+    std::cout<<"\tBackground in Data (Whole Spectrum) = "<<total_bckg<<std::endl;
+
+    // Subtract bckg hist from data hist
+    invMass_fit_signal->Add(invMass_fit_bckg,-1); 
+
+    // this calculation overestimates the number of background events
+    // in the lower and upper bins
+    // nbkg = fitted_background->Integral(__lower_bin, __upper_bin);
+
+    // integrate the number of background events correctly
+    // notice the mass range, not bin range
+    N_Background_Data = Integrate_SignalRegion(invMass_fit_bckg);
+    double N_Signal_Data = Integrate_SignalRegion(invMass_fit_signal);
+    double N_All_Data = Integrate_SignalRegion(data_invMass);
+
+    std::cout<<std::endl;
+    std::cout<<"\tAll Events in Data (Signal Region) = "<<N_All_Data<<std::endl; 
+    std::cout<<"\tBackground in Data (Signal Region) = "<<N_Background_Data<<std::endl; 
+    std::cout<<"\tSignal in Data (Signal Region) = "<<N_Signal_Data<<std::endl; 
+
 }
 
 double CCProtonPi0_CrossSection::Integrate_SignalRegion(TH1D* h)
@@ -527,7 +587,7 @@ void CCProtonPi0_CrossSection::writeHistograms()
     h_flux_rebinned->Write();
 
     // Pi0 Invariant Mass
-    invMass_fit_result->Write();
+    if (useTFractionFitter) invMass_fit_result->Write();
     invMass_fit_bckg->Write();
     invMass_fit_signal->Write();
     invMass_all->Write();

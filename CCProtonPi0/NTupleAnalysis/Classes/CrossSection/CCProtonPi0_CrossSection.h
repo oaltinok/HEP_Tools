@@ -66,11 +66,12 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_BinList binList;
 
         bool m_isMC;
+        bool useTFractionFitter;
         int iteration;
         double min_invMass;
         double max_invMass;
         double N_Background_Data;
-        double Uncertainity_Bckg;
+        double Uncertainty_Bckg;
 
         // Flux File
         MnvH1D* h_flux_minervaLE_FHC;
@@ -105,6 +106,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         // Functions
         void Calc_CrossSection(XSec &var);
         void Style_XSec(XSec &var);
+        void Calc_Normalized_NBackground_TFractionFitter();
         void Calc_Normalized_NBackground();
         void NormalizeHistogram(MnvH1D* h);
         double Integrate_SignalRegion(TH1D* h);
