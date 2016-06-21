@@ -82,6 +82,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillHistogramWithDefaultErrors(MnvH1D* hist, double var);
         void FillHistogram(MnvH2D* hist, double var1, double var2);
         void FillHistogramWithDefaultErrors(MnvH2D* hist, double var1, double var2);
+        void FillHistogramWithDefaultErrors(vector<MnvH1D*> &hist, double var);
         void FillVertErrorBand_Flux(MnvH1D* h, double var);
         void FillVertErrorBand_Flux(MnvH2D* h, double var1, double var2);
         void FillVertErrorBand_Genie(MnvH1D* h, double var);
@@ -110,7 +111,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fillInteractionReco();
         double calcDeltaInvariantMass();
         int GetEjectedNucleonCount();
-        double GetVertexEnergy();
         double Calc_Enu();
         TLorentzVector Get_Neutrino_4P(const double Enu) const;
         void Calc_EventKinematics();
@@ -132,7 +132,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void getPi0Family();
         void fillPi0MC();
         void fillPi0Reco();
-        double Calc_TruePi0OpeningAngle();
         void FillInvMass_TruthMatch();
 
         // Pi0Blob Specific Functions

@@ -236,6 +236,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         double getCutEfficiency(CCProtonPi0_Cut &currentCut, double effBase) const;
         double getCutPurity(CCProtonPi0_Cut &currentCut) const;
 
+        bool m_isMC;
         vector<CCProtonPi0_Cut> nCutVector_All;
         vector<CCProtonPi0_Cut> nCutVector_1Track;
         vector<CCProtonPi0_Cut> nCutVector_2Track;

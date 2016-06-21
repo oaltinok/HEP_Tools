@@ -12,6 +12,8 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
 {
     cout<<"Initializing CCProtonPi0_CutList"<<endl;
     
+    m_isMC = isMC;
+    
     if(isModeReduce){
         // File Locations
         if (isMC) rootDir = Folder_List::rootDir_CutHists_mc;
@@ -102,6 +104,7 @@ void CCProtonPi0_CutList::initHistograms()
         temp = new MnvH1D( Form("%s_%d","hCut_pi0invMass",i),"Reconstructed Pi0 Invariant Mass All",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
         temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+        if (m_isMC) AddVertErrorBands_MC(temp);
         hCut_pi0invMass.push_back(temp);
        
         // --------------------------------------------------------------------
@@ -196,49 +199,49 @@ void CCProtonPi0_CutList::initHistograms()
         temp = new MnvH1D( Form("%s_%d","SideBand_muon_P",i),"Muon Momentum",binList.size_muon_P, binList.a_muon_P);
         temp->GetXaxis()->SetTitle("Muon Momentum [GeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
-        AddVertErrorBands_MC(temp);
+        if (m_isMC) AddVertErrorBands_MC(temp);
         SideBand_muon_P.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","SideBand_muon_theta",i),"Muon Theta",binList.size_muon_theta, binList.a_muon_theta);
         temp->GetXaxis()->SetTitle("Muon Theta [degree]");
         temp->GetYaxis()->SetTitle("N(Events)");
-        AddVertErrorBands_MC(temp);
+        if (m_isMC) AddVertErrorBands_MC(temp);
         SideBand_muon_theta.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","SideBand_pi0_P",i),"#pi^{0} Momentum",binList.size_pi0_P, binList.a_pi0_P);
         temp->GetXaxis()->SetTitle("#pi^{0} Momentum [GeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
-        AddVertErrorBands_MC(temp);
+        if (m_isMC) AddVertErrorBands_MC(temp);
         SideBand_pi0_P.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","SideBand_pi0_KE",i),"#pi^{0} Kinetic Energy",binList.size_pi0_KE, binList.a_pi0_KE);
         temp->GetXaxis()->SetTitle("#pi^{0} Kinetic Energy [GeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
-        AddVertErrorBands_MC(temp);
+        if (m_isMC) AddVertErrorBands_MC(temp);
         SideBand_pi0_KE.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","SideBand_pi0_theta",i),"#pi^{0} Theta",binList.size_pi0_theta, binList.a_pi0_theta);
         temp->GetXaxis()->SetTitle("#pi^{0} Theta [degree]");
         temp->GetYaxis()->SetTitle("N(Events)");
-        AddVertErrorBands_MC(temp);
+        if (m_isMC) AddVertErrorBands_MC(temp);
         SideBand_pi0_theta.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","SideBand_neutrino_E",i),"Neutrino Energy",binList.size_Enu, binList.a_Enu);
         temp->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
-        AddVertErrorBands_MC(temp);
+        if (m_isMC) AddVertErrorBands_MC(temp);
         SideBand_neutrino_E.push_back(temp);
             
         temp = new MnvH1D( Form("%s_%d","SideBand_QSq",i),"Q^{2}",binList.size_QSq, binList.a_QSq);
         temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
         temp->GetYaxis()->SetTitle("N(Events)");
-        AddVertErrorBands_MC(temp);
+        if (m_isMC) AddVertErrorBands_MC(temp);
         SideBand_QSq.push_back(temp);
             
         temp = new MnvH1D( Form("%s_%d","SideBand_W",i),"W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
         temp->GetXaxis()->SetTitle("W [GeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
-        AddVertErrorBands_MC(temp);
+        if (m_isMC) AddVertErrorBands_MC(temp);
         SideBand_W.push_back(temp);
 
     }

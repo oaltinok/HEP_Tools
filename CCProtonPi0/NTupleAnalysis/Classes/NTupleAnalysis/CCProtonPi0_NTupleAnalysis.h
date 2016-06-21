@@ -126,6 +126,10 @@ class CCProtonPi0_NTupleAnalysis
         template<class MnvHistoType>
         void AddVertErrorBand_MuonTracking(MnvHistoType* h);
 
+
+        // Systematics - Multi Universe 
+        void GetAllVertUniverses(MnvH1D* hist, std::vector<TH1D*> &all_universes);
+
     private:
 };
 

@@ -4,7 +4,7 @@ using namespace std;
 
 CCProtonPi0_SideBandTool sbtool;
 
-double calc_ChiSq_SideBand(SideBand &sb, Double_t *par, bool isPartial = false, int min_bin = 1, int max_bin = 1)
+double calc_ChiSq_SideBand(SideBand &sb, Double_t *par, int unv = 0, bool isPartial = false, int min_bin = 1, int max_bin = 1)
 {
     if (!isPartial){
         min_bin = 1;
@@ -19,17 +19,17 @@ double calc_ChiSq_SideBand(SideBand &sb, Double_t *par, bool isPartial = false, 
     double ChiSq = 0.0;
 
     for (int i = 1; i <= max_bin; ++i) {
-        double nData = sb.data->GetBinContent(i);
+        double nData = sb.data_all_universes[unv]->GetBinContent(i);
         if (nData == 0) continue;
 
         // Do not use Signal and Other in Fit
-        double nSignal = sb.signal[0]->GetBinContent(i) * sbtool.POT_ratio;
-        double nOther = sb.Other[0]->GetBinContent(i) * sbtool.POT_ratio;
+        double nSignal = sb.signal_all_universes[unv]->GetBinContent(i) * sbtool.POT_ratio;
+        double nOther = sb.Other_all_universes[unv]->GetBinContent(i) * sbtool.POT_ratio;
 
         // par[] will be the weights associated with that background
-        double nWithPi0 = par[0] * sb.WithPi0[0]->GetBinContent(i) * sbtool.POT_ratio;
-        double nQELike = par[1] * sb.QELike[0]->GetBinContent(i) * sbtool.POT_ratio;
-        double nSinglePiPlus = par[2] * sb.SinglePiPlus[0]->GetBinContent(i) * sbtool.POT_ratio;
+        double nWithPi0 = par[0] * sb.WithPi0_all_universes[unv]->GetBinContent(i) * sbtool.POT_ratio;
+        double nQELike = par[1] * sb.QELike_all_universes[unv]->GetBinContent(i) * sbtool.POT_ratio;
+        double nSinglePiPlus = par[2] * sb.SinglePiPlus_all_universes[unv]->GetBinContent(i) * sbtool.POT_ratio;
         
         double nTotalMC = nSignal + nWithPi0 + nQELike + nSinglePiPlus + nOther;
 
@@ -50,18 +50,18 @@ void calc_ChiSq(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t if
     double ChiSq = 0;
 
     // Calculate ChiSq for Michel for ALL Bins
-    ChiSq += calc_ChiSq_SideBand(sbtool.Michel, par);
+    ChiSq += calc_ChiSq_SideBand(sbtool.Michel, par, sbtool.current_unv);
    
     // Calculate ChiSq for pID for ALL Bins
-    ChiSq += calc_ChiSq_SideBand(sbtool.pID, par);
+    ChiSq += calc_ChiSq_SideBand(sbtool.pID, par, sbtool.current_unv);
 
     // Calculate ChiSq for Low Inv Mass 
     //      Inv Mass itself for first 6 bins
-    ChiSq += calc_ChiSq_SideBand(sbtool.LowInvMass, par, true, 1, 6);
+    ChiSq += calc_ChiSq_SideBand(sbtool.LowInvMass, par, sbtool.current_unv, true, 1, 6);
     
     // Calculate ChiSq for High Inv Mass
     //      Inv Mass itself for last 30 bins
-    ChiSq += calc_ChiSq_SideBand(sbtool.HighInvMass, par, true, 21, 50);
+    ChiSq += calc_ChiSq_SideBand(sbtool.HighInvMass, par, sbtool.current_unv, true, 21, 50);
 
     f = ChiSq;
     return;
@@ -69,6 +69,10 @@ void calc_ChiSq(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t if
 
 void FitMinuit()
 {
+    cout<<"======================================================================"<<endl;
+    cout<<"Universe = "<<sbtool.current_unv<<endl;
+    cout<<"======================================================================"<<endl;
+    
     TMinuit *ptMinuit = new TMinuit(3);  //initialize TMinuit with a maximum of 3 params
     //
     //  select verbose level:
@@ -132,8 +136,13 @@ void FitMinuit()
     //*-*                    3= full accurate covariance matrix
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     
-    sbtool.ApplyFitResults(min_ChiSq, fParamVal, fParamErr);
-    sbtool.Plot();
+    sbtool.SaveFitResults(min_ChiSq, fParamVal, fParamErr);
+
+    // Plot only for Central Value
+    if (sbtool.current_unv == 0){
+        sbtool.ApplyFitResults();
+        sbtool.Plot();
+    }
     
     std::cout << "\n";
     std::cout << " Minimum chi square = " << min_ChiSq<< "\n";
@@ -158,6 +167,7 @@ void FitMinuit()
     //*-*    when INKODE=5, MNPRIN chooses IKODE=1,2, or 3, according to ISW(2)
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
+    delete ptMinuit;
 }
 
 void FitSideBands()
@@ -165,7 +175,45 @@ void FitSideBands()
     cout<<"======================================================================"<<endl;
     cout<<"Fitting Side Bands..."<<endl;
     cout<<"======================================================================"<<endl;
-    FitMinuit();
+
+    while(sbtool.current_unv < sbtool.N_Universes){
+        FitMinuit();
+        sbtool.current_unv++;
+    }
+  
+    std::cout<<"Writing List of Weights for all Universes"<<std::endl;
+    // Open Text File
+    std::string file_name = Folder_List::output + Folder_List::textOut + "Weights_All_Universes" +".txt";
+    ofstream file;
+    file.open(file_name.c_str());
+
+    
+    // Write Header
+    file<<std::left;
+    file.width(12); file<<"Universe"<<" "; 
+    file.width(12); file<<"ChiSq"<<" ";    
+    file.width(20); file<<"wgt(SinglePiPlus)"<<" ";    
+    file.width(20); file<<"wgt(QELike)"<<" ";    
+    file.width(20); file<<"wgt(Other)"<<" ";    
+    file.width(20); file<<"err(SinglePiPlus)"<<" ";    
+    file.width(20); file<<"err(QELike)"<<" ";    
+    file.width(20); file<<"err(Other)"<<" ";    
+    file<<std::endl;
+
+    for (unsigned int i = 0; i < sbtool.ChiSq.size(); ++i){
+        file.width(12); file<<i<<" "; 
+        file.width(12); file<<sbtool.ChiSq[i]<<" ";    
+        file.width(20); file<<sbtool.wgt_SinglePiPlus[i]<<" ";    
+        file.width(20); file<<sbtool.wgt_QELike[i]<<" ";    
+        file.width(20); file<<sbtool.wgt_WithPi0[i]<<" ";    
+        file.width(20); file<<sbtool.err_SinglePiPlus[i]<<" ";    
+        file.width(20); file<<sbtool.err_QELike[i]<<" ";    
+        file.width(20); file<<sbtool.err_WithPi0[i]<<" ";    
+        file<<std::endl;
+    }
+
+    std::cout<<"Writing "<<file_name<<std::endl;
+    file.close();
 }
 
 

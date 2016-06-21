@@ -27,7 +27,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  Data vs MC
     //--------------------------------------------------------------------------
     //plotInteraction_DataMC();
-    plotMuon_DataMC();
+    //plotMuon_DataMC();
     //plotProton_DataMC();
     //plotPion_DataMC();
     //plotCutHistograms_DataMC();
@@ -45,9 +45,10 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  Plot Function Reserved for Other Studies
     //--------------------------------------------------------------------------
     //SavePi0InvMassPoints();
-    //plotOtherStudies();
+    plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
+    //Systematics();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -165,18 +166,20 @@ void CCProtonPi0_Plotter::plotOtherStudies()
     rootDir_SB.data = Folder_List::rootDir_sideBand_Original_data;
     rootDir_SB.mc = Folder_List::rootDir_sideBand_Original_mc;
     
-    DrawDataStackedMC(rootDir_SB,"SideBand_muon_P",plotDir);
+    
+    TFile* f_mc = new TFile(rootDir_SB.mc.c_str());
+    MnvH1D* mc = GetMnvH1D(f_mc, "SideBand_muon_P_0");
+  
+    std::vector<TH1D*> all_universes;
+    GetAllVertUniverses(mc, all_universes);
 
-    //DrawNormalizedMigrationHistogram(rootDir_Muon,"muon_theta_response",plotDir);
-    //DrawNormalizedMigrationHistogram(rootDir_Interaction,"QSq_response",plotDir);
-    
-    //PlotFluxHistograms();
-    
-    //PlotTotalEnuXSec();
+    std::cout<<"Got All Universes"<<std::endl;
+    std::cout<<"N(Universes) = "<<all_universes.size()<<std::endl;
+    std::cout<<"Integrals"<<std::endl;
+    for (unsigned int j = 0; j < all_universes.size(); ++j){
+            std::cout<<"\t"<<all_universes[j]->Integral()<<std::endl;
+    }
 
-    //DrawBackgroundSubtraction(true);
-    //DrawBackgroundSubtraction(false);
-    
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
 
@@ -2035,6 +2038,11 @@ void CCProtonPi0_Plotter::UnfoldingStudy()
 
     //PlotUnfolding_TruthComparison();
     PlotUnfolding_Migration();
+}
+
+void CCProtonPi0_Plotter::Systematics()
+{
+    Systematics_RawData();
 }
 
 void CCProtonPi0_Plotter::PlotDelta()

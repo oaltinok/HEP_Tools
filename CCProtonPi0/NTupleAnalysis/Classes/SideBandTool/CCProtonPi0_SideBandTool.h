@@ -56,6 +56,14 @@ struct SideBand
     MnvH1D* SinglePiPlus[2];
     MnvH1D* Other[2];
 
+    std::vector<TH1D*> data_all_universes;
+    std::vector<TH1D*> mc_total_all_universes;
+    std::vector<TH1D*> signal_all_universes;
+    std::vector<TH1D*> WithPi0_all_universes;
+    std::vector<TH1D*> QELike_all_universes;
+    std::vector<TH1D*> SinglePiPlus_all_universes;
+    std::vector<TH1D*> Other_all_universes;
+
     XSec_Var muon_P;
     XSec_Var muon_theta;
     XSec_Var pi0_P;
@@ -82,7 +90,8 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_SideBandTool();
         ~CCProtonPi0_SideBandTool();
         
-        void ApplyFitResults(double chisq, double par_values[3], double par_errors[3]);
+        void SaveFitResults(double chisq, double par_values[3], double par_errors[3]);
+        void ApplyFitResults();
         void Plot();
         
         SideBand Original;
@@ -90,24 +99,27 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
         SideBand pID;
         SideBand LowInvMass;
         SideBand HighInvMass;
+        
+        int N_Universes;
+        int current_unv;
+
+        std::vector<double> ChiSq;
+        std::vector<double> wgt_WithPi0;
+        std::vector<double> wgt_QELike;
+        std::vector<double> wgt_SinglePiPlus;
+
+        std::vector<double> err_WithPi0;
+        std::vector<double> err_QELike;
+        std::vector<double> err_SinglePiPlus;
 
     private:
-        double ChiSq;
-        double wgt_WithPi0;
-        double wgt_QELike;
-        double wgt_SinglePiPlus;
-
-        double err_WithPi0;
-        double err_QELike;
-        double err_SinglePiPlus;
-
         void OpenRootFiles();
         void initSideBands();
         void initSideBand_FitHistograms(SideBand &sb);
+        void initSideBand_AllUniverses(SideBand& sb);
         void initSideBand_XSecHistograms(SideBand& sb);
         void initSideBand_XSecHistograms(SideBand& sb, XSec_Var& xsec_var, std::string name);
         void SetNames(SideBand &sb, std::string name);
-        void ApplyFitResults();
         void ApplyFitResults(SideBand &sb);
         void ApplyFitResults(XSec_Var &xsec_var);
 

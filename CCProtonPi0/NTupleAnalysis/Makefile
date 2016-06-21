@@ -20,7 +20,8 @@ NTUPLEANALYSISCPP = Classes/NTupleAnalysis/CCProtonPi0_NTupleAnalysis.cpp
 PLOTTERMACROSCPP = Classes/Plotter/CCProtonPi0_Plotter_Macros.cpp
 PLOTTERCPP = Classes/Plotter/CCProtonPi0_Plotter.cpp
 UNFOLDINGSTUDYCPP = Classes/Plotter/CCProtonPi0_Plotter_UnfoldingStudy.cpp
-ALLPLOTTERCPP = $(PLOTTERMACROSCPP) $(PLOTTERCPP) $(UNFOLDINGSTUDYCPP)
+SYSTEMATICSCPP = Classes/Plotter/CCProtonPi0_Plotter_Systematics.cpp
+ALLPLOTTERCPP = $(PLOTTERMACROSCPP) $(PLOTTERCPP) $(UNFOLDINGSTUDYCPP) $(SYSTEMATICSCPP)
 
 # Class: Analyzer
 ANALYZERCPP = Classes/Analyzer/CCProtonPi0_Analyzer.cpp

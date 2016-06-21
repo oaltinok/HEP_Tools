@@ -23,7 +23,11 @@ DefaultPlotFolder_List=(Muon
 	    SideBand	
 		Interaction
         CutHists
+        Systematics 
         OtherStudies)
+
+SystematicsList=(Summary
+        GENIE)
 
 VariableList=(xsec_pi0_P
         xsec_pi0_KE
@@ -73,6 +77,15 @@ for folder in ${VariableList[@]}; do
     done
     cd .. ## exit Variable
 done
+
+# Create SubFolders inside Plots/Systematics
+cd Systematics
+for folder in ${SystematicsList[@]};do
+    echo "... Creating ${Main_Folder}/${DefaultPlots}/Systematics/${folder}"
+    mkdir ${folder}
+done
+cd .. # exit Systematics
+
 cd .. # exit DefaultPlots
 cd .. # exit Main_Folder
 

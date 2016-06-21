@@ -4,6 +4,7 @@ using namespace PlotUtils;
 
 CCProtonPi0_SideBandTool::CCProtonPi0_SideBandTool() : CCProtonPi0_NTupleAnalysis()
 {
+    current_unv = 0;
     OpenRootFiles();
     initSideBands();
 }
@@ -72,6 +73,12 @@ void CCProtonPi0_SideBandTool::initSideBands()
     initSideBand_FitHistograms(LowInvMass);
     initSideBand_FitHistograms(HighInvMass);
 
+    initSideBand_AllUniverses(Original);
+    initSideBand_AllUniverses(Michel);
+    initSideBand_AllUniverses(pID);
+    initSideBand_AllUniverses(LowInvMass);
+    initSideBand_AllUniverses(HighInvMass);
+
     initSideBand_XSecHistograms(Original);
     initSideBand_XSecHistograms(Michel);
     initSideBand_XSecHistograms(pID);
@@ -102,6 +109,27 @@ void CCProtonPi0_SideBandTool::initSideBand_FitHistograms(SideBand& sb)
    
     var = var_name + "_6";
     sb.Other[0] = GetMnvH1D(sb.f_mc_fit, var);   
+}
+
+void CCProtonPi0_SideBandTool::initSideBand_AllUniverses(SideBand& sb)
+{
+
+    GetAllVertUniverses(sb.data, sb.data_all_universes);
+    GetAllVertUniverses(sb.mc_total, sb.mc_total_all_universes);
+    GetAllVertUniverses(sb.signal[0], sb.signal_all_universes);
+    GetAllVertUniverses(sb.WithPi0[0], sb.WithPi0_all_universes);
+    GetAllVertUniverses(sb.QELike[0], sb.QELike_all_universes);
+    GetAllVertUniverses(sb.SinglePiPlus[0], sb.SinglePiPlus_all_universes);
+    GetAllVertUniverses(sb.Other[0], sb.Other_all_universes);
+    N_Universes = sb.data_all_universes.size();
+//    std::cout<<"\t"<<"Data N(Universes) = "<<sb.data_all_universes.size()<<std::endl;
+//    std::cout<<"\t"<<"MC Total N(Universes) = "<<sb.mc_total_all_universes.size()<<std::endl;
+//    std::cout<<"\t"<<"Signal N(Universes) = "<<sb.signal_all_universes.size()<<std::endl;
+//    std::cout<<"\t"<<"WithPi0 N(Universes) = "<<sb.WithPi0_all_universes.size()<<std::endl;
+//    std::cout<<"\t"<<"QELike N(Universes) = "<<sb.QELike_all_universes.size()<<std::endl;
+//    std::cout<<"\t"<<"SinglePiPlus N(Universes) = "<<sb.SinglePiPlus_all_universes.size()<<std::endl;
+//    std::cout<<"\t"<<"Other N(Universes) = "<<sb.Other_all_universes.size()<<std::endl;
+    
 }
 
 void CCProtonPi0_SideBandTool::initSideBand_XSecHistograms(SideBand& sb)
@@ -334,11 +362,11 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
         text->SetTextSize(0.03);
         text->SetNDC();
         text->DrawLatex(0.6, 0.64, Form("Fit Results with %d points, %d pars", nPoints, nPars));
-        text->DrawLatex(0.6, 0.60, Form("Fit #chi^{2} = %3.2f", ChiSq));
-        text->DrawLatex(0.6, 0.56, Form("Fit #chi^{2}/dof = %3.2f", ChiSq/(nPoints-nPars)));
-        text->DrawLatex(0.6, 0.52, Form("#color[4]{wgt(SinglePiPlus) = %3.2f#pm %3.2f}", wgt_SinglePiPlus, err_SinglePiPlus));
-        text->DrawLatex(0.6, 0.48, Form("wgt(QELike) = %3.2f#pm %3.2f", wgt_QELike, err_QELike));
-        text->DrawLatex(0.6, 0.44, Form("#color[2]{wgt(WithPi0) = %3.2f#pm %3.2f}", wgt_WithPi0, err_WithPi0));
+        text->DrawLatex(0.6, 0.60, Form("Fit #chi^{2} = %3.2f", ChiSq[0]));
+        text->DrawLatex(0.6, 0.56, Form("Fit #chi^{2}/dof = %3.2f", ChiSq[0]/(nPoints-nPars)));
+        text->DrawLatex(0.6, 0.52, Form("#color[4]{wgt(SinglePiPlus) = %3.2f#pm %3.2f}", wgt_SinglePiPlus[0], err_SinglePiPlus[0]));
+        text->DrawLatex(0.6, 0.48, Form("wgt(QELike) = %3.2f#pm %3.2f", wgt_QELike[0], err_QELike[0]));
+        text->DrawLatex(0.6, 0.44, Form("#color[2]{wgt(WithPi0) = %3.2f#pm %3.2f}", wgt_WithPi0[0], err_WithPi0[0]));
         delete text;
     }
     
@@ -450,18 +478,16 @@ void CCProtonPi0_SideBandTool::ColorHists(MnvH1D* data, MnvH1D* signal, MnvH1D* 
     data->SetFillStyle(0);
 }
 
-void CCProtonPi0_SideBandTool::ApplyFitResults(double chisq, double par_values[3], double par_errors[3])
+void CCProtonPi0_SideBandTool::SaveFitResults(double chisq, double par_values[3], double par_errors[3])
 {
-    ChiSq = chisq;
-    wgt_WithPi0 = par_values[0];
-    wgt_QELike = par_values[1];
-    wgt_SinglePiPlus = par_values[2];
+    ChiSq.push_back(chisq);
+    wgt_WithPi0.push_back(par_values[0]);
+    wgt_QELike.push_back(par_values[1]);
+    wgt_SinglePiPlus.push_back(par_values[2]);
 
-    err_WithPi0 = par_errors[0];
-    err_QELike = par_errors[1];
-    err_SinglePiPlus = par_errors[2];
-
-    ApplyFitResults();
+    err_WithPi0.push_back(par_errors[0]);
+    err_QELike.push_back(par_errors[1]);
+    err_SinglePiPlus.push_back(par_errors[2]);
 }
 
 void CCProtonPi0_SideBandTool::ApplyFitResults()
@@ -484,9 +510,9 @@ void CCProtonPi0_SideBandTool::ApplyFitResults(SideBand &sb)
     sb.Other[1] = new MnvH1D (*sb.Other[0]);
 
     // Scale 
-    sb.WithPi0[1]->Scale(wgt_WithPi0);
-    sb.QELike[1]->Scale(wgt_QELike);
-    sb.SinglePiPlus[1]->Scale(wgt_SinglePiPlus);
+    sb.WithPi0[1]->Scale(wgt_WithPi0[0]);
+    sb.QELike[1]->Scale(wgt_QELike[0]);
+    sb.SinglePiPlus[1]->Scale(wgt_SinglePiPlus[0]);
 
     // Cross Section Variables
     ApplyFitResults(sb.muon_P);
@@ -509,9 +535,9 @@ void CCProtonPi0_SideBandTool::ApplyFitResults(XSec_Var &xsec_var)
     xsec_var.Other[1] = new MnvH1D (*xsec_var.Other[0]);
 
     // Scale 
-    xsec_var.WithPi0[1]->Scale(wgt_WithPi0);
-    xsec_var.QELike[1]->Scale(wgt_QELike);
-    xsec_var.SinglePiPlus[1]->Scale(wgt_SinglePiPlus);
+    xsec_var.WithPi0[1]->Scale(wgt_WithPi0[0]);
+    xsec_var.QELike[1]->Scale(wgt_QELike[0]);
+    xsec_var.SinglePiPlus[1]->Scale(wgt_SinglePiPlus[0]);
 }
 
 double CCProtonPi0_SideBandTool::calc_ChiSq(MnvH1D* data, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other)

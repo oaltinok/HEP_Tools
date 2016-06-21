@@ -1,5 +1,4 @@
 /cleanup.sh/1.1/Thu Jan  8 17:43:27 2015//
-/main.cpp/1.31/Fri Mar 25 16:55:18 2016//
 D/Classes////
 D/Input////
 D/Libraries////
@@ -8,5 +7,6 @@ D/TruthAnalysis////
 D/doc////
 D/makeClass////
 D/src////
-/Makefile/1.23/Thu May 12 20:17:21 2016//
-/setup.sh/1.20/Thu May 26 13:39:34 2016//
+/Makefile/1.24/Mon Jun 20 14:55:14 2016//
+/main.cpp/1.32/Tue Jun 21 21:11:59 2016//
+/setup.sh/1.21/Mon Jun 20 15:14:05 2016//

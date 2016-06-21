@@ -30,7 +30,7 @@ void Calculate_CrossSection(bool isMC);
 void FitSideBands();
 void FitMinuit();
 void calc_ChiSq(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t iflag);
-double calc_ChiSq_SideBand(SideBand &sb, Double_t *par, bool isPartial = false, int min_bin = 1, int max_bin = 1);
+double calc_ChiSq_SideBand(SideBand &sb, Double_t *par, int unv = 0, bool isPartial = false, int min_bin = 1, int max_bin = 1);
 
 int main(int argc, char *argv[] )
 {

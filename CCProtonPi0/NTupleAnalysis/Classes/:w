@@ -12,7 +12,6 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
     nMaxEvents = 10000;
-    if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
     isDataAnalysis  = true;
@@ -21,11 +20,11 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     writeFSParticleMomentum = false;
 
     // Side Band Control
-    NoSideBand = true;
+    NoSideBand = false;
     sideBand_Michel = false;
     sideBand_PID = false;
     sideBand_LowInvMass = false;
-    sideBand_HighInvMass = false;
+    sideBand_HighInvMass = true;
 
     // Event Selections
     applyProtonScore = true;
@@ -101,13 +100,10 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         if(isScanRun) UpdateScanFileName();
 
         // Progress Message on Terminal
-        int msg_entry;
-        if (m_isMC) msg_entry = 50000;
-        else msg_entry = 5000;
-        if (jentry%msg_entry == 0) cout<<"\tEntry "<<jentry<<endl;
+        if (jentry%50000 == 0) cout<<"\tEntry "<<jentry<<endl;
 
 
-        if (applyMaxEvents && jentry >= nMaxEvents){
+        if (applyMaxEvents && jentry == nMaxEvents){
             cout<<"\tReached Event Limit!"<<endl;
             break;
         }
@@ -126,17 +122,8 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         tree->Fill();
     }
     
-    if (!m_isMC){
-        AddVertErrorBands_Data(cutList.hCut_pi0invMass[0]);
-        AddVertErrorBands_Data(cutList.SideBand_muon_P[0]);
-        AddVertErrorBands_Data(cutList.SideBand_muon_theta[0]);
-        AddVertErrorBands_Data(cutList.SideBand_pi0_P[0]);
-        AddVertErrorBands_Data(cutList.SideBand_pi0_KE[0]);
-        AddVertErrorBands_Data(cutList.SideBand_pi0_theta[0]);
-        AddVertErrorBands_Data(cutList.SideBand_QSq[0]);
-        AddVertErrorBands_Data(cutList.SideBand_W[0]);
-        AddVertErrorBands_Data(cutList.SideBand_neutrino_E[0]);
-    }
+    //if (!m_isMC) AddVertErrorBands_Data(cutList.invMass_all);
+    
     cutList.writeCutTable();
     cutList.writeHistograms();
 
@@ -1679,8 +1666,6 @@ void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors(vector<MnvH1D*> &hist,
             int ind = GetBackgroundTypeInd();
             FillHistogramWithDefaultErrors(hist[ind], var);
         }
-    }else{
-        FillHistogram(hist[0], var);
     }
 }
 

@@ -237,7 +237,7 @@ void CCProtonPi0_Plotter::ApplyStyle(MnvPlotter* plotter)
     plotter->legend_text_size = 0.02;
 }
 
-void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter)
+void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupGENIE)
 {
     //plotter->hist_min_zero = false;
     //plotter->mc_line_width = 0;
@@ -248,52 +248,56 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter)
     plotter->legend_n_columns = 2;
     plotter->height_nspaces_per_hist = 0.5;
     plotter->width_xspace_per_letter = 0.1;
-    //-- define colors of the standard errors
-    plotter->error_color_map.clear();
-    plotter->error_summary_group_map.clear();
+    
+    if (groupGENIE){
+        //-- define colors of the standard errors
+        plotter->error_color_map.clear();
+        plotter->error_summary_group_map.clear();
 
-    plotter->error_color_map["GENIE"] = kGreen+2;
+        plotter->error_color_map["GENIE"] = kGreen+2;
 
-    std::vector<std::string> genieGroup;
-    genieGroup.push_back("GENIE_AGKYxF1pi"         );
-    genieGroup.push_back("GENIE_AhtBY"             );
-    genieGroup.push_back("GENIE_BhtBY"             );
-    genieGroup.push_back("GENIE_CCQEPauliSupViaKF" );
-    genieGroup.push_back("GENIE_CV1uBY"            );
-    genieGroup.push_back("GENIE_CV2uBY"            );
-    genieGroup.push_back("GENIE_EtaNCEL"           );
-    genieGroup.push_back("GENIE_FrAbs_N"           );
-    genieGroup.push_back("GENIE_FrAbs_pi"          );
-    genieGroup.push_back("GENIE_FrCEx_N"           );
-    genieGroup.push_back("GENIE_FrCEx_pi"          );
-    genieGroup.push_back("GENIE_FrElas_N"          );
-    genieGroup.push_back("GENIE_FrElas_pi"         );
-    genieGroup.push_back("GENIE_FrInel_N"          );
-    genieGroup.push_back("GENIE_FrInel_pi"         );
-    genieGroup.push_back("GENIE_FrPiProd_N"        );
-    genieGroup.push_back("GENIE_FrPiProd_pi"       );
-    genieGroup.push_back("GENIE_MFP_N"             );
-    genieGroup.push_back("GENIE_MFP_pi"            );
-    genieGroup.push_back("GENIE_MaCCQE"            );
-    genieGroup.push_back("GENIE_MaCCQEshape"       );
-    genieGroup.push_back("GENIE_MaNCEL"            );
-    genieGroup.push_back("GENIE_MaRES"             );
-    genieGroup.push_back("GENIE_MvRES"             );
-    genieGroup.push_back("GENIE_NormCCQE"          );
-    genieGroup.push_back("GENIE_NormCCRES"         );
-    genieGroup.push_back("GENIE_NormDISCC"         );
-    genieGroup.push_back("GENIE_NormNCRES"         );
-    genieGroup.push_back("GENIE_RDecBR1gamma"      );
-    genieGroup.push_back("GENIE_Rvn1pi"            );
-    genieGroup.push_back("GENIE_Rvn2pi"            );
-    genieGroup.push_back("GENIE_Rvp1pi"            );
-    genieGroup.push_back("GENIE_Rvp2pi"            );
-    genieGroup.push_back("GENIE_Theta_Delta2Npi"   );
-    genieGroup.push_back("GENIE_VecFFCCQEshape"    );
-    plotter->error_summary_group_map["GENIE"] = genieGroup;   
+        std::vector<std::string> genieGroup;
+        genieGroup.push_back("GENIE_AGKYxF1pi"         );
+        genieGroup.push_back("GENIE_AhtBY"             );
+        genieGroup.push_back("GENIE_BhtBY"             );
+        genieGroup.push_back("GENIE_CCQEPauliSupViaKF" );
+        genieGroup.push_back("GENIE_CV1uBY"            );
+        genieGroup.push_back("GENIE_CV2uBY"            );
+        genieGroup.push_back("GENIE_EtaNCEL"           );
+        genieGroup.push_back("GENIE_FrAbs_N"           );
+        genieGroup.push_back("GENIE_FrAbs_pi"          );
+        genieGroup.push_back("GENIE_FrCEx_N"           );
+        genieGroup.push_back("GENIE_FrCEx_pi"          );
+        genieGroup.push_back("GENIE_FrElas_N"          );
+        genieGroup.push_back("GENIE_FrElas_pi"         );
+        genieGroup.push_back("GENIE_FrInel_N"          );
+        genieGroup.push_back("GENIE_FrInel_pi"         );
+        genieGroup.push_back("GENIE_FrPiProd_N"        );
+        genieGroup.push_back("GENIE_FrPiProd_pi"       );
+        genieGroup.push_back("GENIE_MFP_N"             );
+        genieGroup.push_back("GENIE_MFP_pi"            );
+        genieGroup.push_back("GENIE_MaCCQE"            );
+        genieGroup.push_back("GENIE_MaCCQEshape"       );
+        genieGroup.push_back("GENIE_MaNCEL"            );
+        genieGroup.push_back("GENIE_MaRES"             );
+        genieGroup.push_back("GENIE_MvRES"             );
+        genieGroup.push_back("GENIE_NormCCQE"          );
+        genieGroup.push_back("GENIE_NormCCRES"         );
+        genieGroup.push_back("GENIE_NormDISCC"         );
+        genieGroup.push_back("GENIE_NormNCRES"         );
+        genieGroup.push_back("GENIE_RDecBR1gamma"      );
+        genieGroup.push_back("GENIE_Rvn1pi"            );
+        genieGroup.push_back("GENIE_Rvn2pi"            );
+        genieGroup.push_back("GENIE_Rvp1pi"            );
+        genieGroup.push_back("GENIE_Rvp2pi"            );
+        genieGroup.push_back("GENIE_Theta_Delta2Npi"   );
+        genieGroup.push_back("GENIE_VecFFCCQEshape"    );
+        plotter->error_summary_group_map["GENIE"] = genieGroup;   
+    }
+
 }
 
-void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir)
+void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupGENIE)
 {
     // ------------------------------------------------------------------------
     // Plot 
@@ -301,7 +305,7 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
 
-    ApplyStyle_Errors(plotter);
+    ApplyStyle_Errors(plotter, groupGENIE);
 
     plotter->DrawErrorSummary(hist);
 

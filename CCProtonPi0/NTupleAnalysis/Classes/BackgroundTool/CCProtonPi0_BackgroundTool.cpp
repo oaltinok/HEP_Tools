@@ -243,7 +243,7 @@ void CCProtonPi0_BackgroundTool::writeBackgroundTable()
 {
     formBackgroundVectors();
 
-    cout<<">> Writing "<<fileName<<endl;
+    cout<<">> Writing Background Tables"<<endl;
 
     writeBackgroundTableHeader();
     writeBackgroundTableRows(BackgroundCompactVector);

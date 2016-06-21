@@ -72,8 +72,8 @@ MnvH2D* CCProtonPi0_NTupleAnalysis::GetMnvH2D(TFile* f, std::string var_name)
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data(MnvHistoType* h)
 {
-    AddVertErrorBandAndFillWithCV_Flux(h);
     AddVertErrorBandAndFillWithCV_Genie(h);
+    AddVertErrorBandAndFillWithCV_Flux(h);
     AddVertErrorBandAndFillWithCV_MuonTracking(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH1D>(MnvH1D* h);
@@ -141,8 +141,8 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MuonTrac
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC(MnvHistoType* h)
 {
-    AddVertErrorBand_Flux(h);
     AddVertErrorBand_Genie(h);
+    AddVertErrorBand_Flux(h);
     AddVertErrorBand_MuonTracking(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC<MnvH1D>(MnvH1D* h);
@@ -330,5 +330,40 @@ double CCProtonPi0_NTupleAnalysis::Calc_WSq(double Enu, double QSq, double muon_
 
     return WSq;
 }
+
+void CCProtonPi0_NTupleAnalysis::GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes)
+{
+    // Check for input vector
+    if (!all_universes.empty()){
+        std::cout<<"WARNING! input vector<TH1D*> all_universes is NOT empty"<<std::endl;
+        std::cout<<"Returning without change!"<<std::endl;
+        return;
+    }
+
+    // ------------------------------------------------------------------------
+    // Add CV Histogram as first element -- all_universes[0]
+    // ------------------------------------------------------------------------
+    TH1D* cv_hist =  new TH1D(mnvh1d_hist->GetCVHistoWithStatError());
+    all_universes.push_back(cv_hist);
+
+    // ------------------------------------------------------------------------
+    // Add Other Universes from Error Bands
+    // ------------------------------------------------------------------------
+    // Get Vert Error Band Names
+    std::vector<std::string> err_names = mnvh1d_hist->GetVertErrorBandNames();
+   
+    // Loop over all Vertical Error Bands
+    for (unsigned int i = 0; i < err_names.size(); ++i){
+        MnvVertErrorBand* err_band =  mnvh1d_hist->GetVertErrorBand(err_names[i]);
+        // Get All Histograms from it
+        std::vector<TH1D*> err_hists = err_band->GetHists();
+        for (unsigned int j = 0; j < err_hists.size(); ++j){
+            TH1D* temp = new TH1D(*err_hists[j]);
+            all_universes.push_back(temp);
+        }
+    }
+}
+
+
 #endif
 

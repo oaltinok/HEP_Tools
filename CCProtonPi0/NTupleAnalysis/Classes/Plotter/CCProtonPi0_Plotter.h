@@ -141,7 +141,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
         // Helper Functions
         void ApplyStyle(MnvPlotter* plotter);
-        void ApplyStyle_Errors(MnvPlotter* plotter);
+        void ApplyStyle_Errors(MnvPlotter* plotter, bool groupGENIE);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, double hist_max, double arrow_length);
         void SavePi0InvMassPoints();
         void NormalizeToNormBinWidth(MnvH1D* hist);
@@ -190,7 +190,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // Other
         void PlotDelta();
         void DrawBackgroundSubtraction(bool isMC);
-        void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir);
+        void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupGENIE = true);
         void DrawTGraph(rootDir &dir, std::string var_name, std::string plotDir);
         void DrawEfficiencyCurve(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);
@@ -222,6 +222,15 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void PlotUnfolding_Diff(const std::vector<MnvH1D*> &hists, std::string var_name);
         void PlotUnfolding_TruthComparison();
         void PlotUnfolding_Migration();
+
+        // Systematics
+        void Systematics();
+        void Systematics_RawData();
+        void Systematics_DrawErrorSummary(std::string data_var, std::string mc_var);
+        void Systematics_DrawErrorBand_GENIE(std::string mc_var);
+        void Systematics_DrawErrorSummary_GENIE(MnvH1D* hist, std::string var_name, std::string error_name, double err_genie_total);
+        void Systematics_WriteTable(MnvH1D* hist, std::string var_name);
+
 };
 
 #endif
