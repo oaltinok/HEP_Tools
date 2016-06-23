@@ -17,8 +17,9 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     // Control Flow
     isDataAnalysis  = true;
     isScanRun = false;
-    applyBckgConstraints = false;
+    applyBckgConstraints = true;
     writeFSParticleMomentum = false;
+    fillErrors_ByHand = true;
 
     // Side Band Control
     NoSideBand = true;
@@ -187,7 +188,11 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         }
 
         // Progress Message on Terminal
-        if (jentry%25000 == 0) cout<<"\tEntry "<<jentry<<endl;
+        int msg_entry;
+        //if (m_isMC) msg_entry = 25000;
+        if (m_isMC) msg_entry = 2500;
+        else msg_entry = 5000;
+        if (jentry%msg_entry == 0) cout<<"\tEntry "<<jentry<<endl;
 
         if (applyMaxEvents && jentry == nMaxEvents){
             cout<<"\tReached Event Limit!"<<endl;
@@ -281,6 +286,8 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
     specifyRunTime();
 
     openTextFiles();
+
+    ReadBckgConstraints();
 
     cout<<"Initialization Finished!\n"<<endl;
 }
@@ -1617,10 +1624,40 @@ void CCProtonPi0_Analyzer::FillHistogram(TH3D* hist, double var1, double var2, d
 
 void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors(MnvH1D* hist, double var)
 {
+    if (fillErrors_ByHand){
+        FillHistogramWithDefaultErrors_ByHand(hist,var);
+    }else{
+        hist->Fill(var, cvweight);
+        FillVertErrorBand_Genie(hist, var);
+        FillVertErrorBand_Flux(hist, var);
+        FillVertErrorBand_MuonTracking(hist, var);
+    }
+}
+
+void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors_ByHand(MnvH1D* hist, double var)
+{
+    // Fill CV Value
     hist->Fill(var, cvweight);
-    FillVertErrorBand_Genie(hist, var);
-    FillVertErrorBand_Flux(hist, var);
-    FillVertErrorBand_MuonTracking(hist, var);
+
+    // Fill Error Bands by Hand for Background Events
+    if (truth_isBckg_Compact_SinglePiPlus){
+        FillVertErrorBand_All_ByHand(hist, var);
+    }else if (truth_isBckg_Compact_QELike){
+        FillVertErrorBand_All_ByHand(hist, var); 
+    }else if (truth_isBckg_Compact_WithPi0){
+        FillVertErrorBand_All_ByHand(hist, var); 
+    }else{
+        FillVertErrorBand_Genie(hist, var);
+        FillVertErrorBand_Flux(hist, var);
+        FillVertErrorBand_MuonTracking(hist, var);
+    }
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_All_ByHand(MnvH1D* hist, double var)
+{
+    FillVertErrorBand_Flux_ByHand(hist, var);
+    FillVertErrorBand_MuonTracking_ByHand(hist, var);
+    FillVertErrorBand_Genie_ByHand(hist, var);
 }
 
 void CCProtonPi0_Analyzer::FillHistogram(MnvH1D* hist, double var)
@@ -1684,10 +1721,63 @@ void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors(vector<MnvH1D*> &hist,
     }
 }
 
+void CCProtonPi0_Analyzer::FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, std::vector<double> errors)
+{
+    // Get a Pointer to Error Band
+    MnvVertErrorBand* err_band =  h->GetVertErrorBand(error_name);
+
+    // Get a Pointer to Histograms 
+    std::vector<TH1D*> err_hists = err_band->GetHists();
+   
+    // Sanity Check
+    if (err_hists.size() != errors.size()) {
+        std::cout<<"WARNING! Can not Fill Vertical Error Band: "<<error_name<<std::endl;
+        exit(1);
+    }
+
+    // Fill Error Band Base Histogram with Default cvweight
+    int cvbin = err_band->TH1D::Fill(var, cvweight);
+
+    // Update Errors
+    if (cvbin == -1){
+        cvbin = err_band->FindBin(var);
+    }
+    for (unsigned int i = 0; i != err_hists.size(); ++i ) {
+        // wgt_bckg is universe_wgt / cv_wgt
+        double wgt_bckg = GetBckgConstraint(error_name, i);
+        // double wgt_bckg = 1.0; // For Testing
+
+        const double applyWeight = cvweight * wgt_bckg;
+        const double wgtU = errors[i]*applyWeight;
+        err_hists[i]->AddBinContent( cvbin, wgtU );
+
+        const double err = err_hists[i]->GetBinError(cvbin);
+        const double newerr2 = err*err + wgtU*wgtU; 
+        const double newerr = (0.<newerr2) ? sqrt(newerr2) : 0.;
+        err_hists[i]->SetBinError( cvbin, newerr );
+    }
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err1, double err2)
+{
+    std::vector<double> errors;
+    errors.push_back(err1);
+    errors.push_back(err2);
+
+    FillVertErrorBand_ByHand(h, var, error_name, errors);
+}
+
 void CCProtonPi0_Analyzer::FillVertErrorBand_MuonTracking(MnvH1D* h, double var)
 {
     double correctionErr = GetMINOSCorrectionErr();
     h->FillVertErrorBand("MuonTracking", var, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_MuonTracking_ByHand(MnvH1D* h, double var)
+{
+    double correctionErr = GetMINOSCorrectionErr();
+ 
+    FillVertErrorBand_ByHand(h, var, "MuonTracking", 1-correctionErr, 1+correctionErr);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_MuonTracking(MnvH2D* h, double var1, double var2)
@@ -1700,6 +1790,13 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_Flux(MnvH1D* h, double var)
 {
     std::vector<double> flux_errors = GetFluxError();
     h->FillVertErrorBand("Flux",  var, &flux_errors[0],  cvweight, 1.0);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var)
+{
+    std::vector<double> flux_errors = GetFluxError();
+
+    FillVertErrorBand_ByHand(h, var, "Flux", flux_errors);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_Flux(MnvH2D* h, double var1, double var2)
@@ -1745,6 +1842,45 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
     h->FillVertErrorBand("GENIE_Rvp2pi"            ,var, truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           , cvweight);
     h->FillVertErrorBand("GENIE_Theta_Delta2Npi"   ,var, truth_genie_wgt_Theta_Delta2Npi[2]  , truth_genie_wgt_Theta_Delta2Npi[4]  , cvweight);
     h->FillVertErrorBand("GENIE_VecFFCCQEshape"    ,var, truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   , cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_Genie_ByHand(MnvH1D* h, double var)
+{
+    FillVertErrorBand_ByHand(h, var, "GENIE_AGKYxF1pi"         , truth_genie_wgt_AGKYxF1pi[2]        , truth_genie_wgt_AGKYxF1pi[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_AhtBY"             , truth_genie_wgt_AhtBY[2]            , truth_genie_wgt_AhtBY[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_BhtBY"             , truth_genie_wgt_BhtBY[2]            , truth_genie_wgt_BhtBY[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_CCQEPauliSupViaKF" , truth_genie_wgt_CCQEPauliSupViaKF[2], truth_genie_wgt_CCQEPauliSupViaKF[4]);
+    FillVertErrorBand_ByHand(h, var, "GENIE_CV1uBY"            , truth_genie_wgt_CV1uBY[2]           , truth_genie_wgt_CV1uBY[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_CV2uBY"            , truth_genie_wgt_CV2uBY[2]           , truth_genie_wgt_CV2uBY[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_EtaNCEL"           , truth_genie_wgt_EtaNCEL[2]          , truth_genie_wgt_EtaNCEL[4]          );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrAbs_N"           , truth_genie_wgt_FrAbs_N[2]          , truth_genie_wgt_FrAbs_N[4]          );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrAbs_pi"          , truth_genie_wgt_FrAbs_pi[2]         , truth_genie_wgt_FrAbs_pi[4]         );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrCEx_N"           , truth_genie_wgt_FrCEx_N[2]          , truth_genie_wgt_FrCEx_N[4]          );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrCEx_pi"          , truth_genie_wgt_FrCEx_pi[2]         , truth_genie_wgt_FrCEx_pi[4]         );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrElas_N"          , truth_genie_wgt_FrElas_N[2]         , truth_genie_wgt_FrElas_N[4]         );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrElas_pi"         , truth_genie_wgt_FrElas_pi[2]        , truth_genie_wgt_FrElas_pi[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrInel_N"          , truth_genie_wgt_FrInel_N[2]         , truth_genie_wgt_FrInel_N[4]         );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrInel_pi"         , truth_genie_wgt_FrInel_pi[2]        , truth_genie_wgt_FrInel_pi[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrPiProd_N"        , truth_genie_wgt_FrPiProd_N[2]       , truth_genie_wgt_FrPiProd_N[4]       );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrPiProd_pi"       , truth_genie_wgt_FrPiProd_pi[2]      , truth_genie_wgt_FrPiProd_pi[4]      );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MFP_N"             , truth_genie_wgt_MFP_N[2]            , truth_genie_wgt_MFP_N[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MFP_pi"            , truth_genie_wgt_MFP_pi[2]           , truth_genie_wgt_MFP_pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MaCCQE"            , truth_genie_wgt_MaCCQE[2]           , truth_genie_wgt_MaCCQE[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MaCCQEshape"       , truth_genie_wgt_MaCCQEshape[2]      , truth_genie_wgt_MaCCQEshape[4]      );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MaNCEL"            , truth_genie_wgt_MaNCEL[2]           , truth_genie_wgt_MaNCEL[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MaRES"             , truth_genie_wgt_MaRES[2]            , truth_genie_wgt_MaRES[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MvRES"             , truth_genie_wgt_MvRES[2]            , truth_genie_wgt_MvRES[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_NormCCQE"          , truth_genie_wgt_NormCCQE[2]         , truth_genie_wgt_NormCCQE[4]         );
+    FillVertErrorBand_ByHand(h, var, "GENIE_NormCCRES"         , truth_genie_wgt_NormCCRES[2]        , truth_genie_wgt_NormCCRES[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_NormDISCC"         , truth_genie_wgt_NormDISCC[2]        , truth_genie_wgt_NormDISCC[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_NormNCRES"         , truth_genie_wgt_NormNCRES[2]        , truth_genie_wgt_NormNCRES[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_RDecBR1gamma"      , truth_genie_wgt_RDecBR1gamma[2]     , truth_genie_wgt_RDecBR1gamma[4]     );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Rvn1pi"            , truth_genie_wgt_Rvn1pi[2]           , truth_genie_wgt_Rvn1pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Rvn2pi"            , truth_genie_wgt_Rvn2pi[2]           , truth_genie_wgt_Rvn2pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Rvp1pi"            , truth_genie_wgt_Rvp1pi[2]           , truth_genie_wgt_Rvp1pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Rvp2pi"            , truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Theta_Delta2Npi"   , truth_genie_wgt_Theta_Delta2Npi[2]  , truth_genie_wgt_Theta_Delta2Npi[4]  );
+    FillVertErrorBand_ByHand(h, var, "GENIE_VecFFCCQEshape"    , truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   );
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_Genie(MnvH2D* h, double var1, double var2)
@@ -1873,9 +2009,9 @@ void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
         
         // Apply Background Constraints
         if (applyBckgConstraints){
-            if (truth_isBckg_Compact_WithPi0) cvweight *= 0.89;
-            else if (truth_isBckg_Compact_QELike) cvweight *= 0.85;
-            else if (truth_isBckg_Compact_SinglePiPlus) cvweight *= 0.94;
+            if (truth_isBckg_Compact_SinglePiPlus) cvweight *= cv_wgt_SinglePiPlus;
+            else if (truth_isBckg_Compact_QELike) cvweight *= cv_wgt_QELike;
+            else if (truth_isBckg_Compact_WithPi0) cvweight *= cv_wgt_WithPi0;
         }
     }else{
         cvweight = 1.0; 
@@ -2393,6 +2529,86 @@ TLorentzVector CCProtonPi0_Analyzer::GetDelta4P(bool isTruth)
 
     return delta_lorentz;
 }
+
+void CCProtonPi0_Analyzer::ReadBckgConstraints()
+{
+    ifstream file;
+    file.open(Folder_List::BckgConstraints.c_str());
+
+    if (!file.is_open()){
+        std::cout<<"WARNING! Cannot open input file "<<Folder_List::BckgConstraints<<std::endl;
+        exit(1);
+    }
+
+    // Read Header and Discard (Don't use it)
+    std::string line;
+    getline(file, line);
+
+    std::string error_name;
+    int hist_ind;
+    double dummy;
+    double wgt_SinglePiPlus;
+    double wgt_QELike;
+    double wgt_WithPi0;
+
+    // Read CV Result and Save CV Weights
+    getline(file, line);
+    std::stringstream cv_line_ss(line);
+    cv_line_ss>>error_name>>hist_ind>>dummy>>dummy>>wgt_SinglePiPlus>>wgt_QELike>>wgt_WithPi0>>dummy>>dummy>>dummy;
+   
+    if (error_name.compare("CentralValue") == 0){
+        cv_wgt_SinglePiPlus = wgt_SinglePiPlus;
+        cv_wgt_QELike = wgt_QELike;
+        cv_wgt_WithPi0 = wgt_WithPi0;
+    }else{
+        std::cout<<"WARNING! Cannot Read CentralValue Bckg Constraints!"<<std::endl;
+        exit(1);
+    }
+
+    // Read Other Lines
+    while(!file.eof()){
+        getline(file,line);
+        std::stringstream line_ss(line);
+        line_ss>>error_name>>hist_ind>>dummy>>dummy>>wgt_SinglePiPlus>>wgt_QELike>>wgt_WithPi0>>dummy>>dummy>>dummy;
+      
+        error_names.push_back(error_name);
+        error_hist_inds.push_back(hist_ind);
+        error_wgt_SinglePiPlus.push_back(wgt_SinglePiPlus);
+        error_wgt_QELike.push_back(wgt_QELike);
+        error_wgt_WithPi0.push_back(wgt_WithPi0);
+    }
+
+    file.close();
+
+    //for (unsigned int i = 0; i < error_names.size(); ++i){
+    //    std::cout<<error_names[i]<<" ";
+    //    std::cout<<error_hist_inds[i]<<" ";
+    //    std::cout<<error_wgt_SinglePiPlus[i]<<" ";
+    //    std::cout<<error_wgt_QELike[i]<<" ";
+    //    std::cout<<error_wgt_WithPi0[i]<<std::endl;
+    //}
+
+}
+
+double CCProtonPi0_Analyzer::GetBckgConstraint(std::string error_name, int hist_ind)
+{
+    for (unsigned int i = 0; i < error_names.size(); ++i){
+        if (error_name.compare(error_names[i]) == 0 && hist_ind == error_hist_inds[i]){
+           if (truth_isBckg_Compact_SinglePiPlus) return error_wgt_SinglePiPlus[i] / cv_wgt_SinglePiPlus;
+           else if (truth_isBckg_Compact_QELike) return error_wgt_QELike[i] / cv_wgt_QELike;
+           else if (truth_isBckg_Compact_WithPi0) return error_wgt_WithPi0[i] / cv_wgt_WithPi0;
+           else{
+                std::cout<<"WARNING! You tried to get a Background Constraint for a Non-Constraint Event"<<std::endl;
+                exit(1);
+           }
+        }
+    }
+    
+    std::cout<<"WARNING! Can not find BckgConstraint for "<<error_name<<" Hist = "<<hist_ind<<std::endl;
+    exit(1);
+}
+
+
 
 #endif //CCProtonPi0_Analyzer_cpp
 

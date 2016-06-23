@@ -64,6 +64,22 @@ struct SideBand
     std::vector<TH1D*> SinglePiPlus_all_universes;
     std::vector<TH1D*> Other_all_universes;
 
+    std::vector<std::string> err_bands_data_all_universes;
+    std::vector<std::string> err_bands_mc_total_all_universes;
+    std::vector<std::string> err_bands_signal_all_universes;
+    std::vector<std::string> err_bands_WithPi0_all_universes;
+    std::vector<std::string> err_bands_QELike_all_universes;
+    std::vector<std::string> err_bands_SinglePiPlus_all_universes;
+    std::vector<std::string> err_bands_Other_all_universes;
+
+    std::vector<int> hist_ind_data_all_universes;
+    std::vector<int> hist_ind_mc_total_all_universes;
+    std::vector<int> hist_ind_signal_all_universes;
+    std::vector<int> hist_ind_WithPi0_all_universes;
+    std::vector<int> hist_ind_QELike_all_universes;
+    std::vector<int> hist_ind_SinglePiPlus_all_universes;
+    std::vector<int> hist_ind_Other_all_universes;
+
     XSec_Var muon_P;
     XSec_Var muon_theta;
     XSec_Var pi0_P;
@@ -81,6 +97,13 @@ struct SideBand
     TFile* f_mc_var;
     TFile* f_data_var;
 
+    std::vector<double> nData;
+    std::vector<double> nMC;
+    std::vector<double> nSignal;
+    std::vector<double> nWithPi0;
+    std::vector<double> nQELike;
+    std::vector<double> nSinglePiPlus;
+    std::vector<double> nOther;
 };
 
 
@@ -93,6 +116,8 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
         void SaveFitResults(double chisq, double par_values[3], double par_errors[3]);
         void ApplyFitResults();
         void Plot();
+        void WriteFitResults();
+        void WriteStatistics();
         
         SideBand Original;
         SideBand Michel;
@@ -103,7 +128,8 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
         int N_Universes;
         int current_unv;
 
-        std::vector<double> ChiSq;
+        std::vector<double> ChiSq_before_fit;
+        std::vector<double> ChiSq_after_fit;
         std::vector<double> wgt_WithPi0;
         std::vector<double> wgt_QELike;
         std::vector<double> wgt_SinglePiPlus;
@@ -119,10 +145,14 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
         void initSideBand_AllUniverses(SideBand& sb);
         void initSideBand_XSecHistograms(SideBand& sb);
         void initSideBand_XSecHistograms(SideBand& sb, XSec_Var& xsec_var, std::string name);
+        void GetStatistics(SideBand &sb);
         void SetNames(SideBand &sb, std::string name);
         void ApplyFitResults(SideBand &sb);
         void ApplyFitResults(XSec_Var &xsec_var);
-
+        void WriteStatistics(SideBand &sb);
+        double calc_Global_ChiSq(int unv);
+        double calc_ChiSq_SideBand(SideBand &sb, int unv = 0, bool isPartial = false, int min_bin = 1, int max_bin = 1);
+        
         // Plot Functions
         void DrawDataMCWithErrorBand(SideBand &sb);
         void Plot(SideBand &sb);

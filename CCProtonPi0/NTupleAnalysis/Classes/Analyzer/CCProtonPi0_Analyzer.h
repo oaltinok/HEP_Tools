@@ -23,6 +23,7 @@
 #include <TChain.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
+#include <sstream>
 
 #include "PlotUtils/MnvNormalization.h"
 
@@ -80,15 +81,27 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillHistogram(TH2D* hist, double var1, double var2);
         void FillHistogram(TH3D* hist, double var1, double var2, double var3);
         void FillHistogramWithDefaultErrors(MnvH1D* hist, double var);
+        void FillHistogramWithDefaultErrors_ByHand(MnvH1D* hist, double var);
         void FillHistogram(MnvH2D* hist, double var1, double var2);
         void FillHistogramWithDefaultErrors(MnvH2D* hist, double var1, double var2);
         void FillHistogramWithDefaultErrors(vector<MnvH1D*> &hist, double var);
+
+        // Vertical Error Band
+        void FillVertErrorBand_All_ByHand(MnvH1D* hist, double var);
+        void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, std::vector<double> errors);
+        void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err1, double err2);
         void FillVertErrorBand_Flux(MnvH1D* h, double var);
+        void FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_Flux(MnvH2D* h, double var1, double var2);
         void FillVertErrorBand_Genie(MnvH1D* h, double var);
+        void FillVertErrorBand_Genie_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_Genie(MnvH2D* h, double var1, double var2);
         void FillVertErrorBand_MuonTracking(MnvH1D* h, double var);
+        void FillVertErrorBand_MuonTracking_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_MuonTracking(MnvH2D* h, double var1, double var2);
+        void ReadBckgConstraints();
+        double GetBckgConstraint(std::string error_name, int hist_ind);
+
         void CorrectNTupleVariables();
         void CorrectEMShowerCalibration();
         void Calc_WeightFromSystematics();
@@ -169,6 +182,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double m_W_Truth;
 
         // Other Variables
+        bool fillErrors_ByHand;
         bool m_isMC;
         bool isScanRun;
         bool isDataAnalysis;
@@ -205,6 +219,16 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         counter counter2;
         counter counter3;
         counter counter4;
+
+        // Multi Universe Background Constraints
+        std::vector<std::string> error_names;
+        std::vector<int> error_hist_inds;
+        std::vector<double> error_wgt_SinglePiPlus;
+        std::vector<double> error_wgt_QELike;
+        std::vector<double> error_wgt_WithPi0;
+        double cv_wgt_SinglePiPlus;
+        double cv_wgt_QELike;
+        double cv_wgt_WithPi0;
 
         // Pi0InvariantMass Correction
         double mean_MC_1Track;

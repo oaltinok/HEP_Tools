@@ -331,7 +331,7 @@ double CCProtonPi0_NTupleAnalysis::Calc_WSq(double Enu, double QSq, double muon_
     return WSq;
 }
 
-void CCProtonPi0_NTupleAnalysis::GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes)
+void CCProtonPi0_NTupleAnalysis::GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes, std::vector<std::string> &err_bands, std::vector<int> &hist_ind)
 {
     // Check for input vector
     if (!all_universes.empty()){
@@ -345,6 +345,8 @@ void CCProtonPi0_NTupleAnalysis::GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::v
     // ------------------------------------------------------------------------
     TH1D* cv_hist =  new TH1D(mnvh1d_hist->GetCVHistoWithStatError());
     all_universes.push_back(cv_hist);
+    err_bands.push_back("CentralValue");
+    hist_ind.push_back(0);
 
     // ------------------------------------------------------------------------
     // Add Other Universes from Error Bands
@@ -360,6 +362,8 @@ void CCProtonPi0_NTupleAnalysis::GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::v
         for (unsigned int j = 0; j < err_hists.size(); ++j){
             TH1D* temp = new TH1D(*err_hists[j]);
             all_universes.push_back(temp);
+            err_bands.push_back(err_names[i]);
+            hist_ind.push_back(j);
         }
     }
 }

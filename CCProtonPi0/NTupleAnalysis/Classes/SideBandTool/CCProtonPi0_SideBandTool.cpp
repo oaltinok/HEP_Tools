@@ -84,6 +84,18 @@ void CCProtonPi0_SideBandTool::initSideBands()
     initSideBand_XSecHistograms(pID);
     initSideBand_XSecHistograms(LowInvMass);
     initSideBand_XSecHistograms(HighInvMass);
+
+    GetStatistics(Original);
+    GetStatistics(Michel);
+    GetStatistics(pID);
+    GetStatistics(LowInvMass);
+    GetStatistics(HighInvMass);
+
+    // Calc Global ChiSq Before Fit
+    for (unsigned int i = 0; i < Original.data_all_universes.size(); ++i){
+        double Global_ChiSq = calc_Global_ChiSq(i);
+        ChiSq_before_fit.push_back(Global_ChiSq);
+    }
 }
 
 void CCProtonPi0_SideBandTool::initSideBand_FitHistograms(SideBand& sb)
@@ -113,23 +125,15 @@ void CCProtonPi0_SideBandTool::initSideBand_FitHistograms(SideBand& sb)
 
 void CCProtonPi0_SideBandTool::initSideBand_AllUniverses(SideBand& sb)
 {
+    GetAllVertUniverses(sb.data, sb.data_all_universes, sb.err_bands_data_all_universes, sb.hist_ind_data_all_universes);
+    GetAllVertUniverses(sb.mc_total, sb.mc_total_all_universes, sb.err_bands_mc_total_all_universes, sb.hist_ind_mc_total_all_universes);
+    GetAllVertUniverses(sb.signal[0], sb.signal_all_universes, sb.err_bands_signal_all_universes, sb.hist_ind_signal_all_universes);
+    GetAllVertUniverses(sb.WithPi0[0], sb.WithPi0_all_universes, sb.err_bands_WithPi0_all_universes, sb.hist_ind_WithPi0_all_universes);
+    GetAllVertUniverses(sb.QELike[0], sb.QELike_all_universes, sb.err_bands_QELike_all_universes, sb.hist_ind_QELike_all_universes);
+    GetAllVertUniverses(sb.SinglePiPlus[0], sb.SinglePiPlus_all_universes, sb.err_bands_SinglePiPlus_all_universes, sb.hist_ind_SinglePiPlus_all_universes);
+    GetAllVertUniverses(sb.Other[0], sb.Other_all_universes, sb.err_bands_Other_all_universes, sb.hist_ind_Other_all_universes);
 
-    GetAllVertUniverses(sb.data, sb.data_all_universes);
-    GetAllVertUniverses(sb.mc_total, sb.mc_total_all_universes);
-    GetAllVertUniverses(sb.signal[0], sb.signal_all_universes);
-    GetAllVertUniverses(sb.WithPi0[0], sb.WithPi0_all_universes);
-    GetAllVertUniverses(sb.QELike[0], sb.QELike_all_universes);
-    GetAllVertUniverses(sb.SinglePiPlus[0], sb.SinglePiPlus_all_universes);
-    GetAllVertUniverses(sb.Other[0], sb.Other_all_universes);
     N_Universes = sb.data_all_universes.size();
-//    std::cout<<"\t"<<"Data N(Universes) = "<<sb.data_all_universes.size()<<std::endl;
-//    std::cout<<"\t"<<"MC Total N(Universes) = "<<sb.mc_total_all_universes.size()<<std::endl;
-//    std::cout<<"\t"<<"Signal N(Universes) = "<<sb.signal_all_universes.size()<<std::endl;
-//    std::cout<<"\t"<<"WithPi0 N(Universes) = "<<sb.WithPi0_all_universes.size()<<std::endl;
-//    std::cout<<"\t"<<"QELike N(Universes) = "<<sb.QELike_all_universes.size()<<std::endl;
-//    std::cout<<"\t"<<"SinglePiPlus N(Universes) = "<<sb.SinglePiPlus_all_universes.size()<<std::endl;
-//    std::cout<<"\t"<<"Other N(Universes) = "<<sb.Other_all_universes.size()<<std::endl;
-    
 }
 
 void CCProtonPi0_SideBandTool::initSideBand_XSecHistograms(SideBand& sb)
@@ -362,11 +366,13 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
         text->SetTextSize(0.03);
         text->SetNDC();
         text->DrawLatex(0.6, 0.64, Form("Fit Results with %d points, %d pars", nPoints, nPars));
-        text->DrawLatex(0.6, 0.60, Form("Fit #chi^{2} = %3.2f", ChiSq[0]));
-        text->DrawLatex(0.6, 0.56, Form("Fit #chi^{2}/dof = %3.2f", ChiSq[0]/(nPoints-nPars)));
-        text->DrawLatex(0.6, 0.52, Form("#color[4]{wgt(SinglePiPlus) = %3.2f#pm %3.2f}", wgt_SinglePiPlus[0], err_SinglePiPlus[0]));
-        text->DrawLatex(0.6, 0.48, Form("wgt(QELike) = %3.2f#pm %3.2f", wgt_QELike[0], err_QELike[0]));
-        text->DrawLatex(0.6, 0.44, Form("#color[2]{wgt(WithPi0) = %3.2f#pm %3.2f}", wgt_WithPi0[0], err_WithPi0[0]));
+        text->DrawLatex(0.6, 0.61, Form("Before Fit #chi^{2} = %3.2f", ChiSq_before_fit[0]));
+        text->DrawLatex(0.6, 0.58, Form("Before Fit #chi^{2}/dof = %3.2f", ChiSq_before_fit[0]/(nPoints-nPars)));
+        text->DrawLatex(0.6, 0.55, Form("After Fit #chi^{2} = %3.2f", ChiSq_after_fit[0]));
+        text->DrawLatex(0.6, 0.52, Form("After Fit #chi^{2}/dof = %3.2f", ChiSq_after_fit[0]/(nPoints-nPars)));
+        text->DrawLatex(0.6, 0.49, Form("#color[4]{wgt(SinglePiPlus) = %3.2f#pm %3.2f}", wgt_SinglePiPlus[0], err_SinglePiPlus[0]));
+        text->DrawLatex(0.6, 0.46, Form("wgt(QELike) = %3.2f#pm %3.2f", wgt_QELike[0], err_QELike[0]));
+        text->DrawLatex(0.6, 0.43, Form("#color[2]{wgt(WithPi0) = %3.2f#pm %3.2f}", wgt_WithPi0[0], err_WithPi0[0]));
         delete text;
     }
     
@@ -480,7 +486,7 @@ void CCProtonPi0_SideBandTool::ColorHists(MnvH1D* data, MnvH1D* signal, MnvH1D* 
 
 void CCProtonPi0_SideBandTool::SaveFitResults(double chisq, double par_values[3], double par_errors[3])
 {
-    ChiSq.push_back(chisq);
+    ChiSq_after_fit.push_back(chisq);
     wgt_WithPi0.push_back(par_values[0]);
     wgt_QELike.push_back(par_values[1]);
     wgt_SinglePiPlus.push_back(par_values[2]);
@@ -609,4 +615,156 @@ void CCProtonPi0_SideBandTool::DrawDataMCWithErrorBand(SideBand &sb)
     delete h_mc_total;
     delete c;
     delete plotter;
+}
+
+double CCProtonPi0_SideBandTool::calc_ChiSq_SideBand(SideBand &sb, int unv, bool isPartial, int min_bin, int max_bin)
+{
+    if (!isPartial){
+        min_bin = 1;
+        max_bin = sb.data->GetNbinsX();
+    }
+    
+    if (min_bin == max_bin){
+        std::cout<<"Wrong Range for Fit"<<std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    double ChiSq = 0.0;
+
+    for (int i = 1; i <= max_bin; ++i) {
+        double nData = sb.data_all_universes[unv]->GetBinContent(i);
+        if (nData == 0) continue;
+
+        // Do not use Signal and Other in Fit
+        double nSignal = sb.signal_all_universes[unv]->GetBinContent(i) * POT_ratio;
+        double nWithPi0 = sb.WithPi0_all_universes[unv]->GetBinContent(i) * POT_ratio;
+        double nQELike = sb.QELike_all_universes[unv]->GetBinContent(i) * POT_ratio;
+        double nSinglePiPlus = sb.SinglePiPlus_all_universes[unv]->GetBinContent(i) * POT_ratio;
+        double nOther = sb.Other_all_universes[unv]->GetBinContent(i) * POT_ratio;
+        
+        double nTotalMC = nSignal + nWithPi0 + nQELike + nSinglePiPlus + nOther;
+
+        double delta  = std::pow((nData - nTotalMC),2)/nData;
+        ChiSq += delta;
+    }
+
+    return ChiSq;
+}
+
+double CCProtonPi0_SideBandTool::calc_Global_ChiSq(int unv)
+{
+    double ChiSq = 0;
+
+    // Calculate ChiSq for Michel for ALL Bins
+    ChiSq += calc_ChiSq_SideBand(Michel, unv);
+   
+    // Calculate ChiSq for pID for ALL Bins
+    ChiSq += calc_ChiSq_SideBand(pID, unv);
+
+    // Calculate ChiSq for Low Inv Mass 
+    //      Inv Mass itself for first 6 bins
+    ChiSq += calc_ChiSq_SideBand(LowInvMass, unv, true, 1, 6);
+    
+    // Calculate ChiSq for High Inv Mass
+    //      Inv Mass itself for last 30 bins
+    ChiSq += calc_ChiSq_SideBand(HighInvMass, unv, true, 21, 50);
+
+    return ChiSq;
+}
+
+void CCProtonPi0_SideBandTool::GetStatistics(SideBand &sb)
+{
+    for (unsigned int i = 0; i < sb.data_all_universes.size(); ++i){
+        sb.nData.push_back(sb.data_all_universes[i]->Integral());
+        sb.nMC.push_back(sb.mc_total_all_universes[i]->Integral());
+        sb.nSignal.push_back(sb.signal_all_universes[i]->Integral());
+        sb.nWithPi0.push_back(sb.WithPi0_all_universes[i]->Integral());
+        sb.nQELike.push_back(sb.QELike_all_universes[i]->Integral());
+        sb.nSinglePiPlus.push_back(sb.SinglePiPlus_all_universes[i]->Integral());
+        sb.nOther.push_back(sb.Other_all_universes[i]->Integral());
+    }
+}
+
+void CCProtonPi0_SideBandTool::WriteStatistics()
+{
+    WriteStatistics(Original);
+    WriteStatistics(Michel);
+    WriteStatistics(pID);
+    WriteStatistics(LowInvMass);
+    WriteStatistics(HighInvMass);
+}
+
+void CCProtonPi0_SideBandTool::WriteStatistics(SideBand &sb)
+{
+    // Open Text File
+    std::string file_name = Folder_List::output + Folder_List::textOut + "SideBand_Statistics_" + sb.name + ".txt";
+    ofstream file;
+    file.open(file_name.c_str());
+
+    // Write Header
+    file<<std::left;
+    file.width(12); file<<"Universe"<<" "; 
+    file.width(12); file<<"N(Data)"<<" ";    
+    file.width(12); file<<"N(MC)"<<" ";    
+    file.width(12); file<<"N(Signal)"<<" ";    
+    file.width(20); file<<"N(SinglePiPlus)"<<" ";    
+    file.width(12); file<<"N(QELike)"<<" ";    
+    file.width(12); file<<"N(WithPi0)"<<" ";    
+    file.width(12); file<<"N(Other)"<<" ";    
+    file<<std::endl;
+
+    for (unsigned int i = 0; i < sb.nData.size(); ++i){
+        file.width(12); file<<i<<" "; 
+        file.width(12); file<<sb.nData[i]<<" ";    
+        file.width(12); file<<sb.nMC[i]<<" ";    
+        file.width(12); file<<sb.nSignal[i]<<" ";    
+        file.width(20); file<<sb.nSinglePiPlus[i]<<" ";    
+        file.width(12); file<<sb.nQELike[i]<<" ";    
+        file.width(12); file<<sb.nWithPi0[i]<<" ";    
+        file.width(12); file<<sb.nOther[i]<<" ";    
+        file<<std::endl;
+    }
+
+    std::cout<<"Writing "<<file_name<<std::endl;
+    file.close();
+}
+
+void CCProtonPi0_SideBandTool::WriteFitResults()
+{
+    std::cout<<"Writing List of Weights for all Universes"<<std::endl;
+    // Open Text File
+    std::string file_name = Folder_List::BckgConstraints; 
+    ofstream file;
+    file.open(file_name.c_str());
+
+    // Write Header
+    file<<std::left;
+    file.width(32); file<<"Error Band"<<" "; 
+    file.width(6); file<<"Hist"<<" "; 
+    file.width(20); file<<"ChiSq Before Fit"<<" ";    
+    file.width(20); file<<"ChiSq After Fit"<<" ";    
+    file.width(20); file<<"wgt(SinglePiPlus)"<<" ";    
+    file.width(20); file<<"wgt(QELike)"<<" ";    
+    file.width(20); file<<"wgt(WithPi0)"<<" ";    
+    file.width(20); file<<"err(SinglePiPlus)"<<" ";    
+    file.width(20); file<<"err(QELike)"<<" ";    
+    file.width(20); file<<"err(WithPi0)"<<" ";    
+    file<<std::endl;
+
+    for (unsigned int i = 0; i < ChiSq_after_fit.size(); ++i){
+        file.width(32); file<<Original.err_bands_data_all_universes[i]<<" "; 
+        file.width(6); file<<Original.hist_ind_data_all_universes[i]<<" "; 
+        file.width(20); file<<ChiSq_before_fit[i]<<" ";    
+        file.width(20); file<<ChiSq_after_fit[i]<<" ";    
+        file.width(20); file<<wgt_SinglePiPlus[i]<<" ";    
+        file.width(20); file<<wgt_QELike[i]<<" ";    
+        file.width(20); file<<wgt_WithPi0[i]<<" ";    
+        file.width(20); file<<err_SinglePiPlus[i]<<" ";    
+        file.width(20); file<<err_QELike[i]<<" ";    
+        file.width(20); file<<err_WithPi0[i]<<" ";    
+        file<<std::endl;
+    }
+
+    std::cout<<"Writing "<<file_name<<std::endl;
+    file.close();
 }

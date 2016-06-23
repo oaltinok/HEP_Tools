@@ -128,7 +128,7 @@ class CCProtonPi0_NTupleAnalysis
 
 
         // Systematics - Multi Universe 
-        void GetAllVertUniverses(MnvH1D* hist, std::vector<TH1D*> &all_universes);
+        void GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes, std::vector<std::string> &err_bands, std::vector<int> &hist_ind);
 
     private:
 };

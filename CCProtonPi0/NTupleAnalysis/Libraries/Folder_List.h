@@ -24,6 +24,15 @@ Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
 namespace Folder_List
 {
     //-------------------------------------------------------------------------
+    // Input Files
+    //-------------------------------------------------------------------------
+    // Default Folder for Input
+    const std::string input = "Input/";
+
+    // Background Constraints
+    const std::string BckgConstraints = input + "BckgConstraints/" + "Weights_All_Universes.txt";
+
+    //-------------------------------------------------------------------------
     // Data files on /minerva/data/ Disk
     //-------------------------------------------------------------------------
     const std::string rootOut = "/minerva/data/users/oaltinok/NTupleAnalysis/";

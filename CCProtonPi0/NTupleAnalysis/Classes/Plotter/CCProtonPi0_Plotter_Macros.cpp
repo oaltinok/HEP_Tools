@@ -417,6 +417,7 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
 
 
     plotter->DrawDataMC(tempData, tempMC, mc_ratio, "TR", false);
+    //plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", false);
 
     // Add Plot Labels
     plotter->AddHistoTitle(data->GetTitle());

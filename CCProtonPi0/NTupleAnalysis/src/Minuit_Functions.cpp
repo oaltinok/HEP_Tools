@@ -180,40 +180,10 @@ void FitSideBands()
         FitMinuit();
         sbtool.current_unv++;
     }
-  
-    std::cout<<"Writing List of Weights for all Universes"<<std::endl;
-    // Open Text File
-    std::string file_name = Folder_List::output + Folder_List::textOut + "Weights_All_Universes" +".txt";
-    ofstream file;
-    file.open(file_name.c_str());
 
+    sbtool.WriteStatistics();
+    sbtool.WriteFitResults();
     
-    // Write Header
-    file<<std::left;
-    file.width(12); file<<"Universe"<<" "; 
-    file.width(12); file<<"ChiSq"<<" ";    
-    file.width(20); file<<"wgt(SinglePiPlus)"<<" ";    
-    file.width(20); file<<"wgt(QELike)"<<" ";    
-    file.width(20); file<<"wgt(Other)"<<" ";    
-    file.width(20); file<<"err(SinglePiPlus)"<<" ";    
-    file.width(20); file<<"err(QELike)"<<" ";    
-    file.width(20); file<<"err(Other)"<<" ";    
-    file<<std::endl;
-
-    for (unsigned int i = 0; i < sbtool.ChiSq.size(); ++i){
-        file.width(12); file<<i<<" "; 
-        file.width(12); file<<sbtool.ChiSq[i]<<" ";    
-        file.width(20); file<<sbtool.wgt_SinglePiPlus[i]<<" ";    
-        file.width(20); file<<sbtool.wgt_QELike[i]<<" ";    
-        file.width(20); file<<sbtool.wgt_WithPi0[i]<<" ";    
-        file.width(20); file<<sbtool.err_SinglePiPlus[i]<<" ";    
-        file.width(20); file<<sbtool.err_QELike[i]<<" ";    
-        file.width(20); file<<sbtool.err_WithPi0[i]<<" ";    
-        file<<std::endl;
-    }
-
-    std::cout<<"Writing "<<file_name<<std::endl;
-    file.close();
 }
 
 
