@@ -66,12 +66,10 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_BinList binList;
 
         bool m_isMC;
-        bool useTFractionFitter;
         int iteration;
         double min_invMass;
         double max_invMass;
-        double N_Background_Data;
-        double Uncertainty_Bckg;
+        std::vector<double> N_Background_Data;
 
         // Flux File
         MnvH1D* h_flux_minervaLE_FHC;
@@ -79,9 +77,6 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         double flux_integral;
 
         // Pi0 Invariant Mass
-        TH1D* invMass_fit_result;
-        TH1D* invMass_fit_bckg;
-        TH1D* invMass_fit_signal;
         MnvH1D* invMass_all;
         MnvH1D* invMass_mc_reco_signal;
         MnvH1D* invMass_mc_reco_bckg;
@@ -95,6 +90,10 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         XSec W;
         XSec Enu;
         
+        // Output Text File
+        std::string text_out_name;
+        ofstream text_out;
+
         // ROOT Files    
         TFile* f_out;
         TFile* f_truth;
@@ -102,12 +101,12 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         TFile* f_mc_cutHists;
         
         std::string rootDir_out;
-
+        
         // Functions
         void Calc_CrossSection(XSec &var);
         void Style_XSec(XSec &var);
-        void Calc_Normalized_NBackground_TFractionFitter();
         void Calc_Normalized_NBackground();
+        void NormalizeHistogram(TH1D* h);
         void NormalizeHistogram(MnvH1D* h);
         double Integrate_SignalRegion(TH1D* h);
         double GetFluxHistContent(MnvH1D* hist, double low1, double low2);

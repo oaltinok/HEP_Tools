@@ -15,11 +15,14 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
     
     m_isMC = isMC;
 
-    // Use TFractionFitter to estimate N(Background) in Data
-    // I used SideBand Constraints to get MC Data agreement already
-    // I do not need TFractionFitter -- But if you insist you can use
-    useTFractionFitter = false;
-    
+    // Open output Log File
+    if (m_isMC){
+        text_out_name = Folder_List::output + Folder_List::textOut + "CrossSection_Log_MC.txt";
+    }else{
+        text_out_name = Folder_List::output + Folder_List::textOut + "CrossSection_Log_Data.txt";
+    }
+    OpenTextFile(text_out_name, text_out);
+
     OpenRootFiles();
     initHistograms();
     initXSecs();
@@ -28,11 +31,7 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
 
 void CCProtonPi0_CrossSection::Calc_CrossSections()
 {
-    if (useTFractionFitter){
-        Calc_Normalized_NBackground_TFractionFitter();
-    }else{
-        Calc_Normalized_NBackground();
-    }
+    Calc_Normalized_NBackground();
 
     Calc_CrossSection(muon_P);   
     Calc_CrossSection(muon_theta);   
@@ -82,139 +81,84 @@ void CCProtonPi0_CrossSection::Style_XSec(XSec &var)
     var.xsec->Scale(scale);
 }
 
-void CCProtonPi0_CrossSection::Calc_Normalized_NBackground_TFractionFitter()
-{
-    std::cout<<"\nCalculating N(Background) in Data using TFractionFitter"<<std::endl;
-   
-    // ------------------------------------------------------------------------
-    // Get Histograms
-    // ------------------------------------------------------------------------
-  
-    // Get TH1D from MnvH1D
-    TH1D* data_invMass = new TH1D(invMass_all->GetCVHistoWithStatError());
-    TH1D* signal_invMass = new TH1D(invMass_mc_reco_signal->GetCVHistoWithStatError());
-    TH1D* bckg_invMass = new TH1D(invMass_mc_reco_bckg->GetCVHistoWithStatError());
-    
-    invMass_fit_signal = new TH1D(*data_invMass); // Start as data hist (will subtract bckg to get correct signal data)
-    invMass_fit_signal->SetName("invMass_fit_signal");
-    
-    invMass_fit_bckg = new TH1D(*bckg_invMass);
-    invMass_fit_bckg->SetName("invMass_bckg");
-
-    // ------------------------------------------------------------------------
-    // Estimate Background using TFractionFitter
-    // ------------------------------------------------------------------------
-    TObjArray* mc_models = new TObjArray(2);
-    mc_models->Add(signal_invMass);
-    mc_models->Add(bckg_invMass);
-
-    TFractionFitter* fitter = new TFractionFitter(data_invMass, mc_models, "Q");
-    fitter->Constrain(1, 0.0, 1.0);
-    
-    std::cout<<"\tFitting Background Shape..."<<std::endl;
-    Int_t status = fitter->Fit();
-
-    if (status != 0) {
-        std::cerr<<"\t\tFit Error!"<<std::endl;
-    }
-    
-    invMass_fit_result  = new TH1D (*(TH1D*)fitter->GetPlot());
-    invMass_fit_result->SetName("data_fit_result"); 
-
-    Double_t N_Data = data_invMass->Integral();
-    Double_t f0 =     0.0; // fittted signal fraction
-    Double_t f1 =     0.0; // fitted background fraction
-    Double_t f0_err = 0.0; // fitted signal fraction uncertainty
-    Double_t f1_err = 0.0; // fitted background fraction uncertainty
-    
-    fitter->GetResult(0,f0,f0_err); // access fitted value and uncertainty for parameter 1
-    fitter->GetResult(1,f1,f1_err); // access fitted value and uncertainty for parameter 2
-
-    double rf0 = 1.e2 * f0_err/f0;
-    double rf1 = 1.e2 * f1_err/f1;
-    Uncertainty_Bckg = rf1;
-    std::cout<<"\tFit Results:"<<std::endl;
-    std::cout<<"\t\tSignal Fraction = "<<f0<<" Error = "<<f0_err<<" Uncertainty = "<<rf0<<std::endl;
-    std::cout<<"\t\tBackground Fraction = "<<f1<<" Error = "<<f1_err<<" Uncertainty = "<<rf1<<std::endl;
-
-    if (status == 0) {
-        double area = invMass_fit_bckg->Integral();
-        double total_fitted_background = f1 * N_Data; // Total N(Bckg) in Data
-        std::cout<<"\tAll Events in Data (Whole Spectrum) = "<<N_Data<<std::endl;
-        std::cout<<"\tBackground in Data (Whole Spectrum) = "<<total_fitted_background<<std::endl;
-        invMass_fit_bckg->Scale(total_fitted_background/area); 
-        // Subtract scaled bckg hist from data hist
-        invMass_fit_signal->Add(invMass_fit_bckg,-1); 
-
-            // this calculation overestimates the number of background events
-            // in the lower and upper bins
-            // nbkg = fitted_background->Integral(__lower_bin, __upper_bin);
-
-            // integrate the number of background events correctly
-            // notice the mass range, not bin range
-        N_Background_Data = Integrate_SignalRegion(invMass_fit_bckg);
-        double N_Signal_Data = Integrate_SignalRegion(invMass_fit_signal);
-        double N_All_Data = Integrate_SignalRegion(data_invMass);
-
-        std::cout<<std::endl;
-        std::cout<<"\tAll Events in Data (Signal Region) = "<<N_All_Data<<std::endl; 
-        std::cout<<"\tBackground in Data (Signal Region) = "<<N_Background_Data<<std::endl; 
-        std::cout<<"\tSignal in Data (Signal Region) = "<<N_Signal_Data<<std::endl; 
-    }
-
-    delete mc_models;
-    delete fitter;
-}
-
 void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
 {
-    std::cout<<"\nCalculating N(Background) in Data"<<std::endl;
+    text_out<<"\nCalculating N(Background) in Data"<<std::endl;
    
     // ------------------------------------------------------------------------
-    // Get Histograms
+    // Get Histograms for All Universes
     // ------------------------------------------------------------------------
-  
-    // Get TH1D from MnvH1D
-    TH1D* data_invMass = new TH1D(invMass_all->GetCVHistoWithStatError());
-    TH1D* bckg_invMass = new TH1D(invMass_mc_reco_bckg->GetCVHistoWithStatError());
-   
-    // Create New Histograms for Scaling
-    invMass_fit_signal = new TH1D(*data_invMass); // Start as data hist (will subtract bckg to get correct signal data)
-    invMass_fit_signal->SetName("invMass_fit_signal");
+    std::vector<TH1D*> data_invMass;
+    std::vector<TH1D*> bckg_invMass;
+    std::vector<TH1D*> signal_invMass;
     
-    invMass_fit_bckg = new TH1D(*bckg_invMass);
-    invMass_fit_bckg->SetName("invMass_bckg");
-    
-    // Scale MC Background Histogram if we are using Data
-    if (!m_isMC){
-        invMass_fit_bckg->Scale(POT_ratio);    
+    std::vector<std::string> dummy_err_bands;
+    std::vector<int> dummy_hist_ind;
+
+    GetAllVertUniverses(invMass_all, data_invMass, dummy_err_bands, dummy_hist_ind);
+    // Clear Dummy Vectors
+    dummy_err_bands.clear();
+    dummy_hist_ind.clear();
+    GetAllVertUniverses(invMass_mc_reco_bckg, bckg_invMass, dummy_err_bands, dummy_hist_ind);
+    // Clear Dummy Vectors
+    dummy_err_bands.clear();
+    dummy_hist_ind.clear();
+
+    // Get signal_invMass (Background Subtracted)
+    //      Start as data hist (will subtract bckg to get correct signal in data)
+    for (unsigned int i = 0; i < data_invMass.size(); ++i){
+        TH1D* temp = new TH1D(*data_invMass[i]);
+        temp->SetName("invMass_fit_signal");
+        signal_invMass.push_back(temp);
     }
- 
-    // Get N(Events)
-    double total_data   = data_invMass->Integral();
-    double total_bckg   = invMass_fit_bckg->Integral();
+    
+    // POT Normalize MC Background Histogram if we are using Data
+    if (!m_isMC){
+        for (unsigned int i = 0; i < bckg_invMass.size(); ++i){
+            bckg_invMass[i]->Scale(POT_ratio);    
+        }
+    }
 
-    std::cout<<"\tAll Events in Data (Whole Spectrum) = "<<total_data<<std::endl;
-    std::cout<<"\tBackground in Data (Whole Spectrum) = "<<total_bckg<<std::endl;
+    // ------------------------------------------------------------------------
+    // Estimate N(Background) in Data in each universe
+    // ------------------------------------------------------------------------
+    for (unsigned int i = 0; i < data_invMass.size(); ++i){
+        text_out<<"Estimating Backgroung in Universe: "<<i<<std::endl;
+        // Get N(Events)
+        double total_data = data_invMass[i]->Integral();
+        double total_bckg = bckg_invMass[i]->Integral();
 
-    // Subtract bckg hist from data hist
-    invMass_fit_signal->Add(invMass_fit_bckg,-1); 
+        text_out<<"\tAll Events in Data (Whole Spectrum) = "<<total_data<<std::endl;
+        text_out<<"\tBackground in Data (Whole Spectrum) = "<<total_bckg<<std::endl;
 
-    // this calculation overestimates the number of background events
-    // in the lower and upper bins
-    // nbkg = fitted_background->Integral(__lower_bin, __upper_bin);
+        // Subtract bckg hist from data hist
+        signal_invMass[i]->Add(bckg_invMass[i],-1); 
 
-    // integrate the number of background events correctly
-    // notice the mass range, not bin range
-    N_Background_Data = Integrate_SignalRegion(invMass_fit_bckg);
-    double N_Signal_Data = Integrate_SignalRegion(invMass_fit_signal);
-    double N_All_Data = Integrate_SignalRegion(data_invMass);
+        // this calculation overestimates the number of background events
+        // in the lower and upper bins
+        // nbkg = fitted_background->Integral(__lower_bin, __upper_bin);
 
-    std::cout<<std::endl;
-    std::cout<<"\tAll Events in Data (Signal Region) = "<<N_All_Data<<std::endl; 
-    std::cout<<"\tBackground in Data (Signal Region) = "<<N_Background_Data<<std::endl; 
-    std::cout<<"\tSignal in Data (Signal Region) = "<<N_Signal_Data<<std::endl; 
+        // integrate the number of background events correctly
+        // notice the mass range, not bin range
+        N_Background_Data.push_back(Integrate_SignalRegion(bckg_invMass[i]));
+        double N_Signal_Data = Integrate_SignalRegion(signal_invMass[i]);
+        double N_All_Data = Integrate_SignalRegion(data_invMass[i]);
 
+        double percent_signal = N_Signal_Data/N_All_Data*100;
+        double percent_bckg = N_Background_Data[i]/N_All_Data*100.0;
+
+        text_out<<std::endl;
+        text_out<<"\tAll Events in Data (Signal Region) = "<<N_All_Data<<std::endl; 
+        text_out<<"\tBackground in Data (Signal Region) = "<<N_Background_Data[i]<<" "<<percent_bckg<<std::endl; 
+        text_out<<"\tSignal in Data (Signal Region) = "<<N_Signal_Data<<" "<<percent_signal<<std::endl; 
+        text_out<<std::endl;
+        text_out<<std::endl;
+    }
+
+    // Clear Allocated Memory
+    ClearAllUniversesVector(data_invMass);
+    ClearAllUniversesVector(bckg_invMass);
+    ClearAllUniversesVector(signal_invMass);
 }
 
 double CCProtonPi0_CrossSection::Integrate_SignalRegion(TH1D* h)
@@ -258,49 +202,112 @@ double CCProtonPi0_CrossSection::Integrate_SignalRegion(TH1D* h)
     return corrected_nbkg;
 }
 
-void CCProtonPi0_CrossSection::NormalizeHistogram(MnvH1D* h)
+void CCProtonPi0_CrossSection::NormalizeHistogram(TH1D* h)
 {
-    std::cout<<"\tNormalizing Background Shape"<<std::endl;
+    text_out<<"\tNormalizing Background Shape on TH1D"<<std::endl;
     int NBins = h->GetNbinsX();
     double area = h->Integral();
     double nOverFlow = h->GetBinContent(NBins+1);
-    std::cout<<"\t\tBefore Norm = "<<area<<std::endl;
+    text_out<<"\t\tBefore Norm = "<<area<<std::endl;
     h->Scale(1/(area+nOverFlow));
-    std::cout<<"\t\tAfter Norm = "<<h->Integral()<<std::endl;
-    std::cout<<"\tDone!"<<std::endl;
+    text_out<<"\t\tAfter Norm = "<<h->Integral()<<std::endl;
+    text_out<<"\tDone!"<<std::endl;
+}
+
+void CCProtonPi0_CrossSection::NormalizeHistogram(MnvH1D* h)
+{
+    text_out<<"\tNormalizing Background Shape on MnvH1D"<<std::endl;
+    int NBins = h->GetNbinsX();
+    double area = h->Integral();
+    double nOverFlow = h->GetBinContent(NBins+1);
+    text_out<<"\t\tBefore Norm = "<<area<<std::endl;
+    h->Scale(1/(area+nOverFlow),"",false); // Scale only on CentralValue
+    text_out<<"\t\tAfter Norm = "<<h->Integral()<<std::endl;
+    text_out<<"\tDone!"<<std::endl;
 }
 
 MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name)
 {
-    std::cout<<"Subtracting Background for "<<var_name<<std::endl;
-    // Init Histogram
+    text_out<<"Subtracting Background for "<<var_name<<std::endl;
+
+    // Init MnvH1D
     MnvH1D* bckg_subtracted = new MnvH1D(*data); 
     std::string hist_name = var_name + "_bckg_subtracted";
     bckg_subtracted->SetName(hist_name.c_str());
     bckg_subtracted->SetTitle("Background Subtracted Data");
-   
+
+    // ------------------------------------------------------------------------
+    //  Subtract Background from Central Value -- No Universe Subtraction
+    // ------------------------------------------------------------------------
+    text_out<<"\tSubtracting Background in Central Value"<<std::endl;
+
     // Get Shape of Background
     //      Unit area -- Including Overflow
     //      After Normalization, Area MUST be less than 1
     NormalizeHistogram(mc_bckg);
 
     // Estimate N Background in Variable
-    mc_bckg->Scale(N_Background_Data);
+    // [0] is for CV Value
+    mc_bckg->Scale(N_Background_Data[0],"",false);
 
-    // Subtracted Background
-    bckg_subtracted->Add(mc_bckg,-1);
-  
+    // Subtracted Background -- Use TH1D::Add to add only to Central Value Histogram
+    bckg_subtracted->TH1D::Add(mc_bckg,-1);
+
+    text_out<<std::endl;
+    text_out<<"\tTotal Data Area = "<<data->Integral()<<std::endl;
+    text_out<<"\tBackground Subtracted Data Area = "<<bckg_subtracted->Integral()<<std::endl;
+    text_out<<std::endl;
+ 
+    // ------------------------------------------------------------------------
+    // Get Pointers to All Universes
+    // ------------------------------------------------------------------------
+    // >> These are "Pointers" NOT "new" histograms
+    // >> This vector does "NOT" include Central Value Histogram
+    std::vector<TH1D*> data_all_universes;
+    std::vector<TH1D*> bckg_subtracted_all_universes;
+    std::vector<TH1D*> mc_bckg_all_universes;
+    
+    GetPointersAllVertUniverses(data, data_all_universes);
+    GetPointersAllVertUniverses(bckg_subtracted, bckg_subtracted_all_universes);
+    GetPointersAllVertUniverses(mc_bckg, mc_bckg_all_universes);
+
+    text_out<<"N(Universes) = "<<data_all_universes.size()<<std::endl;
+   
+    // Sanity Check
+    if ( bckg_subtracted_all_universes.size() != mc_bckg_all_universes.size()){
+        text_out<<"WARNING! - Subtract Background N(Universes) NOT Same!"<<std::endl;
+        exit(1);
+    }
+    
+    // Loop Over All Universes
+    for (unsigned int i = 0; i < bckg_subtracted_all_universes.size(); ++i){
+        text_out<<"\tSubtracting Background in Universe = "<<i<<std::endl;
+       
+        // Get Shape of Background
+        //      Unit area -- Including Overflow
+        //      After Normalization, Area MUST be less than 1
+        NormalizeHistogram(mc_bckg_all_universes[i]);
+
+        // Estimate N Background in Variable
+        mc_bckg_all_universes[i]->Scale(N_Background_Data[i+1]);
+
+        text_out<<"\tBackground Subtracted Data = "<<bckg_subtracted_all_universes[i]->Integral()<<std::endl;
+        // Subtracted Background
+        bckg_subtracted_all_universes[i]->Add(mc_bckg_all_universes[i],-1);
+       
+        text_out<<"\tTotal Data Area = "<<data_all_universes[i]->Integral()<<std::endl;
+        text_out<<"\tEstimated Background in Data = "<<mc_bckg_all_universes[i]->Integral()<<std::endl;
+        text_out<<"\tBackground Subtracted Data = "<<bckg_subtracted_all_universes[i]->Integral()<<std::endl;
+        text_out<<std::endl;
+    }
+
     // Estimated Background
     bckg_estimated = new MnvH1D(*mc_bckg);
     hist_name = var_name + "_bckg_estimated";
     bckg_estimated->SetName(hist_name.c_str());
     bckg_estimated->SetTitle("Estimated Background in Data"); 
-
-    std::cout<<"\tTotal Data Area = "<<data->Integral()<<std::endl;
-    std::cout<<"\tEstimated Background in Data Area = "<<bckg_estimated->Integral()<<std::endl;
-    std::cout<<"\tBackground Subtracted Data Area = "<<bckg_subtracted->Integral()<<std::endl;
-
-    std::cout<<"Done!"<<std::endl;
+   
+    text_out<<"Done!"<<std::endl;
 
     return bckg_subtracted;
 }
@@ -314,11 +321,6 @@ MnvH1D* CCProtonPi0_CrossSection::Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* r
     std::cout<<"\tNumber of iteratons = "<<iteration<<std::endl;
     // Use MnvUnfold to Unfold Data
     MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted, RooUnfold::kBayes, iteration, true);
-//
-//    // Remove Low Momentum Muons (less than 1 GeV) 
-//    if (var_name.compare("muon_P") == 0){
-//        unfolded->SetBinContent(1,0.0);
-//    }
 
     // Set Name of the Histogram
     std::string hist_name = var_name + "_unfolded";
@@ -346,6 +348,7 @@ MnvH1D* CCProtonPi0_CrossSection::Efficiency_Divide(MnvH1D* unfolded, MnvH1D* ef
     std::cout<<"\tArea After = "<<efficiency_corrected->Integral()<<std::endl;
     
     std::cout<<"Done!"<<std::endl;
+
 
     return efficiency_corrected;
 }
@@ -587,9 +590,6 @@ void CCProtonPi0_CrossSection::writeHistograms()
     h_flux_rebinned->Write();
 
     // Pi0 Invariant Mass
-    if (useTFractionFitter) invMass_fit_result->Write();
-    invMass_fit_bckg->Write();
-    invMass_fit_signal->Write();
     invMass_all->Write();
     invMass_mc_reco_signal->Write();
     invMass_mc_reco_bckg->Write();

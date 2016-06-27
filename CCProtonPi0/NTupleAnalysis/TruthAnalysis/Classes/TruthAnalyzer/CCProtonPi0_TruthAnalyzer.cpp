@@ -233,7 +233,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     AddVertErrorBand_Genie(pi0_theta_mc_truth_all_signal);
 
     // ------------------------------------------------------------------------
-    // Neutrino Energy & Q2
+    // Neutrino Energy, Q2 & W
     // ------------------------------------------------------------------------
     Enu_mc_truth_all_signal = new MnvH1D( "Enu_mc_truth_all_signal","Neutrino Energy for Signal Events",binList.size_Enu, binList.a_Enu);
     Enu_mc_truth_all_signal->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
@@ -375,8 +375,8 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
 void CCProtonPi0_TruthAnalyzer::FillHistogram(MnvH1D* hist, double var)
 {
     hist->Fill(var, cvweight);
-    //FillVertErrorBand_Flux(hist, var);
-    //FillVertErrorBand_Genie(hist, var);
+    FillVertErrorBand_Flux(hist, var);
+    FillVertErrorBand_Genie(hist, var);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillHistogram(TH1D* hist, double var)

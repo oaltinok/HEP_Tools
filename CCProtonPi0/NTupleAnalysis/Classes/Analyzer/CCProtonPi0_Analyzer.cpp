@@ -128,6 +128,7 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     }
     
     if (!m_isMC){
+        AddVertErrorBands_Data(cutList.invMass_all);
         AddVertErrorBands_Data(cutList.hCut_pi0invMass[0]);
         AddVertErrorBands_Data(cutList.SideBand_muon_P[0]);
         AddVertErrorBands_Data(cutList.SideBand_muon_theta[0]);
@@ -2026,6 +2027,8 @@ void CCProtonPi0_Analyzer::AddErrorBands_Data()
     AddVertErrorBands_Data(muon.muon_P_all);
     AddVertErrorBands_Data(muon.muon_theta_all);
     AddVertErrorBands_Data(interaction.QSq_all);
+    AddVertErrorBands_Data(interaction.Enu_all);
+    AddVertErrorBands_Data(interaction.W_all);
 }
 
 

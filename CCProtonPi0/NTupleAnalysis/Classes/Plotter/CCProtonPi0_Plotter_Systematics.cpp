@@ -2,6 +2,43 @@
 
 using namespace PlotUtils;
 
+void CCProtonPi0_Plotter::Systematics_Practice()
+{
+    std::string plotDir = Folder_List::plotDir_Systematics_Summary;
+    //TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+    //TFile* f_xsec_data = new TFile(rootDir_CutHists.data.c_str());
+    TFile* f_mc = new TFile(rootDir_Muon.mc.c_str());
+
+    //MnvH1D* data = GetMnvH1D(f_xsec_data, "invMass_all");
+ 
+    //std::vector<std::string> all_errors = data->GetVertErrorBandNames();
+   
+    //for (unsigned int i = 0; i < all_errors.size(); ++i){
+    //    MnvVertErrorBand* err_band = data->GetVertErrorBand(all_errors[i]);
+    //    std::vector<TH1D*> err_hists = err_band->GetHists();
+    //    for (unsigned int j = 0; j < err_hists.size(); ++j){
+    //        std::cout<<err_hists[j]->GetNbinsX()<<" "<<err_hists[j]->Integral()<<std::endl;
+    //    }
+    //}
+
+    MnvH1D* mc = GetMnvH1D(f_mc, "muon_P_mc_reco_all");
+    MnvH1D* mc2 = new MnvH1D(*mc);
+    
+    std::vector<TH1D*> err_hists_mc;
+    GetPointersAllVertUniverses(mc, err_hists_mc);
+
+    std::vector<TH1D*> err_hists_mc2;
+    GetPointersAllVertUniverses(mc2, err_hists_mc2);
+
+    for (unsigned int i = 0; i < err_hists_mc.size(); ++i){
+        std::cout<<"Universe = "<<i<<std::endl;
+        std::cout<<err_hists_mc[i]->Integral()<<" "<<err_hists_mc2[i]->Integral()<<std::endl;
+    }
+
+    //delete data;
+    delete mc;
+}
+
 void CCProtonPi0_Plotter::Systematics_RawData()
 {
     std::cout<<"Plotting Error Summary for Raw Data..."<<std::endl;
@@ -15,7 +52,7 @@ void CCProtonPi0_Plotter::Systematics_RawData()
     Systematics_DrawErrorSummary("W_all", "W_mc_reco_all");
     Systematics_DrawErrorSummary("Enu_all", "Enu_mc_reco_all");
 
-    Systematics_DrawErrorBand_GENIE("muon_P_mc_reco_all");
+    //Systematics_DrawErrorBand_GENIE("muon_P_mc_reco_all");
 //    Systematics_DrawErrorBand_GENIE("muon_theta_mc_reco_all");
 //    Systematics_DrawErrorBand_GENIE("pi0_P_mc_reco_all");
 //    Systematics_DrawErrorBand_GENIE("pi0_KE_mc_reco_all");
@@ -35,7 +72,7 @@ void CCProtonPi0_Plotter::Systematics_DrawErrorSummary(std::string data_var, std
 
     MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
     MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
-
+    
     data_var = "data_" + data_var;
     mc_var = "mc_" + mc_var;
 

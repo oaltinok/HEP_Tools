@@ -20,8 +20,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     // Cross Sections
     //--------------------------------------------------------------------------
-    //plotCrossSection();
-    //plotCrossSection_Check();
+    plotCrossSection();
+    plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
     //  Data vs MC
@@ -48,7 +48,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
-    Systematics();
+    //Systematics();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -1991,6 +1991,10 @@ void CCProtonPi0_Plotter::PlotXSecVar(std::string var_name, std::string data_var
 
     MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
     MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
+
+    // Remove Error Bands from MC
+    mc->ClearAllErrorBands();
+    
     DrawDataMC(data, mc, plotName, plotDir, isXSec);
   
     // Rename for Error Summary
@@ -2016,12 +2020,12 @@ void CCProtonPi0_Plotter::plotCrossSection()
     plot_W = true;
     plot_Enu = true;
 
-    //plotOriginalData();
-    //plotBackgroundEstimated();
-    //plotBackgroundSubtracted();
-    //plotUnfolded();
-    //plotEfficiencyCorrected();
-    //plotFluxIntegrated();
+    plotOriginalData();
+    plotBackgroundEstimated();
+    plotBackgroundSubtracted();
+    plotUnfolded();
+    plotEfficiencyCorrected();
+    plotFluxIntegrated();
     plotXSec();
 }
 
@@ -2042,7 +2046,7 @@ void CCProtonPi0_Plotter::UnfoldingStudy()
 
 void CCProtonPi0_Plotter::Systematics()
 {
-    Systematics_RawData();
+    Systematics_Practice();
 }
 
 void CCProtonPi0_Plotter::PlotDelta()

@@ -82,7 +82,7 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH2D>(MnvH2D*
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Flux(MnvHistoType* h)
 {
-    h->AddVertErrorBandAndFillWithCV("Flux",  n_universe);
+    h->AddVertErrorBandAndFillWithCV("Flux",  100);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Flux<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Flux<MnvH2D>(MnvH2D* h);
@@ -366,6 +366,37 @@ void CCProtonPi0_NTupleAnalysis::GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::v
             hist_ind.push_back(j);
         }
     }
+}
+
+void CCProtonPi0_NTupleAnalysis::GetPointersAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes)
+{
+    // ------------------------------------------------------------------------
+    // Add Other Universes from Error Bands
+    // ------------------------------------------------------------------------
+    // Get Vert Error Band Names
+    std::vector<std::string> err_names = mnvh1d_hist->GetVertErrorBandNames();
+
+    // Loop over all Vertical Error Bands
+    for (unsigned int i = 0; i < err_names.size(); ++i){
+        MnvVertErrorBand* err_band =  mnvh1d_hist->GetVertErrorBand(err_names[i]);
+        // Get All Histograms from it
+        std::vector<TH1D*> err_hists = err_band->GetHists();
+        for (unsigned int j = 0; j < err_hists.size(); ++j){
+            all_universes.push_back(err_hists[j]);
+        }
+    }
+}
+
+void CCProtonPi0_NTupleAnalysis::ClearAllUniversesVector(std::vector<TH1D*> &all_universes)
+{
+    // Delete all TH1Ds First
+    for (unsigned int i = 0; i < all_universes.size(); ++i){
+        delete all_universes[i];
+    }
+
+    // Remove All Elements from Vector
+    all_universes.clear();
+
 }
 
 

@@ -416,19 +416,42 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     // ------------------------------------------------------------------------
 
 
-    plotter->DrawDataMC(tempData, tempMC, mc_ratio, "TR", false);
-    //plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", false);
 
-    // Add Plot Labels
+//    void MnvPlotter::DrawDataMCWithErrorBand    (   const MnvH1D *  dataHist,
+//            const MnvH1D *  mcHist,
+//            const Double_t  mcScale = 1.0,
+//            const std::string &     legPos = "L",
+//            const bool  useHistTitles = false,
+//            const MnvH1D *  bkgdHist = NULL,
+//            const MnvH1D *  dataBkgdHist = NULL,
+//            const bool  covAreaNormalize = false,
+//            const bool  statPlusSys = false  
+//            )   
+    plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", false, NULL, NULL, false, true);
+
+    // ------------------------------------------------------------------------
+    // Plot Labels 
+    // ------------------------------------------------------------------------
+    // Add ChiSq Text 
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+
+    int ndf;
+    double chiSq = plotter->Chi2DataMC( tempData, tempMC, ndf, mc_ratio);
+    char *chiSq_text = Form("#chi^{2}/ndf = %3.2f/%d = %3.2f", chiSq, ndf, chiSq/(double)ndf); 
+
+    text.DrawLatex(0.20,0.87,chiSq_text);
+
+    // Add Error Explanation Text
+    std::string data_err_text = "Data: inner errors statistical";
+    std::string mc_err_text = "Simulation: statistical errors only";
+    text.DrawLatex(0.55, 0.70, data_err_text.c_str());
+    text.DrawLatex(0.55, 0.66, mc_err_text.c_str());
+
+    // Add Normalization Labels
     plotter->AddHistoTitle(data->GetTitle());
     AddNormBox(plotter, isPOTNorm, mc_ratio);
-
-    // Add Areas
-    const double y_pos = 0.88;
-    const double text_size = 0.03;
-    double area_data = data->Integral("width");
-    double area_mc = mc->Integral("width") * mc_ratio;
-    plotter->AddPlotLabel(Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc),0.3,y_pos,text_size,kBlue); 
 
     // Plot Lower Plot: Data vs MC Ratio
     c->cd(); // Go back to default Canvas before creating 2nd Pad
@@ -1053,13 +1076,11 @@ void CCProtonPi0_Plotter::AddNormBox(MnvPlotter* plotter, bool isPOTNorm, double
 {
     const double y_pos = 0.88;
     const double y_diff = 0.033;
-    //plotter->AddPlotLabel("Playlist: minerva1",0.3,y_pos,y_diff,kBlue);
     if (isPOTNorm){
         plotter->AddPOTNormBox(data_POT,mc_POT,0.3,y_pos-y_diff);
     }else{
         plotter->AddAreaNormBox(1.0,mc_ratio,0.3,y_pos-y_diff);
     }
-
 }
 
 double CCProtonPi0_Plotter::GetMCNormalization(std::string &norm_label, bool isPOTNorm, MnvH1D* data, MnvH1D* mc)
