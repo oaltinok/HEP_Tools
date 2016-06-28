@@ -187,26 +187,31 @@ void CCProtonPi0_Interaction::initHistograms()
     QSq_mc_truth_signal->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(QSq_mc_truth_signal);
+    AddLatErrorBands_MC(QSq_mc_truth_signal);
 
     QSq_mc_reco_all = new MnvH1D( "QSq_mc_reco_all","MC All Reconstructed Q^{2}", binList.size_QSq, binList.a_QSq);
     QSq_mc_reco_all->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(QSq_mc_reco_all);
+    AddLatErrorBands_MC(QSq_mc_reco_all);
 
     QSq_mc_reco_signal = new MnvH1D( "QSq_mc_reco_signal","MC Reconstructed Signal Q^{2}", binList.size_QSq, binList.a_QSq);
     QSq_mc_reco_signal->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(QSq_mc_reco_signal);
+    AddLatErrorBands_MC(QSq_mc_reco_signal);
 
     QSq_mc_reco_bckg = new MnvH1D( "QSq_mc_reco_bckg","MC Reconstructed Background Q^{2}", binList.size_QSq, binList.a_QSq);
     QSq_mc_reco_bckg->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(QSq_mc_reco_bckg);
+    AddLatErrorBands_MC(QSq_mc_reco_bckg);
 
     QSq_response = new MnvH2D( "QSq_response","Signal Q^{2}", binList.size_QSq, binList.a_QSq, binList.size_QSq, binList.a_QSq);
     QSq_response->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
     QSq_response->GetYaxis()->SetTitle("True Q^{2} [GeV^{2}]");
     AddVertErrorBands_MC(QSq_response);
+    AddLatErrorBands_MC(QSq_response);
 
     Enu_all = new MnvH1D( "Enu_all","Data All E_{#nu}", binList.size_Enu, binList.a_Enu);
     Enu_all->GetXaxis()->SetTitle("E_{#nu} [GeV]");
@@ -216,26 +221,31 @@ void CCProtonPi0_Interaction::initHistograms()
     Enu_mc_truth_signal->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     Enu_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(Enu_mc_truth_signal);
+    AddLatErrorBands_MC(Enu_mc_truth_signal);
 
     Enu_mc_reco_all = new MnvH1D( "Enu_mc_reco_all","MC All Reconstructed E_{#nu}", binList.size_Enu, binList.a_Enu);
     Enu_mc_reco_all->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     Enu_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(Enu_mc_reco_all);
+    AddLatErrorBands_MC(Enu_mc_reco_all);
 
     Enu_mc_reco_signal = new MnvH1D( "Enu_mc_reco_signal","MC Reconstructed Signal E_{#nu}", binList.size_Enu, binList.a_Enu);
     Enu_mc_reco_signal->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     Enu_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(Enu_mc_reco_signal);
+    AddLatErrorBands_MC(Enu_mc_reco_signal);
 
     Enu_mc_reco_bckg = new MnvH1D( "Enu_mc_reco_bckg","MC Reconstructed Background E_{#nu}", binList.size_Enu, binList.a_Enu);
     Enu_mc_reco_bckg->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     Enu_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(Enu_mc_reco_bckg);
+    AddLatErrorBands_MC(Enu_mc_reco_bckg);
 
     Enu_response = new MnvH2D( "Enu_response","Signal E_{#nu}", binList.size_Enu, binList.a_Enu, binList.size_Enu, binList.a_Enu);
     Enu_response->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
     Enu_response->GetYaxis()->SetTitle("True E_{#nu} [GeV]");
     AddVertErrorBands_MC(Enu_response);
+    AddLatErrorBands_MC(Enu_response);
 
     W_all = new MnvH1D( "W_all","Data All W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
     W_all->GetXaxis()->SetTitle("W [GeV]");
@@ -684,6 +694,18 @@ void CCProtonPi0_Interaction::initHistograms()
     reco_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
     reco_w_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
+    // Random Number Generator Histograms 
+    normal_rand_numbers = new TH1D( "normal_rand_numbers","Normal Random Numbers",50,-3.0,3.0);
+    normal_rand_numbers->GetXaxis()->SetTitle("Normal Random Numbers");
+    normal_rand_numbers->GetYaxis()->SetTitle("N(Numbers)");
+
+    em_shift_rand_numbers = new TH1D( "em_shift_rand_numbers","EM Energy Scale Shift Random Numbers",50,-0.1,0.1);
+    em_shift_rand_numbers->GetXaxis()->SetTitle("EM Energy Scale Shift");
+    em_shift_rand_numbers->GetYaxis()->SetTitle("N(Numbers)");
+
+    muonP_shift_rand_numbers = new TH1D( "muonP_shift_rand_numbers","Muon Momentum Shift Random Numbers",50,-0.1,0.1);
+    muonP_shift_rand_numbers->GetXaxis()->SetTitle("Muon Momentum Shift");
+    muonP_shift_rand_numbers->GetYaxis()->SetTitle("N(Numbers)");
 }
 
 void CCProtonPi0_Interaction::writeHistograms()
@@ -878,6 +900,10 @@ void CCProtonPi0_Interaction::writeHistograms()
     DeltaTransverse_data->Write();
     DeltaTransverse_mc->Write();
     DeltaTransverse_mc_res->Write();
+
+    normal_rand_numbers->Write();
+    em_shift_rand_numbers->Write();
+    muonP_shift_rand_numbers->Write();
 
     f->Close();
 }

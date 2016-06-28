@@ -87,6 +87,9 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         
         // Other Event Parameters 
         std::vector<MnvH1D*> deltaInvMass;
+        TH1D* normal_rand_numbers;
+        TH1D* em_shift_rand_numbers;
+        TH1D* muonP_shift_rand_numbers;
 
         // Delta Resonance
         MnvH1D* Polarization_data;

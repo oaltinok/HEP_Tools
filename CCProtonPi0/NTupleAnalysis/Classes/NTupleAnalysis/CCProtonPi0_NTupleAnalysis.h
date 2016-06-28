@@ -1,12 +1,12 @@
 #ifndef CCProtonPi0_NTupleAnalysis_h
 #define CCProtonPi0_NTupleAnalysis_h
 /*
-================================================================================
+   ================================================================================
 Class: CCProtonPi0_NTupleAnalysis
-    Base Class for the CCProtonPi0_NTupleAnalysis Package
-    Includes Common Member Variables for all Classes
-        
-    Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
+Base Class for the CCProtonPi0_NTupleAnalysis Package
+Includes Common Member Variables for all Classes
+
+Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 ================================================================================
 */
 #include <iostream>
@@ -47,12 +47,13 @@ class CCProtonPi0_NTupleAnalysis
 {
     public:
         CCProtonPi0_NTupleAnalysis();
-       
+
         std::string ana_folder;
         // Constants 
         static const int nHistograms = 7;
         static const int nTopologies = 2;
         static const int n_universe = 100;
+        static const int n_lateral_universes = 500;
 
         static const std::string version;
         static const double data_POT;
@@ -88,46 +89,73 @@ class CCProtonPi0_NTupleAnalysis
         bool processed_minerva7;
         bool processed_minerva9;
         bool processed_minerva13;
- 
+
         void UpdateFluxReweighter(const int run);
         void ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist);
 
         void OpenTextFile(std::string file_name, std::ofstream &file);
         std::string GetPlaylist(const int run);
         void printBins(const TH1* hist, const std::string var_name, bool useLowEdge = true);
-       
+
         // Returns a "new" MnvH1D or MnvH2D 
         MnvH1D* GetMnvH1D(TFile* f, std::string var_name);
         MnvH2D* GetMnvH2D(TFile* f, std::string var_name);
 
+        // --------------------------------------------------------------------
         // Errors for Data
+        // --------------------------------------------------------------------
+        // Vertical Error Bands
         template<class MnvHistoType>
-        void AddVertErrorBands_Data(MnvHistoType* h);
+            void AddVertErrorBands_Data(MnvHistoType* h);
 
         template<class MnvHistoType>
-        void AddVertErrorBandAndFillWithCV_Flux(MnvHistoType* h);
+            void AddVertErrorBandAndFillWithCV_Flux(MnvHistoType* h);
 
         template<class MnvHistoType>
-        void AddVertErrorBandAndFillWithCV_Genie(MnvHistoType* h);
+            void AddVertErrorBandAndFillWithCV_Genie(MnvHistoType* h);
 
         template<class MnvHistoType>
-        void AddVertErrorBandAndFillWithCV_MuonTracking(MnvHistoType* h);
+            void AddVertErrorBandAndFillWithCV_MuonTracking(MnvHistoType* h);
 
+        // Lateral Error Bands
+        template<class MnvHistoType>
+            void AddLatErrorBands_Data(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBandAndFillWithCV_MuonMomentum(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBandAndFillWithCV_EM_EnergyScale(MnvHistoType* h);
+
+        // --------------------------------------------------------------------
         // Errors for MC
+        // --------------------------------------------------------------------
+        // Vertical Error Bands
         template<class MnvHistoType>
-        void AddVertErrorBands_MC(MnvHistoType* h);
-        
-        template<class MnvHistoType>
-        void AddVertErrorBand_Flux(MnvHistoType* h);
-        
-        template<class MnvHistoType>
-        void AddVertErrorBand_Genie(MnvHistoType* h);
-        
-        template<class MnvHistoType>
-        void AddVertErrorBand_MuonTracking(MnvHistoType* h);
+            void AddVertErrorBands_MC(MnvHistoType* h);
 
+        template<class MnvHistoType>
+            void AddVertErrorBand_Flux(MnvHistoType* h);
 
+        template<class MnvHistoType>
+            void AddVertErrorBand_Genie(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_MuonTracking(MnvHistoType* h);
+
+        // Lateral Error Bands
+        template<class MnvHistoType>
+            void AddLatErrorBands_MC(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBand_MuonMomentum(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBand_EM_EnergyScale(MnvHistoType* h);
+
+        // --------------------------------------------------------------------
         // Systematics - Multi Universe 
+        // --------------------------------------------------------------------
         void GetPointersAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes);
         void GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes, std::vector<std::string> &err_bands, std::vector<int> &hist_ind);
         void ClearAllUniversesVector(std::vector<TH1D*> &all_universes);

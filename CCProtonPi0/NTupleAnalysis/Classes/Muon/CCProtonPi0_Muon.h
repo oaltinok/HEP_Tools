@@ -36,14 +36,7 @@ class CCProtonPi0_Muon : public CCProtonPi0_Particle
         MnvH1D* muon_theta_mc_truth_signal;
         MnvH2D* muon_theta_response;
 
-        // Muon Theta 
-        MnvH1D* muon_cos_theta_all;
-        MnvH1D* muon_cos_theta_mc_reco_all;
-        MnvH1D* muon_cos_theta_mc_reco_signal;
-        MnvH1D* muon_cos_theta_mc_reco_bckg;
-        MnvH1D* muon_cos_theta_mc_truth_signal;
-        MnvH2D* muon_cos_theta_response;
-
+        TH1D* muon_P_shift;
     private:
 };
 

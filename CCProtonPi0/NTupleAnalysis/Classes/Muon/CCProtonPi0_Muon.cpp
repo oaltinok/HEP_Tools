@@ -119,26 +119,31 @@ void CCProtonPi0_Muon::initHistograms()
     muon_P_mc_truth_signal->GetXaxis()->SetTitle("P_{#mu} [GeV]");
     muon_P_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(muon_P_mc_truth_signal);
+    AddLatErrorBands_MC(muon_P_mc_truth_signal);
 
     muon_P_mc_reco_all = new MnvH1D( "muon_P_mc_reco_all","MC All Reconstructed P_{#mu}",binList.size_muon_P, binList.a_muon_P);
     muon_P_mc_reco_all->GetXaxis()->SetTitle("P_{#mu} [GeV]");
     muon_P_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(muon_P_mc_reco_all);
+    AddLatErrorBands_MC(muon_P_mc_reco_all);
 
     muon_P_mc_reco_signal = new MnvH1D( "muon_P_mc_reco_signal","MC Reconstructed Signal P_{#mu}",binList.size_muon_P, binList.a_muon_P);
     muon_P_mc_reco_signal->GetXaxis()->SetTitle("P_{#mu} [GeV]");
     muon_P_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(muon_P_mc_reco_signal);
+    AddLatErrorBands_MC(muon_P_mc_reco_signal);
 
     muon_P_mc_reco_bckg = new MnvH1D( "muon_P_mc_reco_bckg","MC Reconstructed Background P_{#mu}",binList.size_muon_P, binList.a_muon_P);
     muon_P_mc_reco_bckg->GetXaxis()->SetTitle("P_{#mu} [GeV]");
     muon_P_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(muon_P_mc_reco_bckg);
+    AddLatErrorBands_MC(muon_P_mc_reco_bckg);
 
     muon_P_response = new MnvH2D( "muon_P_response","Signal Muon Momentum",binList.size_muon_P, binList.a_muon_P,binList.size_muon_P, binList.a_muon_P);
     muon_P_response->GetXaxis()->SetTitle("Reconstructed P_{#mu} [GeV]");
     muon_P_response->GetYaxis()->SetTitle("True P_{#mu} [GeV]");
     AddVertErrorBands_MC(muon_P_response);
+    AddLatErrorBands_MC(muon_P_response);
 
     // Muon Theta
     muon_theta_all = new MnvH1D( "muon_theta_all","Data All #theta_{#mu}",binList.size_muon_theta, binList.a_muon_theta);
@@ -149,56 +154,35 @@ void CCProtonPi0_Muon::initHistograms()
     muon_theta_mc_truth_signal->GetXaxis()->SetTitle("#theta_{#mu} [degree]");
     muon_theta_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(muon_theta_mc_truth_signal);
+    AddLatErrorBands_MC(muon_theta_mc_truth_signal);
 
     muon_theta_mc_reco_all = new MnvH1D( "muon_theta_mc_reco_all","MC All Reconstructed #theta_{#mu}",binList.size_muon_theta, binList.a_muon_theta);
     muon_theta_mc_reco_all->GetXaxis()->SetTitle("#theta_{#mu} [degree]");
     muon_theta_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(muon_theta_mc_reco_all);
+    AddLatErrorBands_MC(muon_theta_mc_reco_all);
 
     muon_theta_mc_reco_signal = new MnvH1D( "muon_theta_mc_reco_signal","MC Reconstructed Signal #theta_{#mu}",binList.size_muon_theta, binList.a_muon_theta);
     muon_theta_mc_reco_signal->GetXaxis()->SetTitle("#theta_{#mu} [degree]");
     muon_theta_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(muon_theta_mc_reco_signal);
+    AddLatErrorBands_MC(muon_theta_mc_reco_signal);
 
     muon_theta_mc_reco_bckg = new MnvH1D( "muon_theta_mc_reco_bckg","MC Reconstructed Background #theta_{#mu}",binList.size_muon_theta, binList.a_muon_theta);
     muon_theta_mc_reco_bckg->GetXaxis()->SetTitle("#theta_{#mu} [degree]");
     muon_theta_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(muon_theta_mc_reco_bckg);
+    AddLatErrorBands_MC(muon_theta_mc_reco_bckg);
 
     muon_theta_response = new MnvH2D( "muon_theta_response","Signal Muon Angle",binList.size_muon_theta, binList.a_muon_theta,binList.size_muon_theta, binList.a_muon_theta);
     muon_theta_response->GetXaxis()->SetTitle("Reconstructed #theta_{#mu} [degree]");
     muon_theta_response->GetYaxis()->SetTitle("True #theta_{#mu} [degree]");
     AddVertErrorBands_MC(muon_theta_response);
+    AddLatErrorBands_MC(muon_theta_response);
 
-    // Muon Cosine Theta
-    muon_cos_theta_all = new MnvH1D( "muon_cos_theta_all","Data All cos(#theta)_{#mu}",binList.muon_cos_theta.get_nBins(), binList.muon_cos_theta.get_min(), binList.muon_cos_theta.get_max());
-    muon_cos_theta_all->GetXaxis()->SetTitle("cos(#theta_{#mu})");
-    muon_cos_theta_all->GetYaxis()->SetTitle("N(Events)");
-
-    muon_cos_theta_mc_truth_signal = new MnvH1D( "muon_cos_theta_mc_truth_signal","MC Truth Signal cos(#theta)_{#mu}",binList.muon_cos_theta.get_nBins(), binList.muon_cos_theta.get_min(), binList.muon_cos_theta.get_max());
-    muon_cos_theta_mc_truth_signal->GetXaxis()->SetTitle("cos(#theta_{#mu})");
-    muon_cos_theta_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
-    AddVertErrorBands_MC(muon_cos_theta_mc_truth_signal);
-
-    muon_cos_theta_mc_reco_all = new MnvH1D( "muon_cos_theta_mc_reco_all","MC All Reconstructed cos(#theta)_{#mu}",binList.muon_cos_theta.get_nBins(), binList.muon_cos_theta.get_min(), binList.muon_cos_theta.get_max());
-    muon_cos_theta_mc_reco_all->GetXaxis()->SetTitle("cos(#theta_{#mu})");
-    muon_cos_theta_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
-    AddVertErrorBands_MC(muon_cos_theta_mc_reco_all);
-
-    muon_cos_theta_mc_reco_signal = new MnvH1D( "muon_cos_theta_mc_reco_signal","MC Reconstructed Signal cos(#theta)_{#mu}",binList.muon_cos_theta.get_nBins(), binList.muon_cos_theta.get_min(), binList.muon_cos_theta.get_max());
-    muon_cos_theta_mc_reco_signal->GetXaxis()->SetTitle("cos(#theta_{#mu})");
-    muon_cos_theta_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
-    AddVertErrorBands_MC(muon_cos_theta_mc_reco_signal);
-
-    muon_cos_theta_mc_reco_bckg = new MnvH1D( "muon_cos_theta_mc_reco_bckg","MC Reconstructed Background cos(#theta)_{#mu}",binList.muon_cos_theta.get_nBins(), binList.muon_cos_theta.get_min(), binList.muon_cos_theta.get_max());
-    muon_cos_theta_mc_reco_bckg->GetXaxis()->SetTitle("cos(#theta_{#mu})");
-    muon_cos_theta_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
-    AddVertErrorBands_MC(muon_cos_theta_mc_reco_bckg);
-
-    muon_cos_theta_response = new MnvH2D( "muon_cos_theta_response","Signal Muon Angle",binList.muon_cos_theta.get_nBins(), binList.muon_cos_theta.get_min(), binList.muon_cos_theta.get_max(),binList.muon_cos_theta.get_nBins(), binList.muon_cos_theta.get_min(), binList.muon_cos_theta.get_max());
-    muon_cos_theta_response->GetXaxis()->SetTitle("Reconstructed cos(#theta_{#mu})");
-    muon_cos_theta_response->GetYaxis()->SetTitle("True cos(#theta_{#mu})");
-    AddVertErrorBands_MC(muon_cos_theta_response);
+    muon_P_shift = new MnvH1D( "muon_P_shift","Muon Momentum Shuft",50,-100,500);
+    muon_P_shift->GetXaxis()->SetTitle("Muon Momentum Shift[MeV]");
+    muon_P_shift->GetYaxis()->SetTitle("N(Events)");
 }
 
 
@@ -242,12 +226,7 @@ void CCProtonPi0_Muon::writeHistograms()
     muon_theta_mc_reco_bckg->Write();
     muon_theta_response->Write();
 
-    muon_cos_theta_all->Write();
-    muon_cos_theta_mc_truth_signal->Write();
-    muon_cos_theta_mc_reco_all->Write();
-    muon_cos_theta_mc_reco_signal->Write();
-    muon_cos_theta_mc_reco_bckg->Write();
-    muon_cos_theta_response->Write();
+    muon_P_shift->Write();
 
     f->Close();
 }

@@ -69,6 +69,9 @@ MnvH2D* CCProtonPi0_NTupleAnalysis::GetMnvH2D(TFile* f, std::string var_name)
     return h;
 }
 
+// --------------------------------------------------------------------
+// Errors for Data
+// --------------------------------------------------------------------
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data(MnvHistoType* h)
 {
@@ -137,7 +140,36 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MuonTracking(MnvH
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MuonTracking<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MuonTracking<MnvH2D>(MnvH2D* h);
 
-// MC Error Bars
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data(MnvHistoType* h)
+{
+    AddLatErrorBandAndFillWithCV_MuonMomentum(h);
+    AddLatErrorBandAndFillWithCV_EM_EnergyScale(h);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_MuonMomentum(MnvHistoType* h)
+{
+    h->AddLatErrorBandAndFillWithCV("MuonMomentum", n_lateral_universes);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_MuonMomentum<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_MuonMomentum<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_EM_EnergyScale(MnvHistoType* h)
+{
+    h->AddLatErrorBandAndFillWithCV("EM_EnergyScale", n_lateral_universes);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_EM_EnergyScale<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_EM_EnergyScale<MnvH2D>(MnvH2D* h);
+
+
+
+// --------------------------------------------------------------------
+//  Errors for MC
+// --------------------------------------------------------------------
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC(MnvHistoType* h)
 {
@@ -205,6 +237,32 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MuonTracking(MnvHistoType* h)
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MuonTracking<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MuonTracking<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_MC(MnvHistoType* h)
+{
+    AddLatErrorBand_MuonMomentum(h);
+    AddLatErrorBand_EM_EnergyScale(h);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_MC<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_MC<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_MuonMomentum(MnvHistoType* h)
+{
+    h->AddLatErrorBand("MuonMomentum", n_lateral_universes);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_MuonMomentum<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_MuonMomentum<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_EM_EnergyScale(MnvHistoType* h)
+{
+    h->AddLatErrorBand("EM_EnergyScale", n_lateral_universes);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_EM_EnergyScale<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_EM_EnergyScale<MnvH2D>(MnvH2D* h);
+
 
 std::string CCProtonPi0_NTupleAnalysis::GetPlaylist(const int run)
 {
@@ -286,7 +344,7 @@ void CCProtonPi0_NTupleAnalysis::printBins(const TH1* hist, const std::string va
     std::cout.width(12); std::cout<<total;
     std::cout.width(12); std::cout<<total/nEntries*100;
     std::cout<<std::endl;
-    
+
 }
 
 bool CCProtonPi0_NTupleAnalysis::IsWLow(double true_W)
@@ -306,7 +364,7 @@ double CCProtonPi0_NTupleAnalysis::Calc_Enu_Truth(double muon_E, double proton_E
     double Enu;
     const double proton_mass = 938.27; //MeV
     double proton_KE = proton_E - proton_mass;
-   
+
     Enu = muon_E + proton_KE + pi0_E; 
 
     return Enu;
@@ -353,7 +411,7 @@ void CCProtonPi0_NTupleAnalysis::GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::v
     // ------------------------------------------------------------------------
     // Get Vert Error Band Names
     std::vector<std::string> err_names = mnvh1d_hist->GetVertErrorBandNames();
-   
+
     // Loop over all Vertical Error Bands
     for (unsigned int i = 0; i < err_names.size(); ++i){
         MnvVertErrorBand* err_band =  mnvh1d_hist->GetVertErrorBand(err_names[i]);

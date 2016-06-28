@@ -36,6 +36,7 @@
 #include "../Pion/CCProtonPi0_Pion.h"
 #include "../Pi0Blob/CCProtonPi0_Pi0Blob.h"
 #include "../BackgroundTool/CCProtonPi0_BackgroundTool.h"
+#include "../RandNumGenerator/CCProtonPi0_RandNumGenerator.h"
 
 class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
 
@@ -63,7 +64,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void fill_QSq();
         void fill_muon_P();
         void fill_muon_theta();
-        void fill_muon_cos_theta();
         void fill_pi0_P();
         void fill_pi0_KE();
         void fill_pi0_theta();
@@ -101,6 +101,17 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillVertErrorBand_MuonTracking(MnvH2D* h, double var1, double var2);
         void ReadBckgConstraints();
         double GetBckgConstraint(std::string error_name, int hist_ind);
+
+        // Lateral Error Band
+        void initLateralErrorBandShifts();
+        void FillLatErrorBands_MC();
+        void FillLatErrorBand_EM_EnergyScale();
+        void FillLatErrorBand_MuonMomentum();
+        void Calc_muonP_random_shifts();
+        bool ismuonP_shifts_filled;
+        CCProtonPi0_RandNumGenerator RandNumGenerator;
+        std::vector<double> em_random_shifts;
+        std::vector<double> muonP_random_shifts;
 
         void CorrectNTupleVariables();
         void CorrectEMShowerCalibration();
@@ -219,7 +230,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         counter counter2;
         counter counter3;
         counter counter4;
-
+       
         // Multi Universe Background Constraints
         std::vector<std::string> error_names;
         std::vector<int> error_hist_inds;

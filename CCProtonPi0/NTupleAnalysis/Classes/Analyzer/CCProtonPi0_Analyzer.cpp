@@ -10,8 +10,8 @@ using namespace std;
 
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
-    applyMaxEvents = false;
-    nMaxEvents = 10000;
+    applyMaxEvents = true;
+    nMaxEvents = 100;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
@@ -60,7 +60,7 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
 
     cout<<"Reducing NTuple Files to a single file"<<endl;
     cout<<"\tRoot File: "<<rootDir<<endl;
-    TFile* f = new TFile(rootDir.c_str(),"RECREATE");
+    TFile* f = new TFile(rootDir.c_str(),"CREATE");
     if (!f->IsOpen()){
         cout<<"File already exists! Exiting!..."<<endl;
         exit(1);
@@ -107,7 +107,6 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         else msg_entry = 5000;
         if (jentry%msg_entry == 0) cout<<"\tEntry "<<jentry<<endl;
 
-
         if (applyMaxEvents && jentry >= nMaxEvents){
             cout<<"\tReached Event Limit!"<<endl;
             break;
@@ -138,6 +137,17 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         AddVertErrorBands_Data(cutList.SideBand_QSq[0]);
         AddVertErrorBands_Data(cutList.SideBand_W[0]);
         AddVertErrorBands_Data(cutList.SideBand_neutrino_E[0]);
+
+        AddLatErrorBands_Data(cutList.invMass_all);
+        AddLatErrorBands_Data(cutList.hCut_pi0invMass[0]);
+        AddLatErrorBands_Data(cutList.SideBand_muon_P[0]);
+        AddLatErrorBands_Data(cutList.SideBand_muon_theta[0]);
+        AddLatErrorBands_Data(cutList.SideBand_pi0_P[0]);
+        AddLatErrorBands_Data(cutList.SideBand_pi0_KE[0]);
+        AddLatErrorBands_Data(cutList.SideBand_pi0_theta[0]);
+        AddLatErrorBands_Data(cutList.SideBand_QSq[0]);
+        AddLatErrorBands_Data(cutList.SideBand_W[0]);
+        AddLatErrorBands_Data(cutList.SideBand_neutrino_E[0]);
     }
     cutList.writeCutTable();
     cutList.writeHistograms();
@@ -201,7 +211,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         }
        
         UpdateSignalDef();
-
+        
         // Update scanFileName if running for scan
         if(isScanRun) UpdateScanFileName();
 
@@ -218,7 +228,8 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
 
         Calc_WeightFromSystematics();
         Calc_EventKinematics();
-
+        Calc_muonP_random_shifts();
+        
         if (truth_isSignal){
             Calc_EventKinematics_Truth();
             failText<<m_Enu*MeV_to_GeV<<" "<<m_Enu_Truth*MeV_to_GeV<<" "<<mc_incomingE*MeV_to_GeV<<" ";
@@ -289,6 +300,8 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
     openTextFiles();
 
     ReadBckgConstraints();
+
+    initLateralErrorBandShifts();
 
     cout<<"Initialization Finished!\n"<<endl;
 }
@@ -411,7 +424,6 @@ void CCProtonPi0_Analyzer::fillData()
     fill_pi0_theta();
     fill_muon_P();
     fill_muon_theta();
-    fill_muon_cos_theta();
     fill_QSq();
     fill_Enu();
     fill_W();
@@ -1345,6 +1357,8 @@ void CCProtonPi0_Analyzer::fillPi0Reco()
 
 void CCProtonPi0_Analyzer::fillMuonMC()
 {
+    muon.muon_P_shift->Fill(muon_E_shift);
+
     if(truth_isSignal){ 
         // Momentum
         double reco_P = muon_P * MeV_to_GeV;
@@ -1507,28 +1521,6 @@ void CCProtonPi0_Analyzer::fill_muon_theta()
     }
 }
 
-void CCProtonPi0_Analyzer::fill_muon_cos_theta() 
-{
-    if (m_isMC){
-        // MC Reco All
-        FillHistogramWithDefaultErrors(muon.muon_cos_theta_mc_reco_all, cos(muon_theta_beam));
-        if (truth_isSignal){
-            // MC Truth Signal
-            FillHistogramWithDefaultErrors(muon.muon_cos_theta_mc_truth_signal, cos(truth_muon_theta_beam));
-            // MC Reco Signal
-            FillHistogramWithDefaultErrors(muon.muon_cos_theta_mc_reco_signal, cos(muon_theta_beam));
-            // MC Reco vs True -- Response
-            FillHistogramWithDefaultErrors(muon.muon_cos_theta_response, cos(muon_theta_beam), cos(truth_muon_theta_beam));
-        }else{
-            // MC Reco Background
-            FillHistogramWithDefaultErrors(muon.muon_cos_theta_mc_reco_bckg, cos(muon_theta_beam));
-        }
-    }else{
-        // Data
-        FillHistogram(muon.muon_cos_theta_all, cos(muon_theta_beam));
-    }
-}
-
 void CCProtonPi0_Analyzer::fill_pi0_P() 
 {
     if (m_isMC){
@@ -1625,10 +1617,13 @@ void CCProtonPi0_Analyzer::FillHistogram(TH3D* hist, double var1, double var2, d
 
 void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors(MnvH1D* hist, double var)
 {
+    // Fill CV Value
+    hist->Fill(var, cvweight);
+
+    // Fill Vertical Error Bands
     if (fillErrors_ByHand){
         FillHistogramWithDefaultErrors_ByHand(hist,var);
     }else{
-        hist->Fill(var, cvweight);
         FillVertErrorBand_Genie(hist, var);
         FillVertErrorBand_Flux(hist, var);
         FillVertErrorBand_MuonTracking(hist, var);
@@ -1637,9 +1632,6 @@ void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors(MnvH1D* hist, double v
 
 void CCProtonPi0_Analyzer::FillHistogramWithDefaultErrors_ByHand(MnvH1D* hist, double var)
 {
-    // Fill CV Value
-    hist->Fill(var, cvweight);
-
     // Fill Error Bands by Hand for Background Events
     if (truth_isBckg_Compact_SinglePiPlus){
         FillVertErrorBand_All_ByHand(hist, var);
@@ -2029,6 +2021,15 @@ void CCProtonPi0_Analyzer::AddErrorBands_Data()
     AddVertErrorBands_Data(interaction.QSq_all);
     AddVertErrorBands_Data(interaction.Enu_all);
     AddVertErrorBands_Data(interaction.W_all);
+
+    AddLatErrorBands_Data(pi0.pi0_P_all);
+    AddLatErrorBands_Data(pi0.pi0_KE_all);
+    AddLatErrorBands_Data(pi0.pi0_theta_all);
+    AddLatErrorBands_Data(muon.muon_P_all);
+    AddLatErrorBands_Data(muon.muon_theta_all);
+    AddLatErrorBands_Data(interaction.QSq_all);
+    AddLatErrorBands_Data(interaction.Enu_all);
+    AddLatErrorBands_Data(interaction.W_all);
 }
 
 
@@ -2611,6 +2612,53 @@ double CCProtonPi0_Analyzer::GetBckgConstraint(std::string error_name, int hist_
     exit(1);
 }
 
+void CCProtonPi0_Analyzer::initLateralErrorBandShifts()
+{
+    // Fill EM Energy Scale Shifts
+    double em_uncertainty = 0.013;
+    em_random_shifts = RandNumGenerator.GetRandomShifts(em_uncertainty); // ~ Gaussian(0.0, em_uncertainty)
+
+    // Fill Histograms
+    //  Muon Momentum Shift changes event by event
+    std::vector<double> normal_rand_numbers = RandNumGenerator.GetNormalRandomVector();
+    for (unsigned int i = 0; i < normal_rand_numbers.size(); ++i){
+        interaction.normal_rand_numbers->Fill(normal_rand_numbers[i]);
+        interaction.em_shift_rand_numbers->Fill(em_random_shifts[i]);
+    }
+
+    ismuonP_shifts_filled = false;
+}
+
+void CCProtonPi0_Analyzer::Calc_muonP_random_shifts()
+{
+    double muonP_uncertainty = muon_E_shift/muon_P;
+    muonP_random_shifts.clear();
+    muonP_random_shifts = RandNumGenerator.GetRandomShifts(muonP_uncertainty); // ~ Gaussian(0.0, muonP_uncertainty)
+
+    // Fill MuonP shifts only for 1 event
+    if (!ismuonP_shifts_filled){
+        for (unsigned int i = 0; i < muonP_random_shifts.size(); ++i){
+            interaction.muonP_shift_rand_numbers->Fill(muonP_random_shifts[i]);
+        }
+        ismuonP_shifts_filled = true;
+    }
+}
+
+void CCProtonPi0_Analyzer::FillLatErrorBands_MC()
+{
+    FillLatErrorBand_EM_EnergyScale();
+    FillLatErrorBand_MuonMomentum();
+}
+
+void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
+{
+
+}
+
+void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
+{
+    
+}
 
 
 #endif //CCProtonPi0_Analyzer_cpp

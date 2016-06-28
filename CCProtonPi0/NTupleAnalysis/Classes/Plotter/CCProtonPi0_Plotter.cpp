@@ -20,8 +20,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     // Cross Sections
     //--------------------------------------------------------------------------
-    plotCrossSection();
-    plotCrossSection_Check();
+    //plotCrossSection();
+    //plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
     //  Data vs MC
@@ -45,7 +45,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  Plot Function Reserved for Other Studies
     //--------------------------------------------------------------------------
     //SavePi0InvMassPoints();
-    //plotOtherStudies();
+    plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
     //Systematics();
@@ -160,25 +160,12 @@ void CCProtonPi0_Plotter::plotCrossSection_Check()
 void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
-    //std::string plotDir = Folder_List::plotDir_OtherStudies;
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
 
-    //rootDir rootDir_SB;
-    //rootDir_SB.data = Folder_List::rootDir_sideBand_Original_data;
-    //rootDir_SB.mc = Folder_List::rootDir_sideBand_Original_mc;
-    //
-    //
-    //TFile* f_mc = new TFile(rootDir_SB.mc.c_str());
-    //MnvH1D* mc = GetMnvH1D(f_mc, "SideBand_muon_P_0");
-  
-    //std::vector<TH1D*> all_universes;
-    ////GetAllVertUniverses(mc, all_universes);
-
-    //std::cout<<"Got All Universes"<<std::endl;
-    //std::cout<<"N(Universes) = "<<all_universes.size()<<std::endl;
-    //std::cout<<"Integrals"<<std::endl;
-    //for (unsigned int j = 0; j < all_universes.size(); ++j){
-    //        std::cout<<"\t"<<all_universes[j]->Integral()<<std::endl;
-    //}
+    Draw1DHist(rootDir_Interaction,"normal_rand_numbers", plotDir);
+    Draw1DHist(rootDir_Interaction,"em_shift_rand_numbers", plotDir);
+    Draw1DHist(rootDir_Interaction,"muonP_shift_rand_numbers", plotDir);
+    Draw1DHist(rootDir_Muon,"muon_P_shift", plotDir);
 
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }

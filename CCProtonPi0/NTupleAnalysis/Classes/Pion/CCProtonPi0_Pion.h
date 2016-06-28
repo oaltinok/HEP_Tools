@@ -1,6 +1,6 @@
 /*
 ================================================================================
-Class: CCProtonPi0_Pion -> Derived Class from Particle Base Clas
+Class: CCProtonPi0_Pion -> Derived Class from Particle Base Class
     CCProtonPi0_Pion Class  inherits Particle Behaviours and 
                 extends base class with pion specific parameters
 

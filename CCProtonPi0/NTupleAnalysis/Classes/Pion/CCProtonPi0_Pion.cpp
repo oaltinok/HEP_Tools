@@ -140,26 +140,31 @@ void CCProtonPi0_Pion::initHistograms()
     pi0_P_mc_reco_all->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
     pi0_P_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_P_mc_reco_all);
+    AddLatErrorBands_MC(pi0_P_mc_reco_all);
     
     pi0_P_mc_truth_signal = new MnvH1D( "pi0_P_mc_truth_signal","MC Truth Signal P_{#pi^{0}}",binList.size_pi0_P, binList.a_pi0_P);
     pi0_P_mc_truth_signal->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
     pi0_P_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_P_mc_truth_signal);
+    AddLatErrorBands_MC(pi0_P_mc_truth_signal);
 
     pi0_P_mc_reco_signal = new MnvH1D( "pi0_P_mc_reco_signal","MC Reconstructed Signal P_{#pi^{0}}",binList.size_pi0_P, binList.a_pi0_P);
     pi0_P_mc_reco_signal->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
     pi0_P_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_P_mc_reco_signal);
+    AddLatErrorBands_MC(pi0_P_mc_reco_signal);
 
     pi0_P_mc_reco_bckg = new MnvH1D( "pi0_P_mc_reco_bckg","MC Reconstructed Background P_{#pi^{0}}",binList.size_pi0_P, binList.a_pi0_P);
     pi0_P_mc_reco_bckg->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
     pi0_P_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_P_mc_reco_bckg);
+    AddLatErrorBands_MC(pi0_P_mc_reco_bckg);
 
     pi0_P_response = new MnvH2D( "pi0_P_response","Momentum for Signal Events",binList.size_pi0_P, binList.a_pi0_P,binList.size_pi0_P, binList.a_pi0_P);
     pi0_P_response->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
     pi0_P_response->GetYaxis()->SetTitle("True P_{#pi^{0}} [GeV]");
     AddVertErrorBands_MC(pi0_P_response);
+    AddLatErrorBands_MC(pi0_P_response);
 
     //Pi0 Kinetic Energy
     pi0_KE_all = new MnvH1D( "pi0_KE_all","Data All T_{#pi^{0}}", binList.size_pi0_KE, binList.a_pi0_KE);
@@ -170,26 +175,31 @@ void CCProtonPi0_Pion::initHistograms()
     pi0_KE_mc_reco_all->GetXaxis()->SetTitle("T_{#pi^{0}} [GeV]");
     pi0_KE_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_KE_mc_reco_all);
+    AddLatErrorBands_MC(pi0_KE_mc_reco_all);
     
     pi0_KE_mc_truth_signal = new MnvH1D( "pi0_KE_mc_truth_signal","MC Truth Signal T_{#pi^{0}}", binList.size_pi0_KE, binList.a_pi0_KE);
     pi0_KE_mc_truth_signal->GetXaxis()->SetTitle("T_{#pi^{0}} [GeV]");
     pi0_KE_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_KE_mc_truth_signal);
+    AddLatErrorBands_MC(pi0_KE_mc_truth_signal);
 
     pi0_KE_mc_reco_signal = new MnvH1D( "pi0_KE_mc_reco_signal","MC Reconstructed Signal T_{#pi^{0}}", binList.size_pi0_KE, binList.a_pi0_KE);
     pi0_KE_mc_reco_signal->GetXaxis()->SetTitle("T_{#pi^{0}} [GeV]");
     pi0_KE_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_KE_mc_reco_signal);
+    AddLatErrorBands_MC(pi0_KE_mc_reco_signal);
 
     pi0_KE_mc_reco_bckg = new MnvH1D( "pi0_KE_mc_reco_bckg","MC Reconstructed Background T_{#pi^{0}}", binList.size_pi0_KE, binList.a_pi0_KE);
     pi0_KE_mc_reco_bckg->GetXaxis()->SetTitle("T_{#pi^{0}} [GeV]");
     pi0_KE_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_KE_mc_reco_bckg);
+    AddLatErrorBands_MC(pi0_KE_mc_reco_bckg);
 
     pi0_KE_response = new MnvH2D( "pi0_KE_response","Kinetic Energy for Signal Events", binList.size_pi0_KE, binList.a_pi0_KE,  binList.size_pi0_KE, binList.a_pi0_KE);
     pi0_KE_response->GetXaxis()->SetTitle("Reconstructed T_{#pi^{0}} [GeV]");
     pi0_KE_response->GetYaxis()->SetTitle("True T_{#pi^{0}} [GeV]");
     AddVertErrorBands_MC(pi0_KE_response);
+    AddLatErrorBands_MC(pi0_KE_response);
 
     //Pi0 Theta 
     pi0_theta_all = new MnvH1D( "pi0_theta_all","Data All #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
@@ -200,26 +210,31 @@ void CCProtonPi0_Pion::initHistograms()
     pi0_theta_mc_reco_all->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
     pi0_theta_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_theta_mc_reco_all);
+    AddLatErrorBands_MC(pi0_theta_mc_reco_all);
     
     pi0_theta_mc_truth_signal = new MnvH1D( "pi0_theta_mc_truth_signal","MC Truth Signal #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
     pi0_theta_mc_truth_signal->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
     pi0_theta_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_theta_mc_truth_signal);
+    AddLatErrorBands_MC(pi0_theta_mc_truth_signal);
 
     pi0_theta_mc_reco_signal = new MnvH1D( "pi0_theta_mc_reco_signal","MC Reconstructed Signal #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
     pi0_theta_mc_reco_signal->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
     pi0_theta_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_theta_mc_reco_signal);
+    AddLatErrorBands_MC(pi0_theta_mc_reco_signal);
 
     pi0_theta_mc_reco_bckg = new MnvH1D( "pi0_theta_mc_reco_bckg","MC Reconstructed Background #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
     pi0_theta_mc_reco_bckg->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
     pi0_theta_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(pi0_theta_mc_reco_bckg);
+    AddLatErrorBands_MC(pi0_theta_mc_reco_bckg);
 
     pi0_theta_response = new MnvH2D( "pi0_theta_response","Theta for Signal Events", binList.size_pi0_theta, binList.a_pi0_theta, binList.size_pi0_theta, binList.a_pi0_theta);
     pi0_theta_response->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
     pi0_theta_response->GetYaxis()->SetTitle("True #theta_{#pi^{0}} [degree]");
     AddVertErrorBands_MC(pi0_theta_response);
+    AddLatErrorBands_MC(pi0_theta_response);
 
     // Truth Energy - Gamma 1
     gamma1_true_E = new TH1D( "gamma1_true_E","Leading Photon True Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
