@@ -5,7 +5,7 @@
 
 CCProtonPi0_RandNumGenerator::CCProtonPi0_RandNumGenerator() : 
     CCProtonPi0_NTupleAnalysis(), 
-    generator(1987)
+    generator(19870404)
 {
     FillNormalRandomVector();
 }

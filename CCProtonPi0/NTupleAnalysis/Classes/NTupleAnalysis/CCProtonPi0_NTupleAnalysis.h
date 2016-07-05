@@ -72,7 +72,7 @@ class CCProtonPi0_NTupleAnalysis
 
         // Event Kinematics 
         bool IsWLow(double true_W);
-        bool IsEnuInRange(double true_Enu);
+        bool IsEnuInRange(double Enu);
 
         double Calc_Enu_Truth(double muon_E, double proton_E, double pi0_E);
         double Calc_QSq(double Enu, double muon_E, double muon_P, double muon_angle_beam); 

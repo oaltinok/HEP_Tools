@@ -1,4 +1,18 @@
 ===================================================================================================
+v2_89
+CCProtonPi0 Updates:
+	No Major Changes
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	Implemented and Tested FillLatErrorBand() Functions for MnvH1D
+		Two Lateral Error Bands
+			EM_EnergyScale
+			MuonMomentum
+
+	Collected all Systematics Related Implementations under
+		CCProtonPi0_Analyzer_Systematics.cpp
+
+===================================================================================================
 v2_88
 CCProtonPi0 Updates:
 	No Major Changes

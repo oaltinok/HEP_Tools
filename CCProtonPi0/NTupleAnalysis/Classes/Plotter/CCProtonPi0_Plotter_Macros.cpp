@@ -294,7 +294,6 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupGENIE
         genieGroup.push_back("GENIE_VecFFCCQEshape"    );
         plotter->error_summary_group_map["GENIE"] = genieGroup;   
     }
-
 }
 
 void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupGENIE)
@@ -307,7 +306,7 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
 
     ApplyStyle_Errors(plotter, groupGENIE);
 
-    plotter->DrawErrorSummary(hist);
+    plotter->DrawErrorSummary(hist,"TR", true, true, 0.0);
 
     // Add Plot Labels
     plotter->AddHistoTitle(hist->GetTitle());
@@ -590,8 +589,8 @@ void CCProtonPi0_Plotter::DrawMnvH1D(MnvH1D* hist1D, std::string var_name, std::
     hist1D->SetFillColor(kRed);
     hist1D->SetFillStyle(3010);
 
-    double norm_bin_width = hist1D->GetNormBinWidth();
-    hist1D->Scale(norm_bin_width,"width");
+    //double norm_bin_width = hist1D->GetNormBinWidth();
+    //hist1D->Scale(norm_bin_width,"width");
 
     hist1D->Draw("HIST");
     gPad->Update();

@@ -45,10 +45,10 @@ void CCProtonPi0_Plotter::plotHistograms()
     //  Plot Function Reserved for Other Studies
     //--------------------------------------------------------------------------
     //SavePi0InvMassPoints();
-    plotOtherStudies();
+    //plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
-    //Systematics();
+    Systematics();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -160,13 +160,9 @@ void CCProtonPi0_Plotter::plotCrossSection_Check()
 void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
-    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    //std::string plotDir = Folder_List::plotDir_OtherStudies;
 
-    Draw1DHist(rootDir_Interaction,"normal_rand_numbers", plotDir);
-    Draw1DHist(rootDir_Interaction,"em_shift_rand_numbers", plotDir);
-    Draw1DHist(rootDir_Interaction,"muonP_shift_rand_numbers", plotDir);
-    Draw1DHist(rootDir_Muon,"muon_P_shift", plotDir);
-
+    GetFlux();
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
 
@@ -788,6 +784,7 @@ void CCProtonPi0_Plotter::plotMuon_MCOnly()
     std::cout<<"Plotting Muon MC Only"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Muon;
 
+    Draw1DHist(rootDir_Muon,"muon_P_shift", plotDir);
     Draw1DHist(rootDir_Truth,"muon_P_mc_truth_all_signal", plotDir);
     Draw1DHist(rootDir_Truth,"muon_theta_mc_truth_all_signal", plotDir);
 
@@ -1727,6 +1724,35 @@ void CCProtonPi0_Plotter::PlotFluxHistograms()
     PlotFluxRebinned(plotDir);
 }
 
+void CCProtonPi0_Plotter::GetFlux()
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    std::string flux_file_neutrino = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Ana/PlotUtils/data/flux/flux-gen2thin-pdg14-minervame1A.root";
+    std::string flux_file_antineutrino = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Ana/PlotUtils/data/flux/flux-gen2thin-pdg-14-minervame1A.root";
+    //std::string flux_file_antineutrino_LE = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Ana/PlotUtils/data/flux/flux-g4numiv5-pdg-14-minerva5.root";
+    std::string flux_file_antineutrino_LE = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Ana/PlotUtils/data/flux/flux-gen2thin-pdg-14-minerva5.root";
+
+    TFile* f_neutrino = new TFile(flux_file_neutrino.c_str());
+    MnvH1D* neutrino = GetMnvH1D(f_neutrino,"flux_E_cvweighted");
+    printBins(neutrino, "neutrino_flux");
+    neutrino->GetXaxis()->SetRangeUser(0,20.); 
+    DrawMnvH1D(neutrino, "neutrino_flux", plotDir); 
+
+    TFile* f_antineutrino = new TFile(flux_file_antineutrino.c_str());
+    MnvH1D* antineutrino = GetMnvH1D(f_antineutrino,"flux_E_cvweighted");
+    printBins(antineutrino, "antineutrino_flux");
+    antineutrino->GetXaxis()->SetRangeUser(0,20.); 
+    DrawMnvH1D(antineutrino, "antineutrino_flux", plotDir); 
+
+    TFile* f_antineutrino_LE = new TFile(flux_file_antineutrino_LE.c_str());
+    MnvH1D* antineutrino_LE = GetMnvH1D(f_antineutrino_LE,"flux_E_cvweighted");
+    printBins(antineutrino_LE, "antineutrino_LE_flux");
+    antineutrino_LE->GetXaxis()->SetRangeUser(0,20.); 
+    DrawMnvH1D(antineutrino_LE, "antineutrino_LE_flux", plotDir); 
+
+}
+
 void CCProtonPi0_Plotter::PlotFluxComparison(std::string plotDir)
 {
     // Get Histograms
@@ -1998,14 +2024,14 @@ void CCProtonPi0_Plotter::PlotXSecVar(std::string var_name, std::string data_var
 
 void CCProtonPi0_Plotter::plotCrossSection()
 {
-    plot_muon_P = true;
+    plot_muon_P = false;
     plot_muon_theta = true;
-    plot_pi0_P = true;
-    plot_pi0_KE = true;
-    plot_pi0_theta = true;
-    plot_QSq = true;
-    plot_W = true;
-    plot_Enu = true;
+    plot_pi0_P = false;
+    plot_pi0_KE = false;
+    plot_pi0_theta = false;
+    plot_QSq = false;
+    plot_W = false;
+    plot_Enu = false;
 
     plotOriginalData();
     plotBackgroundEstimated();

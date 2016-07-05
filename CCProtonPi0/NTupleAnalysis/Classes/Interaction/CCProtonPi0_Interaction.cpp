@@ -255,27 +255,31 @@ void CCProtonPi0_Interaction::initHistograms()
     W_mc_truth_signal->GetXaxis()->SetTitle("W [GeV]");
     W_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(W_mc_truth_signal);
+    AddLatErrorBands_MC(W_mc_truth_signal);
 
     W_mc_reco_all = new MnvH1D( "W_mc_reco_all","MC All Reconstructed W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
     W_mc_reco_all->GetXaxis()->SetTitle("W [GeV]");
     W_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(W_mc_reco_all);
+    AddLatErrorBands_MC(W_mc_reco_all);
 
     W_mc_reco_signal = new MnvH1D( "W_mc_reco_signal","MC Reconstructed Signal W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
     W_mc_reco_signal->GetXaxis()->SetTitle("W [GeV]");
     W_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(W_mc_reco_signal);
+    AddLatErrorBands_MC(W_mc_reco_signal);
 
     W_mc_reco_bckg = new MnvH1D( "W_mc_reco_bckg","MC Reconstructed Background W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
     W_mc_reco_bckg->GetXaxis()->SetTitle("W [GeV]");
     W_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(W_mc_reco_bckg);
+    AddLatErrorBands_MC(W_mc_reco_bckg);
 
     W_response = new MnvH2D( "W_response","Signal W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max(),binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
     W_response->GetXaxis()->SetTitle("Reconstructed W [GeV]");
     W_response->GetYaxis()->SetTitle("True W [GeV]");
     AddVertErrorBands_MC(W_response);
-
+    AddLatErrorBands_MC(W_response);
 
     // QSq Error, Diff
     WSq_QSq_Diff = new TH2D( "WSq_QSq_Diff","Q^{2} Difference vs W^{2}",binList.wSq.get_nBins(), binList.wSq.get_min(), binList.wSq.get_max(),binList.QSq_Diff.get_nBins(), binList.QSq_Diff.get_min(), binList.QSq_Diff.get_max() );

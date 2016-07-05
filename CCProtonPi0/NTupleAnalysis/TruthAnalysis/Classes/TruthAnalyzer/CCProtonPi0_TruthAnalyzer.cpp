@@ -387,7 +387,7 @@ void CCProtonPi0_TruthAnalyzer::FillHistogram(TH1D* hist, double var)
 void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Flux(MnvH1D* h, double var)
 {
     std::vector<double> flux_errors = GetFluxError();
-    h->FillVertErrorBand("Flux",  var, &flux_errors[0],  cvweight, 1.0);
+    h->FillVertErrorBand("Flux",  var, &flux_errors[0],  cvweight);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
@@ -472,6 +472,8 @@ void CCProtonPi0_TruthAnalyzer::AddOtherErrorBands_FillWithCV()
 void CCProtonPi0_TruthAnalyzer::AddErrorBands_FillWithCV(MnvH1D* hist)
 {
     AddVertErrorBandAndFillWithCV_MuonTracking(hist);
+    AddLatErrorBandAndFillWithCV_MuonMomentum(hist);
+    AddLatErrorBandAndFillWithCV_EM_EnergyScale(hist);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()

@@ -1,7 +1,7 @@
 #ifndef CCProtonPi0_RandNumGenerator_h
 #define CCProtonPi0_RandNumGenerator_h
 
-#include <TRandom.h>
+#include <TRandom1.h>
 
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 
@@ -17,7 +17,7 @@ class CCProtonPi0_RandNumGenerator : public CCProtonPi0_NTupleAnalysis
         void Print_NormalRandomVector();
 
     private:
-        TRandom generator;
+        TRandom1 generator;
         
         void FillNormalRandomVector();
         std::vector<double> normal_random_vector;

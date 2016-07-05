@@ -150,6 +150,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // Flux Study
         double GetFluxHistContent(MnvH1D* hist, double low1, double low2);
         double Integrate(MnvH1D* hist, int start, int end);
+        void GetFlux();
         void PlotFluxHistograms();
         void PlotFluxComparison(std::string plotDir);
         void PlotFluxRatio(std::string plotDir);
@@ -226,6 +227,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // Systematics
         void Systematics();
         void Systematics_Practice();
+        void Systematics_Practice(std::string root_dir, std::string var_name, std::string err_name);
         void Systematics_RawData();
         void Systematics_DrawErrorSummary(std::string data_var, std::string mc_var);
         void Systematics_DrawErrorBand_GENIE(std::string mc_var);

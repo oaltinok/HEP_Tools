@@ -107,7 +107,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
         if (m_isMC){
             AddVertErrorBands_MC(temp);
-            AddLatErrorBands_MC(temp);
         }
         hCut_pi0invMass.push_back(temp);
 
@@ -205,7 +204,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
-            AddLatErrorBands_MC(temp);
         }
         SideBand_muon_P.push_back(temp);
 
@@ -214,7 +212,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
-            AddLatErrorBands_MC(temp);
         }
         SideBand_muon_theta.push_back(temp);
 
@@ -223,7 +220,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
-            AddLatErrorBands_MC(temp);
         }
         SideBand_pi0_P.push_back(temp);
 
@@ -232,7 +228,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
-            AddLatErrorBands_MC(temp);
         }
         SideBand_pi0_KE.push_back(temp);
 
@@ -241,7 +236,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
-            AddLatErrorBands_MC(temp);
         }
         SideBand_pi0_theta.push_back(temp);
 
@@ -250,7 +244,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
-            AddLatErrorBands_MC(temp);
         }
         SideBand_neutrino_E.push_back(temp);
 
@@ -259,7 +252,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
-            AddLatErrorBands_MC(temp);
         }
         SideBand_QSq.push_back(temp);
 
@@ -268,7 +260,6 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
-            AddLatErrorBands_MC(temp);
         }
         SideBand_W.push_back(temp);
 

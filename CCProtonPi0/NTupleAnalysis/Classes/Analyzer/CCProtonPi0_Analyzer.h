@@ -26,6 +26,7 @@
 #include <sstream>
 
 #include "PlotUtils/MnvNormalization.h"
+#include "PlotUtils/HistogramUtils.h"
 
 // Classes
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
@@ -75,41 +76,60 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void writeFSParticle4P(Long64_t nEntry);
         void UpdateScanFileName();
         int GetBackgroundTypeInd();
+        bool IsInvMassInRange(double invMass);
         void FillHistogram(vector<MnvH1D*> &hist, double var);
         void FillHistogram(MnvH1D* hist, double var);
+        void FillHistogram(MnvH2D* hist, double xval, double yval);
         void FillHistogram(TH1D* hist, double var);
-        void FillHistogram(TH2D* hist, double var1, double var2);
-        void FillHistogram(TH3D* hist, double var1, double var2, double var3);
-        void FillHistogramWithDefaultErrors(MnvH1D* hist, double var);
-        void FillHistogramWithDefaultErrors_ByHand(MnvH1D* hist, double var);
-        void FillHistogram(MnvH2D* hist, double var1, double var2);
-        void FillHistogramWithDefaultErrors(MnvH2D* hist, double var1, double var2);
-        void FillHistogramWithDefaultErrors(vector<MnvH1D*> &hist, double var);
+        void FillHistogram(TH2D* hist, double xval, double yval);
+        void FillHistogram(TH3D* hist, double xval, double yval, double var3);
+        
+        void FillHistogramWithErrors(MnvH1D* hist, double var);
+        void FillHistogramWithErrors(MnvH2D* hist, double xval, double yval);
+        void FillHistogramWithErrors(vector<MnvH1D*> &hist, double var);
+        
 
         // Vertical Error Band
-        void FillVertErrorBand_All_ByHand(MnvH1D* hist, double var);
         void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, std::vector<double> errors);
-        void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err1, double err2);
+        void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err_down, double err_up);
+        void FillVertErrorBand_ByHand(MnvH2D* h, double xval, double yval, std::string error_name, std::vector<double> errors);
+        void FillVertErrorBand_ByHand(MnvH2D* h, double xval, double yval, std::string error_name, double err_down, double err_up);
         void FillVertErrorBand_Flux(MnvH1D* h, double var);
+        void FillVertErrorBand_Flux(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var);
-        void FillVertErrorBand_Flux(MnvH2D* h, double var1, double var2);
+        void FillVertErrorBand_Flux_ByHand(MnvH2D* h, double xval, double yval);
+
         void FillVertErrorBand_Genie(MnvH1D* h, double var);
+        void FillVertErrorBand_Genie(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_Genie_ByHand(MnvH1D* h, double var);
-        void FillVertErrorBand_Genie(MnvH2D* h, double var1, double var2);
+        void FillVertErrorBand_Genie_ByHand(MnvH2D* h, double xval, double yval);
+        
         void FillVertErrorBand_MuonTracking(MnvH1D* h, double var);
+        void FillVertErrorBand_MuonTracking(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_MuonTracking_ByHand(MnvH1D* h, double var);
-        void FillVertErrorBand_MuonTracking(MnvH2D* h, double var1, double var2);
+        void FillVertErrorBand_MuonTracking_ByHand(MnvH2D* h, double xval, double yval);
+
         void ReadBckgConstraints();
         double GetBckgConstraint(std::string error_name, int hist_ind);
 
         // Lateral Error Band
-        void initLateralErrorBandShifts();
-        void FillLatErrorBands_MC();
+        void FillLatErrorBands_Auto();
+
+        void initLateralErrorBandShifts(bool isModeReduce);
+        void FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::string err_name, int unv, double var, double wgt);
+        void FillLatErrorBand_SingleUniverse(MnvH2D* hist, std::string err_name, int unv, double xval, double yval, double wgt);
+        void FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::string err_name, double var, std::vector<double> rand_shifts);
+        void FillLatErrorBands_ByHand();
         void FillLatErrorBand_EM_EnergyScale();
         void FillLatErrorBand_MuonMomentum();
+        void FillLatErrorBand_EM_EnergyScale_invMass();
+        void FillLatErrorBand_MuonMomentum_invMass();
         void Calc_muonP_random_shifts();
+        double Calc_Enu_shifted(double muon_E_shifted, double pi0_E_shifted);
+        
         bool ismuonP_shifts_filled;
         CCProtonPi0_RandNumGenerator RandNumGenerator;
+        std::vector<double> no_random_shifts;
         std::vector<double> em_random_shifts;
         std::vector<double> muonP_random_shifts;
 

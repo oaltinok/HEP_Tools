@@ -4,39 +4,15 @@ using namespace PlotUtils;
 
 void CCProtonPi0_Plotter::Systematics_Practice()
 {
-    std::string plotDir = Folder_List::plotDir_Systematics_Summary;
-    //TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
-    //TFile* f_xsec_data = new TFile(rootDir_CutHists.data.c_str());
-    TFile* f_mc = new TFile(rootDir_Muon.mc.c_str());
-
-    //MnvH1D* data = GetMnvH1D(f_xsec_data, "invMass_all");
- 
-    //std::vector<std::string> all_errors = data->GetVertErrorBandNames();
-   
-    //for (unsigned int i = 0; i < all_errors.size(); ++i){
-    //    MnvVertErrorBand* err_band = data->GetVertErrorBand(all_errors[i]);
-    //    std::vector<TH1D*> err_hists = err_band->GetHists();
-    //    for (unsigned int j = 0; j < err_hists.size(); ++j){
-    //        std::cout<<err_hists[j]->GetNbinsX()<<" "<<err_hists[j]->Integral()<<std::endl;
-    //    }
-    //}
-
-    MnvH1D* mc = GetMnvH1D(f_mc, "muon_P_mc_reco_all");
-    MnvH1D* mc2 = new MnvH1D(*mc);
-    
-    std::vector<TH1D*> err_hists_mc;
-    GetPointersAllVertUniverses(mc, err_hists_mc);
-
-    std::vector<TH1D*> err_hists_mc2;
-    GetPointersAllVertUniverses(mc2, err_hists_mc2);
-
-    for (unsigned int i = 0; i < err_hists_mc.size(); ++i){
-        std::cout<<"Universe = "<<i<<std::endl;
-        std::cout<<err_hists_mc[i]->Integral()<<" "<<err_hists_mc2[i]->Integral()<<std::endl;
-    }
-
-    //delete data;
-    delete mc;
+    std::string err_name = "EM_EnergyScale";
+    Systematics_Practice(rootDir_Pion.mc, "pi0_P_mc_reco_all", err_name);
+    //Systematics_Practice(rootDir_Pion.mc, "pi0_KE_mc_reco_all", err_name);
+    //Systematics_Practice(rootDir_Pion.mc, "pi0_theta_mc_reco_all", err_name);
+    Systematics_Practice(rootDir_Muon.mc, "muon_P_mc_reco_all", err_name);
+    //Systematics_Practice(rootDir_Muon.mc, "muon_theta_mc_reco_all", err_name);
+    //Systematics_Practice(rootDir_Interaction.mc, "QSq_mc_reco_all", err_name);
+    //Systematics_Practice(rootDir_Interaction.mc, "W_mc_reco_all", err_name);
+    //Systematics_Practice(rootDir_Interaction.mc, "Enu_mc_reco_all", err_name);
 }
 
 void CCProtonPi0_Plotter::Systematics_RawData()
@@ -174,6 +150,7 @@ void CCProtonPi0_Plotter::Systematics_WriteTable(MnvH1D* hist, std::string var_n
     // Write Header
     file<<std::left;
     file.width(36); file<<"Error Name"<<" "; 
+    file.width(12); file<<"Area";    
     file.width(12); file<<"Percent";    
     file<<std::endl;
 
@@ -183,18 +160,35 @@ void CCProtonPi0_Plotter::Systematics_WriteTable(MnvH1D* hist, std::string var_n
     err_total *= err_total; // Use Square of the Error
     delete h_err_total;
 
-    // Loop Over All Errors
-    std::vector<std::string> all_errors = hist->GetVertErrorBandNames();
+    // Loop Over Vertical Errors
+    std::vector<std::string> vert_errors = hist->GetVertErrorBandNames();
     double total_check = 0.0;
-    for (unsigned int i = 0; i < all_errors.size(); ++i){
-        MnvVertErrorBand* error_band = hist->GetVertErrorBand(all_errors[i]);
+    for (unsigned int i = 0; i < vert_errors.size(); ++i){
+        MnvVertErrorBand* error_band = hist->GetVertErrorBand(vert_errors[i]);
         TH1D* h_err_single = new TH1D(error_band->GetErrorBand()); 
         double err_single = h_err_single->Integral();
         err_single *= err_single; // Use Square of the Error
         total_check += err_single;
         double percent = err_single/err_total*100.0;
         
-        file.width(36); file<<all_errors[i]<<" ";
+        file.width(36); file<<vert_errors[i]<<" ";
+        file.width(12); file<<err_single<<" ";
+        file.width(12); file<<percent<<std::endl;
+        delete h_err_single;
+    }
+
+    // Loop Over Lateral Errors
+    std::vector<std::string> lat_errors = hist->GetLatErrorBandNames();
+    for (unsigned int i = 0; i < lat_errors.size(); ++i){
+        MnvLatErrorBand* error_band = hist->GetLatErrorBand(lat_errors[i]);
+        TH1D* h_err_single = new TH1D(error_band->GetErrorBand()); 
+        double err_single = h_err_single->Integral();
+        err_single *= err_single; // Use Square of the Error
+        total_check += err_single;
+        double percent = err_single/err_total*100.0;
+        
+        file.width(36); file<<lat_errors[i]<<" ";
+        file.width(12); file<<err_single<<" ";
         file.width(12); file<<percent<<std::endl;
         delete h_err_single;
     }
@@ -202,8 +196,38 @@ void CCProtonPi0_Plotter::Systematics_WriteTable(MnvH1D* hist, std::string var_n
     // Write Total
     double total_check_percent = total_check/err_total*100.0;
     file.width(36); file<<"Total"<<" ";
+    file.width(12); file<<total_check<<" ";
     file.width(12); file<<total_check_percent<<std::endl;
 
     file.close();
+}
+
+void CCProtonPi0_Plotter::Systematics_Practice(std::string root_dir, std::string var_name, std::string err_name)
+{
+    TFile* f_mc = new TFile(root_dir.c_str());
+    std::string plotDir = Folder_List::plotDir_Systematics_Summary;
+    MnvH1D* mc = GetMnvH1D(f_mc, var_name);
+  
+    DrawErrorSummary(mc, var_name, plotDir);
+    
+    MnvLatErrorBand* err_band = mc->GetLatErrorBand(err_name);
+    std::vector<TH1D*> err_hists = err_band->GetHists();
+
+    double avg_area = 0.0;
+    for (unsigned int i = 0; i < err_hists.size(); ++i){
+        avg_area +=err_hists[i]->Integral();
+    }
+    std::cout<<var_name<<std::endl;
+    std::cout<<"Avg Error Area = "<<avg_area/(double)500<<std::endl;
+    std::cout<<"CV Area = "<<mc->Integral()<<std::endl;
+    std::cout<<err_hists.size()<<std::endl;
+
+    Systematics_WriteTable(mc, var_name);
+
+    printBins(mc,var_name);
+    printBins((MnvH1D*)err_band,err_name);
+
+    delete mc;
+    delete f_mc;
 }
 

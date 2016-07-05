@@ -1,19 +1,16 @@
-CCPROTONPI0_V="v2_88"
+CCPROTONPI0_V="v2_89"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
 	No Major Changes
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Added 2 Lateral Error Bands
-		EM Energy Scale and Muon Momentum
-		Not filling them in this version. 
-		Implementation for FillLatErrorBands() will be done in next version
-		
-	New Class: RandNumGenerator
-		Used for varying universes in Lateral Error Bands
+	Implemented and Tested FillLatErrorBand() Functions for MnvH1D
+		Two Lateral Error Bands
+			EM_EnergyScale
+			MuonMomentum
 
-	Removed Cross Section for muon_cos_theta
-		It was a test case for muon angle problem
+	Collected all Systematics Related Implementations under
+		CCProtonPi0_Analyzer_Systematics.cpp
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

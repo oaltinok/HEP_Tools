@@ -353,9 +353,9 @@ bool CCProtonPi0_NTupleAnalysis::IsWLow(double true_W)
     else return false;
 }
 
-bool CCProtonPi0_NTupleAnalysis::IsEnuInRange(double true_Enu)
+bool CCProtonPi0_NTupleAnalysis::IsEnuInRange(double Enu)
 {
-    if (true_Enu >= min_Enu && true_Enu <= max_Enu) return true;
+    if (Enu >= min_Enu && Enu <= max_Enu) return true;
     else return false;
 }
 
