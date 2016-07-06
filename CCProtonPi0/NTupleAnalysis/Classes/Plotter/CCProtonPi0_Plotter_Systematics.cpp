@@ -5,14 +5,15 @@ using namespace PlotUtils;
 void CCProtonPi0_Plotter::Systematics_Practice()
 {
     std::string err_name = "EM_EnergyScale";
-    Systematics_Practice(rootDir_Pion.mc, "pi0_P_mc_reco_all", err_name);
-    //Systematics_Practice(rootDir_Pion.mc, "pi0_KE_mc_reco_all", err_name);
-    //Systematics_Practice(rootDir_Pion.mc, "pi0_theta_mc_reco_all", err_name);
-    Systematics_Practice(rootDir_Muon.mc, "muon_P_mc_reco_all", err_name);
-    //Systematics_Practice(rootDir_Muon.mc, "muon_theta_mc_reco_all", err_name);
-    //Systematics_Practice(rootDir_Interaction.mc, "QSq_mc_reco_all", err_name);
-    //Systematics_Practice(rootDir_Interaction.mc, "W_mc_reco_all", err_name);
-    //Systematics_Practice(rootDir_Interaction.mc, "Enu_mc_reco_all", err_name);
+    //Systematics_Practice(rootDir_Pion.mc, "pi0_P_mc_reco_all", err_name);
+    //Systematics_Practice2D(rootDir_Pion.mc, "pi0_P_response", err_name);
+    
+    //Systematics_Practice(rootDir_Muon.mc, "muon_P_mc_reco_all", err_name);
+    //Systematics_Practice2D(rootDir_Muon.mc, "muon_P_response", err_name);
+    
+    Systematics_Practice(rootDir_CutHists.mc, "invMass_mc_reco_all", err_name);
+    Systematics_Practice(rootDir_CutHists.mc, "invMass_mc_reco_signal", err_name);
+    Systematics_Practice(rootDir_CutHists.mc, "invMass_mc_reco_bckg", err_name);
 }
 
 void CCProtonPi0_Plotter::Systematics_RawData()
@@ -226,6 +227,30 @@ void CCProtonPi0_Plotter::Systematics_Practice(std::string root_dir, std::string
 
     printBins(mc,var_name);
     printBins((MnvH1D*)err_band,err_name);
+
+    delete mc;
+    delete f_mc;
+}
+
+void CCProtonPi0_Plotter::Systematics_Practice2D(std::string root_dir, std::string var_name, std::string err_name)
+{
+    TFile* f_mc = new TFile(root_dir.c_str());
+    std::string plotDir = Folder_List::plotDir_Systematics_Summary;
+    MnvH2D* mc = GetMnvH2D(f_mc, var_name);
+  
+    MnvLatErrorBand2D* err_band = mc->GetLatErrorBand(err_name);
+    std::vector<TH2D*> err_hists = err_band->GetHists();
+
+    double avg_area = 0.0;
+    for (unsigned int i = 0; i < err_hists.size(); ++i){
+        std::cout<<err_hists[i]->Integral()<<std::endl;
+        avg_area +=err_hists[i]->Integral();
+    
+    }
+    std::cout<<var_name<<std::endl;
+    std::cout<<"Avg Error Area = "<<avg_area/(double)500<<std::endl;
+    std::cout<<"CV Area = "<<mc->Integral()<<std::endl;
+    std::cout<<err_hists.size()<<std::endl;
 
     delete mc;
     delete f_mc;

@@ -7,14 +7,15 @@ using namespace std;
 
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
-    applyMaxEvents = true;
+    applyMaxEvents = false;
     nMaxEvents = 1000;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
     isDataAnalysis  = true;
     isScanRun = false;
-    applyBckgConstraints = false;
+    applyBckgConstraints_CV = true;
+    applyBckgConstraints_Unv = false;
     writeFSParticleMomentum = false;
     fillErrors_ByHand = true;
 
@@ -24,6 +25,14 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     sideBand_PID = false;
     sideBand_LowInvMass = false;
     sideBand_HighInvMass = false;
+
+
+    // EM Calibration Correction
+    // Found the correction using a Double Gaussian Fit in MATLAB
+    EM_MC_peak = 130.28;
+    EM_Data_peak = 137.76;
+    if (m_isMC) EM_correction = pi0_mass/EM_MC_peak;
+    else EM_correction = pi0_mass/EM_Data_peak;
 
     // Event Selections
     applyProtonScore = true;
@@ -136,15 +145,15 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         AddVertErrorBands_Data(cutList.SideBand_neutrino_E[0]);
 
         AddLatErrorBands_Data(cutList.invMass_all);
-        //AddLatErrorBands_Data(cutList.hCut_pi0invMass[0]);
-        //AddLatErrorBands_Data(cutList.SideBand_muon_P[0]);
-        //AddLatErrorBands_Data(cutList.SideBand_muon_theta[0]);
-        //AddLatErrorBands_Data(cutList.SideBand_pi0_P[0]);
-        //AddLatErrorBands_Data(cutList.SideBand_pi0_KE[0]);
-        //AddLatErrorBands_Data(cutList.SideBand_pi0_theta[0]);
-        //AddLatErrorBands_Data(cutList.SideBand_QSq[0]);
-        //AddLatErrorBands_Data(cutList.SideBand_W[0]);
-        //AddLatErrorBands_Data(cutList.SideBand_neutrino_E[0]);
+        AddLatErrorBands_Data(cutList.hCut_pi0invMass[0]);
+        AddLatErrorBands_Data(cutList.SideBand_muon_P[0]);
+        AddLatErrorBands_Data(cutList.SideBand_muon_theta[0]);
+        AddLatErrorBands_Data(cutList.SideBand_pi0_P[0]);
+        AddLatErrorBands_Data(cutList.SideBand_pi0_KE[0]);
+        AddLatErrorBands_Data(cutList.SideBand_pi0_theta[0]);
+        AddLatErrorBands_Data(cutList.SideBand_QSq[0]);
+        AddLatErrorBands_Data(cutList.SideBand_W[0]);
+        AddLatErrorBands_Data(cutList.SideBand_neutrino_E[0]);
     }
     cutList.writeCutTable();
     cutList.writeHistograms();
@@ -839,9 +848,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // ------------------------------------------------------------------------
     // Low Gamma Energies AND Small Opening Angle Cut 
     // ------------------------------------------------------------------------
-    bool isAngleSmall = pi0_cos_openingAngle > 0.95;
-    bool isEnergyLow = (gamma1_E+gamma2_E) < 400.0;
-    if (isEnergyLow && isAngleSmall) return false;
+    if (IsOpeningAngleSmallAndEnergyLow(gamma1_E, gamma2_E)) return false; 
     cutList.nCut_LowE_SmallAngle.increment(truth_isSignal, study1, study2);
 
     // ------------------------------------------------------------------------
@@ -869,7 +876,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     //      Else fill according to Side Band
     if (NoSideBand){
         FillInvMass_TruthMatch();
-        FillHistogramWithErrors(cutList.hCut_pi0invMass, pi0_invMass);
+        FillHistogramWithVertErrors(cutList.hCut_pi0invMass, pi0_invMass);
 
         if (nProtonCandidates == 0){
             FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
@@ -899,14 +906,14 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     //      If there is no Side Band, Fill for Every Event
     //      Else fill according to Side Band
     if (NoSideBand){
-        FillHistogramWithErrors(cutList.SideBand_muon_P, muon_P*MeV_to_GeV);
-        FillHistogramWithErrors(cutList.SideBand_muon_theta, muon_theta_beam*TMath::RadToDeg());
-        FillHistogramWithErrors(cutList.SideBand_pi0_P, pi0_P*MeV_to_GeV);
-        FillHistogramWithErrors(cutList.SideBand_pi0_KE, pi0_KE*MeV_to_GeV);
-        FillHistogramWithErrors(cutList.SideBand_pi0_theta, pi0_theta_beam*TMath::RadToDeg());
-        FillHistogramWithErrors(cutList.SideBand_neutrino_E, m_Enu*MeV_to_GeV);
-        FillHistogramWithErrors(cutList.SideBand_QSq, m_QSq*MeVSq_to_GeVSq);
-        FillHistogramWithErrors(cutList.SideBand_W, m_W*MeV_to_GeV);
+        FillHistogramWithVertErrors(cutList.SideBand_muon_P, muon_P*MeV_to_GeV);
+        FillHistogramWithVertErrors(cutList.SideBand_muon_theta, muon_theta_beam*TMath::RadToDeg());
+        FillHistogramWithVertErrors(cutList.SideBand_pi0_P, pi0_P*MeV_to_GeV);
+        FillHistogramWithVertErrors(cutList.SideBand_pi0_KE, pi0_KE*MeV_to_GeV);
+        FillHistogramWithVertErrors(cutList.SideBand_pi0_theta, pi0_theta_beam*TMath::RadToDeg());
+        FillHistogramWithVertErrors(cutList.SideBand_neutrino_E, m_Enu*MeV_to_GeV);
+        FillHistogramWithVertErrors(cutList.SideBand_QSq, m_QSq*MeVSq_to_GeVSq);
+        FillHistogramWithVertErrors(cutList.SideBand_W, m_W*MeV_to_GeV);
     }else{
         fill_SideBand_Other();
     }
@@ -960,11 +967,11 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
 
         // Fill 1Track and 2 Track Enu 
         if(nProtonCandidates == 0){
-            FillHistogramWithErrors(interaction.Enu_1Track_response, E_reco, E_true);
+            FillHistogramWithVertErrors(interaction.Enu_1Track_response, E_reco, E_true);
             FillHistogram(interaction.Enu_1Track_Error, E_Error);
             FillHistogram(interaction.Enu_1Track_Diff, E_reco-E_true);
         }else{ 
-            FillHistogramWithErrors(interaction.Enu_2Track_response, E_reco, E_true);
+            FillHistogramWithVertErrors(interaction.Enu_2Track_response, E_reco, E_true);
             FillHistogram(interaction.Enu_2Track_Error, E_Error);
             FillHistogram(interaction.Enu_2Track_Diff, E_reco-E_true);
         }  
@@ -978,11 +985,11 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
         FillHistogram(interaction.QSq_Diff, QSq_reco-QSq_true);
  
         if(nProtonCandidates == 0){
-            FillHistogramWithErrors(interaction.QSq_1Track_response, QSq_reco, QSq_true);
+            FillHistogramWithVertErrors(interaction.QSq_1Track_response, QSq_reco, QSq_true);
             FillHistogram(interaction.QSq_1Track_Error, QSq_error);
             FillHistogram(interaction.QSq_1Track_Diff, QSq_reco-QSq_true);
         }else{ 
-            FillHistogramWithErrors(interaction.QSq_2Track_response, QSq_reco, QSq_true);
+            FillHistogramWithVertErrors(interaction.QSq_2Track_response, QSq_reco, QSq_true);
             FillHistogram(interaction.QSq_2Track_Error, QSq_error);
             FillHistogram(interaction.QSq_2Track_Diff, QSq_reco-QSq_true);
         }  
@@ -1140,7 +1147,7 @@ void CCProtonPi0_Analyzer::fillProtonMC()
         double error_P = Data_Functions::getError(true_P, reco_P);
         FillHistogram(proton.P_error, error_P);
         FillHistogram(proton.P_Diff, reco_P-true_P);
-        FillHistogramWithErrors(proton.proton_P_response, reco_P, true_P);
+        FillHistogramWithVertErrors(proton.proton_P_response, reco_P, true_P);
 
         // Energy
         double reco_E = proton_E * MeV_to_GeV;
@@ -1157,7 +1164,7 @@ void CCProtonPi0_Analyzer::fillProtonMC()
 
         FillHistogram(proton.theta_error, error_theta);
         FillHistogram(proton.theta_Diff, reco_theta-true_theta);
-        FillHistogramWithErrors(proton.proton_theta_response, proton_theta_beam * TMath::RadToDeg(), truth_proton_theta_beam * TMath::RadToDeg());
+        FillHistogramWithVertErrors(proton.proton_theta_response, proton_theta_beam * TMath::RadToDeg(), truth_proton_theta_beam * TMath::RadToDeg());
     }
 }
 
@@ -1403,13 +1410,17 @@ void CCProtonPi0_Analyzer::fill_BackgroundSubtractionHists()
 {
     if (m_isMC){
         // Fill CV and Vertical Error Bands
-        FillHistogramWithErrors(cutList.invMass_mc_reco_all, pi0_invMass);
-        if (truth_isSignal)  FillHistogramWithErrors(cutList.invMass_mc_reco_signal, pi0_invMass);
-        else FillHistogramWithErrors(cutList.invMass_mc_reco_bckg, pi0_invMass);
+        FillHistogramWithVertErrors(cutList.invMass_mc_reco_all, pi0_invMass);
+        if (truth_isSignal)  FillHistogramWithVertErrors(cutList.invMass_mc_reco_signal, pi0_invMass);
+        else FillHistogramWithVertErrors(cutList.invMass_mc_reco_bckg, pi0_invMass);
 
         // Fill Lateral Error Bands
-        FillLatErrorBand_EM_EnergyScale_invMass();
-        FillLatErrorBand_MuonMomentum_invMass();
+        if (fillErrors_ByHand){
+            FillLatErrorBand_EM_EnergyScale_invMass();
+            FillLatErrorBand_MuonMomentum_invMass();
+        }else{
+            FillLatErrorBands_invMass_Auto();
+        }
     }else{
         FillHistogram(cutList.invMass_all, pi0_invMass);
     }
@@ -1419,17 +1430,17 @@ void CCProtonPi0_Analyzer::fill_W()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithErrors(interaction.W_mc_reco_all, m_W * MeV_to_GeV);
+        FillHistogramWithVertErrors(interaction.W_mc_reco_all, m_W * MeV_to_GeV);
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithErrors(interaction.W_mc_truth_signal, m_W_Truth * MeV_to_GeV);
+            FillHistogramWithVertErrors(interaction.W_mc_truth_signal, m_W_Truth * MeV_to_GeV);
             // MC Reco Signal
-            FillHistogramWithErrors(interaction.W_mc_reco_signal, m_W * MeV_to_GeV);
+            FillHistogramWithVertErrors(interaction.W_mc_reco_signal, m_W * MeV_to_GeV);
             // MC Reco vs True -- Response
-            FillHistogramWithErrors(interaction.W_response, m_W * MeV_to_GeV, m_W_Truth * MeV_to_GeV);
+            FillHistogramWithVertErrors(interaction.W_response, m_W * MeV_to_GeV, m_W_Truth * MeV_to_GeV);
         }else{
             // MC Reco Background
-            FillHistogramWithErrors(interaction.W_mc_reco_bckg, m_W * MeV_to_GeV);
+            FillHistogramWithVertErrors(interaction.W_mc_reco_bckg, m_W * MeV_to_GeV);
         }
     }else{
         // Data
@@ -1441,17 +1452,17 @@ void CCProtonPi0_Analyzer::fill_Enu()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithErrors(interaction.Enu_mc_reco_all, m_Enu * MeV_to_GeV);
+        FillHistogramWithVertErrors(interaction.Enu_mc_reco_all, m_Enu * MeV_to_GeV);
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithErrors(interaction.Enu_mc_truth_signal, m_Enu_Truth * MeV_to_GeV);
+            FillHistogramWithVertErrors(interaction.Enu_mc_truth_signal, m_Enu_Truth * MeV_to_GeV);
             // MC Reco Signal
-            FillHistogramWithErrors(interaction.Enu_mc_reco_signal, m_Enu * MeV_to_GeV);
+            FillHistogramWithVertErrors(interaction.Enu_mc_reco_signal, m_Enu * MeV_to_GeV);
             // MC Reco vs True -- Response
-            FillHistogramWithErrors(interaction.Enu_response, m_Enu * MeV_to_GeV, m_Enu_Truth * MeV_to_GeV);
+            FillHistogramWithVertErrors(interaction.Enu_response, m_Enu * MeV_to_GeV, m_Enu_Truth * MeV_to_GeV);
         }else{
             // MC Reco Background
-            FillHistogramWithErrors(interaction.Enu_mc_reco_bckg, m_Enu * MeV_to_GeV);
+            FillHistogramWithVertErrors(interaction.Enu_mc_reco_bckg, m_Enu * MeV_to_GeV);
         }
     }else{
         // Data
@@ -1463,17 +1474,17 @@ void CCProtonPi0_Analyzer::fill_QSq()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithErrors(interaction.QSq_mc_reco_all, m_QSq * MeVSq_to_GeVSq);
+        FillHistogramWithVertErrors(interaction.QSq_mc_reco_all, m_QSq * MeVSq_to_GeVSq);
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithErrors(interaction.QSq_mc_truth_signal, m_QSq_Truth * MeVSq_to_GeVSq);
+            FillHistogramWithVertErrors(interaction.QSq_mc_truth_signal, m_QSq_Truth * MeVSq_to_GeVSq);
             // MC Reco Signal
-            FillHistogramWithErrors(interaction.QSq_mc_reco_signal, m_QSq * MeVSq_to_GeVSq);
+            FillHistogramWithVertErrors(interaction.QSq_mc_reco_signal, m_QSq * MeVSq_to_GeVSq);
             // MC Reco vs True -- Response
-            FillHistogramWithErrors(interaction.QSq_response, m_QSq * MeVSq_to_GeVSq, m_QSq_Truth * MeVSq_to_GeVSq);
+            FillHistogramWithVertErrors(interaction.QSq_response, m_QSq * MeVSq_to_GeVSq, m_QSq_Truth * MeVSq_to_GeVSq);
         }else{
             // MC Reco Background
-            FillHistogramWithErrors(interaction.QSq_mc_reco_bckg, m_QSq * MeVSq_to_GeVSq);
+            FillHistogramWithVertErrors(interaction.QSq_mc_reco_bckg, m_QSq * MeVSq_to_GeVSq);
         }
     }else{
         // Data
@@ -1485,17 +1496,17 @@ void CCProtonPi0_Analyzer::fill_muon_P()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithErrors(muon.muon_P_mc_reco_all, muon_P * MeV_to_GeV);
+        FillHistogramWithVertErrors(muon.muon_P_mc_reco_all, muon_P * MeV_to_GeV);
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithErrors(muon.muon_P_mc_truth_signal, truth_muon_P * MeV_to_GeV);
+            FillHistogramWithVertErrors(muon.muon_P_mc_truth_signal, truth_muon_P * MeV_to_GeV);
             // MC Reco Signal
-            FillHistogramWithErrors(muon.muon_P_mc_reco_signal, muon_P * MeV_to_GeV);
+            FillHistogramWithVertErrors(muon.muon_P_mc_reco_signal, muon_P * MeV_to_GeV);
             // MC Reco vs True -- Response
-            FillHistogramWithErrors(muon.muon_P_response, muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV);
+            FillHistogramWithVertErrors(muon.muon_P_response, muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV);
         }else{
             // MC Reco Background
-            FillHistogramWithErrors(muon.muon_P_mc_reco_bckg, muon_P * MeV_to_GeV);
+            FillHistogramWithVertErrors(muon.muon_P_mc_reco_bckg, muon_P * MeV_to_GeV);
         }
     }else{
         // Data
@@ -1510,17 +1521,17 @@ void CCProtonPi0_Analyzer::fill_muon_theta()
 
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithErrors(muon.muon_theta_mc_reco_all, reco_muon_theta * TMath::RadToDeg());
+        FillHistogramWithVertErrors(muon.muon_theta_mc_reco_all, reco_muon_theta * TMath::RadToDeg());
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithErrors(muon.muon_theta_mc_truth_signal, truth_muon_theta_beam * TMath::RadToDeg());
+            FillHistogramWithVertErrors(muon.muon_theta_mc_truth_signal, truth_muon_theta_beam * TMath::RadToDeg());
             // MC Reco Signal
-            FillHistogramWithErrors(muon.muon_theta_mc_reco_signal, reco_muon_theta * TMath::RadToDeg());
+            FillHistogramWithVertErrors(muon.muon_theta_mc_reco_signal, reco_muon_theta * TMath::RadToDeg());
             // MC Reco vs True -- Response
-            FillHistogramWithErrors(muon.muon_theta_response, reco_muon_theta * TMath::RadToDeg(), truth_muon_theta_beam * TMath::RadToDeg());
+            FillHistogramWithVertErrors(muon.muon_theta_response, reco_muon_theta * TMath::RadToDeg(), truth_muon_theta_beam * TMath::RadToDeg());
         }else{
             // MC Reco Background
-            FillHistogramWithErrors(muon.muon_theta_mc_reco_bckg, reco_muon_theta * TMath::RadToDeg());
+            FillHistogramWithVertErrors(muon.muon_theta_mc_reco_bckg, reco_muon_theta * TMath::RadToDeg());
         }
     }else{
         // Data
@@ -1532,17 +1543,17 @@ void CCProtonPi0_Analyzer::fill_pi0_P()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithErrors(pi0.pi0_P_mc_reco_all, pi0_P * MeV_to_GeV);
+        FillHistogramWithVertErrors(pi0.pi0_P_mc_reco_all, pi0_P * MeV_to_GeV);
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithErrors(pi0.pi0_P_mc_truth_signal, truth_pi0_P * MeV_to_GeV);
+            FillHistogramWithVertErrors(pi0.pi0_P_mc_truth_signal, truth_pi0_P * MeV_to_GeV);
             // MC Reco Signal
-            FillHistogramWithErrors(pi0.pi0_P_mc_reco_signal, pi0_P * MeV_to_GeV);
+            FillHistogramWithVertErrors(pi0.pi0_P_mc_reco_signal, pi0_P * MeV_to_GeV);
             // MC Reco vs True -- Response
-            FillHistogramWithErrors(pi0.pi0_P_response, pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV);
+            FillHistogramWithVertErrors(pi0.pi0_P_response, pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV);
         }else{
             // MC Reco Background
-            FillHistogramWithErrors(pi0.pi0_P_mc_reco_bckg, pi0_P * MeV_to_GeV);
+            FillHistogramWithVertErrors(pi0.pi0_P_mc_reco_bckg, pi0_P * MeV_to_GeV);
         }
     }else{
         // Data
@@ -1554,17 +1565,17 @@ void CCProtonPi0_Analyzer::fill_pi0_KE()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithErrors(pi0.pi0_KE_mc_reco_all, pi0_KE * MeV_to_GeV);
+        FillHistogramWithVertErrors(pi0.pi0_KE_mc_reco_all, pi0_KE * MeV_to_GeV);
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithErrors(pi0.pi0_KE_mc_truth_signal, truth_pi0_KE  * MeV_to_GeV);
+            FillHistogramWithVertErrors(pi0.pi0_KE_mc_truth_signal, truth_pi0_KE  * MeV_to_GeV);
             // MC Reco Signal
-            FillHistogramWithErrors(pi0.pi0_KE_mc_reco_signal, pi0_KE * MeV_to_GeV);
+            FillHistogramWithVertErrors(pi0.pi0_KE_mc_reco_signal, pi0_KE * MeV_to_GeV);
             // MC Reco vs True -- Response
-            FillHistogramWithErrors(pi0.pi0_KE_response, pi0_KE * MeV_to_GeV, truth_pi0_KE * MeV_to_GeV);
+            FillHistogramWithVertErrors(pi0.pi0_KE_response, pi0_KE * MeV_to_GeV, truth_pi0_KE * MeV_to_GeV);
         }else{
             // MC Reco Background
-            FillHistogramWithErrors(pi0.pi0_KE_mc_reco_bckg, pi0_KE * MeV_to_GeV);
+            FillHistogramWithVertErrors(pi0.pi0_KE_mc_reco_bckg, pi0_KE * MeV_to_GeV);
         }
     }else{
         // Data
@@ -1576,17 +1587,17 @@ void CCProtonPi0_Analyzer::fill_pi0_theta()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithErrors(pi0.pi0_theta_mc_reco_all, pi0_theta_beam * TMath::RadToDeg());
+        FillHistogramWithVertErrors(pi0.pi0_theta_mc_reco_all, pi0_theta_beam * TMath::RadToDeg());
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithErrors(pi0.pi0_theta_mc_truth_signal, truth_pi0_theta_beam  * TMath::RadToDeg());
+            FillHistogramWithVertErrors(pi0.pi0_theta_mc_truth_signal, truth_pi0_theta_beam  * TMath::RadToDeg());
             // MC Reco Signal
-            FillHistogramWithErrors(pi0.pi0_theta_mc_reco_signal, pi0_theta_beam * TMath::RadToDeg());
+            FillHistogramWithVertErrors(pi0.pi0_theta_mc_reco_signal, pi0_theta_beam * TMath::RadToDeg());
             // MC Reco vs True -- Response
-            FillHistogramWithErrors(pi0.pi0_theta_response, pi0_theta_beam * TMath::RadToDeg(), truth_pi0_theta_beam * TMath::RadToDeg());
+            FillHistogramWithVertErrors(pi0.pi0_theta_response, pi0_theta_beam * TMath::RadToDeg(), truth_pi0_theta_beam * TMath::RadToDeg());
         }else{
             // MC Reco Background
-            FillHistogramWithErrors(pi0.pi0_theta_mc_reco_bckg, pi0_theta_beam * TMath::RadToDeg());
+            FillHistogramWithVertErrors(pi0.pi0_theta_mc_reco_bckg, pi0_theta_beam * TMath::RadToDeg());
         }
     }else{
         // Data
@@ -1691,38 +1702,31 @@ void CCProtonPi0_Analyzer::CorrectNTupleVariables()
 
 void CCProtonPi0_Analyzer::CorrectEMShowerCalibration()
 {
-    // Found the correction using a Double Gaussian Fit in MATLAB
-    const double pi0_mass = 134.98;
-    double correction;
-    if (m_isMC) correction = pi0_mass/130.28;
-    else correction = pi0_mass/137.76;
-
     // Pi0 Variables
-    pi0_invMass *= correction;
-    pi0_E *= correction;
-    pi0_E_Cal *= correction;
-    pi0_P *= correction;
+    pi0_invMass *= EM_correction;
+    pi0_E_Cal *= EM_correction;
+    pi0_P *= EM_correction;
+    pi0_px *= EM_correction;
+    pi0_py *= EM_correction;
+    pi0_pz *= EM_correction;
+    pi0_E = sqrt(pi0_P*pi0_P + pi0_mass*pi0_mass);
     pi0_KE = pi0_E - pi0_mass;
-    pi0_px *= correction;
-    pi0_py *= correction;
-    pi0_pz *= correction;
-
+    
     // gamma1 
-    gamma1_E *= correction;
-    gamma1_E_Old *= correction;
-    gamma1_P *= correction;
-    gamma1_px *= correction;
-    gamma1_py *= correction;
-    gamma1_pz *= correction;
+    gamma1_E *= EM_correction;
+    gamma1_E_Old *= EM_correction;
+    gamma1_P *= EM_correction;
+    gamma1_px *= EM_correction;
+    gamma1_py *= EM_correction;
+    gamma1_pz *= EM_correction;
 
     // gamma2 
-    gamma2_E *= correction;
-    gamma2_E_Old *= correction;
-    gamma2_P *= correction;
-    gamma2_px *= correction;
-    gamma2_py *= correction;
-    gamma2_pz *= correction;
-
+    gamma2_E *= EM_correction;
+    gamma2_E_Old *= EM_correction;
+    gamma2_P *= EM_correction;
+    gamma2_px *= EM_correction;
+    gamma2_py *= EM_correction;
+    gamma2_pz *= EM_correction;
 }
 
 void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
@@ -1739,7 +1743,7 @@ void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
         cvweight *= minos_eff_correction;
         
         // Apply Background Constraints
-        if (applyBckgConstraints){
+        if (applyBckgConstraints_CV){
             if (truth_isBckg_Compact_SinglePiPlus) cvweight *= cv_wgt_SinglePiPlus;
             else if (truth_isBckg_Compact_QELike) cvweight *= cv_wgt_QELike;
             else if (truth_isBckg_Compact_WithPi0) cvweight *= cv_wgt_WithPi0;
@@ -2091,7 +2095,7 @@ void CCProtonPi0_Analyzer::fill_SideBand_InvMass()
 
     if (fill_Michel || fill_pID){
         FillInvMass_TruthMatch();
-        FillHistogramWithErrors(cutList.hCut_pi0invMass, pi0_invMass);
+        FillHistogramWithVertErrors(cutList.hCut_pi0invMass, pi0_invMass);
 
         if (nProtonCandidates == 0){
             FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
@@ -2111,14 +2115,14 @@ void CCProtonPi0_Analyzer::fill_SideBand_Other()
     bool fill_HighInvMass = sideBand_HighInvMass && isHighInvMassEvent;
 
     if (fill_Michel || fill_pID || fill_LowInvMass || fill_HighInvMass){
-        FillHistogramWithErrors(cutList.SideBand_muon_P, muon_P*MeV_to_GeV);
-        FillHistogramWithErrors(cutList.SideBand_muon_theta, muon_theta_beam*TMath::RadToDeg());
-        FillHistogramWithErrors(cutList.SideBand_pi0_P, pi0_P*MeV_to_GeV);
-        FillHistogramWithErrors(cutList.SideBand_pi0_KE, pi0_KE*MeV_to_GeV);
-        FillHistogramWithErrors(cutList.SideBand_pi0_theta, pi0_theta_beam*TMath::RadToDeg());
-        FillHistogramWithErrors(cutList.SideBand_neutrino_E, m_Enu*MeV_to_GeV);
-        FillHistogramWithErrors(cutList.SideBand_QSq, m_QSq*MeVSq_to_GeVSq);
-        FillHistogramWithErrors(cutList.SideBand_W, m_W*MeV_to_GeV);
+        FillHistogramWithVertErrors(cutList.SideBand_muon_P, muon_P*MeV_to_GeV);
+        FillHistogramWithVertErrors(cutList.SideBand_muon_theta, muon_theta_beam*TMath::RadToDeg());
+        FillHistogramWithVertErrors(cutList.SideBand_pi0_P, pi0_P*MeV_to_GeV);
+        FillHistogramWithVertErrors(cutList.SideBand_pi0_KE, pi0_KE*MeV_to_GeV);
+        FillHistogramWithVertErrors(cutList.SideBand_pi0_theta, pi0_theta_beam*TMath::RadToDeg());
+        FillHistogramWithVertErrors(cutList.SideBand_neutrino_E, m_Enu*MeV_to_GeV);
+        FillHistogramWithVertErrors(cutList.SideBand_QSq, m_QSq*MeVSq_to_GeVSq);
+        FillHistogramWithVertErrors(cutList.SideBand_W, m_W*MeV_to_GeV);
     }
 }
 
@@ -2264,6 +2268,16 @@ bool CCProtonPi0_Analyzer::IsInvMassInRange(double invMass)
 {
     return ((invMass >= min_Pi0_invMass) && (invMass <= max_Pi0_invMass)); 
 }
+
+bool CCProtonPi0_Analyzer::IsOpeningAngleSmallAndEnergyLow(double E_g1, double E_g2)
+{
+    bool isAngleSmall = pi0_cos_openingAngle > 0.95;
+    bool isEnergyLow = (E_g1 + E_g2) < 400.0;
+    if (isEnergyLow && isAngleSmall) return true;
+    else return false;
+}
+
+
 #endif //CCProtonPi0_Analyzer_cpp
 
 

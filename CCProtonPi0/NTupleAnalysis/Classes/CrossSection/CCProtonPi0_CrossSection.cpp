@@ -23,9 +23,13 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
     }
     OpenTextFile(text_out_name, text_out);
 
+    // Results w/o systematics
+    RemoveErrorBands = false;
+
     OpenRootFiles();
     initHistograms();
     initXSecs();
+
     std::cout<<"Done!"<<std::endl;
 }
 
@@ -95,11 +99,11 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     std::vector<std::string> dummy_err_bands;
     std::vector<int> dummy_hist_ind;
 
-    GetAllVertUniverses(invMass_all, data_invMass, dummy_err_bands, dummy_hist_ind);
+    GetAllUniverses(invMass_all, data_invMass, dummy_err_bands, dummy_hist_ind);
     // Clear Dummy Vectors
     dummy_err_bands.clear();
     dummy_hist_ind.clear();
-    GetAllVertUniverses(invMass_mc_reco_bckg, bckg_invMass, dummy_err_bands, dummy_hist_ind);
+    GetAllUniverses(invMass_mc_reco_bckg, bckg_invMass, dummy_err_bands, dummy_hist_ind);
     // Clear Dummy Vectors
     dummy_err_bands.clear();
     dummy_hist_ind.clear();
@@ -267,9 +271,9 @@ MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_b
     std::vector<TH1D*> bckg_subtracted_all_universes;
     std::vector<TH1D*> mc_bckg_all_universes;
     
-    GetPointersAllVertUniverses(data, data_all_universes);
-    GetPointersAllVertUniverses(bckg_subtracted, bckg_subtracted_all_universes);
-    GetPointersAllVertUniverses(mc_bckg, mc_bckg_all_universes);
+    GetPointersAllUniverses(data, data_all_universes);
+    GetPointersAllUniverses(bckg_subtracted, bckg_subtracted_all_universes);
+    GetPointersAllUniverses(mc_bckg, mc_bckg_all_universes);
 
     text_out<<"N(Universes) = "<<data_all_universes.size()<<std::endl;
    
@@ -448,7 +452,14 @@ void CCProtonPi0_CrossSection::initHistograms()
 
     invMass_mc_reco_signal = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_signal");
     invMass_mc_reco_bckg = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_bckg");
+
+    if (RemoveErrorBands){
+        invMass_all->ClearAllErrorBands();
+        invMass_mc_reco_signal->ClearAllErrorBands();
+        invMass_mc_reco_bckg->ClearAllErrorBands();
+    }
 }
+
 
 void CCProtonPi0_CrossSection::initFluxHistograms()
 {
@@ -511,6 +522,17 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
 
     hist_name = var.name + "_response";
     var.response = GetMnvH2D(var.f_mc, hist_name);
+
+    // For
+    if (RemoveErrorBands){
+        var.all->ClearAllErrorBands();
+        var.mc_reco_signal->ClearAllErrorBands();
+        var.mc_reco_bckg->ClearAllErrorBands();
+        var.mc_truth_all_signal->ClearAllErrorBands();
+        var.mc_truth_signal->ClearAllErrorBands();
+        var.eff->ClearAllErrorBands();
+        var.response->ClearAllErrorBands();
+    }
 }
 
 double CCProtonPi0_CrossSection::GetFluxHistContent(MnvH1D* hist, double low1, double low2)

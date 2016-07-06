@@ -228,6 +228,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void Systematics();
         void Systematics_Practice();
         void Systematics_Practice(std::string root_dir, std::string var_name, std::string err_name);
+        void Systematics_Practice2D(std::string root_dir, std::string var_name, std::string err_name);
         void Systematics_RawData();
         void Systematics_DrawErrorSummary(std::string data_var, std::string mc_var);
         void Systematics_DrawErrorBand_GENIE(std::string mc_var);

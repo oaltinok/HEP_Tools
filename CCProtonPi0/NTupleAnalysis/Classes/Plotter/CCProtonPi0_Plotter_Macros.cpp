@@ -399,13 +399,6 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     MnvH1D* tempData = new MnvH1D(*data);
     MnvH1D* tempMC = new MnvH1D(*mc);
     
-    // Normalize to Norm Bin Width
-    NormalizeToNormBinWidth(tempData);
-    NormalizeToNormBinWidth(tempMC);
-
-    //printBins(tempData,"data",false);
-    //printBins(tempMC,"MC",true);
-
     // ------------------------------------------------------------------------
     // Neutrino Energy Comparison Only
     //tempData->SetMaximum(80);
@@ -589,8 +582,8 @@ void CCProtonPi0_Plotter::DrawMnvH1D(MnvH1D* hist1D, std::string var_name, std::
     hist1D->SetFillColor(kRed);
     hist1D->SetFillStyle(3010);
 
-    //double norm_bin_width = hist1D->GetNormBinWidth();
-    //hist1D->Scale(norm_bin_width,"width");
+    double norm_bin_width = hist1D->GetNormBinWidth();
+    hist1D->Scale(norm_bin_width,"width");
 
     hist1D->Draw("HIST");
     gPad->Update();

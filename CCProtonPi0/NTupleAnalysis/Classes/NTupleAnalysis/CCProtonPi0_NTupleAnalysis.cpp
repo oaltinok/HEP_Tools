@@ -23,6 +23,11 @@ const double CCProtonPi0_NTupleAnalysis::mSq_to_cmSq = pow(10,4);
 const double CCProtonPi0_NTupleAnalysis::mm_to_cm = pow(10,-1);
 const double CCProtonPi0_NTupleAnalysis::rad_to_deg = 180.0/M_PI;
 
+const double CCProtonPi0_NTupleAnalysis::muon_mass = 105.66;    // MeV
+const double CCProtonPi0_NTupleAnalysis::pi0_mass = 134.98;     // MeV
+const double CCProtonPi0_NTupleAnalysis::proton_mass = 938.27;  // MeV
+const double CCProtonPi0_NTupleAnalysis::neutron_mass = 939.57; // MeV
+
 // Flux Correction
 const bool CCProtonPi0_NTupleAnalysis::applyNuEConstraint = true;
 const FluxReweighter::EFluxVersion CCProtonPi0_NTupleAnalysis::new_flux = FluxReweighter::gen2thin;
@@ -362,7 +367,6 @@ bool CCProtonPi0_NTupleAnalysis::IsEnuInRange(double Enu)
 double CCProtonPi0_NTupleAnalysis::Calc_Enu_Truth(double muon_E, double proton_E, double pi0_E)
 {
     double Enu;
-    const double proton_mass = 938.27; //MeV
     double proton_KE = proton_E - proton_mass;
 
     Enu = muon_E + proton_KE + pi0_E; 
@@ -372,24 +376,20 @@ double CCProtonPi0_NTupleAnalysis::Calc_Enu_Truth(double muon_E, double proton_E
 
 double CCProtonPi0_NTupleAnalysis::Calc_QSq(double Enu, double muon_E, double muon_P, double muon_angle_beam) 
 {
-    const double Mmu = 105.66;  // Muon Rest Mass [MeV]
-
-    double QSq = 2*Enu*(muon_E - muon_P*cos(muon_angle_beam))-(Mmu*Mmu);
+    double QSq = 2*Enu*(muon_E - muon_P*cos(muon_angle_beam))-(muon_mass*muon_mass);
 
     return QSq;
 }
 
 double CCProtonPi0_NTupleAnalysis::Calc_WSq(double Enu, double QSq, double muon_E)
 {
-    const double Mn = 939.57;    // Neutron Rest Mass [MeV]
-
     // Calculate WSq - Use eq. in Research Logbook page 31
-    double WSq = Mn*Mn + 2*Mn*(Enu - muon_E) - QSq; 
+    double WSq = neutron_mass*neutron_mass + 2*neutron_mass*(Enu - muon_E) - QSq; 
 
     return WSq;
 }
 
-void CCProtonPi0_NTupleAnalysis::GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes, std::vector<std::string> &err_bands, std::vector<int> &hist_ind)
+void CCProtonPi0_NTupleAnalysis::GetAllUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes, std::vector<std::string> &err_bands, std::vector<int> &hist_ind)
 {
     // Check for input vector
     if (!all_universes.empty()){
@@ -410,33 +410,62 @@ void CCProtonPi0_NTupleAnalysis::GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::v
     // Add Other Universes from Error Bands
     // ------------------------------------------------------------------------
     // Get Vert Error Band Names
-    std::vector<std::string> err_names = mnvh1d_hist->GetVertErrorBandNames();
+    std::vector<std::string> vert_err_names = mnvh1d_hist->GetVertErrorBandNames();
 
     // Loop over all Vertical Error Bands
-    for (unsigned int i = 0; i < err_names.size(); ++i){
-        MnvVertErrorBand* err_band =  mnvh1d_hist->GetVertErrorBand(err_names[i]);
+    for (unsigned int i = 0; i < vert_err_names.size(); ++i){
+        MnvVertErrorBand* err_band =  mnvh1d_hist->GetVertErrorBand(vert_err_names[i]);
         // Get All Histograms from it
         std::vector<TH1D*> err_hists = err_band->GetHists();
         for (unsigned int j = 0; j < err_hists.size(); ++j){
             TH1D* temp = new TH1D(*err_hists[j]);
             all_universes.push_back(temp);
-            err_bands.push_back(err_names[i]);
+            err_bands.push_back(vert_err_names[i]);
+            hist_ind.push_back(j);
+        }
+    }
+
+    // Get Lat Error Band Names
+    std::vector<std::string> lat_err_names = mnvh1d_hist->GetLatErrorBandNames();
+
+    // Loop over all Lateral Error Bands
+    for (unsigned int i = 0; i < lat_err_names.size(); ++i){
+        MnvLatErrorBand* err_band =  mnvh1d_hist->GetLatErrorBand(lat_err_names[i]);
+        // Get All Histograms from it
+        std::vector<TH1D*> err_hists = err_band->GetHists();
+        for (unsigned int j = 0; j < err_hists.size(); ++j){
+            TH1D* temp = new TH1D(*err_hists[j]);
+            all_universes.push_back(temp);
+            err_bands.push_back(lat_err_names[i]);
             hist_ind.push_back(j);
         }
     }
 }
 
-void CCProtonPi0_NTupleAnalysis::GetPointersAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes)
+void CCProtonPi0_NTupleAnalysis::GetPointersAllUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes)
 {
     // ------------------------------------------------------------------------
-    // Add Other Universes from Error Bands
+    // Add All Universes from All Error Bands
     // ------------------------------------------------------------------------
     // Get Vert Error Band Names
-    std::vector<std::string> err_names = mnvh1d_hist->GetVertErrorBandNames();
+    std::vector<std::string> vert_err_names = mnvh1d_hist->GetVertErrorBandNames();
 
     // Loop over all Vertical Error Bands
-    for (unsigned int i = 0; i < err_names.size(); ++i){
-        MnvVertErrorBand* err_band =  mnvh1d_hist->GetVertErrorBand(err_names[i]);
+    for (unsigned int i = 0; i < vert_err_names.size(); ++i){
+        MnvVertErrorBand* err_band =  mnvh1d_hist->GetVertErrorBand(vert_err_names[i]);
+        // Get All Histograms from it
+        std::vector<TH1D*> err_hists = err_band->GetHists();
+        for (unsigned int j = 0; j < err_hists.size(); ++j){
+            all_universes.push_back(err_hists[j]);
+        }
+    }
+
+    // Get Lat Error Band Names
+    std::vector<std::string> lat_err_names = mnvh1d_hist->GetLatErrorBandNames();
+
+    // Loop over all Lateral Error Bands
+    for (unsigned int i = 0; i < lat_err_names.size(); ++i){
+        MnvLatErrorBand* err_band =  mnvh1d_hist->GetLatErrorBand(lat_err_names[i]);
         // Get All Histograms from it
         std::vector<TH1D*> err_hists = err_band->GetHists();
         for (unsigned int j = 0; j < err_hists.size(); ++j){

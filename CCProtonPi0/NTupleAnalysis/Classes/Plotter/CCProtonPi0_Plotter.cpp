@@ -20,8 +20,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     // Cross Sections
     //--------------------------------------------------------------------------
-    //plotCrossSection();
-    //plotCrossSection_Check();
+    plotCrossSection();
+    plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
     //  Data vs MC
@@ -48,7 +48,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
-    Systematics();
+    //Systematics();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -728,6 +728,10 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     //plot_stacked_pi0_P();
     //plot_stacked_pi0_theta();
 
+    Draw1DHist(rootDir_Interaction,"normal_rand_numbers",plotDir);
+    Draw1DHist(rootDir_Interaction,"em_shift_rand_numbers",plotDir);
+    Draw1DHist(rootDir_Interaction,"muonP_shift_rand_numbers",plotDir);
+    
     std::cout<<"Plotting Interaction MC Only Finished!"<<std::endl;
 }
 
@@ -2024,14 +2028,14 @@ void CCProtonPi0_Plotter::PlotXSecVar(std::string var_name, std::string data_var
 
 void CCProtonPi0_Plotter::plotCrossSection()
 {
-    plot_muon_P = false;
+    plot_muon_P = true;
     plot_muon_theta = true;
-    plot_pi0_P = false;
-    plot_pi0_KE = false;
-    plot_pi0_theta = false;
-    plot_QSq = false;
-    plot_W = false;
-    plot_Enu = false;
+    plot_pi0_P = true;
+    plot_pi0_KE = true;
+    plot_pi0_theta = true;
+    plot_QSq = true;
+    plot_W = true;
+    plot_Enu = true;
 
     plotOriginalData();
     plotBackgroundEstimated();

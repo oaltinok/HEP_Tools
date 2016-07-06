@@ -69,6 +69,10 @@ class CCProtonPi0_NTupleAnalysis
         static const double max_Enu;
         static const double max_W;
         static const double max_muon_angle;
+        static const double muon_mass;
+        static const double pi0_mass;
+        static const double proton_mass;
+        static const double neutron_mass;
 
         // Event Kinematics 
         bool IsWLow(double true_W);
@@ -156,8 +160,8 @@ class CCProtonPi0_NTupleAnalysis
         // --------------------------------------------------------------------
         // Systematics - Multi Universe 
         // --------------------------------------------------------------------
-        void GetPointersAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes);
-        void GetAllVertUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes, std::vector<std::string> &err_bands, std::vector<int> &hist_ind);
+        void GetPointersAllUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes);
+        void GetAllUniverses(MnvH1D* mnvh1d_hist, std::vector<TH1D*> &all_universes, std::vector<std::string> &err_bands, std::vector<int> &hist_ind);
         void ClearAllUniversesVector(std::vector<TH1D*> &all_universes);
 
     private:

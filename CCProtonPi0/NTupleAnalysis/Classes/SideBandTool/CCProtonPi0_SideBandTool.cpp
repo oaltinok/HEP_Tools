@@ -125,13 +125,13 @@ void CCProtonPi0_SideBandTool::initSideBand_FitHistograms(SideBand& sb)
 
 void CCProtonPi0_SideBandTool::initSideBand_AllUniverses(SideBand& sb)
 {
-    GetAllVertUniverses(sb.data, sb.data_all_universes, sb.err_bands_data_all_universes, sb.hist_ind_data_all_universes);
-    GetAllVertUniverses(sb.mc_total, sb.mc_total_all_universes, sb.err_bands_mc_total_all_universes, sb.hist_ind_mc_total_all_universes);
-    GetAllVertUniverses(sb.signal[0], sb.signal_all_universes, sb.err_bands_signal_all_universes, sb.hist_ind_signal_all_universes);
-    GetAllVertUniverses(sb.WithPi0[0], sb.WithPi0_all_universes, sb.err_bands_WithPi0_all_universes, sb.hist_ind_WithPi0_all_universes);
-    GetAllVertUniverses(sb.QELike[0], sb.QELike_all_universes, sb.err_bands_QELike_all_universes, sb.hist_ind_QELike_all_universes);
-    GetAllVertUniverses(sb.SinglePiPlus[0], sb.SinglePiPlus_all_universes, sb.err_bands_SinglePiPlus_all_universes, sb.hist_ind_SinglePiPlus_all_universes);
-    GetAllVertUniverses(sb.Other[0], sb.Other_all_universes, sb.err_bands_Other_all_universes, sb.hist_ind_Other_all_universes);
+    GetAllUniverses(sb.data, sb.data_all_universes, sb.err_bands_data_all_universes, sb.hist_ind_data_all_universes);
+    GetAllUniverses(sb.mc_total, sb.mc_total_all_universes, sb.err_bands_mc_total_all_universes, sb.hist_ind_mc_total_all_universes);
+    GetAllUniverses(sb.signal[0], sb.signal_all_universes, sb.err_bands_signal_all_universes, sb.hist_ind_signal_all_universes);
+    GetAllUniverses(sb.WithPi0[0], sb.WithPi0_all_universes, sb.err_bands_WithPi0_all_universes, sb.hist_ind_WithPi0_all_universes);
+    GetAllUniverses(sb.QELike[0], sb.QELike_all_universes, sb.err_bands_QELike_all_universes, sb.hist_ind_QELike_all_universes);
+    GetAllUniverses(sb.SinglePiPlus[0], sb.SinglePiPlus_all_universes, sb.err_bands_SinglePiPlus_all_universes, sb.hist_ind_SinglePiPlus_all_universes);
+    GetAllUniverses(sb.Other[0], sb.Other_all_universes, sb.err_bands_Other_all_universes, sb.hist_ind_Other_all_universes);
 
     N_Universes = sb.data_all_universes.size();
 }

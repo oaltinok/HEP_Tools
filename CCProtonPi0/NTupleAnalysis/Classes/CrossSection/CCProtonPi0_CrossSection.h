@@ -65,6 +65,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
     private:
         CCProtonPi0_BinList binList;
 
+        bool RemoveErrorBands;
         bool m_isMC;
         int iteration;
         double min_invMass;

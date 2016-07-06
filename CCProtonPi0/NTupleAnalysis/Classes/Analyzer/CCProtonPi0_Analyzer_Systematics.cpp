@@ -183,22 +183,22 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_Genie_ByHand(MnvH2D* h, double xval
 }
 
 
-void CCProtonPi0_Analyzer::FillHistogramWithErrors(vector<MnvH1D*> &hist, double var)
+void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(vector<MnvH1D*> &hist, double var)
 {
     if (m_isMC){
         // Always Fill hist[0]
-        FillHistogramWithErrors(hist[0], var);
+        FillHistogramWithVertErrors(hist[0], var);
 
         // Fill Signal
         if (truth_isSignal){
-            FillHistogramWithErrors(hist[1], var);
+            FillHistogramWithVertErrors(hist[1], var);
         }else{
             // Fill Background
-            FillHistogramWithErrors(hist[2], var);
+            FillHistogramWithVertErrors(hist[2], var);
 
             // Fill Background Type
             int ind = GetBackgroundTypeInd();
-            FillHistogramWithErrors(hist[ind], var);
+            FillHistogramWithVertErrors(hist[ind], var);
         }
     }else{
         FillHistogram(hist[0], var);
@@ -229,8 +229,8 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_ByHand(MnvH1D* h, double var, std::
 
     for (unsigned int i = 0; i < err_hists.size(); ++i ) {
         
-        // wgt_bckg is universe_wgt / cv_wgt
-        double wgt_bckg = applyBckgConstraints ? GetBckgConstraint(error_name, i) : 1.0;
+        // wgt_bckg is universe_wgt / cv_wgt 
+        double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint(error_name, i) : 1.0;
 
         const double applyWeight = cvweight * wgt_bckg;
         const double wgtU = errors[i]*applyWeight;
@@ -275,16 +275,16 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_ByHand(MnvH2D* h, double xval, doub
     for( unsigned int i = 0; i < err_hists.size(); ++i ){
         
         // wgt_bckg is universe_wgt / cv_wgt
-        double wgt_bckg = applyBckgConstraints ? GetBckgConstraint(error_name, i) : 1.0;
+        double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint(error_name, i) : 1.0;
 
         const double applyWeight = cvweight * wgt_bckg;
         const double wgtU = errors[i]*applyWeight;
         err_hists[i]->AddBinContent( cvbin, wgtU );
 
-        //const double err = err_hists[i]->GetBinError(cvbin);
-        //const double newerr2 = err*err + wgtU*wgtU; 
-        //const double newerr = (0.<newerr2) ? sqrt(newerr2) : 0.;
-        //err_hists[i]->SetBinError( cvbin, newerr );
+        const double err = err_hists[i]->GetBinError(cvbin);
+        const double newerr2 = err*err + wgtU*wgtU; 
+        const double newerr = (0.<newerr2) ? sqrt(newerr2) : 0.;
+        err_hists[i]->SetBinError( cvbin, newerr );
     }
 }
 
@@ -349,7 +349,7 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_Flux_ByHand(MnvH2D* h, double xval,
     FillVertErrorBand_ByHand(h, xval, yval, "Flux", flux_errors);
 }
 
-void CCProtonPi0_Analyzer::FillHistogramWithErrors(MnvH1D* hist, double var)
+void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH1D* hist, double var)
 {
     // Fill CV Value
     hist->Fill(var, cvweight);
@@ -366,7 +366,7 @@ void CCProtonPi0_Analyzer::FillHistogramWithErrors(MnvH1D* hist, double var)
     }
 }
 
-void CCProtonPi0_Analyzer::FillHistogramWithErrors(MnvH2D* hist, double xval, double yval)
+void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH2D* hist, double xval, double yval)
 {
     // Fill CV Value
     hist->Fill(xval,yval, cvweight);
@@ -391,11 +391,9 @@ void CCProtonPi0_Analyzer::initLateralErrorBandShifts(bool isModeReduce)
     }   
 
     // Fill EM Energy Scale Shifts
-    double mc_peak = 130.3;
-    double mc_1sigma = 1.6;
-    double data_peak = 137.8;
-    double data_1sigma = 2.6; 
-    double em_uncertainty = sqrt(pow((mc_1sigma/mc_peak),2) + pow((data_1sigma/data_peak),2));
+    double mc_1sigma = 0.013;
+    double data_1sigma = 0.019; 
+    double em_uncertainty = sqrt(mc_1sigma*mc_1sigma + data_1sigma*data_1sigma);
     em_random_shifts = RandNumGenerator.GetRandomShifts(em_uncertainty); // ~ Gaussian(0.0, em_uncertainty)
 
     if (!isModeReduce){
@@ -442,10 +440,9 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
     for (int i = 0; i < n_lateral_universes; ++i){
 
         // Pi0 Variables
-        const double pi0_mass = 134.98;
         double pi0_invMass_i = (1.0 + em_random_shifts[i]) * pi0_invMass;
-        double pi0_E_i = (1.0 + em_random_shifts[i]) * pi0_E;
         double pi0_P_i = (1.0 + em_random_shifts[i]) * pi0_P;
+        double pi0_E_i = sqrt(pi0_P_i*pi0_P_i + pi0_mass*pi0_mass);
         double pi0_KE_i = pi0_E_i - pi0_mass;
         double Enu_i = Calc_Enu_shifted(muon_E, pi0_E_i); // Use actual muon energy and shifted pi0 energy
         double QSq_i = Calc_QSq(Enu_i, muon_E, muon_P, reco_muon_theta); // Use actual muon energy
@@ -459,7 +456,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
         double W_shift = (W_i - m_W) * MeV_to_GeV;
 
         bool PassedCuts = IsEnuInRange(Enu_i) && IsInvMassInRange(pi0_invMass_i);
-        PassedCuts = true; // For Comparing with Auto Fill
+        //PassedCuts = true; // For Comparing with Auto Fill
         
         if (PassedCuts){
             //-----------------------------------------------------------------
@@ -469,7 +466,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(pi0.pi0_P_mc_truth_signal, err_name, i, truth_pi0_P * MeV_to_GeV, 0.0);
                 FillLatErrorBand_SingleUniverse(pi0.pi0_P_mc_reco_signal, err_name, i, pi0_P * MeV_to_GeV, pi0_P_shift);
-                //FillLatErrorBand_SingleUniverse(pi0.pi0_P_response, err_name, i, pi0_P_i * MeV_to_GeV, truth_pi0_P * MeV_to_GeV, cvweight);
+                FillLatErrorBand_SingleUniverse(pi0.pi0_P_response, err_name, i, pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV, pi0_P_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(pi0.pi0_P_mc_reco_bckg, err_name, i, pi0_P * MeV_to_GeV, pi0_P_shift);
             }
@@ -480,7 +477,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(pi0.pi0_KE_mc_truth_signal, err_name, i, truth_pi0_KE * MeV_to_GeV, 0.0);
                 FillLatErrorBand_SingleUniverse(pi0.pi0_KE_mc_reco_signal, err_name, i, pi0_KE * MeV_to_GeV, pi0_KE_shift);
-                //FillLatErrorBand_SingleUniverse(pi0.pi0_KE_response, err_name, i, pi0_KE_i * MeV_to_GeV, truth_pi0_KE * MeV_to_GeV, cvweight);
+                FillLatErrorBand_SingleUniverse(pi0.pi0_KE_response, err_name, i, pi0_KE * MeV_to_GeV, truth_pi0_KE * MeV_to_GeV, pi0_KE_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(pi0.pi0_KE_mc_reco_bckg, err_name, i, pi0_KE * MeV_to_GeV, pi0_KE_shift);
             }
@@ -491,7 +488,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(pi0.pi0_theta_mc_truth_signal, err_name, i, truth_pi0_theta * TMath::RadToDeg(), 0.0);
                 FillLatErrorBand_SingleUniverse(pi0.pi0_theta_mc_reco_signal, err_name, i, pi0_theta * TMath::RadToDeg(), 0.0);
-                //FillLatErrorBand_SingleUniverse(pi0.pi0_theta_response, err_name, i, pi0_theta * TMath::RadToDeg(), truth_pi0_theta * TMath::RadToDeg(), 0.0);
+                FillLatErrorBand_SingleUniverse(pi0.pi0_theta_response, err_name, i, pi0_theta * TMath::RadToDeg(), truth_pi0_theta * TMath::RadToDeg(), 0.0, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(pi0.pi0_theta_mc_reco_bckg, err_name, i, pi0_theta * TMath::RadToDeg(), 0.0);
             }
@@ -502,7 +499,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(muon.muon_P_mc_truth_signal, err_name, i, truth_muon_P * MeV_to_GeV, 0.0);
                 FillLatErrorBand_SingleUniverse(muon.muon_P_mc_reco_signal, err_name, i, muon_P * MeV_to_GeV, 0.0);
-                //FillLatErrorBand_SingleUniverse(muon.muon_P_response, err_name, i, muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV, 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_P_response, err_name, i, muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV, 0.0, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(muon.muon_P_mc_reco_bckg, err_name, i, muon_P * MeV_to_GeV, 0.0);
             }
@@ -513,7 +510,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_truth_signal, err_name, i, truth_muon_theta * TMath::RadToDeg(), 0.0);
                 FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_signal, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
-                //FillLatErrorBand_SingleUniverse(muon.muon_theta_response, err_name, i, muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg(), 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_response, err_name, i, muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg(), 0.0, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_bckg, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
             }
@@ -524,7 +521,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(interaction.QSq_mc_truth_signal, err_name, i, m_QSq_Truth * MeVSq_to_GeVSq, 0.0);
                 FillLatErrorBand_SingleUniverse(interaction.QSq_mc_reco_signal, err_name, i, m_QSq * MeVSq_to_GeVSq, QSq_shift);
-                //FillLatErrorBand_SingleUniverse(interaction.QSq_response, err_name, i, QSq_i * MeVSq_to_GeVSq, m_QSq_Truth * MeVSq_to_GeVSq, cvweight);
+                FillLatErrorBand_SingleUniverse(interaction.QSq_response, err_name, i, m_QSq * MeVSq_to_GeVSq, m_QSq_Truth * MeVSq_to_GeVSq, QSq_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.QSq_mc_reco_bckg, err_name, i, m_QSq * MeVSq_to_GeVSq, QSq_shift);
             }
@@ -535,7 +532,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(interaction.W_mc_truth_signal, err_name, i, m_W_Truth * MeV_to_GeV, 0.0);
                 FillLatErrorBand_SingleUniverse(interaction.W_mc_reco_signal, err_name, i, m_W * MeV_to_GeV, W_shift);
-                //FillLatErrorBand_SingleUniverse(interaction.W_response, err_name, i, W_i * MeV_to_GeV, m_W_Truth * MeV_to_GeV, cvweight);
+                FillLatErrorBand_SingleUniverse(interaction.W_response, err_name, i, m_W * MeV_to_GeV, m_W_Truth * MeV_to_GeV, W_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.W_mc_reco_bckg, err_name, i, m_W * MeV_to_GeV, W_shift);
             }
@@ -546,7 +543,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_truth_signal, err_name, i, m_Enu_Truth * MeV_to_GeV, 0.0);
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_signal, err_name, i, m_Enu * MeV_to_GeV, Enu_shift);
-                //FillLatErrorBand_SingleUniverse(interaction.Enu_response, err_name, i, Enu_i * MeV_to_GeV, m_Enu_Truth * MeV_to_GeV, cvweight);
+                FillLatErrorBand_SingleUniverse(interaction.Enu_response, err_name, i, m_Enu * MeV_to_GeV, m_Enu_Truth * MeV_to_GeV, Enu_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_bckg, err_name, i, m_Enu * MeV_to_GeV, Enu_shift);
             }
@@ -588,7 +585,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(muon.muon_P_mc_truth_signal, err_name, i, truth_muon_P * MeV_to_GeV, 0.0);
                 FillLatErrorBand_SingleUniverse(muon.muon_P_mc_reco_signal, err_name, i, muon_P * MeV_to_GeV, muon_P_shift);
-                //FillLatErrorBand_SingleUniverse(muon.muon_P_response, err_name, i, muon_P_i * MeV_to_GeV, truth_muon_P * MeV_to_GeV, cvweight);
+                FillLatErrorBand_SingleUniverse(muon.muon_P_response, err_name, i, muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV, muon_P_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(muon.muon_P_mc_reco_bckg, err_name, i, muon_P * MeV_to_GeV, muon_P_shift);
             }
@@ -599,7 +596,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_truth_signal, err_name, i, truth_muon_theta * TMath::RadToDeg(), 0.0);
                 FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_signal, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
-                //FillLatErrorBand_SingleUniverse(muon.muon_theta_response, err_name, i, reco_muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg(), 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_response, err_name, i, reco_muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg(), 0.0, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_bckg, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
             }
@@ -610,7 +607,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(pi0.pi0_P_mc_truth_signal, err_name, i, truth_pi0_P * MeV_to_GeV, 0.0);
                 FillLatErrorBand_SingleUniverse(pi0.pi0_P_mc_reco_signal, err_name, i, pi0_P * MeV_to_GeV, 0.0);
-                //FillLatErrorBand_SingleUniverse(pi0.pi0_P_response, err_name, i, pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV, 0.0);
+                FillLatErrorBand_SingleUniverse(pi0.pi0_P_response, err_name, i, pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV, 0.0, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(pi0.pi0_P_mc_reco_bckg, err_name, i, pi0_P * MeV_to_GeV, 0.0);
             }
@@ -621,7 +618,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(pi0.pi0_KE_mc_truth_signal, err_name, i, truth_pi0_KE * MeV_to_GeV, 0.0);
                 FillLatErrorBand_SingleUniverse(pi0.pi0_KE_mc_reco_signal, err_name, i, pi0_KE * MeV_to_GeV, 0.0);
-                //FillLatErrorBand_SingleUniverse(pi0.pi0_KE_response, err_name, i, pi0_KE * MeV_to_GeV, truth_pi0_KE * MeV_to_GeV, 0.0);
+                FillLatErrorBand_SingleUniverse(pi0.pi0_KE_response, err_name, i, pi0_KE * MeV_to_GeV, truth_pi0_KE * MeV_to_GeV, 0.0, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(pi0.pi0_KE_mc_reco_bckg, err_name, i, pi0_KE * MeV_to_GeV, 0.0);
             }
@@ -632,7 +629,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(pi0.pi0_theta_mc_truth_signal, err_name, i, truth_pi0_theta * TMath::RadToDeg(), 0.0);
                 FillLatErrorBand_SingleUniverse(pi0.pi0_theta_mc_reco_signal, err_name, i, pi0_theta * TMath::RadToDeg(), 0.0);
-                //FillLatErrorBand_SingleUniverse(pi0.pi0_theta_response, err_name, i, pi0_theta * TMath::RadToDeg(), truth_pi0_theta * TMath::RadToDeg(), 0.0);
+                FillLatErrorBand_SingleUniverse(pi0.pi0_theta_response, err_name, i, pi0_theta * TMath::RadToDeg(), truth_pi0_theta * TMath::RadToDeg(), 0.0, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(pi0.pi0_theta_mc_reco_bckg, err_name, i, pi0_theta * TMath::RadToDeg(), 0.0);
             }
@@ -643,7 +640,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(interaction.QSq_mc_truth_signal, err_name, i, m_QSq_Truth * MeVSq_to_GeVSq, 0.0);
                 FillLatErrorBand_SingleUniverse(interaction.QSq_mc_reco_signal, err_name, i, m_QSq * MeVSq_to_GeVSq, QSq_shift);
-                //FillLatErrorBand_SingleUniverse(interaction.QSq_response, err_name, i, QSq_i * MeVSq_to_GeVSq, m_QSq_Truth * MeVSq_to_GeVSq, cvweight);
+                FillLatErrorBand_SingleUniverse(interaction.QSq_response, err_name, i, m_QSq * MeVSq_to_GeVSq, m_QSq_Truth * MeVSq_to_GeVSq, QSq_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.QSq_mc_reco_bckg, err_name, i, m_QSq * MeVSq_to_GeVSq, QSq_shift);
             }
@@ -654,7 +651,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(interaction.W_mc_truth_signal, err_name, i, m_W_Truth * MeV_to_GeV, 0.0);
                 FillLatErrorBand_SingleUniverse(interaction.W_mc_reco_signal, err_name, i, m_W * MeV_to_GeV, W_shift);
-                //FillLatErrorBand_SingleUniverse(interaction.W_response, err_name, i, W_i * MeV_to_GeV, m_W_Truth * MeV_to_GeV, cvweight);
+                FillLatErrorBand_SingleUniverse(interaction.W_response, err_name, i, m_W * MeV_to_GeV, m_W_Truth * MeV_to_GeV, W_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.W_mc_reco_bckg, err_name, i, m_W * MeV_to_GeV, W_shift);
             }
@@ -665,7 +662,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_truth_signal, err_name, i, m_Enu_Truth * MeV_to_GeV, 0.0);
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_signal, err_name, i, m_Enu * MeV_to_GeV, Enu_shift);
-                //FillLatErrorBand_SingleUniverse(interaction.Enu_response, err_name, i, Enu_i * MeV_to_GeV, m_Enu_Truth * MeV_to_GeV, cvweight);
+                FillLatErrorBand_SingleUniverse(interaction.Enu_response, err_name, i, m_Enu * MeV_to_GeV, m_Enu_Truth * MeV_to_GeV, Enu_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_bckg, err_name, i, m_Enu * MeV_to_GeV, Enu_shift);
             }
@@ -681,16 +678,19 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale_invMass()
     
     for (int i = 0; i < n_lateral_universes; ++i){
 
-        // Pi0 Variables
-        double pi0_invMass_i = (1.0 + em_random_shifts[i]) * pi0_invMass;
-        double pi0_E_i = (1.0 + em_random_shifts[i]) * pi0_E;
+        // EM Energy Dependent Variables
+        double gamma1_E_i = (1.0 + em_random_shifts[i]) * gamma1_E;
+        double gamma2_E_i = (1.0 + em_random_shifts[i]) * gamma2_E;
+        double pi0_P_i = (1.0 + em_random_shifts[i]) * pi0_P;
+        double pi0_E_i = sqrt(pi0_P_i*pi0_P_i + pi0_mass*pi0_mass);
         double Enu_i = Calc_Enu_shifted(muon_E, pi0_E_i); // Use actual muon energy and shifted pi0 energy
 
-        double pi0_invMass_shift = pi0_invMass_i - pi0_invMass;
-
-        bool PassedCuts = IsEnuInRange(Enu_i);
+        bool PassedCuts = IsEnuInRange(Enu_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
+        //PassedCuts = true; // For testing with Auto Fill
 
         if (PassedCuts){
+            double pi0_invMass_i = (1.0 + em_random_shifts[i]) * pi0_invMass;
+            double pi0_invMass_shift = pi0_invMass_i - pi0_invMass;
             FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_all, err_name, i, pi0_invMass, pi0_invMass_shift);
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_signal, err_name, i, pi0_invMass, pi0_invMass_shift);
@@ -768,9 +768,41 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::st
     }      
 
     // wgt_bckg is universe_wgt / cv_wgt
-    double wgt_bckg = applyBckgConstraints ? GetBckgConstraint(err_name, unv) : 1.0;
+    double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint(err_name, unv) : 1.0;
     double wgtU = cvweight * wgt_bckg;
+    err_hists[unv]->AddBinContent( bin, wgtU );
 
+    const double err = err_hists[unv]->GetBinError(bin);
+    const double newerr2 = err*err + wgtU*wgtU;
+    const double newerr = (0.<newerr2) ? sqrt(newerr2) : 0.;
+    err_hists[unv]->SetBinError( bin, newerr );
+
+}
+
+void CCProtonPi0_Analyzer::FillLatErrorBand_SingleUniverse(MnvH2D* hist, std::string err_name, int unv, double xval, double yval, double x_shift, double y_shift)
+{
+    // Get a Pointer to Error Band
+    MnvLatErrorBand2D* err_band =  hist->GetLatErrorBand(err_name);
+
+    // Get a Pointer to Histograms 
+    std::vector<TH2D*> err_hists = err_band->GetHists();
+  
+    // Fill Error Band Base Histogram with Default cvweight
+    // Fill Only once with Universe 0
+    if (unv == 0){ 
+        err_band->TH2D::Fill(xval, yval, cvweight);
+    }
+
+    // Do not Fill Error Band if Shift is NOT Physical
+    if( MnvHist::IsNotPhysicalShift(x_shift) || MnvHist::IsNotPhysicalShift(y_shift) ) return;
+
+    const double x_shiftVal = xval + x_shift;
+    const double y_shiftVal = yval + y_shift;
+    int bin = hist->FindBin( x_shiftVal, y_shiftVal );
+  
+    // wgt_bckg is universe_wgt / cv_wgt
+    double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint(err_name, unv) : 1.0;
+    double wgtU = cvweight * wgt_bckg;
     err_hists[unv]->AddBinContent( bin, wgtU );
 
     const double err = err_hists[unv]->GetBinError(bin);
@@ -875,8 +907,35 @@ void CCProtonPi0_Analyzer::FillLatErrorBands_Auto()
         double shift = pi0_P_i - pi0_P;
         pi0_P_random_shifts.push_back(shift * MeV_to_GeV);
     }
+
+    // Fill for pi0 -- Shifted Distribution
     pi0.pi0_P_mc_reco_all->FillLatErrorBand("EM_EnergyScale", pi0_P * MeV_to_GeV, pi0_P_random_shifts, cvweight);    
+    pi0.pi0_P_response->FillLatErrorBand("EM_EnergyScale", pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV, pi0_P_random_shifts, no_random_shifts, cvweight);    
+
+    // Fill for muon -- No Shift 
     muon.muon_P_mc_reco_all->FillLatErrorBand("EM_EnergyScale", muon_P * MeV_to_GeV, no_random_shifts, cvweight);    
+    muon.muon_P_response->FillLatErrorBand("EM_EnergyScale", muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV, no_random_shifts, no_random_shifts, cvweight);    
+}
+
+void CCProtonPi0_Analyzer::FillLatErrorBands_invMass_Auto()
+{
+    // Test Function for Comparing Fill_ByHand
+    std::vector<double> pi0_invMass_random_shifts;
+    for (unsigned int i = 0; i < em_random_shifts.size(); ++i ){
+        double pi0_invMass_i = (1.0 + em_random_shifts[i]) * pi0_invMass;
+        double shift = pi0_invMass_i - pi0_invMass;
+        pi0_invMass_random_shifts.push_back(shift);
+    }
+
+    // Fill for EM_EnergyScale -- Shifted Distribution
+    cutList.invMass_mc_reco_all->FillLatErrorBand("EM_EnergyScale", pi0_invMass, pi0_invMass_random_shifts, cvweight);    
+    cutList.invMass_mc_reco_signal->FillLatErrorBand("EM_EnergyScale", pi0_invMass, pi0_invMass_random_shifts, cvweight);    
+    cutList.invMass_mc_reco_bckg->FillLatErrorBand("EM_EnergyScale", pi0_invMass, pi0_invMass_random_shifts, cvweight);    
+
+    // Fill for Muon Momentum -- No Shift
+    cutList.invMass_mc_reco_all->FillLatErrorBand("MuonMomentum", pi0_invMass, no_random_shifts, cvweight);    
+    cutList.invMass_mc_reco_signal->FillLatErrorBand("MuonMomentum", pi0_invMass, no_random_shifts, cvweight);    
+    cutList.invMass_mc_reco_bckg->FillLatErrorBand("MuonMomentum", pi0_invMass, no_random_shifts, cvweight);    
 }
 
 #endif //CCProtonPi0_Analyzer_Systematics_cpp

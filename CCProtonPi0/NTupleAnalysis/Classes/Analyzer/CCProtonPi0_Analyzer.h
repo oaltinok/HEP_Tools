@@ -77,6 +77,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void UpdateScanFileName();
         int GetBackgroundTypeInd();
         bool IsInvMassInRange(double invMass);
+        bool IsOpeningAngleSmallAndEnergyLow(double E_g1, double E_g2);
         void FillHistogram(vector<MnvH1D*> &hist, double var);
         void FillHistogram(MnvH1D* hist, double var);
         void FillHistogram(MnvH2D* hist, double xval, double yval);
@@ -84,9 +85,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillHistogram(TH2D* hist, double xval, double yval);
         void FillHistogram(TH3D* hist, double xval, double yval, double var3);
         
-        void FillHistogramWithErrors(MnvH1D* hist, double var);
-        void FillHistogramWithErrors(MnvH2D* hist, double xval, double yval);
-        void FillHistogramWithErrors(vector<MnvH1D*> &hist, double var);
+        void FillHistogramWithVertErrors(MnvH1D* hist, double var);
+        void FillHistogramWithVertErrors(MnvH2D* hist, double xval, double yval);
+        void FillHistogramWithVertErrors(vector<MnvH1D*> &hist, double var);
         
 
         // Vertical Error Band
@@ -113,13 +114,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double GetBckgConstraint(std::string error_name, int hist_ind);
 
         // Lateral Error Band
-        void FillLatErrorBands_Auto();
-
         void initLateralErrorBandShifts(bool isModeReduce);
-        void FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::string err_name, int unv, double var, double wgt);
-        void FillLatErrorBand_SingleUniverse(MnvH2D* hist, std::string err_name, int unv, double xval, double yval, double wgt);
-        void FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::string err_name, double var, std::vector<double> rand_shifts);
+        void FillLatErrorBands_Auto();
+        void FillLatErrorBands_invMass_Auto();
         void FillLatErrorBands_ByHand();
+        void FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::string err_name, int unv, double var, double shift);
+        void FillLatErrorBand_SingleUniverse(MnvH2D* hist, std::string err_name, int unv, double xval, double yval, double x_shift, double y_shift);
         void FillLatErrorBand_EM_EnergyScale();
         void FillLatErrorBand_MuonMomentum();
         void FillLatErrorBand_EM_EnergyScale_invMass();
@@ -217,7 +217,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool m_isMC;
         bool isScanRun;
         bool isDataAnalysis;
-        bool applyBckgConstraints;
+        bool applyBckgConstraints_CV;
+        bool applyBckgConstraints_Unv;
         bool applyProtonScore;
         bool applyPhotonDistance;
         bool writeFSParticleMomentum;
@@ -234,6 +235,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         bool sideBand_PID;
         bool sideBand_LowInvMass;
         bool sideBand_HighInvMass;
+        double EM_MC_peak;
+        double EM_Data_peak;
+        double EM_correction;
         double cvweight;
         double latest_ScanID;
         double minProtonScore_LLR;

@@ -22,8 +22,8 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
         cout<<"\tRoot File: "<<rootDir<<endl;
 
         // Create Root File 
-        //f = new TFile(rootDir.c_str(),"RECREATE");
-        f = new TFile(rootDir.c_str(),"CREATE");
+        f = new TFile(rootDir.c_str(),"RECREATE");
+        //f = new TFile(rootDir.c_str(),"CREATE");
         if (!f->IsOpen()){
             cout<<"File already exists! Exiting!..."<<endl;
             exit(1);
