@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed May 25 10:29:58 2016 by ROOT version 5.34/05
+// Tue Jul 19 08:50:00 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -123,7 +123,9 @@ public :
    Bool_t          truth_isGamma2_conv_inside;
    Bool_t          truth_isSignal;
    Bool_t          truth_isSignal_Out;
+   Bool_t          truth_isSignal_EventRecord;
    Bool_t          truth_isFidVol;
+   Bool_t          truth_isMINOS_Match;
    Bool_t          truth_isNC;
    Bool_t          truth_ReconstructEvent;
    Bool_t          truth_isBckg_NoPi0;
@@ -150,6 +152,12 @@ public :
    Int_t           truth_Bckg_nPi0_Total;
    Int_t           truth_Bckg_nPiCharged;
    Int_t           truth_Bckg_nPiCharged_ChargeExchanged;
+   Int_t           truth_InNucleus_N_pi0_final;
+   Int_t           truth_InNucleus_N_pi0_initial;
+   Int_t           truth_InNucleus_N_piminus_final;
+   Int_t           truth_InNucleus_N_piminus_initial;
+   Int_t           truth_InNucleus_N_piplus_final;
+   Int_t           truth_InNucleus_N_piplus_initial;
    Int_t           truth_N_FSParticles;
    Int_t           truth_N_other;
    Int_t           truth_N_pi0;
@@ -301,6 +309,8 @@ public :
    Int_t           anglescan_ncand;
    Int_t           anglescan_ncandx;
    Int_t           anglescan_nfoundBlobs;
+   Int_t           detmc_ntrajectory;
+   Int_t           detmc_ntrajectory2;
    Int_t           g1blob_1ParFit_ndof;
    Int_t           g1dedx_doublet;
    Int_t           g1dedx_empty_plane;
@@ -499,12 +509,22 @@ public :
    Double_t        vtx_z;
    Int_t           all_protons_kinked[10];
    Int_t           all_protons_odMatch[10];
+   Int_t           detmc_traj_id_sz;
+   Int_t           detmc_traj_id[365];   //[detmc_traj_id_sz]
+   Int_t           detmc_traj_mother_sz;
+   Int_t           detmc_traj_mother[365];   //[detmc_traj_mother_sz]
+   Int_t           detmc_traj_pdg_sz;
+   Int_t           detmc_traj_pdg[365];   //[detmc_traj_pdg_sz]
+   Int_t           detmc_traj_proc_sz;
+   Int_t           detmc_traj_proc[365];   //[detmc_traj_proc_sz]
+   Int_t           detmc_traj_status_sz;
+   Int_t           detmc_traj_status[365];   //[detmc_traj_status_sz]
    Int_t           g1dedx_cluster_occupancy_sz;
    Int_t           g1dedx_cluster_occupancy[6];   //[g1dedx_cluster_occupancy_sz]
    Int_t           g2dedx_cluster_occupancy_sz;
    Int_t           g2dedx_cluster_occupancy[6];   //[g2dedx_cluster_occupancy_sz]
    Int_t           nTracks_Secondary_Vtx_sz;
-   Int_t           nTracks_Secondary_Vtx[2];   //[nTracks_Secondary_Vtx_sz]
+   Int_t           nTracks_Secondary_Vtx[5];   //[nTracks_Secondary_Vtx_sz]
    Double_t        all_protons_E[10];
    Double_t        all_protons_KE[10];
    Double_t        all_protons_LLRScore[10];
@@ -529,6 +549,46 @@ public :
    Double_t        all_protons_startPointZ[10];
    Double_t        all_protons_theta[10];
    Double_t        all_protons_theta_beam[10];
+   Int_t           detmc_traj_E0_sz;
+   Double_t        detmc_traj_E0[365];   //[detmc_traj_E0_sz]
+   Int_t           detmc_traj_Ef_sz;
+   Double_t        detmc_traj_Ef[365];   //[detmc_traj_Ef_sz]
+   Int_t           detmc_traj_preEf_sz;
+   Double_t        detmc_traj_preEf[365];   //[detmc_traj_preEf_sz]
+   Int_t           detmc_traj_prepxf_sz;
+   Double_t        detmc_traj_prepxf[365];   //[detmc_traj_prepxf_sz]
+   Int_t           detmc_traj_prepyf_sz;
+   Double_t        detmc_traj_prepyf[365];   //[detmc_traj_prepyf_sz]
+   Int_t           detmc_traj_prepzf_sz;
+   Double_t        detmc_traj_prepzf[365];   //[detmc_traj_prepzf_sz]
+   Int_t           detmc_traj_px0_sz;
+   Double_t        detmc_traj_px0[365];   //[detmc_traj_px0_sz]
+   Int_t           detmc_traj_pxf_sz;
+   Double_t        detmc_traj_pxf[365];   //[detmc_traj_pxf_sz]
+   Int_t           detmc_traj_py0_sz;
+   Double_t        detmc_traj_py0[365];   //[detmc_traj_py0_sz]
+   Int_t           detmc_traj_pyf_sz;
+   Double_t        detmc_traj_pyf[365];   //[detmc_traj_pyf_sz]
+   Int_t           detmc_traj_pz0_sz;
+   Double_t        detmc_traj_pz0[365];   //[detmc_traj_pz0_sz]
+   Int_t           detmc_traj_pzf_sz;
+   Double_t        detmc_traj_pzf[365];   //[detmc_traj_pzf_sz]
+   Int_t           detmc_traj_t0_sz;
+   Double_t        detmc_traj_t0[365];   //[detmc_traj_t0_sz]
+   Int_t           detmc_traj_tf_sz;
+   Double_t        detmc_traj_tf[365];   //[detmc_traj_tf_sz]
+   Int_t           detmc_traj_x0_sz;
+   Double_t        detmc_traj_x0[365];   //[detmc_traj_x0_sz]
+   Int_t           detmc_traj_xf_sz;
+   Double_t        detmc_traj_xf[365];   //[detmc_traj_xf_sz]
+   Int_t           detmc_traj_y0_sz;
+   Double_t        detmc_traj_y0[365];   //[detmc_traj_y0_sz]
+   Int_t           detmc_traj_yf_sz;
+   Double_t        detmc_traj_yf[365];   //[detmc_traj_yf_sz]
+   Int_t           detmc_traj_z0_sz;
+   Double_t        detmc_traj_z0[365];   //[detmc_traj_z0_sz]
+   Int_t           detmc_traj_zf_sz;
+   Double_t        detmc_traj_zf[365];   //[detmc_traj_zf_sz]
    Double_t        fit_vtx[3];
    Int_t           g1dedx_cluster_energy_sz;
    Double_t        g1dedx_cluster_energy[6];   //[g1dedx_cluster_energy_sz]
@@ -545,11 +605,11 @@ public :
    Double_t        gamma2_end_vertex[3];
    Double_t        gamma2_vertex[3];
    Int_t           muon_thetaX_allNodes_sz;
-   Double_t        muon_thetaX_allNodes[153];   //[muon_thetaX_allNodes_sz]
+   Double_t        muon_thetaX_allNodes[158];   //[muon_thetaX_allNodes_sz]
    Int_t           muon_thetaY_allNodes_sz;
-   Double_t        muon_thetaY_allNodes[153];   //[muon_thetaY_allNodes_sz]
+   Double_t        muon_thetaY_allNodes[158];   //[muon_thetaY_allNodes_sz]
    Int_t           muon_theta_allNodes_sz;
-   Double_t        muon_theta_allNodes[153];   //[muon_theta_allNodes_sz]
+   Double_t        muon_theta_allNodes[158];   //[muon_theta_allNodes_sz]
    Int_t           od_distanceBlobTower_sz;
    Double_t        od_distanceBlobTower[2];   //[od_distanceBlobTower_sz]
    Int_t           od_idBlobTime_sz;
@@ -608,24 +668,24 @@ public :
    Double_t        mc_initNucVec[4];
    Double_t        mc_primFSLepton[4];
    Int_t           mc_nFSPart;
-   Double_t        mc_FSPartPx[13];   //[mc_nFSPart]
-   Double_t        mc_FSPartPy[13];   //[mc_nFSPart]
-   Double_t        mc_FSPartPz[13];   //[mc_nFSPart]
-   Double_t        mc_FSPartE[13];   //[mc_nFSPart]
-   Int_t           mc_FSPartPDG[13];   //[mc_nFSPart]
+   Double_t        mc_FSPartPx[95];   //[mc_nFSPart]
+   Double_t        mc_FSPartPy[95];   //[mc_nFSPart]
+   Double_t        mc_FSPartPz[95];   //[mc_nFSPart]
+   Double_t        mc_FSPartE[95];   //[mc_nFSPart]
+   Int_t           mc_FSPartPDG[95];   //[mc_nFSPart]
    Int_t           mc_er_nPart;
-   Int_t           mc_er_ID[30];   //[mc_er_nPart]
-   Int_t           mc_er_status[30];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucX[30];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucY[30];   //[mc_er_nPart]
-   Double_t        mc_er_posInNucZ[30];   //[mc_er_nPart]
-   Double_t        mc_er_Px[30];   //[mc_er_nPart]
-   Double_t        mc_er_Py[30];   //[mc_er_nPart]
-   Double_t        mc_er_Pz[30];   //[mc_er_nPart]
-   Double_t        mc_er_E[30];   //[mc_er_nPart]
-   Int_t           mc_er_FD[30];   //[mc_er_nPart]
-   Int_t           mc_er_LD[30];   //[mc_er_nPart]
-   Int_t           mc_er_mother[30];   //[mc_er_nPart]
+   Int_t           mc_er_ID[121];   //[mc_er_nPart]
+   Int_t           mc_er_status[121];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucX[121];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucY[121];   //[mc_er_nPart]
+   Double_t        mc_er_posInNucZ[121];   //[mc_er_nPart]
+   Double_t        mc_er_Px[121];   //[mc_er_nPart]
+   Double_t        mc_er_Py[121];   //[mc_er_nPart]
+   Double_t        mc_er_Pz[121];   //[mc_er_nPart]
+   Double_t        mc_er_E[121];   //[mc_er_nPart]
+   Int_t           mc_er_FD[121];   //[mc_er_nPart]
+   Int_t           mc_er_LD[121];   //[mc_er_nPart]
+   Int_t           mc_er_mother[121];   //[mc_er_nPart]
    Int_t           mc_fr_nNuAncestorIDs;
    Int_t           mc_fr_nuAncestorIDs[6];   //[mc_fr_nNuAncestorIDs]
    Int_t           mc_fr_nuParentID;
@@ -656,11 +716,11 @@ public :
    Int_t           mc_wgt_ppfx1_Total_sz;
    Double_t        mc_wgt_ppfx1_Total[100];   //[mc_wgt_ppfx1_Total_sz]
    Int_t           n_prongs;
-   Int_t           prong_nParticles[4];   //[n_prongs]
-   Double_t        prong_part_score[4];   //[n_prongs]
-   Double_t        prong_part_mass[4];   //[n_prongs]
-   Int_t           prong_part_charge[4];   //[n_prongs]
-   Int_t           prong_part_pid[4];   //[n_prongs]
+   Int_t           prong_nParticles[5];   //[n_prongs]
+   Double_t        prong_part_score[5];   //[n_prongs]
+   Double_t        prong_part_mass[5];   //[n_prongs]
+   Int_t           prong_part_charge[5];   //[n_prongs]
+   Int_t           prong_part_pid[5];   //[n_prongs]
    vector<vector<double> > *prong_part_E;
    vector<vector<double> > *prong_part_pos;
 
@@ -766,7 +826,9 @@ public :
    TBranch        *b_truth_isGamma2_conv_inside;   //!
    TBranch        *b_truth_isSignal;   //!
    TBranch        *b_truth_isSignal_Out;   //!
+   TBranch        *b_truth_isSignal_EventRecord;   //!
    TBranch        *b_truth_isFidVol;   //!
+   TBranch        *b_truth_isMINOS_Match;   //!
    TBranch        *b_truth_isNC;   //!
    TBranch        *b_truth_ReconstructEvent;   //!
    TBranch        *b_truth_isBckg_NoPi0;   //!
@@ -793,6 +855,12 @@ public :
    TBranch        *b_truth_Bckg_nPi0_Total;   //!
    TBranch        *b_truth_Bckg_nPiCharged;   //!
    TBranch        *b_truth_Bckg_nPiCharged_ChargeExchanged;   //!
+   TBranch        *b_truth_InNucleus_N_pi0_final;   //!
+   TBranch        *b_truth_InNucleus_N_pi0_initial;   //!
+   TBranch        *b_truth_InNucleus_N_piminus_final;   //!
+   TBranch        *b_truth_InNucleus_N_piminus_initial;   //!
+   TBranch        *b_truth_InNucleus_N_piplus_final;   //!
+   TBranch        *b_truth_InNucleus_N_piplus_initial;   //!
    TBranch        *b_truth_N_FSParticles;   //!
    TBranch        *b_truth_N_other;   //!
    TBranch        *b_truth_N_pi0;   //!
@@ -944,6 +1012,8 @@ public :
    TBranch        *b_anglescan_ncand;   //!
    TBranch        *b_anglescan_ncandx;   //!
    TBranch        *b_anglescan_nfoundBlobs;   //!
+   TBranch        *b_detmc_ntrajectory;   //!
+   TBranch        *b_detmc_ntrajectory2;   //!
    TBranch        *b_g1blob_1ParFit_ndof;   //!
    TBranch        *b_g1dedx_doublet;   //!
    TBranch        *b_g1dedx_empty_plane;   //!
@@ -1142,6 +1212,16 @@ public :
    TBranch        *b_vtx_z;   //!
    TBranch        *b_all_protons_kinked;   //!
    TBranch        *b_all_protons_odMatch;   //!
+   TBranch        *b_detmc_traj_id_sz;   //!
+   TBranch        *b_detmc_traj_id;   //!
+   TBranch        *b_detmc_traj_mother_sz;   //!
+   TBranch        *b_detmc_traj_mother;   //!
+   TBranch        *b_detmc_traj_pdg_sz;   //!
+   TBranch        *b_detmc_traj_pdg;   //!
+   TBranch        *b_detmc_traj_proc_sz;   //!
+   TBranch        *b_detmc_traj_proc;   //!
+   TBranch        *b_detmc_traj_status_sz;   //!
+   TBranch        *b_detmc_traj_status;   //!
    TBranch        *b_g1dedx_cluster_occupancy_sz;   //!
    TBranch        *b_g1dedx_cluster_occupancy;   //!
    TBranch        *b_g2dedx_cluster_occupancy_sz;   //!
@@ -1172,6 +1252,46 @@ public :
    TBranch        *b_all_protons_startPointZ;   //!
    TBranch        *b_all_protons_theta;   //!
    TBranch        *b_all_protons_theta_beam;   //!
+   TBranch        *b_detmc_traj_E0_sz;   //!
+   TBranch        *b_detmc_traj_E0;   //!
+   TBranch        *b_detmc_traj_Ef_sz;   //!
+   TBranch        *b_detmc_traj_Ef;   //!
+   TBranch        *b_detmc_traj_preEf_sz;   //!
+   TBranch        *b_detmc_traj_preEf;   //!
+   TBranch        *b_detmc_traj_prepxf_sz;   //!
+   TBranch        *b_detmc_traj_prepxf;   //!
+   TBranch        *b_detmc_traj_prepyf_sz;   //!
+   TBranch        *b_detmc_traj_prepyf;   //!
+   TBranch        *b_detmc_traj_prepzf_sz;   //!
+   TBranch        *b_detmc_traj_prepzf;   //!
+   TBranch        *b_detmc_traj_px0_sz;   //!
+   TBranch        *b_detmc_traj_px0;   //!
+   TBranch        *b_detmc_traj_pxf_sz;   //!
+   TBranch        *b_detmc_traj_pxf;   //!
+   TBranch        *b_detmc_traj_py0_sz;   //!
+   TBranch        *b_detmc_traj_py0;   //!
+   TBranch        *b_detmc_traj_pyf_sz;   //!
+   TBranch        *b_detmc_traj_pyf;   //!
+   TBranch        *b_detmc_traj_pz0_sz;   //!
+   TBranch        *b_detmc_traj_pz0;   //!
+   TBranch        *b_detmc_traj_pzf_sz;   //!
+   TBranch        *b_detmc_traj_pzf;   //!
+   TBranch        *b_detmc_traj_t0_sz;   //!
+   TBranch        *b_detmc_traj_t0;   //!
+   TBranch        *b_detmc_traj_tf_sz;   //!
+   TBranch        *b_detmc_traj_tf;   //!
+   TBranch        *b_detmc_traj_x0_sz;   //!
+   TBranch        *b_detmc_traj_x0;   //!
+   TBranch        *b_detmc_traj_xf_sz;   //!
+   TBranch        *b_detmc_traj_xf;   //!
+   TBranch        *b_detmc_traj_y0_sz;   //!
+   TBranch        *b_detmc_traj_y0;   //!
+   TBranch        *b_detmc_traj_yf_sz;   //!
+   TBranch        *b_detmc_traj_yf;   //!
+   TBranch        *b_detmc_traj_z0_sz;   //!
+   TBranch        *b_detmc_traj_z0;   //!
+   TBranch        *b_detmc_traj_zf_sz;   //!
+   TBranch        *b_detmc_traj_zf;   //!
    TBranch        *b_fit_vtx;   //!
    TBranch        *b_g1dedx_cluster_energy_sz;   //!
    TBranch        *b_g1dedx_cluster_energy;   //!
@@ -1341,7 +1461,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_81/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/CCProtonPi0");
+      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_91/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1494,7 +1614,9 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_isGamma2_conv_inside", &truth_isGamma2_conv_inside, &b_truth_isGamma2_conv_inside);
    fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
    fChain->SetBranchAddress("truth_isSignal_Out", &truth_isSignal_Out, &b_truth_isSignal_Out);
+   fChain->SetBranchAddress("truth_isSignal_EventRecord", &truth_isSignal_EventRecord, &b_truth_isSignal_EventRecord);
    fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
+   fChain->SetBranchAddress("truth_isMINOS_Match", &truth_isMINOS_Match, &b_truth_isMINOS_Match);
    fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
    fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);
    fChain->SetBranchAddress("truth_isBckg_NoPi0", &truth_isBckg_NoPi0, &b_truth_isBckg_NoPi0);
@@ -1521,6 +1643,12 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_Bckg_nPi0_Total", &truth_Bckg_nPi0_Total, &b_truth_Bckg_nPi0_Total);
    fChain->SetBranchAddress("truth_Bckg_nPiCharged", &truth_Bckg_nPiCharged, &b_truth_Bckg_nPiCharged);
    fChain->SetBranchAddress("truth_Bckg_nPiCharged_ChargeExchanged", &truth_Bckg_nPiCharged_ChargeExchanged, &b_truth_Bckg_nPiCharged_ChargeExchanged);
+   fChain->SetBranchAddress("truth_InNucleus_N_pi0_final", &truth_InNucleus_N_pi0_final, &b_truth_InNucleus_N_pi0_final);
+   fChain->SetBranchAddress("truth_InNucleus_N_pi0_initial", &truth_InNucleus_N_pi0_initial, &b_truth_InNucleus_N_pi0_initial);
+   fChain->SetBranchAddress("truth_InNucleus_N_piminus_final", &truth_InNucleus_N_piminus_final, &b_truth_InNucleus_N_piminus_final);
+   fChain->SetBranchAddress("truth_InNucleus_N_piminus_initial", &truth_InNucleus_N_piminus_initial, &b_truth_InNucleus_N_piminus_initial);
+   fChain->SetBranchAddress("truth_InNucleus_N_piplus_final", &truth_InNucleus_N_piplus_final, &b_truth_InNucleus_N_piplus_final);
+   fChain->SetBranchAddress("truth_InNucleus_N_piplus_initial", &truth_InNucleus_N_piplus_initial, &b_truth_InNucleus_N_piplus_initial);
    fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
    fChain->SetBranchAddress("truth_N_other", &truth_N_other, &b_truth_N_other);
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
@@ -1672,6 +1800,8 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("anglescan_ncand", &anglescan_ncand, &b_anglescan_ncand);
    fChain->SetBranchAddress("anglescan_ncandx", &anglescan_ncandx, &b_anglescan_ncandx);
    fChain->SetBranchAddress("anglescan_nfoundBlobs", &anglescan_nfoundBlobs, &b_anglescan_nfoundBlobs);
+   fChain->SetBranchAddress("detmc_ntrajectory", &detmc_ntrajectory, &b_detmc_ntrajectory);
+   fChain->SetBranchAddress("detmc_ntrajectory2", &detmc_ntrajectory2, &b_detmc_ntrajectory2);
    fChain->SetBranchAddress("g1blob_1ParFit_ndof", &g1blob_1ParFit_ndof, &b_g1blob_1ParFit_ndof);
    fChain->SetBranchAddress("g1dedx_doublet", &g1dedx_doublet, &b_g1dedx_doublet);
    fChain->SetBranchAddress("g1dedx_empty_plane", &g1dedx_empty_plane, &b_g1dedx_empty_plane);
@@ -1870,6 +2000,16 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("vtx_z", &vtx_z, &b_vtx_z);
    fChain->SetBranchAddress("all_protons_kinked", all_protons_kinked, &b_all_protons_kinked);
    fChain->SetBranchAddress("all_protons_odMatch", all_protons_odMatch, &b_all_protons_odMatch);
+   fChain->SetBranchAddress("detmc_traj_id_sz", &detmc_traj_id_sz, &b_detmc_traj_id_sz);
+   fChain->SetBranchAddress("detmc_traj_id", detmc_traj_id, &b_detmc_traj_id);
+   fChain->SetBranchAddress("detmc_traj_mother_sz", &detmc_traj_mother_sz, &b_detmc_traj_mother_sz);
+   fChain->SetBranchAddress("detmc_traj_mother", detmc_traj_mother, &b_detmc_traj_mother);
+   fChain->SetBranchAddress("detmc_traj_pdg_sz", &detmc_traj_pdg_sz, &b_detmc_traj_pdg_sz);
+   fChain->SetBranchAddress("detmc_traj_pdg", detmc_traj_pdg, &b_detmc_traj_pdg);
+   fChain->SetBranchAddress("detmc_traj_proc_sz", &detmc_traj_proc_sz, &b_detmc_traj_proc_sz);
+   fChain->SetBranchAddress("detmc_traj_proc", detmc_traj_proc, &b_detmc_traj_proc);
+   fChain->SetBranchAddress("detmc_traj_status_sz", &detmc_traj_status_sz, &b_detmc_traj_status_sz);
+   fChain->SetBranchAddress("detmc_traj_status", detmc_traj_status, &b_detmc_traj_status);
    fChain->SetBranchAddress("g1dedx_cluster_occupancy_sz", &g1dedx_cluster_occupancy_sz, &b_g1dedx_cluster_occupancy_sz);
    fChain->SetBranchAddress("g1dedx_cluster_occupancy", g1dedx_cluster_occupancy, &b_g1dedx_cluster_occupancy);
    fChain->SetBranchAddress("g2dedx_cluster_occupancy_sz", &g2dedx_cluster_occupancy_sz, &b_g2dedx_cluster_occupancy_sz);
@@ -1900,6 +2040,46 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("all_protons_startPointZ", all_protons_startPointZ, &b_all_protons_startPointZ);
    fChain->SetBranchAddress("all_protons_theta", all_protons_theta, &b_all_protons_theta);
    fChain->SetBranchAddress("all_protons_theta_beam", all_protons_theta_beam, &b_all_protons_theta_beam);
+   fChain->SetBranchAddress("detmc_traj_E0_sz", &detmc_traj_E0_sz, &b_detmc_traj_E0_sz);
+   fChain->SetBranchAddress("detmc_traj_E0", detmc_traj_E0, &b_detmc_traj_E0);
+   fChain->SetBranchAddress("detmc_traj_Ef_sz", &detmc_traj_Ef_sz, &b_detmc_traj_Ef_sz);
+   fChain->SetBranchAddress("detmc_traj_Ef", detmc_traj_Ef, &b_detmc_traj_Ef);
+   fChain->SetBranchAddress("detmc_traj_preEf_sz", &detmc_traj_preEf_sz, &b_detmc_traj_preEf_sz);
+   fChain->SetBranchAddress("detmc_traj_preEf", detmc_traj_preEf, &b_detmc_traj_preEf);
+   fChain->SetBranchAddress("detmc_traj_prepxf_sz", &detmc_traj_prepxf_sz, &b_detmc_traj_prepxf_sz);
+   fChain->SetBranchAddress("detmc_traj_prepxf", detmc_traj_prepxf, &b_detmc_traj_prepxf);
+   fChain->SetBranchAddress("detmc_traj_prepyf_sz", &detmc_traj_prepyf_sz, &b_detmc_traj_prepyf_sz);
+   fChain->SetBranchAddress("detmc_traj_prepyf", detmc_traj_prepyf, &b_detmc_traj_prepyf);
+   fChain->SetBranchAddress("detmc_traj_prepzf_sz", &detmc_traj_prepzf_sz, &b_detmc_traj_prepzf_sz);
+   fChain->SetBranchAddress("detmc_traj_prepzf", detmc_traj_prepzf, &b_detmc_traj_prepzf);
+   fChain->SetBranchAddress("detmc_traj_px0_sz", &detmc_traj_px0_sz, &b_detmc_traj_px0_sz);
+   fChain->SetBranchAddress("detmc_traj_px0", detmc_traj_px0, &b_detmc_traj_px0);
+   fChain->SetBranchAddress("detmc_traj_pxf_sz", &detmc_traj_pxf_sz, &b_detmc_traj_pxf_sz);
+   fChain->SetBranchAddress("detmc_traj_pxf", detmc_traj_pxf, &b_detmc_traj_pxf);
+   fChain->SetBranchAddress("detmc_traj_py0_sz", &detmc_traj_py0_sz, &b_detmc_traj_py0_sz);
+   fChain->SetBranchAddress("detmc_traj_py0", detmc_traj_py0, &b_detmc_traj_py0);
+   fChain->SetBranchAddress("detmc_traj_pyf_sz", &detmc_traj_pyf_sz, &b_detmc_traj_pyf_sz);
+   fChain->SetBranchAddress("detmc_traj_pyf", detmc_traj_pyf, &b_detmc_traj_pyf);
+   fChain->SetBranchAddress("detmc_traj_pz0_sz", &detmc_traj_pz0_sz, &b_detmc_traj_pz0_sz);
+   fChain->SetBranchAddress("detmc_traj_pz0", detmc_traj_pz0, &b_detmc_traj_pz0);
+   fChain->SetBranchAddress("detmc_traj_pzf_sz", &detmc_traj_pzf_sz, &b_detmc_traj_pzf_sz);
+   fChain->SetBranchAddress("detmc_traj_pzf", detmc_traj_pzf, &b_detmc_traj_pzf);
+   fChain->SetBranchAddress("detmc_traj_t0_sz", &detmc_traj_t0_sz, &b_detmc_traj_t0_sz);
+   fChain->SetBranchAddress("detmc_traj_t0", detmc_traj_t0, &b_detmc_traj_t0);
+   fChain->SetBranchAddress("detmc_traj_tf_sz", &detmc_traj_tf_sz, &b_detmc_traj_tf_sz);
+   fChain->SetBranchAddress("detmc_traj_tf", detmc_traj_tf, &b_detmc_traj_tf);
+   fChain->SetBranchAddress("detmc_traj_x0_sz", &detmc_traj_x0_sz, &b_detmc_traj_x0_sz);
+   fChain->SetBranchAddress("detmc_traj_x0", detmc_traj_x0, &b_detmc_traj_x0);
+   fChain->SetBranchAddress("detmc_traj_xf_sz", &detmc_traj_xf_sz, &b_detmc_traj_xf_sz);
+   fChain->SetBranchAddress("detmc_traj_xf", detmc_traj_xf, &b_detmc_traj_xf);
+   fChain->SetBranchAddress("detmc_traj_y0_sz", &detmc_traj_y0_sz, &b_detmc_traj_y0_sz);
+   fChain->SetBranchAddress("detmc_traj_y0", detmc_traj_y0, &b_detmc_traj_y0);
+   fChain->SetBranchAddress("detmc_traj_yf_sz", &detmc_traj_yf_sz, &b_detmc_traj_yf_sz);
+   fChain->SetBranchAddress("detmc_traj_yf", detmc_traj_yf, &b_detmc_traj_yf);
+   fChain->SetBranchAddress("detmc_traj_z0_sz", &detmc_traj_z0_sz, &b_detmc_traj_z0_sz);
+   fChain->SetBranchAddress("detmc_traj_z0", detmc_traj_z0, &b_detmc_traj_z0);
+   fChain->SetBranchAddress("detmc_traj_zf_sz", &detmc_traj_zf_sz, &b_detmc_traj_zf_sz);
+   fChain->SetBranchAddress("detmc_traj_zf", detmc_traj_zf, &b_detmc_traj_zf);
    fChain->SetBranchAddress("fit_vtx", fit_vtx, &b_fit_vtx);
    fChain->SetBranchAddress("g1dedx_cluster_energy_sz", &g1dedx_cluster_energy_sz, &b_g1dedx_cluster_energy_sz);
    fChain->SetBranchAddress("g1dedx_cluster_energy", g1dedx_cluster_energy, &b_g1dedx_cluster_energy);

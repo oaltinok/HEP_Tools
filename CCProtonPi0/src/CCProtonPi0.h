@@ -80,6 +80,8 @@ Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
 #include "Event/TimeSlice.h"
 #include "Event/MCIDDigit.h"
 #include "Event/MCHit.h"
+#include <Event/TG4Trajectory.h>
+#include <Event/TG4TrajectoryPointExtraInfo.h>
 #include "G4Material.hh"
 #include "G4Navigator.hh"
 #include "G4ThreeVector.hh"
@@ -393,6 +395,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         double GetTotalExtraEnergy(const Minerva::PhysicsEvent* event) const;
         double FindShowerMaxZ(SmartRef<Minerva::IDBlob> blob) const;
         std::vector<double> EstimateShowerEndPoint(const Gaudi::LorentzVector& shower_4P, const std::vector<double> init_pos, double max_z) const;
+        void SaveTrajectories(Minerva::PhysicsEvent* event) const;
 
         // --------------------------------------------------------------------
         // Study: Shower Energy Functions

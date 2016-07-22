@@ -3,7 +3,7 @@
 # outputs list of files to  pl_DATATYPE_Merged.dat
 #
 DATATYPE=$1
-CCPROTONPI0_V="v2_81"
+CCPROTONPI0_V="v2_91"
 
 input_error()
 {

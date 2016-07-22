@@ -478,8 +478,6 @@ void CCProtonPi0_CrossSection::initFluxHistograms()
     h_flux_rebinned = new MnvH1D( "h_flux_rebinned","Flux (rebinned)", binList.size_Enu, binList.a_Enu);
     h_flux_rebinned->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     h_flux_rebinned->GetYaxis()->SetTitle("#nu_{#mu} s/cm^{2}/P.O.T./GeV");
-    AddVertErrorBands_MC(h_flux_rebinned);
-
     int nBins = h_flux_rebinned->GetNbinsX();
     for (int i = 1; i <= nBins; i++){
         double low = h_flux_rebinned->GetBinLowEdge(i);
@@ -488,6 +486,9 @@ void CCProtonPi0_CrossSection::initFluxHistograms()
         double bin_width = h_flux_rebinned->GetBinWidth(i);
         h_flux_rebinned->SetBinContent(i,content/bin_width);
     }
+    // Add Error Bands and Fill with CV for Flux Histogram -- Required for Divide()
+    AddVertErrorBands_Data(h_flux_rebinned);
+    AddLatErrorBands_Data(h_flux_rebinned);
 }
 
 void CCProtonPi0_CrossSection::initHistograms(XSec &var)

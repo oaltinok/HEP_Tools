@@ -53,7 +53,7 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
     m_anaSignature = "CCProtonPi0";
 
     // Private Properties
-    declareProperty("WriteFSParticleTable", m_writeFSParticle_Table =   false);
+    declareProperty("WriteFSParticleTable", m_writeFSParticle_Table = false);
 
     declareProperty("KeepAfter_VertexCuts", m_keepAfter_vertex_cuts = false);
     declareProperty("KeepAfter_MuonCuts", m_keepAfter_muon_cuts = false);
@@ -61,7 +61,7 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
     declareProperty("KeepAfter_ProtonCuts", m_keepAfter_proton_cuts = false);
     declareProperty("KeepAfter_Pi0Cuts", m_keepAfter_pi0_cuts = false);
 
-    declareProperty("RemoveEvents_WithMichel", m_removeEvents_withMichel = true);
+    declareProperty("RemoveEvents_WithMichel", m_removeEvents_withMichel = false);
 
     declareProperty("DoPlausibilityCuts",   m_DoPlausibilityCuts    =   true);
     declareProperty("DoTruthMatch",         m_DoTruthMatch          =   true);
@@ -219,6 +219,13 @@ StatusCode CCProtonPi0::initialize()
     declareIntTruthBranch("N_pi0", -1 );
     declareIntTruthBranch("N_other", -1 );
 
+    declareIntTruthBranch("InNucleus_N_pi0_initial", -1 );
+    declareIntTruthBranch("InNucleus_N_piplus_initial", -1 );
+    declareIntTruthBranch("InNucleus_N_piminus_initial", -1 );
+    declareIntTruthBranch("InNucleus_N_pi0_final", -1 );
+    declareIntTruthBranch("InNucleus_N_piplus_final", -1 );
+    declareIntTruthBranch("InNucleus_N_piminus_final", -1 );
+   
     declareIntTruthBranch( "vertex_module", 500);
     declareIntTruthBranch( "vertex_plane", 0);
     declareIntTruthBranch( "target_material", -1); 
@@ -273,7 +280,9 @@ StatusCode CCProtonPi0::initialize()
     // ------------------------------------------------------------------------
     declareBoolTruthBranch("isSignal");
     declareBoolTruthBranch("isSignal_Out");
+    declareBoolTruthBranch("isSignal_EventRecord");
     declareBoolTruthBranch("isFidVol");
+    declareBoolTruthBranch("isMINOS_Match");
     declareBoolTruthBranch("isNC");
     declareBoolTruthBranch("ReconstructEvent");
 
@@ -337,6 +346,41 @@ StatusCode CCProtonPi0::initialize()
     // ------------------------------------------------------------------------       
     // Event Branches
     // ------------------------------------------------------------------------       
+    // MC Trajectory Information
+    declareIntEventBranch("detmc_ntrajectory", -1);
+    declareIntEventBranch("detmc_ntrajectory2", -1);
+
+    declareContainerIntEventBranch("detmc_traj_pdg");
+    declareContainerIntEventBranch("detmc_traj_id");
+    declareContainerIntEventBranch("detmc_traj_mother");
+    declareContainerIntEventBranch("detmc_traj_proc");
+    declareContainerIntEventBranch("detmc_traj_status");
+
+    declareContainerDoubleEventBranch("detmc_traj_x0");
+    declareContainerDoubleEventBranch("detmc_traj_y0");
+    declareContainerDoubleEventBranch("detmc_traj_z0");
+    declareContainerDoubleEventBranch("detmc_traj_t0");
+
+    declareContainerDoubleEventBranch("detmc_traj_px0");
+    declareContainerDoubleEventBranch("detmc_traj_py0");
+    declareContainerDoubleEventBranch("detmc_traj_pz0");
+    declareContainerDoubleEventBranch("detmc_traj_E0");
+
+    declareContainerDoubleEventBranch("detmc_traj_xf");
+    declareContainerDoubleEventBranch("detmc_traj_yf");
+    declareContainerDoubleEventBranch("detmc_traj_zf");
+    declareContainerDoubleEventBranch("detmc_traj_tf");
+
+    declareContainerDoubleEventBranch("detmc_traj_pxf");
+    declareContainerDoubleEventBranch("detmc_traj_pyf");
+    declareContainerDoubleEventBranch("detmc_traj_pzf");
+    declareContainerDoubleEventBranch("detmc_traj_Ef");
+
+    declareContainerDoubleEventBranch("detmc_traj_prepxf");
+    declareContainerDoubleEventBranch("detmc_traj_prepyf");
+    declareContainerDoubleEventBranch("detmc_traj_prepzf");
+    declareContainerDoubleEventBranch("detmc_traj_preEf");
+
     // Cut Results
     declareIntEventBranch( "Cut_Vertex_None", -1 );
     declareIntEventBranch( "Cut_Vertex_Not_Reconstructable", -1 );
@@ -541,6 +585,12 @@ StatusCode CCProtonPi0::initialize()
     declareContainerDoubleEventBranch("all_protons_p_visEnergy", 10,SENTINEL);
     declareContainerDoubleEventBranch("all_protons_p_dEdXTool", 10,SENTINEL);
 
+    for(unsigned int i = 0; i < m_dedx_uncertainties.size(); i++) {
+        std::string name = m_dedx_uncertainties[i];
+        declareContainerDoubleEventBranch("all_protons_momentum_shift_" + name, 10, SENTINEL);
+        declareContainerDoubleEventBranch("all_protons_score1_shift_"   + name, 10, SENTINEL);
+    }
+
     // Leading(Interaction Proton) Kinematics 
     declareDoubleEventBranch("proton_px",SENTINEL);
     declareDoubleEventBranch("proton_py",SENTINEL);
@@ -558,6 +608,12 @@ StatusCode CCProtonPi0::initialize()
     declareDoubleEventBranch("proton_LLRScore", SENTINEL);
     declareIntEventBranch("proton_kinked",-1);
     declareIntEventBranch("proton_leadingIndice",-1);
+
+    for(unsigned int i = 0; i < m_dedx_uncertainties.size(); i++) {
+        std::string name = m_dedx_uncertainties[i];
+        declareDoubleEventBranch("proton_momentum_shift_" + name, SENTINEL);
+        declareDoubleEventBranch("proton_score1_shift_"   + name, SENTINEL);
+    }
 
     // Pi0 & Gamma1,2 Kinematics -- Filled in setPi0Data()    
     declareDoubleEventBranch("pi0_px",SENTINEL);
@@ -947,6 +1003,7 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
 
     FillTrajectoryMap();
 
+    SaveTrajectories(event);
     //==========================================================================
     // Vertex Reconstruction
     //==========================================================================
@@ -5072,6 +5129,250 @@ double CCProtonPi0::FindShowerMaxZ(SmartRef<Minerva::IDBlob> blob) const
     return temp_max;
 }
 
+void CCProtonPi0::SaveTrajectories(Minerva::PhysicsEvent* event) const
+{
+    event->setIntData("detmc_ntrajectory", fTrajectoryMap.size());
+
+    std::map<int, Minerva::TG4Trajectory*> skimmed_trajectories;
+    std::map<int, Minerva::TG4Trajectory*> tier1_trajectories;
+    for (std::map<int, Minerva::TG4Trajectory*>::iterator t
+             = fTrajectoryMap.begin();
+         t != fTrajectoryMap.end(); ++t) {
+        if (t->second->GetParentId() == 0) {
+            tier1_trajectories.insert(std::make_pair(t->first, t->second));
+            skimmed_trajectories.insert(std::make_pair(t->first, t->second));
+        }
+        else break;
+
+            /*
+        std::cout << "\t"
+                  << setw(8) << t->second->GetParentId()
+                  << setw(8) << t->second->GetTrackId()
+                  << setw(8) << t->second->GetPDGCode()
+                  << std::endl;
+            */
+    }
+
+    std::map<int, Minerva::TG4Trajectory*> tier2_trajectories;
+    for (std::map<int, Minerva::TG4Trajectory*>::iterator t
+             = fTrajectoryMap.begin();
+         t != fTrajectoryMap.end(); ++t) {
+        if (tier1_trajectories.find(t->second->GetParentId()) != tier1_trajectories.end()) {
+
+            std::string proc = t->second->GetProcessName();
+            if (proc == "muIoni" || proc == "eBrem" || proc == "hIoni") continue;
+
+            if (t->second->GetPDGCode() > 1e9) continue;
+            
+            tier2_trajectories.insert(std::make_pair(t->first, t->second));
+            skimmed_trajectories.insert(std::make_pair(t->first, t->second));
+
+                /*
+            std::cout << "\t\t"
+                      << setw(8)  << t->second->GetParentId()
+                      << setw(8)  << t->second->GetTrackId()
+                      << setw(15) << t->second->GetPDGCode()
+                      << setw(30) << t->second->GetProcessName()
+                      << std::endl;
+                */
+            
+        }
+    }
+
+    std::map<int, Minerva::TG4Trajectory*> tier3_trajectories;
+    for (std::map<int, Minerva::TG4Trajectory*>::iterator t
+             = fTrajectoryMap.begin();
+         t != fTrajectoryMap.end(); ++t) {
+        if (tier2_trajectories.find(t->second->GetParentId()) != tier2_trajectories.end()) {
+            
+            std::string proc = t->second->GetProcessName();
+            if (proc == "muIoni" || proc == "eBrem" || proc == "hIoni") continue;
+
+            if (t->second->GetPDGCode() > 1e9) continue;
+                    
+            tier3_trajectories.insert(std::make_pair(t->first, t->second));
+                // delay adding tiered 3 trajectories, see below
+                /*
+            std::cout << "\t\t\t"
+                      << setw(8)  << t->second->GetParentId()
+                      << setw(8)  << t->second->GetTrackId()
+                      << setw(15) << t->second->GetPDGCode()
+                      << setw(30) << t->second->GetProcessName()
+                      << std::endl;
+                */
+        }
+    }
+
+    int ntrajectory2 = tier1_trajectories.size() + tier2_trajectories.size() + tier3_trajectories.size();
+    event->setIntData("detmc_ntrajectory2", ntrajectory2);
+
+    if (ntrajectory2 > 100) {
+            // too many trajectories, try to remove neutrons from tiered 2 trajectories
+            // and re-run tiered 3
+        std::map<int, Minerva::TG4Trajectory*> reduced_tier2_trajectories;
+        for (std::map<int, Minerva::TG4Trajectory*>::iterator t = tier2_trajectories.begin();
+             t != tier2_trajectories.end(); ++t) {
+            if (t->second->GetPDGCode() == 2112) continue;
+            reduced_tier2_trajectories.insert(std::make_pair(t->first, t->second));
+        }
+
+        tier2_trajectories = reduced_tier2_trajectories;
+
+    }
+
+        // add tiered 3 trajectories
+    for (std::map<int, Minerva::TG4Trajectory*>::iterator t
+             = fTrajectoryMap.begin();
+         t != fTrajectoryMap.end(); ++t) {
+        if (tier2_trajectories.find(t->second->GetParentId()) != tier2_trajectories.end()) {
+            
+            std::string proc = t->second->GetProcessName();
+            if (proc == "muIoni" || proc == "eBrem" || proc == "hIoni") continue;
+            
+            if (t->second->GetPDGCode() > 1e9) continue;
+
+            if (skimmed_trajectories.size() <= 100) skimmed_trajectories.insert(std::make_pair(t->first, t->second));
+
+        }
+    }
+
+    std::cout << "\tTotal tiered trajectories: " << skimmed_trajectories.size() << " " << ntrajectory2
+              << std::endl;
+    
+    debug() << "\twrite trajectory info to the ntuple " << endmsg;
+
+    std::vector<int> detmc_traj_pdg;
+    std::vector<int> detmc_traj_id;
+    std::vector<int> detmc_traj_mother;
+    std::vector<int> detmc_traj_proc;
+    std::vector<int> detmc_traj_status;
+    
+    std::vector<double> detmc_traj_x0;
+    std::vector<double> detmc_traj_y0;
+    std::vector<double> detmc_traj_z0;
+    std::vector<double> detmc_traj_t0;
+    
+    std::vector<double> detmc_traj_px0;
+    std::vector<double> detmc_traj_py0;
+    std::vector<double> detmc_traj_pz0;
+    std::vector<double> detmc_traj_E0;
+
+    std::vector<double> detmc_traj_xf;
+    std::vector<double> detmc_traj_yf;
+    std::vector<double> detmc_traj_zf;
+    std::vector<double> detmc_traj_tf;
+    
+    std::vector<double> detmc_traj_pxf;
+    std::vector<double> detmc_traj_pyf;
+    std::vector<double> detmc_traj_pzf;
+    std::vector<double> detmc_traj_Ef;
+
+    std::vector<double> detmc_traj_prepxf;
+    std::vector<double> detmc_traj_prepyf;
+    std::vector<double> detmc_traj_prepzf;
+    std::vector<double> detmc_traj_preEf;
+
+    
+    for (std::map<int, Minerva::TG4Trajectory*>::iterator t = skimmed_trajectories.begin();
+         t != skimmed_trajectories.end(); ++t) {
+        std::string proc = t->second->GetProcessName();
+
+        int code = -1;
+
+        if      (proc == "hadElastic")                code = 0;
+        else if (proc == "NeutronInelastic")          code = 1;
+        else if (proc == "ProtonInelastic")           code = 2;
+        else if (proc == "PionMinusInelastic")        code = 3;
+        else if (proc == "PionPlusInelastic")         code = 4;
+        else if (proc == "CHIPSNuclearCaptureAtRest") code = 5;
+        else if (proc == "Decay")                     code = 6;
+        else if (proc == "conv")                      code = 7;
+        else if (proc == "compt")                     code = 8;
+        else if (proc == "Primary")                   code = 10;
+        else code = 20;
+
+            /*
+        std::cout << "\t\t\t"
+                  << setw(8)  << t->second->GetParentId()
+                  << setw(8)  << t->second->GetTrackId()
+                  << setw(15) << t->second->GetPDGCode()
+                  << setw(30) << t->second->GetProcessName()
+                  << setw(5)  << code
+                  << std::endl;
+            */
+                  
+        const Minerva::TG4Trajectory* trajectory = t->second;
+        
+        const int pdg    = trajectory->GetPDGCode();                detmc_traj_pdg.push_back(pdg);
+        const int id     = trajectory->GetTrackId();                detmc_traj_id.push_back(id);
+        const int mother = trajectory->GetParentId();               detmc_traj_mother.push_back(mother);
+        const int status = trajectory->GetLeavingCode();            detmc_traj_status.push_back(status);
+        const int proc_enum = code;                                 detmc_traj_proc.push_back(proc_enum);
+                                                                    
+        const double x0 = trajectory->GetInitialPosition().X();     detmc_traj_x0.push_back(x0);
+        const double y0 = trajectory->GetInitialPosition().Y();     detmc_traj_y0.push_back(y0);
+        const double z0 = trajectory->GetInitialPosition().Z();     detmc_traj_z0.push_back(z0);
+        const double t0 = trajectory->GetInitialPosition().T();     detmc_traj_t0.push_back(t0);
+        
+        const double px0 = trajectory->GetInitialMomentum().Px();   detmc_traj_px0.push_back(px0);
+        const double py0 = trajectory->GetInitialMomentum().Py();   detmc_traj_py0.push_back(py0);
+        const double pz0 = trajectory->GetInitialMomentum().Pz();   detmc_traj_pz0.push_back(pz0);
+        const double E0  = trajectory->GetInitialMomentum().E();    detmc_traj_E0.push_back(E0);
+
+        const double xf = trajectory->GetFinalPosition().X();       detmc_traj_xf.push_back(xf);
+        const double yf = trajectory->GetFinalPosition().Y();       detmc_traj_yf.push_back(yf);
+        const double zf = trajectory->GetFinalPosition().Z();       detmc_traj_zf.push_back(zf);
+        const double tf = trajectory->GetFinalPosition().T();       detmc_traj_tf.push_back(tf);
+
+        Minerva::TG4TrajectoryPointExtraInfo* extraInfo =  dynamic_cast<Minerva::TG4TrajectoryPointExtraInfo*>(trajectory->GetTrajectoryPoints().back());
+        assert(extraInfo);
+        
+        const double pxf = extraInfo->GetMomentum().Px();           detmc_traj_pxf.push_back(pxf);
+        const double pyf = extraInfo->GetMomentum().Py();           detmc_traj_pyf.push_back(pyf);
+        const double pzf = extraInfo->GetMomentum().Pz();           detmc_traj_pzf.push_back(pzf);
+        const double Ef  = extraInfo->GetMomentum().E();            detmc_traj_Ef.push_back(Ef);
+        
+        const double prepxf = extraInfo->GetPreMomentum().Px();     detmc_traj_prepxf.push_back(prepxf);
+        const double prepyf = extraInfo->GetPreMomentum().Py();     detmc_traj_prepyf.push_back(prepyf);
+        const double prepzf = extraInfo->GetPreMomentum().Pz();     detmc_traj_prepzf.push_back(prepzf);
+        const double preEf  = extraInfo->GetPreMomentum().E();      detmc_traj_preEf.push_back(preEf);
+
+
+    } // loop over trajectories
+
+
+    event->setContainerIntData("detmc_traj_pdg",    detmc_traj_pdg);
+    event->setContainerIntData("detmc_traj_id",     detmc_traj_id);
+    event->setContainerIntData("detmc_traj_mother", detmc_traj_mother);
+    event->setContainerIntData("detmc_traj_proc",   detmc_traj_proc);
+    event->setContainerIntData("detmc_traj_status", detmc_traj_status);
+
+    event->setContainerDoubleData("detmc_traj_x0", detmc_traj_x0);
+    event->setContainerDoubleData("detmc_traj_y0", detmc_traj_y0);
+    event->setContainerDoubleData("detmc_traj_z0", detmc_traj_z0);
+    event->setContainerDoubleData("detmc_traj_t0", detmc_traj_t0);
+
+    event->setContainerDoubleData("detmc_traj_px0", detmc_traj_px0);
+    event->setContainerDoubleData("detmc_traj_py0", detmc_traj_py0);
+    event->setContainerDoubleData("detmc_traj_pz0", detmc_traj_pz0);
+    event->setContainerDoubleData("detmc_traj_E0",  detmc_traj_E0);
+
+    event->setContainerDoubleData("detmc_traj_xf", detmc_traj_xf);
+    event->setContainerDoubleData("detmc_traj_yf", detmc_traj_yf);
+    event->setContainerDoubleData("detmc_traj_zf", detmc_traj_zf);
+    event->setContainerDoubleData("detmc_traj_tf", detmc_traj_tf);
+
+    event->setContainerDoubleData("detmc_traj_pxf", detmc_traj_pxf);
+    event->setContainerDoubleData("detmc_traj_pyf", detmc_traj_pyf);
+    event->setContainerDoubleData("detmc_traj_pzf", detmc_traj_pzf);
+    event->setContainerDoubleData("detmc_traj_Ef",  detmc_traj_Ef);
+
+    event->setContainerDoubleData("detmc_traj_prepxf", detmc_traj_prepxf);
+    event->setContainerDoubleData("detmc_traj_prepyf", detmc_traj_prepyf);
+    event->setContainerDoubleData("detmc_traj_prepzf", detmc_traj_prepzf);
+    event->setContainerDoubleData("detmc_traj_preEf",  detmc_traj_preEf);
+    
+}
 
 
 #endif

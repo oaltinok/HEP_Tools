@@ -147,7 +147,9 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("truth_isGamma2_conv_inside", &truth_isGamma2_conv_inside, &b_truth_isGamma2_conv_inside);
         fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
         fChain->SetBranchAddress("truth_isSignal_Out", &truth_isSignal_Out, &b_truth_isSignal_Out);
+        fChain->SetBranchAddress("truth_isSignal_EventRecord", &truth_isSignal_EventRecord, &b_truth_isSignal_EventRecord);
         fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
+        fChain->SetBranchAddress("truth_isMINOS_Match", &truth_isMINOS_Match, &b_truth_isMINOS_Match);
         fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
         fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);
         fChain->SetBranchAddress("truth_isBckg_NoPi0", &truth_isBckg_NoPi0, &b_truth_isBckg_NoPi0);
@@ -174,6 +176,12 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("truth_Bckg_nPi0_Total", &truth_Bckg_nPi0_Total, &b_truth_Bckg_nPi0_Total);
         fChain->SetBranchAddress("truth_Bckg_nPiCharged", &truth_Bckg_nPiCharged, &b_truth_Bckg_nPiCharged);
         fChain->SetBranchAddress("truth_Bckg_nPiCharged_ChargeExchanged", &truth_Bckg_nPiCharged_ChargeExchanged, &b_truth_Bckg_nPiCharged_ChargeExchanged);
+        fChain->SetBranchAddress("truth_InNucleus_N_pi0_final", &truth_InNucleus_N_pi0_final, &b_truth_InNucleus_N_pi0_final);
+        fChain->SetBranchAddress("truth_InNucleus_N_pi0_initial", &truth_InNucleus_N_pi0_initial, &b_truth_InNucleus_N_pi0_initial);
+        fChain->SetBranchAddress("truth_InNucleus_N_piminus_final", &truth_InNucleus_N_piminus_final, &b_truth_InNucleus_N_piminus_final);
+        fChain->SetBranchAddress("truth_InNucleus_N_piminus_initial", &truth_InNucleus_N_piminus_initial, &b_truth_InNucleus_N_piminus_initial);
+        fChain->SetBranchAddress("truth_InNucleus_N_piplus_final", &truth_InNucleus_N_piplus_final, &b_truth_InNucleus_N_piplus_final);
+        fChain->SetBranchAddress("truth_InNucleus_N_piplus_initial", &truth_InNucleus_N_piplus_initial, &b_truth_InNucleus_N_piplus_initial);
         fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
         fChain->SetBranchAddress("truth_N_other", &truth_N_other, &b_truth_N_other);
         fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
@@ -285,7 +293,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
         fChain->SetBranchAddress("truth_muon_4P", truth_muon_4P, &b_truth_muon_4P);
         fChain->SetBranchAddress("truth_pi0_4P", truth_pi0_4P, &b_truth_pi0_4P);
         fChain->SetBranchAddress("truth_proton_4P", truth_proton_4P, &b_truth_proton_4P);
-    } 
+    }
     fChain->SetBranchAddress("physEvtNum", &physEvtNum, &b_physEvtNum);
     fChain->SetBranchAddress("n_hyps", &n_hyps, &b_n_hyps);
     fChain->SetBranchAddress("processType", &processType, &b_processType);
@@ -326,6 +334,8 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("anglescan_ncand", &anglescan_ncand, &b_anglescan_ncand);
     fChain->SetBranchAddress("anglescan_ncandx", &anglescan_ncandx, &b_anglescan_ncandx);
     fChain->SetBranchAddress("anglescan_nfoundBlobs", &anglescan_nfoundBlobs, &b_anglescan_nfoundBlobs);
+    fChain->SetBranchAddress("detmc_ntrajectory", &detmc_ntrajectory, &b_detmc_ntrajectory);
+    fChain->SetBranchAddress("detmc_ntrajectory2", &detmc_ntrajectory2, &b_detmc_ntrajectory2);
     fChain->SetBranchAddress("g1blob_1ParFit_ndof", &g1blob_1ParFit_ndof, &b_g1blob_1ParFit_ndof);
     fChain->SetBranchAddress("g1dedx_doublet", &g1dedx_doublet, &b_g1dedx_doublet);
     fChain->SetBranchAddress("g1dedx_empty_plane", &g1dedx_empty_plane, &b_g1dedx_empty_plane);
@@ -524,6 +534,16 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("vtx_z", &vtx_z, &b_vtx_z);
     fChain->SetBranchAddress("all_protons_kinked", all_protons_kinked, &b_all_protons_kinked);
     fChain->SetBranchAddress("all_protons_odMatch", all_protons_odMatch, &b_all_protons_odMatch);
+    fChain->SetBranchAddress("detmc_traj_id_sz", &detmc_traj_id_sz, &b_detmc_traj_id_sz);
+    fChain->SetBranchAddress("detmc_traj_id", detmc_traj_id, &b_detmc_traj_id);
+    fChain->SetBranchAddress("detmc_traj_mother_sz", &detmc_traj_mother_sz, &b_detmc_traj_mother_sz);
+    fChain->SetBranchAddress("detmc_traj_mother", detmc_traj_mother, &b_detmc_traj_mother);
+    fChain->SetBranchAddress("detmc_traj_pdg_sz", &detmc_traj_pdg_sz, &b_detmc_traj_pdg_sz);
+    fChain->SetBranchAddress("detmc_traj_pdg", detmc_traj_pdg, &b_detmc_traj_pdg);
+    fChain->SetBranchAddress("detmc_traj_proc_sz", &detmc_traj_proc_sz, &b_detmc_traj_proc_sz);
+    fChain->SetBranchAddress("detmc_traj_proc", detmc_traj_proc, &b_detmc_traj_proc);
+    fChain->SetBranchAddress("detmc_traj_status_sz", &detmc_traj_status_sz, &b_detmc_traj_status_sz);
+    fChain->SetBranchAddress("detmc_traj_status", detmc_traj_status, &b_detmc_traj_status);
     fChain->SetBranchAddress("g1dedx_cluster_occupancy_sz", &g1dedx_cluster_occupancy_sz, &b_g1dedx_cluster_occupancy_sz);
     fChain->SetBranchAddress("g1dedx_cluster_occupancy", g1dedx_cluster_occupancy, &b_g1dedx_cluster_occupancy);
     fChain->SetBranchAddress("g2dedx_cluster_occupancy_sz", &g2dedx_cluster_occupancy_sz, &b_g2dedx_cluster_occupancy_sz);
@@ -554,6 +574,46 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("all_protons_startPointZ", all_protons_startPointZ, &b_all_protons_startPointZ);
     fChain->SetBranchAddress("all_protons_theta", all_protons_theta, &b_all_protons_theta);
     fChain->SetBranchAddress("all_protons_theta_beam", all_protons_theta_beam, &b_all_protons_theta_beam);
+    fChain->SetBranchAddress("detmc_traj_E0_sz", &detmc_traj_E0_sz, &b_detmc_traj_E0_sz);
+    fChain->SetBranchAddress("detmc_traj_E0", detmc_traj_E0, &b_detmc_traj_E0);
+    fChain->SetBranchAddress("detmc_traj_Ef_sz", &detmc_traj_Ef_sz, &b_detmc_traj_Ef_sz);
+    fChain->SetBranchAddress("detmc_traj_Ef", detmc_traj_Ef, &b_detmc_traj_Ef);
+    fChain->SetBranchAddress("detmc_traj_preEf_sz", &detmc_traj_preEf_sz, &b_detmc_traj_preEf_sz);
+    fChain->SetBranchAddress("detmc_traj_preEf", detmc_traj_preEf, &b_detmc_traj_preEf);
+    fChain->SetBranchAddress("detmc_traj_prepxf_sz", &detmc_traj_prepxf_sz, &b_detmc_traj_prepxf_sz);
+    fChain->SetBranchAddress("detmc_traj_prepxf", detmc_traj_prepxf, &b_detmc_traj_prepxf);
+    fChain->SetBranchAddress("detmc_traj_prepyf_sz", &detmc_traj_prepyf_sz, &b_detmc_traj_prepyf_sz);
+    fChain->SetBranchAddress("detmc_traj_prepyf", detmc_traj_prepyf, &b_detmc_traj_prepyf);
+    fChain->SetBranchAddress("detmc_traj_prepzf_sz", &detmc_traj_prepzf_sz, &b_detmc_traj_prepzf_sz);
+    fChain->SetBranchAddress("detmc_traj_prepzf", detmc_traj_prepzf, &b_detmc_traj_prepzf);
+    fChain->SetBranchAddress("detmc_traj_px0_sz", &detmc_traj_px0_sz, &b_detmc_traj_px0_sz);
+    fChain->SetBranchAddress("detmc_traj_px0", detmc_traj_px0, &b_detmc_traj_px0);
+    fChain->SetBranchAddress("detmc_traj_pxf_sz", &detmc_traj_pxf_sz, &b_detmc_traj_pxf_sz);
+    fChain->SetBranchAddress("detmc_traj_pxf", detmc_traj_pxf, &b_detmc_traj_pxf);
+    fChain->SetBranchAddress("detmc_traj_py0_sz", &detmc_traj_py0_sz, &b_detmc_traj_py0_sz);
+    fChain->SetBranchAddress("detmc_traj_py0", detmc_traj_py0, &b_detmc_traj_py0);
+    fChain->SetBranchAddress("detmc_traj_pyf_sz", &detmc_traj_pyf_sz, &b_detmc_traj_pyf_sz);
+    fChain->SetBranchAddress("detmc_traj_pyf", detmc_traj_pyf, &b_detmc_traj_pyf);
+    fChain->SetBranchAddress("detmc_traj_pz0_sz", &detmc_traj_pz0_sz, &b_detmc_traj_pz0_sz);
+    fChain->SetBranchAddress("detmc_traj_pz0", detmc_traj_pz0, &b_detmc_traj_pz0);
+    fChain->SetBranchAddress("detmc_traj_pzf_sz", &detmc_traj_pzf_sz, &b_detmc_traj_pzf_sz);
+    fChain->SetBranchAddress("detmc_traj_pzf", detmc_traj_pzf, &b_detmc_traj_pzf);
+    fChain->SetBranchAddress("detmc_traj_t0_sz", &detmc_traj_t0_sz, &b_detmc_traj_t0_sz);
+    fChain->SetBranchAddress("detmc_traj_t0", detmc_traj_t0, &b_detmc_traj_t0);
+    fChain->SetBranchAddress("detmc_traj_tf_sz", &detmc_traj_tf_sz, &b_detmc_traj_tf_sz);
+    fChain->SetBranchAddress("detmc_traj_tf", detmc_traj_tf, &b_detmc_traj_tf);
+    fChain->SetBranchAddress("detmc_traj_x0_sz", &detmc_traj_x0_sz, &b_detmc_traj_x0_sz);
+    fChain->SetBranchAddress("detmc_traj_x0", detmc_traj_x0, &b_detmc_traj_x0);
+    fChain->SetBranchAddress("detmc_traj_xf_sz", &detmc_traj_xf_sz, &b_detmc_traj_xf_sz);
+    fChain->SetBranchAddress("detmc_traj_xf", detmc_traj_xf, &b_detmc_traj_xf);
+    fChain->SetBranchAddress("detmc_traj_y0_sz", &detmc_traj_y0_sz, &b_detmc_traj_y0_sz);
+    fChain->SetBranchAddress("detmc_traj_y0", detmc_traj_y0, &b_detmc_traj_y0);
+    fChain->SetBranchAddress("detmc_traj_yf_sz", &detmc_traj_yf_sz, &b_detmc_traj_yf_sz);
+    fChain->SetBranchAddress("detmc_traj_yf", detmc_traj_yf, &b_detmc_traj_yf);
+    fChain->SetBranchAddress("detmc_traj_z0_sz", &detmc_traj_z0_sz, &b_detmc_traj_z0_sz);
+    fChain->SetBranchAddress("detmc_traj_z0", detmc_traj_z0, &b_detmc_traj_z0);
+    fChain->SetBranchAddress("detmc_traj_zf_sz", &detmc_traj_zf_sz, &b_detmc_traj_zf_sz);
+    fChain->SetBranchAddress("detmc_traj_zf", detmc_traj_zf, &b_detmc_traj_zf);
     fChain->SetBranchAddress("fit_vtx", fit_vtx, &b_fit_vtx);
     fChain->SetBranchAddress("g1dedx_cluster_energy_sz", &g1dedx_cluster_energy_sz, &b_g1dedx_cluster_energy_sz);
     fChain->SetBranchAddress("g1dedx_cluster_energy", g1dedx_cluster_energy, &b_g1dedx_cluster_energy);
@@ -688,6 +748,7 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("prong_part_mass", prong_part_mass, &b_prong_part_mass);
     fChain->SetBranchAddress("prong_part_charge", prong_part_charge, &b_prong_part_charge);
     fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
+
 
 }
 

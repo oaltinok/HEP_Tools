@@ -710,6 +710,20 @@ void CCProtonPi0_Interaction::initHistograms()
     muonP_shift_rand_numbers = new TH1D( "muonP_shift_rand_numbers","Muon Momentum Shift Random Numbers",50,-0.1,0.1);
     muonP_shift_rand_numbers->GetXaxis()->SetTitle("Muon Momentum Shift");
     muonP_shift_rand_numbers->GetYaxis()->SetTitle("N(Numbers)");
+
+    Err_NeutronResponse = new TH1D( "Err_NeutronResponse","Neutron Response Error",50,-1,1);
+    Err_NeutronResponse->GetXaxis()->SetTitle("Error used as (wgt = 1 #pm error)");
+    Err_NeutronResponse->GetYaxis()->SetTitle("N(Events)");
+
+    Err_PionResponse = new TH1D( "Err_PionResponse","Pion Response Error",50,-1,1);
+    Err_PionResponse->GetXaxis()->SetTitle("Error used as (wgt = 1 #pm error)");
+    Err_PionResponse->GetYaxis()->SetTitle("N(Events)");
+
+    Err_MuonTracking = new TH1D( "Err_MuonTracking","Muon Tracking Error",50,-1,1);
+    Err_MuonTracking->GetXaxis()->SetTitle("Error used as (wgt = 1 #pm error)");
+    Err_MuonTracking->GetYaxis()->SetTitle("N(Events)");
+
+
 }
 
 void CCProtonPi0_Interaction::writeHistograms()
@@ -908,6 +922,10 @@ void CCProtonPi0_Interaction::writeHistograms()
     normal_rand_numbers->Write();
     em_shift_rand_numbers->Write();
     muonP_shift_rand_numbers->Write();
+
+    Err_NeutronResponse->Write();
+    Err_PionResponse->Write();
+    Err_MuonTracking->Write();
 
     f->Close();
 }

@@ -107,6 +107,7 @@ void CCProtonPi0_CutList::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
         if (m_isMC){
             AddVertErrorBands_MC(temp);
+            AddLatErrorBands_MC(temp);
         }
         hCut_pi0invMass.push_back(temp);
 

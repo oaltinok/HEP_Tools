@@ -90,7 +90,7 @@ void CCProtonPi0_CrossSection::init_pi0_theta()
     pi0_theta.isEv = false;
 
     pi0_theta.plot_title = "Differential Cross Section for #theta_{#pi^{0}}";
-    pi0_theta.plot_xlabel = "Pion theta [GeV]";
+    pi0_theta.plot_xlabel = "Pion Angle [degree]";
     pi0_theta.plot_ylabel = "d#sigma/d#theta_{#pi^{0}} (10^{-40} cm^{2}/nucleon/degree)";
 
     // ROOT Files

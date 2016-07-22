@@ -24,7 +24,11 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
     public:
         CCProtonPi0_Interaction(bool isModeReduce, bool isMC);
         void writeHistograms();
-        
+       
+        bool isErrHistFilled_NeutronResponse;
+        bool isErrHistFilled_PionResponse;
+        bool isErrHistFilled_MuonTracking;
+
         //--------------------------------------------------------------------------
         //     Histograms
         //--------------------------------------------------------------------------
@@ -81,6 +85,11 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         MnvH1D* W_mc_reco_bckg;
         MnvH1D* W_mc_truth_signal;
         MnvH2D* W_response;
+
+        // Vertical Error Band -- Errors 
+        TH1D* Err_NeutronResponse;  
+        TH1D* Err_PionResponse;  
+        TH1D* Err_MuonTracking;  
 
         // Vertex
         std::vector<MnvH1D*> vertex_z;

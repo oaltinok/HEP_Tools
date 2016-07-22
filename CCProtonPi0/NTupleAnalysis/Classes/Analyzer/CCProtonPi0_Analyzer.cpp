@@ -15,7 +15,7 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     isDataAnalysis  = true;
     isScanRun = false;
     applyBckgConstraints_CV = true;
-    applyBckgConstraints_Unv = false;
+    applyBckgConstraints_Unv = true;
     writeFSParticleMomentum = false;
     fillErrors_ByHand = true;
 
@@ -25,7 +25,6 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     sideBand_PID = false;
     sideBand_LowInvMass = false;
     sideBand_HighInvMass = false;
-
 
     // EM Calibration Correction
     // Found the correction using a Double Gaussian Fit in MATLAB
@@ -52,10 +51,10 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     latest_ScanID = 0.0;
 
     // Counter Names
-    counter1.name = "N(Failed EM Shift) = ";
-    counter2.name = "N(Failed Muon P Shift) = ";
-    counter3.name = "N/A";
-    counter4.name = "N/A";
+    counter1.name = "N(PionResponse) = ";
+    counter2.name = "N(NeutronResponse) = ";
+    counter3.name = "N/A = ";
+    counter4.name = "N/A= ";
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
@@ -104,6 +103,12 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
             break;
         }
 
+        // Reset Counters isCounted
+        counter1.isCounted = false;
+        counter2.isCounted = false;
+        counter3.isCounted = false;
+        counter4.isCounted = false;
+      
         // Update scanFileName if running for scan
         if(isScanRun) UpdateScanFileName();
 
@@ -146,14 +151,14 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
 
         AddLatErrorBands_Data(cutList.invMass_all);
         AddLatErrorBands_Data(cutList.hCut_pi0invMass[0]);
-        AddLatErrorBands_Data(cutList.SideBand_muon_P[0]);
-        AddLatErrorBands_Data(cutList.SideBand_muon_theta[0]);
-        AddLatErrorBands_Data(cutList.SideBand_pi0_P[0]);
-        AddLatErrorBands_Data(cutList.SideBand_pi0_KE[0]);
-        AddLatErrorBands_Data(cutList.SideBand_pi0_theta[0]);
-        AddLatErrorBands_Data(cutList.SideBand_QSq[0]);
-        AddLatErrorBands_Data(cutList.SideBand_W[0]);
-        AddLatErrorBands_Data(cutList.SideBand_neutrino_E[0]);
+//        AddLatErrorBands_Data(cutList.SideBand_muon_P[0]);
+//        AddLatErrorBands_Data(cutList.SideBand_muon_theta[0]);
+//        AddLatErrorBands_Data(cutList.SideBand_pi0_P[0]);
+//        AddLatErrorBands_Data(cutList.SideBand_pi0_KE[0]);
+//        AddLatErrorBands_Data(cutList.SideBand_pi0_theta[0]);
+//        AddLatErrorBands_Data(cutList.SideBand_QSq[0]);
+//        AddLatErrorBands_Data(cutList.SideBand_W[0]);
+//        AddLatErrorBands_Data(cutList.SideBand_neutrino_E[0]);
     }
     cutList.writeCutTable();
     cutList.writeHistograms();
@@ -216,6 +221,17 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             break;
         }
        
+        // Reset Counters isCounted
+        counter1.isCounted = false;
+        counter2.isCounted = false;
+        counter3.isCounted = false;
+        counter4.isCounted = false;
+         
+        // Reset Interaction Hist Filled
+        interaction.isErrHistFilled_NeutronResponse = false;
+        interaction.isErrHistFilled_PionResponse = false;
+        interaction.isErrHistFilled_MuonTracking = false;
+
         UpdateSignalDef();
         
         // Update scanFileName if running for scan
@@ -242,11 +258,9 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             failText<<m_W*MeV_to_GeV<<" "<<m_W_Truth*MeV_to_GeV<<" "<<mc_w*MeV_to_GeV;
             failText<<std::endl;
         }
-
         //----------------------------------------------------------------------
         // Data Analysis and Other Studies
         //----------------------------------------------------------------------
-        if (truth_isSignal_Out && !truth_isSignal) counter3.count++;
         if (isDataAnalysis){
             fillData();
             if (m_isMC){
@@ -255,13 +269,13 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             }
         } 
         if (writeFSParticleMomentum) writeFSParticle4P(jentry);
-
     } // end for-loop
 
     if (!m_isMC) AddErrorBands_Data();
     //--------------------------------------------------------------------------
     // Studies
     //--------------------------------------------------------------------------
+    
 
     
     //--------------------------------------------------------------------------
@@ -304,6 +318,7 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
     cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
 
     m_isMC = isMC;
+    m_isModeReduce = isModeReduce;
 
     cvweight = 1.0;
    
@@ -647,7 +662,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     cutList.nCut_Muon_Charge.increment(truth_isSignal, study1, study2);
 
     // ------------------------------------------------------------------------
-    // Michel Cuts
+    // Michel Study 
     // ------------------------------------------------------------------------
     if ( Cut_Vertex_Michel_Exist == 1 && truth_vtx_michel_large_evis_most_pdg != -1){
         if (truth_vtx_michel_evis_most_pdg == 211){ 
@@ -677,7 +692,11 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
             FillHistogram(cutList.michel_other_distance_z, vtx_michelProng_Large_begin_Z - vtx_z);
         }
     }
-  
+    //GetMichelStatistics();
+
+    // ------------------------------------------------------------------------
+    // Michel Cuts 
+    // ------------------------------------------------------------------------
     isMichelEvent = (Cut_Vertex_Michel_Exist == 1) || (Cut_EndPoint_Michel_Exist == 1) || (Cut_secEndPoint_Michel_Exist == 1);
     if( isMichelEvent){
         FillHistogram(cutList.hCut_Michel,1);
@@ -877,6 +896,11 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (NoSideBand){
         FillInvMass_TruthMatch();
         FillHistogramWithVertErrors(cutList.hCut_pi0invMass, pi0_invMass);
+        // Fill Lateral Error Bands on hCut_pi0invMass
+        if (m_isMC){
+            FillLatErrorBand_EM_EnergyScale_SideBand_invMass();
+            FillLatErrorBand_MuonMomentum_SideBand_invMass();
+        }
 
         if (nProtonCandidates == 0){
             FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
@@ -2096,7 +2120,11 @@ void CCProtonPi0_Analyzer::fill_SideBand_InvMass()
     if (fill_Michel || fill_pID){
         FillInvMass_TruthMatch();
         FillHistogramWithVertErrors(cutList.hCut_pi0invMass, pi0_invMass);
-
+        // Fill Lateral Error Bands
+        if (m_isMC){
+            FillLatErrorBand_EM_EnergyScale_SideBand_invMass();
+            FillLatErrorBand_MuonMomentum_SideBand_invMass();
+        }
         if (nProtonCandidates == 0){
             FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
             FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
@@ -2123,6 +2151,7 @@ void CCProtonPi0_Analyzer::fill_SideBand_Other()
         FillHistogramWithVertErrors(cutList.SideBand_neutrino_E, m_Enu*MeV_to_GeV);
         FillHistogramWithVertErrors(cutList.SideBand_QSq, m_QSq*MeVSq_to_GeVSq);
         FillHistogramWithVertErrors(cutList.SideBand_W, m_W*MeV_to_GeV);
+        // I am not filling Lateral Error Bands on SideBand Other Variables
     }
 }
 
@@ -2277,6 +2306,52 @@ bool CCProtonPi0_Analyzer::IsOpeningAngleSmallAndEnergyLow(double E_g1, double E
     else return false;
 }
 
+int CCProtonPi0_Analyzer::CountFSParticles(int pdg, double P_limit)
+{
+    int count = 0;
+    for (int i = 0; i < mc_nFSPart; ++i){
+        if (mc_FSPartPDG[i] == pdg ){ 
+            double P = HEP_Functions::calcMomentum(mc_FSPartPx[i], mc_FSPartPy[i], mc_FSPartPz[i]);
+            if (P > P_limit){
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+void CCProtonPi0_Analyzer::PrintFSParticles()
+{
+    std::cout<<"-------------------------"<<std::endl;
+    for (int i = 0; i < mc_nFSPart; ++i){
+        std::cout<<"PDG = "<<mc_FSPartPDG[i]<<std::endl;
+    }
+}
+
+void CCProtonPi0_Analyzer::GetMichelStatistics()
+{
+//    // Count Data Overlay Statistics
+//    if ( Cut_Vertex_Michel_Exist == 1 ){
+//        if (truth_vtx_michel_evis_most_pdg == -1) counter1.count++;
+//        else counter2.count++;
+//    }
+
+    bool isMichelFound = (Cut_Vertex_Michel_Exist == 1) || (Cut_EndPoint_Michel_Exist == 1) || (Cut_secEndPoint_Michel_Exist == 1);
+
+    // Total Number of Truth Michels
+    if (truth_isBckg_withMichel) counter1.count++;
+
+    // Total Number of Found Michels
+    if (isMichelFound) counter2.count++;
+
+    // Count Missed Michels
+    if (truth_isBckg_withMichel && !isMichelFound) counter3.count++;
+
+    // Count False Positives
+    if (!truth_isBckg_withMichel && isMichelFound) counter4.count++;
+
+
+}
 
 #endif //CCProtonPi0_Analyzer_cpp
 

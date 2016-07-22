@@ -237,7 +237,7 @@ void CCProtonPi0_Plotter::ApplyStyle(MnvPlotter* plotter)
     plotter->legend_text_size = 0.02;
 }
 
-void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupGENIE)
+void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupErrors)
 {
     //plotter->hist_min_zero = false;
     //plotter->mc_line_width = 0;
@@ -249,54 +249,83 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupGENIE
     plotter->height_nspaces_per_hist = 0.5;
     plotter->width_xspace_per_letter = 0.1;
     
-    if (groupGENIE){
+    if (groupErrors){
         //-- define colors of the standard errors
         plotter->error_color_map.clear();
         plotter->error_summary_group_map.clear();
 
-        plotter->error_color_map["GENIE"] = kGreen+2;
+        //plotter->error_color_map["GENIE"] = kGreen+2;
 
+        //---------------------------------------------------------------------
+        // GENIE Cross Section
+        //---------------------------------------------------------------------
         std::vector<std::string> genieGroup;
-        genieGroup.push_back("GENIE_AGKYxF1pi"         );
         genieGroup.push_back("GENIE_AhtBY"             );
         genieGroup.push_back("GENIE_BhtBY"             );
         genieGroup.push_back("GENIE_CCQEPauliSupViaKF" );
         genieGroup.push_back("GENIE_CV1uBY"            );
         genieGroup.push_back("GENIE_CV2uBY"            );
         genieGroup.push_back("GENIE_EtaNCEL"           );
-        genieGroup.push_back("GENIE_FrAbs_N"           );
-        genieGroup.push_back("GENIE_FrAbs_pi"          );
-        genieGroup.push_back("GENIE_FrCEx_N"           );
-        genieGroup.push_back("GENIE_FrCEx_pi"          );
-        genieGroup.push_back("GENIE_FrElas_N"          );
-        genieGroup.push_back("GENIE_FrElas_pi"         );
-        genieGroup.push_back("GENIE_FrInel_N"          );
-        genieGroup.push_back("GENIE_FrInel_pi"         );
-        genieGroup.push_back("GENIE_FrPiProd_N"        );
-        genieGroup.push_back("GENIE_FrPiProd_pi"       );
-        genieGroup.push_back("GENIE_MFP_N"             );
-        genieGroup.push_back("GENIE_MFP_pi"            );
         genieGroup.push_back("GENIE_MaCCQE"            );
-        genieGroup.push_back("GENIE_MaCCQEshape"       );
+        //genieGroup.push_back("GENIE_MaCCQEshape"       );
         genieGroup.push_back("GENIE_MaNCEL"            );
         genieGroup.push_back("GENIE_MaRES"             );
         genieGroup.push_back("GENIE_MvRES"             );
-        genieGroup.push_back("GENIE_NormCCQE"          );
-        genieGroup.push_back("GENIE_NormCCRES"         );
+        //genieGroup.push_back("GENIE_NormCCQE"          );
+        //genieGroup.push_back("GENIE_NormCCRES"         );
         genieGroup.push_back("GENIE_NormDISCC"         );
         genieGroup.push_back("GENIE_NormNCRES"         );
-        genieGroup.push_back("GENIE_RDecBR1gamma"      );
         genieGroup.push_back("GENIE_Rvn1pi"            );
         genieGroup.push_back("GENIE_Rvn2pi"            );
         genieGroup.push_back("GENIE_Rvp1pi"            );
         genieGroup.push_back("GENIE_Rvp2pi"            );
-        genieGroup.push_back("GENIE_Theta_Delta2Npi"   );
         genieGroup.push_back("GENIE_VecFFCCQEshape"    );
-        plotter->error_summary_group_map["GENIE"] = genieGroup;   
+        plotter->error_summary_group_map["Cross Section Model"] = genieGroup;   
+        
+        //---------------------------------------------------------------------
+        // GENIE FSI
+        //---------------------------------------------------------------------
+        std::vector<std::string> fsiGroup;
+        fsiGroup.push_back("GENIE_AGKYxF1pi"         );
+        fsiGroup.push_back("GENIE_FrAbs_N"           );
+        fsiGroup.push_back("GENIE_FrAbs_pi"          );
+        fsiGroup.push_back("GENIE_FrCEx_N"           );
+        fsiGroup.push_back("GENIE_FrCEx_pi"          );
+        fsiGroup.push_back("GENIE_FrElas_N"          );
+        fsiGroup.push_back("GENIE_FrElas_pi"         );
+        fsiGroup.push_back("GENIE_FrInel_N"          );
+        fsiGroup.push_back("GENIE_FrInel_pi"         );
+        fsiGroup.push_back("GENIE_FrPiProd_N"        );
+        fsiGroup.push_back("GENIE_FrPiProd_pi"       );
+        fsiGroup.push_back("GENIE_MFP_N"             );
+        fsiGroup.push_back("GENIE_MFP_pi"            );
+        fsiGroup.push_back("GENIE_RDecBR1gamma"      );
+        fsiGroup.push_back("GENIE_Theta_Delta2Npi"   );
+        plotter->error_summary_group_map["FSI Model"] = fsiGroup;   
+        
+        //---------------------------------------------------------------------
+        // Detector Response
+        //---------------------------------------------------------------------
+        std::vector<std::string> detGroup;
+        detGroup.push_back("NeutronResponse");
+        detGroup.push_back("PionResponse");
+        //detGroup.push_back("Mass_Scale");
+        //detGroup.push_back("POT_Scale");
+        detGroup.push_back("MuonTracking");
+        detGroup.push_back("EM_EnergyScale");
+        detGroup.push_back("MuonMomentum");
+        plotter->error_summary_group_map["Detector"] = detGroup;
+
+        //---------------------------------------------------------------------
+        // Other
+        //---------------------------------------------------------------------
+        //std::vector<std::string> otherGroup;
+        //otherGroup.push_back("Background_fit");
+        //error_summary_group_map["Other"] = otherGroup;
     }
 }
 
-void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupGENIE)
+void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors)
 {
     // ------------------------------------------------------------------------
     // Plot 
@@ -304,8 +333,9 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     MnvPlotter* plotter = new MnvPlotter();
     TCanvas* c = new TCanvas("c","c",1280,800);
 
-    ApplyStyle_Errors(plotter, groupGENIE);
+    ApplyStyle_Errors(plotter, groupErrors);
 
+    plotter->axis_maximum = 0.5;
     plotter->DrawErrorSummary(hist,"TR", true, true, 0.0);
 
     // Add Plot Labels
@@ -408,7 +438,6 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     // ------------------------------------------------------------------------
 
 
-
 //    void MnvPlotter::DrawDataMCWithErrorBand    (   const MnvH1D *  dataHist,
 //            const MnvH1D *  mcHist,
 //            const Double_t  mcScale = 1.0,
@@ -419,6 +448,7 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
 //            const bool  covAreaNormalize = false,
 //            const bool  statPlusSys = false  
 //            )   
+    plotter->headroom = 1.75;
     plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", false, NULL, NULL, false, true);
 
     // ------------------------------------------------------------------------

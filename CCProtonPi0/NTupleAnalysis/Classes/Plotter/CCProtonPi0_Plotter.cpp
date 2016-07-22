@@ -728,9 +728,7 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     //plot_stacked_pi0_P();
     //plot_stacked_pi0_theta();
 
-    Draw1DHist(rootDir_Interaction,"normal_rand_numbers",plotDir);
-    Draw1DHist(rootDir_Interaction,"em_shift_rand_numbers",plotDir);
-    Draw1DHist(rootDir_Interaction,"muonP_shift_rand_numbers",plotDir);
+    plot_SystematicsInfo();
     
     std::cout<<"Plotting Interaction MC Only Finished!"<<std::endl;
 }
@@ -788,9 +786,9 @@ void CCProtonPi0_Plotter::plotMuon_MCOnly()
     std::cout<<"Plotting Muon MC Only"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Muon;
 
-    Draw1DHist(rootDir_Muon,"muon_P_shift", plotDir);
-    Draw1DHist(rootDir_Truth,"muon_P_mc_truth_all_signal", plotDir);
-    Draw1DHist(rootDir_Truth,"muon_theta_mc_truth_all_signal", plotDir);
+    //Draw1DHist(rootDir_Muon,"muon_P_shift", plotDir);
+    //Draw1DHist(rootDir_Truth,"muon_P_mc_truth_all_signal", plotDir);
+    //Draw1DHist(rootDir_Truth,"muon_theta_mc_truth_all_signal", plotDir);
 
     //DrawSignalMC(rootDir_Muon, "P", plotDir);
     //DrawStackedMC(rootDir_Muon, "P", plotDir);
@@ -799,13 +797,13 @@ void CCProtonPi0_Plotter::plotMuon_MCOnly()
     //DrawStackedMC(rootDir_Muon, "cos_theta", plotDir);
     //DrawSignalMC(rootDir_Muon, "cos_theta", plotDir);
 
-    Draw1DHist(rootDir_Muon,"P_error",plotDir);
-    Draw1DHist(rootDir_Muon,"theta_error",plotDir);
+    //Draw1DHist(rootDir_Muon,"P_error",plotDir);
+    //Draw1DHist(rootDir_Muon,"theta_error",plotDir);
     //Draw1DHis(rootDir_Muon,"theta_Diff",plotDir);
     //Draw1DHist(rootDir_Muon,"cos_theta_error",plotDir);
 
-    DrawNormalizedMigrationHistogram(rootDir_Muon, "muon_P_response", plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Muon, "muon_theta_response", plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Muon, "muon_P_response", plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Muon, "muon_theta_response", plotDir);
 
     std::cout<<"Plotting Muon MC Only Finished!\n"<<std::endl;
 
@@ -1732,28 +1730,19 @@ void CCProtonPi0_Plotter::GetFlux()
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
 
-    std::string flux_file_neutrino = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Ana/PlotUtils/data/flux/flux-gen2thin-pdg14-minervame1A.root";
-    std::string flux_file_antineutrino = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Ana/PlotUtils/data/flux/flux-gen2thin-pdg-14-minervame1A.root";
-    //std::string flux_file_antineutrino_LE = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Ana/PlotUtils/data/flux/flux-g4numiv5-pdg-14-minerva5.root";
-    std::string flux_file_antineutrino_LE = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Ana/PlotUtils/data/flux/flux-gen2thin-pdg-14-minerva5.root";
+    std::string rootDir_mc = rootDir_Muon.mc;
 
-    TFile* f_neutrino = new TFile(flux_file_neutrino.c_str());
-    MnvH1D* neutrino = GetMnvH1D(f_neutrino,"flux_E_cvweighted");
-    printBins(neutrino, "neutrino_flux");
-    neutrino->GetXaxis()->SetRangeUser(0,20.); 
-    DrawMnvH1D(neutrino, "neutrino_flux", plotDir); 
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+   
+    MnvH1D* mc = (MnvH1D*)f_mc->Get("muon_theta_mc_reco_all");
+    DrawErrorSummary(mc,"muon_theta",plotDir);
 
-    TFile* f_antineutrino = new TFile(flux_file_antineutrino.c_str());
-    MnvH1D* antineutrino = GetMnvH1D(f_antineutrino,"flux_E_cvweighted");
-    printBins(antineutrino, "antineutrino_flux");
-    antineutrino->GetXaxis()->SetRangeUser(0,20.); 
-    DrawMnvH1D(antineutrino, "antineutrino_flux", plotDir); 
+    std::string rootDir_mc2 = rootDir_CutHists.mc;
 
-    TFile* f_antineutrino_LE = new TFile(flux_file_antineutrino_LE.c_str());
-    MnvH1D* antineutrino_LE = GetMnvH1D(f_antineutrino_LE,"flux_E_cvweighted");
-    printBins(antineutrino_LE, "antineutrino_LE_flux");
-    antineutrino_LE->GetXaxis()->SetRangeUser(0,20.); 
-    DrawMnvH1D(antineutrino_LE, "antineutrino_LE_flux", plotDir); 
+    TFile* f_mc2 = new TFile(rootDir_mc2.c_str());
+   
+    MnvH1D* mc2 = (MnvH1D*)f_mc2->Get("invMass_mc_reco_all");
+    DrawErrorSummary(mc2,"invMass_mc_reco_all",plotDir);
 
 }
 
@@ -2063,7 +2052,8 @@ void CCProtonPi0_Plotter::UnfoldingStudy()
 
 void CCProtonPi0_Plotter::Systematics()
 {
-    Systematics_Practice();
+    //Systematics_Practice();
+    Systematics_XSec();
 }
 
 void CCProtonPi0_Plotter::PlotDelta()
@@ -2080,5 +2070,19 @@ void CCProtonPi0_Plotter::PlotDelta()
     Draw2DHist(rootDir_Interaction, "DeltaTransverse_mc_res", plotDir);
 
 }
+
+void CCProtonPi0_Plotter::plot_SystematicsInfo()
+{
+    std::string plotDir = Folder_List::plotDir_Interaction;
+    
+    Draw1DHist(rootDir_Interaction,"normal_rand_numbers",plotDir);
+    Draw1DHist(rootDir_Interaction,"em_shift_rand_numbers",plotDir);
+    Draw1DHist(rootDir_Interaction,"muonP_shift_rand_numbers",plotDir);
+
+    Draw1DHist(rootDir_Interaction,"Err_NeutronResponse",plotDir);
+    Draw1DHist(rootDir_Interaction,"Err_PionResponse",plotDir);
+    Draw1DHist(rootDir_Interaction,"Err_MuonTracking",plotDir);
+}
+
 #endif
 

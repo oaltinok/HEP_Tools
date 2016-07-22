@@ -128,6 +128,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotTruth_ShortProton();
 
         // Other Plots 
+        void plot_SystematicsInfo();
         void PlotTotalEnuXSec();
         void plotGENIEXSec();
         void plotOtherStudies();
@@ -141,7 +142,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
         // Helper Functions
         void ApplyStyle(MnvPlotter* plotter);
-        void ApplyStyle_Errors(MnvPlotter* plotter, bool groupGENIE);
+        void ApplyStyle_Errors(MnvPlotter* plotter, bool groupErrors);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, double hist_max, double arrow_length);
         void SavePi0InvMassPoints();
         void NormalizeToNormBinWidth(MnvH1D* hist);
@@ -191,7 +192,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // Other
         void PlotDelta();
         void DrawBackgroundSubtraction(bool isMC);
-        void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupGENIE = true);
+        void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors = true);
         void DrawTGraph(rootDir &dir, std::string var_name, std::string plotDir);
         void DrawEfficiencyCurve(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);
@@ -229,11 +230,14 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void Systematics_Practice();
         void Systematics_Practice(std::string root_dir, std::string var_name, std::string err_name);
         void Systematics_Practice2D(std::string root_dir, std::string var_name, std::string err_name);
-        void Systematics_RawData();
+        void Systematics_XSec();
         void Systematics_DrawErrorSummary(std::string data_var, std::string mc_var);
         void Systematics_DrawErrorBand_GENIE(std::string mc_var);
         void Systematics_DrawErrorSummary_GENIE(MnvH1D* hist, std::string var_name, std::string error_name, double err_genie_total);
         void Systematics_WriteTable(MnvH1D* hist, std::string var_name);
+        void Systematics_WriteTable_BinByBin(MnvH1D* hist, std::string var_name);
+        TH1D* GetTotalError_GENIE(MnvH1D* hist);
+        TH1D* GetTotalError_DetectorResponse(MnvH1D* hist);
 
 };
 

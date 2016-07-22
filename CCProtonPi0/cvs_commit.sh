@@ -1,23 +1,20 @@
-CCPROTONPI0_V="v2_90"
+CCPROTONPI0_V="v2_91"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	No Major Changes
+	Function to Save Trajectory Info inside the Detector
+		Copied from CCPi0AnaTool
+
+	Added NTuple Variables for dEdX Uncertainties
+		Not filling them in this version
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Implemented and Tested FillVertErrorBand() and FillLatErrorBand() for MnvH2D
+	New Vertical Error Bands
+		PionResponse
+			Weights for SingleChargedPion_ChargeExchange
+		NeutronResponse
+			Weights for Neutron Inelastic  Scattering
 
-	Revised EM Uncertainty Correction
-		Corrected Energy is calculated from Corrected Momentum
-		Corrected Kinetic Energy is calculated from Corrected Energy
-
-	Fixed a Bug in DrawDataMC_WithRatio() for XSec Variables
-		I added a line to Normalize Histograms for another task.
-		Normalization is already done by CrossSection class
-		Removed 2nd Normalization from Plot function
-
-	CrossSection Calculations Tested
-		Added functionality to do calculations without systematics
-			Remove error bands
+	Removed Old/Unused Implementations	
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

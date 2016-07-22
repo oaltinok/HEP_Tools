@@ -1,4 +1,22 @@
 ===================================================================================================
+v2_91
+CCProtonPi0 Updates:
+	Function to Save Trajectory Info inside the Detector
+		Copied from CCPi0AnaTool
+
+	Added NTuple Variables for dEdX Uncertainties
+		Not filling them in this version
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	New Vertical Error Bands
+		PionResponse
+			Weights for SingleChargedPion_ChargeExchange
+		NeutronResponse
+			Weights for Neutron Inelastic  Scattering
+
+	Removed Old/Unused Implementations	
+
+===================================================================================================
 v2_90
 CCProtonPi0 Updates:
 	No Major Changes

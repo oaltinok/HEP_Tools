@@ -64,6 +64,7 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
             N_muon++;
             Gaudi::LorentzVector muon_4p = (*it_mcpart)->GetInitialMomentum();
             muon_theta_beam = m_coordSysTool->thetaWRTBeam(muon_4p)*TMath::RadToDeg();
+            debug()<<"Theta(Muon) = "<<muon_theta_beam<<endmsg;
         }else{
             N_other++;
             debug()<<"tagSignal Other PDG = "<<particle_PDG<<endmsg;
@@ -96,6 +97,7 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     debug()<<"isMINOS = "<<isMINOS<<" "<<muon_theta_beam<<endmsg;
     truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal", isSignal );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal_Out", isSignal_Out );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isMINOS_Match", isMINOS);
 
     return isSignal;
 }
@@ -1009,6 +1011,12 @@ void CCProtonPi0::writeEventRecord(Minerva::GenMinInteraction* truthEvent, bool 
     if(isSignal){
         std::cout<<">> Marked as Signal! <<"<<std::endl;
     }
+
+    bool isSignal_EventRecord = truthEvent->filtertaglist()->isFilterTagTrue("isSignal_EventRecord");
+    if(isSignal_EventRecord){
+        std::cout<<">> Marked as Signal! inside Nucleus <<"<<std::endl;
+    }
+
     std::cout<<std::left;
     std::cout.width(4); std::cout<<"ID";
     std::cout.width(12); std::cout<<"PDG";
@@ -1148,7 +1156,6 @@ void CCProtonPi0::saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int
         }
     }
 }
-
 
 #endif
 

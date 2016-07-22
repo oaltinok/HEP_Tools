@@ -1,9 +1,4 @@
-/calc_flux.cpp/1.3/Tue Mar 15 15:50:05 2016//
-/constants.h/1.1/Wed Feb 10 04:11:20 2016//
-/integrate.h/1.1/Wed Feb 10 04:11:20 2016//
-/piecewise_delta_flux.h/1.1/Wed Feb 10 04:11:20 2016//
-/smooth_delta_flux.h/1.1/Wed Feb 10 04:11:20 2016//
-/CCProtonPi0_CrossSection_Style.cpp/1.5/Thu May 26 13:44:09 2016//
-/CCProtonPi0_CrossSection.cpp/1.19/Wed Jul  6 20:14:50 2016//
 /CCProtonPi0_CrossSection.h/1.16/Wed Jul  6 18:31:11 2016//
+/CCProtonPi0_CrossSection.cpp/1.20/Wed Jul 13 14:54:12 2016//
+/CCProtonPi0_CrossSection_Style.cpp/1.6/Wed Jul 13 15:59:33 2016//
 D

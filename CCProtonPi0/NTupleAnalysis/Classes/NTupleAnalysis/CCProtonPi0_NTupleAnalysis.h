@@ -38,9 +38,9 @@ struct counter
 {
     std::string name;
     double count;
+    bool isCounted;
 
-    counter():count(0.0){}
-
+    counter():count(0.0), isCounted(false){}
 };
 
 class CCProtonPi0_NTupleAnalysis
@@ -71,6 +71,7 @@ class CCProtonPi0_NTupleAnalysis
         static const double max_muon_angle;
         static const double muon_mass;
         static const double pi0_mass;
+        static const double piplus_mass;
         static const double proton_mass;
         static const double neutron_mass;
 
@@ -121,6 +122,13 @@ class CCProtonPi0_NTupleAnalysis
         template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_MuonTracking(MnvHistoType* h);
 
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_NeutronResponse(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_PionResponse(MnvHistoType* h);
+
+
         // Lateral Error Bands
         template<class MnvHistoType>
             void AddLatErrorBands_Data(MnvHistoType* h);
@@ -146,6 +154,12 @@ class CCProtonPi0_NTupleAnalysis
 
         template<class MnvHistoType>
             void AddVertErrorBand_MuonTracking(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_NeutronResponse(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_PionResponse(MnvHistoType* h);
 
         // Lateral Error Bands
         template<class MnvHistoType>
