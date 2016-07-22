@@ -7,9 +7,11 @@ Package_List=(Tools/SystemTests
     Tools/CondorUtils
     Tools/ProductionScripts
     Rec/ParticleMaker
+    Rec/ProngMaker
     Ana/CCProtonPi0
     Ana/PlotUtils
-    Ana/UnfoldUtils)
+    Ana/UnfoldUtils
+    MParamFiles)
 
 Default_Setup=/cmt/setup.sh
 
