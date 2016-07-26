@@ -126,6 +126,27 @@ void CCProtonPi0_Proton::initHistograms()
     E_Diff->GetXaxis()->SetTitle("E_{Reco}-E_{True} [GeV]");
     E_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_E_Diff.get_width()));
 
+    // dEdX Uncertainties 
+    energy_shift_BetheBloch = new TH1D( "energy_shift_BetheBloch","Proton Energy Shift by BetheBloch", 100,-50,50);
+    energy_shift_BetheBloch->GetXaxis()->SetTitle("Energy Shift [MeV]");
+    energy_shift_BetheBloch->GetYaxis()->SetTitle("N(Events)");
+
+    energy_shift_Birks = new TH1D( "energy_shift_Birks","Proton Energy Shift by Birks", 100,-50,50);
+    energy_shift_Birks->GetXaxis()->SetTitle("Energy Shift [MeV]");
+    energy_shift_Birks->GetYaxis()->SetTitle("N(Events)");
+
+    energy_shift_MEU = new TH1D( "energy_shift_MEU","Proton Energy Shift by MEU", 100,-50,50);
+    energy_shift_MEU->GetXaxis()->SetTitle("Energy Shift [MeV]");
+    energy_shift_MEU->GetYaxis()->SetTitle("N(Events)");
+
+    energy_shift_Mass = new TH1D( "energy_shift_Mass","Proton Energy Shift by Mass", 100,-50,50);
+    energy_shift_Mass->GetXaxis()->SetTitle("Energy Shift [MeV]");
+    energy_shift_Mass->GetYaxis()->SetTitle("N(Events)");
+
+    energy_shift_Nominal = new TH1D( "energy_shift_Nominal","Proton Energy Shift by Nominal", 100,-50,50);
+    energy_shift_Nominal->GetXaxis()->SetTitle("Energy Shift [MeV]");
+    energy_shift_Nominal->GetYaxis()->SetTitle("N(Events)");
+
 }
 
 void CCProtonPi0_Proton::writeHistograms()
@@ -156,6 +177,12 @@ void CCProtonPi0_Proton::writeHistograms()
     E_Diff->Write();
     P_Diff->Write();
 
+    energy_shift_BetheBloch->Write();
+    energy_shift_Birks->Write();
+    energy_shift_MEU->Write();
+    energy_shift_Mass->Write();
+    energy_shift_Nominal->Write();
+    
     f->Close();
 }
 

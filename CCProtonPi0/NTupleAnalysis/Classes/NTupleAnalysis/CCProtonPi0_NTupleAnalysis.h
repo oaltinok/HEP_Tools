@@ -101,6 +101,7 @@ class CCProtonPi0_NTupleAnalysis
         void OpenTextFile(std::string file_name, std::ofstream &file);
         std::string GetPlaylist(const int run);
         void printBins(const TH1* hist, const std::string var_name, bool useLowEdge = true);
+        void RunTimeError(std::string message);
 
         // Returns a "new" MnvH1D or MnvH2D 
         MnvH1D* GetMnvH1D(TFile* f, std::string var_name);
@@ -114,10 +115,22 @@ class CCProtonPi0_NTupleAnalysis
             void AddVertErrorBands_Data(MnvHistoType* h);
 
         template<class MnvHistoType>
+            void AddVertErrorBands_TruthTree(MnvHistoType* h);
+
+        template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_Flux(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_Genie(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_BckgConstraint(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_TargetMass(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_ProtonTracking(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_MuonTracking(MnvHistoType* h);
@@ -128,13 +141,30 @@ class CCProtonPi0_NTupleAnalysis
         template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_PionResponse(MnvHistoType* h);
 
-
         // Lateral Error Bands
         template<class MnvHistoType>
             void AddLatErrorBands_Data(MnvHistoType* h);
 
         template<class MnvHistoType>
+            void AddLatErrorBands_TruthTree(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBandAndFillWithCV_ProtonEnergy_MassModel(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBandAndFillWithCV_ProtonEnergy_MEU(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBandAndFillWithCV_ProtonEnergy_BetheBloch(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBandAndFillWithCV_ProtonEnergy_Birks(MnvHistoType* h);
+
+        template<class MnvHistoType>
             void AddLatErrorBandAndFillWithCV_MuonMomentum(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBandAndFillWithCV_MuonTheta(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddLatErrorBandAndFillWithCV_EM_EnergyScale(MnvHistoType* h);
@@ -153,6 +183,15 @@ class CCProtonPi0_NTupleAnalysis
             void AddVertErrorBand_Genie(MnvHistoType* h);
 
         template<class MnvHistoType>
+            void AddVertErrorBand_BckgConstraint(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_TargetMass(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_ProtonTracking(MnvHistoType* h);
+
+        template<class MnvHistoType>
             void AddVertErrorBand_MuonTracking(MnvHistoType* h);
 
         template<class MnvHistoType>
@@ -166,7 +205,22 @@ class CCProtonPi0_NTupleAnalysis
             void AddLatErrorBands_MC(MnvHistoType* h);
 
         template<class MnvHistoType>
+            void AddLatErrorBand_ProtonEnergy_MassModel(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBand_ProtonEnergy_MEU(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBand_ProtonEnergy_BetheBloch(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBand_ProtonEnergy_Birks(MnvHistoType* h);
+
+        template<class MnvHistoType>
             void AddLatErrorBand_MuonMomentum(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBand_MuonTheta(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddLatErrorBand_EM_EnergyScale(MnvHistoType* h);

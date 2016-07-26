@@ -115,6 +115,7 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
     declareProperty( "RecoverSingleShower_SearchView", m_recoverSingleShower_SearchView = true);
 
     // dedx uncertainties
+    m_dedx_uncertainties.push_back("Nominal");
     m_dedx_uncertainties.push_back("Mass_Up");
     m_dedx_uncertainties.push_back("Mass_Down");
     m_dedx_uncertainties.push_back("MEU_Up");
@@ -587,7 +588,7 @@ StatusCode CCProtonPi0::initialize()
 
     for(unsigned int i = 0; i < m_dedx_uncertainties.size(); i++) {
         std::string name = m_dedx_uncertainties[i];
-        declareContainerDoubleEventBranch("all_protons_momentum_shift_" + name, 10, SENTINEL);
+        declareContainerDoubleEventBranch("all_protons_energy_shift_" + name, 10, SENTINEL);
         declareContainerDoubleEventBranch("all_protons_score1_shift_"   + name, 10, SENTINEL);
     }
 
@@ -611,7 +612,7 @@ StatusCode CCProtonPi0::initialize()
 
     for(unsigned int i = 0; i < m_dedx_uncertainties.size(); i++) {
         std::string name = m_dedx_uncertainties[i];
-        declareDoubleEventBranch("proton_momentum_shift_" + name, SENTINEL);
+        declareDoubleEventBranch("proton_energy_shift_" + name, SENTINEL);
         declareDoubleEventBranch("proton_score1_shift_"   + name, SENTINEL);
     }
 
@@ -1872,13 +1873,13 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
     SmartRef<Minerva::Vertex> vertex  = event->interactionVertex();   
     double vertexZ = vertex->position().z();
 
-    std::map< std::string, std::vector<double> > dedxMapMomentum;
+    std::map< std::string, std::vector<double> > dedxMapEnergy;
     std::map< std::string, std::vector<double> > dedxMapScore;
 
     for(unsigned int i = 0; i < m_dedx_uncertainties.size(); i++) {
         std::string name = m_dedx_uncertainties[i];
         std::vector<double> tmp(10,-1);
-        dedxMapMomentum.insert( std::pair< std::string,std::vector<double> >(name,tmp) );
+        dedxMapEnergy.insert( std::pair< std::string,std::vector<double> >(name,tmp) );
         dedxMapScore.insert( std::pair< std::string,std::vector<double> >(name,tmp) );
     }
 
@@ -1889,7 +1890,8 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
 
         double theta = prong->minervaTracks().front()->theta();
         double phi   = prong->minervaTracks().front()->phi();
-
+        double E_original = particle->momentumVec().E();
+        
         proton_theta[i] = theta;
         proton_phi[i] = phi;
         proton_theta_beam[i]  = m_coordSysTool->thetaWRTBeam(particle->momentumVec());
@@ -1929,6 +1931,22 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
         chi2[i]    = particle->getDoubleData("chi2_ndf");
         m_protonUtils->getParticleScores(prong,protonScore[i],pionScore[i]);
 
+        // --------------------------------------------------------------------
+        // dEdX Uncertainties
+        // --------------------------------------------------------------------
+        for(unsigned int j = 0; j < m_dedx_uncertainties.size(); j++) {
+            std::string name = m_dedx_uncertainties[j];
+
+            double score_varied = particle->hasDoubleData("score1_" + name) ? particle->getDoubleData("score1_" + name) : 0.0;
+            double E_varied     = particle->hasDoubleData("FitE_"   + name) ? particle->getDoubleData("FitE_"   + name) : 0.0;
+
+            double score_shift  = particle->getDoubleData("score1") - score_varied;
+            double E_shift      = E_original - E_varied;
+
+            (dedxMapEnergy.find(name))->second.at(i) = E_shift;
+            (dedxMapScore.find(name))->second.at(i) = score_shift;
+        }
+
         m_LikelihoodPIDTool->makeParticles( prong, protonLikelihood, protonHypotheses );
         m_LikelihoodPIDTool->makeParticles( prong, pionLikelihood, pionHypotheses );
 
@@ -1946,8 +1964,10 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
         }
 
         //----------------------------------------------------------------------
-        // Debugging: Check values
-        debug()<<"Proton Candidate = "<<i<<" P = "<<p[i]<<endmsg;
+        // Debugging: Check values for All Protons
+        debug()<<"Proton Candidate = "<<i<<endmsg;
+        debug()<<"Original Energy = "<<E_original<<endmsg;
+        debug()<<"Corrected Momentum = "<<p[i]<<endmsg;
         debug()<<"P4(Proton) = ( "<<px[i]<<", "<<py[i]<<", "<<pz[i]<<", "<<E[i]<<" )"<<endmsg;
         debug()<<"  protonScore = "<<protonScore[i]<<" pionScore = "<<pionScore[i]<<endmsg;
         debug()<<"  protonScoreLLR = "<<protonScoreLLR[i]<<endmsg;
@@ -1955,12 +1975,38 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
         debug()<<"  ekin[i] = "<<ekin[i]<<endmsg;
         debug()<<"  kinked[i] = "<<kinked[i]<<endmsg;
         debug()<<"  odMatch[i] = "<<odMatch[i]<<endmsg;
-        debug()<<"  leadingProtonIndice = "<<leadingProtonIndice<<endmsg;
+        for(unsigned int j = 0; j < m_dedx_uncertainties.size(); j++) {
+            std::string name = m_dedx_uncertainties[j];
+
+            debug()<<" proton_energy_shift_"<<name<<"[i] = "<<(dedxMapEnergy.find(name))->second.at(i)<<endmsg;
+            debug()<<" proton_score1_shift_"<<name<<"[i] = "<<(dedxMapScore.find(name))->second.at(i)<<endmsg;
+        }
         //----------------------------------------------------------------------
 
         // Check Momentum 
         if ( isnan(p[i]) ) return false;
     }
+
+
+    //----------------------------------------------------------------------
+    // Debugging: Check values for Leading Proton
+    debug()<<"Proton Candidate = "<<leadingProtonIndice<<endmsg;
+    debug()<<"Corrected Momentum = "<<p[leadingProtonIndice]<<endmsg;
+    debug()<<"P4(Proton) = ( "<<px[leadingProtonIndice]<<", "<<py[leadingProtonIndice]<<", "<<pz[leadingProtonIndice]<<", "<<E[leadingProtonIndice]<<" )"<<endmsg;
+    debug()<<"  protonScore = "<<protonScore[leadingProtonIndice]<<" pionScore = "<<pionScore[leadingProtonIndice]<<endmsg;
+    debug()<<"  protonScoreLLR = "<<protonScoreLLR[leadingProtonIndice]<<endmsg;
+    debug()<<"  length = "<<length[leadingProtonIndice]<<endmsg;
+    debug()<<"  ekin = "<<ekin[leadingProtonIndice]<<endmsg;
+    debug()<<"  kinked = "<<kinked[leadingProtonIndice]<<endmsg;
+    debug()<<"  odMatch = "<<odMatch[leadingProtonIndice]<<endmsg;
+    for(unsigned int j = 0; j < m_dedx_uncertainties.size(); j++) {
+        std::string name = m_dedx_uncertainties[j];
+
+        debug()<<" proton_energy_shift_"<<name<<" = "<<(dedxMapEnergy.find(name))->second.at(leadingProtonIndice)<<endmsg;
+        debug()<<" proton_score1_shift_"<<name<<" = "<<(dedxMapScore.find(name))->second.at(leadingProtonIndice)<<endmsg;
+    }
+    //----------------------------------------------------------------------
+
 
     // Set Leading Proton 4-Momentum
     m_proton_4P.SetPxPyPzE( px[leadingProtonIndice], py[leadingProtonIndice], pz[leadingProtonIndice],E[leadingProtonIndice]);
@@ -1991,6 +2037,15 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
     event->setContainerDoubleData("all_protons_theta_beam",proton_theta_beam);
     event->setContainerDoubleData("all_protons_phi",proton_phi);
     event->setContainerDoubleData("all_protons_phi_beam",proton_phi_beam);
+    for(unsigned int j = 0; j < m_dedx_uncertainties.size(); j++) {
+        std::string name = m_dedx_uncertainties[j];
+
+        std::vector<double> E_shift_vect     = dedxMapEnergy.find(name)->second;
+        std::vector<double> score_shift_vect = dedxMapScore.find(name)->second;
+
+        event->setContainerDoubleData("all_protons_energy_shift_" + name, E_shift_vect);
+        event->setContainerDoubleData("all_protons_score1_shift_" + name, score_shift_vect);
+    }
 
     event->setDoubleData("proton_px",px[leadingProtonIndice]);
     event->setDoubleData("proton_py",py[leadingProtonIndice]);
@@ -2008,6 +2063,15 @@ bool CCProtonPi0::setProtonData( Minerva::PhysicsEvent *event ) const
     event->setDoubleData("proton_LLRScore", protonScoreLLR[leadingProtonIndice]);
     event->setIntData("proton_kinked",kinked[leadingProtonIndice]);
     event->setIntData("proton_leadingIndice",leadingProtonIndice);
+    for(unsigned int j = 0; j < m_dedx_uncertainties.size(); j++) {
+        std::string name = m_dedx_uncertainties[j];
+
+        std::vector<double> E_shift_vect     = dedxMapEnergy.find(name)->second;
+        std::vector<double> score_shift_vect = dedxMapScore.find(name)->second;
+
+        event->setDoubleData("proton_energy_shift_" + name, E_shift_vect[leadingProtonIndice]);
+        event->setDoubleData("proton_score1_shift_" + name, score_shift_vect[leadingProtonIndice]);
+    }
 
     return true;
 }

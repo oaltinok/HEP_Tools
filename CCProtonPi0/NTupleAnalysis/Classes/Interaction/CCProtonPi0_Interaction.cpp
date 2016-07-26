@@ -321,6 +321,10 @@ void CCProtonPi0_Interaction::initHistograms()
     QSq_2Track_Diff->GetYaxis()->SetTitle("N(Events)");
 
     // Short Proton True Information
+    nProtons = new MnvH1D( "nProtons","Number of Tracked Protons",5,0.0,5.0);
+    nProtons->GetXaxis()->SetTitle("N(Protons)");
+    nProtons->GetYaxis()->SetTitle("N(Events)");
+
     proton_true_P_1Track = new TH1D( "proton_true_P_1Track","Short Proton True Momentum",binList.short_proton_P.get_nBins(), binList.short_proton_P.get_min(), binList.short_proton_P.get_max() );
     proton_true_P_1Track->GetXaxis()->SetTitle("Short Proton P_{True} [MeV]");
     proton_true_P_1Track->GetYaxis()->SetTitle(Form("Candidates / %3.2f ",binList.short_proton_P.get_width()));
@@ -711,6 +715,14 @@ void CCProtonPi0_Interaction::initHistograms()
     muonP_shift_rand_numbers->GetXaxis()->SetTitle("Muon Momentum Shift");
     muonP_shift_rand_numbers->GetYaxis()->SetTitle("N(Numbers)");
 
+    muon_theta_shift_rand_numbers = new TH1D( "muon_theta_shift_rand_numbers","Muon Theta Shift Random Numbers",50,-0.02,0.02);
+    muon_theta_shift_rand_numbers->GetXaxis()->SetTitle("Muon Theta Shift");
+    muon_theta_shift_rand_numbers->GetYaxis()->SetTitle("N(Numbers)");
+
+    Birks_shift_rand_numbers = new TH1D( "Birks_shift_rand_numbers","Proton Energy Birks Shift Random Numbers",50,-0.02,0.02);
+    Birks_shift_rand_numbers->GetXaxis()->SetTitle("Proton Energy Birks Shift");
+    Birks_shift_rand_numbers->GetYaxis()->SetTitle("N(Numbers)");
+
     Err_NeutronResponse = new TH1D( "Err_NeutronResponse","Neutron Response Error",50,-1,1);
     Err_NeutronResponse->GetXaxis()->SetTitle("Error used as (wgt = 1 #pm error)");
     Err_NeutronResponse->GetYaxis()->SetTitle("N(Events)");
@@ -791,6 +803,7 @@ void CCProtonPi0_Interaction::writeHistograms()
     W_response->Write();
     
     // Short Proton
+    nProtons->Write();
     proton_true_P_1Track->Write();
     proton_true_KE_1Track->Write();
     proton_true_theta_1Track->Write();
@@ -922,6 +935,8 @@ void CCProtonPi0_Interaction::writeHistograms()
     normal_rand_numbers->Write();
     em_shift_rand_numbers->Write();
     muonP_shift_rand_numbers->Write();
+    muon_theta_shift_rand_numbers->Write();
+    Birks_shift_rand_numbers->Write();
 
     Err_NeutronResponse->Write();
     Err_PionResponse->Write();

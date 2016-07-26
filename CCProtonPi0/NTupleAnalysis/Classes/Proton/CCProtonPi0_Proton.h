@@ -28,6 +28,12 @@ class CCProtonPi0_Proton : public CCProtonPi0_Particle
         MnvH2D* proton_theta_response;
         MnvH2D* proton_P_response;
 
+        TH1D* energy_shift_BetheBloch;
+        TH1D* energy_shift_Birks;
+        TH1D* energy_shift_MEU;
+        TH1D* energy_shift_Mass;
+        TH1D* energy_shift_Nominal;
+        
     private:
         CCProtonPi0_SingleBin bin_trackLength;
         CCProtonPi0_SingleBin bin_trackKinked;

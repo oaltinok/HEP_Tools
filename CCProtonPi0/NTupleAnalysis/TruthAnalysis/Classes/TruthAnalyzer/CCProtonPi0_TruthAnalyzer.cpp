@@ -459,23 +459,25 @@ std::vector<double> CCProtonPi0_TruthAnalyzer::GetFluxError()
 
 void CCProtonPi0_TruthAnalyzer::AddOtherErrorBands_FillWithCV()
 {
-    AddErrorBands_FillWithCV(muon_P_mc_truth_all_signal);
-    AddErrorBands_FillWithCV(muon_theta_mc_truth_all_signal);
-    AddErrorBands_FillWithCV(pi0_P_mc_truth_all_signal);
-    AddErrorBands_FillWithCV(pi0_KE_mc_truth_all_signal);
-    AddErrorBands_FillWithCV(pi0_theta_mc_truth_all_signal);
-    AddErrorBands_FillWithCV(Enu_mc_truth_all_signal);
-    AddErrorBands_FillWithCV(QSq_mc_truth_all_signal);
-    AddErrorBands_FillWithCV(W_mc_truth_all_signal);
-}
+    // Add Vertical Error Bands
+    AddVertErrorBands_TruthTree(muon_P_mc_truth_all_signal);
+    AddVertErrorBands_TruthTree(muon_theta_mc_truth_all_signal);
+    AddVertErrorBands_TruthTree(pi0_P_mc_truth_all_signal);
+    AddVertErrorBands_TruthTree(pi0_KE_mc_truth_all_signal);
+    AddVertErrorBands_TruthTree(pi0_theta_mc_truth_all_signal);
+    AddVertErrorBands_TruthTree(Enu_mc_truth_all_signal);
+    AddVertErrorBands_TruthTree(QSq_mc_truth_all_signal);
+    AddVertErrorBands_TruthTree(W_mc_truth_all_signal);
 
-void CCProtonPi0_TruthAnalyzer::AddErrorBands_FillWithCV(MnvH1D* hist)
-{
-    AddVertErrorBandAndFillWithCV_MuonTracking(hist);
-    AddVertErrorBandAndFillWithCV_NeutronResponse(hist);
-    AddVertErrorBandAndFillWithCV_PionResponse(hist);
-    AddLatErrorBandAndFillWithCV_MuonMomentum(hist);
-    AddLatErrorBandAndFillWithCV_EM_EnergyScale(hist);
+    // Add Lateral Error Bands
+    AddLatErrorBands_TruthTree(muon_P_mc_truth_all_signal);
+    AddLatErrorBands_TruthTree(muon_theta_mc_truth_all_signal);
+    AddLatErrorBands_TruthTree(pi0_P_mc_truth_all_signal);
+    AddLatErrorBands_TruthTree(pi0_KE_mc_truth_all_signal);
+    AddLatErrorBands_TruthTree(pi0_theta_mc_truth_all_signal);
+    AddLatErrorBands_TruthTree(Enu_mc_truth_all_signal);
+    AddLatErrorBands_TruthTree(QSq_mc_truth_all_signal);
+    AddLatErrorBands_TruthTree(W_mc_truth_all_signal);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()

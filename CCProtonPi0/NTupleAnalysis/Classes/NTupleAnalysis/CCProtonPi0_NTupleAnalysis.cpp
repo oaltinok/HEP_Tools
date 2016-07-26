@@ -6,10 +6,10 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v2_91";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v2_92";
 
-const double CCProtonPi0_NTupleAnalysis::data_POT = 3.27486e+20;
-const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.14209e+21;
+const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33534e+20;
+const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.21874e+21;
 const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
 
 const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
@@ -83,12 +83,29 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data(MnvHistoType* h)
 {
     AddVertErrorBandAndFillWithCV_Genie(h);
     AddVertErrorBandAndFillWithCV_Flux(h);
+    AddVertErrorBandAndFillWithCV_BckgConstraint(h);
+    AddVertErrorBandAndFillWithCV_TargetMass(h);
     AddVertErrorBandAndFillWithCV_MuonTracking(h);
+    AddVertErrorBandAndFillWithCV_ProtonTracking(h);
     AddVertErrorBandAndFillWithCV_NeutronResponse(h);
     AddVertErrorBandAndFillWithCV_PionResponse(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH2D>(MnvH2D* h);
+
+// Truth Tree Only have GENIE and Flux Errors, others are handled as Data
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree(MnvHistoType* h)
+{
+    AddVertErrorBandAndFillWithCV_BckgConstraint(h);
+    AddVertErrorBandAndFillWithCV_TargetMass(h);
+    AddVertErrorBandAndFillWithCV_MuonTracking(h);
+    AddVertErrorBandAndFillWithCV_ProtonTracking(h);
+    AddVertErrorBandAndFillWithCV_NeutronResponse(h);
+    AddVertErrorBandAndFillWithCV_PionResponse(h);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Flux(MnvHistoType* h)
@@ -141,6 +158,30 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Genie<Mn
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Genie<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_BckgConstraint(MnvHistoType* h)
+{
+    h->AddVertErrorBandAndFillWithCV("BckgConstraint", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_BckgConstraint<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_BckgConstraint<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_TargetMass(MnvHistoType* h)
+{
+    h->AddVertErrorBandAndFillWithCV("TargetMass", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_TargetMass<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_TargetMass<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_ProtonTracking(MnvHistoType* h)
+{
+    h->AddVertErrorBandAndFillWithCV("ProtonTracking", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_ProtonTracking<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_ProtonTracking<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MuonTracking(MnvHistoType* h)
 {
     h->AddVertErrorBandAndFillWithCV("MuonTracking", 2);
@@ -167,11 +208,62 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_PionResp
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data(MnvHistoType* h)
 {
+    AddLatErrorBandAndFillWithCV_ProtonEnergy_MassModel(h);
+    AddLatErrorBandAndFillWithCV_ProtonEnergy_MEU(h);
+    AddLatErrorBandAndFillWithCV_ProtonEnergy_BetheBloch(h);
+    AddLatErrorBandAndFillWithCV_ProtonEnergy_Birks(h);
     AddLatErrorBandAndFillWithCV_MuonMomentum(h);
+    AddLatErrorBandAndFillWithCV_MuonTheta(h);
     AddLatErrorBandAndFillWithCV_EM_EnergyScale(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_TruthTree(MnvHistoType* h)
+{
+    AddLatErrorBandAndFillWithCV_ProtonEnergy_MassModel(h);
+    AddLatErrorBandAndFillWithCV_ProtonEnergy_MEU(h);
+    AddLatErrorBandAndFillWithCV_ProtonEnergy_BetheBloch(h);
+    AddLatErrorBandAndFillWithCV_ProtonEnergy_Birks(h);
+    AddLatErrorBandAndFillWithCV_MuonMomentum(h);
+    AddLatErrorBandAndFillWithCV_MuonTheta(h);
+    AddLatErrorBandAndFillWithCV_EM_EnergyScale(h);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_TruthTree<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_TruthTree<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_MassModel(MnvHistoType* h)
+{
+    h->AddLatErrorBandAndFillWithCV("ProtonEnergy_MassModel", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_MassModel<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_MassModel<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_MEU(MnvHistoType* h)
+{
+    h->AddLatErrorBandAndFillWithCV("ProtonEnergy_MEU", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_MEU<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_MEU<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_BetheBloch(MnvHistoType* h)
+{
+    h->AddLatErrorBandAndFillWithCV("ProtonEnergy_BetheBloch", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_BetheBloch<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_BetheBloch<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_Birks(MnvHistoType* h)
+{
+    h->AddLatErrorBandAndFillWithCV("ProtonEnergy_Birks", n_lateral_universes);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_Birks<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_Birks<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_MuonMomentum(MnvHistoType* h)
@@ -180,6 +272,14 @@ void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_MuonMomentum(MnvHi
 }
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_MuonMomentum<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_MuonMomentum<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_MuonTheta(MnvHistoType* h)
+{
+    h->AddLatErrorBandAndFillWithCV("MuonTheta", n_lateral_universes);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_MuonTheta<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_MuonTheta<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_EM_EnergyScale(MnvHistoType* h)
@@ -198,7 +298,10 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC(MnvHistoType* h)
 {
     AddVertErrorBand_Genie(h);
     AddVertErrorBand_Flux(h);
+    AddVertErrorBand_BckgConstraint(h);
+    AddVertErrorBand_TargetMass(h);
     AddVertErrorBand_MuonTracking(h);
+    AddVertErrorBand_ProtonTracking(h);
     AddVertErrorBand_NeutronResponse(h);
     AddVertErrorBand_PionResponse(h);
 }
@@ -255,6 +358,30 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_Genie(MnvHistoType* h)
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_Genie<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_Genie<MnvH2D>(MnvH2D* h);
 
+     template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_BckgConstraint(MnvHistoType* h)
+{
+    h->AddVertErrorBand("BckgConstraint", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_BckgConstraint<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_BckgConstraint<MnvH2D>(MnvH2D* h);
+
+     template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_TargetMass(MnvHistoType* h)
+{
+    h->AddVertErrorBand("TargetMass", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_TargetMass<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_TargetMass<MnvH2D>(MnvH2D* h);
+
+   template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_ProtonTracking(MnvHistoType* h)
+{
+    h->AddVertErrorBand("ProtonTracking", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_ProtonTracking<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_ProtonTracking<MnvH2D>(MnvH2D* h);
+
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MuonTracking(MnvHistoType* h)
 {
@@ -282,11 +409,40 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_PionResponse<MnvH2D>(
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_MC(MnvHistoType* h)
 {
+    AddLatErrorBand_ProtonEnergy_MassModel(h);
+    AddLatErrorBand_ProtonEnergy_MEU(h);
+    AddLatErrorBand_ProtonEnergy_BetheBloch(h);
+    AddLatErrorBand_ProtonEnergy_Birks(h);
     AddLatErrorBand_MuonMomentum(h);
+    AddLatErrorBand_MuonTheta(h);
     AddLatErrorBand_EM_EnergyScale(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_MC<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_MC<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_MassModel(MnvHistoType* h)
+{
+    h->AddLatErrorBand("ProtonEnergy_MassModel", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_MassModel<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_MassModel<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_MEU(MnvHistoType* h)
+{
+    h->AddLatErrorBand("ProtonEnergy_MEU", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_MEU<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_MEU<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_BetheBloch(MnvHistoType* h)
+{
+    h->AddLatErrorBand("ProtonEnergy_BetheBloch", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_BetheBloch<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_BetheBloch<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_MuonMomentum(MnvHistoType* h)
@@ -295,6 +451,22 @@ void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_MuonMomentum(MnvHistoType* h)
 }
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_MuonMomentum<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_MuonMomentum<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_MuonTheta(MnvHistoType* h)
+{
+    h->AddLatErrorBand("MuonTheta", n_lateral_universes);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_MuonTheta<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_MuonTheta<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_Birks(MnvHistoType* h)
+{
+    h->AddLatErrorBand("ProtonEnergy_Birks", n_lateral_universes);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_Birks<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_ProtonEnergy_Birks<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_EM_EnergyScale(MnvHistoType* h)
@@ -522,6 +694,10 @@ void CCProtonPi0_NTupleAnalysis::ClearAllUniversesVector(std::vector<TH1D*> &all
 
 }
 
-
+void CCProtonPi0_NTupleAnalysis::RunTimeError(std::string message)
+{
+    std::cout<<">> Error: "<<message<<std::endl;
+    exit(1); 
+}
 #endif
 

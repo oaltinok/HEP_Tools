@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jul 19 08:50:00 2016 by ROOT version 5.34/05
+// Mon Jul 25 08:41:11 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -474,6 +474,14 @@ public :
    Double_t        proton_KE;
    Double_t        proton_LLRScore;
    Double_t        proton_P;
+   Double_t        proton_energy_shift_BetheBloch_Down;
+   Double_t        proton_energy_shift_BetheBloch_Up;
+   Double_t        proton_energy_shift_Birks;
+   Double_t        proton_energy_shift_MEU_Down;
+   Double_t        proton_energy_shift_MEU_Up;
+   Double_t        proton_energy_shift_Mass_Down;
+   Double_t        proton_energy_shift_Mass_Up;
+   Double_t        proton_energy_shift_Nominal;
    Double_t        proton_length;
    Double_t        proton_phi;
    Double_t        proton_phi_beam;
@@ -482,6 +490,14 @@ public :
    Double_t        proton_px;
    Double_t        proton_py;
    Double_t        proton_pz;
+   Double_t        proton_score1_shift_BetheBloch_Down;
+   Double_t        proton_score1_shift_BetheBloch_Up;
+   Double_t        proton_score1_shift_Birks;
+   Double_t        proton_score1_shift_MEU_Down;
+   Double_t        proton_score1_shift_MEU_Up;
+   Double_t        proton_score1_shift_Mass_Down;
+   Double_t        proton_score1_shift_Mass_Up;
+   Double_t        proton_score1_shift_Nominal;
    Double_t        proton_theta;
    Double_t        proton_theta_beam;
    Double_t        reco_eventID;
@@ -533,6 +549,14 @@ public :
    Double_t        all_protons_endPointX[10];
    Double_t        all_protons_endPointY[10];
    Double_t        all_protons_endPointZ[10];
+   Double_t        all_protons_energy_shift_BetheBloch_Down[10];
+   Double_t        all_protons_energy_shift_BetheBloch_Up[10];
+   Double_t        all_protons_energy_shift_Birks[10];
+   Double_t        all_protons_energy_shift_MEU_Down[10];
+   Double_t        all_protons_energy_shift_MEU_Up[10];
+   Double_t        all_protons_energy_shift_Mass_Down[10];
+   Double_t        all_protons_energy_shift_Mass_Up[10];
+   Double_t        all_protons_energy_shift_Nominal[10];
    Double_t        all_protons_length[10];
    Double_t        all_protons_p_calCorrection[10];
    Double_t        all_protons_p_dEdXTool[10];
@@ -544,6 +568,14 @@ public :
    Double_t        all_protons_px[10];
    Double_t        all_protons_py[10];
    Double_t        all_protons_pz[10];
+   Double_t        all_protons_score1_shift_BetheBloch_Down[10];
+   Double_t        all_protons_score1_shift_BetheBloch_Up[10];
+   Double_t        all_protons_score1_shift_Birks[10];
+   Double_t        all_protons_score1_shift_MEU_Down[10];
+   Double_t        all_protons_score1_shift_MEU_Up[10];
+   Double_t        all_protons_score1_shift_Mass_Down[10];
+   Double_t        all_protons_score1_shift_Mass_Up[10];
+   Double_t        all_protons_score1_shift_Nominal[10];
    Double_t        all_protons_startPointX[10];
    Double_t        all_protons_startPointY[10];
    Double_t        all_protons_startPointZ[10];
@@ -1177,6 +1209,14 @@ public :
    TBranch        *b_proton_KE;   //!
    TBranch        *b_proton_LLRScore;   //!
    TBranch        *b_proton_P;   //!
+   TBranch        *b_proton_energy_shift_BetheBloch_Down;   //!
+   TBranch        *b_proton_energy_shift_BetheBloch_Up;   //!
+   TBranch        *b_proton_energy_shift_Birks;   //!
+   TBranch        *b_proton_energy_shift_MEU_Down;   //!
+   TBranch        *b_proton_energy_shift_MEU_Up;   //!
+   TBranch        *b_proton_energy_shift_Mass_Down;   //!
+   TBranch        *b_proton_energy_shift_Mass_Up;   //!
+   TBranch        *b_proton_energy_shift_Nominal;   //!
    TBranch        *b_proton_length;   //!
    TBranch        *b_proton_phi;   //!
    TBranch        *b_proton_phi_beam;   //!
@@ -1185,6 +1225,14 @@ public :
    TBranch        *b_proton_px;   //!
    TBranch        *b_proton_py;   //!
    TBranch        *b_proton_pz;   //!
+   TBranch        *b_proton_score1_shift_BetheBloch_Down;   //!
+   TBranch        *b_proton_score1_shift_BetheBloch_Up;   //!
+   TBranch        *b_proton_score1_shift_Birks;   //!
+   TBranch        *b_proton_score1_shift_MEU_Down;   //!
+   TBranch        *b_proton_score1_shift_MEU_Up;   //!
+   TBranch        *b_proton_score1_shift_Mass_Down;   //!
+   TBranch        *b_proton_score1_shift_Mass_Up;   //!
+   TBranch        *b_proton_score1_shift_Nominal;   //!
    TBranch        *b_proton_theta;   //!
    TBranch        *b_proton_theta_beam;   //!
    TBranch        *b_reco_eventID;   //!
@@ -1236,6 +1284,14 @@ public :
    TBranch        *b_all_protons_endPointX;   //!
    TBranch        *b_all_protons_endPointY;   //!
    TBranch        *b_all_protons_endPointZ;   //!
+   TBranch        *b_all_protons_energy_shift_BetheBloch_Down;   //!
+   TBranch        *b_all_protons_energy_shift_BetheBloch_Up;   //!
+   TBranch        *b_all_protons_energy_shift_Birks;   //!
+   TBranch        *b_all_protons_energy_shift_MEU_Down;   //!
+   TBranch        *b_all_protons_energy_shift_MEU_Up;   //!
+   TBranch        *b_all_protons_energy_shift_Mass_Down;   //!
+   TBranch        *b_all_protons_energy_shift_Mass_Up;   //!
+   TBranch        *b_all_protons_energy_shift_Nominal;   //!
    TBranch        *b_all_protons_length;   //!
    TBranch        *b_all_protons_p_calCorrection;   //!
    TBranch        *b_all_protons_p_dEdXTool;   //!
@@ -1247,6 +1303,14 @@ public :
    TBranch        *b_all_protons_px;   //!
    TBranch        *b_all_protons_py;   //!
    TBranch        *b_all_protons_pz;   //!
+   TBranch        *b_all_protons_score1_shift_BetheBloch_Down;   //!
+   TBranch        *b_all_protons_score1_shift_BetheBloch_Up;   //!
+   TBranch        *b_all_protons_score1_shift_Birks;   //!
+   TBranch        *b_all_protons_score1_shift_MEU_Down;   //!
+   TBranch        *b_all_protons_score1_shift_MEU_Up;   //!
+   TBranch        *b_all_protons_score1_shift_Mass_Down;   //!
+   TBranch        *b_all_protons_score1_shift_Mass_Up;   //!
+   TBranch        *b_all_protons_score1_shift_Nominal;   //!
    TBranch        *b_all_protons_startPointX;   //!
    TBranch        *b_all_protons_startPointY;   //!
    TBranch        *b_all_protons_startPointZ;   //!
@@ -1461,7 +1525,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_91/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/CCProtonPi0");
+      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_92/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1965,6 +2029,14 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("proton_KE", &proton_KE, &b_proton_KE);
    fChain->SetBranchAddress("proton_LLRScore", &proton_LLRScore, &b_proton_LLRScore);
    fChain->SetBranchAddress("proton_P", &proton_P, &b_proton_P);
+   fChain->SetBranchAddress("proton_energy_shift_BetheBloch_Down", &proton_energy_shift_BetheBloch_Down, &b_proton_energy_shift_BetheBloch_Down);
+   fChain->SetBranchAddress("proton_energy_shift_BetheBloch_Up", &proton_energy_shift_BetheBloch_Up, &b_proton_energy_shift_BetheBloch_Up);
+   fChain->SetBranchAddress("proton_energy_shift_Birks", &proton_energy_shift_Birks, &b_proton_energy_shift_Birks);
+   fChain->SetBranchAddress("proton_energy_shift_MEU_Down", &proton_energy_shift_MEU_Down, &b_proton_energy_shift_MEU_Down);
+   fChain->SetBranchAddress("proton_energy_shift_MEU_Up", &proton_energy_shift_MEU_Up, &b_proton_energy_shift_MEU_Up);
+   fChain->SetBranchAddress("proton_energy_shift_Mass_Down", &proton_energy_shift_Mass_Down, &b_proton_energy_shift_Mass_Down);
+   fChain->SetBranchAddress("proton_energy_shift_Mass_Up", &proton_energy_shift_Mass_Up, &b_proton_energy_shift_Mass_Up);
+   fChain->SetBranchAddress("proton_energy_shift_Nominal", &proton_energy_shift_Nominal, &b_proton_energy_shift_Nominal);
    fChain->SetBranchAddress("proton_length", &proton_length, &b_proton_length);
    fChain->SetBranchAddress("proton_phi", &proton_phi, &b_proton_phi);
    fChain->SetBranchAddress("proton_phi_beam", &proton_phi_beam, &b_proton_phi_beam);
@@ -1973,6 +2045,14 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("proton_px", &proton_px, &b_proton_px);
    fChain->SetBranchAddress("proton_py", &proton_py, &b_proton_py);
    fChain->SetBranchAddress("proton_pz", &proton_pz, &b_proton_pz);
+   fChain->SetBranchAddress("proton_score1_shift_BetheBloch_Down", &proton_score1_shift_BetheBloch_Down, &b_proton_score1_shift_BetheBloch_Down);
+   fChain->SetBranchAddress("proton_score1_shift_BetheBloch_Up", &proton_score1_shift_BetheBloch_Up, &b_proton_score1_shift_BetheBloch_Up);
+   fChain->SetBranchAddress("proton_score1_shift_Birks", &proton_score1_shift_Birks, &b_proton_score1_shift_Birks);
+   fChain->SetBranchAddress("proton_score1_shift_MEU_Down", &proton_score1_shift_MEU_Down, &b_proton_score1_shift_MEU_Down);
+   fChain->SetBranchAddress("proton_score1_shift_MEU_Up", &proton_score1_shift_MEU_Up, &b_proton_score1_shift_MEU_Up);
+   fChain->SetBranchAddress("proton_score1_shift_Mass_Down", &proton_score1_shift_Mass_Down, &b_proton_score1_shift_Mass_Down);
+   fChain->SetBranchAddress("proton_score1_shift_Mass_Up", &proton_score1_shift_Mass_Up, &b_proton_score1_shift_Mass_Up);
+   fChain->SetBranchAddress("proton_score1_shift_Nominal", &proton_score1_shift_Nominal, &b_proton_score1_shift_Nominal);
    fChain->SetBranchAddress("proton_theta", &proton_theta, &b_proton_theta);
    fChain->SetBranchAddress("proton_theta_beam", &proton_theta_beam, &b_proton_theta_beam);
    fChain->SetBranchAddress("reco_eventID", &reco_eventID, &b_reco_eventID);
@@ -2024,6 +2104,14 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("all_protons_endPointX", all_protons_endPointX, &b_all_protons_endPointX);
    fChain->SetBranchAddress("all_protons_endPointY", all_protons_endPointY, &b_all_protons_endPointY);
    fChain->SetBranchAddress("all_protons_endPointZ", all_protons_endPointZ, &b_all_protons_endPointZ);
+   fChain->SetBranchAddress("all_protons_energy_shift_BetheBloch_Down", all_protons_energy_shift_BetheBloch_Down, &b_all_protons_energy_shift_BetheBloch_Down);
+   fChain->SetBranchAddress("all_protons_energy_shift_BetheBloch_Up", all_protons_energy_shift_BetheBloch_Up, &b_all_protons_energy_shift_BetheBloch_Up);
+   fChain->SetBranchAddress("all_protons_energy_shift_Birks", all_protons_energy_shift_Birks, &b_all_protons_energy_shift_Birks);
+   fChain->SetBranchAddress("all_protons_energy_shift_MEU_Down", all_protons_energy_shift_MEU_Down, &b_all_protons_energy_shift_MEU_Down);
+   fChain->SetBranchAddress("all_protons_energy_shift_MEU_Up", all_protons_energy_shift_MEU_Up, &b_all_protons_energy_shift_MEU_Up);
+   fChain->SetBranchAddress("all_protons_energy_shift_Mass_Down", all_protons_energy_shift_Mass_Down, &b_all_protons_energy_shift_Mass_Down);
+   fChain->SetBranchAddress("all_protons_energy_shift_Mass_Up", all_protons_energy_shift_Mass_Up, &b_all_protons_energy_shift_Mass_Up);
+   fChain->SetBranchAddress("all_protons_energy_shift_Nominal", all_protons_energy_shift_Nominal, &b_all_protons_energy_shift_Nominal);
    fChain->SetBranchAddress("all_protons_length", all_protons_length, &b_all_protons_length);
    fChain->SetBranchAddress("all_protons_p_calCorrection", all_protons_p_calCorrection, &b_all_protons_p_calCorrection);
    fChain->SetBranchAddress("all_protons_p_dEdXTool", all_protons_p_dEdXTool, &b_all_protons_p_dEdXTool);
@@ -2035,6 +2123,14 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("all_protons_px", all_protons_px, &b_all_protons_px);
    fChain->SetBranchAddress("all_protons_py", all_protons_py, &b_all_protons_py);
    fChain->SetBranchAddress("all_protons_pz", all_protons_pz, &b_all_protons_pz);
+   fChain->SetBranchAddress("all_protons_score1_shift_BetheBloch_Down", all_protons_score1_shift_BetheBloch_Down, &b_all_protons_score1_shift_BetheBloch_Down);
+   fChain->SetBranchAddress("all_protons_score1_shift_BetheBloch_Up", all_protons_score1_shift_BetheBloch_Up, &b_all_protons_score1_shift_BetheBloch_Up);
+   fChain->SetBranchAddress("all_protons_score1_shift_Birks", all_protons_score1_shift_Birks, &b_all_protons_score1_shift_Birks);
+   fChain->SetBranchAddress("all_protons_score1_shift_MEU_Down", all_protons_score1_shift_MEU_Down, &b_all_protons_score1_shift_MEU_Down);
+   fChain->SetBranchAddress("all_protons_score1_shift_MEU_Up", all_protons_score1_shift_MEU_Up, &b_all_protons_score1_shift_MEU_Up);
+   fChain->SetBranchAddress("all_protons_score1_shift_Mass_Down", all_protons_score1_shift_Mass_Down, &b_all_protons_score1_shift_Mass_Down);
+   fChain->SetBranchAddress("all_protons_score1_shift_Mass_Up", all_protons_score1_shift_Mass_Up, &b_all_protons_score1_shift_Mass_Up);
+   fChain->SetBranchAddress("all_protons_score1_shift_Nominal", all_protons_score1_shift_Nominal, &b_all_protons_score1_shift_Nominal);
    fChain->SetBranchAddress("all_protons_startPointX", all_protons_startPointX, &b_all_protons_startPointX);
    fChain->SetBranchAddress("all_protons_startPointY", all_protons_startPointY, &b_all_protons_startPointY);
    fChain->SetBranchAddress("all_protons_startPointZ", all_protons_startPointZ, &b_all_protons_startPointZ);

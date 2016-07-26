@@ -8,16 +8,16 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
-    nMaxEvents = 1000;
+    nMaxEvents = 10000;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
     isDataAnalysis  = true;
     isScanRun = false;
     applyBckgConstraints_CV = true;
-    applyBckgConstraints_Unv = true;
+    applyBckgConstraints_Unv = false;
     writeFSParticleMomentum = false;
-    fillErrors_ByHand = true;
+    fillErrors_ByHand = true; // Affects only Vertical Error Bands - Lateral Bands always filled ByHand
 
     // Side Band Control
     NoSideBand = true;
@@ -51,10 +51,10 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     latest_ScanID = 0.0;
 
     // Counter Names
-    counter1.name = "N(PionResponse) = ";
-    counter2.name = "N(NeutronResponse) = ";
-    counter3.name = "N/A = ";
-    counter4.name = "N/A= ";
+    counter1.name = "All N(Protons) == 2 = ";
+    counter2.name = "Signal N(Protons) == 2 = ";
+    counter3.name = "All N(Protons) > 2 = ";
+    counter4.name = "Signal N(Protons) > 2 = ";
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
@@ -250,32 +250,26 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
 
         Calc_WeightFromSystematics();
         Calc_EventKinematics();
+        if (truth_isSignal) Calc_EventKinematics_Truth();
         
-        if (truth_isSignal){
-            Calc_EventKinematics_Truth();
-            failText<<m_Enu*MeV_to_GeV<<" "<<m_Enu_Truth*MeV_to_GeV<<" "<<mc_incomingE*MeV_to_GeV<<" ";
-            failText<<m_QSq*MeVSq_to_GeVSq<<" "<<m_QSq_Truth*MeVSq_to_GeVSq<<" "<<mc_Q2*MeVSq_to_GeVSq<<" ";
-            failText<<m_W*MeV_to_GeV<<" "<<m_W_Truth*MeV_to_GeV<<" "<<mc_w*MeV_to_GeV;
-            failText<<std::endl;
-        }
         //----------------------------------------------------------------------
-        // Data Analysis and Other Studies
+        // Data Analysis -- Fills Histograms with Error Bands (Slow)
         //----------------------------------------------------------------------
         if (isDataAnalysis){
             fillData();
             if (m_isMC){
-                if (fillErrors_ByHand) FillLatErrorBands_ByHand();
-                else FillLatErrorBands_Auto();
+                FillLatErrorBands_ByHand();
             }
         } 
         if (writeFSParticleMomentum) writeFSParticle4P(jentry);
+
+        //--------------------------------------------------------------------------
+        // Studies during for loop
+        //--------------------------------------------------------------------------
+        Study_ProtonSystematics();
     } // end for-loop
 
     if (!m_isMC) AddErrorBands_Data();
-    //--------------------------------------------------------------------------
-    // Studies
-    //--------------------------------------------------------------------------
-    
 
     
     //--------------------------------------------------------------------------
@@ -900,8 +894,14 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
         if (m_isMC){
             FillLatErrorBand_EM_EnergyScale_SideBand_invMass();
             FillLatErrorBand_MuonMomentum_SideBand_invMass();
+            FillLatErrorBand_MuonTheta_SideBand_invMass();
+            if (nProtonCandidates > 0){
+                FillLatErrorBand_ProtonEnergy_Birks_SideBand_invMass();
+                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MassModel");
+                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MEU");
+                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_BetheBloch");
+            }
         }
-
         if (nProtonCandidates == 0){
             FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
             FillHistogram(cutList.hCut_1Track_pi0invMass,pi0_invMass);
@@ -1439,11 +1439,14 @@ void CCProtonPi0_Analyzer::fill_BackgroundSubtractionHists()
         else FillHistogramWithVertErrors(cutList.invMass_mc_reco_bckg, pi0_invMass);
 
         // Fill Lateral Error Bands
-        if (fillErrors_ByHand){
-            FillLatErrorBand_EM_EnergyScale_invMass();
-            FillLatErrorBand_MuonMomentum_invMass();
-        }else{
-            FillLatErrorBands_invMass_Auto();
+        FillLatErrorBand_EM_EnergyScale_invMass();
+        FillLatErrorBand_MuonMomentum_invMass();
+        FillLatErrorBand_MuonTheta_invMass();
+        if (nProtonCandidates > 0){
+            FillLatErrorBand_ProtonEnergy_Birks_invMass();
+            FillLatErrorBand_ProtonEnergy_invMass("ProtonEnergy_MassModel");
+            FillLatErrorBand_ProtonEnergy_invMass("ProtonEnergy_MEU");
+            FillLatErrorBand_ProtonEnergy_invMass("ProtonEnergy_BetheBloch");
         }
     }else{
         FillHistogram(cutList.invMass_all, pi0_invMass);
@@ -1875,19 +1878,19 @@ double CCProtonPi0_Analyzer::Calc_Enu()
     if (nProtonCandidates == 0){
         Enu = muon_E + pi0_E + vertex_blob_energy + Extra_Energy_Total;
     }else{
-        Enu = muon_E + proton_KE + pi0_E + vertex_blob_energy + Extra_Energy_Total;
+       Enu = muon_E + m_total_proton_KE + pi0_E + vertex_blob_energy + Extra_Energy_Total;
     }
 
     return Enu;
 }
 
-double CCProtonPi0_Analyzer::Calc_Enu_shifted(double muon_E_shifted, double pi0_E_shifted)
+double CCProtonPi0_Analyzer::Calc_Enu_shifted(double muon_E_shifted, double pi0_E_shifted, double total_proton_KE_shifted)
 {
     double Enu_shifted;
     if (nProtonCandidates == 0){
         Enu_shifted = muon_E_shifted + pi0_E_shifted + vertex_blob_energy + Extra_Energy_Total;
     }else{
-        Enu_shifted = muon_E_shifted + proton_KE + pi0_E_shifted + vertex_blob_energy + Extra_Energy_Total;
+        Enu_shifted = muon_E_shifted + total_proton_KE_shifted + pi0_E_shifted + vertex_blob_energy + Extra_Energy_Total;
     }
 
     return Enu_shifted;
@@ -1908,8 +1911,15 @@ TLorentzVector CCProtonPi0_Analyzer::Get_Neutrino_4P(const double Enu) const
 
 void CCProtonPi0_Analyzer::Calc_EventKinematics()
 {
+    // Get Corrected Muon Angle
     double reco_muon_theta = GetCorrectedMuonTheta();
-    
+
+    // Get Total Proton KE
+    m_total_proton_KE = 0.0;
+    for (int i = 0; i < nProtonCandidates; ++i ){
+        m_total_proton_KE += all_protons_KE[i];
+    }
+
     m_Enu = Calc_Enu();
     m_QSq = Calc_QSq(m_Enu, muon_E, muon_P, reco_muon_theta);
     m_WSq = Calc_WSq(m_Enu, m_QSq, muon_E);
@@ -2124,6 +2134,13 @@ void CCProtonPi0_Analyzer::fill_SideBand_InvMass()
         if (m_isMC){
             FillLatErrorBand_EM_EnergyScale_SideBand_invMass();
             FillLatErrorBand_MuonMomentum_SideBand_invMass();
+            FillLatErrorBand_MuonTheta_SideBand_invMass();
+            if (nProtonCandidates > 0){
+                FillLatErrorBand_ProtonEnergy_Birks_SideBand_invMass();
+                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MassModel");
+                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MEU");
+                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_BetheBloch");
+            }
         }
         if (nProtonCandidates == 0){
             FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
@@ -2339,10 +2356,10 @@ void CCProtonPi0_Analyzer::GetMichelStatistics()
     bool isMichelFound = (Cut_Vertex_Michel_Exist == 1) || (Cut_EndPoint_Michel_Exist == 1) || (Cut_secEndPoint_Michel_Exist == 1);
 
     // Total Number of Truth Michels
-    if (truth_isBckg_withMichel) counter1.count++;
+    //if (truth_isBckg_withMichel) counter1.count++;
 
     // Total Number of Found Michels
-    if (isMichelFound) counter2.count++;
+    //if (isMichelFound) counter2.count++;
 
     // Count Missed Michels
     if (truth_isBckg_withMichel && !isMichelFound) counter3.count++;
@@ -2350,6 +2367,32 @@ void CCProtonPi0_Analyzer::GetMichelStatistics()
     // Count False Positives
     if (!truth_isBckg_withMichel && isMichelFound) counter4.count++;
 
+
+}
+
+void CCProtonPi0_Analyzer::Study_ProtonSystematics()
+{
+    FillHistogram(proton.trackLength, proton_length * mm_to_cm);
+    
+    // Fill nProtons
+    FillHistogram(interaction.nProtons, nProtonCandidates);
+    if (nProtonCandidates == 2) counter1.count++;
+    if (nProtonCandidates == 2 && truth_isSignal) counter2.count++;
+
+    if (nProtonCandidates > 2) counter3.count++;
+    if (nProtonCandidates > 2 && truth_isSignal) counter4.count++;
+
+    // Fill Energy Shift
+    if (nProtonCandidates > 0){
+        proton.energy_shift_BetheBloch->Fill(proton_energy_shift_BetheBloch_Down);
+        proton.energy_shift_BetheBloch->Fill(proton_energy_shift_BetheBloch_Up);
+        proton.energy_shift_Birks->Fill(proton_energy_shift_Birks);
+        proton.energy_shift_MEU->Fill(proton_energy_shift_MEU_Down);
+        proton.energy_shift_MEU->Fill(proton_energy_shift_MEU_Up);
+        proton.energy_shift_Mass->Fill(proton_energy_shift_Mass_Down);
+        proton.energy_shift_Mass->Fill(proton_energy_shift_Mass_Up);
+        proton.energy_shift_Nominal->Fill(proton_energy_shift_Nominal);
+    }
 
 }
 

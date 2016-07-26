@@ -499,6 +499,14 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("proton_KE", &proton_KE, &b_proton_KE);
     fChain->SetBranchAddress("proton_LLRScore", &proton_LLRScore, &b_proton_LLRScore);
     fChain->SetBranchAddress("proton_P", &proton_P, &b_proton_P);
+    fChain->SetBranchAddress("proton_energy_shift_BetheBloch_Down", &proton_energy_shift_BetheBloch_Down, &b_proton_energy_shift_BetheBloch_Down);
+    fChain->SetBranchAddress("proton_energy_shift_BetheBloch_Up", &proton_energy_shift_BetheBloch_Up, &b_proton_energy_shift_BetheBloch_Up);
+    fChain->SetBranchAddress("proton_energy_shift_Birks", &proton_energy_shift_Birks, &b_proton_energy_shift_Birks);
+    fChain->SetBranchAddress("proton_energy_shift_MEU_Down", &proton_energy_shift_MEU_Down, &b_proton_energy_shift_MEU_Down);
+    fChain->SetBranchAddress("proton_energy_shift_MEU_Up", &proton_energy_shift_MEU_Up, &b_proton_energy_shift_MEU_Up);
+    fChain->SetBranchAddress("proton_energy_shift_Mass_Down", &proton_energy_shift_Mass_Down, &b_proton_energy_shift_Mass_Down);
+    fChain->SetBranchAddress("proton_energy_shift_Mass_Up", &proton_energy_shift_Mass_Up, &b_proton_energy_shift_Mass_Up);
+    fChain->SetBranchAddress("proton_energy_shift_Nominal", &proton_energy_shift_Nominal, &b_proton_energy_shift_Nominal);
     fChain->SetBranchAddress("proton_length", &proton_length, &b_proton_length);
     fChain->SetBranchAddress("proton_phi", &proton_phi, &b_proton_phi);
     fChain->SetBranchAddress("proton_phi_beam", &proton_phi_beam, &b_proton_phi_beam);
@@ -507,6 +515,14 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("proton_px", &proton_px, &b_proton_px);
     fChain->SetBranchAddress("proton_py", &proton_py, &b_proton_py);
     fChain->SetBranchAddress("proton_pz", &proton_pz, &b_proton_pz);
+    fChain->SetBranchAddress("proton_score1_shift_BetheBloch_Down", &proton_score1_shift_BetheBloch_Down, &b_proton_score1_shift_BetheBloch_Down);
+    fChain->SetBranchAddress("proton_score1_shift_BetheBloch_Up", &proton_score1_shift_BetheBloch_Up, &b_proton_score1_shift_BetheBloch_Up);
+    fChain->SetBranchAddress("proton_score1_shift_Birks", &proton_score1_shift_Birks, &b_proton_score1_shift_Birks);
+    fChain->SetBranchAddress("proton_score1_shift_MEU_Down", &proton_score1_shift_MEU_Down, &b_proton_score1_shift_MEU_Down);
+    fChain->SetBranchAddress("proton_score1_shift_MEU_Up", &proton_score1_shift_MEU_Up, &b_proton_score1_shift_MEU_Up);
+    fChain->SetBranchAddress("proton_score1_shift_Mass_Down", &proton_score1_shift_Mass_Down, &b_proton_score1_shift_Mass_Down);
+    fChain->SetBranchAddress("proton_score1_shift_Mass_Up", &proton_score1_shift_Mass_Up, &b_proton_score1_shift_Mass_Up);
+    fChain->SetBranchAddress("proton_score1_shift_Nominal", &proton_score1_shift_Nominal, &b_proton_score1_shift_Nominal);
     fChain->SetBranchAddress("proton_theta", &proton_theta, &b_proton_theta);
     fChain->SetBranchAddress("proton_theta_beam", &proton_theta_beam, &b_proton_theta_beam);
     fChain->SetBranchAddress("reco_eventID", &reco_eventID, &b_reco_eventID);
@@ -558,6 +574,14 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("all_protons_endPointX", all_protons_endPointX, &b_all_protons_endPointX);
     fChain->SetBranchAddress("all_protons_endPointY", all_protons_endPointY, &b_all_protons_endPointY);
     fChain->SetBranchAddress("all_protons_endPointZ", all_protons_endPointZ, &b_all_protons_endPointZ);
+    fChain->SetBranchAddress("all_protons_energy_shift_BetheBloch_Down", all_protons_energy_shift_BetheBloch_Down, &b_all_protons_energy_shift_BetheBloch_Down);
+    fChain->SetBranchAddress("all_protons_energy_shift_BetheBloch_Up", all_protons_energy_shift_BetheBloch_Up, &b_all_protons_energy_shift_BetheBloch_Up);
+    fChain->SetBranchAddress("all_protons_energy_shift_Birks", all_protons_energy_shift_Birks, &b_all_protons_energy_shift_Birks);
+    fChain->SetBranchAddress("all_protons_energy_shift_MEU_Down", all_protons_energy_shift_MEU_Down, &b_all_protons_energy_shift_MEU_Down);
+    fChain->SetBranchAddress("all_protons_energy_shift_MEU_Up", all_protons_energy_shift_MEU_Up, &b_all_protons_energy_shift_MEU_Up);
+    fChain->SetBranchAddress("all_protons_energy_shift_Mass_Down", all_protons_energy_shift_Mass_Down, &b_all_protons_energy_shift_Mass_Down);
+    fChain->SetBranchAddress("all_protons_energy_shift_Mass_Up", all_protons_energy_shift_Mass_Up, &b_all_protons_energy_shift_Mass_Up);
+    fChain->SetBranchAddress("all_protons_energy_shift_Nominal", all_protons_energy_shift_Nominal, &b_all_protons_energy_shift_Nominal);
     fChain->SetBranchAddress("all_protons_length", all_protons_length, &b_all_protons_length);
     fChain->SetBranchAddress("all_protons_p_calCorrection", all_protons_p_calCorrection, &b_all_protons_p_calCorrection);
     fChain->SetBranchAddress("all_protons_p_dEdXTool", all_protons_p_dEdXTool, &b_all_protons_p_dEdXTool);
@@ -569,6 +593,14 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("all_protons_px", all_protons_px, &b_all_protons_px);
     fChain->SetBranchAddress("all_protons_py", all_protons_py, &b_all_protons_py);
     fChain->SetBranchAddress("all_protons_pz", all_protons_pz, &b_all_protons_pz);
+    fChain->SetBranchAddress("all_protons_score1_shift_BetheBloch_Down", all_protons_score1_shift_BetheBloch_Down, &b_all_protons_score1_shift_BetheBloch_Down);
+    fChain->SetBranchAddress("all_protons_score1_shift_BetheBloch_Up", all_protons_score1_shift_BetheBloch_Up, &b_all_protons_score1_shift_BetheBloch_Up);
+    fChain->SetBranchAddress("all_protons_score1_shift_Birks", all_protons_score1_shift_Birks, &b_all_protons_score1_shift_Birks);
+    fChain->SetBranchAddress("all_protons_score1_shift_MEU_Down", all_protons_score1_shift_MEU_Down, &b_all_protons_score1_shift_MEU_Down);
+    fChain->SetBranchAddress("all_protons_score1_shift_MEU_Up", all_protons_score1_shift_MEU_Up, &b_all_protons_score1_shift_MEU_Up);
+    fChain->SetBranchAddress("all_protons_score1_shift_Mass_Down", all_protons_score1_shift_Mass_Down, &b_all_protons_score1_shift_Mass_Down);
+    fChain->SetBranchAddress("all_protons_score1_shift_Mass_Up", all_protons_score1_shift_Mass_Up, &b_all_protons_score1_shift_Mass_Up);
+    fChain->SetBranchAddress("all_protons_score1_shift_Nominal", all_protons_score1_shift_Nominal, &b_all_protons_score1_shift_Nominal);
     fChain->SetBranchAddress("all_protons_startPointX", all_protons_startPointX, &b_all_protons_startPointX);
     fChain->SetBranchAddress("all_protons_startPointY", all_protons_startPointY, &b_all_protons_startPointY);
     fChain->SetBranchAddress("all_protons_startPointZ", all_protons_startPointZ, &b_all_protons_startPointZ);
@@ -748,7 +780,6 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("prong_part_mass", prong_part_mass, &b_prong_part_mass);
     fChain->SetBranchAddress("prong_part_charge", prong_part_charge, &b_prong_part_charge);
     fChain->SetBranchAddress("prong_part_pid", prong_part_pid, &b_prong_part_pid);
-
 
 }
 

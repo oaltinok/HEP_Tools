@@ -20,8 +20,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     // Cross Sections
     //--------------------------------------------------------------------------
-    plotCrossSection();
-    plotCrossSection_Check();
+    //plotCrossSection();
+    //plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
     //  Data vs MC
@@ -48,7 +48,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
-    //Systematics();
+    Systematics();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -750,8 +750,9 @@ void CCProtonPi0_Plotter::plotInteraction_DataMC()
     //DrawDataMC(rootDir_Interaction,"WSq",plotDir);
     //DrawDataMC(rootDir_Interaction,"W",plotDir);
     //DrawDataMC(rootDir_Interaction,"deltaInvMass",plotDir);
+    //DrawDataMC(rootDir_Interaction,"nProtons",plotDir);
 
-    DrawStackedMC(rootDir_Interaction,"CV_weight",plotDir);
+    //DrawStackedMC(rootDir_Interaction,"CV_weight",plotDir);
     //DrawDataStackedMC(rootDir_Interaction,"Enu_1Track",plotDir);
     //DrawDataStackedMC(rootDir_Interaction,"Enu_2Track",plotDir);
     //DrawDataStackedMC(rootDir_Interaction,"Enu",plotDir);
@@ -828,13 +829,20 @@ void CCProtonPi0_Plotter::plotProton_MCOnly()
     //DrawStackedMC(rootDir_Proton, "theta", plotDir);
     //DrawStackedMC(rootDir_Proton, "phi", plotDir);
 
-    Draw1DHist(rootDir_Proton,"P_error",plotDir);
-    Draw1DHist(rootDir_Proton,"P_Diff",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Proton, "proton_P_response", plotDir);
-    Draw1DHist(rootDir_Proton,"theta_error",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Proton, "proton_theta_response", plotDir);
+    //Draw1DHist(rootDir_Proton,"P_error",plotDir);
+    //Draw1DHist(rootDir_Proton,"P_Diff",plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Proton, "proton_P_response", plotDir);
+    //Draw1DHist(rootDir_Proton,"theta_error",plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Proton, "proton_theta_response", plotDir);
     //Draw1DHist(rootDir_Proton,"E_error",plotDir);
     //Draw1DHist(rootDir_Proton,"E_Diff",plotDir);
+
+    // Energy Shift Uncertainty
+    Draw1DHist(rootDir_Proton,"energy_shift_BetheBloch",plotDir);
+    Draw1DHist(rootDir_Proton,"energy_shift_Birks",plotDir);
+    Draw1DHist(rootDir_Proton,"energy_shift_MEU",plotDir);
+    Draw1DHist(rootDir_Proton,"energy_shift_Mass",plotDir);
+    Draw1DHist(rootDir_Proton,"energy_shift_Nominal",plotDir);
 
     std::cout<<"Plotting Proton MC Only Finished!\n"<<std::endl;
 }
@@ -845,15 +853,11 @@ void CCProtonPi0_Plotter::plotProton_DataMC()
     std::cout<<"Plotting Proton Data vs MC"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Proton;
 
-    plotStandardHistograms(rootDir_Proton, plotDir);
+    //plotStandardHistograms(rootDir_Proton, plotDir);
 
     std::cout<<">> Plotting Unique Histograms"<<std::endl;
 
-    //DrawDataMC(rootDir_Proton,"trackLength",plotDir);
-    //DrawDataMC(rootDir_Proton,"trackKinked",plotDir);
-    //DrawDataMC(rootDir_Proton,"partScore",plotDir);
-
-    //DrawDataStackedMC(rootDir_Proton,"trackLength",plotDir);
+    DrawDataStackedMC(rootDir_Proton,"trackLength",plotDir);
     //DrawDataStackedMC(rootDir_Proton,"trackKinked",plotDir);
     //DrawDataStackedMC(rootDir_Proton,"partScore",plotDir);
 
@@ -2052,8 +2056,16 @@ void CCProtonPi0_Plotter::UnfoldingStudy()
 
 void CCProtonPi0_Plotter::Systematics()
 {
+    Systematics_CheckErrorSummary(rootDir_CutHists.mc, "invMass_mc_reco_all");
+    Systematics_CheckErrorSummary(rootDir_Muon.mc, "muon_P_mc_reco_all");
+    Systematics_CheckErrorSummary(rootDir_Muon.mc, "muon_theta_mc_reco_all");
+    Systematics_CheckErrorSummary(rootDir_Pion.mc, "pi0_P_mc_reco_all");
+    Systematics_CheckErrorSummary(rootDir_Pion.mc, "pi0_KE_mc_reco_all");
+    Systematics_CheckErrorSummary(rootDir_Pion.mc, "pi0_theta_mc_reco_all");
+    Systematics_CheckErrorSummary(rootDir_Interaction.mc, "QSq_mc_reco_all");
+    Systematics_CheckErrorSummary(rootDir_Interaction.mc, "Enu_mc_reco_all");
     //Systematics_Practice();
-    Systematics_XSec();
+    //Systematics_XSec();
 }
 
 void CCProtonPi0_Plotter::PlotDelta()
@@ -2078,6 +2090,8 @@ void CCProtonPi0_Plotter::plot_SystematicsInfo()
     Draw1DHist(rootDir_Interaction,"normal_rand_numbers",plotDir);
     Draw1DHist(rootDir_Interaction,"em_shift_rand_numbers",plotDir);
     Draw1DHist(rootDir_Interaction,"muonP_shift_rand_numbers",plotDir);
+    Draw1DHist(rootDir_Interaction,"muon_theta_shift_rand_numbers",plotDir);
+    Draw1DHist(rootDir_Interaction,"Birks_shift_rand_numbers",plotDir);
 
     Draw1DHist(rootDir_Interaction,"Err_NeutronResponse",plotDir);
     Draw1DHist(rootDir_Interaction,"Err_PionResponse",plotDir);

@@ -99,6 +99,8 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* normal_rand_numbers;
         TH1D* em_shift_rand_numbers;
         TH1D* muonP_shift_rand_numbers;
+        TH1D* muon_theta_shift_rand_numbers;
+        TH1D* Birks_shift_rand_numbers;
 
         // Delta Resonance
         MnvH1D* Polarization_data;
@@ -113,6 +115,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* h_extra_rejected_energy;
        
         // Short Proton
+        MnvH1D* nProtons;
         TH1D* proton_true_P_1Track;
         TH1D* proton_true_KE_1Track;
         TH1D* proton_true_theta_1Track;

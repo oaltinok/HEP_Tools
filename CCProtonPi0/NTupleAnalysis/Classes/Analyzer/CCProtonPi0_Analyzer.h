@@ -95,6 +95,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err_down, double err_up);
         void FillVertErrorBand_ByHand(MnvH2D* h, double xval, double yval, std::string error_name, std::vector<double> errors);
         void FillVertErrorBand_ByHand(MnvH2D* h, double xval, double yval, std::string error_name, double err_down, double err_up);
+        
         void FillVertErrorBand_Flux(MnvH1D* h, double var);
         void FillVertErrorBand_Flux(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var);
@@ -105,16 +106,37 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillVertErrorBand_Genie_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_Genie_ByHand(MnvH2D* h, double xval, double yval);
 
+        double GetBckgConstraintErr();
+        void FillVertErrorBand_BckgConstraint(MnvH1D* h, double var);
+        void FillVertErrorBand_BckgConstraint(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_BckgConstraint_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_BckgConstraint_ByHand(MnvH2D* h, double xval, double yval);
+
+        double GetTargetMassErr();
+        void FillVertErrorBand_TargetMass(MnvH1D* h, double var);
+        void FillVertErrorBand_TargetMass(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_TargetMass_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_TargetMass_ByHand(MnvH2D* h, double xval, double yval);
+
+        double GetProtonTrackingErr();
+        void FillVertErrorBand_ProtonTracking(MnvH1D* h, double var);
+        void FillVertErrorBand_ProtonTracking(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_ProtonTracking_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_ProtonTracking_ByHand(MnvH2D* h, double xval, double yval);
+
+        double GetMINOSCorrectionErr();
         void FillVertErrorBand_MuonTracking(MnvH1D* h, double var);
         void FillVertErrorBand_MuonTracking(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_MuonTracking_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_MuonTracking_ByHand(MnvH2D* h, double xval, double yval);
 
+        double GetPionResponseErr();
         void FillVertErrorBand_PionResponse(MnvH1D* h, double var);
         void FillVertErrorBand_PionResponse(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_PionResponse_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_PionResponse_ByHand(MnvH2D* h, double xval, double yval);
 
+        double GetNeutronResponseErr();
         void FillVertErrorBand_NeutronResponse(MnvH1D* h, double var);
         void FillVertErrorBand_NeutronResponse(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_NeutronResponse_ByHand(MnvH1D* h, double var);
@@ -126,27 +148,52 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
 
         // Lateral Error Band
         void initLateralErrorBandShifts(bool isModeReduce);
+        void Fill_RandomShiftHistograms();
+        void Calc_no_random_shifts();
+        void Calc_em_energy_random_shifts();
+        void Calc_muon_theta_random_shifts();
         void Calc_muonP_random_shifts();
-        double Calc_Enu_shifted(double muon_E_shifted, double pi0_E_shifted);
+        void Calc_Birks_random_shifts();
+        double Calc_Enu_shifted(double muon_E_shifted, double pi0_E_shifted, double total_proton_KE_shifted);
         void FillLatErrorBands_Auto();
         void FillLatErrorBands_invMass_Auto();
         void FillLatErrorBands_ByHand();
         void FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::string err_name, int unv, double var, double shift);
         void FillLatErrorBand_SingleUniverse(MnvH2D* hist, std::string err_name, int unv, double xval, double yval, double x_shift, double y_shift);
+        
         void FillLatErrorBand_EM_EnergyScale();
         void FillLatErrorBand_EM_EnergyScale_invMass();
         void FillLatErrorBand_EM_EnergyScale_SideBand_invMass();
+        
         void FillLatErrorBand_MuonMomentum();
         void FillLatErrorBand_MuonMomentum_invMass();
         void FillLatErrorBand_MuonMomentum_SideBand_invMass();
 
+        void FillLatErrorBand_MuonTheta();
+        void FillLatErrorBand_MuonTheta_invMass();
+        void FillLatErrorBand_MuonTheta_SideBand_invMass();
+        
+        void FillLatErrorBand_ProtonEnergy(std::string err_name);
+        void FillLatErrorBand_ProtonEnergy_invMass(std::string err_name);
+        void FillLatErrorBand_ProtonEnergy_SideBand_invMass(std::string err_name);
+
+        void FillLatErrorBand_ProtonEnergy_Birks();
+        void FillLatErrorBand_ProtonEnergy_Birks_invMass();
+        void FillLatErrorBand_ProtonEnergy_Birks_SideBand_invMass();
+
         bool ismuonP_shifts_filled;
+        bool isBirks_shifts_filled;
         CCProtonPi0_RandNumGenerator RandNumGenerator;
         std::vector<double> no_random_shifts;
-        std::vector<double> em_random_shifts;
+        std::vector<double> em_energy_random_shifts;
         std::vector<double> muonP_random_shifts;
+        std::vector<double> muon_theta_random_shifts;
+        std::vector< std::vector<double> > Birks_random_shifts2D;
 
-        double GetNeutronResponseErr();
+        // Proton Systematics
+        void FillProtonEnergyShiftVector(std::vector<double> &energy_shifts, Double_t shifts[10]);
+        std::vector<double> GetProtonEnergyShifts(std::string err_name, int unv);
+
         double Calc_f(double neutron_KE);
         double CalcNeutronPathLength(int i);
         int GetLeadingNeutronInd();
@@ -159,7 +206,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void CorrectEMShowerCalibration();
         void Calc_WeightFromSystematics();
         void AddErrorBands_Data();
-        double GetMINOSCorrectionErr();
         double GetMINOSCorrection();
         double GetFluxWeight();
         void GetDeltaPolarization();
@@ -197,6 +243,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         //  Proton Specific Functions
         void fillProtonMC();
         void fillProtonReco();
+        void Study_ProtonSystematics();
 
         //  Pion Specific Functions
         void getPi0Family();
@@ -229,6 +276,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         CCProtonPi0_Pi0Blob pi0Blob;
         CCProtonPi0_BackgroundTool bckgTool;
         CCProtonPi0_CutList cutList;
+        double m_total_proton_KE;
         double m_Enu;
         double m_Enu_Truth;
         double m_QSq;
@@ -291,6 +339,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double cv_wgt_SinglePiPlus;
         double cv_wgt_QELike;
         double cv_wgt_WithPi0;
+        double cv_err_SinglePiPlus;
+        double cv_err_QELike;
+        double cv_err_WithPi0;
 
         // Pi0InvariantMass Correction
         double mean_MC_1Track;
@@ -770,6 +821,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        proton_KE;
         Double_t        proton_LLRScore;
         Double_t        proton_P;
+        Double_t        proton_energy_shift_BetheBloch_Down;
+        Double_t        proton_energy_shift_BetheBloch_Up;
+        Double_t        proton_energy_shift_Birks;
+        Double_t        proton_energy_shift_MEU_Down;
+        Double_t        proton_energy_shift_MEU_Up;
+        Double_t        proton_energy_shift_Mass_Down;
+        Double_t        proton_energy_shift_Mass_Up;
+        Double_t        proton_energy_shift_Nominal;
         Double_t        proton_length;
         Double_t        proton_phi;
         Double_t        proton_phi_beam;
@@ -778,6 +837,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        proton_px;
         Double_t        proton_py;
         Double_t        proton_pz;
+        Double_t        proton_score1_shift_BetheBloch_Down;
+        Double_t        proton_score1_shift_BetheBloch_Up;
+        Double_t        proton_score1_shift_Birks;
+        Double_t        proton_score1_shift_MEU_Down;
+        Double_t        proton_score1_shift_MEU_Up;
+        Double_t        proton_score1_shift_Mass_Down;
+        Double_t        proton_score1_shift_Mass_Up;
+        Double_t        proton_score1_shift_Nominal;
         Double_t        proton_theta;
         Double_t        proton_theta_beam;
         Double_t        reco_eventID;
@@ -829,6 +896,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        all_protons_endPointX[10];
         Double_t        all_protons_endPointY[10];
         Double_t        all_protons_endPointZ[10];
+        Double_t        all_protons_energy_shift_BetheBloch_Down[10];
+        Double_t        all_protons_energy_shift_BetheBloch_Up[10];
+        Double_t        all_protons_energy_shift_Birks[10];
+        Double_t        all_protons_energy_shift_MEU_Down[10];
+        Double_t        all_protons_energy_shift_MEU_Up[10];
+        Double_t        all_protons_energy_shift_Mass_Down[10];
+        Double_t        all_protons_energy_shift_Mass_Up[10];
+        Double_t        all_protons_energy_shift_Nominal[10];
         Double_t        all_protons_length[10];
         Double_t        all_protons_p_calCorrection[10];
         Double_t        all_protons_p_dEdXTool[10];
@@ -840,6 +915,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        all_protons_px[10];
         Double_t        all_protons_py[10];
         Double_t        all_protons_pz[10];
+        Double_t        all_protons_score1_shift_BetheBloch_Down[10];
+        Double_t        all_protons_score1_shift_BetheBloch_Up[10];
+        Double_t        all_protons_score1_shift_Birks[10];
+        Double_t        all_protons_score1_shift_MEU_Down[10];
+        Double_t        all_protons_score1_shift_MEU_Up[10];
+        Double_t        all_protons_score1_shift_Mass_Down[10];
+        Double_t        all_protons_score1_shift_Mass_Up[10];
+        Double_t        all_protons_score1_shift_Nominal[10];
         Double_t        all_protons_startPointX[10];
         Double_t        all_protons_startPointY[10];
         Double_t        all_protons_startPointZ[10];
@@ -1471,6 +1554,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_proton_KE;   //!
         TBranch        *b_proton_LLRScore;   //!
         TBranch        *b_proton_P;   //!
+        TBranch        *b_proton_energy_shift_BetheBloch_Down;   //!
+        TBranch        *b_proton_energy_shift_BetheBloch_Up;   //!
+        TBranch        *b_proton_energy_shift_Birks;   //!
+        TBranch        *b_proton_energy_shift_MEU_Down;   //!
+        TBranch        *b_proton_energy_shift_MEU_Up;   //!
+        TBranch        *b_proton_energy_shift_Mass_Down;   //!
+        TBranch        *b_proton_energy_shift_Mass_Up;   //!
+        TBranch        *b_proton_energy_shift_Nominal;   //!
         TBranch        *b_proton_length;   //!
         TBranch        *b_proton_phi;   //!
         TBranch        *b_proton_phi_beam;   //!
@@ -1479,6 +1570,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_proton_px;   //!
         TBranch        *b_proton_py;   //!
         TBranch        *b_proton_pz;   //!
+        TBranch        *b_proton_score1_shift_BetheBloch_Down;   //!
+        TBranch        *b_proton_score1_shift_BetheBloch_Up;   //!
+        TBranch        *b_proton_score1_shift_Birks;   //!
+        TBranch        *b_proton_score1_shift_MEU_Down;   //!
+        TBranch        *b_proton_score1_shift_MEU_Up;   //!
+        TBranch        *b_proton_score1_shift_Mass_Down;   //!
+        TBranch        *b_proton_score1_shift_Mass_Up;   //!
+        TBranch        *b_proton_score1_shift_Nominal;   //!
         TBranch        *b_proton_theta;   //!
         TBranch        *b_proton_theta_beam;   //!
         TBranch        *b_reco_eventID;   //!
@@ -1530,6 +1629,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_all_protons_endPointX;   //!
         TBranch        *b_all_protons_endPointY;   //!
         TBranch        *b_all_protons_endPointZ;   //!
+        TBranch        *b_all_protons_energy_shift_BetheBloch_Down;   //!
+        TBranch        *b_all_protons_energy_shift_BetheBloch_Up;   //!
+        TBranch        *b_all_protons_energy_shift_Birks;   //!
+        TBranch        *b_all_protons_energy_shift_MEU_Down;   //!
+        TBranch        *b_all_protons_energy_shift_MEU_Up;   //!
+        TBranch        *b_all_protons_energy_shift_Mass_Down;   //!
+        TBranch        *b_all_protons_energy_shift_Mass_Up;   //!
+        TBranch        *b_all_protons_energy_shift_Nominal;   //!
         TBranch        *b_all_protons_length;   //!
         TBranch        *b_all_protons_p_calCorrection;   //!
         TBranch        *b_all_protons_p_dEdXTool;   //!
@@ -1541,6 +1648,14 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_all_protons_px;   //!
         TBranch        *b_all_protons_py;   //!
         TBranch        *b_all_protons_pz;   //!
+        TBranch        *b_all_protons_score1_shift_BetheBloch_Down;   //!
+        TBranch        *b_all_protons_score1_shift_BetheBloch_Up;   //!
+        TBranch        *b_all_protons_score1_shift_Birks;   //!
+        TBranch        *b_all_protons_score1_shift_MEU_Down;   //!
+        TBranch        *b_all_protons_score1_shift_MEU_Up;   //!
+        TBranch        *b_all_protons_score1_shift_Mass_Down;   //!
+        TBranch        *b_all_protons_score1_shift_Mass_Up;   //!
+        TBranch        *b_all_protons_score1_shift_Nominal;   //!
         TBranch        *b_all_protons_startPointX;   //!
         TBranch        *b_all_protons_startPointY;   //!
         TBranch        *b_all_protons_startPointZ;   //!

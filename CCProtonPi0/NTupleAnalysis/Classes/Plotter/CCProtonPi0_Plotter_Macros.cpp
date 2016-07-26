@@ -309,19 +309,30 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupError
         std::vector<std::string> detGroup;
         detGroup.push_back("NeutronResponse");
         detGroup.push_back("PionResponse");
-        //detGroup.push_back("Mass_Scale");
-        //detGroup.push_back("POT_Scale");
         detGroup.push_back("MuonTracking");
         detGroup.push_back("EM_EnergyScale");
         detGroup.push_back("MuonMomentum");
+        detGroup.push_back("MuonTheta");
+        detGroup.push_back("TargetMass");
         plotter->error_summary_group_map["Detector"] = detGroup;
+
+        //---------------------------------------------------------------------
+        // Proton 
+        //---------------------------------------------------------------------
+        std::vector<std::string> protonGroup;
+        protonGroup.push_back("ProtonTracking");
+        protonGroup.push_back("ProtonEnergy_Birks");
+        protonGroup.push_back("ProtonEnergy_BetheBloch");
+        protonGroup.push_back("ProtonEnergy_MassModel");
+        protonGroup.push_back("ProtonEnergy_MEU");
+        plotter->error_summary_group_map["Proton"] = protonGroup;
 
         //---------------------------------------------------------------------
         // Other
         //---------------------------------------------------------------------
-        //std::vector<std::string> otherGroup;
-        //otherGroup.push_back("Background_fit");
-        //error_summary_group_map["Other"] = otherGroup;
+        std::vector<std::string> otherGroup;
+        otherGroup.push_back("BckgConstraint");
+        plotter->error_summary_group_map["Other"] = otherGroup;
     }
 }
 

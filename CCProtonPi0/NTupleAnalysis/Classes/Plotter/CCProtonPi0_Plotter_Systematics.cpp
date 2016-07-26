@@ -2,6 +2,21 @@
 
 using namespace PlotUtils;
 
+void CCProtonPi0_Plotter::Systematics_CheckErrorSummary(std::string root_dir, std::string var_name)
+{
+    std::string plotDir = Folder_List::plotDir_Systematics_Summary;
+    TFile* f_mc = new TFile(root_dir.c_str());
+
+    MnvH1D* mc = GetMnvH1D(f_mc, var_name);
+    
+    DrawErrorSummary(mc, var_name, plotDir);
+
+    Systematics_WriteTable(mc, var_name);
+    Systematics_WriteTable_BinByBin(mc, var_name);
+
+    delete mc;
+}
+
 void CCProtonPi0_Plotter::Systematics_Practice()
 {
     std::string err_name = "EM_EnergyScale";
