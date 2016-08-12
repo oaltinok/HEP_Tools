@@ -75,7 +75,8 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         // Flux File
         MnvH1D* h_flux_minervaLE_FHC;
         MnvH1D* h_flux_rebinned;
-        double flux_integral;
+        double cv_flux_integral;
+        std::vector<double> unv_flux_integral;
 
         // Pi0 Invariant Mass
         MnvH1D* invMass_all;
@@ -104,13 +105,17 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         std::string rootDir_out;
         
         // Functions
+        void IntegrateAllFluxUniverses();
+        void AddErrorBands_FluxHistogram();
+        void RebinFluxHistogram();
+        void RebinFluxHistogram(TH1* rebinned, TH1* reference);
         void Calc_CrossSection(XSec &var);
         void Style_XSec(XSec &var);
         void Calc_Normalized_NBackground();
         void NormalizeHistogram(TH1D* h);
         void NormalizeHistogram(MnvH1D* h);
         double Integrate_SignalRegion(TH1D* h);
-        double GetFluxHistContent(MnvH1D* hist, double low1, double low2);
+        double GetFluxHistContent(TH1* hist, double low1, double low2);
         double GetSmallestBinWidth(MnvH1D* hist);
         void OpenRootFiles();
         void writeHistograms();

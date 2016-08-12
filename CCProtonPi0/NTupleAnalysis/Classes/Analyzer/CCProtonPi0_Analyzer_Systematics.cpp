@@ -283,10 +283,10 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_ByHand(MnvH2D* h, double xval, doub
         const double wgtU = errors[i]*applyWeight;
         err_hists[i]->AddBinContent( cvbin, wgtU );
 
-        const double err = err_hists[i]->GetBinError(cvbin);
-        const double newerr2 = err*err + wgtU*wgtU; 
-        const double newerr = (0.<newerr2) ? sqrt(newerr2) : 0.;
-        err_hists[i]->SetBinError( cvbin, newerr );
+        //const double err = err_hists[i]->GetBinError(cvbin);
+        //const double newerr2 = err*err + wgtU*wgtU; 
+        //const double newerr = (0.<newerr2) ? sqrt(newerr2) : 0.;
+        //err_hists[i]->SetBinError( cvbin, newerr );
     }
 }
 
@@ -445,27 +445,25 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_MuonTracking_ByHand(MnvH2D* h, doub
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_Flux(MnvH1D* h, double var)
 {
-    std::vector<double> flux_errors = GetFluxError();
+    std::vector<double> flux_errors = GetFluxError(mc_incomingE * MeV_to_GeV, mc_incoming);
     h->FillVertErrorBand("Flux",  var, &flux_errors[0],  cvweight, 1.0);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var)
 {
-    std::vector<double> flux_errors = GetFluxError();
-
+    std::vector<double> flux_errors = GetFluxError(mc_incomingE * MeV_to_GeV, mc_incoming);
     FillVertErrorBand_ByHand(h, var, "Flux", flux_errors);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_Flux(MnvH2D* h, double xval, double yval)
 {
-    std::vector<double> flux_errors = GetFluxError();
+    std::vector<double> flux_errors = GetFluxError(mc_incomingE * MeV_to_GeV, mc_incoming);
     h->FillVertErrorBand("Flux",  xval, yval,  &flux_errors[0],  cvweight, 1.0);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_Flux_ByHand(MnvH2D* h, double xval, double yval)
 {
-    std::vector<double> flux_errors = GetFluxError();
-
+    std::vector<double> flux_errors = GetFluxError(mc_incomingE * MeV_to_GeV, mc_incoming);
     FillVertErrorBand_ByHand(h, xval, yval, "Flux", flux_errors);
 }
 
@@ -666,13 +664,13 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy(std::string err_name)
             //-----------------------------------------------------------------
             // muon_theta
             //-----------------------------------------------------------------
-            FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_all, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
+            FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_all, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_truth_signal, err_name, i, truth_muon_theta * TMath::RadToDeg(), 0.0);
-                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_signal, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
-                FillLatErrorBand_SingleUniverse(muon.muon_theta_response, err_name, i, muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg(), 0.0, 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_signal, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_response, err_name, i, reco_muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg(), 0.0, 0.0);
             }else{
-                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_bckg, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_bckg, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
             }
             //-----------------------------------------------------------------
             // QSq
@@ -787,13 +785,13 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks()
             //-----------------------------------------------------------------
             // muon_theta
             //-----------------------------------------------------------------
-            FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_all, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
+            FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_all, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_truth_signal, err_name, i, truth_muon_theta * TMath::RadToDeg(), 0.0);
-                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_signal, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
-                FillLatErrorBand_SingleUniverse(muon.muon_theta_response, err_name, i, muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg(), 0.0, 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_signal, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_response, err_name, i, reco_muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg(), 0.0, 0.0);
             }else{
-                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_bckg, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_bckg, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
             }
             //-----------------------------------------------------------------
             // QSq
@@ -841,7 +839,9 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
     
     for (int i = 0; i < n_lateral_universes; ++i){
 
-        // Pi0 Variables
+        // EM Energy Dependent Variables
+        double gamma1_E_i = (1.0 + em_energy_random_shifts[i]) * gamma1_E;
+        double gamma2_E_i = (1.0 + em_energy_random_shifts[i]) * gamma2_E;
         double pi0_invMass_i = (1.0 + em_energy_random_shifts[i]) * pi0_invMass;
         double pi0_P_i = (1.0 + em_energy_random_shifts[i]) * pi0_P;
         double pi0_E_i = sqrt(pi0_P_i*pi0_P_i + pi0_mass*pi0_mass);
@@ -857,7 +857,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
         double QSq_shift = (QSq_i - m_QSq) * MeVSq_to_GeVSq;
         double W_shift = (W_i - m_W) * MeV_to_GeV;
 
-        bool PassedCuts = IsEnuInRange(Enu_i) && IsInvMassInRange(pi0_invMass_i);
+        bool PassedCuts = IsEnuInRange(Enu_i) && IsInvMassInRange(pi0_invMass_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
         
         if (PassedCuts){
             //-----------------------------------------------------------------
@@ -907,13 +907,13 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
             //-----------------------------------------------------------------
             // muon_theta
             //-----------------------------------------------------------------
-            FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_all, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
+            FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_all, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_truth_signal, err_name, i, truth_muon_theta * TMath::RadToDeg(), 0.0);
-                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_signal, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
-                FillLatErrorBand_SingleUniverse(muon.muon_theta_response, err_name, i, muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg(), 0.0, 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_signal, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_response, err_name, i, reco_muon_theta * TMath::RadToDeg(), truth_muon_theta * TMath::RadToDeg(), 0.0, 0.0);
             }else{
-                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_bckg, err_name, i, muon_theta * TMath::RadToDeg(), 0.0);
+                FillLatErrorBand_SingleUniverse(muon.muon_theta_mc_reco_bckg, err_name, i, reco_muon_theta * TMath::RadToDeg(), 0.0);
             }
             //-----------------------------------------------------------------
             // QSq
@@ -949,7 +949,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_bckg, err_name, i, m_Enu * MeV_to_GeV, Enu_shift);
             }
         }else{
-           //counter1.count++;
+            // Does not satisfy cuts
         }
     }
 }
@@ -1068,7 +1068,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_bckg, err_name, i, m_Enu * MeV_to_GeV, Enu_shift);
             }
         }else{
-           //counter2.count++;
+            // Does not satisfy cuts
         }
     }
 }
@@ -1272,7 +1272,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale_invMass()
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_bckg, err_name, i, pi0_invMass, pi0_invMass_shift);
             }
         }else{
-           //counter1.count++;
+            // Does not satisfy cuts
         }
     }
 }
@@ -1300,7 +1300,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum_invMass()
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_bckg, err_name, i, pi0_invMass, 0.0);
             }
         }else{
-           //counter2.count++;
+            // Does not satisfy cuts
         }
     }
 }

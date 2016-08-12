@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed May 25 08:52:34 2016 by ROOT version 5.34/05
+// Wed Aug  3 13:34:31 2016 by ROOT version 5.34/05
 // from TChain Truth/
 //////////////////////////////////////////////////////////
 
@@ -26,7 +26,9 @@ public :
    Bool_t          truth_isGamma2_conv_inside;
    Bool_t          truth_isSignal;
    Bool_t          truth_isSignal_Out;
+   Bool_t          truth_isSignal_EventRecord;
    Bool_t          truth_isFidVol;
+   Bool_t          truth_isMINOS_Match;
    Bool_t          truth_isNC;
    Bool_t          truth_ReconstructEvent;
    Bool_t          truth_isBckg_NoPi0;
@@ -53,6 +55,12 @@ public :
    Int_t           truth_Bckg_nPi0_Total;
    Int_t           truth_Bckg_nPiCharged;
    Int_t           truth_Bckg_nPiCharged_ChargeExchanged;
+   Int_t           truth_InNucleus_N_pi0_final;
+   Int_t           truth_InNucleus_N_pi0_initial;
+   Int_t           truth_InNucleus_N_piminus_final;
+   Int_t           truth_InNucleus_N_piminus_initial;
+   Int_t           truth_InNucleus_N_piplus_final;
+   Int_t           truth_InNucleus_N_piplus_initial;
    Int_t           truth_N_FSParticles;
    Int_t           truth_N_other;
    Int_t           truth_N_pi0;
@@ -254,7 +262,9 @@ public :
    TBranch        *b_truth_isGamma2_conv_inside;   //!
    TBranch        *b_truth_isSignal;   //!
    TBranch        *b_truth_isSignal_Out;   //!
+   TBranch        *b_truth_isSignal_EventRecord;   //!
    TBranch        *b_truth_isFidVol;   //!
+   TBranch        *b_truth_isMINOS_Match;   //!
    TBranch        *b_truth_isNC;   //!
    TBranch        *b_truth_ReconstructEvent;   //!
    TBranch        *b_truth_isBckg_NoPi0;   //!
@@ -281,6 +291,12 @@ public :
    TBranch        *b_truth_Bckg_nPi0_Total;   //!
    TBranch        *b_truth_Bckg_nPiCharged;   //!
    TBranch        *b_truth_Bckg_nPiCharged_ChargeExchanged;   //!
+   TBranch        *b_truth_InNucleus_N_pi0_final;   //!
+   TBranch        *b_truth_InNucleus_N_pi0_initial;   //!
+   TBranch        *b_truth_InNucleus_N_piminus_final;   //!
+   TBranch        *b_truth_InNucleus_N_piminus_initial;   //!
+   TBranch        *b_truth_InNucleus_N_piplus_final;   //!
+   TBranch        *b_truth_InNucleus_N_piplus_initial;   //!
    TBranch        *b_truth_N_FSParticles;   //!
    TBranch        *b_truth_N_other;   //!
    TBranch        *b_truth_N_pi0;   //!
@@ -510,7 +526,7 @@ Truth_Branch::Truth_Branch(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("Truth","");
-      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_81/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/Truth");
+      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_93/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/Truth");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -564,7 +580,9 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_isGamma2_conv_inside", &truth_isGamma2_conv_inside, &b_truth_isGamma2_conv_inside);
    fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
    fChain->SetBranchAddress("truth_isSignal_Out", &truth_isSignal_Out, &b_truth_isSignal_Out);
+   fChain->SetBranchAddress("truth_isSignal_EventRecord", &truth_isSignal_EventRecord, &b_truth_isSignal_EventRecord);
    fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
+   fChain->SetBranchAddress("truth_isMINOS_Match", &truth_isMINOS_Match, &b_truth_isMINOS_Match);
    fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
    fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);
    fChain->SetBranchAddress("truth_isBckg_NoPi0", &truth_isBckg_NoPi0, &b_truth_isBckg_NoPi0);
@@ -591,6 +609,12 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_Bckg_nPi0_Total", &truth_Bckg_nPi0_Total, &b_truth_Bckg_nPi0_Total);
    fChain->SetBranchAddress("truth_Bckg_nPiCharged", &truth_Bckg_nPiCharged, &b_truth_Bckg_nPiCharged);
    fChain->SetBranchAddress("truth_Bckg_nPiCharged_ChargeExchanged", &truth_Bckg_nPiCharged_ChargeExchanged, &b_truth_Bckg_nPiCharged_ChargeExchanged);
+   fChain->SetBranchAddress("truth_InNucleus_N_pi0_final", &truth_InNucleus_N_pi0_final, &b_truth_InNucleus_N_pi0_final);
+   fChain->SetBranchAddress("truth_InNucleus_N_pi0_initial", &truth_InNucleus_N_pi0_initial, &b_truth_InNucleus_N_pi0_initial);
+   fChain->SetBranchAddress("truth_InNucleus_N_piminus_final", &truth_InNucleus_N_piminus_final, &b_truth_InNucleus_N_piminus_final);
+   fChain->SetBranchAddress("truth_InNucleus_N_piminus_initial", &truth_InNucleus_N_piminus_initial, &b_truth_InNucleus_N_piminus_initial);
+   fChain->SetBranchAddress("truth_InNucleus_N_piplus_final", &truth_InNucleus_N_piplus_final, &b_truth_InNucleus_N_piplus_final);
+   fChain->SetBranchAddress("truth_InNucleus_N_piplus_initial", &truth_InNucleus_N_piplus_initial, &b_truth_InNucleus_N_piplus_initial);
    fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
    fChain->SetBranchAddress("truth_N_other", &truth_N_other, &b_truth_N_other);
    fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);

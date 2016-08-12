@@ -8,7 +8,7 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
-    nMaxEvents = 10000;
+    nMaxEvents = 1000;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
@@ -123,8 +123,6 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
             break;
         }
     
-        UpdateSignalDef();
-        
         Calc_WeightFromSystematics();
 
         CorrectEMShowerCalibration();
@@ -232,8 +230,6 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         interaction.isErrHistFilled_PionResponse = false;
         interaction.isErrHistFilled_MuonTracking = false;
 
-        UpdateSignalDef();
-        
         // Update scanFileName if running for scan
         if(isScanRun) UpdateScanFileName();
 
@@ -953,7 +949,7 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
     if(truth_isSignal){
         // Fill for selected sample
         //  false means -- Not MINOS match only
-        FillSignalCharacteristics(false);
+        //FillSignalCharacteristics(false);
 
         // Short Proton True Information
         if (nProtonCandidates == 0){
@@ -974,7 +970,7 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
         }
 
         // W: Error, Difference
-        double W_true = mc_w * MeV_to_GeV;
+        double W_true = m_W_Truth * MeV_to_GeV;
         double W_reco = m_W * MeV_to_GeV;
         double W_Error = Data_Functions::getError(W_true, W_reco);
 
@@ -986,34 +982,36 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
         double E_reco = m_Enu * MeV_to_GeV;
         double E_Error = Data_Functions::getError(E_true, E_reco);
 
+        FillHistogram(interaction.Enu_All_response, E_reco, E_true);
         FillHistogram(interaction.Enu_Error, E_Error);
         FillHistogram(interaction.Enu_Diff, E_reco-E_true);
 
         // Fill 1Track and 2 Track Enu 
         if(nProtonCandidates == 0){
-            FillHistogramWithVertErrors(interaction.Enu_1Track_response, E_reco, E_true);
+            FillHistogram(interaction.Enu_1Track_response, E_reco, E_true);
             FillHistogram(interaction.Enu_1Track_Error, E_Error);
             FillHistogram(interaction.Enu_1Track_Diff, E_reco-E_true);
         }else{ 
-            FillHistogramWithVertErrors(interaction.Enu_2Track_response, E_reco, E_true);
+            FillHistogram(interaction.Enu_2Track_response, E_reco, E_true);
             FillHistogram(interaction.Enu_2Track_Error, E_Error);
             FillHistogram(interaction.Enu_2Track_Diff, E_reco-E_true);
         }  
     
         // QSq True, Error and Difference
-        double QSq_true = mc_Q2 * MeVSq_to_GeVSq;
+        double QSq_true = m_QSq_Truth * MeVSq_to_GeVSq;
         double QSq_reco = m_QSq * MeVSq_to_GeVSq;
         double QSq_error = Data_Functions::getError(QSq_true,QSq_reco);
 
+        FillHistogram(interaction.QSq_All_response, QSq_reco, QSq_true);
         FillHistogram(interaction.QSq_Error, QSq_error);
         FillHistogram(interaction.QSq_Diff, QSq_reco-QSq_true);
  
         if(nProtonCandidates == 0){
-            FillHistogramWithVertErrors(interaction.QSq_1Track_response, QSq_reco, QSq_true);
+            FillHistogram(interaction.QSq_1Track_response, QSq_reco, QSq_true);
             FillHistogram(interaction.QSq_1Track_Error, QSq_error);
             FillHistogram(interaction.QSq_1Track_Diff, QSq_reco-QSq_true);
         }else{ 
-            FillHistogramWithVertErrors(interaction.QSq_2Track_response, QSq_reco, QSq_true);
+            FillHistogram(interaction.QSq_2Track_response, QSq_reco, QSq_true);
             FillHistogram(interaction.QSq_2Track_Error, QSq_error);
             FillHistogram(interaction.QSq_2Track_Diff, QSq_reco-QSq_true);
         }  
@@ -1171,7 +1169,7 @@ void CCProtonPi0_Analyzer::fillProtonMC()
         double error_P = Data_Functions::getError(true_P, reco_P);
         FillHistogram(proton.P_error, error_P);
         FillHistogram(proton.P_Diff, reco_P-true_P);
-        FillHistogramWithVertErrors(proton.proton_P_response, reco_P, true_P);
+        FillHistogram(proton.proton_P_response, reco_P, true_P);
 
         // Energy
         double reco_E = proton_E * MeV_to_GeV;
@@ -1188,7 +1186,7 @@ void CCProtonPi0_Analyzer::fillProtonMC()
 
         FillHistogram(proton.theta_error, error_theta);
         FillHistogram(proton.theta_Diff, reco_theta-true_theta);
-        FillHistogramWithVertErrors(proton.proton_theta_response, proton_theta_beam * TMath::RadToDeg(), truth_proton_theta_beam * TMath::RadToDeg());
+        FillHistogram(proton.proton_theta_response, proton_theta_beam * TMath::RadToDeg(), truth_proton_theta_beam * TMath::RadToDeg());
     }
 }
 
@@ -1763,7 +1761,7 @@ void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
         UpdateFluxReweighter(mc_run); 
         
         // Replace cvweight with Flux Weight
-        cvweight = GetFluxWeight();
+        cvweight = GetFluxWeight(mc_incomingE * MeV_to_GeV, mc_incoming);
 
         // Update cvweight with MINOS Efficiency Correction
         const double minos_eff_correction = GetMINOSCorrection();
@@ -1779,23 +1777,6 @@ void CCProtonPi0_Analyzer::Calc_WeightFromSystematics()
         cvweight = 1.0; 
     }
 }
-
-void CCProtonPi0_Analyzer::UpdateSignalDef()
-{
-    // Signal Definition with Neutrino Energy
-    if (m_isMC && truth_isSignal){
-        bool isEnu_inRange = IsEnuInRange(mc_incomingE);
-        bool isW_inRange = IsWLow(mc_w);
-        truth_isSignal = isEnu_inRange && isW_inRange;
-        // If event no longer a signal due to Enu Range -- it is background
-        if (!truth_isSignal){
-            truth_isBckg_Compact_WithPi0 = true;
-            truth_isBckg_SinglePi0 = true;
-            truth_isBckg_Other = true;
-        }
-    }
-}
-
 
 void CCProtonPi0_Analyzer::FillInvMass_TruthMatch()
 {
@@ -1838,26 +1819,6 @@ double CCProtonPi0_Analyzer::GetMINOSCorrection()
     return correction;
 }
 
-double CCProtonPi0_Analyzer::GetFluxWeight()
-{
-    double Enu = mc_incomingE * MeV_to_GeV; // true neutrino energy (GeV)
-    int nuPDG = mc_incoming; //neutrino PDG code
-
-    double flux_weight = frw->GetFluxCVWeight(Enu, nuPDG);
-
-    return flux_weight;
-}
-
-std::vector<double> CCProtonPi0_Analyzer::GetFluxError()
-{
-    double Enu = mc_incomingE * MeV_to_GeV; // true neutrino energy (GeV)
-    int nuPDG = mc_incoming; //neutrino PDG code
-
-    std::vector<double> flux_error = frw->GetFluxErrorWeights(Enu, nuPDG);
-
-    return flux_error;
-}
-
 double CCProtonPi0_Analyzer::Calc_MuonCosTheta()
 {
     double P_muon = truth_muon_P;
@@ -1878,8 +1839,15 @@ double CCProtonPi0_Analyzer::Calc_Enu()
     if (nProtonCandidates == 0){
         Enu = muon_E + pi0_E + vertex_blob_energy + Extra_Energy_Total;
     }else{
-       Enu = muon_E + m_total_proton_KE + pi0_E + vertex_blob_energy + Extra_Energy_Total;
+        Enu = muon_E + m_total_proton_KE + pi0_E + vertex_blob_energy + Extra_Energy_Total;
     }
+
+    return Enu;
+}
+
+double CCProtonPi0_Analyzer::Calc_Enu_Cal()
+{
+    double Enu = muon_E + CCProtonPi0_hadron_recoil_CCInc;
 
     return Enu;
 }
@@ -1921,6 +1889,7 @@ void CCProtonPi0_Analyzer::Calc_EventKinematics()
     }
 
     m_Enu = Calc_Enu();
+    //m_Enu = Calc_Enu_Cal(); // Test results are not good! -- Use Calc_Enu()
     m_QSq = Calc_QSq(m_Enu, muon_E, muon_P, reco_muon_theta);
     m_WSq = Calc_WSq(m_Enu, m_QSq, muon_E);
    
@@ -1930,7 +1899,7 @@ void CCProtonPi0_Analyzer::Calc_EventKinematics()
 
 void CCProtonPi0_Analyzer::Calc_EventKinematics_Truth()
 {
-    m_Enu_Truth = Calc_Enu_Truth(truth_muon_4P[3],truth_proton_4P[3], truth_pi0_4P[3]);
+    m_Enu_Truth = mc_incomingE;
     m_QSq_Truth = Calc_QSq(m_Enu_Truth, truth_muon_4P[3], truth_muon_P, truth_muon_theta_beam);
     m_WSq_Truth = Calc_WSq(m_Enu_Truth, m_QSq_Truth, truth_muon_4P[3]);
     if (m_WSq_Truth > 0) m_W_Truth = sqrt(m_WSq_Truth);

@@ -62,8 +62,8 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
         else if ( particle_PDG == PDG::pi0 ) N_pi0++;
         else if ( particle_PDG == PDG::muon ){
             N_muon++;
-            Gaudi::LorentzVector muon_4p = (*it_mcpart)->GetInitialMomentum();
-            muon_theta_beam = m_coordSysTool->thetaWRTBeam(muon_4p)*TMath::RadToDeg();
+            Gaudi::LorentzVector muon_4P = (*it_mcpart)->GetInitialMomentum();
+            muon_theta_beam = m_coordSysTool->thetaWRTBeam(muon_4P)*TMath::RadToDeg();
             debug()<<"Theta(Muon) = "<<muon_theta_beam<<endmsg;
         }else{
             N_other++;
@@ -82,25 +82,74 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     // Find Signal --  Inside Fiducial Volume
     //                 CC Neutrino Interaction
     //                 FS Particles: muon, pi0, X (No Meson)
+    //                 MINOS Acceptance: Small Angle, High Momentum
+    //                 Neutrino Energy Limit
     //--------------------------------------------------------------------------
     int t_current = truthEvent->current();
     int t_neutrinoPDG = truthEvent->incoming();
 
-    bool isFidVol = truthEvent->filtertaglist()->isFilterTagTrue("isFidVol");
-    bool isMINOS = muon_theta_beam <= 25.0;
+    // CC-Neutrino Single Pi0
     bool isCCNeutrino = (t_current == 1 && t_neutrinoPDG == PDG::nu_mu);
     bool isFSGood = (N_pi0 == 1 && N_other == 0);
 
-    bool isSignal = isCCNeutrino && isFSGood && isFidVol && isMINOS;
-    bool isSignal_Out = isCCNeutrino && isFSGood;
+    // Detector Acceptance
+    bool isFidVol = truthEvent->filtertaglist()->isFilterTagTrue("isFidVol");
+    bool isMINOS = muon_theta_beam <= m_muon_theta_max;
+    bool isAcceptanceGood = isFidVol && isMINOS;
+    
+    // Kinematics Cuts
+    double t_Enu = truthEvent->incomingEnergy(); 
+    double W_exp = truthEvent->getDoubleData("W_exp");
+    bool isEnuInRange = (t_Enu >= m_Enu_min) && (t_Enu <= m_Enu_max);
+    bool isWInRange = W_exp <= m_W_max;
+    bool isKinematicsGood = isEnuInRange && isWInRange;
 
-    debug()<<"isMINOS = "<<isMINOS<<" "<<muon_theta_beam<<endmsg;
+    bool isSignal = isCCNeutrino && isFSGood && isAcceptanceGood && isKinematicsGood;
+    bool isSignalOut_Acceptance = isCCNeutrino && isFSGood && !isAcceptanceGood && isKinematicsGood;
+    bool isSignalOut_Kinematics= isCCNeutrino && isFSGood && isAcceptanceGood && !isKinematicsGood;
+
+    debug()<<"isSignal = "<<isSignal<<endmsg;
+    debug()<<"isAcceptanceGood = "<<isAcceptanceGood<<endmsg;
+    debug()<<"\tmuon_theta_beam = "<<muon_theta_beam<<endmsg;
+    debug()<<"isKinematicsGood = "<<isKinematicsGood<<endmsg;
+    debug()<<"\tEnu = "<<t_Enu<<" W_exp = "<<W_exp<<endmsg;
+
     truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal", isSignal );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal_Out", isSignal_Out );
-    truthEvent->filtertaglist()->setOrAddFilterTag( "isMINOS_Match", isMINOS);
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isSignalOut_Acceptance", isSignalOut_Acceptance );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isSignalOut_Kinematics", isSignalOut_Kinematics);
 
     return isSignal;
 }
+
+void CCProtonPi0::Calc_TrueEventKinematics(Minerva::GenMinInteraction* truthEvent) const
+{
+    // Neutrino Energy
+    double neutrino_E = truthEvent->incomingEnergy();
+
+    // Primary FS Lepton
+    const Gaudi::LorentzVector* muon_4P = new Gaudi::LorentzVector(truthEvent->PrimFSLepton());
+    double muon_E = muon_4P->E();
+    double muon_P = muon_4P->P();
+    double muon_theta_beam = m_coordSysTool->thetaWRTBeam(*muon_4P);
+    
+    double QSq = Calc_QSq(neutrino_E, muon_E, muon_P, muon_theta_beam);
+    double WSq = Calc_WSq(neutrino_E, QSq, muon_E);
+    double W = WSq > 0.0 ? sqrt(WSq) : 0.0;
+
+    debug()<<"True Event Kinematics"<<endmsg;
+    debug()<<"\tmuon_E = "<<muon_E<<" muon_P = "<<muon_P<<" muon_theta_beam = "<<muon_theta_beam<<endmsg;
+    debug()<<"\tneutrino_E = "<<neutrino_E<<endmsg;
+    debug()<<"\tQSq = "<<QSq<<endmsg;
+    debug()<<"\tWSq = "<<WSq<<endmsg;
+    debug()<<"\tW = "<<W<<endmsg;
+
+    truthEvent->setDoubleData("QSq_exp",  QSq);
+    truthEvent->setDoubleData("WSq_exp",  WSq);
+    truthEvent->setDoubleData("W_exp",  W);
+
+    delete muon_4P;
+}
+
 // Compact Background Types
 //      QE Like
 //      Single Charge Pion
@@ -179,14 +228,15 @@ void CCProtonPi0::tagBackground_Compact(Minerva::GenMinInteraction* truthEvent) 
     bool QELike = false;
     bool SinglePiPlus = false;
     bool Other = false;
-    bool isSignal_Out = truthEvent->filtertaglist()->isFilterTagTrue("isSignal_Out");
+    bool isSignalOut_Acceptance = truthEvent->filtertaglist()->isFilterTagTrue("isSignalOut_Acceptance");
+    bool isSignalOut_Kinematics = truthEvent->filtertaglist()->isFilterTagTrue("isSignalOut_Kinematics");
 
     // -------------------------------------------------------------------------
     // Background Types 
     // -------------------------------------------------------------------------
-    if (isSignal_Out) Other = true;
+    if (isSignalOut_Acceptance) Other = true;
     else if (nAntiMuon > 0) Other = true;
-    else if (nPiZero > 0) WithPi0 = true;
+    else if (nPiZero > 0 || isSignalOut_Kinematics) WithPi0 = true;
     else if (nNucleon > 0 && nPiPlus == 0 && nPiMinus == 0 && nOther == 0) QELike = true;
     else if (nPiPlus > 0 && nPiMinus == 0 && nOther == 0) SinglePiPlus = true;
     else Other = true;
@@ -365,9 +415,9 @@ void CCProtonPi0::tagBackground(Minerva::GenMinInteraction* truthEvent) const
     bool isMultiPionWithPi0 = false;
     bool isMultiPionWithoutPi0 = false;
     bool isOther = false;
-    bool isSignal_Out = truthEvent->filtertaglist()->isFilterTagTrue("isSignal_Out");
+    bool isSignalOut_Acceptance = truthEvent->filtertaglist()->isFilterTagTrue("isSignalOut_Acceptance");
 
-    if (isSignal_Out) isOther = true;
+    if (isSignalOut_Acceptance) isOther = true;
     else if (isNC) ; // Do Nothing
     else if (nAntiMuon == 1) isAntiNeutrino = true;
     else if (nOther > 0) isOther = true;

@@ -8,6 +8,7 @@
 #include <AnaUtils/IMuonUtils.h>
 #include <AnaUtils/IAnalysisToolUtils.h>
 #include <AnaUtils/IDeadTimeTool.h>
+#include <AnaUtils/IRecoilUtils.h>
 #include <AnaUtils/AnaFilterTags.h>
 #include <EnergyRecTools/ICalorimetryUtils.h>
 #include <TruthMatcher/ITruthMatcher.h>
@@ -67,6 +68,12 @@ CCProtonPi0::CCProtonPi0(const std::string& type, const std::string& name, const
     declareProperty("DoTruthMatch",         m_DoTruthMatch          =   true);
 
     declareProperty("BeamAngleBias",       m_beamAngleBias = 0.006*CLHEP::radian);
+
+    // Signal Definition Requirements
+    declareProperty("Signal_Min_NeutrinoE", m_Enu_min = 1500.0);
+    declareProperty("Signal_Max_NeutrinoE", m_Enu_max = 20000.0);
+    declareProperty("Signal_Max_W", m_W_max = 1800.0);
+    declareProperty("Signal_Max_MuonAngle", m_muon_theta_max = 25.0);
 
     // Optional Studies
     declareProperty("StudyMichelElectron", m_study_michel_electron = true);
@@ -231,6 +238,11 @@ StatusCode CCProtonPi0::initialize()
     declareIntTruthBranch( "vertex_plane", 0);
     declareIntTruthBranch( "target_material", -1); 
 
+    // Event Kinematics
+    declareDoubleTruthBranch("QSq_exp", SENTINEL);
+    declareDoubleTruthBranch("WSq_exp", SENTINEL);
+    declareDoubleTruthBranch("W_exp", SENTINEL);
+
     // Signal Kinematics
     declareContainerDoubleTruthBranch("muon_4P", 4, SENTINEL );
     declareContainerDoubleTruthBranch("proton_4P", 4, SENTINEL );
@@ -280,10 +292,10 @@ StatusCode CCProtonPi0::initialize()
     // Signal and Background
     // ------------------------------------------------------------------------
     declareBoolTruthBranch("isSignal");
-    declareBoolTruthBranch("isSignal_Out");
+    declareBoolTruthBranch("isSignalOut_Acceptance");
+    declareBoolTruthBranch("isSignalOut_Kinematics");
     declareBoolTruthBranch("isSignal_EventRecord");
     declareBoolTruthBranch("isFidVol");
-    declareBoolTruthBranch("isMINOS_Match");
     declareBoolTruthBranch("isNC");
     declareBoolTruthBranch("ReconstructEvent");
 
@@ -699,7 +711,10 @@ StatusCode CCProtonPi0::initialize()
     //-------------------------------------------------------------------------
     // NeutrinoInt Branches 
     //-------------------------------------------------------------------------
-
+    // Hadron Recoil
+    declareDoubleBranch( m_hypMeths, "hadron_recoil_CCInc", 0.0);
+    declareDoubleBranch( m_hypMeths, "hadron_recoil", 0.0);
+    
     // Truth Match for Prongs
     declareIntBranch(m_hypMeths,    "isMuonInsideOD",        -1);
     declareIntBranch(m_hypMeths,    "ntrajMuonProng",        -1);
@@ -1323,6 +1338,20 @@ StatusCode CCProtonPi0::interpretEvent( const Minerva::PhysicsEvent *event, cons
     nuInt->setInteractionCurrent( Minerva::NeutrinoInt::ChargedCurrent );
     nuInt->setInteractionType( Minerva::NeutrinoInt::UnknownInt );
 
+    //--------------------------------------------------------------
+    // Hadronic Recoil
+    //--------------------------------------------------------------
+    double hadron_recoilE_CCInc = RecoilUtils->calcRecoilEFromClusters( event, muonProng, "CCInclusive", -1); 
+    double hadron_recoilE = RecoilUtils->calcRecoilEFromClusters( event, muonProng, "Default");
+ 
+    debug()<<"hadron_recoilE_CCInc = "<<hadron_recoilE_CCInc<<" at event time "<<event->time()<<" used muon: "<<event->filtertaglist()->isFilterTagTrue("used_muon_time")<<endmsg;
+    debug()<<"hadron_recoilE_Default = "<<hadron_recoilE<<" at event time "<<event->time()<<" used muon: "<<event->filtertaglist()->isFilterTagTrue("used_muon_time")<<endmsg;
+
+    nuInt->setDoubleData("hadron_recoil_CCInc", hadron_recoilE_CCInc);
+    nuInt->setDoubleData("hadron_recoil", hadron_recoilE);
+    
+    debug()<<"Finished hadronic recoil"<<endmsg;
+
     //--------------------------------------------------------------------------
     // Truth Matching for Muon and Proton Prongs
     //--------------------------------------------------------------------------
@@ -1366,7 +1395,8 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     }
 
     isTrueVertexFiducial(truthEvent);
-    
+    Calc_TrueEventKinematics(truthEvent);
+
     //--------------------------------------------------------------------------
     // Fill GENIE Weight Branches
     //--------------------------------------------------------------------------
@@ -5436,6 +5466,22 @@ void CCProtonPi0::SaveTrajectories(Minerva::PhysicsEvent* event) const
     event->setContainerDoubleData("detmc_traj_prepzf", detmc_traj_prepzf);
     event->setContainerDoubleData("detmc_traj_preEf",  detmc_traj_preEf);
     
+}
+
+double CCProtonPi0::Calc_QSq(double Enu, double muon_E, double muon_P, double muon_angle_beam) const
+{
+    double muon_mass = MinervaUnits::M_muon;
+    double QSq = 2*Enu*(muon_E - muon_P*cos(muon_angle_beam))-(muon_mass*muon_mass);
+
+    return QSq;
+}
+
+double CCProtonPi0::Calc_WSq(double Enu, double QSq, double muon_E) const
+{
+    double neutron_mass = MinervaUnits::M_neutron;
+    double WSq = neutron_mass*neutron_mass + 2*neutron_mass*(Enu - muon_E) - QSq; 
+
+    return WSq;
 }
 
 

@@ -68,8 +68,6 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 
         nAll.count++;
 
-        UpdateSignalDef();
-       
         if (truth_isSignal_Out) nSignal_Out.count++;
         
         // Count Signal and Background inside Fiducial Volume
@@ -386,7 +384,7 @@ void CCProtonPi0_TruthAnalyzer::FillHistogram(TH1D* hist, double var)
 
 void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Flux(MnvH1D* h, double var)
 {
-    std::vector<double> flux_errors = GetFluxError();
+    std::vector<double> flux_errors = GetFluxError(mc_incomingE * MeV_to_GeV, mc_incoming);
     h->FillVertErrorBand("Flux",  var, &flux_errors[0],  cvweight);
 }
 
@@ -434,29 +432,8 @@ void CCProtonPi0_TruthAnalyzer::Calc_WeightFromSystematics()
     UpdateFluxReweighter(mc_run); 
         
     // Replace cvweight with Flux Weight
-    cvweight = GetFluxWeight();
+    cvweight = GetFluxWeight(mc_incomingE * MeV_to_GeV, mc_incoming);
 }
-
-double CCProtonPi0_TruthAnalyzer::GetFluxWeight()
-{
-    double Enu = mc_incomingE * MeV_to_GeV; // true neutrino energy (GeV)
-    int nuPDG = mc_incoming; //neutrino PDG code
-
-    double flux_weight = frw->GetFluxCVWeight(Enu, nuPDG);
-
-    return flux_weight;
-}
-
-std::vector<double> CCProtonPi0_TruthAnalyzer::GetFluxError()
-{
-    double Enu = mc_incomingE * MeV_to_GeV; // true neutrino energy (GeV)
-    int nuPDG = mc_incoming; //neutrino PDG code
-
-    std::vector<double> flux_error = frw->GetFluxErrorWeights(Enu, nuPDG);
-
-    return flux_error;
-}
-
 void CCProtonPi0_TruthAnalyzer::AddOtherErrorBands_FillWithCV()
 {
     // Add Vertical Error Bands
@@ -484,7 +461,7 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
 {
     Calc_WeightFromSystematics();
 
-    double Enu_Truth = Calc_Enu_Truth(truth_muon_4P[3], truth_proton_4P[3], truth_pi0_4P[3]);
+    double Enu_Truth = mc_incomingE;
     double QSq_Truth = Calc_QSq(Enu_Truth, truth_muon_4P[3], truth_muon_P, truth_muon_theta_beam);
     double WSq_Truth = Calc_WSq(Enu_Truth, QSq_Truth, truth_muon_4P[3]);
     double W_Truth;
@@ -554,22 +531,6 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
         }
     }else{
         std::cout<<"WARNING! Signal Event with different interaction Type!"<<std::endl;
-    }
-}
-
-void CCProtonPi0_TruthAnalyzer::UpdateSignalDef()
-{
-    // Signal Definition with Neutrino Energy
-    if (truth_isSignal){
-        bool isEnu_inRange = IsEnuInRange(mc_incomingE);
-        bool isW_inRange = IsWLow(mc_w);
-        truth_isSignal = isEnu_inRange && isW_inRange;
-        // If event no longer a signal due to Enu Range -- it is background
-        if (!truth_isSignal){
-            truth_isBckg_Compact_WithPi0 = true;
-            truth_isBckg_SinglePi0 = true;
-            truth_isBckg_Other = true;
-        }
     }
 }
 

@@ -208,6 +208,13 @@ class CCProtonPi0 : public MinervaAnalysisTool
         double m_recoUpStreamZ;
         double m_recoDownStreamZ;
 
+        // Signal Definition Requirements
+        double m_W_max;
+        double m_Enu_min;
+        double m_Enu_max;
+        double m_muon_P_min;
+        double m_muon_theta_max;
+
         // Analysis Parameters
         double m_beamAngleBias;
 
@@ -334,6 +341,10 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool tagSignal( Minerva::GenMinInteraction* truthEvent) const;
         bool vertexInFiducialVolume(Minerva::PhysicsEvent *event) const;
         bool vertexInRecoVolume(Minerva::PhysicsEvent *event) const;
+
+        void Calc_TrueEventKinematics(Minerva::GenMinInteraction* truthEvent) const;
+        double Calc_QSq(double Enu, double muon_E, double muon_P, double muon_angle_beam) const;
+        double Calc_WSq(double Enu, double QSq, double muon_E) const;
         double CalcMinBlobSeparation( const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
         double TwoParLineFitBlobVtxDistance(const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
         double calcDistance( double x1, double y1, double z1,double x2, double y2, double z2) const;

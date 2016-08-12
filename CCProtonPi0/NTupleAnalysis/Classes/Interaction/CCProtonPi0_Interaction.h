@@ -126,6 +126,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
        
         // QSq Error, Difference
         TH2D* WSq_QSq_Diff;
+        MnvH2D* QSq_All_response;
         MnvH2D* QSq_1Track_response;
         MnvH2D* QSq_2Track_response;
 
@@ -138,6 +139,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* QSq_2Track_Diff;
 
         // Neutrino Energy: Error, Difference
+        MnvH2D* Enu_All_response;
         MnvH2D* Enu_1Track_response;
         MnvH2D* Enu_2Track_response;
 

@@ -232,31 +232,39 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::str
     file.width(12); file<<"(III)FSI"<<" "; 
     file.width(12); file<<"(IV)Flux"<<" "; 
     file.width(12); file<<"(V)Other"<<" "; 
+    file.width(12); file<<"(VI)Proton"<<" "; 
     file.width(12); file<<"Total"; 
     file<<std::endl;
 
     // Get Errors
     TH1D* h_err_total = new TH1D(hist->GetTotalError(false,true));
-    TH1D* h_err_flux = new TH1D(hist->GetVertErrorBand("Flux")->GetErrorBand(true));
-    TH1D* h_err_GENIE = GetTotalError_GENIE(hist); // Return "new" TH1D -- Don't forget to delete
-    TH1D* h_err_detector = GetTotalError_DetectorResponse(hist); // Return "new" TH1D -- Don't forget to delete
+    TH1D* h_err_det = GetTotalErrorInGroup(hist, detGroup); // Returns new TH1D -- delete at the end 
+    TH1D* h_err_genie = GetTotalErrorInGroup(hist, genieGroup); 
+    TH1D* h_err_fsi = GetTotalErrorInGroup(hist, fsiGroup); 
+    TH1D* h_err_flux = GetTotalErrorInGroup(hist, fluxGroup); 
+    TH1D* h_err_other = GetTotalErrorInGroup(hist, otherGroup); 
+    TH1D* h_err_proton = GetTotalErrorInGroup(hist, protonGroup); 
 
     int nBins = h_err_total->GetNbinsX();
     for (int i = 1; i <= nBins; ++i){
         double bin_min = h_err_total->GetBinLowEdge(i);
         double bin_width = h_err_total->GetBinWidth(i);
 
-        double detector = h_err_detector->GetBinContent(i);
-        double genie = h_err_GENIE->GetBinContent(i);
+        double detector = h_err_det->GetBinContent(i);
+        double genie = h_err_genie->GetBinContent(i);
+        double fsi = h_err_fsi->GetBinContent(i);
         double flux = h_err_flux->GetBinContent(i);
+        double other = h_err_other->GetBinContent(i);
+        double proton = h_err_proton->GetBinContent(i);
         double total = h_err_total->GetBinContent(i);
 
         file.width(16); file<<Form("%2.1f - %2.1f",bin_min,bin_min+bin_width)<<" ";    
         file.width(12); file<<Form("%3.2f",detector*100)<<" ";
         file.width(12); file<<Form("%3.2f",genie*100)<<" ";
-        file.width(12); file<<"N/A"<<" ";
+        file.width(12); file<<Form("%3.2f",fsi*100)<<" ";
         file.width(12); file<<Form("%3.2f",flux*100)<<" ";
-        file.width(12); file<<"N/A"<<" ";
+        file.width(12); file<<Form("%3.2f",other*100)<<" ";
+        file.width(12); file<<Form("%3.2f",proton*100)<<" ";
         file.width(12); file<<Form("%3.2f",total*100);
         file<<std::endl;
     }
@@ -264,82 +272,12 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::str
     file.close();
 
     delete h_err_total;
+    delete h_err_det;
+    delete h_err_genie;
+    delete h_err_fsi;
     delete h_err_flux;
-    delete h_err_GENIE;
-    delete h_err_detector;
-}
-
-TH1D* CCProtonPi0_Plotter::GetTotalError_GENIE(MnvH1D* hist)
-{
-    // Use a "new" MnvH1D -- Do not change Input
-    MnvH1D* temp = new MnvH1D(*hist);
- 
-    // Remove Non-Genie Error Bands
-    // First Remove Lateral Error Bands
-    std::vector<std::string> lat_errors = temp->GetLatErrorBandNames();
-   
-    for (unsigned int i = 0; i < lat_errors.size(); ++i){
-        std::size_t found = lat_errors[i].find("GENIE");
-        if (found == std::string::npos){
-            MnvLatErrorBand* non_genie = temp->PopLatErrorBand(lat_errors[i]);
-            delete non_genie;
-        }
-    }
-   
-    // Second Remove Vertical Error Bands
-    std::vector<std::string> vert_errors = temp->GetVertErrorBandNames();
-    for (unsigned int i = 0; i < vert_errors.size(); ++i){
-        std::size_t found = vert_errors[i].find("GENIE");
-        if (found == std::string::npos){
-            MnvVertErrorBand* non_genie = temp->PopVertErrorBand(vert_errors[i]);
-            delete non_genie;
-        }
-    }
-
-    // Finally Get Total Error (Only GENIE Left)
-    TH1D* h_err_total = new TH1D(temp->GetTotalError(false,true));
-    
-    delete temp;
-    return h_err_total;
-}
-
-TH1D* CCProtonPi0_Plotter::GetTotalError_DetectorResponse(MnvH1D* hist)
-{
-    // Use a "new" MnvH1D -- Do not change Input
-    MnvH1D* temp = new MnvH1D(*hist);
- 
-    // First Remove GENIE Error Bands
-    std::vector<std::string> vert_errors = temp->GetVertErrorBandNames();
-    for (unsigned int i = 0; i < vert_errors.size(); ++i){
-        std::size_t found = vert_errors[i].find("GENIE");
-        if (found != std::string::npos){
-            MnvVertErrorBand* genie = temp->PopVertErrorBand(vert_errors[i]);
-            delete genie;
-        }
-    }
-
-    // Delete Flux
-    MnvVertErrorBand* flux = temp->PopVertErrorBand("Flux");
-    delete flux;
-
-    // ------------------------------------------------------------------------
-    // Test -- What is Left
-    // ------------------------------------------------------------------------
-    //std::vector<std::string> vert_errors_test = temp->GetVertErrorBandNames();
-    //for (unsigned int i = 0; i < vert_errors_test.size(); ++i){
-    //    std::cout<<vert_errors_test[i]<<std::endl;
-    //}
-
-    //std::vector<std::string> lat_errors_test = temp->GetLatErrorBandNames();
-    //for (unsigned int i = 0; i < lat_errors_test.size(); ++i){
-    //    std::cout<<lat_errors_test[i]<<std::endl;
-    //}
-
-    // Finally Get Total Error (Only Detector Response Left)
-    TH1D* h_err_total = new TH1D(temp->GetTotalError(false,true));
-    
-    delete temp;
-    return h_err_total;
+    delete h_err_other;
+    delete h_err_proton;
 }
 
 
@@ -394,5 +332,169 @@ void CCProtonPi0_Plotter::Systematics_Practice2D(std::string root_dir, std::stri
 
     delete mc;
     delete f_mc;
+}
+
+void CCProtonPi0_Plotter::Systematics_SetErrorSummaryGroups()
+{
+    //---------------------------------------------------------------------
+    // (I) Detector Response
+    //---------------------------------------------------------------------
+    detGroup.push_back("NeutronResponse");
+    detGroup.push_back("PionResponse");
+    detGroup.push_back("MuonTracking");
+    detGroup.push_back("EM_EnergyScale");
+    detGroup.push_back("MuonMomentum");
+    detGroup.push_back("MuonTheta");
+    detGroup.push_back("TargetMass");
+    
+    //---------------------------------------------------------------------
+    // (II) GENIE Cross Section
+    //---------------------------------------------------------------------
+    genieGroup.push_back("GENIE_AhtBY"             );
+    genieGroup.push_back("GENIE_BhtBY"             );
+    genieGroup.push_back("GENIE_CCQEPauliSupViaKF" );
+    genieGroup.push_back("GENIE_CV1uBY"            );
+    genieGroup.push_back("GENIE_CV2uBY"            );
+    genieGroup.push_back("GENIE_EtaNCEL"           );
+    genieGroup.push_back("GENIE_MaCCQE"            );
+    //genieGroup.push_back("GENIE_MaCCQEshape"       );
+    genieGroup.push_back("GENIE_MaNCEL"            );
+    genieGroup.push_back("GENIE_MaRES"             );
+    genieGroup.push_back("GENIE_MvRES"             );
+    //genieGroup.push_back("GENIE_NormCCQE"          );
+    //genieGroup.push_back("GENIE_NormCCRES"         );
+    genieGroup.push_back("GENIE_NormDISCC"         );
+    genieGroup.push_back("GENIE_NormNCRES"         );
+    genieGroup.push_back("GENIE_Rvn1pi"            );
+    genieGroup.push_back("GENIE_Rvn2pi"            );
+    genieGroup.push_back("GENIE_Rvp1pi"            );
+    genieGroup.push_back("GENIE_Rvp2pi"            );
+    genieGroup.push_back("GENIE_VecFFCCQEshape"    );
+
+    //---------------------------------------------------------------------
+    // (III) GENIE FSI
+    //---------------------------------------------------------------------
+    fsiGroup.push_back("GENIE_AGKYxF1pi"         );
+    fsiGroup.push_back("GENIE_FrAbs_N"           );
+    fsiGroup.push_back("GENIE_FrAbs_pi"          );
+    fsiGroup.push_back("GENIE_FrCEx_N"           );
+    fsiGroup.push_back("GENIE_FrCEx_pi"          );
+    fsiGroup.push_back("GENIE_FrElas_N"          );
+    fsiGroup.push_back("GENIE_FrElas_pi"         );
+    fsiGroup.push_back("GENIE_FrInel_N"          );
+    fsiGroup.push_back("GENIE_FrInel_pi"         );
+    fsiGroup.push_back("GENIE_FrPiProd_N"        );
+    fsiGroup.push_back("GENIE_FrPiProd_pi"       );
+    fsiGroup.push_back("GENIE_MFP_N"             );
+    fsiGroup.push_back("GENIE_MFP_pi"            );
+    fsiGroup.push_back("GENIE_RDecBR1gamma"      );
+    fsiGroup.push_back("GENIE_Theta_Delta2Npi"   );
+     
+    //---------------------------------------------------------------------
+    // (IV) Flux 
+    //---------------------------------------------------------------------
+    fluxGroup.push_back("Flux");
+
+    //---------------------------------------------------------------------
+    // (V) Other
+    //---------------------------------------------------------------------
+    otherGroup.push_back("BckgConstraint");
+    
+    //---------------------------------------------------------------------
+    // Proton 
+    //---------------------------------------------------------------------
+    protonGroup.push_back("ProtonTracking");
+    protonGroup.push_back("ProtonEnergy_Birks");
+    protonGroup.push_back("ProtonEnergy_BetheBloch");
+    protonGroup.push_back("ProtonEnergy_MassModel");
+    protonGroup.push_back("ProtonEnergy_MEU");
+
+}
+
+int CCProtonPi0_Plotter::GetErrorSummaryGroup(std::string err_name)
+{
+    if (IsErrorInGroup(err_name, detGroup)) return 1;
+    else if (IsErrorInGroup(err_name, genieGroup)) return 2;
+    else if (IsErrorInGroup(err_name, fsiGroup)) return 3;
+    else if (IsErrorInGroup(err_name, fluxGroup)) return 4;
+    else if (IsErrorInGroup(err_name, otherGroup)) return 5;
+    else if (IsErrorInGroup(err_name, protonGroup)) return 6;
+    else RunTimeError("Can not find Error Summary Group!");
+    
+    return -1;
+}
+
+bool CCProtonPi0_Plotter::IsErrorInGroup(std::string err_name, std::vector<std::string> errGroup)
+{
+    for (unsigned int i = 0; i < errGroup.size(); ++i){
+        if (err_name.compare(errGroup[i]) == 0) return true;
+    }
+
+    return false;
+}
+
+TH1D* CCProtonPi0_Plotter::GetTotalErrorInGroup(MnvH1D* hist, std::vector<std::string> errGroup, bool area_normalized)
+{
+    // Get a Copy of the Input Histogram
+    MnvH1D* tempHist = new MnvH1D(*hist);
+
+    // Remove Vertical Error Bands not in the Group
+    std::vector<std::string> vert_errors = tempHist->GetVertErrorBandNames();
+    
+    for (unsigned int i = 0; i < vert_errors.size(); ++i){
+        if (!IsErrorInGroup(vert_errors[i], errGroup)){ 
+            MnvVertErrorBand* non_group = tempHist->PopVertErrorBand(vert_errors[i]);
+            delete non_group;
+        }
+    }
+
+    // Remove Latical Error Bands not in the Group
+    std::vector<std::string> lat_errors = tempHist->GetLatErrorBandNames();
+    
+    for (unsigned int i = 0; i < lat_errors.size(); ++i){
+        if (!IsErrorInGroup(lat_errors[i], errGroup)){ 
+            MnvLatErrorBand* non_group = tempHist->PopLatErrorBand(lat_errors[i]);
+            delete non_group;
+        }
+    }
+
+    // Debugging: Print What is left?
+//    std::vector<std::string> all_errors = tempHist->GetErrorBandNames();
+//    std::cout<<"What is Left?"<<std::endl;
+//    for (unsigned int i = 0; i < all_errors.size(); ++i){
+//        std::cout<<"\t"<<all_errors[i]<<std::endl;
+//    }
+
+    // Get Total Error Histogram
+    TH1D* total_error = new TH1D(tempHist->GetTotalError(false,true,area_normalized));
+
+    delete tempHist;
+    
+    return total_error;
+}
+
+void CCProtonPi0_Plotter::PrintVertErrorBand(MnvH1D* hist, std::string var_name, std::string err_name)
+{
+    // Print Header
+    std::cout<<std::endl;
+    std::cout<<var_name<<" "<<err_name<<std::endl;
+    std::cout.width(12); std::cout<<std::left<<"Universe";
+    std::cout.width(6); std::cout<<std::left<<"Bin";
+    std::cout.width(12); std::cout<<std::left<<"Content";
+    std::cout<<std::endl;
+
+    const MnvVertErrorBand* hist_err_band = hist->GetVertErrorBand(err_name);
+    const std::vector<TH1D*> hist_hists = hist_err_band->GetHists();
+
+    for (unsigned int j = 0; j < hist_hists.size(); ++j){
+        int nBins = hist_hists[j]->GetNbinsX();
+        for (int bin = 1; bin <= nBins; ++bin){
+            double hist_bin_content = hist_hists[j]->GetBinContent(bin);
+            std::cout.width(12); std::cout<<std::left<<j;
+            std::cout.width(6); std::cout<<std::left<<bin;
+            std::cout.width(12); std::cout<<std::left<<hist_bin_content;
+            std::cout<<std::endl;
+        }
+    }
 }
 

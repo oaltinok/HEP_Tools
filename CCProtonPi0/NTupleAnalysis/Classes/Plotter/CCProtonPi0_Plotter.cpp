@@ -21,7 +21,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     // Cross Sections
     //--------------------------------------------------------------------------
     //plotCrossSection();
-    //plotCrossSection_Check();
+    plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
     //  Data vs MC
@@ -48,7 +48,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
-    Systematics();
+    //Systematics();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -79,6 +79,79 @@ CCProtonPi0_Plotter::CCProtonPi0_Plotter() : CCProtonPi0_NTupleAnalysis()
     std::cout<<"POT Ratio = "<<POT_ratio<<std::endl;
 
     setRootDirs(); 
+    Systematics_SetErrorSummaryGroups();
+}
+
+void CCProtonPi0_Plotter::CheckAllUniverses(std::string test_name, MnvH1D* data, MnvH1D* mc)
+{
+    
+    // Check CV First
+    int nBins = data->GetNbinsX();
+    for (int i = 0; i < nBins; ++i){
+        double data_content = data->GetBinContent(i);
+        double mc_content = mc->GetBinContent(i);
+        double ratio = data_content/mc_content;
+        if (isnan(ratio)) continue;
+        else if ( fabs(ratio - 1.0) > EPSILON){
+            std::cout<<"-----------------------------------------------------------"<<std::endl;
+            std::cout<<"\tClosure Test Failed for "<<test_name<<std::endl;
+            std::cout<<"\tCentral Value"<<std::endl;
+            std::cout<<"\tBin = "<<i<<std::endl;
+            std::cout<<"\tData = "<<data_content<<" MC = "<<mc_content<<std::endl;
+            std::cout<<"\tData/MC = "<<data_content/mc_content<<std::endl;
+            exit(1);
+        }
+    }
+
+    // Vertical Error Bands
+    std::vector<std::string> data_vert_errors = data->GetVertErrorBandNames();
+    std::vector<std::string> mc_vert_errors = mc->GetVertErrorBandNames();
+
+    for (unsigned int i = 0; i < data_vert_errors.size(); ++i){
+        const MnvVertErrorBand* data_err_band = data->GetVertErrorBand(data_vert_errors[i]);
+        const MnvVertErrorBand* mc_err_band = mc->GetVertErrorBand(mc_vert_errors[i]);
+
+        const std::vector<TH1D*> data_hists = data_err_band->GetHists();
+        const std::vector<TH1D*> mc_hists = mc_err_band->GetHists();
+        
+        CompareUniversesBinByBin(data_hists, mc_hists, data_vert_errors[i], test_name);
+    }
+
+    // Lateral Error Bands
+    std::vector<std::string> data_lat_errors = data->GetLatErrorBandNames();
+    std::vector<std::string> mc_lat_errors = mc->GetLatErrorBandNames();
+
+    for (unsigned int i = 0; i < data_lat_errors.size(); ++i){
+        const MnvLatErrorBand* data_err_band = data->GetLatErrorBand(data_lat_errors[i]);
+        const MnvLatErrorBand* mc_err_band = mc->GetLatErrorBand(mc_lat_errors[i]);
+
+        const std::vector<TH1D*> data_hists = data_err_band->GetHists();
+        const std::vector<TH1D*> mc_hists = mc_err_band->GetHists();
+        
+        CompareUniversesBinByBin(data_hists, mc_hists, data_lat_errors[i], test_name);
+    }
+}
+
+void CCProtonPi0_Plotter::CompareUniversesBinByBin(const std::vector<TH1D*> data_hists, const std::vector<TH1D*> mc_hists, std::string err_name, std::string test_name)
+{
+    for (unsigned int j = 0; j < data_hists.size(); ++j){
+        int nBins = data_hists[j]->GetNbinsX();
+        for (int bin = 1; bin <= nBins; ++bin){
+            double data_bin_content = data_hists[j]->GetBinContent(bin);
+            double mc_bin_content = mc_hists[j]->GetBinContent(bin);
+            double ratio = data_bin_content/mc_bin_content;
+            if (isnan(ratio)) continue;
+            else if ( fabs(ratio - 1.0) > EPSILON){
+                std::cout<<"-----------------------------------------------------------"<<std::endl;
+                std::cout<<"\tClosure Test Failed for "<<test_name<<std::endl;
+                std::cout<<"\tError Band = "<<err_name<<std::endl;
+                std::cout<<"\tUniverse = "<<j<<std::endl;
+                std::cout<<"\tBin = "<<bin<<std::endl;
+                std::cout<<"\tData = "<<data_bin_content<<" MC = "<<mc_bin_content<<std::endl;
+                std::cout<<"\tData/MC = "<<ratio<<std::endl;
+            }
+        }
+    }
 }
 
 void CCProtonPi0_Plotter::plotCrossSection_Check(std::string var_name, std::string plotDir)
@@ -100,6 +173,7 @@ void CCProtonPi0_Plotter::plotCrossSection_Check(std::string var_name, std::stri
     data = (MnvH1D*)f_xsec->Get(var.c_str()); 
     var = var_name + "_check_bckg_estimated";
     DrawDataMC(data, mc, var, plotDir, true);
+    CheckAllUniverses("Estimated Background",data, mc);
 
     // Subtracted Background 
     var = var_name + "_mc_reco_signal";
@@ -108,6 +182,7 @@ void CCProtonPi0_Plotter::plotCrossSection_Check(std::string var_name, std::stri
     data = (MnvH1D*)f_xsec->Get(var.c_str()); 
     var = var_name + "_check_bckg_subtracted";
     DrawDataMC(data, mc, var, plotDir, true);
+    CheckAllUniverses("Subtracted Background",data, mc);
 
     // Unfolded 
     var = var_name + "_mc_truth_signal";
@@ -116,6 +191,7 @@ void CCProtonPi0_Plotter::plotCrossSection_Check(std::string var_name, std::stri
     data = (MnvH1D*)f_xsec->Get(var.c_str()); 
     var = var_name + "_check_unfolded";
     DrawDataMC(data, mc, var, plotDir, true);
+    CheckAllUniverses("Unfolded",data, mc);
    
     // Efficiency Correction 
     var = var_name + "_mc_truth_all_signal";
@@ -124,6 +200,7 @@ void CCProtonPi0_Plotter::plotCrossSection_Check(std::string var_name, std::stri
     data = (MnvH1D*)f_xsec->Get(var.c_str()); 
     var = var_name + "_check_efficiency_corrected";
     DrawDataMC(data, mc, var, plotDir, true);
+    CheckAllUniverses("Efficiency Corrected",data, mc);
     
     std::cout<<"Plotting Cross Section Check Finished!"<<std::endl;
 }
@@ -132,37 +209,38 @@ void CCProtonPi0_Plotter::plotCrossSection_Check()
 {
     std::string plotDir;
 
-    plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Check;
-    plotCrossSection_Check("muon_P", plotDir);
+    //plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Check;
+    //plotCrossSection_Check("muon_P", plotDir);
 
-    plotDir = Folder_List::xsec_muon_theta + Folder_List::plotDir_Check;
-    plotCrossSection_Check("muon_theta", plotDir);
+    //plotDir = Folder_List::xsec_muon_theta + Folder_List::plotDir_Check;
+    //plotCrossSection_Check("muon_theta", plotDir);
 
-    plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Check;
-    plotCrossSection_Check("pi0_P", plotDir);
+    //plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Check;
+    //plotCrossSection_Check("pi0_P", plotDir);
 
     plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_Check;
     plotCrossSection_Check("pi0_KE", plotDir);
 
-    plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_Check;
-    plotCrossSection_Check("pi0_theta", plotDir);
+    //plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_Check;
+    //plotCrossSection_Check("pi0_theta", plotDir);
 
-    plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_Check;
-    plotCrossSection_Check("QSq", plotDir);
+    //plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_Check;
+    //plotCrossSection_Check("QSq", plotDir);
 
-    plotDir = Folder_List::xsec_W + Folder_List::plotDir_Check;
-    plotCrossSection_Check("W", plotDir);
+    //plotDir = Folder_List::xsec_W + Folder_List::plotDir_Check;
+    //plotCrossSection_Check("W", plotDir);
 
-    plotDir = Folder_List::xsec_Enu + Folder_List::plotDir_Check;
-    plotCrossSection_Check("Enu", plotDir);
+    //plotDir = Folder_List::xsec_Enu + Folder_List::plotDir_Check;
+    //plotCrossSection_Check("Enu", plotDir);
 }
 
 void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
-    //std::string plotDir = Folder_List::plotDir_OtherStudies;
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+ 
+    PlotXSecVar("pi0_P", "xsec", "xsec", plotDir, "xsec_data_MC" );
 
-    GetFlux();
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
 
@@ -625,6 +703,7 @@ void CCProtonPi0_Plotter::plotXSec()
     if (plot_pi0_P){
         plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_CrossSection;
         PlotXSecVar("pi0_P", "xsec", "xsec", plotDir, "xsec_data_MC" );
+        PlotXSecVar_WithMiniBoone("pi0_P", plotDir);
     }
 
     if (plot_pi0_KE){
@@ -658,7 +737,7 @@ void CCProtonPi0_Plotter::plotXSec()
 void CCProtonPi0_Plotter::plotTruth_Enu()
 {
     std::string plotDir = Folder_List::plotDir_Interaction;
-    DrawNormalizedMigrationHistogram(rootDir_Interaction, "Enu_response", plotDir);
+    DrawNormalizedMigrationHistogram(rootDir_Interaction, "Enu_All_response", plotDir);
     DrawNormalizedMigrationHistogram(rootDir_Interaction, "Enu_1Track_response", plotDir);
     DrawNormalizedMigrationHistogram(rootDir_Interaction, "Enu_2Track_response", plotDir);
   
@@ -677,7 +756,7 @@ void CCProtonPi0_Plotter::plotTruth_Enu()
 void CCProtonPi0_Plotter::plotTruth_QSq()
 {
     std::string plotDir = Folder_List::plotDir_Interaction;
-    DrawNormalizedMigrationHistogram(rootDir_Interaction, "QSq_response", plotDir);
+    DrawNormalizedMigrationHistogram(rootDir_Interaction, "QSq_All_response", plotDir);
     DrawNormalizedMigrationHistogram(rootDir_Interaction, "QSq_1Track_response", plotDir);
     DrawNormalizedMigrationHistogram(rootDir_Interaction, "QSq_2Track_response", plotDir);
     
@@ -713,9 +792,9 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
 
     //plot_SignalKinematics();
 
-    //plotTruth_Enu();
-    //plotTruth_QSq();
-    //plotTruth_W();
+    plotTruth_Enu();
+    plotTruth_QSq();
+    plotTruth_W();
     //plotTruth_ShortProton();
 
     //DrawSignalMC(rootDir_Interaction, "W_1Track", plotDir);
@@ -728,7 +807,7 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     //plot_stacked_pi0_P();
     //plot_stacked_pi0_theta();
 
-    plot_SystematicsInfo();
+    //plot_SystematicsInfo();
     
     std::cout<<"Plotting Interaction MC Only Finished!"<<std::endl;
 }
@@ -2019,23 +2098,50 @@ void CCProtonPi0_Plotter::PlotXSecVar(std::string var_name, std::string data_var
     delete f_xsec_data;
 }
 
+void CCProtonPi0_Plotter::PlotXSecVar_WithMiniBoone(std::string var_name, std::string plotDir)
+{
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+
+    std::string data_var = var_name + "_xsec";
+    std::string mc_var = var_name + "_xsec";
+
+    MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
+    MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
+
+    // Remove Error Bands from MC
+    mc->ClearAllErrorBands();
+   
+    // MiniBoone Data
+    double x[11] = {0.05, 0.125, 0.175, 0.225, 0.275, 0.35, 0.45, 0.55, 0.70, 0.90, 1.20};
+    double y[11] = {3.51, 19.04, 23.50, 20.71, 13.59, 9.75, 5.29, 3.05, 1.36, 0.62, 0.14};
+    TGraph* otherData = new TGraph(11,x,y);
+
+    DrawDataMC_WithOtherData(data, mc, otherData, var_name, "MiniBooNE", plotDir);
+  
+    delete data;
+    delete mc;
+    delete f_xsec_mc;
+    delete f_xsec_data;
+}
+
 void CCProtonPi0_Plotter::plotCrossSection()
 {
-    plot_muon_P = true;
-    plot_muon_theta = true;
+    plot_muon_P = false;
+    plot_muon_theta = false;
     plot_pi0_P = true;
-    plot_pi0_KE = true;
-    plot_pi0_theta = true;
-    plot_QSq = true;
-    plot_W = true;
-    plot_Enu = true;
+    plot_pi0_KE = false;
+    plot_pi0_theta = false;
+    plot_QSq = false;
+    plot_W = false;
+    plot_Enu = false;
 
-    plotOriginalData();
-    plotBackgroundEstimated();
-    plotBackgroundSubtracted();
-    plotUnfolded();
-    plotEfficiencyCorrected();
-    plotFluxIntegrated();
+    //plotOriginalData();
+    //plotBackgroundEstimated();
+    //plotBackgroundSubtracted();
+    //plotUnfolded();
+    //plotEfficiencyCorrected();
+    //plotFluxIntegrated();
     plotXSec();
 }
 
@@ -2056,16 +2162,17 @@ void CCProtonPi0_Plotter::UnfoldingStudy()
 
 void CCProtonPi0_Plotter::Systematics()
 {
-    Systematics_CheckErrorSummary(rootDir_CutHists.mc, "invMass_mc_reco_all");
-    Systematics_CheckErrorSummary(rootDir_Muon.mc, "muon_P_mc_reco_all");
-    Systematics_CheckErrorSummary(rootDir_Muon.mc, "muon_theta_mc_reco_all");
-    Systematics_CheckErrorSummary(rootDir_Pion.mc, "pi0_P_mc_reco_all");
-    Systematics_CheckErrorSummary(rootDir_Pion.mc, "pi0_KE_mc_reco_all");
-    Systematics_CheckErrorSummary(rootDir_Pion.mc, "pi0_theta_mc_reco_all");
-    Systematics_CheckErrorSummary(rootDir_Interaction.mc, "QSq_mc_reco_all");
-    Systematics_CheckErrorSummary(rootDir_Interaction.mc, "Enu_mc_reco_all");
-    //Systematics_Practice();
-    //Systematics_XSec();
+    //Systematics_CheckErrorSummary(rootDir_CrossSection.mc, "h_flux_rebinned");
+    //Systematics_CheckErrorSummary(rootDir_CutHists.mc, "invMass_mc_reco_all");
+    //Systematics_CheckErrorSummary(rootDir_Muon.mc, "muon_P_mc_reco_all");
+    //Systematics_CheckErrorSummary(rootDir_Muon.mc, "muon_theta_mc_reco_all");
+    //Systematics_CheckErrorSummary(rootDir_Pion.mc, "pi0_P_mc_reco_all");
+    //Systematics_CheckErrorSummary(rootDir_Pion.mc, "pi0_KE_mc_reco_all");
+    //Systematics_CheckErrorSummary(rootDir_Pion.mc, "pi0_theta_mc_reco_all");
+    //Systematics_CheckErrorSummary(rootDir_Interaction.mc, "QSq_mc_reco_all");
+    //Systematics_CheckErrorSummary(rootDir_Interaction.mc, "Enu_mc_reco_all");
+    //Systematics_Practic();
+    Systematics_XSec();
 }
 
 void CCProtonPi0_Plotter::PlotDelta()

@@ -286,15 +286,17 @@ void CCProtonPi0_Interaction::initHistograms()
     WSq_QSq_Diff->GetXaxis()->SetTitle("W^{2} [GeV^{2}]");
     WSq_QSq_Diff->GetYaxis()->SetTitle("Q^{2}_{Reco} - Q^{2}_{True} [GeV^{2}]");
 
+    QSq_All_response = new MnvH2D( "QSq_All_response","Signal Q^{2} All", binList.size_QSq, binList.a_QSq, binList.size_QSq, binList.a_QSq);
+    QSq_All_response->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
+    QSq_All_response->GetYaxis()->SetTitle("True Q^{2} [GeV^{2}]");
+
     QSq_1Track_response = new MnvH2D( "QSq_1Track_response","Signal Q^{2} 1Track", binList.size_QSq, binList.a_QSq, binList.size_QSq, binList.a_QSq);
     QSq_1Track_response->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
     QSq_1Track_response->GetYaxis()->SetTitle("True Q^{2} [GeV^{2}]");
-    AddVertErrorBands_MC(QSq_1Track_response);
 
     QSq_2Track_response = new MnvH2D( "QSq_2Track_response","Signal Q^{2} 1Track", binList.size_QSq, binList.a_QSq, binList.size_QSq, binList.a_QSq);
     QSq_2Track_response->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
     QSq_2Track_response->GetYaxis()->SetTitle("True Q^{2} [GeV^{2}]");
-    AddVertErrorBands_MC(QSq_2Track_response);
 
     QSq_Error = new MnvH1D( "QSq_Error","Q^{2} Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     QSq_Error->GetXaxis()->SetTitle("(Q^{2}_{Reco} - Q^{2}_{True})/Q^{2}_{True}");
@@ -380,15 +382,17 @@ void CCProtonPi0_Interaction::initHistograms()
     // ------------------------------------------------------------------------
     // Neutrino Energy: Truth, Error, Difference
     // ------------------------------------------------------------------------
+    Enu_All_response = new MnvH2D( "Enu_All_response","Signal E_{#nu} All", binList.size_Enu, binList.a_Enu, binList.size_Enu, binList.a_Enu);
+    Enu_All_response->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
+    Enu_All_response->GetYaxis()->SetTitle("True E_{#nu} [GeV]");
+
     Enu_1Track_response = new MnvH2D( "Enu_1Track_response","Signal E_{#nu} 1Track", binList.size_Enu, binList.a_Enu, binList.size_Enu, binList.a_Enu);
     Enu_1Track_response->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
     Enu_1Track_response->GetYaxis()->SetTitle("True E_{#nu} [GeV]");
-    AddVertErrorBands_MC(Enu_1Track_response);
 
     Enu_2Track_response = new MnvH2D( "Enu_2Track_response","Signal E_{#nu} 2Track", binList.size_Enu, binList.a_Enu, binList.size_Enu, binList.a_Enu);
     Enu_2Track_response->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
     Enu_2Track_response->GetYaxis()->SetTitle("True E_{#nu} [GeV]");
-    AddVertErrorBands_MC(Enu_2Track_response);
 
     Enu_Error = new TH1D("Enu_Error","Neutrino Energy Error",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     Enu_Error->GetXaxis()->SetTitle("(E_{#nu}^{Reco}-E_{#nu}^{True})/E_{#nu}^{True}");
@@ -818,6 +822,7 @@ void CCProtonPi0_Interaction::writeHistograms()
     
     // QSq Truth, Error, Difference
     WSq_QSq_Diff->Write();
+    QSq_All_response->Write();
     QSq_1Track_response->Write();
     QSq_2Track_response->Write();
     
@@ -834,6 +839,7 @@ void CCProtonPi0_Interaction::writeHistograms()
     W_Error->Write();
 
     // Neutrino Energy: Error, Difference
+    Enu_All_response->Write();
     Enu_1Track_response->Write();
     Enu_2Track_response->Write();
     

@@ -6,10 +6,12 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v2_92";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v2_93";
+
+const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
 const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33534e+20;
-const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.21874e+21;
+const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.21773e+21; 
 const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
 
 const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
@@ -106,6 +108,21 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree(MnvHistoType* h)
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree<MnvH2D>(MnvH2D* h);
+
+// Flux Histogram have Flux Errors, others are handled as Data
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram(MnvHistoType* h)
+{
+    AddVertErrorBandAndFillWithCV_Genie(h);
+    AddVertErrorBandAndFillWithCV_BckgConstraint(h);
+    AddVertErrorBandAndFillWithCV_TargetMass(h);
+    AddVertErrorBandAndFillWithCV_MuonTracking(h);
+    AddVertErrorBandAndFillWithCV_ProtonTracking(h);
+    AddVertErrorBandAndFillWithCV_NeutronResponse(h);
+    AddVertErrorBandAndFillWithCV_PionResponse(h);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Flux(MnvHistoType* h)
@@ -219,19 +236,23 @@ void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data(MnvHistoType* h)
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data<MnvH2D>(MnvH2D* h);
 
+// All Truth Tree Lateral Error Bands are Handled as Data
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_TruthTree(MnvHistoType* h)
 {
-    AddLatErrorBandAndFillWithCV_ProtonEnergy_MassModel(h);
-    AddLatErrorBandAndFillWithCV_ProtonEnergy_MEU(h);
-    AddLatErrorBandAndFillWithCV_ProtonEnergy_BetheBloch(h);
-    AddLatErrorBandAndFillWithCV_ProtonEnergy_Birks(h);
-    AddLatErrorBandAndFillWithCV_MuonMomentum(h);
-    AddLatErrorBandAndFillWithCV_MuonTheta(h);
-    AddLatErrorBandAndFillWithCV_EM_EnergyScale(h);
+    AddLatErrorBands_Data(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_TruthTree<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_TruthTree<MnvH2D>(MnvH2D* h);
+
+// All Flux Histogram Lateral Error Bands are Handled as Data
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_FluxHistogram(MnvHistoType* h)
+{
+    AddLatErrorBands_Data(h);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_FluxHistogram<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_FluxHistogram<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddLatErrorBandAndFillWithCV_ProtonEnergy_MassModel(MnvHistoType* h)
@@ -699,5 +720,20 @@ void CCProtonPi0_NTupleAnalysis::RunTimeError(std::string message)
     std::cout<<">> Error: "<<message<<std::endl;
     exit(1); 
 }
+
+double CCProtonPi0_NTupleAnalysis::GetFluxWeight(double Enu, int nuPDG)
+{
+    double flux_weight = frw->GetFluxCVWeight(Enu, nuPDG);
+    return flux_weight;
+}
+
+std::vector<double> CCProtonPi0_NTupleAnalysis::GetFluxError(double Enu, int nuPDG)
+{
+    std::vector<double> flux_error = frw->GetFluxErrorWeights(Enu, nuPDG);
+    return flux_error;
+}
+
+
+
 #endif
 

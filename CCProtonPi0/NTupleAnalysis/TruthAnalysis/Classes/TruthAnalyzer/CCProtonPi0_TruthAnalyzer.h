@@ -101,9 +101,6 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void FillHistogram(MnvH1D *hist, double var);
         void FillHistogram(TH1D* hist, double var);
         void FillSignalHistograms();
-        void UpdateSignalDef();
-        double GetFluxWeight();
-        std::vector<double> GetFluxError();
         int Get_nFS_pions();
         bool isMother_DIS_Fragment(int ind);
         void PrintEventRecord();
@@ -146,7 +143,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Bool_t          truth_isGamma2_conv_inside;
         Bool_t          truth_isSignal;
         Bool_t          truth_isSignal_Out;
+        Bool_t          truth_isSignal_EventRecord;
         Bool_t          truth_isFidVol;
+        Bool_t          truth_isMINOS_Match;
         Bool_t          truth_isNC;
         Bool_t          truth_ReconstructEvent;
         Bool_t          truth_isBckg_NoPi0;
@@ -173,6 +172,12 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Int_t           truth_Bckg_nPi0_Total;
         Int_t           truth_Bckg_nPiCharged;
         Int_t           truth_Bckg_nPiCharged_ChargeExchanged;
+        Int_t           truth_InNucleus_N_pi0_final;
+        Int_t           truth_InNucleus_N_pi0_initial;
+        Int_t           truth_InNucleus_N_piminus_final;
+        Int_t           truth_InNucleus_N_piminus_initial;
+        Int_t           truth_InNucleus_N_piplus_final;
+        Int_t           truth_InNucleus_N_piplus_initial;
         Int_t           truth_N_FSParticles;
         Int_t           truth_N_other;
         Int_t           truth_N_pi0;
@@ -374,7 +379,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_isGamma2_conv_inside;   //!
         TBranch        *b_truth_isSignal;   //!
         TBranch        *b_truth_isSignal_Out;   //!
+        TBranch        *b_truth_isSignal_EventRecord;   //!
         TBranch        *b_truth_isFidVol;   //!
+        TBranch        *b_truth_isMINOS_Match;   //!
         TBranch        *b_truth_isNC;   //!
         TBranch        *b_truth_ReconstructEvent;   //!
         TBranch        *b_truth_isBckg_NoPi0;   //!
@@ -401,6 +408,12 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_Bckg_nPi0_Total;   //!
         TBranch        *b_truth_Bckg_nPiCharged;   //!
         TBranch        *b_truth_Bckg_nPiCharged_ChargeExchanged;   //!
+        TBranch        *b_truth_InNucleus_N_pi0_final;   //!
+        TBranch        *b_truth_InNucleus_N_pi0_initial;   //!
+        TBranch        *b_truth_InNucleus_N_piminus_final;   //!
+        TBranch        *b_truth_InNucleus_N_piminus_initial;   //!
+        TBranch        *b_truth_InNucleus_N_piplus_final;   //!
+        TBranch        *b_truth_InNucleus_N_piplus_initial;   //!
         TBranch        *b_truth_N_FSParticles;   //!
         TBranch        *b_truth_N_other;   //!
         TBranch        *b_truth_N_pi0;   //!

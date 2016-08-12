@@ -39,10 +39,9 @@
 #include "../BackgroundTool/CCProtonPi0_BackgroundTool.h"
 #include "../RandNumGenerator/CCProtonPi0_RandNumGenerator.h"
 
-class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
-
+class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
+{
     public :
-
         CCProtonPi0_Analyzer(bool isModeReduce, bool isMC); 
         ~CCProtonPi0_Analyzer();
 
@@ -55,7 +54,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
 
     private:
         //  Runtime and CCProtonPi0_Analyzer Functions
-        void UpdateSignalDef();
         bool getCutStatistics();
         void Increment_nCut(vector<CCProtonPi0_Cut> &nCut, bool study1, bool study2);
         void fillData();
@@ -95,7 +93,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err_down, double err_up);
         void FillVertErrorBand_ByHand(MnvH2D* h, double xval, double yval, std::string error_name, std::vector<double> errors);
         void FillVertErrorBand_ByHand(MnvH2D* h, double xval, double yval, std::string error_name, double err_down, double err_up);
-        
+
         void FillVertErrorBand_Flux(MnvH1D* h, double var);
         void FillVertErrorBand_Flux(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var);
@@ -160,11 +158,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillLatErrorBands_ByHand();
         void FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::string err_name, int unv, double var, double shift);
         void FillLatErrorBand_SingleUniverse(MnvH2D* hist, std::string err_name, int unv, double xval, double yval, double x_shift, double y_shift);
-        
+
         void FillLatErrorBand_EM_EnergyScale();
         void FillLatErrorBand_EM_EnergyScale_invMass();
         void FillLatErrorBand_EM_EnergyScale_SideBand_invMass();
-        
+
         void FillLatErrorBand_MuonMomentum();
         void FillLatErrorBand_MuonMomentum_invMass();
         void FillLatErrorBand_MuonMomentum_SideBand_invMass();
@@ -172,7 +170,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void FillLatErrorBand_MuonTheta();
         void FillLatErrorBand_MuonTheta_invMass();
         void FillLatErrorBand_MuonTheta_SideBand_invMass();
-        
+
         void FillLatErrorBand_ProtonEnergy(std::string err_name);
         void FillLatErrorBand_ProtonEnergy_invMass(std::string err_name);
         void FillLatErrorBand_ProtonEnergy_SideBand_invMass(std::string err_name);
@@ -207,13 +205,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         void Calc_WeightFromSystematics();
         void AddErrorBands_Data();
         double GetMINOSCorrection();
-        double GetFluxWeight();
         void GetDeltaPolarization();
         void GetDeltaTransverse();
         TVector3 GetNeutrinoCrossMuon(bool isTruth);
         TLorentzVector GetDelta4P(bool isTruth);
-        std::vector<double> GetFluxError();
-
 
         //  Interaction Specific Functions
         void FillSignalCharacteristics(bool isMinosMatched);
@@ -225,6 +220,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         double calcDeltaInvariantMass();
         int GetEjectedNucleonCount();
         double Calc_Enu();
+        double Calc_Enu_Cal();
         TLorentzVector Get_Neutrino_4P(const double Enu) const;
         void Calc_EventKinematics();
         void Calc_EventKinematics_Truth();
@@ -399,6 +395,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         Double_t        CCProtonPi0_endMuonTrajXPosition;
         Double_t        CCProtonPi0_endMuonTrajYPosition;
         Double_t        CCProtonPi0_endMuonTrajZPosition;
+        Double_t        CCProtonPi0_hadron_recoil;
+        Double_t        CCProtonPi0_hadron_recoil_CCInc;
         Double_t        CCProtonPi0_minos_trk_bave;
         Double_t        CCProtonPi0_minos_trk_chi2;
         Double_t        CCProtonPi0_minos_trk_end_u;
@@ -1132,6 +1130,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis{
         TBranch        *b_CCProtonPi0_endMuonTrajXPosition;   //!
         TBranch        *b_CCProtonPi0_endMuonTrajYPosition;   //!
         TBranch        *b_CCProtonPi0_endMuonTrajZPosition;   //!
+        TBranch        *b_CCProtonPi0_hadron_recoil;   //!
+        TBranch        *b_CCProtonPi0_hadron_recoil_CCInc;   //!
         TBranch        *b_CCProtonPi0_minos_trk_bave;   //!
         TBranch        *b_CCProtonPi0_minos_trk_chi2;   //!
         TBranch        *b_CCProtonPi0_minos_trk_end_u;   //!

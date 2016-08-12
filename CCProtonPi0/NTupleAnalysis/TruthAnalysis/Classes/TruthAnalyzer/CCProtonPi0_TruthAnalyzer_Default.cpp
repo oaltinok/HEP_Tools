@@ -45,7 +45,9 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_isGamma2_conv_inside", &truth_isGamma2_conv_inside, &b_truth_isGamma2_conv_inside);
     fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
     fChain->SetBranchAddress("truth_isSignal_Out", &truth_isSignal_Out, &b_truth_isSignal_Out);
+    fChain->SetBranchAddress("truth_isSignal_EventRecord", &truth_isSignal_EventRecord, &b_truth_isSignal_EventRecord);
     fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
+    fChain->SetBranchAddress("truth_isMINOS_Match", &truth_isMINOS_Match, &b_truth_isMINOS_Match);
     fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
     fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);
     fChain->SetBranchAddress("truth_isBckg_NoPi0", &truth_isBckg_NoPi0, &b_truth_isBckg_NoPi0);
@@ -72,6 +74,12 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_Bckg_nPi0_Total", &truth_Bckg_nPi0_Total, &b_truth_Bckg_nPi0_Total);
     fChain->SetBranchAddress("truth_Bckg_nPiCharged", &truth_Bckg_nPiCharged, &b_truth_Bckg_nPiCharged);
     fChain->SetBranchAddress("truth_Bckg_nPiCharged_ChargeExchanged", &truth_Bckg_nPiCharged_ChargeExchanged, &b_truth_Bckg_nPiCharged_ChargeExchanged);
+    fChain->SetBranchAddress("truth_InNucleus_N_pi0_final", &truth_InNucleus_N_pi0_final, &b_truth_InNucleus_N_pi0_final);
+    fChain->SetBranchAddress("truth_InNucleus_N_pi0_initial", &truth_InNucleus_N_pi0_initial, &b_truth_InNucleus_N_pi0_initial);
+    fChain->SetBranchAddress("truth_InNucleus_N_piminus_final", &truth_InNucleus_N_piminus_final, &b_truth_InNucleus_N_piminus_final);
+    fChain->SetBranchAddress("truth_InNucleus_N_piminus_initial", &truth_InNucleus_N_piminus_initial, &b_truth_InNucleus_N_piminus_initial);
+    fChain->SetBranchAddress("truth_InNucleus_N_piplus_final", &truth_InNucleus_N_piplus_final, &b_truth_InNucleus_N_piplus_final);
+    fChain->SetBranchAddress("truth_InNucleus_N_piplus_initial", &truth_InNucleus_N_piplus_initial, &b_truth_InNucleus_N_piplus_initial);
     fChain->SetBranchAddress("truth_N_FSParticles", &truth_N_FSParticles, &b_truth_N_FSParticles);
     fChain->SetBranchAddress("truth_N_other", &truth_N_other, &b_truth_N_other);
     fChain->SetBranchAddress("truth_N_pi0", &truth_N_pi0, &b_truth_N_pi0);
@@ -266,7 +274,6 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("mc_wgt_Norm", &mc_wgt_Norm, &b_mc_wgt_Norm);
     fChain->SetBranchAddress("mc_wgt_ppfx1_Total_sz", &mc_wgt_ppfx1_Total_sz, &b_mc_wgt_ppfx1_Total_sz);
     fChain->SetBranchAddress("mc_wgt_ppfx1_Total", mc_wgt_ppfx1_Total, &b_mc_wgt_ppfx1_Total);
-
 
 
 

@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Jul 25 08:41:11 2016 by ROOT version 5.34/05
+// Wed Aug  3 13:29:22 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -52,6 +52,8 @@ public :
    Double_t        CCProtonPi0_endMuonTrajXPosition;
    Double_t        CCProtonPi0_endMuonTrajYPosition;
    Double_t        CCProtonPi0_endMuonTrajZPosition;
+   Double_t        CCProtonPi0_hadron_recoil;
+   Double_t        CCProtonPi0_hadron_recoil_CCInc;
    Double_t        CCProtonPi0_minos_trk_bave;
    Double_t        CCProtonPi0_minos_trk_chi2;
    Double_t        CCProtonPi0_minos_trk_end_u;
@@ -787,6 +789,8 @@ public :
    TBranch        *b_CCProtonPi0_endMuonTrajXPosition;   //!
    TBranch        *b_CCProtonPi0_endMuonTrajYPosition;   //!
    TBranch        *b_CCProtonPi0_endMuonTrajZPosition;   //!
+   TBranch        *b_CCProtonPi0_hadron_recoil;   //!
+   TBranch        *b_CCProtonPi0_hadron_recoil_CCInc;   //!
    TBranch        *b_CCProtonPi0_minos_trk_bave;   //!
    TBranch        *b_CCProtonPi0_minos_trk_chi2;   //!
    TBranch        *b_CCProtonPi0_minos_trk_end_u;   //!
@@ -1525,7 +1529,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_92/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/CCProtonPi0");
+      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_93/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1607,6 +1611,8 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajXPosition", &CCProtonPi0_endMuonTrajXPosition, &b_CCProtonPi0_endMuonTrajXPosition);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajYPosition", &CCProtonPi0_endMuonTrajYPosition, &b_CCProtonPi0_endMuonTrajYPosition);
    fChain->SetBranchAddress("CCProtonPi0_endMuonTrajZPosition", &CCProtonPi0_endMuonTrajZPosition, &b_CCProtonPi0_endMuonTrajZPosition);
+   fChain->SetBranchAddress("CCProtonPi0_hadron_recoil", &CCProtonPi0_hadron_recoil, &b_CCProtonPi0_hadron_recoil);
+   fChain->SetBranchAddress("CCProtonPi0_hadron_recoil_CCInc", &CCProtonPi0_hadron_recoil_CCInc, &b_CCProtonPi0_hadron_recoil_CCInc);
    fChain->SetBranchAddress("CCProtonPi0_minos_trk_bave", &CCProtonPi0_minos_trk_bave, &b_CCProtonPi0_minos_trk_bave);
    fChain->SetBranchAddress("CCProtonPi0_minos_trk_chi2", &CCProtonPi0_minos_trk_chi2, &b_CCProtonPi0_minos_trk_chi2);
    fChain->SetBranchAddress("CCProtonPi0_minos_trk_end_u", &CCProtonPi0_minos_trk_end_u, &b_CCProtonPi0_minos_trk_end_u);

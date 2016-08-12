@@ -248,7 +248,7 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupError
     plotter->legend_n_columns = 2;
     plotter->height_nspaces_per_hist = 0.5;
     plotter->width_xspace_per_letter = 0.1;
-    
+
     if (groupErrors){
         //-- define colors of the standard errors
         plotter->error_color_map.clear();
@@ -256,83 +256,12 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupError
 
         //plotter->error_color_map["GENIE"] = kGreen+2;
 
-        //---------------------------------------------------------------------
-        // GENIE Cross Section
-        //---------------------------------------------------------------------
-        std::vector<std::string> genieGroup;
-        genieGroup.push_back("GENIE_AhtBY"             );
-        genieGroup.push_back("GENIE_BhtBY"             );
-        genieGroup.push_back("GENIE_CCQEPauliSupViaKF" );
-        genieGroup.push_back("GENIE_CV1uBY"            );
-        genieGroup.push_back("GENIE_CV2uBY"            );
-        genieGroup.push_back("GENIE_EtaNCEL"           );
-        genieGroup.push_back("GENIE_MaCCQE"            );
-        //genieGroup.push_back("GENIE_MaCCQEshape"       );
-        genieGroup.push_back("GENIE_MaNCEL"            );
-        genieGroup.push_back("GENIE_MaRES"             );
-        genieGroup.push_back("GENIE_MvRES"             );
-        //genieGroup.push_back("GENIE_NormCCQE"          );
-        //genieGroup.push_back("GENIE_NormCCRES"         );
-        genieGroup.push_back("GENIE_NormDISCC"         );
-        genieGroup.push_back("GENIE_NormNCRES"         );
-        genieGroup.push_back("GENIE_Rvn1pi"            );
-        genieGroup.push_back("GENIE_Rvn2pi"            );
-        genieGroup.push_back("GENIE_Rvp1pi"            );
-        genieGroup.push_back("GENIE_Rvp2pi"            );
-        genieGroup.push_back("GENIE_VecFFCCQEshape"    );
-        plotter->error_summary_group_map["Cross Section Model"] = genieGroup;   
-        
-        //---------------------------------------------------------------------
-        // GENIE FSI
-        //---------------------------------------------------------------------
-        std::vector<std::string> fsiGroup;
-        fsiGroup.push_back("GENIE_AGKYxF1pi"         );
-        fsiGroup.push_back("GENIE_FrAbs_N"           );
-        fsiGroup.push_back("GENIE_FrAbs_pi"          );
-        fsiGroup.push_back("GENIE_FrCEx_N"           );
-        fsiGroup.push_back("GENIE_FrCEx_pi"          );
-        fsiGroup.push_back("GENIE_FrElas_N"          );
-        fsiGroup.push_back("GENIE_FrElas_pi"         );
-        fsiGroup.push_back("GENIE_FrInel_N"          );
-        fsiGroup.push_back("GENIE_FrInel_pi"         );
-        fsiGroup.push_back("GENIE_FrPiProd_N"        );
-        fsiGroup.push_back("GENIE_FrPiProd_pi"       );
-        fsiGroup.push_back("GENIE_MFP_N"             );
-        fsiGroup.push_back("GENIE_MFP_pi"            );
-        fsiGroup.push_back("GENIE_RDecBR1gamma"      );
-        fsiGroup.push_back("GENIE_Theta_Delta2Npi"   );
-        plotter->error_summary_group_map["FSI Model"] = fsiGroup;   
-        
-        //---------------------------------------------------------------------
-        // Detector Response
-        //---------------------------------------------------------------------
-        std::vector<std::string> detGroup;
-        detGroup.push_back("NeutronResponse");
-        detGroup.push_back("PionResponse");
-        detGroup.push_back("MuonTracking");
-        detGroup.push_back("EM_EnergyScale");
-        detGroup.push_back("MuonMomentum");
-        detGroup.push_back("MuonTheta");
-        detGroup.push_back("TargetMass");
         plotter->error_summary_group_map["Detector"] = detGroup;
-
-        //---------------------------------------------------------------------
-        // Proton 
-        //---------------------------------------------------------------------
-        std::vector<std::string> protonGroup;
-        protonGroup.push_back("ProtonTracking");
-        protonGroup.push_back("ProtonEnergy_Birks");
-        protonGroup.push_back("ProtonEnergy_BetheBloch");
-        protonGroup.push_back("ProtonEnergy_MassModel");
-        protonGroup.push_back("ProtonEnergy_MEU");
-        plotter->error_summary_group_map["Proton"] = protonGroup;
-
-        //---------------------------------------------------------------------
-        // Other
-        //---------------------------------------------------------------------
-        std::vector<std::string> otherGroup;
-        otherGroup.push_back("BckgConstraint");
+        plotter->error_summary_group_map["Cross Section Model"] = genieGroup;   
+        plotter->error_summary_group_map["FSI Model"] = fsiGroup;   
+        plotter->error_summary_group_map["Flux"] = fluxGroup;
         plotter->error_summary_group_map["Other"] = otherGroup;
+        plotter->error_summary_group_map["Proton"] = protonGroup;
     }
 }
 
@@ -559,6 +488,51 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     delete h_data;
     delete h_mc_total;
     delete h_data_mc_ratio;
+}
+
+void CCProtonPi0_Plotter::DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGraph* otherData, std::string var_name, std::string ext_data_name, std::string plotDir)
+{
+    std::cout<<"Plotting for "<<var_name<<std::endl;
+    
+    double mc_ratio = 1.0;
+
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,1280);
+
+    MnvH1D* tempData = new MnvH1D(*data);
+    MnvH1D* tempMC = new MnvH1D(*mc);
+      
+    plotter->headroom = 1.75;
+    plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", false, NULL, NULL, false, true);
+
+    otherData->SetMarkerColor(4);
+    otherData->SetMarkerSize(1.5);
+    otherData->SetMarkerStyle(21);
+
+    otherData->Draw("SAMEP");
+
+    // ------------------------------------------------------------------------
+    // Plot Labels 
+    // ------------------------------------------------------------------------
+    // Add Normalization Labels
+    plotter->AddHistoTitle(data->GetTitle());
+    AddNormBox(plotter, true, mc_ratio);
+
+    // Plot Output
+    gStyle->SetOptStat(0); 
+    c->Update();
+    std::string out_name;
+    out_name = plotDir + var_name + "_" + ext_data_name + ".png"; 
+
+    c->Print(out_name.c_str(),"png");
+
+    delete c;
+    delete plotter;
+    delete tempData;
+    delete tempMC;
 }
 
 void CCProtonPi0_Plotter::DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec)

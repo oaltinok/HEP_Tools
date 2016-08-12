@@ -56,6 +56,7 @@ class CCProtonPi0_NTupleAnalysis
         static const int n_lateral_universes = 500;
 
         static const std::string version;
+        static const double EPSILON;
         static const double data_POT;
         static const double mc_POT;
         static const double POT_ratio;
@@ -97,6 +98,8 @@ class CCProtonPi0_NTupleAnalysis
 
         void UpdateFluxReweighter(const int run);
         void ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist);
+        double GetFluxWeight(double Enu, int nuPDG);
+        std::vector<double> GetFluxError(double Enu, int nuPDG);
 
         void OpenTextFile(std::string file_name, std::ofstream &file);
         std::string GetPlaylist(const int run);
@@ -116,6 +119,9 @@ class CCProtonPi0_NTupleAnalysis
 
         template<class MnvHistoType>
             void AddVertErrorBands_TruthTree(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBands_FluxHistogram(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_Flux(MnvHistoType* h);
@@ -147,6 +153,9 @@ class CCProtonPi0_NTupleAnalysis
 
         template<class MnvHistoType>
             void AddLatErrorBands_TruthTree(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLatErrorBands_FluxHistogram(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddLatErrorBandAndFillWithCV_ProtonEnergy_MassModel(MnvHistoType* h);

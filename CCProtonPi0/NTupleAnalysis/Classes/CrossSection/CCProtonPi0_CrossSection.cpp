@@ -373,7 +373,7 @@ MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_correct
         std::cout<<"Flux Integration for Neutrino Energy!"<<std::endl; 
         flux_integrated->Divide(data_efficiency_corrected, h_flux_rebinned);
     }else{
-        flux_integrated->Scale(1/flux_integral);
+        flux_integrated->Scale(1/cv_flux_integral);
     }
     std::cout<<"Done!"<<std::endl;
 
@@ -464,31 +464,20 @@ void CCProtonPi0_CrossSection::initHistograms()
 void CCProtonPi0_CrossSection::initFluxHistograms()
 {
     // Get Reweighted Flux Histogram
-    // Use minervaLE_FHC because I compared others and all are almost same
-    // Integral of this is the average
     delete frw;
     frw = new FluxReweighter(14, applyNuEConstraint, FluxReweighter::minervaLE_FHC, new_flux, old_flux);
     h_flux_minervaLE_FHC = new MnvH1D (*(frw->GetFluxReweighted(14)));
     h_flux_minervaLE_FHC->SetName("h_flux_minervaLE_FHC");
     h_flux_minervaLE_FHC->Scale(1/mSq_to_cmSq); // Our measurement scale is cm2
-    flux_integral = h_flux_minervaLE_FHC->Integral(4,30,"width");
-    std::cout<<"Signal Region Flux Integral = "<<flux_integral<<std::endl; 
-   
-    // Get Rebinned Flux for Neutrino Energy
-    h_flux_rebinned = new MnvH1D( "h_flux_rebinned","Flux (rebinned)", binList.size_Enu, binList.a_Enu);
-    h_flux_rebinned->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    h_flux_rebinned->GetYaxis()->SetTitle("#nu_{#mu} s/cm^{2}/P.O.T./GeV");
-    int nBins = h_flux_rebinned->GetNbinsX();
-    for (int i = 1; i <= nBins; i++){
-        double low = h_flux_rebinned->GetBinLowEdge(i);
-        double up = h_flux_rebinned->GetBinLowEdge(i+1);
-        double content = GetFluxHistContent(h_flux_minervaLE_FHC,low,up);
-        double bin_width = h_flux_rebinned->GetBinWidth(i);
-        h_flux_rebinned->SetBinContent(i,content/bin_width);
-    }
-    // Add Error Bands and Fill with CV for Flux Histogram -- Required for Divide()
-    AddVertErrorBands_Data(h_flux_rebinned);
-    AddLatErrorBands_Data(h_flux_rebinned);
+
+    // Flux Universes have different integrals -- We need to get them
+    IntegrateAllFluxUniverses();
+
+    // Rebin the Flux Histogram for Neutrino Energy Divide() Operation
+    RebinFluxHistogram();
+
+    // Add Missing Error Bands after rebinning
+    AddErrorBands_FluxHistogram();
 }
 
 void CCProtonPi0_CrossSection::initHistograms(XSec &var)
@@ -536,7 +525,7 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
     }
 }
 
-double CCProtonPi0_CrossSection::GetFluxHistContent(MnvH1D* hist, double low1, double low2)
+double CCProtonPi0_CrossSection::GetFluxHistContent(TH1* hist, double low1, double low2)
 {
     double total = 0.0;
     int nBins = hist->GetNbinsX();
@@ -559,6 +548,89 @@ double CCProtonPi0_CrossSection::GetSmallestBinWidth(MnvH1D* hist)
     }
 
     return smallest;
+}
+
+void CCProtonPi0_CrossSection::AddErrorBands_FluxHistogram()
+{
+    // Flux Histogram have only Flux Error Bands -- Other Error Bands are added and filled with CV
+    AddVertErrorBands_FluxHistogram(h_flux_rebinned);
+    AddLatErrorBands_FluxHistogram(h_flux_rebinned);
+    
+}
+
+void CCProtonPi0_CrossSection::IntegrateAllFluxUniverses()
+{
+    // Integrate for Central Value
+    cv_flux_integral = h_flux_minervaLE_FHC->Integral(4,30,"width");
+    text_out<<"Signal Region Flux Integrals"<<std::endl;    
+    text_out<<"\tCentral Value = "<<cv_flux_integral<<std::endl;    
+    
+    // Integrate Flux Error Band Universes
+    MnvVertErrorBand* flux_err_band = h_flux_minervaLE_FHC->GetVertErrorBand("Flux");
+    const std::vector<TH1D*> flux_err_band_universes = flux_err_band->GetHists();
+
+    for (unsigned int i = 0; i < flux_err_band_universes.size(); ++i){
+        double temp_integral = flux_err_band_universes[i]->Integral(4,30,"width");
+        unv_flux_integral.push_back(temp_integral);
+        text_out<<"\tFlux Unv "<<i<<" = "<<temp_integral<<std::endl;
+    }
+}
+
+void CCProtonPi0_CrossSection::RebinFluxHistogram()
+{
+    // Create an empty MnvH1D and Fill it with Central Value 
+    h_flux_rebinned = new MnvH1D( "h_flux_rebinned","Flux (rebinned)", binList.size_Enu, binList.a_Enu);
+    h_flux_rebinned->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    h_flux_rebinned->GetYaxis()->SetTitle("#nu_{#mu} s/cm^{2}/P.O.T./GeV");
+
+    RebinFluxHistogram(h_flux_rebinned, h_flux_minervaLE_FHC);
+
+    // ------------------------------------------------------------------------
+    // Get All Universes in Flux Error Band and Rebin Them
+    // ------------------------------------------------------------------------
+    // 1) Get All Universes from h_flux_minervaLE_FHC as reference
+    std::vector<TH1D*> reference_flux_err_unv = h_flux_minervaLE_FHC->GetVertErrorBand("Flux")->GetHists();
+
+    // 2) Add Empty Error Band to flux_rebinned
+    h_flux_rebinned->AddVertErrorBand("Flux", reference_flux_err_unv.size());
+
+    // 3) Get All Universes from h_flux_rebinned
+    std::vector<TH1D*> rebinned_flux_err_unv = h_flux_rebinned->GetVertErrorBand("Flux")->GetHists();
+
+    // 4) Fill Empty Universes on flux_rebinned by using flux_minerva_LE_FHC
+    if (rebinned_flux_err_unv.size() != reference_flux_err_unv.size()){
+        RunTimeError("h_flux_rebinned have wrong N(Universes) in Flux Error Band");
+    }
+    for (unsigned int unv = 0; unv < reference_flux_err_unv.size(); ++unv){
+        RebinFluxHistogram(rebinned_flux_err_unv[unv], reference_flux_err_unv[unv]); 
+    }
+
+    // Check Rebinned Flux Histogram Integrals -- For Testing
+    text_out<<"Testing! -- Rebinned Flux Integrals"<<std::endl;
+    // Integrate for Central Value
+    text_out<<"Signal Region Flux Integrals"<<std::endl;    
+    text_out<<"\tCentral Value = "<<h_flux_rebinned->Integral(2,12,"width")<<std::endl;    
+    // Integrate Flux Error Band Universes
+    MnvVertErrorBand* flux_err_band = h_flux_rebinned->GetVertErrorBand("Flux");
+    const std::vector<TH1D*> flux_err_band_universes = flux_err_band->GetHists();
+
+    for (unsigned int i = 0; i < flux_err_band_universes.size(); ++i){
+        double temp_integral = flux_err_band_universes[i]->Integral(2,12,"width");
+        text_out<<"\tFlux Unv "<<i<<" = "<<temp_integral<<std::endl;
+    }
+
+}
+
+void CCProtonPi0_CrossSection::RebinFluxHistogram(TH1* rebinned, TH1* reference)
+{
+    int nBins = rebinned->GetNbinsX();
+    for (int i = 1; i <= nBins; i++){
+        double low = rebinned->GetBinLowEdge(i);
+        double up = rebinned->GetBinLowEdge(i+1);
+        double content = GetFluxHistContent(reference,low,up);
+        double bin_width = rebinned->GetBinWidth(i);
+        rebinned->SetBinContent(i,content/bin_width);
+    }
 }
 
 void CCProtonPi0_CrossSection::writeHistograms(XSec &var)

@@ -77,6 +77,14 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         rootDir rootDir_Proton;
         rootDir rootDir_Pion;
 
+        // Error Summary Groups
+        std::vector<std::string> detGroup;
+        std::vector<std::string> genieGroup;
+        std::vector<std::string> fsiGroup;
+        std::vector<std::string> fluxGroup;
+        std::vector<std::string> otherGroup;
+        std::vector<std::string> protonGroup;
+        
         // POT Stats
         double POT_Ratio_data_mc;
 
@@ -95,6 +103,8 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         bool plot_Enu;
 
         void PlotXSecVar(std::string var_name, std::string data_var, std::string mc_var, std::string plotDir, std::string plotName);
+        void PlotXSecVar_WithMiniBoone(std::string var_name, std::string plotDir);
+        
         void plotCrossSection();
         void plotOriginalData();
         void plotBackgroundSubtracted();
@@ -105,6 +115,8 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotXSec();
         void plotCrossSection_Check();
         void plotCrossSection_Check(std::string var_name, std::string plotDir);
+        void CheckAllUniverses(std::string test_name, MnvH1D* data, MnvH1D* mc);
+        void CompareUniversesBinByBin(const std::vector<TH1D*> data_hists, const std::vector<TH1D*> mc_hists, std::string err_name, std::string test_name);
 
         // Data vs MC
         void plotInteraction_DataMC();
@@ -184,6 +196,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec = false);
         void DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);
+        void DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGraph* otherData, std::string var_name, std::string ext_data_name, std::string plotDir);
         void DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
@@ -226,6 +239,10 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void PlotUnfolding_Migration();
 
         // Systematics
+        void PrintVertErrorBand(MnvH1D* hist, std::string var_name, std::string err_name);
+        bool IsErrorInGroup(std::string err_name, std::vector<std::string> errGroup);
+        int GetErrorSummaryGroup(std::string err_name);
+        void Systematics_SetErrorSummaryGroups();
         void Systematics();
         void Systematics_CheckErrorSummary(std::string root_dir, std::string var_name);
         void Systematics_Practice();
@@ -237,8 +254,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void Systematics_DrawErrorSummary_GENIE(MnvH1D* hist, std::string var_name, std::string error_name, double err_genie_total);
         void Systematics_WriteTable(MnvH1D* hist, std::string var_name);
         void Systematics_WriteTable_BinByBin(MnvH1D* hist, std::string var_name);
-        TH1D* GetTotalError_GENIE(MnvH1D* hist);
-        TH1D* GetTotalError_DetectorResponse(MnvH1D* hist);
+        TH1D* GetTotalErrorInGroup(MnvH1D* hist, std::vector<std::string> errGroup, bool area_normalized = false);
 
 };
 
