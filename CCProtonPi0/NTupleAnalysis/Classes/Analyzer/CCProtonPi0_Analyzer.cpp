@@ -51,10 +51,12 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     latest_ScanID = 0.0;
 
     // Counter Names
-    counter1.name = "All N(Protons) == 2 = ";
-    counter2.name = "Signal N(Protons) == 2 = ";
-    counter3.name = "All N(Protons) > 2 = ";
-    counter4.name = "Signal N(Protons) > 2 = ";
+    nSignalOut_Acceptance.setName("SignalOut_Acceptance");
+    nSignalOut_Kinematics.setName("SignalOut_Kinematics");
+    counter1.setName("True Michels");
+    counter2.setName("No Michels");
+    counter3.setName("N/A");
+    counter4.setName("N/A");
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
@@ -168,10 +170,10 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     //--------------------------------------------------------------------------
     // Counters
     //--------------------------------------------------------------------------
-    cout<<counter1.name<<counter1.count<<endl;
-    cout<<counter2.name<<counter2.count<<endl;
-    cout<<counter3.name<<counter3.count<<endl;
-    cout<<counter4.name<<counter4.count<<endl;
+    counter1.print();
+    counter2.print();
+    counter3.print();
+    counter4.print();
 }
 
 
@@ -262,7 +264,13 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         //--------------------------------------------------------------------------
         // Studies during for loop
         //--------------------------------------------------------------------------
-        Study_ProtonSystematics();
+        if(truth_isSignalOut_Acceptance) nSignalOut_Acceptance.increment();
+        if(truth_isSignalOut_Kinematics) nSignalOut_Kinematics.increment();
+   
+        if (truth_isBckg_withMichel) counter1.increment();
+        else counter2.increment();
+
+        //Study_ProtonSystematics();
     } // end for-loop
 
     if (!m_isMC) AddErrorBands_Data();
@@ -286,10 +294,12 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     //--------------------------------------------------------------------------
     // Counters
     //--------------------------------------------------------------------------
-    cout<<counter1.name<<counter1.count<<endl;
-    cout<<counter2.name<<counter2.count<<endl;
-    cout<<counter3.name<<counter3.count<<endl;
-    cout<<counter4.name<<counter4.count<<endl;
+    nSignalOut_Acceptance.print();
+    nSignalOut_Kinematics.print();
+    counter1.print(); 
+    counter2.print(); 
+    counter3.print(); 
+    counter4.print(); 
 }
 
 //------------------------------------------------------------------------------
@@ -651,6 +661,12 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if( Cut_Muon_Charge == 1) return false;
     cutList.nCut_Muon_Charge.increment(truth_isSignal, study1, study2);
 
+    double reco_muon_theta = GetCorrectedMuonTheta();
+    if( reco_muon_theta*TMath::RadToDeg() > max_muon_theta) return false;
+    cutList.nCut_Muon_Angle.increment(truth_isSignal, study1, study2);
+
+    //GetMichelStatistics();
+
     // ------------------------------------------------------------------------
     // Michel Study 
     // ------------------------------------------------------------------------
@@ -682,7 +698,6 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
             FillHistogram(cutList.michel_other_distance_z, vtx_michelProng_Large_begin_Z - vtx_z);
         }
     }
-    //GetMichelStatistics();
 
     // ------------------------------------------------------------------------
     // Michel Cuts 
@@ -872,13 +887,18 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (nProtonCandidates == 0) cutList.nCut_1Track_beamEnergy.increment(truth_isSignal, study1, study2);
     else cutList.nCut_2Track_beamEnergy.increment(truth_isSignal, study1, study2);
 
-    bool isW_inRange = m_W <= max_W;
-    if (!isW_inRange) return false;
+    // ------------------------------------------------------------------------
+    // W Cut
+    // ------------------------------------------------------------------------
+    if (m_W > max_W) return false;
+    
+    cutList.nCut_W.increment(truth_isSignal, study1, study2);
+    if (nProtonCandidates == 0) cutList.nCut_1Track_W.increment(truth_isSignal, study1, study2);
+    else cutList.nCut_2Track_W.increment(truth_isSignal, study1, study2);
 
     // ------------------------------------------------------------------------
     // Pi0 Invariant Mass Cut
     // ------------------------------------------------------------------------
-    fill_BackgroundSubtractionHists();
 
     // Fill Invariant Mass Histograms
     //      If there is no Side Band, Fill for Every Event
@@ -914,6 +934,8 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
 
     if (pi0_invMass > max_Pi0_invMass) isHighInvMassEvent = true;
     else isHighInvMassEvent = false;
+
+    fill_BackgroundSubtractionHists();
 
     if( isLowInvMassEvent && !sideBand_LowInvMass) return false;
     if( isHighInvMassEvent && !sideBand_HighInvMass) return false;
@@ -2316,27 +2338,25 @@ void CCProtonPi0_Analyzer::PrintFSParticles()
 
 void CCProtonPi0_Analyzer::GetMichelStatistics()
 {
-//    // Count Data Overlay Statistics
-//    if ( Cut_Vertex_Michel_Exist == 1 ){
-//        if (truth_vtx_michel_evis_most_pdg == -1) counter1.count++;
-//        else counter2.count++;
-//    }
+    // Count Data Overlay Statistics
+    //if ( Cut_Vertex_Michel_Exist == 1 ){
+        //if (truth_vtx_michel_evis_most_pdg == -1) counter1.increment()
+        //else counter2.increment();
+    //}
 
     bool isMichelFound = (Cut_Vertex_Michel_Exist == 1) || (Cut_EndPoint_Michel_Exist == 1) || (Cut_secEndPoint_Michel_Exist == 1);
 
     // Total Number of Truth Michels
-    //if (truth_isBckg_withMichel) counter1.count++;
+    if (truth_isBckg_withMichel) counter1.increment();
 
     // Total Number of Found Michels
-    //if (isMichelFound) counter2.count++;
+    if (isMichelFound) counter2.increment();
 
     // Count Missed Michels
-    if (truth_isBckg_withMichel && !isMichelFound) counter3.count++;
+    if (truth_isBckg_withMichel && !isMichelFound) counter3.increment();
 
     // Count False Positives
-    if (!truth_isBckg_withMichel && isMichelFound) counter4.count++;
-
-
+    if (!truth_isBckg_withMichel && isMichelFound) counter4.increment();
 }
 
 void CCProtonPi0_Analyzer::Study_ProtonSystematics()
@@ -2345,11 +2365,11 @@ void CCProtonPi0_Analyzer::Study_ProtonSystematics()
     
     // Fill nProtons
     FillHistogram(interaction.nProtons, nProtonCandidates);
-    if (nProtonCandidates == 2) counter1.count++;
-    if (nProtonCandidates == 2 && truth_isSignal) counter2.count++;
+    //if (nProtonCandidates == 2) counter1.increment();
+    //if (nProtonCandidates == 2 && truth_isSignal) counter2.increment();
 
-    if (nProtonCandidates > 2) counter3.count++;
-    if (nProtonCandidates > 2 && truth_isSignal) counter4.count++;
+    //if (nProtonCandidates > 2) counter3.increment();
+    //if (nProtonCandidates > 2 && truth_isSignal) counter4.increment();
 
     // Fill Energy Shift
     if (nProtonCandidates > 0){

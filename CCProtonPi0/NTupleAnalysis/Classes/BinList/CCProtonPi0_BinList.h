@@ -106,6 +106,7 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin eVis_nuclearTarget;
         CCProtonPi0_SingleBin eVis_other;
         CCProtonPi0_SingleBin pi0_invMass;
+        CCProtonPi0_SingleBin pi0_invMass_signal;
         CCProtonPi0_SingleBin bin_photonConvLength;
         
         // Michel Tool

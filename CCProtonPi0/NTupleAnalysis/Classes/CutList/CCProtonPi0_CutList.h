@@ -39,6 +39,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_Vertex_Not_Reconstructable; 
         CCProtonPi0_Cut nCut_Vertex_Not_Fiducial;
         CCProtonPi0_Cut nCut_Muon_None;              
+        CCProtonPi0_Cut nCut_Muon_Angle;
         CCProtonPi0_Cut nCut_Muon_Charge;
         CCProtonPi0_Cut nCut_Vertex_Michel_Exist; 
         CCProtonPi0_Cut nCut_EndPoint_Michel_Exist;
@@ -57,6 +58,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_LowE_SmallAngle;
         CCProtonPi0_Cut nCut_Pi0_invMass;
         CCProtonPi0_Cut nCut_beamEnergy;
+        CCProtonPi0_Cut nCut_W;
 
         // 1 Track Cuts
         CCProtonPi0_Cut nCut_1Track_All;
@@ -68,6 +70,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_1Track_Photon2DistanceLow;
         CCProtonPi0_Cut nCut_1Track_Pi0_invMass;
         CCProtonPi0_Cut nCut_1Track_beamEnergy;
+        CCProtonPi0_Cut nCut_1Track_W;
 
         // 2 Track Cuts
         CCProtonPi0_Cut nCut_2Track_All;
@@ -80,6 +83,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Cut nCut_2Track_Photon2DistanceLow;
         CCProtonPi0_Cut nCut_2Track_Pi0_invMass;
         CCProtonPi0_Cut nCut_2Track_beamEnergy;
+        CCProtonPi0_Cut nCut_2Track_W;
 
         // -------------------------------------------------------------------------
         // Cut Histograms

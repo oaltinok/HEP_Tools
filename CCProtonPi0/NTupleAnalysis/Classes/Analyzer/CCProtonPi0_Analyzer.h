@@ -38,6 +38,7 @@
 #include "../Pi0Blob/CCProtonPi0_Pi0Blob.h"
 #include "../BackgroundTool/CCProtonPi0_BackgroundTool.h"
 #include "../RandNumGenerator/CCProtonPi0_RandNumGenerator.h"
+#include "../Counter/CCProtonPi0_Counter.h"
 
 class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
 {
@@ -110,6 +111,18 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillVertErrorBand_BckgConstraint_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_BckgConstraint_ByHand(MnvH2D* h, double xval, double yval);
 
+        double GetMichelFakeErr();
+        void FillVertErrorBand_MichelFake(MnvH1D* h, double var);
+        void FillVertErrorBand_MichelFake(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_MichelFake_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_MichelFake_ByHand(MnvH2D* h, double xval, double yval);
+
+        double GetMichelTrueErr();
+        void FillVertErrorBand_MichelTrue(MnvH1D* h, double var);
+        void FillVertErrorBand_MichelTrue(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_MichelTrue_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_MichelTrue_ByHand(MnvH2D* h, double xval, double yval);
+
         double GetTargetMassErr();
         void FillVertErrorBand_TargetMass(MnvH1D* h, double var);
         void FillVertErrorBand_TargetMass(MnvH2D* h, double xval, double yval);
@@ -153,8 +166,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void Calc_muonP_random_shifts();
         void Calc_Birks_random_shifts();
         double Calc_Enu_shifted(double muon_E_shifted, double pi0_E_shifted, double total_proton_KE_shifted);
-        void FillLatErrorBands_Auto();
-        void FillLatErrorBands_invMass_Auto();
         void FillLatErrorBands_ByHand();
         void FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::string err_name, int unv, double var, double shift);
         void FillLatErrorBand_SingleUniverse(MnvH2D* hist, std::string err_name, int unv, double xval, double yval, double x_shift, double y_shift);
@@ -321,10 +332,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double nMaxEvents;
         vector<double> PDG_pi0_Mother;
         vector<double> PDG_pi0_GrandMother;
-        counter counter1;
-        counter counter2;
-        counter counter3;
-        counter counter4;
+        CCProtonPi0_Counter nSignalOut_Acceptance;
+        CCProtonPi0_Counter nSignalOut_Kinematics;
+        CCProtonPi0_Counter counter1;
+        CCProtonPi0_Counter counter2;
+        CCProtonPi0_Counter counter3;
+        CCProtonPi0_Counter counter4;
 
         // Multi Universe Background Constraints
         std::vector<std::string> error_names;
@@ -467,10 +480,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         Bool_t          truth_isGamma1_conv_inside;
         Bool_t          truth_isGamma2_conv_inside;
         Bool_t          truth_isSignal;
-        Bool_t          truth_isSignal_Out;
+        Bool_t          truth_isSignalOut_Acceptance;
+        Bool_t          truth_isSignalOut_Kinematics;
         Bool_t          truth_isSignal_EventRecord;
         Bool_t          truth_isFidVol;
-        Bool_t          truth_isMINOS_Match;
         Bool_t          truth_isNC;
         Bool_t          truth_ReconstructEvent;
         Bool_t          truth_isBckg_NoPi0;
@@ -521,6 +534,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         Int_t           truth_vertex_plane;
         Int_t           truth_vtx_michel_evis_most_pdg;
         Int_t           truth_vtx_michel_large_evis_most_pdg;
+        Double_t        truth_QSq_exp;
+        Double_t        truth_WSq_exp;
+        Double_t        truth_W_exp;
         Double_t        truth_allClusters_evis_pizero;
         Double_t        truth_blob1_evis_muon;
         Double_t        truth_blob1_evis_neutron;
@@ -1202,10 +1218,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_isGamma1_conv_inside;   //!
         TBranch        *b_truth_isGamma2_conv_inside;   //!
         TBranch        *b_truth_isSignal;   //!
-        TBranch        *b_truth_isSignal_Out;   //!
+        TBranch        *b_truth_isSignalOut_Acceptance;   //!
+        TBranch        *b_truth_isSignalOut_Kinematics;   //!
         TBranch        *b_truth_isSignal_EventRecord;   //!
         TBranch        *b_truth_isFidVol;   //!
-        TBranch        *b_truth_isMINOS_Match;   //!
         TBranch        *b_truth_isNC;   //!
         TBranch        *b_truth_ReconstructEvent;   //!
         TBranch        *b_truth_isBckg_NoPi0;   //!
@@ -1256,6 +1272,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_vertex_plane;   //!
         TBranch        *b_truth_vtx_michel_evis_most_pdg;   //!
         TBranch        *b_truth_vtx_michel_large_evis_most_pdg;   //!
+        TBranch        *b_truth_QSq_exp;   //!
+        TBranch        *b_truth_WSq_exp;   //!
+        TBranch        *b_truth_W_exp;   //!
         TBranch        *b_truth_allClusters_evis_pizero;   //!
         TBranch        *b_truth_blob1_evis_muon;   //!
         TBranch        *b_truth_blob1_evis_neutron;   //!
@@ -1833,6 +1852,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_prong_part_mass;   //!
         TBranch        *b_prong_part_charge;   //!
         TBranch        *b_prong_part_pid;   //!
+
 
 };
 

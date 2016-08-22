@@ -20,6 +20,7 @@
 #include "../../../Libraries/Folder_List.h"
 #include "../../../Classes/NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 #include "../../../Classes/BinList/CCProtonPi0_BinList.h"
+#include "../../../Classes/Counter/CCProtonPi0_Counter.h"
 
 using namespace PlotUtils;
 
@@ -91,12 +92,12 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void Calc_WeightFromSystematics();
         void AddOtherErrorBands_FillWithCV();
         void AddErrorBands_FillWithCV(MnvH1D* hist);
-        double GetPercent(counter nAll, counter nOther);
+        double GetPercent(CCProtonPi0_Counter nAll, CCProtonPi0_Counter nOther);
         void initHistograms();
         void openTextFiles();
         void resetCounters();
         void writeTextFile();
-        void WriteCounter(counter Counter, counter PercentBase);
+        void WriteCounter(CCProtonPi0_Counter Counter, CCProtonPi0_Counter PercentBase);
         void writeHistograms();
         void FillHistogram(MnvH1D *hist, double var);
         void FillHistogram(TH1D* hist, double var);
@@ -115,21 +116,22 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         ofstream textFile;
 
         // Counters
-        counter nAll;
-        counter nSignal;
-        counter nSignal_Out;
-        counter nBckg;
+        CCProtonPi0_Counter nAll;
+        CCProtonPi0_Counter nSignal;
+        CCProtonPi0_Counter nSignalOut_Acceptance;
+        CCProtonPi0_Counter nSignalOut_Kinematics;
+        CCProtonPi0_Counter nBckg;
 
         // Signal Type
-        counter nQE;
-        counter nRES_1232;
-        counter nRES_1535;
-        counter nRES_1520;
-        counter nRES_Other;
-        counter nDIS_1_pi;
-        counter nDIS_2_pi;
-        counter nDIS_Multi_pi;
-        counter nNon_RES;
+        CCProtonPi0_Counter nQE;
+        CCProtonPi0_Counter nRES_1232;
+        CCProtonPi0_Counter nRES_1535;
+        CCProtonPi0_Counter nRES_1520;
+        CCProtonPi0_Counter nRES_Other;
+        CCProtonPi0_Counter nDIS_1_pi;
+        CCProtonPi0_Counter nDIS_2_pi;
+        CCProtonPi0_Counter nDIS_Multi_pi;
+        CCProtonPi0_Counter nNon_RES;
 
         double cvweight;
 
@@ -142,10 +144,10 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Bool_t          truth_isGamma1_conv_inside;
         Bool_t          truth_isGamma2_conv_inside;
         Bool_t          truth_isSignal;
-        Bool_t          truth_isSignal_Out;
+        Bool_t          truth_isSignalOut_Acceptance;
+        Bool_t          truth_isSignalOut_Kinematics;
         Bool_t          truth_isSignal_EventRecord;
         Bool_t          truth_isFidVol;
-        Bool_t          truth_isMINOS_Match;
         Bool_t          truth_isNC;
         Bool_t          truth_ReconstructEvent;
         Bool_t          truth_isBckg_NoPi0;
@@ -196,6 +198,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Int_t           truth_vertex_plane;
         Int_t           truth_vtx_michel_evis_most_pdg;
         Int_t           truth_vtx_michel_large_evis_most_pdg;
+        Double_t        truth_QSq_exp;
+        Double_t        truth_WSq_exp;
+        Double_t        truth_W_exp;
         Double_t        truth_allClusters_evis_pizero;
         Double_t        truth_blob1_evis_muon;
         Double_t        truth_blob1_evis_neutron;
@@ -378,10 +383,10 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_isGamma1_conv_inside;   //!
         TBranch        *b_truth_isGamma2_conv_inside;   //!
         TBranch        *b_truth_isSignal;   //!
-        TBranch        *b_truth_isSignal_Out;   //!
+        TBranch        *b_truth_isSignalOut_Acceptance;   //!
+        TBranch        *b_truth_isSignalOut_Kinematics;   //!
         TBranch        *b_truth_isSignal_EventRecord;   //!
         TBranch        *b_truth_isFidVol;   //!
-        TBranch        *b_truth_isMINOS_Match;   //!
         TBranch        *b_truth_isNC;   //!
         TBranch        *b_truth_ReconstructEvent;   //!
         TBranch        *b_truth_isBckg_NoPi0;   //!
@@ -432,6 +437,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_vertex_plane;   //!
         TBranch        *b_truth_vtx_michel_evis_most_pdg;   //!
         TBranch        *b_truth_vtx_michel_large_evis_most_pdg;   //!
+        TBranch        *b_truth_QSq_exp;   //!
+        TBranch        *b_truth_WSq_exp;   //!
+        TBranch        *b_truth_W_exp;   //!
         TBranch        *b_truth_allClusters_evis_pizero;   //!
         TBranch        *b_truth_blob1_evis_muon;   //!
         TBranch        *b_truth_blob1_evis_neutron;   //!

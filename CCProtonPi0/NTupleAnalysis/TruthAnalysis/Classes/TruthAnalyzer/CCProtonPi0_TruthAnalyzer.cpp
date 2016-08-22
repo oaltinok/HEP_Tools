@@ -66,13 +66,14 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
             break;
         }
 
-        nAll.count++;
+        nAll.increment();
 
-        if (truth_isSignal_Out) nSignal_Out.count++;
+        if (truth_isSignalOut_Acceptance) nSignalOut_Acceptance.increment();
+        if (truth_isSignalOut_Kinematics) nSignalOut_Kinematics.increment();
         
         // Count Signal and Background inside Fiducial Volume
-        if (truth_isSignal) nSignal.count++;
-        else nBckg.count++;
+        if (truth_isSignal) nSignal.increment();
+        else nBckg.increment();
 
         // Count Signal Type & Fill Histograms
         if (truth_isSignal){
@@ -99,7 +100,8 @@ void CCProtonPi0_TruthAnalyzer::writeTextFile()
 
     // Events inside Fiducial Volume
     WriteCounter(nSignal, nAll);
-    WriteCounter(nSignal_Out, nAll);
+    WriteCounter(nSignalOut_Acceptance, nAll);
+    WriteCounter(nSignalOut_Kinematics, nAll);
     WriteCounter(nBckg, nAll);
     textFile<<std::endl;
  
@@ -122,14 +124,14 @@ void CCProtonPi0_TruthAnalyzer::writeTextFile()
     textFile.close();
 }
 
-void CCProtonPi0_TruthAnalyzer::WriteCounter(counter Counter, counter PercentBase)
+void CCProtonPi0_TruthAnalyzer::WriteCounter(CCProtonPi0_Counter Counter, CCProtonPi0_Counter PercentBase)
 {
-    textFile<<Counter.name<<"\t"<<Counter.count<<"\t"<<GetPercent(PercentBase,Counter)<<std::endl;
+    textFile<<Counter.getName()<<"\t"<<Counter.getCount()<<"\t"<<GetPercent(PercentBase,Counter)<<std::endl;
 }
 
-double CCProtonPi0_TruthAnalyzer::GetPercent(counter nAll, counter nOther)
+double CCProtonPi0_TruthAnalyzer::GetPercent(CCProtonPi0_Counter nAll, CCProtonPi0_Counter nOther)
 {
-    double percent = (nOther.count/nAll.count) * 100;
+    double percent = (nOther.getCount()/nAll.getCount()) * 100;
     return percent;
 }
 
@@ -158,24 +160,25 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() : CCProtonPi0_NTupleAnaly
 
 void CCProtonPi0_TruthAnalyzer::resetCounters() 
 {
-    nAll.name = "nAll";
+    nAll.setName("nAll");
     
-    nSignal.name = "nSignal";
-    nSignal_Out.name = "nSignal_Out";
-    nBckg.name = "nBckg";
+    nSignal.setName("nSignal");
+    nSignalOut_Acceptance.setName("nSignalOut_Acceptance");
+    nSignalOut_Kinematics.setName("nSignalOut_Kinematics");
+    nBckg.setName("nBckg");
 
     // Signal Type
-    nQE.name = "nQuasi_Elastic";
+    nQE.setName("nQuasi_Elastic");
     
-    nRES_1232.name = "nSignal_RES_Delta";
-    nRES_1535.name = "nSignal_RES_1535";
-    nRES_1520.name = "nSignal_RES_1520";
-    nRES_Other.name = "nSignal_RES_Other";
+    nRES_1232.setName("nSignal_RES_Delta");
+    nRES_1535.setName("nSignal_RES_1535");
+    nRES_1520.setName("nSignal_RES_1520");
+    nRES_Other.setName("nSignal_RES_Other");
     
-    nDIS_1_pi.name = "nSignal_DIS_1pi";
-    nDIS_2_pi.name = "nSignal_DIS_2pi";
-    nDIS_Multi_pi.name = "nSignal_DIS_Multi_pi";
-    nNon_RES.name = "nSignal_Non_RES";
+    nDIS_1_pi.setName("nSignal_DIS_1pi");
+    nDIS_2_pi.setName("nSignal_DIS_2pi");
+    nDIS_Multi_pi.setName("nSignal_DIS_Multi_pi");
+    nNon_RES.setName("nSignal_Non_RES");
 }
 
 
@@ -480,28 +483,28 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
     
     // Signal Characteristics
     if (mc_intType == 1){
-        nQE.count++;
+        nQE.increment();
         FillHistogram(mc_Q2_QE, mc_Q2 * MeVSq_to_GeVSq);
         FillHistogram(mc_incomingE_QE, mc_incomingE * MeV_to_GeV);
         FillHistogram(mc_w_QE, mc_w * MeV_to_GeV);
     }else if (mc_intType == 2){
         if (mc_resID == 0){ 
-            nRES_1232.count++; 
+            nRES_1232.increment(); 
             FillHistogram(mc_Q2_RES_1232, mc_Q2 * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_RES_1232, mc_incomingE * MeV_to_GeV);
             FillHistogram(mc_w_RES_1232, mc_w * MeV_to_GeV);
         }else if (mc_resID == 1){
-            nRES_1535.count++; 
+            nRES_1535.increment(); 
             FillHistogram(mc_Q2_RES_1535, mc_Q2 * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_RES_1535, mc_incomingE * MeV_to_GeV);
             FillHistogram(mc_w_RES_1535, mc_w * MeV_to_GeV);
         }else if (mc_resID == 2){
-            nRES_1520.count++; 
+            nRES_1520.increment(); 
             FillHistogram(mc_Q2_RES_1520, mc_Q2 * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_RES_1520, mc_incomingE * MeV_to_GeV);
             FillHistogram(mc_w_RES_1520, mc_w * MeV_to_GeV);
         }else{
-            nRES_Other.count++; 
+            nRES_Other.increment(); 
             FillHistogram(mc_Q2_RES_Other, mc_Q2 * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_RES_Other, mc_incomingE * MeV_to_GeV);
             FillHistogram(mc_w_RES_Other, mc_w * MeV_to_GeV);
@@ -509,22 +512,22 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
     }else if (mc_intType == 3){
         int nFS_pions = Get_nFS_pions();
         if (mc_w*MeV_to_GeV < 1.7 ){
-            nNon_RES.count++;
+            nNon_RES.increment();
             FillHistogram(mc_Q2_Non_RES, mc_Q2 * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_Non_RES, mc_incomingE * MeV_to_GeV);
             FillHistogram(mc_w_Non_RES, mc_w * MeV_to_GeV);
         }else if (nFS_pions == 1){
-            nDIS_1_pi.count++;
+            nDIS_1_pi.increment();
             FillHistogram(mc_Q2_DIS_1_pi, mc_Q2 * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_DIS_1_pi, mc_incomingE * MeV_to_GeV);
             FillHistogram(mc_w_DIS_1_pi, mc_w * MeV_to_GeV);
         }else if (nFS_pions == 2){
-            nDIS_2_pi.count++;
+            nDIS_2_pi.increment();
             FillHistogram(mc_Q2_DIS_2_pi, mc_Q2 * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_DIS_2_pi, mc_incomingE * MeV_to_GeV);
             FillHistogram(mc_w_DIS_2_pi, mc_w * MeV_to_GeV);
         }else if (nFS_pions > 2){
-            nDIS_Multi_pi.count++;
+            nDIS_Multi_pi.increment();
             FillHistogram(mc_Q2_DIS_Multi_pi, mc_Q2 * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_DIS_Multi_pi, mc_incomingE * MeV_to_GeV);
             FillHistogram(mc_w_DIS_Multi_pi, mc_w * MeV_to_GeV);

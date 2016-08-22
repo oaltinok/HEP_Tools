@@ -6,17 +6,18 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v2_93";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v2_94";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
 const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33534e+20;
-const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.21773e+21; 
+const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.2192e+21; 
 const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
 
+const double CCProtonPi0_NTupleAnalysis::max_muon_theta = 25; // degree
 const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
 const double CCProtonPi0_NTupleAnalysis::max_Enu = 20000; // MeV
-const double CCProtonPi0_NTupleAnalysis::max_W = 140000; // MeV
+const double CCProtonPi0_NTupleAnalysis::max_W = 1800; // MeV
 
 const double CCProtonPi0_NTupleAnalysis::SENTINEL = -9.9;
 const double CCProtonPi0_NTupleAnalysis::MeV_to_GeV = pow(10,-3);
@@ -86,6 +87,8 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data(MnvHistoType* h)
     AddVertErrorBandAndFillWithCV_Genie(h);
     AddVertErrorBandAndFillWithCV_Flux(h);
     AddVertErrorBandAndFillWithCV_BckgConstraint(h);
+    AddVertErrorBandAndFillWithCV_MichelTrue(h);
+    AddVertErrorBandAndFillWithCV_MichelFake(h);
     AddVertErrorBandAndFillWithCV_TargetMass(h);
     AddVertErrorBandAndFillWithCV_MuonTracking(h);
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
@@ -100,6 +103,8 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH2D>(MnvH2D*
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree(MnvHistoType* h)
 {
     AddVertErrorBandAndFillWithCV_BckgConstraint(h);
+    AddVertErrorBandAndFillWithCV_MichelTrue(h);
+    AddVertErrorBandAndFillWithCV_MichelFake(h);
     AddVertErrorBandAndFillWithCV_TargetMass(h);
     AddVertErrorBandAndFillWithCV_MuonTracking(h);
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
@@ -115,6 +120,8 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram(MnvHistoType* h
 {
     AddVertErrorBandAndFillWithCV_Genie(h);
     AddVertErrorBandAndFillWithCV_BckgConstraint(h);
+    AddVertErrorBandAndFillWithCV_MichelTrue(h);
+    AddVertErrorBandAndFillWithCV_MichelFake(h);
     AddVertErrorBandAndFillWithCV_TargetMass(h);
     AddVertErrorBandAndFillWithCV_MuonTracking(h);
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
@@ -181,6 +188,22 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_BckgConstraint(Mn
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_BckgConstraint<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_BckgConstraint<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MichelFake(MnvHistoType* h)
+{
+    h->AddVertErrorBandAndFillWithCV("MichelFake", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MichelFake<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MichelFake<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MichelTrue(MnvHistoType* h)
+{
+    h->AddVertErrorBandAndFillWithCV("MichelTrue", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MichelTrue<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_MichelTrue<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_TargetMass(MnvHistoType* h)
@@ -320,6 +343,8 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC(MnvHistoType* h)
     AddVertErrorBand_Genie(h);
     AddVertErrorBand_Flux(h);
     AddVertErrorBand_BckgConstraint(h);
+    AddVertErrorBand_MichelTrue(h);
+    AddVertErrorBand_MichelFake(h);
     AddVertErrorBand_TargetMass(h);
     AddVertErrorBand_MuonTracking(h);
     AddVertErrorBand_ProtonTracking(h);
@@ -386,6 +411,22 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_BckgConstraint(MnvHistoType* h
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_BckgConstraint<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_BckgConstraint<MnvH2D>(MnvH2D* h);
+
+     template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MichelFake(MnvHistoType* h)
+{
+    h->AddVertErrorBand("MichelFake", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MichelFake<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MichelFake<MnvH2D>(MnvH2D* h);
+
+     template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MichelTrue(MnvHistoType* h)
+{
+    h->AddVertErrorBand("MichelTrue", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MichelTrue<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_MichelTrue<MnvH2D>(MnvH2D* h);
 
      template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_TargetMass(MnvHistoType* h)

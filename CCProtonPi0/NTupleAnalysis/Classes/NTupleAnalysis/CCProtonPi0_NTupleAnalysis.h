@@ -34,15 +34,6 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 
 using namespace PlotUtils;
 
-struct counter
-{
-    std::string name;
-    double count;
-    bool isCounted;
-
-    counter():count(0.0), isCounted(false){}
-};
-
 class CCProtonPi0_NTupleAnalysis
 {
     public:
@@ -66,6 +57,7 @@ class CCProtonPi0_NTupleAnalysis
         static const double mSq_to_cmSq; 
         static const double mm_to_cm;
         static const double rad_to_deg;
+        static const double max_muon_theta;
         static const double min_Enu;
         static const double max_Enu;
         static const double max_W;
@@ -133,6 +125,12 @@ class CCProtonPi0_NTupleAnalysis
             void AddVertErrorBandAndFillWithCV_BckgConstraint(MnvHistoType* h);
 
         template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_MichelTrue(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_MichelFake(MnvHistoType* h);
+
+        template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_TargetMass(MnvHistoType* h);
 
         template<class MnvHistoType>
@@ -193,6 +191,12 @@ class CCProtonPi0_NTupleAnalysis
 
         template<class MnvHistoType>
             void AddVertErrorBand_BckgConstraint(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_MichelTrue(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_MichelFake(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddVertErrorBand_TargetMass(MnvHistoType* h);

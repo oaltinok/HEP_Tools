@@ -83,7 +83,6 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         std::vector<std::string> fsiGroup;
         std::vector<std::string> fluxGroup;
         std::vector<std::string> otherGroup;
-        std::vector<std::string> protonGroup;
         
         // POT Stats
         double POT_Ratio_data_mc;

@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Aug  3 13:29:22 2016 by ROOT version 5.34/05
+// Wed Aug 17 09:31:20 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -124,10 +124,10 @@ public :
    Bool_t          truth_isGamma1_conv_inside;
    Bool_t          truth_isGamma2_conv_inside;
    Bool_t          truth_isSignal;
-   Bool_t          truth_isSignal_Out;
+   Bool_t          truth_isSignalOut_Acceptance;
+   Bool_t          truth_isSignalOut_Kinematics;
    Bool_t          truth_isSignal_EventRecord;
    Bool_t          truth_isFidVol;
-   Bool_t          truth_isMINOS_Match;
    Bool_t          truth_isNC;
    Bool_t          truth_ReconstructEvent;
    Bool_t          truth_isBckg_NoPi0;
@@ -178,6 +178,9 @@ public :
    Int_t           truth_vertex_plane;
    Int_t           truth_vtx_michel_evis_most_pdg;
    Int_t           truth_vtx_michel_large_evis_most_pdg;
+   Double_t        truth_QSq_exp;
+   Double_t        truth_WSq_exp;
+   Double_t        truth_W_exp;
    Double_t        truth_allClusters_evis_pizero;
    Double_t        truth_blob1_evis_muon;
    Double_t        truth_blob1_evis_neutron;
@@ -861,10 +864,10 @@ public :
    TBranch        *b_truth_isGamma1_conv_inside;   //!
    TBranch        *b_truth_isGamma2_conv_inside;   //!
    TBranch        *b_truth_isSignal;   //!
-   TBranch        *b_truth_isSignal_Out;   //!
+   TBranch        *b_truth_isSignalOut_Acceptance;   //!
+   TBranch        *b_truth_isSignalOut_Kinematics;   //!
    TBranch        *b_truth_isSignal_EventRecord;   //!
    TBranch        *b_truth_isFidVol;   //!
-   TBranch        *b_truth_isMINOS_Match;   //!
    TBranch        *b_truth_isNC;   //!
    TBranch        *b_truth_ReconstructEvent;   //!
    TBranch        *b_truth_isBckg_NoPi0;   //!
@@ -915,6 +918,9 @@ public :
    TBranch        *b_truth_vertex_plane;   //!
    TBranch        *b_truth_vtx_michel_evis_most_pdg;   //!
    TBranch        *b_truth_vtx_michel_large_evis_most_pdg;   //!
+   TBranch        *b_truth_QSq_exp;   //!
+   TBranch        *b_truth_WSq_exp;   //!
+   TBranch        *b_truth_W_exp;   //!
    TBranch        *b_truth_allClusters_evis_pizero;   //!
    TBranch        *b_truth_blob1_evis_muon;   //!
    TBranch        *b_truth_blob1_evis_neutron;   //!
@@ -1529,7 +1535,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_93/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/CCProtonPi0");
+      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_94/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1683,10 +1689,10 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_isGamma1_conv_inside", &truth_isGamma1_conv_inside, &b_truth_isGamma1_conv_inside);
    fChain->SetBranchAddress("truth_isGamma2_conv_inside", &truth_isGamma2_conv_inside, &b_truth_isGamma2_conv_inside);
    fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
-   fChain->SetBranchAddress("truth_isSignal_Out", &truth_isSignal_Out, &b_truth_isSignal_Out);
+   fChain->SetBranchAddress("truth_isSignalOut_Acceptance", &truth_isSignalOut_Acceptance, &b_truth_isSignalOut_Acceptance);
+   fChain->SetBranchAddress("truth_isSignalOut_Kinematics", &truth_isSignalOut_Kinematics, &b_truth_isSignalOut_Kinematics);
    fChain->SetBranchAddress("truth_isSignal_EventRecord", &truth_isSignal_EventRecord, &b_truth_isSignal_EventRecord);
    fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
-   fChain->SetBranchAddress("truth_isMINOS_Match", &truth_isMINOS_Match, &b_truth_isMINOS_Match);
    fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
    fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);
    fChain->SetBranchAddress("truth_isBckg_NoPi0", &truth_isBckg_NoPi0, &b_truth_isBckg_NoPi0);
@@ -1737,6 +1743,9 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("truth_vertex_plane", &truth_vertex_plane, &b_truth_vertex_plane);
    fChain->SetBranchAddress("truth_vtx_michel_evis_most_pdg", &truth_vtx_michel_evis_most_pdg, &b_truth_vtx_michel_evis_most_pdg);
    fChain->SetBranchAddress("truth_vtx_michel_large_evis_most_pdg", &truth_vtx_michel_large_evis_most_pdg, &b_truth_vtx_michel_large_evis_most_pdg);
+   fChain->SetBranchAddress("truth_QSq_exp", &truth_QSq_exp, &b_truth_QSq_exp);
+   fChain->SetBranchAddress("truth_WSq_exp", &truth_WSq_exp, &b_truth_WSq_exp);
+   fChain->SetBranchAddress("truth_W_exp", &truth_W_exp, &b_truth_W_exp);
    fChain->SetBranchAddress("truth_allClusters_evis_pizero", &truth_allClusters_evis_pizero, &b_truth_allClusters_evis_pizero);
    fChain->SetBranchAddress("truth_blob1_evis_muon", &truth_blob1_evis_muon, &b_truth_blob1_evis_muon);
    fChain->SetBranchAddress("truth_blob1_evis_neutron", &truth_blob1_evis_neutron, &b_truth_blob1_evis_neutron);

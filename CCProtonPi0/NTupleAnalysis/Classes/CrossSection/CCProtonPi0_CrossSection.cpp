@@ -43,7 +43,7 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection(pi0_KE);   
     Calc_CrossSection(pi0_theta);   
     Calc_CrossSection(QSq);   
-    Calc_CrossSection(W);   
+    //Calc_CrossSection(W);   
     Calc_CrossSection(Enu);   
     
     writeHistograms();
@@ -96,17 +96,13 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     std::vector<TH1D*> bckg_invMass;
     std::vector<TH1D*> signal_invMass;
     
-    std::vector<std::string> dummy_err_bands;
-    std::vector<int> dummy_hist_ind;
+    std::vector<std::string> all_err_bands;
+    std::vector<std::string> bckg_err_bands;
+    std::vector<int> all_hist_ind;
+    std::vector<int> bckg_hist_ind;
 
-    GetAllUniverses(invMass_all, data_invMass, dummy_err_bands, dummy_hist_ind);
-    // Clear Dummy Vectors
-    dummy_err_bands.clear();
-    dummy_hist_ind.clear();
-    GetAllUniverses(invMass_mc_reco_bckg, bckg_invMass, dummy_err_bands, dummy_hist_ind);
-    // Clear Dummy Vectors
-    dummy_err_bands.clear();
-    dummy_hist_ind.clear();
+    GetAllUniverses(invMass_all, data_invMass, all_err_bands, all_hist_ind);
+    GetAllUniverses(invMass_mc_reco_bckg, bckg_invMass, bckg_err_bands, bckg_hist_ind);
 
     // Get signal_invMass (Background Subtracted)
     //      Start as data hist (will subtract bckg to get correct signal in data)
@@ -127,26 +123,15 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     // Estimate N(Background) in Data in each universe
     // ------------------------------------------------------------------------
     for (unsigned int i = 0; i < data_invMass.size(); ++i){
-        text_out<<"Estimating Backgroung in Universe: "<<i<<std::endl;
-        // Get N(Events)
-        double total_data = data_invMass[i]->Integral();
-        double total_bckg = bckg_invMass[i]->Integral();
-
-        text_out<<"\tAll Events in Data (Whole Spectrum) = "<<total_data<<std::endl;
-        text_out<<"\tBackground in Data (Whole Spectrum) = "<<total_bckg<<std::endl;
+        text_out<<"Estimating Background in Error Band: "<<all_err_bands[i]<<" Universe = "<<all_hist_ind[i]<<std::endl;
 
         // Subtract bckg hist from data hist
         signal_invMass[i]->Add(bckg_invMass[i],-1); 
 
-        // this calculation overestimates the number of background events
-        // in the lower and upper bins
-        // nbkg = fitted_background->Integral(__lower_bin, __upper_bin);
-
-        // integrate the number of background events correctly
-        // notice the mass range, not bin range
-        N_Background_Data.push_back(Integrate_SignalRegion(bckg_invMass[i]));
-        double N_Signal_Data = Integrate_SignalRegion(signal_invMass[i]);
-        double N_All_Data = Integrate_SignalRegion(data_invMass[i]);
+        N_Background_Data.push_back(bckg_invMass[i]->Integral());
+        
+        double N_Signal_Data = signal_invMass[i]->Integral();
+        double N_All_Data = data_invMass[i]->Integral();
 
         double percent_signal = N_Signal_Data/N_All_Data*100;
         double percent_bckg = N_Background_Data[i]/N_All_Data*100.0;
@@ -163,47 +148,6 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     ClearAllUniversesVector(data_invMass);
     ClearAllUniversesVector(bckg_invMass);
     ClearAllUniversesVector(signal_invMass);
-}
-
-double CCProtonPi0_CrossSection::Integrate_SignalRegion(TH1D* h)
-{
-    int lower_bin = h->FindBin(min_invMass);
-    int upper_bin = h->FindBin(max_invMass);
-    
-    double nbkg = h->Integral(lower_bin, upper_bin);
-    
-        // assume uniform event distribution within the bin,
-        // calculate the over counting for the lower bin
-    double low_edge = h->GetBinLowEdge(lower_bin);
-        //std::cout << "lower bound " << lower_bound << std::endl;
-        //std::cout << "low_edge    " << low_edge    << std::endl;
-    double dm1 = min_invMass - low_edge;
-    
-    double bin_width1   = h->GetBinWidth(lower_bin);
-    double bin_content1 = h->GetBinContent(lower_bin);
-    double overcount1   = (dm1/bin_width1) * bin_content1;
-    
-        // assume uniform event distribution within the bin,
-        // calculate the over counting for the upper bin
-    double high_edge = h->GetBinLowEdge(upper_bin) + h->GetBinWidth(upper_bin);
-        //std::cout << "upper bound " << upper_bound << std::endl;
-        //std::cout << "high_edge    " << high_edge    << std::endl;
-    double dm2 = high_edge - max_invMass;
-    
-    double bin_width2   = h->GetBinWidth(upper_bin);
-    double bin_content2 = h->GetBinContent(upper_bin);
-    double overcount2   = (dm2/bin_width2) * bin_content2;
-    
-        // correct for over-counting
-    double corrected_nbkg = nbkg - overcount1 - overcount2;
-
-        /*
-    std::cout << " uncorrected integral, corrected integral: "
-              << nbkg << "," << corrected_nbkg
-              << std::endl;
-        */
-    
-    return corrected_nbkg;
 }
 
 void CCProtonPi0_CrossSection::NormalizeHistogram(TH1D* h)
@@ -283,9 +227,17 @@ MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_b
         exit(1);
     }
     
+    // Get Universes Names  -- For Logging purposes only
+    std::vector<TH1D*> dummy_hists;
+    std::vector<std::string> err_bands;
+    std::vector<int> hist_ind;
+
+    GetAllUniverses(data, dummy_hists, err_bands, hist_ind);
+    ClearAllUniversesVector(dummy_hists);
+
     // Loop Over All Universes
     for (unsigned int i = 0; i < bckg_subtracted_all_universes.size(); ++i){
-        text_out<<"\tSubtracting Background in Universe = "<<i<<std::endl;
+        text_out<<"\tSubtracting Background in Error Band: "<<err_bands[i+1]<<" Universe = "<<hist_ind[i+1]<<std::endl;
        
         // Get Shape of Background
         //      Unit area -- Including Overflow
@@ -418,7 +370,7 @@ void CCProtonPi0_CrossSection::initXSecs()
     init_pi0_KE();
     init_pi0_theta();
     init_QSq();
-    init_W();
+    //init_W();
     init_Enu();
 }
 
@@ -695,7 +647,7 @@ void CCProtonPi0_CrossSection::writeHistograms()
     writeHistograms(pi0_KE);
     writeHistograms(pi0_theta);
     writeHistograms(QSq);
-    writeHistograms(W);
+    //writeHistograms(W);
     writeHistograms(Enu);
 
     f_out->Close();

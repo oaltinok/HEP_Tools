@@ -371,6 +371,54 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_ByHand(MnvH2D* h, do
     FillVertErrorBand_ByHand(h, xval, yval, "BckgConstraint", 1-correctionErr, 1+correctionErr);
 }
 
+void CCProtonPi0_Analyzer::FillVertErrorBand_MichelTrue(MnvH1D* h, double var)
+{
+    double correctionErr = GetMichelTrueErr();
+    h->FillVertErrorBand("MichelTrue", var, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_MichelTrue_ByHand(MnvH1D* h, double var)
+{
+    double correctionErr = GetMichelTrueErr();
+    FillVertErrorBand_ByHand(h, var, "MichelTrue", 1-correctionErr, 1+correctionErr);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_MichelTrue(MnvH2D* h, double xval, double yval)
+{
+    double correctionErr = GetMichelTrueErr();
+    h->FillVertErrorBand("MichelTrue", xval, yval, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_MichelTrue_ByHand(MnvH2D* h, double xval, double yval)
+{
+    double correctionErr = GetMichelTrueErr();
+    FillVertErrorBand_ByHand(h, xval, yval, "MichelTrue", 1-correctionErr, 1+correctionErr);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_MichelFake(MnvH1D* h, double var)
+{
+    double correctionErr = GetMichelFakeErr();
+    h->FillVertErrorBand("MichelFake", var, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_MichelFake_ByHand(MnvH1D* h, double var)
+{
+    double correctionErr = GetMichelFakeErr();
+    FillVertErrorBand_ByHand(h, var, "MichelFake", 1-correctionErr, 1+correctionErr);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_MichelFake(MnvH2D* h, double xval, double yval)
+{
+    double correctionErr = GetMichelFakeErr();
+    h->FillVertErrorBand("MichelFake", xval, yval, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_MichelFake_ByHand(MnvH2D* h, double xval, double yval)
+{
+    double correctionErr = GetMichelFakeErr();
+    FillVertErrorBand_ByHand(h, xval, yval, "MichelFake", 1-correctionErr, 1+correctionErr);
+}
+
 void CCProtonPi0_Analyzer::FillVertErrorBand_TargetMass(MnvH1D* h, double var)
 {
     double correctionErr = GetTargetMassErr();
@@ -477,6 +525,8 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH1D* hist, double var)
         FillVertErrorBand_Genie_ByHand(hist, var);
         FillVertErrorBand_Flux_ByHand(hist, var);
         FillVertErrorBand_BckgConstraint_ByHand(hist, var);
+        FillVertErrorBand_MichelTrue_ByHand(hist, var);
+        FillVertErrorBand_MichelFake_ByHand(hist, var);
         FillVertErrorBand_TargetMass_ByHand(hist, var);
         FillVertErrorBand_ProtonTracking_ByHand(hist, var);
         FillVertErrorBand_MuonTracking_ByHand(hist, var);
@@ -486,6 +536,8 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH1D* hist, double var)
         FillVertErrorBand_Genie(hist, var);
         FillVertErrorBand_Flux(hist, var);
         FillVertErrorBand_BckgConstraint(hist, var);
+        FillVertErrorBand_MichelTrue(hist, var);
+        FillVertErrorBand_MichelFake(hist, var);
         FillVertErrorBand_TargetMass(hist, var);
         FillVertErrorBand_ProtonTracking(hist, var);
         FillVertErrorBand_MuonTracking(hist, var);
@@ -504,6 +556,8 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH2D* hist, double xval
         FillVertErrorBand_Genie_ByHand(hist, xval, yval);
         FillVertErrorBand_Flux_ByHand(hist, xval, yval);
         FillVertErrorBand_BckgConstraint_ByHand(hist, xval, yval);
+        FillVertErrorBand_MichelTrue_ByHand(hist, xval, yval);
+        FillVertErrorBand_MichelFake_ByHand(hist, xval, yval);
         FillVertErrorBand_TargetMass_ByHand(hist, xval, yval);
         FillVertErrorBand_ProtonTracking_ByHand(hist, xval, yval);
         FillVertErrorBand_MuonTracking_ByHand(hist, xval, yval);
@@ -513,6 +567,8 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH2D* hist, double xval
         FillVertErrorBand_Genie(hist, xval, yval);
         FillVertErrorBand_Flux(hist, xval, yval);
         FillVertErrorBand_BckgConstraint(hist, xval, yval);
+        FillVertErrorBand_MichelTrue(hist, xval, yval);
+        FillVertErrorBand_MichelFake(hist, xval, yval);
         FillVertErrorBand_TargetMass(hist, xval, yval);
         FillVertErrorBand_ProtonTracking(hist, xval, yval);
         FillVertErrorBand_MuonTracking(hist, xval, yval);
@@ -858,7 +914,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
         double W_shift = (W_i - m_W) * MeV_to_GeV;
 
         bool PassedCuts = IsEnuInRange(Enu_i) && IsInvMassInRange(pi0_invMass_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
-        
+
         if (PassedCuts){
             //-----------------------------------------------------------------
             // pi0_P
@@ -1259,12 +1315,13 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale_invMass()
         double pi0_P_i = (1.0 + em_energy_random_shifts[i]) * pi0_P;
         double pi0_E_i = sqrt(pi0_P_i*pi0_P_i + pi0_mass*pi0_mass);
         double Enu_i = Calc_Enu_shifted(muon_E, pi0_E_i, m_total_proton_KE); // Use actual muon energy and shifted pi0 energy
+        double pi0_invMass_i = (1.0 + em_energy_random_shifts[i]) * pi0_invMass;
+        double pi0_invMass_shift = pi0_invMass_i - pi0_invMass;
 
-        bool PassedCuts = IsEnuInRange(Enu_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
+        bool PassedCuts = IsEnuInRange(Enu_i) && IsInvMassInRange(pi0_invMass_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
 
         if (PassedCuts){
-            double pi0_invMass_i = (1.0 + em_energy_random_shifts[i]) * pi0_invMass;
-            double pi0_invMass_shift = pi0_invMass_i - pi0_invMass;
+            pi0_invMass_shift = 0.0;
             FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_all, err_name, i, pi0_invMass, pi0_invMass_shift);
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_signal, err_name, i, pi0_invMass, pi0_invMass_shift);
@@ -1694,47 +1751,6 @@ void CCProtonPi0_Analyzer::ReadBckgConstraints()
 
 }
 
-void CCProtonPi0_Analyzer::FillLatErrorBands_Auto()
-{
-    // Test Function for Comparing Fill_ByHand
-    std::vector<double> pi0_P_random_shifts;
-    for (unsigned int i = 0; i < em_energy_random_shifts.size(); ++i ){
-        double pi0_P_i = (1.0 + em_energy_random_shifts[i]) * pi0_P;
-        double shift = pi0_P_i - pi0_P;
-        pi0_P_random_shifts.push_back(shift * MeV_to_GeV);
-    }
-
-    // Fill for pi0 -- Shifted Distribution
-    pi0.pi0_P_mc_reco_all->FillLatErrorBand("EM_EnergyScale", pi0_P * MeV_to_GeV, pi0_P_random_shifts, cvweight);    
-    pi0.pi0_P_response->FillLatErrorBand("EM_EnergyScale", pi0_P * MeV_to_GeV, truth_pi0_P * MeV_to_GeV, pi0_P_random_shifts, no_random_shifts, cvweight);    
-
-    // Fill for muon -- No Shift 
-    muon.muon_P_mc_reco_all->FillLatErrorBand("EM_EnergyScale", muon_P * MeV_to_GeV, no_random_shifts, cvweight);    
-    muon.muon_P_response->FillLatErrorBand("EM_EnergyScale", muon_P * MeV_to_GeV, truth_muon_P * MeV_to_GeV, no_random_shifts, no_random_shifts, cvweight);    
-}
-
-void CCProtonPi0_Analyzer::FillLatErrorBands_invMass_Auto()
-{
-    // Test Function for Comparing Fill_ByHand
-    std::vector<double> pi0_invMass_random_shifts;
-    for (unsigned int i = 0; i < em_energy_random_shifts.size(); ++i ){
-        double pi0_invMass_i = (1.0 + em_energy_random_shifts[i]) * pi0_invMass;
-        double shift = pi0_invMass_i - pi0_invMass;
-        pi0_invMass_random_shifts.push_back(shift);
-    }
-
-    // Fill for EM_EnergyScale -- Shifted Distribution
-    cutList.invMass_mc_reco_all->FillLatErrorBand("EM_EnergyScale", pi0_invMass, pi0_invMass_random_shifts, cvweight);    
-    cutList.invMass_mc_reco_signal->FillLatErrorBand("EM_EnergyScale", pi0_invMass, pi0_invMass_random_shifts, cvweight);    
-    cutList.invMass_mc_reco_bckg->FillLatErrorBand("EM_EnergyScale", pi0_invMass, pi0_invMass_random_shifts, cvweight);    
-
-    // Fill for Muon Momentum -- No Shift
-    cutList.invMass_mc_reco_all->FillLatErrorBand("MuonMomentum", pi0_invMass, no_random_shifts, cvweight);    
-    cutList.invMass_mc_reco_signal->FillLatErrorBand("MuonMomentum", pi0_invMass, no_random_shifts, cvweight);    
-    cutList.invMass_mc_reco_bckg->FillLatErrorBand("MuonMomentum", pi0_invMass, no_random_shifts, cvweight);    
-}
-
-
 double CCProtonPi0_Analyzer::GetNeutronResponseErr()
 {
     int nNeutrons = CountFSParticles(2112, 150);
@@ -1976,9 +1992,23 @@ double CCProtonPi0_Analyzer::GetBckgConstraintErr()
     return correctionErr;
 }
 
+double CCProtonPi0_Analyzer::GetMichelFakeErr()
+{
+    // Uncertainty is 0.5% hence weights 1-0.005 AND 1+0.005
+    // docDB 11443, slide 38 
+    return 0.005;
+}
+
+double CCProtonPi0_Analyzer::GetMichelTrueErr()
+{
+    // Uncertainty is 1.1% hence weights 1-0.011 AND 1+0.011
+    // docDB 11443, slide 38 
+    return 0.011;
+}
+
 double CCProtonPi0_Analyzer::GetTargetMassErr()
 {
-    //Uncertainty is 1.4% hence weights 1-0.014 AND 1+0.014
+    // Uncertainty is 1.4% hence weights 1-0.014 AND 1+0.014
     return 0.014;
 }
 

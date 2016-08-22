@@ -21,7 +21,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     // Cross Sections
     //--------------------------------------------------------------------------
     //plotCrossSection();
-    plotCrossSection_Check();
+    //plotCrossSection_Check();
 
     //--------------------------------------------------------------------------
     //  Data vs MC
@@ -48,7 +48,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
-    //Systematics();
+    Systematics();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -99,7 +99,7 @@ void CCProtonPi0_Plotter::CheckAllUniverses(std::string test_name, MnvH1D* data,
             std::cout<<"\tBin = "<<i<<std::endl;
             std::cout<<"\tData = "<<data_content<<" MC = "<<mc_content<<std::endl;
             std::cout<<"\tData/MC = "<<data_content/mc_content<<std::endl;
-            exit(1);
+            //exit(1);
         }
     }
 
@@ -140,7 +140,7 @@ void CCProtonPi0_Plotter::CompareUniversesBinByBin(const std::vector<TH1D*> data
             double data_bin_content = data_hists[j]->GetBinContent(bin);
             double mc_bin_content = mc_hists[j]->GetBinContent(bin);
             double ratio = data_bin_content/mc_bin_content;
-            if (isnan(ratio)) continue;
+            if (isnan(ratio) || mc_bin_content == 0 || data_bin_content == 0) continue;
             else if ( fabs(ratio - 1.0) > EPSILON){
                 std::cout<<"-----------------------------------------------------------"<<std::endl;
                 std::cout<<"\tClosure Test Failed for "<<test_name<<std::endl;
@@ -209,29 +209,29 @@ void CCProtonPi0_Plotter::plotCrossSection_Check()
 {
     std::string plotDir;
 
-    //plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("muon_P", plotDir);
+    plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Check;
+    plotCrossSection_Check("muon_P", plotDir);
 
-    //plotDir = Folder_List::xsec_muon_theta + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("muon_theta", plotDir);
+    plotDir = Folder_List::xsec_muon_theta + Folder_List::plotDir_Check;
+    plotCrossSection_Check("muon_theta", plotDir);
 
-    //plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("pi0_P", plotDir);
+    plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Check;
+    plotCrossSection_Check("pi0_P", plotDir);
 
     plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_Check;
     plotCrossSection_Check("pi0_KE", plotDir);
 
-    //plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("pi0_theta", plotDir);
+    plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_Check;
+    plotCrossSection_Check("pi0_theta", plotDir);
 
-    //plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("QSq", plotDir);
+    plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_Check;
+    plotCrossSection_Check("QSq", plotDir);
 
     //plotDir = Folder_List::xsec_W + Folder_List::plotDir_Check;
     //plotCrossSection_Check("W", plotDir);
 
-    //plotDir = Folder_List::xsec_Enu + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("Enu", plotDir);
+    plotDir = Folder_List::xsec_Enu + Folder_List::plotDir_Check;
+    plotCrossSection_Check("Enu", plotDir);
 }
 
 void CCProtonPi0_Plotter::plotOtherStudies()
@@ -2127,21 +2127,21 @@ void CCProtonPi0_Plotter::PlotXSecVar_WithMiniBoone(std::string var_name, std::s
 
 void CCProtonPi0_Plotter::plotCrossSection()
 {
-    plot_muon_P = false;
-    plot_muon_theta = false;
+    plot_muon_P = true;
+    plot_muon_theta = true;
     plot_pi0_P = true;
-    plot_pi0_KE = false;
-    plot_pi0_theta = false;
-    plot_QSq = false;
+    plot_pi0_KE = true;
+    plot_pi0_theta = true;
+    plot_QSq = true;
+    plot_Enu = true;
     plot_W = false;
-    plot_Enu = false;
 
-    //plotOriginalData();
-    //plotBackgroundEstimated();
-    //plotBackgroundSubtracted();
-    //plotUnfolded();
-    //plotEfficiencyCorrected();
-    //plotFluxIntegrated();
+    plotOriginalData();
+    plotBackgroundEstimated();
+    plotBackgroundSubtracted();
+    plotUnfolded();
+    plotEfficiencyCorrected();
+    plotFluxIntegrated();
     plotXSec();
 }
 

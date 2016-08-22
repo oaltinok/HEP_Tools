@@ -44,10 +44,10 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_isGamma1_conv_inside", &truth_isGamma1_conv_inside, &b_truth_isGamma1_conv_inside);
     fChain->SetBranchAddress("truth_isGamma2_conv_inside", &truth_isGamma2_conv_inside, &b_truth_isGamma2_conv_inside);
     fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
-    fChain->SetBranchAddress("truth_isSignal_Out", &truth_isSignal_Out, &b_truth_isSignal_Out);
+    fChain->SetBranchAddress("truth_isSignalOut_Acceptance", &truth_isSignalOut_Acceptance, &b_truth_isSignalOut_Acceptance);
+    fChain->SetBranchAddress("truth_isSignalOut_Kinematics", &truth_isSignalOut_Kinematics, &b_truth_isSignalOut_Kinematics);
     fChain->SetBranchAddress("truth_isSignal_EventRecord", &truth_isSignal_EventRecord, &b_truth_isSignal_EventRecord);
     fChain->SetBranchAddress("truth_isFidVol", &truth_isFidVol, &b_truth_isFidVol);
-    fChain->SetBranchAddress("truth_isMINOS_Match", &truth_isMINOS_Match, &b_truth_isMINOS_Match);
     fChain->SetBranchAddress("truth_isNC", &truth_isNC, &b_truth_isNC);
     fChain->SetBranchAddress("truth_ReconstructEvent", &truth_ReconstructEvent, &b_truth_ReconstructEvent);
     fChain->SetBranchAddress("truth_isBckg_NoPi0", &truth_isBckg_NoPi0, &b_truth_isBckg_NoPi0);
@@ -98,6 +98,9 @@ void CCProtonPi0_TruthAnalyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("truth_vertex_plane", &truth_vertex_plane, &b_truth_vertex_plane);
     fChain->SetBranchAddress("truth_vtx_michel_evis_most_pdg", &truth_vtx_michel_evis_most_pdg, &b_truth_vtx_michel_evis_most_pdg);
     fChain->SetBranchAddress("truth_vtx_michel_large_evis_most_pdg", &truth_vtx_michel_large_evis_most_pdg, &b_truth_vtx_michel_large_evis_most_pdg);
+    fChain->SetBranchAddress("truth_QSq_exp", &truth_QSq_exp, &b_truth_QSq_exp);
+    fChain->SetBranchAddress("truth_WSq_exp", &truth_WSq_exp, &b_truth_WSq_exp);
+    fChain->SetBranchAddress("truth_W_exp", &truth_W_exp, &b_truth_W_exp);
     fChain->SetBranchAddress("truth_allClusters_evis_pizero", &truth_allClusters_evis_pizero, &b_truth_allClusters_evis_pizero);
     fChain->SetBranchAddress("truth_blob1_evis_muon", &truth_blob1_evis_muon, &b_truth_blob1_evis_muon);
     fChain->SetBranchAddress("truth_blob1_evis_neutron", &truth_blob1_evis_neutron, &b_truth_blob1_evis_neutron);

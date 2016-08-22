@@ -114,7 +114,6 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void Calc_Normalized_NBackground();
         void NormalizeHistogram(TH1D* h);
         void NormalizeHistogram(MnvH1D* h);
-        double Integrate_SignalRegion(TH1D* h);
         double GetFluxHistContent(TH1* hist, double low1, double low2);
         double GetSmallestBinWidth(MnvH1D* hist);
         void OpenRootFiles();

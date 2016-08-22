@@ -37,6 +37,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     //--------------------------------------------------------------------------
     //pi0_invMass.setBin(25,0.0,500.0);
     pi0_invMass.setBin(50,0.0,500.0);
+    pi0_invMass_signal.setBin(14,60.0,200.0);
     muon_P.setBin(18,1.0,10.0);
     muon_theta.setBin(12,0.0,25.0);
     muon_cos_theta.setBin(25,0.90,1.0);

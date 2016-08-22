@@ -41,8 +41,8 @@ void CCProtonPi0_Plotter::Systematics_XSec()
     Systematics_DrawErrorSummary("pi0_KE_xsec", "pi0_KE_xsec");
     Systematics_DrawErrorSummary("pi0_theta_xsec", "pi0_theta_xsec");
     Systematics_DrawErrorSummary("QSq_xsec", "QSq_xsec");
-    Systematics_DrawErrorSummary("W_xsec", "W_xsec");
     Systematics_DrawErrorSummary("Enu_xsec", "Enu_xsec");
+    //Systematics_DrawErrorSummary("W_xsec", "W_xsec");
 
     //Systematics_DrawErrorBand_GENIE("muon_P_xsec");
     //Systematics_DrawErrorBand_GENIE("muon_theta_xsec");
@@ -232,7 +232,6 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::str
     file.width(12); file<<"(III)FSI"<<" "; 
     file.width(12); file<<"(IV)Flux"<<" "; 
     file.width(12); file<<"(V)Other"<<" "; 
-    file.width(12); file<<"(VI)Proton"<<" "; 
     file.width(12); file<<"Total"; 
     file<<std::endl;
 
@@ -243,7 +242,6 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::str
     TH1D* h_err_fsi = GetTotalErrorInGroup(hist, fsiGroup); 
     TH1D* h_err_flux = GetTotalErrorInGroup(hist, fluxGroup); 
     TH1D* h_err_other = GetTotalErrorInGroup(hist, otherGroup); 
-    TH1D* h_err_proton = GetTotalErrorInGroup(hist, protonGroup); 
 
     int nBins = h_err_total->GetNbinsX();
     for (int i = 1; i <= nBins; ++i){
@@ -255,7 +253,6 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::str
         double fsi = h_err_fsi->GetBinContent(i);
         double flux = h_err_flux->GetBinContent(i);
         double other = h_err_other->GetBinContent(i);
-        double proton = h_err_proton->GetBinContent(i);
         double total = h_err_total->GetBinContent(i);
 
         file.width(16); file<<Form("%2.1f - %2.1f",bin_min,bin_min+bin_width)<<" ";    
@@ -264,7 +261,6 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::str
         file.width(12); file<<Form("%3.2f",fsi*100)<<" ";
         file.width(12); file<<Form("%3.2f",flux*100)<<" ";
         file.width(12); file<<Form("%3.2f",other*100)<<" ";
-        file.width(12); file<<Form("%3.2f",proton*100)<<" ";
         file.width(12); file<<Form("%3.2f",total*100);
         file<<std::endl;
     }
@@ -277,7 +273,6 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::str
     delete h_err_fsi;
     delete h_err_flux;
     delete h_err_other;
-    delete h_err_proton;
 }
 
 
@@ -345,8 +340,15 @@ void CCProtonPi0_Plotter::Systematics_SetErrorSummaryGroups()
     detGroup.push_back("EM_EnergyScale");
     detGroup.push_back("MuonMomentum");
     detGroup.push_back("MuonTheta");
+    detGroup.push_back("MichelTrue");
+    detGroup.push_back("MichelFake");
     detGroup.push_back("TargetMass");
-    
+    detGroup.push_back("ProtonTracking");
+    detGroup.push_back("ProtonEnergy_Birks");
+    detGroup.push_back("ProtonEnergy_BetheBloch");
+    detGroup.push_back("ProtonEnergy_MassModel");
+    detGroup.push_back("ProtonEnergy_MEU");
+   
     //---------------------------------------------------------------------
     // (II) GENIE Cross Section
     //---------------------------------------------------------------------
@@ -399,16 +401,6 @@ void CCProtonPi0_Plotter::Systematics_SetErrorSummaryGroups()
     // (V) Other
     //---------------------------------------------------------------------
     otherGroup.push_back("BckgConstraint");
-    
-    //---------------------------------------------------------------------
-    // Proton 
-    //---------------------------------------------------------------------
-    protonGroup.push_back("ProtonTracking");
-    protonGroup.push_back("ProtonEnergy_Birks");
-    protonGroup.push_back("ProtonEnergy_BetheBloch");
-    protonGroup.push_back("ProtonEnergy_MassModel");
-    protonGroup.push_back("ProtonEnergy_MEU");
-
 }
 
 int CCProtonPi0_Plotter::GetErrorSummaryGroup(std::string err_name)
@@ -418,7 +410,6 @@ int CCProtonPi0_Plotter::GetErrorSummaryGroup(std::string err_name)
     else if (IsErrorInGroup(err_name, fsiGroup)) return 3;
     else if (IsErrorInGroup(err_name, fluxGroup)) return 4;
     else if (IsErrorInGroup(err_name, otherGroup)) return 5;
-    else if (IsErrorInGroup(err_name, protonGroup)) return 6;
     else RunTimeError("Can not find Error Summary Group!");
     
     return -1;

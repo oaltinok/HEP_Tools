@@ -31,7 +31,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
 
         use_nTrueSignal = true;
         //nTrueSignal = 167420;
-        nTrueSignal = 395283.0;
+        nTrueSignal = 314645.0;
 
         SetCutNames();
         OpenTextFiles(isMC);
@@ -515,23 +515,23 @@ void CCProtonPi0_CutList::initHistograms()
     background_invMass_other->GetYaxis()->SetTitle("N(Events)");
 
     // Pi0 Invariant Mass - Background Subtraction
-    invMass_all = new MnvH1D("invMass_all","Data #pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    invMass_all = new MnvH1D("invMass_all","Data #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
     invMass_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
     invMass_all->GetYaxis()->SetTitle("N(Events)");
 
-    invMass_mc_reco_all = new MnvH1D("invMass_mc_reco_all","MC Reconstructed #pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    invMass_mc_reco_all = new MnvH1D("invMass_mc_reco_all","MC Reconstructed #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
     invMass_mc_reco_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
     invMass_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(invMass_mc_reco_all);
     AddLatErrorBands_MC(invMass_mc_reco_all);
 
-    invMass_mc_reco_signal = new MnvH1D("invMass_mc_reco_signal","Signal #pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    invMass_mc_reco_signal = new MnvH1D("invMass_mc_reco_signal","Signal #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
     invMass_mc_reco_signal->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
     invMass_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(invMass_mc_reco_signal);
     AddLatErrorBands_MC(invMass_mc_reco_signal);
 
-    invMass_mc_reco_bckg = new MnvH1D("invMass_mc_reco_bckg","Background #pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+    invMass_mc_reco_bckg = new MnvH1D("invMass_mc_reco_bckg","Background #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
     invMass_mc_reco_bckg->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
     invMass_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(invMass_mc_reco_bckg);
@@ -579,6 +579,7 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_Vertex_Not_Reconstructable.set_Name("Vertex_Not_Reconstructable"); 
     nCut_Vertex_Not_Fiducial.set_Name("Vertex_Not_Fiducial");
     nCut_Muon_None.set_Name("Muon_None");              
+    nCut_Muon_Angle.set_Name("Muon_Angle");              
     nCut_Muon_Charge.set_Name("Muon_Charge");
     nCut_Vertex_Michel_Exist.set_Name("Vertex_Michel_Exist"); 
     nCut_EndPoint_Michel_Exist.set_Name("EndPoint_Michel_Exist");
@@ -596,6 +597,7 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_Photon2DistanceLow.set_Name("Photon2DistanceLow");
     nCut_LowE_SmallAngle.set_Name("LowE_SmallAngle");
     nCut_beamEnergy.set_Name("beamEnergy");
+    nCut_W.set_Name("W");
     nCut_Pi0_invMass.set_Name("Pi0_invMass");
 
     // 1Track
@@ -608,6 +610,7 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_1Track_Photon2DistanceLow.set_Name("Photon2DistanceLow");
     nCut_1Track_Pi0_invMass.set_Name("Pi0_invMass");
     nCut_1Track_beamEnergy.set_Name("beamEnergy");
+    nCut_1Track_W.set_Name("W");
 
     // 2 Track
     nCut_2Track_All.set_Name("All_2Track");
@@ -620,6 +623,7 @@ void CCProtonPi0_CutList::SetCutNames()
     nCut_2Track_Photon2DistanceLow.set_Name("Photon2DistanceLow");
     nCut_2Track_Pi0_invMass.set_Name("Pi0_invMass");
     nCut_2Track_beamEnergy.set_Name("beamEnergy");
+    nCut_2Track_W.set_Name("W");
 }
 
 void CCProtonPi0_CutList::OpenTextFiles(bool isMC)
@@ -684,6 +688,7 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_All.push_back(nCut_Vertex_Not_Fiducial);
     nCutVector_All.push_back(nCut_Muon_None);              
     nCutVector_All.push_back(nCut_Muon_Charge);
+    nCutVector_All.push_back(nCut_Muon_Angle);
     nCutVector_All.push_back(nCut_Vertex_Michel_Exist); 
     nCutVector_All.push_back(nCut_EndPoint_Michel_Exist);
     nCutVector_All.push_back(nCut_secEndPoint_Michel_Exist);
@@ -700,6 +705,7 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_All.push_back(nCut_Photon2DistanceLow);
     nCutVector_All.push_back(nCut_LowE_SmallAngle);
     nCutVector_All.push_back(nCut_beamEnergy);
+    nCutVector_All.push_back(nCut_W);
     nCutVector_All.push_back(nCut_Pi0_invMass);
 
     // 1 Track
@@ -711,6 +717,7 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_1Track.push_back(nCut_1Track_Photon1DistanceLow);
     nCutVector_1Track.push_back(nCut_1Track_Photon2DistanceLow);
     nCutVector_1Track.push_back(nCut_1Track_beamEnergy);
+    nCutVector_1Track.push_back(nCut_1Track_W);
     nCutVector_1Track.push_back(nCut_1Track_Pi0_invMass);
 
     // 2 Track
@@ -723,6 +730,7 @@ void CCProtonPi0_CutList::formCutVectors()
     nCutVector_2Track.push_back(nCut_2Track_Photon1DistanceLow);
     nCutVector_2Track.push_back(nCut_2Track_Photon2DistanceLow);
     nCutVector_2Track.push_back(nCut_2Track_beamEnergy);
+    nCutVector_2Track.push_back(nCut_2Track_W);
     nCutVector_2Track.push_back(nCut_2Track_Pi0_invMass);
 }
 
