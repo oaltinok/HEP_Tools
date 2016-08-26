@@ -1,21 +1,100 @@
 function [  ] = GetPlots( var_name )
 
-global pot_ratio;
-pot_ratio = 0.150295;
-
 ReadTables(var_name);
 
-truth = MergeColumns(1) .* pot_ratio;
+truth = MergeColumns(1);
 cv = MergeColumns(2);
-difference = cv - truth;
-percent_difference = (difference ./ truth) .* 100;
 err_stat = MergeColumns(3);
 err_syst = MergeColumns(4);
 
+area_ratio = sum(cv) / sum(truth);
+truth = truth .* area_ratio;
 
-PlotVal(var_name, 'Percent (Reco-Truth)/Truth', percent_difference, strcat('Plots/',var_name,'_diff.png'),1);
+difference = cv - truth;
+residual = (difference ./ truth);
+residual(isnan(residual)) = 0.0; % In some cases truth is Zero leading a NaN in residual
+
+% FindMinDifference(var_name, difference);
+
+%% Plots
+PlotVal(var_name, 'Fractional Residual (Unfolded-Truth)/Truth', residual , strcat('Plots/',var_name,'_diff.png'),1);
 PlotVal(var_name, 'Fractional Stat Error', err_stat, strcat('Plots/',var_name,'_err_stat.png'),0);
 PlotVal(var_name, 'Fractional Syst Error', err_syst, strcat('Plots/',var_name,'_err_syst.png'),0);
+
+PlotSums(var_name, 'Fractional Residual (Unfolded-Truth)/Truth', residual, strcat('Plots/',var_name,'_diff_sum.png'));
+PlotSums(var_name, 'Fractional Stat Error', err_stat, strcat('Plots/',var_name,'_err_stat_sum.png'));
+PlotSums(var_name, 'Fractional Syst Error', err_syst, strcat('Plots/',var_name,'_err_syst_sum.png'));
+
+end
+
+function [] = FindMinDifference(var_name, var)
+
+sum_var = abs(sum(var));
+var_size = size(sum_var);
+
+diff_array = zeros(var_size(1), var_size(2)-1);
+
+current_min = 999999;
+
+for ii = 1:var_size(2)-1
+    temp_diff = abs(sum_var(:,ii+1)-sum_var(:,ii));
+    diff_array(ii) = temp_diff;
+    if temp_diff < current_min
+        current_min = temp_diff;
+        min_iter = ii+i;
+    end
+end
+
+disp(var_name);
+disp(diff_array);
+disp(sprintf('%s = %3.2f','Minimum Difference', current_min));
+disp(sprintf('%s = %d','Minimum Iteration', min_iter));
+
+
+end
+
+function [] = PlotSums(var_name,  y_label, YMatrix, fig_name)
+
+figure1 = figure('visible','off');
+
+YMatrix = sum(abs(YMatrix));
+
+% Create axes
+axes1 = axes('Parent',figure1);
+hold(axes1,'on');
+
+% Axis Limits
+x = 0:1:10;
+xlim([0, 10]);
+
+plot(x,YMatrix,'-b', 'LineWidth', 2);
+
+% N(Iterations) = 4 Line
+y_limits = [min(YMatrix), max(YMatrix)*1.01];
+ylim(y_limits);
+x_4 = linspace(4,4,1000);
+y_4 = linspace(y_limits(1), y_limits(2), 1000);
+plot(x_4,y_4,'--r', 'LineWidth', 2);
+
+% Create xlabel
+xlabel('Iteration','FontWeight','bold');
+ax = gca;
+ax.XTick = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+% Create ylabel
+y_label = ['Total ', y_label];
+ylabel(y_label, 'FontWeight','bold');
+
+% Create title
+title_text = [var_name, ' ', y_label];
+title(title_text,'Interpreter','none');
+
+box(axes1,'on');
+% Set the remaining axes properties
+set(axes1,'FontSize',16,'FontWeight','bold');
+
+% Save Figure
+saveas(figure1,fig_name);
 
 end
 
@@ -32,17 +111,18 @@ matrix_size = size(YMatrix1);
 xlim([1, matrix_size(1)]);
 
 % Create multiple lines using matrix input to plot
-plot1 = plot(YMatrix1,'Parent',axes1, 'LineWidth', 2);
-set(plot1(1),'DisplayName','Iteration 1');
-set(plot1(2),'DisplayName','Iteration 2');
-set(plot1(3),'DisplayName','Iteration 3');
-set(plot1(4),'DisplayName','Iteration 4');
-set(plot1(5),'DisplayName','Iteration 5');
-set(plot1(6),'DisplayName','Iteration 6');
-set(plot1(7),'DisplayName','Iteration 7');
-set(plot1(8),'DisplayName','Iteration 8');
-set(plot1(9),'DisplayName','Iteration 9');
-set(plot1(10),'DisplayName','Iteration 10');
+plot1 = plot(YMatrix1,'Parent',axes1, 'LineWidth', 1);
+set(plot1(1),'DisplayName','No Iteration', 'LineWidth', 2, 'Color', 'r');
+set(plot1(2),'DisplayName','Iteration 1');
+set(plot1(3),'DisplayName','Iteration 2');
+set(plot1(4),'DisplayName','Iteration 3');
+set(plot1(5),'DisplayName','Iteration 4');
+set(plot1(6),'DisplayName','Iteration 5');
+set(plot1(7),'DisplayName','Iteration 6');
+set(plot1(8),'DisplayName','Iteration 7');
+set(plot1(9),'DisplayName','Iteration 8');
+set(plot1(10),'DisplayName','Iteration 9');
+set(plot1(11),'DisplayName','Iteration 10');
 
 if plot_zero_line
     zero_line_x = linspace(1,matrix_size(1),1000);
@@ -51,7 +131,7 @@ if plot_zero_line
     plot2 = plot(zero_line_x, zero_line_y, '--k', 'LineWidth', 2);
     set(get(get(plot2,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
     
-    ylim([-50,50]);
+    ylim([-0.5,0.5]);
 else
     ylim([0,0.50]);
 end
@@ -80,6 +160,7 @@ saveas(figure1,fig_name);
 end
 
 function [] = ReadTables(var_name)
+global table_0; 
 global table_1; 
 global table_2; 
 global table_3;
@@ -91,6 +172,7 @@ global table_8;
 global table_9;
 global table_10;
 
+table_0 = load(strcat('Input/Table_',var_name,'_0.txt'));
 table_1 = load(strcat('Input/Table_',var_name,'_1.txt'));
 table_2 = load(strcat('Input/Table_',var_name,'_2.txt'));
 table_3 = load(strcat('Input/Table_',var_name,'_3.txt'));
@@ -104,6 +186,7 @@ table_10 = load(strcat('Input/Table_',var_name,'_10.txt'));
 end
 
 function [var] = MergeColumns(col_ind)
+global table_0;
 global table_1;
 global table_2;
 global table_3;
@@ -115,10 +198,10 @@ global table_8;
 global table_9;
 global table_10;
 
-var = [ table_1(:,col_ind), table_2(:,col_ind), table_3(:,col_ind),...
-        table_4(:,col_ind), table_5(:,col_ind), table_6(:,col_ind),...
-        table_7(:,col_ind), table_8(:,col_ind), table_9(:,col_ind),...
-        table_10(:,col_ind)];
+var = [ table_0(:,col_ind), table_1(:,col_ind), table_2(:,col_ind),...
+        table_3(:,col_ind), table_4(:,col_ind), table_5(:,col_ind),...
+        table_6(:,col_ind), table_7(:,col_ind), table_8(:,col_ind),...
+        table_9(:,col_ind), table_10(:,col_ind)];
 
 end
 
