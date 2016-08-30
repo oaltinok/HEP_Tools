@@ -1,4 +1,4 @@
-function [  ] = GetPlots( var_name )
+function [ ] = GetPlots( var_name )
 
 ReadTables(var_name);
 
@@ -13,47 +13,24 @@ truth = truth .* area_ratio;
 difference = cv - truth;
 residual = (difference ./ truth);
 residual(isnan(residual)) = 0.0; % In some cases truth is Zero leading a NaN in residual
+pull = difference./err_stat;
+pull(isnan(pull)) = 0;
 
-% FindMinDifference(var_name, difference);
 
 %% Plots
-PlotVal(var_name, 'Fractional Residual (Unfolded-Truth)/Truth', residual , strcat('Plots/',var_name,'_diff.png'),1);
-PlotVal(var_name, 'Fractional Stat Error', err_stat, strcat('Plots/',var_name,'_err_stat.png'),0);
-PlotVal(var_name, 'Fractional Syst Error', err_syst, strcat('Plots/',var_name,'_err_syst.png'),0);
+PlotVal(var_name, 'Fractional Residual (Unfolded-Truth)/Truth', residual , strcat('Plots/',var_name,'_diff.png'),1,[-0.5,0.5]);
+PlotVal(var_name, 'Pull', pull , strcat('Plots/',var_name,'_pull.png'),1,[-2e4, 2e4]);
+PlotVal(var_name, 'Fractional Stat Error', err_stat, strcat('Plots/',var_name,'_err_stat.png'),0,[0.0,0.5]);
+PlotVal(var_name, 'Fractional Syst Error', err_syst, strcat('Plots/',var_name,'_err_syst.png'),0,[0.0,0.5]);
 
-PlotSums(var_name, 'Fractional Residual (Unfolded-Truth)/Truth', residual, strcat('Plots/',var_name,'_diff_sum.png'));
-PlotSums(var_name, 'Fractional Stat Error', err_stat, strcat('Plots/',var_name,'_err_stat_sum.png'));
-PlotSums(var_name, 'Fractional Syst Error', err_syst, strcat('Plots/',var_name,'_err_syst_sum.png'));
-
-end
-
-function [] = FindMinDifference(var_name, var)
-
-sum_var = abs(sum(var));
-var_size = size(sum_var);
-
-diff_array = zeros(var_size(1), var_size(2)-1);
-
-current_min = 999999;
-
-for ii = 1:var_size(2)-1
-    temp_diff = abs(sum_var(:,ii+1)-sum_var(:,ii));
-    diff_array(ii) = temp_diff;
-    if temp_diff < current_min
-        current_min = temp_diff;
-        min_iter = ii+i;
-    end
-end
-
-disp(var_name);
-disp(diff_array);
-disp(sprintf('%s = %3.2f','Minimum Difference', current_min));
-disp(sprintf('%s = %d','Minimum Iteration', min_iter));
-
+PlotSums(var_name, 'Fractional Residual (Unfolded-Truth)/Truth', residual, strcat('Plots/',var_name,'_diff_sum.png'),[0, 3]);
+PlotSums(var_name, 'Pull (Unfolded-Truth)/Stat_Err', pull, strcat('Plots/',var_name,'_pull_sum.png'),[1e4, 10e4]);
+PlotSums(var_name, 'Fractional Stat Error', err_stat, strcat('Plots/',var_name,'_err_stat_sum.png'),[0, 1]);
+PlotSums(var_name, 'Fractional Syst Error', err_syst, strcat('Plots/',var_name,'_err_syst_sum.png'),[1, 3]);
 
 end
 
-function [] = PlotSums(var_name,  y_label, YMatrix, fig_name)
+function [] = PlotSums(var_name,  y_label, YMatrix, fig_name, y_limits)
 
 figure1 = figure('visible','off');
 
@@ -70,7 +47,7 @@ xlim([0, 10]);
 plot(x,YMatrix,'-b', 'LineWidth', 2);
 
 % N(Iterations) = 4 Line
-y_limits = [min(YMatrix), max(YMatrix)*1.01];
+% y_limits = [min(YMatrix), max(YMatrix)*1.01];
 ylim(y_limits);
 x_4 = linspace(4,4,1000);
 y_4 = linspace(y_limits(1), y_limits(2), 1000);
@@ -98,7 +75,7 @@ saveas(figure1,fig_name);
 
 end
 
-function [] = PlotVal(var_name, y_label, YMatrix1, fig_name, plot_zero_line)
+function [] = PlotVal(var_name, y_label, YMatrix1, fig_name, plot_zero_line, y_limits)
 
 figure1 = figure('visible','off');
 
@@ -124,18 +101,16 @@ set(plot1(9),'DisplayName','Iteration 8');
 set(plot1(10),'DisplayName','Iteration 9');
 set(plot1(11),'DisplayName','Iteration 10');
 
+
 if plot_zero_line
     zero_line_x = linspace(1,matrix_size(1),1000);
     zero_line_y = linspace(0,0,1000);
     
     plot2 = plot(zero_line_x, zero_line_y, '--k', 'LineWidth', 2);
     set(get(get(plot2,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-    
-    ylim([-0.5,0.5]);
-else
-    ylim([0,0.50]);
 end
 
+ylim(y_limits);
 
 % Create xlabel
 xlabel('Bin Number','FontWeight','bold');
