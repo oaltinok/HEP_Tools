@@ -310,6 +310,13 @@ void CCProtonPi0_Analyzer::Init(string playlist, TChain* fChain)
     fChain->SetBranchAddress("vtxErr", vtxErr, &b_vtxErr);
     fChain->SetBranchAddress("E", E, &b_E);
     fChain->SetBranchAddress("found_truth", &found_truth, &b_found_truth);
+    fChain->SetBranchAddress("ImprovedMichel_EventHasMichel", &ImprovedMichel_EventHasMichel, &b_ImprovedMichel_EventHasMichel);
+    fChain->SetBranchAddress("ImprovedMichel_EventHasMatchedMichel", &ImprovedMichel_EventHasMatchedMichel, &b_ImprovedMichel_EventHasMatchedMichel);
+    fChain->SetBranchAddress("ImprovedMichel_VertexHasMichel", &ImprovedMichel_VertexHasMichel, &b_ImprovedMichel_VertexHasMichel);
+    fChain->SetBranchAddress("ImprovedMichel_EndPointHasMichel", &ImprovedMichel_EndPointHasMichel, &b_ImprovedMichel_EndPointHasMichel);
+    fChain->SetBranchAddress("ImprovedMichel_secEndPointHasMichel", &ImprovedMichel_secEndPointHasMichel, &b_ImprovedMichel_secEndPointHasMichel);
+    fChain->SetBranchAddress("ImprovedMichel_Gamma1HasMichel", &ImprovedMichel_Gamma1HasMichel, &b_ImprovedMichel_Gamma1HasMichel);
+    fChain->SetBranchAddress("ImprovedMichel_Gamma2HasMichel", &ImprovedMichel_Gamma2HasMichel, &b_ImprovedMichel_Gamma2HasMichel);
     fChain->SetBranchAddress("is_blobs_recovered", &is_blobs_recovered, &b_is_blobs_recovered);
     fChain->SetBranchAddress("is_blobs_recovered_direction", &is_blobs_recovered_direction, &b_is_blobs_recovered_direction);
     fChain->SetBranchAddress("is_blobs_recovered_invMass", &is_blobs_recovered_invMass, &b_is_blobs_recovered_invMass);

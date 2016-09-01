@@ -1,26 +1,24 @@
-CCPROTONPI0_V="v2_94"
+CCPROTONPI0_V="v2_95"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	No Major Changes
+	Included ImprovedMichelTool 
+		Test purposes
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Added new Vertical Error Band
-		MichelTrue: Events with True Michel Tag
-			Their number depend on Michel Tool efficiency
-		MichelFake: Events without True Michel Tag	
-			Their number depend on Michel Tool purity
+	Test Histograms for ImprovedMichelTool
+		Not using the tool itself, just testing
 
-	Added new class Counter
-		Improved existing struct counter
+	Corrected Michel Errors
+		Applying MichelFake Error only to events without true Michel
+		Applying MichelTrue Error only to events with true Michel
 
-	Modified Background Subtraction Histograms
-		Histogram range is limited to signal region
-		Histogram filled after all event selections
-		Error Bands also satisfy all event selections
-		This modification fixed the problem with EM_EnergyScale Error Band
+	Unfolding Study up to 10 Iterations
+		Bin by Bin comparison of Truth-Data, Stat Error, Systematic Error
+		Creates tables for a MATLAB Algorithm
 
-	Turned off Cross Section calculations for W
-		I did not optimized W histograms for the XSec calculations
+	Vertical Error Band for Unfolding Uncertainty Added
+		UnfoldingErr = 1%
+
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

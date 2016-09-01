@@ -31,7 +31,7 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
 
         use_nTrueSignal = true;
         //nTrueSignal = 167420;
-        nTrueSignal = 314645.0;
+        nTrueSignal = 314622.0;
 
         SetCutNames();
         OpenTextFiles(isMC);

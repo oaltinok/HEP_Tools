@@ -80,8 +80,8 @@ Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
 #include "Event/TimeSlice.h"
 #include "Event/MCIDDigit.h"
 #include "Event/MCHit.h"
-#include <Event/TG4Trajectory.h>
-#include <Event/TG4TrajectoryPointExtraInfo.h>
+#include "Event/TG4Trajectory.h"
+#include "Event/TG4TrajectoryPointExtraInfo.h"
 #include "G4Material.hh"
 #include "G4Navigator.hh"
 #include "G4ThreeVector.hh"
@@ -97,6 +97,7 @@ Author:         Ozgur Altinok  - ozgur.altinok@tufts.edu
 #include "ParticleMaker/IParticleMakerTool.h"
 #include "ParticleMaker/IParticleTool.h"
 #include "ProngMaker/IMichelTool.h"
+#include "ProngMaker/IImprovedMichelTool.h"
 #include "ProngMaker/IODProngClassificationTool.h"
 #include "RecInterfaces/IAnchoredTrackFormation.h"
 #include "RecInterfaces/IFiducialPointTool.h"
@@ -125,6 +126,7 @@ class IHoughTool;
 class IIDAnchoredBlobCreator;
 class IIDBlobSeedingTool;
 class IMichelTool;
+class IImprovedMichelTool;
 class IMinervaCoordSysTool;
 class IMinervaMathTool;
 class IMinervaObjectAssociator;
@@ -301,6 +303,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         IIDAnchoredBlobCreator* m_stopPointBlobTool;
         IMichelTool* m_michelTool_Default;
         IMichelTool* m_michelTool_Large;
+        IImprovedMichelTool* m_michelTool_Improved;
         IMinervaCoordSysTool* m_coordSysTool;
         IMinervaMathTool* m_mathTool;
         IMinervaObjectAssociator* m_objectAssociator;
@@ -322,6 +325,9 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool PreFilterPi0( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent ) const;
         bool ShouldReconstructEvent( Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent) const;
         bool TrackEndPointHasMichels(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent) const;
+        bool ImprovedMichel_EventHasMichel(Minerva::PhysicsEvent *event) const;
+        bool ImprovedMichel_HasMichelAtPoint(SmartRef<Minerva::Vertex> point) const;
+        bool ImprovedMichel_HasMichelAtPoint(double x, double y, double z) const;
         bool VertexHasMichels(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent) const;
         bool checkMichel(Minerva::GenMinInteraction* truthEvent) const;
         bool createTrackedParticles(Minerva::PhysicsEvent *event ) const;

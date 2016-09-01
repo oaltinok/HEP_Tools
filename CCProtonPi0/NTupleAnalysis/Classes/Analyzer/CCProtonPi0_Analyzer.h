@@ -129,6 +129,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillVertErrorBand_TargetMass_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_TargetMass_ByHand(MnvH2D* h, double xval, double yval);
 
+        double GetUnfoldingErr();
+        void FillVertErrorBand_Unfolding(MnvH1D* h, double var);
+        void FillVertErrorBand_Unfolding(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_Unfolding_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_Unfolding_ByHand(MnvH2D* h, double xval, double yval);
+
         double GetProtonTrackingErr();
         void FillVertErrorBand_ProtonTracking(MnvH1D* h, double var);
         void FillVertErrorBand_ProtonTracking(MnvH2D* h, double xval, double yval);
@@ -239,7 +245,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void fill_SideBand_Other();
         int CountFSParticles(int pdg, double P_limit = 0.0);
         void PrintFSParticles();
+        void setCounterNames();
         void GetMichelStatistics();
+        void GetMichelStatistics_Showers();
 
         //  Muon Specific Functions
         void fillMuonMC();
@@ -334,6 +342,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         vector<double> PDG_pi0_GrandMother;
         CCProtonPi0_Counter nSignalOut_Acceptance;
         CCProtonPi0_Counter nSignalOut_Kinematics;
+        CCProtonPi0_Counter nMichel_Truth;
+        CCProtonPi0_Counter nMichel_Total_Found;
+        CCProtonPi0_Counter nMichel_Total_Found_Improved;
+        CCProtonPi0_Counter nMichel_Truth_Found;
+        CCProtonPi0_Counter nMichel_Truth_Found_Improved;
         CCProtonPi0_Counter counter1;
         CCProtonPi0_Counter counter2;
         CCProtonPi0_Counter counter3;
@@ -641,6 +654,13 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        vtxErr[4];
         Double_t        E[4];
         Bool_t          found_truth;
+        Bool_t          ImprovedMichel_EventHasMichel;
+        Bool_t          ImprovedMichel_EventHasMatchedMichel;
+        Bool_t          ImprovedMichel_VertexHasMichel;
+        Bool_t          ImprovedMichel_EndPointHasMichel;
+        Bool_t          ImprovedMichel_secEndPointHasMichel;
+        Bool_t          ImprovedMichel_Gamma1HasMichel;
+        Bool_t          ImprovedMichel_Gamma2HasMichel;
         Bool_t          is_blobs_recovered;
         Bool_t          is_blobs_recovered_direction;
         Bool_t          is_blobs_recovered_invMass;
@@ -1379,6 +1399,13 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_vtxErr;   //!
         TBranch        *b_E;   //!
         TBranch        *b_found_truth;   //!
+        TBranch        *b_ImprovedMichel_EventHasMichel;   //!
+        TBranch        *b_ImprovedMichel_EventHasMatchedMichel;   //!
+        TBranch        *b_ImprovedMichel_VertexHasMichel;   //!
+        TBranch        *b_ImprovedMichel_EndPointHasMichel;   //!
+        TBranch        *b_ImprovedMichel_secEndPointHasMichel;   //!
+        TBranch        *b_ImprovedMichel_Gamma1HasMichel;   //!
+        TBranch        *b_ImprovedMichel_Gamma2HasMichel;   //!
         TBranch        *b_is_blobs_recovered;   //!
         TBranch        *b_is_blobs_recovered_direction;   //!
         TBranch        *b_is_blobs_recovered_invMass;   //!
@@ -1852,7 +1879,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_prong_part_mass;   //!
         TBranch        *b_prong_part_charge;   //!
         TBranch        *b_prong_part_pid;   //!
-
 
 };
 

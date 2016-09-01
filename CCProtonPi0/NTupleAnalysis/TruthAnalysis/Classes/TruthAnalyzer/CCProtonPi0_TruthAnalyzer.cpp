@@ -9,7 +9,7 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 {
     // Control Flow
     bool applyMaxEvents = false;
-    double nMaxEvents = 1000000;
+    double nMaxEvents = 100000;
 
     //------------------------------------------------------------------------
     // Create chain
@@ -26,7 +26,9 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
     fChain->SetBranchStatus("truth_pi0_*", true);
     fChain->SetBranchStatus("truth_muon_*", true);
     fChain->SetBranchStatus("truth_proton_*", true);
+    fChain->SetBranchStatus("truth_michel*", true);
     fChain->SetBranchStatus("*genie_wgt_*", true);
+    fChain->SetBranchStatus("mc_vtx", true);
     fChain->SetBranchStatus("mc_run", true);
     fChain->SetBranchStatus("mc_Q2", true);
     fChain->SetBranchStatus("mc_w", true);
@@ -67,6 +69,8 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
         }
 
         nAll.increment();
+        
+        FillMichelHistograms();
 
         if (truth_isSignalOut_Acceptance) nSignalOut_Acceptance.increment();
         if (truth_isSignalOut_Kinematics) nSignalOut_Kinematics.increment();
@@ -197,6 +201,39 @@ void CCProtonPi0_TruthAnalyzer::openTextFiles()
 
 void CCProtonPi0_TruthAnalyzer::initHistograms()
 {
+    // Michel Electron
+    michel_ZX = new TH2D("michel_ZX","Michel Distance to Vertex",50,-300,300,50,-300,300);
+    michel_ZX->GetXaxis()->SetTitle("Michel_Z - Vertex_Z Position [mm]");
+    michel_ZX->GetZaxis()->SetTitle("Michel_X - Vertex_X Position [mm]");
+
+    michel_ZY = new TH2D("michel_ZY","Michel Distance to Vertex",50,-300,300,50,-300,300);
+    michel_ZY->GetXaxis()->SetTitle("Michel_Z - Vertex_Z Position [mm]");
+    michel_ZY->GetYaxis()->SetTitle("Michel_Y - Vertex_Y Position [mm]");
+
+    michel_dist_X = new TH1D("michel_dist_X","Michel Distance to Vertex",50,-300,300);
+    michel_dist_X->GetXaxis()->SetTitle("Michel_X - Vertex_X Position [mm]");
+    michel_dist_X->GetYaxis()->SetTitle("N(Events)");
+
+    michel_dist_Y = new TH1D("michel_dist_Y","Michel Distance to Vertex",50,-300,300);
+    michel_dist_Y->GetXaxis()->SetTitle("Michel_Y - Vertex_Y Position [mm]");
+    michel_dist_Y->GetYaxis()->SetTitle("N(Events)");
+
+    michel_dist_Z = new TH1D("michel_dist_Z","Michel Distance to Vertex",50,-300,300);
+    michel_dist_Z->GetXaxis()->SetTitle("Michel_Z - Vertex_Z Position [mm]");
+    michel_dist_Z->GetYaxis()->SetTitle("N(Events)");
+
+    michel_dist_total = new TH1D("michel_dist_total","Michel Distance to Vertex",50,0,1000);
+    michel_dist_total->GetXaxis()->SetTitle("Michel Begin Position - Vertex Position [mm]");
+    michel_dist_total->GetYaxis()->SetTitle("N(Events)");
+
+    michel_pionP = new TH1D("michel_pionP","Michel Pion Momentum",50,0,1000);
+    michel_pionP->GetXaxis()->SetTitle("Michel Pion Momentum [MeV]");
+    michel_pionP->GetYaxis()->SetTitle("N(Events)");
+
+    michel_pion_dist = new TH1D("michel_pion_dist","Michel Pion Distance to Vertex",50,0,1000);
+    michel_pion_dist->GetXaxis()->SetTitle("Michel Pion Distance to Vertex [mm]");
+    michel_pion_dist->GetYaxis()->SetTitle("N(Events)");
+
     // ------------------------------------------------------------------------
     // Muon Variables
     // ------------------------------------------------------------------------
@@ -432,6 +469,8 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
 
 void CCProtonPi0_TruthAnalyzer::Calc_WeightFromSystematics()
 {
+    cvweight = 1.0;
+    return;
     UpdateFluxReweighter(mc_run); 
         
     // Replace cvweight with Flux Weight
@@ -566,6 +605,23 @@ void CCProtonPi0_TruthAnalyzer::PrintEventRecord()
     }
 }
 
+void CCProtonPi0_TruthAnalyzer::FillMichelHistograms()
+{
+    if (truth_isBckg_withMichel && truth_michelPion_begin_dist_vtx < 25.0){
+        double dist_x = mc_vtx[0]-truth_michelMuon_endPoint[0];
+        double dist_y = mc_vtx[1]-truth_michelMuon_endPoint[1];
+        double dist_z = mc_vtx[2]-truth_michelMuon_endPoint[2];
+        michel_ZX->Fill(dist_z, dist_x);
+        michel_ZY->Fill(dist_z, dist_y);
+        michel_dist_X->Fill(dist_x);
+        michel_dist_Y->Fill(dist_y);
+        michel_dist_Z->Fill(dist_z);
+        michel_dist_total->Fill(truth_michelMuon_end_dist_vtx);
+        michel_pionP->Fill(truth_michelPion_P);
+        michel_pion_dist->Fill(truth_michelPion_begin_dist_vtx);
+    }
+}
+
 void CCProtonPi0_TruthAnalyzer::writeHistograms()
 {
     f->cd();
@@ -579,6 +635,16 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     Enu_mc_truth_all_signal->Write();
     QSq_mc_truth_all_signal->Write();
     W_mc_truth_all_signal->Write();
+
+    // Michel Electron
+    michel_ZX->Write();
+    michel_ZY->Write();
+    michel_dist_X->Write();
+    michel_dist_Y->Write();
+    michel_dist_Z->Write();
+    michel_dist_total->Write();
+    michel_pionP->Write();
+    michel_pion_dist->Write();
 
     // Signal Q2
     mc_Q2_QE->Write();

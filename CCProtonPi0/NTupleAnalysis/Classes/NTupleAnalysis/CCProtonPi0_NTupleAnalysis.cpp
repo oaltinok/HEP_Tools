@@ -6,12 +6,12 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v2_94";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v2_95";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
-const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33534e+20;
-const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.2192e+21; 
+const double CCProtonPi0_NTupleAnalysis::data_POT = 3.38538e+20;
+const double CCProtonPi0_NTupleAnalysis::mc_POT = 1.88049e+21; 
 const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
 
 const double CCProtonPi0_NTupleAnalysis::max_muon_theta = 25; // degree
@@ -90,6 +90,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data(MnvHistoType* h)
     AddVertErrorBandAndFillWithCV_MichelTrue(h);
     AddVertErrorBandAndFillWithCV_MichelFake(h);
     AddVertErrorBandAndFillWithCV_TargetMass(h);
+    AddVertErrorBandAndFillWithCV_Unfolding(h);
     AddVertErrorBandAndFillWithCV_MuonTracking(h);
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
     AddVertErrorBandAndFillWithCV_NeutronResponse(h);
@@ -106,6 +107,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree(MnvHistoType* h)
     AddVertErrorBandAndFillWithCV_MichelTrue(h);
     AddVertErrorBandAndFillWithCV_MichelFake(h);
     AddVertErrorBandAndFillWithCV_TargetMass(h);
+    AddVertErrorBandAndFillWithCV_Unfolding(h);
     AddVertErrorBandAndFillWithCV_MuonTracking(h);
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
     AddVertErrorBandAndFillWithCV_NeutronResponse(h);
@@ -123,6 +125,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram(MnvHistoType* h
     AddVertErrorBandAndFillWithCV_MichelTrue(h);
     AddVertErrorBandAndFillWithCV_MichelFake(h);
     AddVertErrorBandAndFillWithCV_TargetMass(h);
+    AddVertErrorBandAndFillWithCV_Unfolding(h);
     AddVertErrorBandAndFillWithCV_MuonTracking(h);
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
     AddVertErrorBandAndFillWithCV_NeutronResponse(h);
@@ -212,6 +215,14 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_TargetMass(MnvHis
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_TargetMass<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_TargetMass<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Unfolding(MnvHistoType* h)
+{
+    h->AddVertErrorBandAndFillWithCV("Unfolding", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Unfolding<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Unfolding<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_ProtonTracking(MnvHistoType* h)
@@ -346,6 +357,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC(MnvHistoType* h)
     AddVertErrorBand_MichelTrue(h);
     AddVertErrorBand_MichelFake(h);
     AddVertErrorBand_TargetMass(h);
+    AddVertErrorBand_Unfolding(h);
     AddVertErrorBand_MuonTracking(h);
     AddVertErrorBand_ProtonTracking(h);
     AddVertErrorBand_NeutronResponse(h);
@@ -435,6 +447,14 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_TargetMass(MnvHistoType* h)
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_TargetMass<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_TargetMass<MnvH2D>(MnvH2D* h);
+
+     template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_Unfolding(MnvHistoType* h)
+{
+    h->AddVertErrorBand("Unfolding", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_Unfolding<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_Unfolding<MnvH2D>(MnvH2D* h);
 
    template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_ProtonTracking(MnvHistoType* h)

@@ -15,11 +15,11 @@ const int CCProtonPi0_BinList::size_muon_P = 9;
 const double CCProtonPi0_BinList::a_muon_theta[] = {0, 2, 4, 6, 8, 10, 12, 16, 20, 25};
 const int CCProtonPi0_BinList::size_muon_theta = 9;
 
-const double CCProtonPi0_BinList::a_pi0_P[] = {0, 0.05, 0.15, 0.25, 0.40, 0.55, 0.75, 1, 1.40};
+const double CCProtonPi0_BinList::a_pi0_P[] = {0, 0.075, 0.15, 0.25, 0.40, 0.55, 0.75, 1, 1.50};
 const int CCProtonPi0_BinList::size_pi0_P = 8;
 
-const double CCProtonPi0_BinList::a_pi0_KE[] = {0, 0.05, 0.15, 0.25, 0.40, 0.55, 0.75, 1, 1.40};
-const int CCProtonPi0_BinList::size_pi0_KE = 8;
+const double CCProtonPi0_BinList::a_pi0_KE[] = {0, 0.05, 0.15, 0.25, 0.40, 0.55, 0.75, 1};
+const int CCProtonPi0_BinList::size_pi0_KE = 7;
 
 const double CCProtonPi0_BinList::a_pi0_theta[] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 120, 180};
 const int CCProtonPi0_BinList::size_pi0_theta = 11;
@@ -27,8 +27,8 @@ const int CCProtonPi0_BinList::size_pi0_theta = 11;
 const double CCProtonPi0_BinList::a_QSq[] = {0, 0.10, 0.25, 0.40, 0.60, 0.85, 1.15, 1.55, 2.0};
 const int CCProtonPi0_BinList::size_QSq = 8;
 
-const double CCProtonPi0_BinList::a_Enu[] = {0, 1.5, 2.0, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0, 20.0};
-const int CCProtonPi0_BinList::size_Enu = 12;
+const double CCProtonPi0_BinList::a_Enu[] = {0, 1.5, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0, 20.0};
+const int CCProtonPi0_BinList::size_Enu = 11;
 
 CCProtonPi0_BinList::CCProtonPi0_BinList()
 {

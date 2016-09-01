@@ -41,6 +41,16 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         MnvH1D* QSq_mc_truth_all_signal;
         MnvH1D* W_mc_truth_all_signal;
 
+        // Michel Electron
+        TH2D* michel_ZX;
+        TH2D* michel_ZY;
+        TH1D* michel_dist_X;
+        TH1D* michel_dist_Y;
+        TH1D* michel_dist_Z;
+        TH1D* michel_dist_total;
+        TH1D* michel_pionP;
+        TH1D* michel_pion_dist;
+
         // Signal Q2
         TH1D* mc_Q2_QE;
 
@@ -102,6 +112,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void FillHistogram(MnvH1D *hist, double var);
         void FillHistogram(TH1D* hist, double var);
         void FillSignalHistograms();
+        void FillMichelHistograms();
         int Get_nFS_pions();
         bool isMother_DIS_Fragment(int ind);
         void PrintEventRecord();

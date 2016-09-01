@@ -443,6 +443,30 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_TargetMass_ByHand(MnvH2D* h, double
     FillVertErrorBand_ByHand(h, xval, yval, "TargetMass", 1-correctionErr, 1+correctionErr);
 }
 
+void CCProtonPi0_Analyzer::FillVertErrorBand_Unfolding(MnvH1D* h, double var)
+{
+    double correctionErr = GetUnfoldingErr();
+    h->FillVertErrorBand("Unfolding", var, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_Unfolding_ByHand(MnvH1D* h, double var)
+{
+    double correctionErr = GetUnfoldingErr();
+    FillVertErrorBand_ByHand(h, var, "Unfolding", 1-correctionErr, 1+correctionErr);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_Unfolding(MnvH2D* h, double xval, double yval)
+{
+    double correctionErr = GetUnfoldingErr();
+    h->FillVertErrorBand("Unfolding", xval, yval, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_Unfolding_ByHand(MnvH2D* h, double xval, double yval)
+{
+    double correctionErr = GetUnfoldingErr();
+    FillVertErrorBand_ByHand(h, xval, yval, "Unfolding", 1-correctionErr, 1+correctionErr);
+}
+
 void CCProtonPi0_Analyzer::FillVertErrorBand_ProtonTracking(MnvH1D* h, double var)
 {
     double correctionErr = GetProtonTrackingErr();
@@ -528,6 +552,7 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH1D* hist, double var)
         FillVertErrorBand_MichelTrue_ByHand(hist, var);
         FillVertErrorBand_MichelFake_ByHand(hist, var);
         FillVertErrorBand_TargetMass_ByHand(hist, var);
+        FillVertErrorBand_Unfolding_ByHand(hist, var);
         FillVertErrorBand_ProtonTracking_ByHand(hist, var);
         FillVertErrorBand_MuonTracking_ByHand(hist, var);
         FillVertErrorBand_PionResponse_ByHand(hist, var);
@@ -539,6 +564,7 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH1D* hist, double var)
         FillVertErrorBand_MichelTrue(hist, var);
         FillVertErrorBand_MichelFake(hist, var);
         FillVertErrorBand_TargetMass(hist, var);
+        FillVertErrorBand_Unfolding(hist, var);
         FillVertErrorBand_ProtonTracking(hist, var);
         FillVertErrorBand_MuonTracking(hist, var);
         FillVertErrorBand_PionResponse(hist, var);
@@ -559,6 +585,7 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH2D* hist, double xval
         FillVertErrorBand_MichelTrue_ByHand(hist, xval, yval);
         FillVertErrorBand_MichelFake_ByHand(hist, xval, yval);
         FillVertErrorBand_TargetMass_ByHand(hist, xval, yval);
+        FillVertErrorBand_Unfolding_ByHand(hist, xval, yval);
         FillVertErrorBand_ProtonTracking_ByHand(hist, xval, yval);
         FillVertErrorBand_MuonTracking_ByHand(hist, xval, yval);
         FillVertErrorBand_PionResponse_ByHand(hist, xval, yval);
@@ -570,6 +597,7 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH2D* hist, double xval
         FillVertErrorBand_MichelTrue(hist, xval, yval);
         FillVertErrorBand_MichelFake(hist, xval, yval);
         FillVertErrorBand_TargetMass(hist, xval, yval);
+        FillVertErrorBand_Unfolding(hist, xval, yval);
         FillVertErrorBand_ProtonTracking(hist, xval, yval);
         FillVertErrorBand_MuonTracking(hist, xval, yval);
         FillVertErrorBand_PionResponse(hist, xval, yval);
@@ -1996,20 +2024,35 @@ double CCProtonPi0_Analyzer::GetMichelFakeErr()
 {
     // Uncertainty is 0.5% hence weights 1-0.005 AND 1+0.005
     // docDB 11443, slide 38 
-    return 0.005;
+    
+    // Michel Fake Error Applied only to Events without True Michel
+    double correctionErr = 0.0;
+    if (!truth_isBckg_withMichel) correctionErr = 0.005;
+    return correctionErr;
 }
 
 double CCProtonPi0_Analyzer::GetMichelTrueErr()
 {
     // Uncertainty is 1.1% hence weights 1-0.011 AND 1+0.011
     // docDB 11443, slide 38 
-    return 0.011;
+    
+    // Michel True Error Applied only to Events with True Michel
+    double correctionErr = 0.0;
+    if (truth_isBckg_withMichel) correctionErr = 0.011;
+    return correctionErr;
 }
 
 double CCProtonPi0_Analyzer::GetTargetMassErr()
 {
     // Uncertainty is 1.4% hence weights 1-0.014 AND 1+0.014
     return 0.014;
+}
+
+double CCProtonPi0_Analyzer::GetUnfoldingErr()
+{
+    // Uncertainty is 1% hence weights 1-0.01 AND 1+0.01
+    // docDB 12426, slide 22
+    return 0.01;
 }
 
 double CCProtonPi0_Analyzer::GetPionResponseErr()

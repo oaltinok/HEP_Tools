@@ -134,6 +134,9 @@ class CCProtonPi0_NTupleAnalysis
             void AddVertErrorBandAndFillWithCV_TargetMass(MnvHistoType* h);
 
         template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_Unfolding(MnvHistoType* h);
+
+        template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_ProtonTracking(MnvHistoType* h);
 
         template<class MnvHistoType>
@@ -200,6 +203,9 @@ class CCProtonPi0_NTupleAnalysis
 
         template<class MnvHistoType>
             void AddVertErrorBand_TargetMass(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_Unfolding(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddVertErrorBand_ProtonTracking(MnvHistoType* h);

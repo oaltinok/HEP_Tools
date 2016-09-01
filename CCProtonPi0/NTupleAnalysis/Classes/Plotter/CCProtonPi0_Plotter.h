@@ -219,6 +219,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
         // Unfolding Study
         void UnfoldingStudy();
+        void UnfoldingStudy_Iterations(std::string var_name);
         void UnfoldingStudy_muon_P();
         void UnfoldingStudy_muon_theta();
         void UnfoldingStudy_muon_cos_theta();

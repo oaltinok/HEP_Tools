@@ -274,7 +274,7 @@ MnvH1D* CCProtonPi0_CrossSection::Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* r
     // Init Histogram
     MnvH1D* unfolded = 0;
 
-    std::cout<<"\tNumber of iteratons = "<<iteration<<std::endl;
+    std::cout<<"\tNumber of iterations = "<<iteration<<std::endl;
     // Use MnvUnfold to Unfold Data
     MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted, RooUnfold::kBayes, iteration, true);
 

@@ -8,7 +8,7 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
-    nMaxEvents = 1000;
+    nMaxEvents = 10000;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
@@ -51,12 +51,7 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     latest_ScanID = 0.0;
 
     // Counter Names
-    nSignalOut_Acceptance.setName("SignalOut_Acceptance");
-    nSignalOut_Kinematics.setName("SignalOut_Kinematics");
-    counter1.setName("True Michels");
-    counter2.setName("No Michels");
-    counter3.setName("N/A");
-    counter4.setName("N/A");
+    setCounterNames();
 }
 
 void CCProtonPi0_Analyzer::reduce(string playlist)
@@ -170,6 +165,11 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
     //--------------------------------------------------------------------------
     // Counters
     //--------------------------------------------------------------------------
+    nMichel_Truth.print();
+    nMichel_Total_Found.print();
+    nMichel_Total_Found_Improved.print();
+    nMichel_Truth_Found.print();
+    nMichel_Truth_Found_Improved.print();
     counter1.print();
     counter2.print();
     counter3.print();
@@ -665,7 +665,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if( reco_muon_theta*TMath::RadToDeg() > max_muon_theta) return false;
     cutList.nCut_Muon_Angle.increment(truth_isSignal, study1, study2);
 
-    //GetMichelStatistics();
+    GetMichelStatistics();
 
     // ------------------------------------------------------------------------
     // Michel Study 
@@ -830,6 +830,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     bool isGamma1_Michel = gamma1_isMichel_begin || gamma1_isMichel_end;
     bool isGamma2_Michel = gamma2_isMichel_begin || gamma2_isMichel_end;
     isShower_Michel_Exist = isGamma1_Michel || isGamma2_Michel;
+    
     if (isShower_Michel_Exist && !sideBand_Michel) return false;
 
     // No End point for vertical showers - so use the following
@@ -2338,25 +2339,27 @@ void CCProtonPi0_Analyzer::PrintFSParticles()
 
 void CCProtonPi0_Analyzer::GetMichelStatistics()
 {
-    // Count Data Overlay Statistics
-    //if ( Cut_Vertex_Michel_Exist == 1 ){
-        //if (truth_vtx_michel_evis_most_pdg == -1) counter1.increment()
-        //else counter2.increment();
-    //}
+    bool isGamma1_Michel = gamma1_isMichel_begin || gamma1_isMichel_end;
+    bool isGamma2_Michel = gamma2_isMichel_begin || gamma2_isMichel_end;
 
-    bool isMichelFound = (Cut_Vertex_Michel_Exist == 1) || (Cut_EndPoint_Michel_Exist == 1) || (Cut_secEndPoint_Michel_Exist == 1);
+    bool isShowerMichelFound = isGamma1_Michel || isGamma2_Michel; 
+    //bool isShowerMichelFound_Improved = ImprovedMichel_Gamma1HasMichel || ImprovedMichel_Gamma2HasMichel;
+
+    bool isMichelFound = (Cut_Vertex_Michel_Exist == 1) || (Cut_EndPoint_Michel_Exist == 1) || (Cut_secEndPoint_Michel_Exist == 1) || isShowerMichelFound;
+    //bool isMichelFound_Improved = ImprovedMichel_VertexHasMichel || ImprovedMichel_EndPointHasMichel || ImprovedMichel_secEndPointHasMichel || isShowerMichelFound_Improved; 
+    bool isMichelFound_Improved = ImprovedMichel_EventHasMatchedMichel;
 
     // Total Number of Truth Michels
-    if (truth_isBckg_withMichel) counter1.increment();
+    if (truth_isBckg_withMichel) nMichel_Truth.increment();
 
     // Total Number of Found Michels
-    if (isMichelFound) counter2.increment();
+    if (isMichelFound) nMichel_Total_Found.increment();
+    if (isMichelFound_Improved) nMichel_Total_Found_Improved.increment();
+    
+    // Truth Found Michels
+    if (truth_isBckg_withMichel && isMichelFound) nMichel_Truth_Found.increment();
+    if (truth_isBckg_withMichel && isMichelFound_Improved) nMichel_Truth_Found_Improved.increment();
 
-    // Count Missed Michels
-    if (truth_isBckg_withMichel && !isMichelFound) counter3.increment();
-
-    // Count False Positives
-    if (!truth_isBckg_withMichel && isMichelFound) counter4.increment();
 }
 
 void CCProtonPi0_Analyzer::Study_ProtonSystematics()
@@ -2384,6 +2387,27 @@ void CCProtonPi0_Analyzer::Study_ProtonSystematics()
     }
 
 }
+
+void CCProtonPi0_Analyzer::setCounterNames()
+{
+    // Single Use Counters 
+    counter1.setName("N/A");
+    counter2.setName("N/A");
+    counter3.setName("N/A");
+    counter4.setName("N/A");
+
+    // Signal Counters
+    nSignalOut_Acceptance.setName("SignalOut_Acceptance");
+    nSignalOut_Kinematics.setName("SignalOut_Kinematics");
+
+    // Michel Counters
+    nMichel_Truth.setName("nMichel_Truth");
+    nMichel_Total_Found.setName("nMichel_Total_Found");
+    nMichel_Total_Found_Improved.setName("nMichel_Total_Found_Improved");
+    nMichel_Truth_Found.setName("nMichel_Truth_Found");
+    nMichel_Truth_Found_Improved.setName("nMichel_Truth_Found_Improved");
+}
+
 
 #endif //CCProtonPi0_Analyzer_cpp
 

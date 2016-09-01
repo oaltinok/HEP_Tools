@@ -22,7 +22,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     //plotCrossSection();
     //plotCrossSection_Check();
-
+    
     //--------------------------------------------------------------------------
     //  Data vs MC
     //--------------------------------------------------------------------------
@@ -30,7 +30,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotMuon_DataMC();
     //plotProton_DataMC();
     //plotPion_DataMC();
-    //plotCutHistograms_DataMC();
+    plotCutHistograms_DataMC();
 
     //--------------------------------------------------------------------------
     //  MC Only
@@ -48,7 +48,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
-    Systematics();
+    //Systematics();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -238,8 +238,15 @@ void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
     std::string plotDir = Folder_List::plotDir_OtherStudies;
- 
-    PlotXSecVar("pi0_P", "xsec", "xsec", plotDir, "xsec_data_MC" );
+
+    Draw2DHist(rootDir_Truth, "michel_ZX", plotDir);
+    Draw2DHist(rootDir_Truth, "michel_ZY", plotDir);
+    Draw1DHist(rootDir_Truth, "michel_dist_X", plotDir);
+    Draw1DHist(rootDir_Truth, "michel_dist_Y", plotDir);
+    Draw1DHist(rootDir_Truth, "michel_dist_Z", plotDir);
+    Draw1DHist(rootDir_Truth, "michel_dist_total", plotDir);
+    Draw1DHist(rootDir_Truth, "michel_pionP", plotDir);
+    Draw1DHist(rootDir_Truth, "michel_pion_dist", plotDir);
 
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
@@ -2148,7 +2155,13 @@ void CCProtonPi0_Plotter::plotCrossSection()
 
 void CCProtonPi0_Plotter::UnfoldingStudy()
 {
-
+    UnfoldingStudy_Iterations("muon_P");
+    UnfoldingStudy_Iterations("muon_theta");
+    UnfoldingStudy_Iterations("pi0_P");
+    UnfoldingStudy_Iterations("pi0_KE");
+    UnfoldingStudy_Iterations("pi0_theta");
+    UnfoldingStudy_Iterations("QSq");
+    UnfoldingStudy_Iterations("Enu");
     //UnfoldingStudy_muon_P();
     //UnfoldingStudy_muon_theta();
     //UnfoldingStudy_muon_cos_theta();
@@ -2157,7 +2170,7 @@ void CCProtonPi0_Plotter::UnfoldingStudy()
     //UnfoldingStudy_pi0_theta();
 
     //PlotUnfolding_TruthComparison();
-    PlotUnfolding_Migration();
+    //PlotUnfolding_Migration();
 }
 
 void CCProtonPi0_Plotter::Systematics()

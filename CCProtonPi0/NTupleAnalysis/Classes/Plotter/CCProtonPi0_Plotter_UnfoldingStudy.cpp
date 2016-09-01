@@ -1,8 +1,64 @@
 #include "CCProtonPi0_Plotter.h"
 
-const int max_iter = 4;
+const int max_iter = 10;
 
 using namespace PlotUtils;
+
+void CCProtonPi0_Plotter::UnfoldingStudy_Iterations(std::string var_name)
+{
+    std::cout<<"Unfolding Study for "<<var_name<<std::endl;
+
+    // Input Files
+    std::string path = Folder_List::rootOut + Folder_List::Data + Folder_List::analyzed;
+    std::vector<TFile*> f;
+    
+    for (int i = 0; i <= max_iter; ++i){
+        std::string dir = Form("%s%s%d%s", path.c_str(), "CrossSection_", i, ".root");
+        std::cout<<"\t Reading File "<<dir<<std::endl;
+        TFile* temp = new TFile(dir.c_str());
+        f.push_back(temp);
+    }
+ 
+    // Write Table 
+    std::string var;
+    std::string var_truth = Form("%s_%s", var_name.c_str(), "mc_truth_signal");
+    for (int i = 0; i <= max_iter; ++i){
+        // Output Text File
+        std::string file_name = Form("%s%s%s_%d%s", Folder_List::plotDir_OtherStudies.c_str(), "Table_", var_name.c_str(), i ,".txt");
+        ofstream file;
+        OpenTextFile(file_name, file);
+   
+        // N(Iterations) == 0 -- No Unfolding
+        if (i == 0){
+            var = Form("%s_%s", var_name.c_str(), "bckg_subtracted");
+        }else{
+            var = Form("%s_%s", var_name.c_str(), "unfolded");
+        }
+        // Histograms
+        MnvH1D* hist = GetMnvH1D(f[i], var);
+        MnvH1D* hist_truth = GetMnvH1D(f[i], var_truth);
+        TH1D* h_err_stat = new TH1D(hist->GetStatError(true));
+        TH1D* h_err_syst = new TH1D(hist->GetTotalError(false,true));
+
+        int nBins = hist->GetNbinsX();
+        for (int bin = 1; bin <= nBins; ++bin){
+            double cv = hist->GetBinContent(bin);
+            double truth = hist_truth->GetBinContent(bin);
+            double stat = h_err_stat->GetBinContent(bin);
+            double syst = h_err_syst->GetBinContent(bin);
+
+            file<<truth<<" "<<cv<<" "<<stat<<" "<<syst<<std::endl;
+        }
+        
+        delete hist;
+        delete h_err_stat;
+        delete h_err_syst;
+    }
+
+    // Clean Memory
+    f.clear();
+}
+
 
 void CCProtonPi0_Plotter::UnfoldingStudy_muon_cos_theta()
 {

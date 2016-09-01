@@ -185,6 +185,7 @@ StatusCode CCProtonPi0::initialize()
         m_odMatchTool = tool<IODProngClassificationTool>("ODTrackMatchTool"); 
         m_energyCorrectionTool = tool<IEnergyCorrectionTool>("EnergyCorrectionTool"); 
         m_hitTagger = tool<IHitTaggerTool>( "HitTaggerTool" ); 
+        m_michelTool_Improved = tool<IImprovedMichelTool>("ImprovedMichelTool");
         m_michelTool_Default = tool<IMichelTool>("MichelTool","MichelTool_Default");
         m_michelTool_Large = tool<IMichelTool>("MichelTool","MichelTool_Large");
         m_objectAssociator = tool<IMinervaObjectAssociator>("MinervaObjectAssociator");
@@ -412,6 +413,15 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch( "Cut_BlobDirectionBad", -1 );
     declareIntEventBranch( "Cut_Pi0_Bad", -1 );
 
+    // Michel Veto
+    declareBoolEventBranch( "ImprovedMichel_EventHasMichel");
+    declareBoolEventBranch( "ImprovedMichel_EventHasMatchedMichel");
+    declareBoolEventBranch( "ImprovedMichel_VertexHasMichel");
+    declareBoolEventBranch( "ImprovedMichel_EndPointHasMichel");
+    declareBoolEventBranch( "ImprovedMichel_secEndPointHasMichel");
+    declareBoolEventBranch( "ImprovedMichel_Gamma1HasMichel");
+    declareBoolEventBranch( "ImprovedMichel_Gamma2HasMichel");
+    
     // General Reco
     declareDoubleEventBranch( "time", -1.0 );
     declareDoubleEventBranch( "reco_eventID", -1.0 );
@@ -500,7 +510,6 @@ StatusCode CCProtonPi0::initialize()
     declareIntEventBranch("gamma2_blob_nclusters",-1);
     declareDoubleEventBranch("gamma2_blob_energy",-1);
     declareDoubleEventBranch("gamma2_blob_minsep", -1.0);
-
 
     // Calculate_dEdx() -- Called from setBlobData()
     declareIntEventBranch("g1dedx_nplane", -1);
@@ -1080,9 +1089,15 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
     //==========================================================================
     debug()<<"START: Michel Electron Search"<<endmsg;
 
+    bool has_michel_event = ImprovedMichel_EventHasMichel(event);
     bool has_michel_vertex = VertexHasMichels(event, truthEvent);
     bool has_michel_trackend = TrackEndPointHasMichels(event, truthEvent);
 
+    if (m_removeEvents_withMichel && has_michel_event) {
+        if( m_keepAfter_michel_cuts ) return interpretFailEvent(event); 
+        else return StatusCode::SUCCESS; 
+    }
+    
     if (m_removeEvents_withMichel && has_michel_vertex ){
         if( m_keepAfter_michel_cuts ) return interpretFailEvent(event); 
         else return StatusCode::SUCCESS; 
@@ -2322,6 +2337,20 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
     bool gamma2_isMichel_begin = m_michelTool_Default->findMichel( vertex2[0], vertex2[1], vertex2[2], time2, dummy_prong_3);
     bool gamma2_isMichel_end = m_michelTool_Default->findMichel( end_vertex2[0], end_vertex2[1], end_vertex2[2], time2, dummy_prong_4);
 
+    bool ImprovedMichel_Gamma1_Michel_Begin = ImprovedMichel_HasMichelAtPoint(vertex1[0], vertex1[1], vertex1[2]);
+    bool ImprovedMichel_Gamma1_Michel_End = ImprovedMichel_HasMichelAtPoint(end_vertex1[0], end_vertex1[1], end_vertex1[2]);
+
+    bool ImprovedMichel_Gamma2_Michel_Begin = ImprovedMichel_HasMichelAtPoint(vertex2[0], vertex2[1], vertex2[2]);
+    bool ImprovedMichel_Gamma2_Michel_End = ImprovedMichel_HasMichelAtPoint(end_vertex2[0], end_vertex2[1], end_vertex2[2]);
+    
+    if (ImprovedMichel_Gamma1_Michel_Begin || ImprovedMichel_Gamma1_Michel_End){
+        event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_EventHasMatchedMichel", true);
+    }
+ 
+    if (ImprovedMichel_Gamma2_Michel_Begin || ImprovedMichel_Gamma2_Michel_End){
+        event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_EventHasMatchedMichel", true);
+    }
+
     // Check Momentum
     if ( isnan(pi0_4P.P()) ) return false;
 
@@ -2384,6 +2413,8 @@ bool CCProtonPi0::setPi0Data( Minerva::PhysicsEvent *event ) const
     // Gamma1 Information
     event->filtertaglist()->setOrAddFilterTag( "gamma1_isMichel_begin", gamma1_isMichel_begin );
     event->filtertaglist()->setOrAddFilterTag( "gamma1_isMichel_end", gamma1_isMichel_end );
+    event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_Gamma1HasMichel", ImprovedMichel_Gamma1_Michel_Begin || ImprovedMichel_Gamma1_Michel_End);
+    event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_Gamma2HasMichel", ImprovedMichel_Gamma2_Michel_Begin || ImprovedMichel_Gamma2_Michel_End);
     event->setDoubleData("gamma1_px",g1mom.Px());
     event->setDoubleData("gamma1_py", g1mom.Py());
     event->setDoubleData("gamma1_pz", g1mom.Pz());
@@ -4106,6 +4137,27 @@ void CCProtonPi0::tagPrimaryMuon(Minerva::PhysicsEvent *event) const
     event->setTime( m_recoTimeTool->prongBestTime(m_MuonProng) );
 }
 
+bool CCProtonPi0::ImprovedMichel_EventHasMichel(Minerva::PhysicsEvent *event) const
+{
+    debug()<<"START: Searching Events with ImprovedMichelTool"<<endmsg;
+
+    m_michelTool_Improved->Reset();
+    m_michelTool_Improved->FindMichel(event->time() + 200.0);
+    m_michelTool_Improved->ApplyQualityCuts();
+
+    int nMichel = m_michelTool_Improved->GetMichelCount(); 
+    bool foundMichel = nMichel > 0;
+
+    if (foundMichel) {
+        debug()<<"Found a Michel Electron!"<<endmsg;
+        event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_EventHasMichel", true);
+    }
+
+    debug()<<"nMichel = "<<nMichel<<endmsg;
+
+    return foundMichel;
+}
+
 bool CCProtonPi0::VertexHasMichels(Minerva::PhysicsEvent *event, Minerva::GenMinInteraction* truthEvent) const
 {
     Minerva::Prong vtx_michel_prong;
@@ -4135,6 +4187,12 @@ bool CCProtonPi0::VertexHasMichels(Minerva::PhysicsEvent *event, Minerva::GenMin
         event->setIntData("Cut_Vertex_Large_Michel_Exist",1);
     }
 
+    bool foundMichel_Improved = ImprovedMichel_HasMichelAtPoint(vertex);
+    event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_VertexHasMichel", foundMichel_Improved);
+    if (foundMichel_Improved){
+        event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_EventHasMatchedMichel", true);
+    }
+
     // Return value depends on Default Michel Search
     if (foundMichel) return true;
     else return false;
@@ -4144,6 +4202,10 @@ bool CCProtonPi0::TrackEndPointHasMichels(Minerva::PhysicsEvent *event, Minerva:
 {
     // Get All Prongs to search for end point michels
     ProngVect primaryProngs = event->primaryProngs();
+    bool foundMichel_EndPoint = false;
+    bool foundMichel_secEndPoint = false;
+    bool foundMichel_Improved_EndPoint = false;
+    bool foundMichel_Improved_secEndPoint = false;
 
     for (ProngVect::iterator iterProngs = primaryProngs.begin(); iterProngs != primaryProngs.end(); ++iterProngs) {
 
@@ -4175,17 +4237,27 @@ bool CCProtonPi0::TrackEndPointHasMichels(Minerva::PhysicsEvent *event, Minerva:
         }
 
         //Search for endpoint michels
-        Minerva::Prong michelProng;
-        bool foundMichel = m_michelTool_Default->findMichel( endpoint_vtx, michelProng );
+        if (!foundMichel_Improved_EndPoint){
+            foundMichel_Improved_EndPoint = ImprovedMichel_HasMichelAtPoint(endpoint_vtx);
+            event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_EndPointHasMichel", foundMichel_Improved_EndPoint);
+            if (foundMichel_Improved_EndPoint){
+                event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_EventHasMatchedMichel", true);
+            }
+        }
 
-        if (foundMichel){
+        // Skip Track if we already found the Michel
+        if (foundMichel_EndPoint) continue;
+
+        Minerva::Prong michelProng;
+        foundMichel_EndPoint = m_michelTool_Default->findMichel( endpoint_vtx, michelProng );
+
+        if (foundMichel_EndPoint){
             debug()<<"Found an End Point Michel Electron!"<<endmsg;
             if (m_study_michel_electron){
                 saveMichelProngToNTuple(event, michelProng, false, false);
                 if(truthEvent) saveMichelProngTruth(truthEvent, michelProng, false, false);
             }
             event->setIntData("Cut_EndPoint_Michel_Exist",1);
-            return true;
         }
 
         // Search for secondary Michels
@@ -4194,21 +4266,48 @@ bool CCProtonPi0::TrackEndPointHasMichels(Minerva::PhysicsEvent *event, Minerva:
             for (SmartRefVector<Minerva::Track>::iterator iterTracks = (*iterProngs)->minervaTracks().begin(); iterTracks != (*iterProngs)->minervaTracks().end() - 1; ++iterTracks) {
                 SmartRef<Minerva::Vertex> current_end_vtx;
                 m_objectAssociator->getVertex_fromTrackBack( current_end_vtx, *iterTracks );
-                foundMichel = m_michelTool_Default->findMichel( current_end_vtx, michelProng);
-                if (foundMichel) {
+
+                // Search with MichelToolImproved
+                if (!foundMichel_Improved_secEndPoint){
+                    foundMichel_Improved_secEndPoint = ImprovedMichel_HasMichelAtPoint(current_end_vtx);
+                    event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_secEndPointHasMichel", foundMichel_Improved_secEndPoint);
+                    if (foundMichel_Improved_secEndPoint){
+                        event->filtertaglist()->setOrAddFilterTag( "ImprovedMichel_EventHasMatchedMichel", true);
+                    }
+                }
+
+                // Skip Secondary Track if we already found the Michel
+                if (foundMichel_secEndPoint) continue;
+
+                foundMichel_secEndPoint = m_michelTool_Default->findMichel( current_end_vtx, michelProng);
+                if (foundMichel_secEndPoint) {
                     debug()<<"Found a Secondary End Point Michel Electron!"<<endmsg;
                     if (m_study_michel_electron){
                         saveMichelProngToNTuple(event, michelProng, false, false);
                         if(truthEvent) saveMichelProngTruth(truthEvent, michelProng, false, false);
                     }
                     event->setIntData("Cut_secEndPoint_Michel_Exist",1);
-                    return true;
                 }
             }
         }
     }//end loop over primary prongs
 
-    return false;
+    return foundMichel_EndPoint || foundMichel_secEndPoint;
+}
+
+bool CCProtonPi0::ImprovedMichel_HasMichelAtPoint(SmartRef<Minerva::Vertex> point) const
+{
+    const Gaudi::XYZPoint pos = point->position(); 
+    double x = pos.x(); 
+    double y = pos.y(); 
+    double z = pos.z(); 
+    return ImprovedMichel_HasMichelAtPoint(x, y, z);
+}
+
+bool CCProtonPi0::ImprovedMichel_HasMichelAtPoint(double x, double y, double z) const
+{
+    const double max_distance = 500.0; // in mm
+    return m_michelTool_Improved->Match(x, y, z, max_distance, max_distance);
 }
 
 void CCProtonPi0::ColorUnusedIDClusters(Minerva::PhysicsEvent *event) const

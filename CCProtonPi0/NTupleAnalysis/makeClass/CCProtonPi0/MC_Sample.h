@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Aug 17 09:31:20 2016 by ROOT version 5.34/05
+// Sun Aug 28 14:35:50 2016 by ROOT version 5.34/05
 // from TChain CCProtonPi0/
 //////////////////////////////////////////////////////////
 
@@ -285,6 +285,13 @@ public :
    Double_t        vtxErr[4];
    Double_t        E[4];
    Bool_t          found_truth;
+   Bool_t          ImprovedMichel_EventHasMichel;
+   Bool_t          ImprovedMichel_EventHasMatchedMichel;
+   Bool_t          ImprovedMichel_VertexHasMichel;
+   Bool_t          ImprovedMichel_EndPointHasMichel;
+   Bool_t          ImprovedMichel_secEndPointHasMichel;
+   Bool_t          ImprovedMichel_Gamma1HasMichel;
+   Bool_t          ImprovedMichel_Gamma2HasMichel;
    Bool_t          is_blobs_recovered;
    Bool_t          is_blobs_recovered_direction;
    Bool_t          is_blobs_recovered_invMass;
@@ -1025,6 +1032,13 @@ public :
    TBranch        *b_vtxErr;   //!
    TBranch        *b_E;   //!
    TBranch        *b_found_truth;   //!
+   TBranch        *b_ImprovedMichel_EventHasMichel;   //!
+   TBranch        *b_ImprovedMichel_EventHasMatchedMichel;   //!
+   TBranch        *b_ImprovedMichel_VertexHasMichel;   //!
+   TBranch        *b_ImprovedMichel_EndPointHasMichel;   //!
+   TBranch        *b_ImprovedMichel_secEndPointHasMichel;   //!
+   TBranch        *b_ImprovedMichel_Gamma1HasMichel;   //!
+   TBranch        *b_ImprovedMichel_Gamma2HasMichel;   //!
    TBranch        *b_is_blobs_recovered;   //!
    TBranch        *b_is_blobs_recovered_direction;   //!
    TBranch        *b_is_blobs_recovered_invMass;   //!
@@ -1535,7 +1549,7 @@ MC_Sample::MC_Sample(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("CCProtonPi0","");
-      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_94/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/CCProtonPi0");
+      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_95/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/CCProtonPi0");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -1850,6 +1864,13 @@ void MC_Sample::Init(TTree *tree)
    fChain->SetBranchAddress("vtxErr", vtxErr, &b_vtxErr);
    fChain->SetBranchAddress("E", E, &b_E);
    fChain->SetBranchAddress("found_truth", &found_truth, &b_found_truth);
+   fChain->SetBranchAddress("ImprovedMichel_EventHasMichel", &ImprovedMichel_EventHasMichel, &b_ImprovedMichel_EventHasMichel);
+   fChain->SetBranchAddress("ImprovedMichel_EventHasMatchedMichel", &ImprovedMichel_EventHasMatchedMichel, &b_ImprovedMichel_EventHasMatchedMichel);
+   fChain->SetBranchAddress("ImprovedMichel_VertexHasMichel", &ImprovedMichel_VertexHasMichel, &b_ImprovedMichel_VertexHasMichel);
+   fChain->SetBranchAddress("ImprovedMichel_EndPointHasMichel", &ImprovedMichel_EndPointHasMichel, &b_ImprovedMichel_EndPointHasMichel);
+   fChain->SetBranchAddress("ImprovedMichel_secEndPointHasMichel", &ImprovedMichel_secEndPointHasMichel, &b_ImprovedMichel_secEndPointHasMichel);
+   fChain->SetBranchAddress("ImprovedMichel_Gamma1HasMichel", &ImprovedMichel_Gamma1HasMichel, &b_ImprovedMichel_Gamma1HasMichel);
+   fChain->SetBranchAddress("ImprovedMichel_Gamma2HasMichel", &ImprovedMichel_Gamma2HasMichel, &b_ImprovedMichel_Gamma2HasMichel);
    fChain->SetBranchAddress("is_blobs_recovered", &is_blobs_recovered, &b_is_blobs_recovered);
    fChain->SetBranchAddress("is_blobs_recovered_direction", &is_blobs_recovered_direction, &b_is_blobs_recovered_direction);
    fChain->SetBranchAddress("is_blobs_recovered_invMass", &is_blobs_recovered_invMass, &b_is_blobs_recovered_invMass);

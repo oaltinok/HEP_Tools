@@ -261,7 +261,6 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupError
         plotter->error_summary_group_map["FSI Model"] = fsiGroup;   
         plotter->error_summary_group_map["Flux"] = fluxGroup;
         plotter->error_summary_group_map["Other"] = otherGroup;
-        plotter->error_summary_group_map["Proton"] = protonGroup;
     }
 }
 
@@ -777,18 +776,12 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
     hist2D->GetYaxis()->SetTitleOffset(1.8);
     hist2D->Draw("colz");
     gPad->Update();
-
-    //double line_min = hist2D->GetXaxis()->GetBinLowEdge(1);
-    //double line_max = hist2D->GetXaxis()->GetBinLowEdge(nBinsX);
-    //TLine xy;
-    //xy.SetLineWidth(2);
-    //xy.SetLineColor(kBlack);
-    //xy.DrawLine(line_min,line_min,line_max,line_max);
-
-    //TLine fit;
-    //fit.SetLineWidth(2);
-    //fit.SetLineColor(kRed);
-    //fit.DrawLine(0,80.9,500,585.9);
+    
+    TPaveStats* ps = (TPaveStats *)hist2D->GetListOfFunctions()->FindObject("stats");
+    ps->SetX1NDC(0.15);
+    ps->SetX2NDC(0.55);
+    c->Modified();
+    c->Update();
 
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
 
