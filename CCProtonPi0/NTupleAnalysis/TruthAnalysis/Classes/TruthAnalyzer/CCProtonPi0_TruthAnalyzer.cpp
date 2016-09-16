@@ -469,8 +469,6 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
 
 void CCProtonPi0_TruthAnalyzer::Calc_WeightFromSystematics()
 {
-    cvweight = 1.0;
-    return;
     UpdateFluxReweighter(mc_run); 
         
     // Replace cvweight with Flux Weight

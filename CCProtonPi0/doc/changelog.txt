@@ -1,4 +1,17 @@
 ===================================================================================================
+v2_96
+CCProtonPi0 Updates:
+
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	Fixed ProtonEnergy Lateral Error Band Fill
+		I was filling only for Events with a Proton
+		Actually, I need to fill them for events without a Proton as well.
+
+	New Class: BckgConstrainer
+		Uses a map to hold Background Weights for all universes
+
+===================================================================================================
 v2_95
 CCProtonPi0 Updates:
 	Included ImprovedMichelTool 

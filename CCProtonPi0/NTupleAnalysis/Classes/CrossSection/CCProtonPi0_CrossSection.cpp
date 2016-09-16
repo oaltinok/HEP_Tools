@@ -9,7 +9,6 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
 {
     std::cout<<"Initializing CCProtonPi0_CrossSection"<<std::endl;
 
-    iteration = 1; // Unfolding Iteration
     min_invMass = 60; // MeV
     max_invMass = 200; // MeV
     
@@ -43,7 +42,7 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection(pi0_KE);   
     Calc_CrossSection(pi0_theta);   
     Calc_CrossSection(QSq);   
-    //Calc_CrossSection(W);   
+    Calc_CrossSection(W);   
     Calc_CrossSection(Enu);   
     
     writeHistograms();
@@ -56,7 +55,7 @@ void CCProtonPi0_CrossSection::Calc_CrossSection(XSec &var)
 
     // Data Correction
     var.bckg_subtracted = Subtract_Background(var.all, var.mc_reco_bckg, var.bckg_estimated,var.name);
-    var.unfolded = Unfold_Data(var.bckg_subtracted, var.response, var.name);   
+    var.unfolded = Unfold_Data(var.bckg_subtracted, var.response, var.name, var.nIterations);   
     var.efficiency_corrected = Efficiency_Divide(var.unfolded, var.eff, var.name);   
 
     // Integrate Flux
@@ -268,15 +267,16 @@ MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_b
     return bckg_subtracted;
 }
 
-MnvH1D* CCProtonPi0_CrossSection::Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name)
+MnvH1D* CCProtonPi0_CrossSection::Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name, int nIter)
 {
     std::cout<<"Unfolding Data for "<<var_name<<std::endl;
     // Init Histogram
     MnvH1D* unfolded = 0;
 
-    std::cout<<"\tNumber of iterations = "<<iteration<<std::endl;
+    std::cout<<"\tNumber of iterations = "<<nIter<<std::endl;
+
     // Use MnvUnfold to Unfold Data
-    MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted, RooUnfold::kBayes, iteration, true);
+    MinervaUnfold::MnvUnfold::Get().UnfoldHisto(unfolded, response, bckg_subtracted, RooUnfold::kBayes, nIter, true);
 
     // Set Name of the Histogram
     std::string hist_name = var_name + "_unfolded";
@@ -370,7 +370,7 @@ void CCProtonPi0_CrossSection::initXSecs()
     init_pi0_KE();
     init_pi0_theta();
     init_QSq();
-    //init_W();
+    init_W();
     init_Enu();
 }
 
@@ -647,7 +647,7 @@ void CCProtonPi0_CrossSection::writeHistograms()
     writeHistograms(pi0_KE);
     writeHistograms(pi0_theta);
     writeHistograms(QSq);
-    //writeHistograms(W);
+    writeHistograms(W);
     writeHistograms(Enu);
 
     f_out->Close();

@@ -388,6 +388,9 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
 //            const bool  statPlusSys = false  
 //            )   
     plotter->headroom = 1.75;
+    plotter->data_line_width = 2;
+    plotter->data_marker_size = 1.5;
+    gStyle->SetEndErrorSize(6);
     plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", false, NULL, NULL, false, true);
 
     // ------------------------------------------------------------------------

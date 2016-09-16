@@ -15,7 +15,7 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     isDataAnalysis  = true;
     isScanRun = false;
     applyBckgConstraints_CV = true;
-    applyBckgConstraints_Unv = false;
+    applyBckgConstraints_Unv = true;
     writeFSParticleMomentum = false;
     fillErrors_ByHand = true; // Affects only Vertical Error Bands - Lateral Bands always filled ByHand
 
@@ -326,9 +326,9 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
 
     openTextFiles();
 
-    ReadBckgConstraints();
-
     initLateralErrorBandShifts(isModeReduce);
+
+    initCVWeights();
 
     cout<<"Initialization Finished!\n"<<endl;
 }
@@ -912,12 +912,10 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
             FillLatErrorBand_EM_EnergyScale_SideBand_invMass();
             FillLatErrorBand_MuonMomentum_SideBand_invMass();
             FillLatErrorBand_MuonTheta_SideBand_invMass();
-            if (nProtonCandidates > 0){
-                FillLatErrorBand_ProtonEnergy_Birks_SideBand_invMass();
-                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MassModel");
-                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MEU");
-                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_BetheBloch");
-            }
+            FillLatErrorBand_ProtonEnergy_Birks_SideBand_invMass();
+            FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MassModel");
+            FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MEU");
+            FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_BetheBloch");
         }
         if (nProtonCandidates == 0){
             FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
@@ -2127,12 +2125,10 @@ void CCProtonPi0_Analyzer::fill_SideBand_InvMass()
             FillLatErrorBand_EM_EnergyScale_SideBand_invMass();
             FillLatErrorBand_MuonMomentum_SideBand_invMass();
             FillLatErrorBand_MuonTheta_SideBand_invMass();
-            if (nProtonCandidates > 0){
-                FillLatErrorBand_ProtonEnergy_Birks_SideBand_invMass();
-                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MassModel");
-                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MEU");
-                FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_BetheBloch");
-            }
+            FillLatErrorBand_ProtonEnergy_Birks_SideBand_invMass();
+            FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MassModel");
+            FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_MEU");
+            FillLatErrorBand_ProtonEnergy_SideBand_invMass("ProtonEnergy_BetheBloch");
         }
         if (nProtonCandidates == 0){
             FillHistogram(cutList.pi0_invMass_1Track, pi0_invMass);
@@ -2406,6 +2402,21 @@ void CCProtonPi0_Analyzer::setCounterNames()
     nMichel_Total_Found_Improved.setName("nMichel_Total_Found_Improved");
     nMichel_Truth_Found.setName("nMichel_Truth_Found");
     nMichel_Truth_Found_Improved.setName("nMichel_Truth_Found_Improved");
+}
+
+
+void CCProtonPi0_Analyzer::initCVWeights()
+{
+    cv_wgt_SinglePiPlus = BckgConstrainer.GetBckgConstraint("CentralValue", 0, "SinglePiPlus");
+    cv_wgt_QELike = BckgConstrainer.GetBckgConstraint("CentralValue", 0, "QELike");
+    cv_wgt_WithPi0 = BckgConstrainer.GetBckgConstraint("CentralValue", 0, "WithPi0");
+
+    cv_err_SinglePiPlus = BckgConstrainer.GetBckgConstraintErr("CentralValue", 0, "SinglePiPlus");
+    cv_err_QELike = BckgConstrainer.GetBckgConstraintErr("CentralValue", 0, "QELike");
+    cv_err_WithPi0 = BckgConstrainer.GetBckgConstraintErr("CentralValue", 0, "WithPi0");
+
+    std::cout<<"CV Background Weights = "<<cv_wgt_SinglePiPlus<<" "<<cv_wgt_QELike<<" "<<cv_wgt_WithPi0<<std::endl;
+    std::cout<<"CV Background Weight Errors = "<<cv_err_SinglePiPlus<<" "<<cv_err_QELike<<" "<<cv_err_WithPi0<<std::endl;
 }
 
 

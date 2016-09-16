@@ -4,9 +4,9 @@ using namespace PlotUtils;
 
 CCProtonPi0_SideBandTool::CCProtonPi0_SideBandTool() : CCProtonPi0_NTupleAnalysis()
 {
-    //current_unv = 0;
-    //OpenRootFiles();
-    //initSideBands();
+    current_unv = 0;
+    OpenRootFiles();
+    initSideBands();
 }
 
 void CCProtonPi0_SideBandTool::OpenRootFiles()

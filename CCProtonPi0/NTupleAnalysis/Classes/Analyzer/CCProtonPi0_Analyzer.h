@@ -38,6 +38,7 @@
 #include "../Pi0Blob/CCProtonPi0_Pi0Blob.h"
 #include "../BackgroundTool/CCProtonPi0_BackgroundTool.h"
 #include "../RandNumGenerator/CCProtonPi0_RandNumGenerator.h"
+#include "../BckgConstrainer/CCProtonPi0_BckgConstrainer.h"
 #include "../Counter/CCProtonPi0_Counter.h"
 
 class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
@@ -67,6 +68,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void fill_pi0_P();
         void fill_pi0_KE();
         void fill_pi0_theta();
+        void initCVWeights();
         void specifyRunTime();
         void openTextFiles();
         void closeTextFiles();
@@ -159,10 +161,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillVertErrorBand_NeutronResponse_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_NeutronResponse_ByHand(MnvH2D* h, double xval, double yval);
 
-        void ReadBckgConstraints();
-        double GetBckgConstraint(std::string error_name, int hist_ind);
-        void GetSearchRange(std::string error_name, int &begin, int &end);
-
         // Lateral Error Band
         void initLateralErrorBandShifts(bool isModeReduce);
         void Fill_RandomShiftHistograms();
@@ -248,6 +246,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void setCounterNames();
         void GetMichelStatistics();
         void GetMichelStatistics_Showers();
+        double GetBckgConstraint(std::string error_name, int hist_ind);
 
         //  Muon Specific Functions
         void fillMuonMC();
@@ -351,13 +350,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Counter counter2;
         CCProtonPi0_Counter counter3;
         CCProtonPi0_Counter counter4;
+        CCProtonPi0_BckgConstrainer BckgConstrainer;
 
-        // Multi Universe Background Constraints
-        std::vector<std::string> error_names;
-        std::vector<int> error_hist_inds;
-        std::vector<double> error_wgt_SinglePiPlus;
-        std::vector<double> error_wgt_QELike;
-        std::vector<double> error_wgt_WithPi0;
+        // Central Value Background Constraints
         double cv_wgt_SinglePiPlus;
         double cv_wgt_QELike;
         double cv_wgt_WithPi0;

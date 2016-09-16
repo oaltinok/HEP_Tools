@@ -42,7 +42,7 @@ void CCProtonPi0_Plotter::Systematics_XSec()
     Systematics_DrawErrorSummary("pi0_theta_xsec", "pi0_theta_xsec");
     Systematics_DrawErrorSummary("QSq_xsec", "QSq_xsec");
     Systematics_DrawErrorSummary("Enu_xsec", "Enu_xsec");
-    //Systematics_DrawErrorSummary("W_xsec", "W_xsec");
+    Systematics_DrawErrorSummary("W_xsec", "W_xsec");
 
     //Systematics_DrawErrorBand_GENIE("muon_P_xsec");
     //Systematics_DrawErrorBand_GENIE("muon_theta_xsec");
@@ -401,6 +401,7 @@ void CCProtonPi0_Plotter::Systematics_SetErrorSummaryGroups()
     // (V) Other
     //---------------------------------------------------------------------
     otherGroup.push_back("BckgConstraint");
+    otherGroup.push_back("Unfolding");
 }
 
 int CCProtonPi0_Plotter::GetErrorSummaryGroup(std::string err_name)

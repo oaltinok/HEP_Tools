@@ -20,8 +20,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     // Cross Sections
     //--------------------------------------------------------------------------
-    //plotCrossSection();
-    //plotCrossSection_Check();
+    plotCrossSection();
+    plotCrossSection_Check();
     
     //--------------------------------------------------------------------------
     //  Data vs MC
@@ -30,7 +30,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotMuon_DataMC();
     //plotProton_DataMC();
     //plotPion_DataMC();
-    plotCutHistograms_DataMC();
+    //plotCutHistograms_DataMC();
 
     //--------------------------------------------------------------------------
     //  MC Only
@@ -2141,7 +2141,7 @@ void CCProtonPi0_Plotter::plotCrossSection()
     plot_pi0_theta = true;
     plot_QSq = true;
     plot_Enu = true;
-    plot_W = false;
+    plot_W = true;
 
     plotOriginalData();
     plotBackgroundEstimated();

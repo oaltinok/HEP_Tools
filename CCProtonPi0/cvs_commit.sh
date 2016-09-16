@@ -1,24 +1,15 @@
-CCPROTONPI0_V="v2_95"
+CCPROTONPI0_V="v2_96"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Included ImprovedMichelTool 
-		Test purposes
+
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Test Histograms for ImprovedMichelTool
-		Not using the tool itself, just testing
+	Fixed ProtonEnergy Lateral Error Band Fill
+		I was filling only for Events with a Proton
+		Actually, I need to fill them for events without a Proton as well.
 
-	Corrected Michel Errors
-		Applying MichelFake Error only to events without true Michel
-		Applying MichelTrue Error only to events with true Michel
-
-	Unfolding Study up to 10 Iterations
-		Bin by Bin comparison of Truth-Data, Stat Error, Systematic Error
-		Creates tables for a MATLAB Algorithm
-
-	Vertical Error Band for Unfolding Uncertainty Added
-		UnfoldingErr = 1%
-
+	New Class: BckgConstrainer
+		Uses a map to hold Background Weights for all universes
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

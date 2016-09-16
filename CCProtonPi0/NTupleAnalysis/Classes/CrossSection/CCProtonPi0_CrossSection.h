@@ -33,6 +33,7 @@ struct XSec
     std::string plot_ylabel;
 
     double smallest_bin_width;
+    int nIterations;
 
     // ROOT Files
     TFile* f_data;
@@ -67,7 +68,6 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
 
         bool RemoveErrorBands;
         bool m_isMC;
-        int iteration;
         double min_invMass;
         double max_invMass;
         std::vector<double> N_Background_Data;
@@ -132,7 +132,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void init_QSq();
         void init_Enu();
         MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name);
-        MnvH1D* Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name);
+        MnvH1D* Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name, int nIter);
         MnvH1D* Efficiency_Divide(MnvH1D* unfolded, MnvH1D* eff, std::string var_name);
         MnvH1D* Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name);
         MnvH1D* Calc_FinalCrossSection(MnvH1D* flux_integrated, std::string var_name);
