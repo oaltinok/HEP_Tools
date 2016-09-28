@@ -21,7 +21,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, 
     // POT Normalized Plots 
     // ------------------------------------------------------------------------
     DrawDataStackedMC_BckgAll(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
-    DrawDataStackedMC_BckgType(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
+    //DrawDataStackedMC_BckgType(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
 
     // ------------------------------------------------------------------------
     // Area Normalized Plots 

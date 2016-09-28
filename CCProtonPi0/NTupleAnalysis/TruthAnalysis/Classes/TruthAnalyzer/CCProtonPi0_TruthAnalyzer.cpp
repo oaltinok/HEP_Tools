@@ -11,6 +11,10 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
     bool applyMaxEvents = false;
     double nMaxEvents = 100000;
 
+    applyBckgConstraints_CV = true;
+    applyBckgConstraints_Unv = true;
+    fillErrors_ByHand = true;
+
     //------------------------------------------------------------------------
     // Create chain
     //------------------------------------------------------------------------
@@ -20,28 +24,6 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
     if (!fChain) return;
     if (fChain == 0) return;
     
-    // Disable Branches for Performance
-    fChain->SetBranchStatus("*", false);
-    fChain->SetBranchStatus("truth_is*", true);
-    fChain->SetBranchStatus("truth_pi0_*", true);
-    fChain->SetBranchStatus("truth_muon_*", true);
-    fChain->SetBranchStatus("truth_proton_*", true);
-    fChain->SetBranchStatus("truth_michel*", true);
-    fChain->SetBranchStatus("*genie_wgt_*", true);
-    fChain->SetBranchStatus("mc_vtx", true);
-    fChain->SetBranchStatus("mc_run", true);
-    fChain->SetBranchStatus("mc_Q2", true);
-    fChain->SetBranchStatus("mc_w", true);
-    fChain->SetBranchStatus("mc_intType", true);
-    fChain->SetBranchStatus("mc_resID", true);
-    fChain->SetBranchStatus("mc_incomingE", true);
-    fChain->SetBranchStatus("mc_nFSPart", true);
-    fChain->SetBranchStatus("mc_FSPartPDG", true);
-    fChain->SetBranchStatus("mc_er_nPart", true);
-    fChain->SetBranchStatus("mc_er_ID", true);
-    fChain->SetBranchStatus("mc_er_status", true);
-    fChain->SetBranchStatus("mc_er_mother", true);
-
     //------------------------------------------------------------------------
     // Loop over Chain
     //------------------------------------------------------------------------
@@ -69,19 +51,25 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
         }
 
         nAll.increment();
-        
-        FillMichelHistograms();
 
-        if (truth_isSignalOut_Acceptance) nSignalOut_Acceptance.increment();
-        if (truth_isSignalOut_Kinematics) nSignalOut_Kinematics.increment();
-        
-        // Count Signal and Background inside Fiducial Volume
-        if (truth_isSignal) nSignal.increment();
-        else nBckg.increment();
+        if (truth_isFidVol) nFidVol.increment();
+        else nFidVol_Out.increment();
 
-        // Count Signal Type & Fill Histograms
-        if (truth_isSignal){
-            FillSignalHistograms();
+        // Count Events Only inside the Fidicual Volume
+        if (truth_isFidVol){
+            FillMichelHistograms();
+
+            if (truth_isSignalOut_Acceptance) nSignalOut_Acceptance.increment();
+            if (truth_isSignalOut_Kinematics) nSignalOut_Kinematics.increment();
+
+            // Count Signal and Background inside Fiducial Volume
+            if (truth_isSignal) nSignal.increment();
+            else nBckg.increment();
+
+            // Count Signal Type & Fill Histograms
+            if (truth_isSignal){
+                FillSignalHistograms();
+            }
         }
     }
 
@@ -101,12 +89,16 @@ void CCProtonPi0_TruthAnalyzer::writeTextFile()
     // All Events
     WriteCounter(nAll, nAll);
     textFile<<std::endl;
+    
+    WriteCounter(nFidVol, nAll);
+    WriteCounter(nFidVol_Out, nAll);
+    textFile<<std::endl;
 
     // Events inside Fiducial Volume
-    WriteCounter(nSignal, nAll);
-    WriteCounter(nSignalOut_Acceptance, nAll);
-    WriteCounter(nSignalOut_Kinematics, nAll);
-    WriteCounter(nBckg, nAll);
+    WriteCounter(nSignal, nFidVol);
+    WriteCounter(nSignalOut_Acceptance, nFidVol);
+    WriteCounter(nSignalOut_Kinematics, nFidVol);
+    WriteCounter(nBckg, nFidVol);
     textFile<<std::endl;
  
     // Signal Types
@@ -139,8 +131,9 @@ double CCProtonPi0_TruthAnalyzer::GetPercent(CCProtonPi0_Counter nAll, CCProtonP
     return percent;
 }
 
-CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() : CCProtonPi0_NTupleAnalysis()
-
+CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() : 
+    CCProtonPi0_NTupleAnalysis(),
+    BckgConstrainer(Folder_List::BckgConstraints_TruthAnalysis)
 {
     std::cout<<"Initializing TruthAnalyzer!"<<std::endl;
 
@@ -158,6 +151,8 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() : CCProtonPi0_NTupleAnaly
     openTextFiles();
 
     resetCounters();
+    
+    initCVWeights();
 
     std::cout<<"Finished"<<std::endl;
 }
@@ -165,7 +160,10 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() : CCProtonPi0_NTupleAnaly
 void CCProtonPi0_TruthAnalyzer::resetCounters() 
 {
     nAll.setName("nAll");
-    
+   
+    nFidVol.setName("nFidVol");
+    nFidVol_Out.setName("nFidVol_Out");
+
     nSignal.setName("nSignal");
     nSignalOut_Acceptance.setName("nSignalOut_Acceptance");
     nSignalOut_Kinematics.setName("nSignalOut_Kinematics");
@@ -294,78 +292,78 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     // ------------------------------------------------------------------------
     // Signal Q2
     // ------------------------------------------------------------------------
-    mc_Q2_QE = new TH1D("mc_Q2_QE","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_QE = new TH1D("mc_Q2_QE","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     mc_Q2_QE->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_QE->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_RES_1232 = new TH1D("mc_Q2_RES_1232","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_1232 = new TH1D("mc_Q2_RES_1232","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     mc_Q2_RES_1232->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_RES_1232->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_RES_1535 = new TH1D("mc_Q2_RES_1535","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_1535 = new TH1D("mc_Q2_RES_1535","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     mc_Q2_RES_1535->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_RES_1535->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_RES_1520 = new TH1D("mc_Q2_RES_1520","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_1520 = new TH1D("mc_Q2_RES_1520","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     mc_Q2_RES_1520->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_RES_1520->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_RES_Other = new TH1D("mc_Q2_RES_Other","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_RES_Other = new TH1D("mc_Q2_RES_Other","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     mc_Q2_RES_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_1_pi = new TH1D("mc_Q2_DIS_1_pi","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_1_pi = new TH1D("mc_Q2_DIS_1_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     mc_Q2_DIS_1_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_2_pi = new TH1D("mc_Q2_DIS_2_pi","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_2_pi = new TH1D("mc_Q2_DIS_2_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     mc_Q2_DIS_2_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_Multi_pi = new TH1D("mc_Q2_DIS_Multi_pi","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_DIS_Multi_pi = new TH1D("mc_Q2_DIS_Multi_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     mc_Q2_DIS_Multi_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_Non_RES = new TH1D("mc_Q2_Non_RES","Q^{2} for Signal Events",binList.QSq.get_nBins(), binList.QSq.get_min(), binList.QSq.get_max());
+    mc_Q2_Non_RES = new TH1D("mc_Q2_Non_RES","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     mc_Q2_Non_RES->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal incomingE
     // ------------------------------------------------------------------------
-    mc_incomingE_QE = new TH1D("mc_incomingE_QE","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_QE = new TH1D("mc_incomingE_QE","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     mc_incomingE_QE->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_QE->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_RES_1232 = new TH1D("mc_incomingE_RES_1232","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_1232 = new TH1D("mc_incomingE_RES_1232","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     mc_incomingE_RES_1232->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_RES_1232->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_RES_1535 = new TH1D("mc_incomingE_RES_1535","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_1535 = new TH1D("mc_incomingE_RES_1535","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     mc_incomingE_RES_1535->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_RES_1535->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_RES_1520 = new TH1D("mc_incomingE_RES_1520","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_1520 = new TH1D("mc_incomingE_RES_1520","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     mc_incomingE_RES_1520->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_RES_1520->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_RES_Other = new TH1D("mc_incomingE_RES_Other","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_RES_Other = new TH1D("mc_incomingE_RES_Other","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     mc_incomingE_RES_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_1_pi = new TH1D("mc_incomingE_DIS_1_pi","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_1_pi = new TH1D("mc_incomingE_DIS_1_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     mc_incomingE_DIS_1_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_2_pi = new TH1D("mc_incomingE_DIS_2_pi","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_2_pi = new TH1D("mc_incomingE_DIS_2_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     mc_incomingE_DIS_2_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_Multi_pi = new TH1D("mc_incomingE_DIS_Multi_pi","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_DIS_Multi_pi = new TH1D("mc_incomingE_DIS_Multi_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     mc_incomingE_DIS_Multi_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_Non_RES = new TH1D("mc_incomingE_Non_RES","E_{#nu} for Signal Events",binList.beamE.get_nBins(), binList.beamE.get_min(), binList.beamE.get_max());
+    mc_incomingE_Non_RES = new TH1D("mc_incomingE_Non_RES","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     mc_incomingE_Non_RES->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
@@ -413,8 +411,14 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
 void CCProtonPi0_TruthAnalyzer::FillHistogram(MnvH1D* hist, double var)
 {
     hist->Fill(var, cvweight);
-    FillVertErrorBand_Flux(hist, var);
-    FillVertErrorBand_Genie(hist, var);
+
+    if (fillErrors_ByHand){
+        FillVertErrorBand_Flux_ByHand(hist, var);
+        FillVertErrorBand_Genie_ByHand(hist, var);
+    }else{
+        FillVertErrorBand_Flux(hist, var);
+        FillVertErrorBand_Genie(hist, var);
+    }
 }
 
 void CCProtonPi0_TruthAnalyzer::FillHistogram(TH1D* hist, double var)
@@ -426,6 +430,12 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Flux(MnvH1D* h, double var)
 {
     std::vector<double> flux_errors = GetFluxError(mc_incomingE * MeV_to_GeV, mc_incoming);
     h->FillVertErrorBand("Flux",  var, &flux_errors[0],  cvweight);
+}
+
+void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var)
+{
+    std::vector<double> flux_errors = GetFluxError(mc_incomingE * MeV_to_GeV, mc_incoming);
+    FillVertErrorBand_ByHand(h, var, "Flux", flux_errors);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
@@ -467,12 +477,137 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
     h->FillVertErrorBand("GENIE_VecFFCCQEshape"    ,var, truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   , cvweight);
 }
 
+void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie_ByHand(MnvH1D* h, double var)
+{
+    FillVertErrorBand_ByHand(h, var, "GENIE_AGKYxF1pi"         , truth_genie_wgt_AGKYxF1pi[2]        , truth_genie_wgt_AGKYxF1pi[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_AhtBY"             , truth_genie_wgt_AhtBY[2]            , truth_genie_wgt_AhtBY[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_BhtBY"             , truth_genie_wgt_BhtBY[2]            , truth_genie_wgt_BhtBY[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_CCQEPauliSupViaKF" , truth_genie_wgt_CCQEPauliSupViaKF[2], truth_genie_wgt_CCQEPauliSupViaKF[4]);
+    FillVertErrorBand_ByHand(h, var, "GENIE_CV1uBY"            , truth_genie_wgt_CV1uBY[2]           , truth_genie_wgt_CV1uBY[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_CV2uBY"            , truth_genie_wgt_CV2uBY[2]           , truth_genie_wgt_CV2uBY[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_EtaNCEL"           , truth_genie_wgt_EtaNCEL[2]          , truth_genie_wgt_EtaNCEL[4]          );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrAbs_N"           , truth_genie_wgt_FrAbs_N[2]          , truth_genie_wgt_FrAbs_N[4]          );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrAbs_pi"          , truth_genie_wgt_FrAbs_pi[2]         , truth_genie_wgt_FrAbs_pi[4]         );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrCEx_N"           , truth_genie_wgt_FrCEx_N[2]          , truth_genie_wgt_FrCEx_N[4]          );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrCEx_pi"          , truth_genie_wgt_FrCEx_pi[2]         , truth_genie_wgt_FrCEx_pi[4]         );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrElas_N"          , truth_genie_wgt_FrElas_N[2]         , truth_genie_wgt_FrElas_N[4]         );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrElas_pi"         , truth_genie_wgt_FrElas_pi[2]        , truth_genie_wgt_FrElas_pi[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrInel_N"          , truth_genie_wgt_FrInel_N[2]         , truth_genie_wgt_FrInel_N[4]         );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrInel_pi"         , truth_genie_wgt_FrInel_pi[2]        , truth_genie_wgt_FrInel_pi[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrPiProd_N"        , truth_genie_wgt_FrPiProd_N[2]       , truth_genie_wgt_FrPiProd_N[4]       );
+    FillVertErrorBand_ByHand(h, var, "GENIE_FrPiProd_pi"       , truth_genie_wgt_FrPiProd_pi[2]      , truth_genie_wgt_FrPiProd_pi[4]      );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MFP_N"             , truth_genie_wgt_MFP_N[2]            , truth_genie_wgt_MFP_N[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MFP_pi"            , truth_genie_wgt_MFP_pi[2]           , truth_genie_wgt_MFP_pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MaCCQE"            , truth_genie_wgt_MaCCQE[2]           , truth_genie_wgt_MaCCQE[4]           );
+    //FillVertErrorBand_ByHand(h, var, "GENIE_MaCCQEshape"       , truth_genie_wgt_MaCCQEshape[2]      , truth_genie_wgt_MaCCQEshape[4]      );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MaNCEL"            , truth_genie_wgt_MaNCEL[2]           , truth_genie_wgt_MaNCEL[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MaRES"             , truth_genie_wgt_MaRES[2]            , truth_genie_wgt_MaRES[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MvRES"             , truth_genie_wgt_MvRES[2]            , truth_genie_wgt_MvRES[4]            );
+    //FillVertErrorBand_ByHand(h, var, "GENIE_NormCCQE"          , truth_genie_wgt_NormCCQE[2]         , truth_genie_wgt_NormCCQE[4]         );
+    //FillVertErrorBand_ByHand(h, var, "GENIE_NormCCRES"         , truth_genie_wgt_NormCCRES[2]        , truth_genie_wgt_NormCCRES[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_NormDISCC"         , truth_genie_wgt_NormDISCC[2]        , truth_genie_wgt_NormDISCC[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_NormNCRES"         , truth_genie_wgt_NormNCRES[2]        , truth_genie_wgt_NormNCRES[4]        );
+    FillVertErrorBand_ByHand(h, var, "GENIE_RDecBR1gamma"      , truth_genie_wgt_RDecBR1gamma[2]     , truth_genie_wgt_RDecBR1gamma[4]     );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Rvn1pi"            , truth_genie_wgt_Rvn1pi[2]           , truth_genie_wgt_Rvn1pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Rvn2pi"            , truth_genie_wgt_Rvn2pi[2]           , truth_genie_wgt_Rvn2pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Rvp1pi"            , truth_genie_wgt_Rvp1pi[2]           , truth_genie_wgt_Rvp1pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Rvp2pi"            , truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Theta_Delta2Npi"   , truth_genie_wgt_Theta_Delta2Npi[2]  , truth_genie_wgt_Theta_Delta2Npi[4]  );
+    FillVertErrorBand_ByHand(h, var, "GENIE_VecFFCCQEshape"    , truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   );
+}
+
+void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err_down, double err_up)
+{
+    std::vector<double> errors;
+    errors.push_back(err_down);
+    errors.push_back(err_up);
+
+    FillVertErrorBand_ByHand(h, var, error_name, errors);
+}
+
+void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, std::vector<double> errors)
+{
+    // Get a Pointer to Error Band
+    MnvVertErrorBand* err_band =  h->GetVertErrorBand(error_name);
+
+    // Get a Pointer to Histograms 
+    std::vector<TH1D*> err_hists = err_band->GetHists();
+   
+    // Sanity Check
+    if (err_hists.size() != errors.size()) {
+        std::cout<<"WARNING! Can not Fill Vertical Error Band: "<<error_name<<std::endl;
+        exit(1);
+    }
+
+    // Fill Error Band Base Histogram with Default cvweight
+    int cvbin = err_band->TH1D::Fill(var, cvweight);
+
+    // Update Errors
+    if (cvbin == -1){
+        cvbin = err_band->FindBin(var);
+    }
+
+    for (unsigned int i = 0; i < err_hists.size(); ++i ) {
+        
+        // wgt_bckg is universe_wgt / cv_wgt 
+        double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint(error_name, i) : 1.0;
+      
+        const double applyWeight = cvweight * wgt_bckg;
+        const double wgtU = errors[i]*applyWeight;
+        err_hists[i]->AddBinContent( cvbin, wgtU );
+
+        const double err = err_hists[i]->GetBinError(cvbin);
+        const double newerr2 = err*err + wgtU*wgtU; 
+        const double newerr = (0.<newerr2) ? sqrt(newerr2) : 0.;
+        err_hists[i]->SetBinError( cvbin, newerr );
+    }
+}
+
+double CCProtonPi0_TruthAnalyzer::GetBckgConstraint(std::string error_name, int hist_ind)
+{
+    // Find the Bckg Constraint if it is one of the constrained events
+    if (truth_isBckg_Compact_SinglePiPlus){
+        double bckg_wgt_SinglePiPlus = BckgConstrainer.GetBckgConstraint(error_name, hist_ind, "SinglePiPlus");
+        return bckg_wgt_SinglePiPlus / cv_wgt_SinglePiPlus;
+    }else if (truth_isBckg_Compact_QELike){
+        double bckg_wgt_QELike = BckgConstrainer.GetBckgConstraint(error_name, hist_ind, "QELike");
+        return bckg_wgt_QELike / cv_wgt_QELike;
+    }else if (truth_isBckg_Compact_WithPi0){
+        double bckg_wgt_WithPi0 = BckgConstrainer.GetBckgConstraint(error_name, hist_ind, "WithPi0");
+        return bckg_wgt_WithPi0 / cv_wgt_WithPi0;
+    }else{
+        return 1.0;
+    }
+}
+
+void CCProtonPi0_TruthAnalyzer::initCVWeights()
+{
+    cv_wgt_SinglePiPlus = BckgConstrainer.GetBckgConstraint("CentralValue", 0, "SinglePiPlus");
+    cv_wgt_QELike = BckgConstrainer.GetBckgConstraint("CentralValue", 0, "QELike");
+    cv_wgt_WithPi0 = BckgConstrainer.GetBckgConstraint("CentralValue", 0, "WithPi0");
+
+    cv_err_SinglePiPlus = BckgConstrainer.GetBckgConstraintErr("CentralValue", 0, "SinglePiPlus");
+    cv_err_QELike = BckgConstrainer.GetBckgConstraintErr("CentralValue", 0, "QELike");
+    cv_err_WithPi0 = BckgConstrainer.GetBckgConstraintErr("CentralValue", 0, "WithPi0");
+
+    std::cout<<"CV Background Weights = "<<cv_wgt_SinglePiPlus<<" "<<cv_wgt_QELike<<" "<<cv_wgt_WithPi0<<std::endl;
+    std::cout<<"CV Background Weight Errors = "<<cv_err_SinglePiPlus<<" "<<cv_err_QELike<<" "<<cv_err_WithPi0<<std::endl;
+}
+
 void CCProtonPi0_TruthAnalyzer::Calc_WeightFromSystematics()
 {
     UpdateFluxReweighter(mc_run); 
         
     // Replace cvweight with Flux Weight
     cvweight = GetFluxWeight(mc_incomingE * MeV_to_GeV, mc_incoming);
+
+    // Apply Background Constraints
+    if (applyBckgConstraints_CV){
+        if (truth_isBckg_Compact_SinglePiPlus) cvweight *= cv_wgt_SinglePiPlus;
+        else if (truth_isBckg_Compact_QELike) cvweight *= cv_wgt_QELike;
+        else if (truth_isBckg_Compact_WithPi0) cvweight *= cv_wgt_WithPi0;
+    }
+
 }
 void CCProtonPi0_TruthAnalyzer::AddOtherErrorBands_FillWithCV()
 {
@@ -501,73 +636,66 @@ void CCProtonPi0_TruthAnalyzer::FillSignalHistograms()
 {
     Calc_WeightFromSystematics();
 
-    double Enu_Truth = mc_incomingE;
-    double QSq_Truth = Calc_QSq(Enu_Truth, truth_muon_4P[3], truth_muon_P, truth_muon_theta_beam);
-    double WSq_Truth = Calc_WSq(Enu_Truth, QSq_Truth, truth_muon_4P[3]);
-    double W_Truth;
-    if (WSq_Truth > 0) W_Truth = sqrt(WSq_Truth);
-    else W_Truth = -1;
-
     // Cross Section Variables
     FillHistogram(muon_P_mc_truth_all_signal, truth_muon_P * MeV_to_GeV);
     FillHistogram(muon_theta_mc_truth_all_signal, truth_muon_theta * rad_to_deg);
     FillHistogram(pi0_P_mc_truth_all_signal, truth_pi0_P * MeV_to_GeV);
     FillHistogram(pi0_KE_mc_truth_all_signal, truth_pi0_KE * MeV_to_GeV);
     FillHistogram(pi0_theta_mc_truth_all_signal, truth_pi0_theta * rad_to_deg);
-    FillHistogram(Enu_mc_truth_all_signal, Enu_Truth * MeV_to_GeV);
-    FillHistogram(QSq_mc_truth_all_signal, QSq_Truth * MeVSq_to_GeVSq);
-    FillHistogram(W_mc_truth_all_signal, W_Truth * MeV_to_GeV);
+    FillHistogram(Enu_mc_truth_all_signal, mc_incomingE * MeV_to_GeV);
+    FillHistogram(QSq_mc_truth_all_signal, truth_QSq_exp * MeVSq_to_GeVSq);
+    FillHistogram(W_mc_truth_all_signal, truth_W_exp * MeV_to_GeV);
     
     // Signal Characteristics
     if (mc_intType == 1){
         nQE.increment();
-        FillHistogram(mc_Q2_QE, mc_Q2 * MeVSq_to_GeVSq);
+        FillHistogram(mc_Q2_QE, truth_QSq_exp * MeVSq_to_GeVSq);
         FillHistogram(mc_incomingE_QE, mc_incomingE * MeV_to_GeV);
-        FillHistogram(mc_w_QE, mc_w * MeV_to_GeV);
+        FillHistogram(mc_w_QE, truth_W_exp * MeV_to_GeV);
     }else if (mc_intType == 2){
         if (mc_resID == 0){ 
             nRES_1232.increment(); 
-            FillHistogram(mc_Q2_RES_1232, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_Q2_RES_1232, truth_QSq_exp * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_RES_1232, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_RES_1232, mc_w * MeV_to_GeV);
+            FillHistogram(mc_w_RES_1232, truth_W_exp * MeV_to_GeV);
         }else if (mc_resID == 1){
             nRES_1535.increment(); 
-            FillHistogram(mc_Q2_RES_1535, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_Q2_RES_1535, truth_QSq_exp * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_RES_1535, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_RES_1535, mc_w * MeV_to_GeV);
+            FillHistogram(mc_w_RES_1535, truth_W_exp * MeV_to_GeV);
         }else if (mc_resID == 2){
             nRES_1520.increment(); 
-            FillHistogram(mc_Q2_RES_1520, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_Q2_RES_1520, truth_QSq_exp * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_RES_1520, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_RES_1520, mc_w * MeV_to_GeV);
+            FillHistogram(mc_w_RES_1520, truth_W_exp * MeV_to_GeV);
         }else{
             nRES_Other.increment(); 
-            FillHistogram(mc_Q2_RES_Other, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_Q2_RES_Other, truth_QSq_exp * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_RES_Other, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_RES_Other, mc_w * MeV_to_GeV);
+            FillHistogram(mc_w_RES_Other, truth_W_exp * MeV_to_GeV);
         }
     }else if (mc_intType == 3){
         int nFS_pions = Get_nFS_pions();
         if (mc_w*MeV_to_GeV < 1.7 ){
             nNon_RES.increment();
-            FillHistogram(mc_Q2_Non_RES, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_Q2_Non_RES, truth_QSq_exp * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_Non_RES, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_Non_RES, mc_w * MeV_to_GeV);
+            FillHistogram(mc_w_Non_RES, truth_W_exp * MeV_to_GeV);
         }else if (nFS_pions == 1){
             nDIS_1_pi.increment();
-            FillHistogram(mc_Q2_DIS_1_pi, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_Q2_DIS_1_pi, truth_QSq_exp * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_DIS_1_pi, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_DIS_1_pi, mc_w * MeV_to_GeV);
+            FillHistogram(mc_w_DIS_1_pi, truth_W_exp * MeV_to_GeV);
         }else if (nFS_pions == 2){
             nDIS_2_pi.increment();
-            FillHistogram(mc_Q2_DIS_2_pi, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_Q2_DIS_2_pi, truth_QSq_exp * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_DIS_2_pi, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_DIS_2_pi, mc_w * MeV_to_GeV);
+            FillHistogram(mc_w_DIS_2_pi, truth_W_exp * MeV_to_GeV);
         }else if (nFS_pions > 2){
             nDIS_Multi_pi.increment();
-            FillHistogram(mc_Q2_DIS_Multi_pi, mc_Q2 * MeVSq_to_GeVSq);
+            FillHistogram(mc_Q2_DIS_Multi_pi, truth_QSq_exp * MeVSq_to_GeVSq);
             FillHistogram(mc_incomingE_DIS_Multi_pi, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_DIS_Multi_pi, mc_w * MeV_to_GeV);
+            FillHistogram(mc_w_DIS_Multi_pi, truth_W_exp * MeV_to_GeV);
         }
     }else{
         std::cout<<"WARNING! Signal Event with different interaction Type!"<<std::endl;

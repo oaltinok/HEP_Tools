@@ -238,21 +238,25 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void PlotUnfolding_TruthComparison();
         void PlotUnfolding_Migration();
 
+        // --------------------------------------------------------------------
         // Systematics
-        void PrintVertErrorBand(MnvH1D* hist, std::string var_name, std::string err_name);
+        //      Implementations are in CCProtonPi0_Plotter_Systematics.cpp
+        // --------------------------------------------------------------------
+        // Error Grouping
         bool IsErrorInGroup(std::string err_name, std::vector<std::string> errGroup);
-        int GetErrorSummaryGroup(std::string err_name);
         void Systematics_SetErrorSummaryGroups();
+        
+        // Macros & Plotting
         void Systematics();
         void Systematics_CheckErrorSummary(std::string root_dir, std::string var_name);
-        void Systematics_Practice();
-        void Systematics_Practice(std::string root_dir, std::string var_name, std::string err_name);
-        void Systematics_Practice2D(std::string root_dir, std::string var_name, std::string err_name);
+        void Systematics_invMass();
         void Systematics_XSec();
         void Systematics_DrawErrorSummary(std::string data_var, std::string mc_var);
         void Systematics_DrawErrorBand_GENIE(std::string mc_var);
         void Systematics_DrawErrorSummary_GENIE(MnvH1D* hist, std::string var_name, std::string error_name, double err_genie_total);
-        void Systematics_WriteTable(MnvH1D* hist, std::string var_name);
+        // Tables
+        void Systematics_WriteTables(std::string var_name);
+        void Systematics_WriteTable_Fraction(MnvH1D* hist, std::string var_name);
         void Systematics_WriteTable_BinByBin(MnvH1D* hist, std::string var_name);
         TH1D* GetTotalErrorInGroup(MnvH1D* hist, std::vector<std::string> errGroup, bool area_normalized = false);
 

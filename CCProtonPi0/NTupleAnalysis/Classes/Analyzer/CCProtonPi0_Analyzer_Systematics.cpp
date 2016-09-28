@@ -275,10 +275,7 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_ByHand(MnvH2D* h, double xval, doub
     for( unsigned int i = 0; i < err_hists.size(); ++i ){
         
         // wgt_bckg is universe_wgt / cv_wgt
-        //double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint(error_name, i) : 1.0;
-
-        double wgt_bckg = 1.0; // We fill MnvH2D only for Signal Events: No need to search for Bckg Constraints
-
+        double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint(error_name, i) : 1.0;
         const double applyWeight = cvweight * wgt_bckg;
         const double wgtU = errors[i]*applyWeight;
         err_hists[i]->AddBinContent( cvbin, wgtU );
@@ -347,28 +344,76 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_PionResponse_ByHand(MnvH2D* h, doub
     FillVertErrorBand_ByHand(h, xval, yval, "PionResponse", 1-correctionErr, 1+correctionErr);
 }
 
-void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint(MnvH1D* h, double var)
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_WithPi0(MnvH1D* h, double var)
 {
-    double correctionErr = GetBckgConstraintErr();
-    h->FillVertErrorBand("BckgConstraint", var, 1-correctionErr, 1+correctionErr, cvweight);
+    double correctionErr = GetBckgConstraint_WithPi0Err();
+    h->FillVertErrorBand("BckgConstraint_WithPi0", var, 1-correctionErr, 1+correctionErr, cvweight);
 }
 
-void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_ByHand(MnvH1D* h, double var)
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_WithPi0_ByHand(MnvH1D* h, double var)
 {
-    double correctionErr = GetBckgConstraintErr();
-    FillVertErrorBand_ByHand(h, var, "BckgConstraint", 1-correctionErr, 1+correctionErr);
+    double correctionErr = GetBckgConstraint_WithPi0Err();
+    FillVertErrorBand_ByHand(h, var, "BckgConstraint_WithPi0", 1-correctionErr, 1+correctionErr);
 }
 
-void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint(MnvH2D* h, double xval, double yval)
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_WithPi0(MnvH2D* h, double xval, double yval)
 {
-    double correctionErr = GetBckgConstraintErr();
-    h->FillVertErrorBand("BckgConstraint", xval, yval, 1-correctionErr, 1+correctionErr, cvweight);
+    double correctionErr = GetBckgConstraint_WithPi0Err();
+    h->FillVertErrorBand("BckgConstraint_WithPi0", xval, yval, 1-correctionErr, 1+correctionErr, cvweight);
 }
 
-void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_ByHand(MnvH2D* h, double xval, double yval)
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_WithPi0_ByHand(MnvH2D* h, double xval, double yval)
 {
-    double correctionErr = GetBckgConstraintErr();
-    FillVertErrorBand_ByHand(h, xval, yval, "BckgConstraint", 1-correctionErr, 1+correctionErr);
+    double correctionErr = GetBckgConstraint_WithPi0Err();
+    FillVertErrorBand_ByHand(h, xval, yval, "BckgConstraint_WithPi0", 1-correctionErr, 1+correctionErr);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_SinglePiPlus(MnvH1D* h, double var)
+{
+    double correctionErr = GetBckgConstraint_SinglePiPlusErr();
+    h->FillVertErrorBand("BckgConstraint_SinglePiPlus", var, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_SinglePiPlus_ByHand(MnvH1D* h, double var)
+{
+    double correctionErr = GetBckgConstraint_SinglePiPlusErr();
+    FillVertErrorBand_ByHand(h, var, "BckgConstraint_SinglePiPlus", 1-correctionErr, 1+correctionErr);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_SinglePiPlus(MnvH2D* h, double xval, double yval)
+{
+    double correctionErr = GetBckgConstraint_SinglePiPlusErr();
+    h->FillVertErrorBand("BckgConstraint_SinglePiPlus", xval, yval, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_SinglePiPlus_ByHand(MnvH2D* h, double xval, double yval)
+{
+    double correctionErr = GetBckgConstraint_SinglePiPlusErr();
+    FillVertErrorBand_ByHand(h, xval, yval, "BckgConstraint_SinglePiPlus", 1-correctionErr, 1+correctionErr);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_QELike(MnvH1D* h, double var)
+{
+    double correctionErr = GetBckgConstraint_QELikeErr();
+    h->FillVertErrorBand("BckgConstraint_QELike", var, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_QELike_ByHand(MnvH1D* h, double var)
+{
+    double correctionErr = GetBckgConstraint_QELikeErr();
+    FillVertErrorBand_ByHand(h, var, "BckgConstraint_QELike", 1-correctionErr, 1+correctionErr);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_QELike(MnvH2D* h, double xval, double yval)
+{
+    double correctionErr = GetBckgConstraint_QELikeErr();
+    h->FillVertErrorBand("BckgConstraint_QELike", xval, yval, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_Analyzer::FillVertErrorBand_BckgConstraint_QELike_ByHand(MnvH2D* h, double xval, double yval)
+{
+    double correctionErr = GetBckgConstraint_QELikeErr();
+    FillVertErrorBand_ByHand(h, xval, yval, "BckgConstraint_QELike", 1-correctionErr, 1+correctionErr);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_MichelTrue(MnvH1D* h, double var)
@@ -548,7 +593,9 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH1D* hist, double var)
     if (fillErrors_ByHand){
         FillVertErrorBand_Genie_ByHand(hist, var);
         FillVertErrorBand_Flux_ByHand(hist, var);
-        FillVertErrorBand_BckgConstraint_ByHand(hist, var);
+        FillVertErrorBand_BckgConstraint_WithPi0_ByHand(hist, var);
+        FillVertErrorBand_BckgConstraint_SinglePiPlus_ByHand(hist, var);
+        FillVertErrorBand_BckgConstraint_QELike_ByHand(hist, var);
         FillVertErrorBand_MichelTrue_ByHand(hist, var);
         FillVertErrorBand_MichelFake_ByHand(hist, var);
         FillVertErrorBand_TargetMass_ByHand(hist, var);
@@ -560,7 +607,9 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH1D* hist, double var)
     }else{
         FillVertErrorBand_Genie(hist, var);
         FillVertErrorBand_Flux(hist, var);
-        FillVertErrorBand_BckgConstraint(hist, var);
+        FillVertErrorBand_BckgConstraint_WithPi0(hist, var);
+        FillVertErrorBand_BckgConstraint_SinglePiPlus(hist, var);
+        FillVertErrorBand_BckgConstraint_QELike(hist, var);
         FillVertErrorBand_MichelTrue(hist, var);
         FillVertErrorBand_MichelFake(hist, var);
         FillVertErrorBand_TargetMass(hist, var);
@@ -581,7 +630,9 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH2D* hist, double xval
     if (fillErrors_ByHand){
         FillVertErrorBand_Genie_ByHand(hist, xval, yval);
         FillVertErrorBand_Flux_ByHand(hist, xval, yval);
-        FillVertErrorBand_BckgConstraint_ByHand(hist, xval, yval);
+        FillVertErrorBand_BckgConstraint_WithPi0_ByHand(hist, xval, yval);
+        FillVertErrorBand_BckgConstraint_SinglePiPlus_ByHand(hist, xval, yval);
+        FillVertErrorBand_BckgConstraint_QELike_ByHand(hist, xval, yval);
         FillVertErrorBand_MichelTrue_ByHand(hist, xval, yval);
         FillVertErrorBand_MichelFake_ByHand(hist, xval, yval);
         FillVertErrorBand_TargetMass_ByHand(hist, xval, yval);
@@ -593,7 +644,9 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH2D* hist, double xval
     }else{
         FillVertErrorBand_Genie(hist, xval, yval);
         FillVertErrorBand_Flux(hist, xval, yval);
-        FillVertErrorBand_BckgConstraint(hist, xval, yval);
+        FillVertErrorBand_BckgConstraint_WithPi0(hist, xval, yval);
+        FillVertErrorBand_BckgConstraint_SinglePiPlus(hist, xval, yval);
+        FillVertErrorBand_BckgConstraint_QELike(hist, xval, yval);
         FillVertErrorBand_MichelTrue(hist, xval, yval);
         FillVertErrorBand_MichelFake(hist, xval, yval);
         FillVertErrorBand_TargetMass(hist, xval, yval);
@@ -700,7 +753,8 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy(std::string err_name)
             WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
             W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-            PassedCuts = IsEnuInRange(Enu_i);
+            PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
+
         }else{
             // For No Proton Events, event passes all cuts
             PassedCuts = true;
@@ -835,7 +889,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks()
             WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
             W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-            PassedCuts = IsEnuInRange(Enu_i);
+            PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
         }else{
             // For No Proton Events, event passes all cuts
             PassedCuts = true;
@@ -953,7 +1007,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
         // EM Energy Dependent Variables
         double gamma1_E_i = (1.0 + em_energy_random_shifts[i]) * gamma1_E;
         double gamma2_E_i = (1.0 + em_energy_random_shifts[i]) * gamma2_E;
-        double pi0_invMass_i = (1.0 + em_energy_random_shifts[i]) * pi0_invMass;
+        double pi0_invMass_i = std::sqrt(2*gamma1_E_i*gamma2_E_i*(1-pi0_cos_openingAngle));
         double pi0_P_i = (1.0 + em_energy_random_shifts[i]) * pi0_P;
         double pi0_E_i = sqrt(pi0_P_i*pi0_P_i + pi0_mass*pi0_mass);
         double pi0_KE_i = pi0_E_i - pi0_mass;
@@ -962,15 +1016,15 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
         double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
         double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-        double pi0_P_shift = (pi0_P_i - pi0_P) * MeV_to_GeV;
-        double pi0_KE_shift = (pi0_KE_i - pi0_KE) * MeV_to_GeV;
-        double Enu_shift = (Enu_i - m_Enu) * MeV_to_GeV;
-        double QSq_shift = (QSq_i - m_QSq) * MeVSq_to_GeVSq;
-        double W_shift = (W_i - m_W) * MeV_to_GeV;
-
-        bool PassedCuts = IsEnuInRange(Enu_i) && IsInvMassInRange(pi0_invMass_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
+        bool PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i) && IsInvMassInRange(pi0_invMass_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
 
         if (PassedCuts){
+            double pi0_P_shift = (pi0_P_i - pi0_P) * MeV_to_GeV;
+            double pi0_KE_shift = (pi0_KE_i - pi0_KE) * MeV_to_GeV;
+            double Enu_shift = (Enu_i - m_Enu) * MeV_to_GeV;
+            double QSq_shift = (QSq_i - m_QSq) * MeVSq_to_GeVSq;
+            double W_shift = (W_i - m_W) * MeV_to_GeV;
+
             //-----------------------------------------------------------------
             // pi0_P
             //-----------------------------------------------------------------
@@ -1075,21 +1129,21 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
     for (int i = 0; i < n_lateral_universes; ++i){
 
         // Muon Variables
-        double muon_E_i = (1.0 + muonP_random_shifts[i]) * muon_E;
         double muon_P_i = (1.0 + muonP_random_shifts[i]) * muon_P;
+        double muon_E_i = sqrt(muon_P_i * muon_P_i + muon_mass * muon_mass);
         double Enu_i = Calc_Enu_shifted(muon_E_i, pi0_E, m_total_proton_KE); // Use shifted muon energy and actual pi0 energy
         double QSq_i = Calc_QSq(Enu_i, muon_E_i, muon_P_i, reco_muon_theta); // Use shifted muon energy
         double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E_i); // Use shifted muon energy
         double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-        double muon_P_shift = (muon_P_i - muon_P) * MeV_to_GeV;
-        double Enu_shift = (Enu_i - m_Enu) * MeV_to_GeV;
-        double QSq_shift = (QSq_i - m_QSq) * MeVSq_to_GeVSq;
-        double W_shift = (W_i - m_W) * MeV_to_GeV;
-
-        bool PassedCuts = IsEnuInRange(Enu_i);
+        bool PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
 
         if (PassedCuts){
+            double muon_P_shift = (muon_P_i - muon_P) * MeV_to_GeV;
+            double Enu_shift = (Enu_i - m_Enu) * MeV_to_GeV;
+            double QSq_shift = (QSq_i - m_QSq) * MeVSq_to_GeVSq;
+            double W_shift = (W_i - m_W) * MeV_to_GeV;
+
             //-----------------------------------------------------------------
             // muon_P
             //-----------------------------------------------------------------
@@ -1195,16 +1249,15 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonTheta()
         double QSq_i = Calc_QSq(m_Enu, muon_E, muon_P, muon_theta_i); // Use actual neutrino energy and shifted muon theta
         double WSq_i = Calc_WSq(m_Enu, QSq_i, muon_E); // Use shifted QSq 
         double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
-
-        double muon_theta_shift = (muon_theta_i - reco_muon_theta) * TMath::RadToDeg();
-        double QSq_shift = (QSq_i - m_QSq) * MeVSq_to_GeVSq;
-        double W_shift = (W_i - m_W) * MeV_to_GeV;
         
-        // It always passes cuts, we did not change any cut specific variable
-        //  Keeeping this PassedCuts for future reference - I may use W cut in future
-        bool PassedCuts =  true;
+        bool PassedCuts =  IsWInRange(W_i);
 
         if (PassedCuts){
+
+            double muon_theta_shift = (muon_theta_i - reco_muon_theta) * TMath::RadToDeg();
+            double QSq_shift = (QSq_i - m_QSq) * MeVSq_to_GeVSq;
+            double W_shift = (W_i - m_W) * MeV_to_GeV;
+
             //-----------------------------------------------------------------
             // muon_P
             //-----------------------------------------------------------------
@@ -1302,6 +1355,8 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonTheta()
 void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_invMass(std::string err_name)
 {
     bool PassedCuts;
+    double reco_muon_theta = GetCorrectedMuonTheta();
+
     for (int i = 0; i < 2; ++i){
         if (nProtonCandidates > 0){
             std::vector<double> proton_energy_shifts = GetProtonEnergyShifts(err_name, i);
@@ -1312,9 +1367,14 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_invMass(std::string err
                 total_proton_KE_i += all_protons_KE[p] + proton_energy_shifts[p]; 
             }
             double Enu_i = Calc_Enu_shifted(muon_E, pi0_E, total_proton_KE_i); // Use actual muon energy and pi0 energy but shifted proton kinetic energy
+            double QSq_i = Calc_QSq(Enu_i, muon_E, muon_P, reco_muon_theta); // Use actual muon energy
+            double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
+            double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-            PassedCuts = IsEnuInRange(Enu_i);
+            PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
+
         }else{
+            // If there are no protons, event passes cuts
             PassedCuts = true;
         }
         
@@ -1339,6 +1399,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks_invMass()
 
     // For each event Birks_random_shifts is different
     Calc_Birks_random_shifts();
+    double reco_muon_theta = GetCorrectedMuonTheta();
 
     for (int i = 0; i < n_lateral_universes; ++i){
 
@@ -1349,10 +1410,15 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks_invMass()
             total_proton_KE_i += (1.0 + Birks_random_shifts2D[p][i]) * all_protons_KE[p]; 
         }
         double Enu_i = Calc_Enu_shifted(muon_E, pi0_E, total_proton_KE_i); // Use actual muon energy and pi0 energy but shifted proton kinetic energy
+        double QSq_i = Calc_QSq(Enu_i, muon_E, muon_P, reco_muon_theta); // Use actual muon energy
+        double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
+        double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-        PassedCuts = IsEnuInRange(Enu_i);
+        PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
+
         }else{
-            PassedCuts = false;
+            // If there are no protons, event passes cuts
+            PassedCuts = true;
         }
         
         if (PassedCuts){
@@ -1372,21 +1438,23 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale_invMass()
 {
     std::string err_name = "EM_EnergyScale";
     
+    double reco_muon_theta = GetCorrectedMuonTheta();
     for (int i = 0; i < n_lateral_universes; ++i){
 
-        // EM Energy Dependent Variables
         double gamma1_E_i = (1.0 + em_energy_random_shifts[i]) * gamma1_E;
         double gamma2_E_i = (1.0 + em_energy_random_shifts[i]) * gamma2_E;
+        double pi0_invMass_i = std::sqrt(2*gamma1_E_i*gamma2_E_i*(1-pi0_cos_openingAngle));
         double pi0_P_i = (1.0 + em_energy_random_shifts[i]) * pi0_P;
         double pi0_E_i = sqrt(pi0_P_i*pi0_P_i + pi0_mass*pi0_mass);
         double Enu_i = Calc_Enu_shifted(muon_E, pi0_E_i, m_total_proton_KE); // Use actual muon energy and shifted pi0 energy
-        double pi0_invMass_i = (1.0 + em_energy_random_shifts[i]) * pi0_invMass;
-        double pi0_invMass_shift = pi0_invMass_i - pi0_invMass;
+        double QSq_i = Calc_QSq(Enu_i, muon_E, muon_P, reco_muon_theta); // Use actual muon energy
+        double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
+        double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-        bool PassedCuts = IsEnuInRange(Enu_i) && IsInvMassInRange(pi0_invMass_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
+        bool PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i) && IsInvMassInRange(pi0_invMass_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
 
         if (PassedCuts){
-            pi0_invMass_shift = 0.0;
+            double pi0_invMass_shift = pi0_invMass_i - pi0_invMass;
             FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_all, err_name, i, pi0_invMass, pi0_invMass_shift);
             if (truth_isSignal){
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_signal, err_name, i, pi0_invMass, pi0_invMass_shift);
@@ -1405,14 +1473,19 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum_invMass()
     
     // For each event muonP_random_shifts is different
     Calc_muonP_random_shifts();
+    double reco_muon_theta = GetCorrectedMuonTheta();
  
     for (int i = 0; i < n_lateral_universes; ++i){
 
         // Muon Variables
-        double muon_E_i = (1.0 + muonP_random_shifts[i]) * muon_E;
+        double muon_P_i = (1.0 + muonP_random_shifts[i]) * muon_P;
+        double muon_E_i = sqrt(muon_P_i * muon_P_i + muon_mass * muon_mass);
         double Enu_i = Calc_Enu_shifted(muon_E_i, pi0_E, m_total_proton_KE); // Use shifted muon energy and actual pi0 energy
+        double QSq_i = Calc_QSq(Enu_i, muon_E_i, muon_P_i, reco_muon_theta); // Use shifted muon energy
+        double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E_i); // Use shifted muon energy
+        double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-        bool PassedCuts = IsEnuInRange(Enu_i);
+        bool PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
 
         if (PassedCuts){
             FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_all, err_name, i, pi0_invMass, 0.0);
@@ -1430,11 +1503,16 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum_invMass()
 void CCProtonPi0_Analyzer::FillLatErrorBand_MuonTheta_invMass()
 {
     std::string err_name = "MuonTheta";
+    double reco_muon_theta = GetCorrectedMuonTheta();
     
     for (int i = 0; i < n_lateral_universes; ++i){
-       
-        // Always Satisfies Cuts
-        bool PassedCuts = true;
+
+        double muon_theta_i = (1.0 + muon_theta_random_shifts[i]) * reco_muon_theta;
+        double QSq_i = Calc_QSq(m_Enu, muon_E, muon_P, muon_theta_i); // Use actual neutrino energy and shifted muon theta
+        double WSq_i = Calc_WSq(m_Enu, QSq_i, muon_E); // Use shifted QSq 
+        double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
+
+        bool PassedCuts = IsWInRange(W_i);
 
         if (PassedCuts){
             FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_all, err_name, i, pi0_invMass, 0.0);
@@ -1453,6 +1531,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonTheta_invMass()
 void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_SideBand_invMass(std::string err_name)
 {
     bool PassedCuts;
+    double reco_muon_theta = GetCorrectedMuonTheta();
 
     for (int i = 0; i < 2; ++i){
         if (nProtonCandidates > 0){
@@ -1464,8 +1543,12 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_SideBand_invMass(std::s
                 total_proton_KE_i += all_protons_KE[p] + proton_energy_shifts[p]; 
             }
             double Enu_i = Calc_Enu_shifted(muon_E, pi0_E, total_proton_KE_i); // Use actual muon energy and pi0 energy but shifted proton kinetic energy
+            double QSq_i = Calc_QSq(Enu_i, muon_E, muon_P, reco_muon_theta); // Use actual muon energy
+            double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
+            double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-            PassedCuts = IsEnuInRange(Enu_i); 
+            PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
+
         }else{
             // For No Proton Events, event passes all cuts
             PassedCuts = true;
@@ -1494,6 +1577,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks_SideBand_invMass(
     std::string err_name = "ProtonEnergy_Birks";
 
     bool PassedCuts;
+    double reco_muon_theta = GetCorrectedMuonTheta();
     
     // For each event Birks_random_shifts is different
     Calc_Birks_random_shifts();
@@ -1507,8 +1591,12 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks_SideBand_invMass(
                 total_proton_KE_i += (1.0 + Birks_random_shifts2D[p][i]) * all_protons_KE[p]; 
             }
             double Enu_i = Calc_Enu_shifted(muon_E, pi0_E, total_proton_KE_i); // Use actual muon energy and pi0 energy but shifted proton kinetic energy
+            double QSq_i = Calc_QSq(Enu_i, muon_E, muon_P, reco_muon_theta); // Use actual muon energy
+            double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
+            double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-            PassedCuts = IsEnuInRange(Enu_i); 
+            PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
+
         }else{
             // For No Proton Events, event passes all cuts
             PassedCuts = true;
@@ -1535,20 +1623,24 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks_SideBand_invMass(
 void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale_SideBand_invMass()
 {
     std::string err_name = "EM_EnergyScale";
+    double reco_muon_theta = GetCorrectedMuonTheta();
     
     for (int i = 0; i < n_lateral_universes; ++i){
 
         // EM Energy Dependent Variables
         double gamma1_E_i = (1.0 + em_energy_random_shifts[i]) * gamma1_E;
         double gamma2_E_i = (1.0 + em_energy_random_shifts[i]) * gamma2_E;
+        double pi0_invMass_i = std::sqrt(2*gamma1_E_i*gamma2_E_i*(1-pi0_cos_openingAngle));
         double pi0_P_i = (1.0 + em_energy_random_shifts[i]) * pi0_P;
         double pi0_E_i = sqrt(pi0_P_i*pi0_P_i + pi0_mass*pi0_mass);
         double Enu_i = Calc_Enu_shifted(muon_E, pi0_E_i, m_total_proton_KE); // Use actual muon energy and shifted pi0 energy
+        double QSq_i = Calc_QSq(Enu_i, muon_E, muon_P, reco_muon_theta); // Use actual muon energy
+        double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
+        double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-        bool PassedCuts = IsEnuInRange(Enu_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
+        bool PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
 
         if (PassedCuts){
-            double pi0_invMass_i = (1.0 + em_energy_random_shifts[i]) * pi0_invMass;
             double pi0_invMass_shift = pi0_invMass_i - pi0_invMass;
             
             // Fill All Events on [0]
@@ -1574,14 +1666,18 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum_SideBand_invMass()
     
     // For each event muonP_random_shifts is different
     Calc_muonP_random_shifts();
+    double reco_muon_theta = GetCorrectedMuonTheta();
  
     for (int i = 0; i < n_lateral_universes; ++i){
 
-        // Muon Variables
-        double muon_E_i = (1.0 + muonP_random_shifts[i]) * muon_E;
+        double muon_P_i = (1.0 + muonP_random_shifts[i]) * muon_P;
+        double muon_E_i = sqrt(muon_P_i * muon_P_i + muon_mass * muon_mass);
         double Enu_i = Calc_Enu_shifted(muon_E_i, pi0_E, m_total_proton_KE); // Use shifted muon energy and actual pi0 energy
+        double QSq_i = Calc_QSq(Enu_i, muon_E_i, muon_P_i, reco_muon_theta); // Use shifted muon energy
+        double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E_i); // Use shifted muon energy
+        double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
-        bool PassedCuts = IsEnuInRange(Enu_i);
+        bool PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
 
         if (PassedCuts){
             // Fill All Events on [0]
@@ -1605,9 +1701,16 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonTheta_SideBand_invMass()
 {
     std::string err_name = "MuonTheta";
     
+    double reco_muon_theta = GetCorrectedMuonTheta();
+    
     for (int i = 0; i < n_lateral_universes; ++i){
 
-        bool PassedCuts = true;
+        double muon_theta_i = (1.0 + muon_theta_random_shifts[i]) * reco_muon_theta;
+        double QSq_i = Calc_QSq(m_Enu, muon_E, muon_P, muon_theta_i); // Use actual neutrino energy and shifted muon theta
+        double WSq_i = Calc_WSq(m_Enu, QSq_i, muon_E); // Use shifted QSq 
+        double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
+
+        bool PassedCuts = IsWInRange(W_i);
 
         if (PassedCuts){
             // Fill All Events on [0]
@@ -1665,11 +1768,13 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::st
                 break;
     }      
 
+    // Get Weight for the specific universe
     // wgt_bckg is universe_wgt / cv_wgt
     double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint(err_name, unv) : 1.0;
     double wgtU = cvweight * wgt_bckg;
     err_hists[unv]->AddBinContent( bin, wgtU );
 
+    // Update Bin Error
     const double err = err_hists[unv]->GetBinError(bin);
     const double newerr2 = err*err + wgtU*wgtU;
     const double newerr = (0.<newerr2) ? sqrt(newerr2) : 0.;
@@ -1699,16 +1804,14 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_SingleUniverse(MnvH2D* hist, std::st
     int bin = hist->FindBin( x_shiftVal, y_shiftVal );
   
     // wgt_bckg is universe_wgt / cv_wgt
-    //double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint(err_name, unv) : 1.0;
-
-    double wgt_bckg = 1.0; // We fill MnvH2D only for Signal Events: No need to search for Bckg Constraints
+    double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint(err_name, unv) : 1.0;
     double wgtU = cvweight * wgt_bckg;
     err_hists[unv]->AddBinContent( bin, wgtU );
 
-    const double err = err_hists[unv]->GetBinError(bin);
-    const double newerr2 = err*err + wgtU*wgtU;
-    const double newerr = (0.<newerr2) ? sqrt(newerr2) : 0.;
-    err_hists[unv]->SetBinError( bin, newerr );
+//    const double err = err_hists[unv]->GetBinError(bin);
+//    const double newerr2 = err*err + wgtU*wgtU;
+//    const double newerr = (0.<newerr2) ? sqrt(newerr2) : 0.;
+//    err_hists[unv]->SetBinError( bin, newerr );
 
 }
 
@@ -1958,13 +2061,31 @@ void CCProtonPi0_Analyzer::FillProtonEnergyShiftVector(std::vector<double> &ener
     }
 }
 
-double CCProtonPi0_Analyzer::GetBckgConstraintErr()
+double CCProtonPi0_Analyzer::GetBckgConstraint_WithPi0Err()
+{
+    double correctionErr;
+
+    if (truth_isBckg_Compact_WithPi0) correctionErr = cv_err_WithPi0;
+    else correctionErr = 0.0;
+
+    return correctionErr;
+}
+
+double CCProtonPi0_Analyzer::GetBckgConstraint_SinglePiPlusErr()
 {
     double correctionErr;
 
     if (truth_isBckg_Compact_SinglePiPlus) correctionErr = cv_err_SinglePiPlus;
-    else if (truth_isBckg_Compact_QELike) correctionErr = cv_err_QELike;
-    else if (truth_isBckg_Compact_WithPi0) correctionErr = cv_err_WithPi0;
+    else correctionErr = 0.0;
+
+    return correctionErr;
+}
+
+double CCProtonPi0_Analyzer::GetBckgConstraint_QELikeErr()
+{
+    double correctionErr;
+
+    if (truth_isBckg_Compact_QELike) correctionErr = cv_err_QELike;
     else correctionErr = 0.0;
 
     return correctionErr;

@@ -271,6 +271,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         else counter2.increment();
 
         //Study_ProtonSystematics();
+        //Study_GENIE_Weights();
     } // end for-loop
 
     if (!m_isMC) AddErrorBands_Data();
@@ -313,7 +314,8 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
     pi0(isModeReduce, isMC),
     pi0Blob(isModeReduce, isMC),
     bckgTool(isModeReduce),
-    cutList(isModeReduce, isMC)
+    cutList(isModeReduce, isMC),
+    BckgConstrainer(Folder_List::BckgConstraints)
 {   
     cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
 
@@ -891,7 +893,7 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     // ------------------------------------------------------------------------
     // W Cut
     // ------------------------------------------------------------------------
-    if (m_W > max_W) return false;
+    if ( !IsWInRange(m_W) ) return false;
     
     cutList.nCut_W.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_W.increment(truth_isSignal, study1, study2);
@@ -934,10 +936,10 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     if (pi0_invMass > max_Pi0_invMass) isHighInvMassEvent = true;
     else isHighInvMassEvent = false;
 
-    fill_BackgroundSubtractionHists();
-
     if( isLowInvMassEvent && !sideBand_LowInvMass) return false;
     if( isHighInvMassEvent && !sideBand_HighInvMass) return false;
+
+    fill_BackgroundSubtractionHists();
 
     cutList.nCut_Pi0_invMass.increment(truth_isSignal, study1, study2);
     if (nProtonCandidates == 0) cutList.nCut_1Track_Pi0_invMass.increment(truth_isSignal, study1, study2);
@@ -1042,6 +1044,15 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
 void CCProtonPi0_Analyzer::fillInteractionReco()
 {
     FillHistogram(interaction.CV_weight, cvweight);
+    
+    FillHistogram(interaction.MaRES_shifts, truth_genie_wgt_MaRES[2]);
+    FillHistogram(interaction.MaRES_shifts, truth_genie_wgt_MaRES[4]);
+
+    FillHistogram(interaction.MvRES_shifts, truth_genie_wgt_MvRES[2]);
+    FillHistogram(interaction.MvRES_shifts, truth_genie_wgt_MvRES[4]);
+
+    FillHistogram(interaction.Rvn1pi_shifts, truth_genie_wgt_Rvn1pi[2]);
+    FillHistogram(interaction.Rvn1pi_shifts, truth_genie_wgt_Rvn1pi[4]);
     
     //GetDeltaPolarization();
     GetDeltaTransverse();
@@ -1461,12 +1472,10 @@ void CCProtonPi0_Analyzer::fill_BackgroundSubtractionHists()
         FillLatErrorBand_EM_EnergyScale_invMass();
         FillLatErrorBand_MuonMomentum_invMass();
         FillLatErrorBand_MuonTheta_invMass();
-        if (nProtonCandidates > 0){
-            FillLatErrorBand_ProtonEnergy_Birks_invMass();
-            FillLatErrorBand_ProtonEnergy_invMass("ProtonEnergy_MassModel");
-            FillLatErrorBand_ProtonEnergy_invMass("ProtonEnergy_MEU");
-            FillLatErrorBand_ProtonEnergy_invMass("ProtonEnergy_BetheBloch");
-        }
+        FillLatErrorBand_ProtonEnergy_Birks_invMass();
+        FillLatErrorBand_ProtonEnergy_invMass("ProtonEnergy_MassModel");
+        FillLatErrorBand_ProtonEnergy_invMass("ProtonEnergy_MEU");
+        FillLatErrorBand_ProtonEnergy_invMass("ProtonEnergy_BetheBloch");
     }else{
         FillHistogram(cutList.invMass_all, pi0_invMass);
     }
@@ -1921,10 +1930,9 @@ void CCProtonPi0_Analyzer::Calc_EventKinematics()
 void CCProtonPi0_Analyzer::Calc_EventKinematics_Truth()
 {
     m_Enu_Truth = mc_incomingE;
-    m_QSq_Truth = Calc_QSq(m_Enu_Truth, truth_muon_4P[3], truth_muon_P, truth_muon_theta_beam);
-    m_WSq_Truth = Calc_WSq(m_Enu_Truth, m_QSq_Truth, truth_muon_4P[3]);
-    if (m_WSq_Truth > 0) m_W_Truth = sqrt(m_WSq_Truth);
-    else m_W_Truth = -1;
+    m_QSq_Truth = truth_QSq_exp;
+    m_WSq_Truth = truth_WSq_exp;
+    m_W_Truth = truth_W_exp;
 }
 
 void CCProtonPi0_Analyzer::FillSignalCharacteristics_Reco()
@@ -1959,49 +1967,48 @@ void CCProtonPi0_Analyzer::FillSignalCharacteristics_Reco()
 
 void CCProtonPi0_Analyzer::FillSignalCharacteristics(bool isMinosMatched)
 {
-    if (isMinosMatched)
-    {
+    if (isMinosMatched) {
         // Signal Characteristics
         if (mc_intType == 1){
-            FillHistogram(cutList.mc_Q2_QE, mc_Q2 * MeVSq_to_GeVSq);
-            FillHistogram(cutList.mc_incomingE_QE, mc_incomingE * MeV_to_GeV);
-            FillHistogram(cutList.mc_w_QE, mc_w * MeV_to_GeV);
+            FillHistogram(cutList.mc_Q2_QE, m_QSq_Truth * MeVSq_to_GeVSq);
+            FillHistogram(cutList.mc_incomingE_QE, m_Enu_Truth * MeV_to_GeV);
+            FillHistogram(cutList.mc_w_QE, m_W_Truth * MeV_to_GeV);
         }else if (mc_intType == 2){
             if (mc_resID == 0){ 
-                FillHistogram(cutList.mc_Q2_RES_1232, mc_Q2 * MeVSq_to_GeVSq);
-                FillHistogram(cutList.mc_incomingE_RES_1232, mc_incomingE * MeV_to_GeV);
-                FillHistogram(cutList.mc_w_RES_1232, mc_w * MeV_to_GeV);
+                FillHistogram(cutList.mc_Q2_RES_1232, m_QSq_Truth * MeVSq_to_GeVSq);
+                FillHistogram(cutList.mc_incomingE_RES_1232, m_Enu_Truth * MeV_to_GeV);
+                FillHistogram(cutList.mc_w_RES_1232, m_W_Truth * MeV_to_GeV);
             }else if (mc_resID == 1){
-                FillHistogram(cutList.mc_Q2_RES_1535, mc_Q2 * MeVSq_to_GeVSq);
-                FillHistogram(cutList.mc_incomingE_RES_1535, mc_incomingE * MeV_to_GeV);
-                FillHistogram(cutList.mc_w_RES_1535, mc_w * MeV_to_GeV);
+                FillHistogram(cutList.mc_Q2_RES_1535, m_QSq_Truth * MeVSq_to_GeVSq);
+                FillHistogram(cutList.mc_incomingE_RES_1535, m_Enu_Truth * MeV_to_GeV);
+                FillHistogram(cutList.mc_w_RES_1535, m_W_Truth * MeV_to_GeV);
             }else if (mc_resID == 2){
-                FillHistogram(cutList.mc_Q2_RES_1520, mc_Q2 * MeVSq_to_GeVSq);
-                FillHistogram(cutList.mc_incomingE_RES_1520, mc_incomingE * MeV_to_GeV);
-                FillHistogram(cutList.mc_w_RES_1520, mc_w * MeV_to_GeV);
+                FillHistogram(cutList.mc_Q2_RES_1520, m_QSq_Truth * MeVSq_to_GeVSq);
+                FillHistogram(cutList.mc_incomingE_RES_1520, m_Enu_Truth * MeV_to_GeV);
+                FillHistogram(cutList.mc_w_RES_1520, m_W_Truth * MeV_to_GeV);
             }else{
-                FillHistogram(cutList.mc_Q2_RES_Other, mc_Q2 * MeVSq_to_GeVSq);
-                FillHistogram(cutList.mc_incomingE_RES_Other, mc_incomingE * MeV_to_GeV);
-                FillHistogram(cutList.mc_w_RES_Other, mc_w * MeV_to_GeV);
+                FillHistogram(cutList.mc_Q2_RES_Other, m_QSq_Truth * MeVSq_to_GeVSq);
+                FillHistogram(cutList.mc_incomingE_RES_Other, m_Enu_Truth * MeV_to_GeV);
+                FillHistogram(cutList.mc_w_RES_Other, m_W_Truth * MeV_to_GeV);
             }
         }else if (mc_intType == 3){
             int nFS_pions = Get_nFS_pions();
-            if (mc_w * MeV_to_GeV < 1.7){
-                FillHistogram(cutList.mc_Q2_Non_RES, mc_Q2 * MeVSq_to_GeVSq);
-                FillHistogram(cutList.mc_incomingE_Non_RES, mc_incomingE * MeV_to_GeV);
-                FillHistogram(cutList.mc_w_Non_RES, mc_w * MeV_to_GeV);
+            if (m_W_Truth * MeV_to_GeV < 1.7){
+                FillHistogram(cutList.mc_Q2_Non_RES, m_QSq_Truth * MeVSq_to_GeVSq);
+                FillHistogram(cutList.mc_incomingE_Non_RES, m_Enu_Truth * MeV_to_GeV);
+                FillHistogram(cutList.mc_w_Non_RES, m_W_Truth * MeV_to_GeV);
             }else if (nFS_pions == 1){
-                FillHistogram(cutList.mc_Q2_DIS_1_pi, mc_Q2 * MeVSq_to_GeVSq);
-                FillHistogram(cutList.mc_incomingE_DIS_1_pi, mc_incomingE * MeV_to_GeV);
-                FillHistogram(cutList.mc_w_DIS_1_pi, mc_w * MeV_to_GeV);
+                FillHistogram(cutList.mc_Q2_DIS_1_pi, m_QSq_Truth * MeVSq_to_GeVSq);
+                FillHistogram(cutList.mc_incomingE_DIS_1_pi, m_Enu_Truth * MeV_to_GeV);
+                FillHistogram(cutList.mc_w_DIS_1_pi, m_W_Truth * MeV_to_GeV);
             }else if (nFS_pions == 2){
-                FillHistogram(cutList.mc_Q2_DIS_2_pi, mc_Q2 * MeVSq_to_GeVSq);
-                FillHistogram(cutList.mc_incomingE_DIS_2_pi, mc_incomingE * MeV_to_GeV);
-                FillHistogram(cutList.mc_w_DIS_2_pi, mc_w * MeV_to_GeV);
+                FillHistogram(cutList.mc_Q2_DIS_2_pi, m_QSq_Truth * MeVSq_to_GeVSq);
+                FillHistogram(cutList.mc_incomingE_DIS_2_pi, m_Enu_Truth * MeV_to_GeV);
+                FillHistogram(cutList.mc_w_DIS_2_pi, m_W_Truth * MeV_to_GeV);
             }else if (nFS_pions > 2){
-                FillHistogram(cutList.mc_Q2_DIS_Multi_pi, mc_Q2 * MeVSq_to_GeVSq);
-                FillHistogram(cutList.mc_incomingE_DIS_Multi_pi, mc_incomingE * MeV_to_GeV);
-                FillHistogram(cutList.mc_w_DIS_Multi_pi, mc_w * MeV_to_GeV);
+                FillHistogram(cutList.mc_Q2_DIS_Multi_pi, m_QSq_Truth * MeVSq_to_GeVSq);
+                FillHistogram(cutList.mc_incomingE_DIS_Multi_pi, m_Enu_Truth * MeV_to_GeV);
+                FillHistogram(cutList.mc_w_DIS_Multi_pi, m_W_Truth * MeV_to_GeV);
             }
         }else{
             std::cout<<"WARNING! Signal Event with different interaction Type!"<<std::endl;
@@ -2404,7 +2411,6 @@ void CCProtonPi0_Analyzer::setCounterNames()
     nMichel_Truth_Found_Improved.setName("nMichel_Truth_Found_Improved");
 }
 
-
 void CCProtonPi0_Analyzer::initCVWeights()
 {
     cv_wgt_SinglePiPlus = BckgConstrainer.GetBckgConstraint("CentralValue", 0, "SinglePiPlus");
@@ -2417,6 +2423,14 @@ void CCProtonPi0_Analyzer::initCVWeights()
 
     std::cout<<"CV Background Weights = "<<cv_wgt_SinglePiPlus<<" "<<cv_wgt_QELike<<" "<<cv_wgt_WithPi0<<std::endl;
     std::cout<<"CV Background Weight Errors = "<<cv_err_SinglePiPlus<<" "<<cv_err_QELike<<" "<<cv_err_WithPi0<<std::endl;
+}
+
+void CCProtonPi0_Analyzer::Study_GENIE_Weights()
+{
+    std::cout<<"MaRES, MvRES and Rvn1pi Shifts"<<std::endl;
+    for (int i = 0; i < genie_wgt_n_shifts; ++i){
+        std::cout<<i<<"\t"<<truth_genie_wgt_MaRES[i]<<" "<<truth_genie_wgt_MvRES[i]<<" "<<truth_genie_wgt_Rvn1pi[i]<<std::endl; 
+    }
 }
 
 

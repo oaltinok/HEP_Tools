@@ -29,6 +29,7 @@ namespace Folder_List
 
     // Background Constraints
     const std::string BckgConstraints = input + "BckgConstraints/" + "Weights_All_Universes.txt";
+    const std::string BckgConstraints_TruthAnalysis = "../" + input + "BckgConstraints/" + "Weights_All_Universes.txt";
 
     //-------------------------------------------------------------------------
     // Data files on /minerva/data/ Disk

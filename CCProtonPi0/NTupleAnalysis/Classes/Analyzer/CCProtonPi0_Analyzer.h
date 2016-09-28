@@ -107,11 +107,23 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillVertErrorBand_Genie_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_Genie_ByHand(MnvH2D* h, double xval, double yval);
 
-        double GetBckgConstraintErr();
-        void FillVertErrorBand_BckgConstraint(MnvH1D* h, double var);
-        void FillVertErrorBand_BckgConstraint(MnvH2D* h, double xval, double yval);
-        void FillVertErrorBand_BckgConstraint_ByHand(MnvH1D* h, double var);
-        void FillVertErrorBand_BckgConstraint_ByHand(MnvH2D* h, double xval, double yval);
+        double GetBckgConstraint_WithPi0Err();
+        void FillVertErrorBand_BckgConstraint_WithPi0(MnvH1D* h, double var);
+        void FillVertErrorBand_BckgConstraint_WithPi0(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_BckgConstraint_WithPi0_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_BckgConstraint_WithPi0_ByHand(MnvH2D* h, double xval, double yval);
+
+        double GetBckgConstraint_SinglePiPlusErr();
+        void FillVertErrorBand_BckgConstraint_SinglePiPlus(MnvH1D* h, double var);
+        void FillVertErrorBand_BckgConstraint_SinglePiPlus(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_BckgConstraint_SinglePiPlus_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_BckgConstraint_SinglePiPlus_ByHand(MnvH2D* h, double xval, double yval);
+
+        double GetBckgConstraint_QELikeErr();
+        void FillVertErrorBand_BckgConstraint_QELike(MnvH1D* h, double var);
+        void FillVertErrorBand_BckgConstraint_QELike(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_BckgConstraint_QELike_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_BckgConstraint_QELike_ByHand(MnvH2D* h, double xval, double yval);
 
         double GetMichelFakeErr();
         void FillVertErrorBand_MichelFake(MnvH1D* h, double var);
@@ -172,6 +184,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double Calc_Enu_shifted(double muon_E_shifted, double pi0_E_shifted, double total_proton_KE_shifted);
         void FillLatErrorBands_ByHand();
         void FillLatErrorBand_SingleUniverse(MnvH1D* hist, std::string err_name, int unv, double var, double shift);
+        void FillLatErrorBand_SingleUniverse2(MnvH1D* hist, std::string err_name, int unv, double var, double shift);
         void FillLatErrorBand_SingleUniverse(MnvH2D* hist, std::string err_name, int unv, double xval, double yval, double x_shift, double y_shift);
 
         void FillLatErrorBand_EM_EnergyScale();
@@ -247,6 +260,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void GetMichelStatistics();
         void GetMichelStatistics_Showers();
         double GetBckgConstraint(std::string error_name, int hist_ind);
+        void Study_GENIE_Weights();
 
         //  Muon Specific Functions
         void fillMuonMC();

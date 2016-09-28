@@ -11,49 +11,36 @@ void CCProtonPi0_Plotter::Systematics_CheckErrorSummary(std::string root_dir, st
     
     DrawErrorSummary(mc, var_name, plotDir);
 
-    Systematics_WriteTable(mc, var_name);
+    Systematics_WriteTable_Fraction(mc, var_name);
     Systematics_WriteTable_BinByBin(mc, var_name);
 
     delete mc;
 }
 
-void CCProtonPi0_Plotter::Systematics_Practice()
+void CCProtonPi0_Plotter::Systematics_invMass()
 {
-    std::string err_name = "EM_EnergyScale";
-    //Systematics_Practice(rootDir_Pion.mc, "pi0_P_mc_reco_all", err_name);
-    //Systematics_Practice2D(rootDir_Pion.mc, "pi0_P_response", err_name);
-    
-    //Systematics_Practice(rootDir_Muon.mc, "muon_P_mc_reco_all", err_name);
-    //Systematics_Practice2D(rootDir_Muon.mc, "muon_P_response", err_name);
-    
-    Systematics_Practice(rootDir_CutHists.mc, "hCut_pi0invMass_0", err_name);
-    Systematics_Practice(rootDir_CutHists.mc, "hCut_pi0invMass_1", err_name);
-    Systematics_Practice(rootDir_CutHists.mc, "hCut_pi0invMass_2", err_name);
+    Systematics_DrawErrorSummary("invMass_all", "invMass_mc_reco_all");
 }
 
 void CCProtonPi0_Plotter::Systematics_XSec()
 {
-    std::cout<<"Plotting Error Summary for Raw Data..."<<std::endl;
+    //Systematics_DrawErrorSummary("muon_P_xsec", "muon_P_xsec");
+    //Systematics_DrawErrorSummary("muon_theta_xsec", "muon_theta_xsec");
+    //Systematics_DrawErrorSummary("pi0_P_xsec", "pi0_P_xsec");
+    //Systematics_DrawErrorSummary("pi0_KE_xsec", "pi0_KE_xsec");
+    //Systematics_DrawErrorSummary("pi0_theta_xsec", "pi0_theta_xsec");
+    //Systematics_DrawErrorSummary("QSq_xsec", "QSq_xsec");
+    //Systematics_DrawErrorSummary("Enu_xsec", "Enu_xsec");
+    //Systematics_DrawErrorSummary("W_xsec", "W_xsec");
 
-    Systematics_DrawErrorSummary("muon_P_xsec", "muon_P_xsec");
-    Systematics_DrawErrorSummary("muon_theta_xsec", "muon_theta_xsec");
-    Systematics_DrawErrorSummary("pi0_P_xsec", "pi0_P_xsec");
-    Systematics_DrawErrorSummary("pi0_KE_xsec", "pi0_KE_xsec");
-    Systematics_DrawErrorSummary("pi0_theta_xsec", "pi0_theta_xsec");
-    Systematics_DrawErrorSummary("QSq_xsec", "QSq_xsec");
-    Systematics_DrawErrorSummary("Enu_xsec", "Enu_xsec");
-    Systematics_DrawErrorSummary("W_xsec", "W_xsec");
-
-    //Systematics_DrawErrorBand_GENIE("muon_P_xsec");
-    //Systematics_DrawErrorBand_GENIE("muon_theta_xsec");
-    //Systematics_DrawErrorBand_GENIE("pi0_P_xsec");
-    //Systematics_DrawErrorBand_GENIE("pi0_KE_xsec");
-    //Systematics_DrawErrorBand_GENIE("pi0_theta_xsec");
-    //Systematics_DrawErrorBand_GENIE("QSq_xsec");
+    Systematics_DrawErrorBand_GENIE("muon_P_xsec");
+    Systematics_DrawErrorBand_GENIE("muon_theta_xsec");
+    Systematics_DrawErrorBand_GENIE("pi0_P_xsec");
+    Systematics_DrawErrorBand_GENIE("pi0_KE_xsec");
+    Systematics_DrawErrorBand_GENIE("pi0_theta_xsec");
+    Systematics_DrawErrorBand_GENIE("QSq_xsec");
     //Systematics_DrawErrorBand_GENIE("W_xsec");
-    //Systematics_DrawErrorBand_GENIE("Enu_xsec");
-
-    std::cout<<"Plotting Error Summary for Raw Data Finished!"<<std::endl;
+    Systematics_DrawErrorBand_GENIE("Enu_xsec");
 }
 
 void CCProtonPi0_Plotter::Systematics_DrawErrorSummary(std::string data_var, std::string mc_var)
@@ -70,7 +57,7 @@ void CCProtonPi0_Plotter::Systematics_DrawErrorSummary(std::string data_var, std
     DrawErrorSummary(data, data_var, plotDir);
     DrawErrorSummary(mc, mc_var, plotDir);
 
-    //Systematics_WriteTable(data, data_var);
+    Systematics_WriteTable_Fraction(data, data_var);
     Systematics_WriteTable_BinByBin(data, data_var);
 
     delete data;
@@ -83,19 +70,24 @@ void CCProtonPi0_Plotter::Systematics_DrawErrorBand_GENIE(std::string data_var)
 
     MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
 
-    std::vector<std::string> all_errors = data->GetVertErrorBandNames();
-    
     // First Remove Non-GENIE Error Bands
-    for (unsigned int i = 0; i < all_errors.size(); ++i){
-        std::size_t found = all_errors[i].find("GENIE");
+    std::vector<std::string> vert_errors = data->GetVertErrorBandNames();
+    for (unsigned int i = 0; i < vert_errors.size(); ++i){
+        std::size_t found = vert_errors[i].find("GENIE");
         if (found == std::string::npos){
-            MnvVertErrorBand* non_genie = data->PopVertErrorBand(all_errors[i]);
+            MnvVertErrorBand* non_genie = data->PopVertErrorBand(vert_errors[i]);
             delete non_genie;
         }
     }
     
+    std::vector<std::string> lat_errors = data->GetLatErrorBandNames();
+    for (unsigned int i = 0; i < lat_errors.size(); ++i){
+            MnvLatErrorBand* non_genie = data->PopLatErrorBand(lat_errors[i]);
+            delete non_genie;
+    }
+
     std::vector<std::string> genie_errors = data->GetVertErrorBandNames();
-    TH1D* err_total = new TH1D(data->GetTotalError(false));
+    TH1D* err_total = new TH1D(data->GetTotalError(false,true));
     double err_genie_total = err_total->Integral();
     delete err_total;
 
@@ -126,18 +118,23 @@ void CCProtonPi0_Plotter::Systematics_DrawErrorSummary_GENIE(MnvH1D* hist, std::
     // Add Plot Labels
     plotter->AddHistoTitle(hist->GetTitle());
 
-    TH1D* h_err_total = new TH1D(hist->GetTotalError(false));
-    MnvVertErrorBand* error_band = hist->GetVertErrorBand(error_name);
-    TH1D* h_err_single = new TH1D(error_band->GetErrorBand()); 
+    // Current Total 
+    TH1D* h_err_total = new TH1D(hist->GetTotalError(false,true));
+
+    // Single Fractional
+    std::vector<std::string> errGroup;
+    errGroup.push_back(error_name);
+    TH1D* h_err_single = GetTotalErrorInGroup(hist, errGroup); 
     double err_total = h_err_total->Integral();
     double err_single = h_err_single->Integral();
 
-    err_genie_total = err_genie_total*err_genie_total;
-    err_total = err_total * err_total;
-    err_single = err_single * err_single;
     delete h_err_total;
     delete h_err_single;
-   
+ 
+    err_genie_total *= err_genie_total;
+    err_total *= err_total;
+    err_single *= err_single;  
+
     // Add Text
     TLatex text;
     text.SetNDC();
@@ -155,64 +152,101 @@ void CCProtonPi0_Plotter::Systematics_DrawErrorSummary_GENIE(MnvH1D* hist, std::
     delete plotter;
 }
 
-void CCProtonPi0_Plotter::Systematics_WriteTable(MnvH1D* hist, std::string var_name)
+void CCProtonPi0_Plotter::Systematics_WriteTables(std::string var_name)
+{
+    std::string plotDir = Folder_List::plotDir_Systematics_Summary;
+    TFile* f_data = new TFile(rootDir_CrossSection.data.c_str());
+
+    std::string var;
+    
+    // Original
+    var = var_name + "_" + "all";
+    MnvH1D* hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
+ 
+    // Background Subtracted 
+    var = var_name + "_" + "bckg_subtracted";
+    hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
+ 
+    // Unfolded 
+    var = var_name + "_" + "unfolded";
+    hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
+ 
+    // Efficiency Corrected 
+    var = var_name + "_" + "efficiency_corrected";
+    hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
+ 
+    // Flux Integrated 
+    var = var_name + "_" + "flux_integrated";
+    hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
+ 
+    // Cross Section 
+    var = var_name + "_" + "xsec";
+    hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
+    
+    delete f_data;
+}
+
+void CCProtonPi0_Plotter::Systematics_WriteTable_Fraction(MnvH1D* hist, std::string var_name)
 {
     // Open Text File
-    std::string file_name = Folder_List::plotDir_Systematics_Summary + "Table_" + var_name + ".txt";
+    std::string file_name = Folder_List::plotDir_Systematics_Summary + "Table_Fractional_" + var_name + ".txt";
     ofstream file;
     OpenTextFile(file_name, file);
 
     // Write Header
     file<<std::left;
-    file.width(36); file<<"Error Name"<<" "; 
-    file.width(12); file<<"Area";    
-    file.width(12); file<<"Percent";    
+    file.width(36); file<<"ErrorName"<<" "; 
+    file.width(12); file<<"Fraction";    
     file<<std::endl;
 
-    // Get Err Total
-    TH1D* h_err_total = new TH1D(hist->GetTotalError(false));
-    double err_total = h_err_total->Integral();
-    err_total *= err_total; // Use Square of the Error
-    delete h_err_total;
-
+    std::vector<std::string> errGroup;
     // Loop Over Vertical Errors
     std::vector<std::string> vert_errors = hist->GetVertErrorBandNames();
-    double total_check = 0.0;
     for (unsigned int i = 0; i < vert_errors.size(); ++i){
-        MnvVertErrorBand* error_band = hist->GetVertErrorBand(vert_errors[i]);
-        TH1D* h_err_single = new TH1D(error_band->GetErrorBand()); 
-        double err_single = h_err_single->Integral();
-        err_single *= err_single; // Use Square of the Error
-        total_check += err_single;
-        double percent = err_single/err_total*100.0;
+        errGroup.clear();
+        errGroup.push_back(vert_errors[i]);
+        TH1D* h_err_single = GetTotalErrorInGroup(hist, errGroup); 
+        int nBins = h_err_single->GetNbinsX();
+        double err_single = h_err_single->Integral()/nBins;
         
         file.width(36); file<<vert_errors[i]<<" ";
-        file.width(12); file<<err_single<<" ";
-        file.width(12); file<<percent<<std::endl;
+        file.width(12); file<<err_single;
+        file<<std::endl;
         delete h_err_single;
     }
 
     // Loop Over Lateral Errors
     std::vector<std::string> lat_errors = hist->GetLatErrorBandNames();
     for (unsigned int i = 0; i < lat_errors.size(); ++i){
-        MnvLatErrorBand* error_band = hist->GetLatErrorBand(lat_errors[i]);
-        TH1D* h_err_single = new TH1D(error_band->GetErrorBand()); 
-        double err_single = h_err_single->Integral();
-        err_single *= err_single; // Use Square of the Error
-        total_check += err_single;
-        double percent = err_single/err_total*100.0;
+        errGroup.clear();
+        errGroup.push_back(lat_errors[i]);
+        TH1D* h_err_single = GetTotalErrorInGroup(hist, errGroup); 
+        int nBins = h_err_single->GetNbinsX();
+        double err_single = h_err_single->Integral()/nBins;
         
         file.width(36); file<<lat_errors[i]<<" ";
         file.width(12); file<<err_single<<" ";
-        file.width(12); file<<percent<<std::endl;
+        file<<std::endl;
         delete h_err_single;
     }
-
-    // Write Total
-    double total_check_percent = total_check/err_total*100.0;
-    file.width(36); file<<"Total"<<" ";
-    file.width(12); file<<total_check<<" ";
-    file.width(12); file<<total_check_percent<<std::endl;
 
     file.close();
 }
@@ -273,60 +307,6 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::str
     delete h_err_fsi;
     delete h_err_flux;
     delete h_err_other;
-}
-
-
-void CCProtonPi0_Plotter::Systematics_Practice(std::string root_dir, std::string var_name, std::string err_name)
-{
-    TFile* f_mc = new TFile(root_dir.c_str());
-    std::string plotDir = Folder_List::plotDir_Systematics_Summary;
-    MnvH1D* mc = GetMnvH1D(f_mc, var_name);
-  
-    DrawErrorSummary(mc, var_name, plotDir);
-    
-    MnvLatErrorBand* err_band = mc->GetLatErrorBand(err_name);
-    std::vector<TH1D*> err_hists = err_band->GetHists();
-
-    double avg_area = 0.0;
-    for (unsigned int i = 0; i < err_hists.size(); ++i){
-        avg_area +=err_hists[i]->Integral();
-    }
-    std::cout<<var_name<<std::endl;
-    std::cout<<"Avg Error Area = "<<avg_area/(double)500<<std::endl;
-    std::cout<<"CV Area = "<<mc->Integral()<<std::endl;
-    std::cout<<err_hists.size()<<std::endl;
-
-    Systematics_WriteTable(mc, var_name);
-
-    //printBins(mc,var_name);
-    printBins((MnvH1D*)err_band,err_name);
-
-    delete mc;
-    delete f_mc;
-}
-
-void CCProtonPi0_Plotter::Systematics_Practice2D(std::string root_dir, std::string var_name, std::string err_name)
-{
-    TFile* f_mc = new TFile(root_dir.c_str());
-    std::string plotDir = Folder_List::plotDir_Systematics_Summary;
-    MnvH2D* mc = GetMnvH2D(f_mc, var_name);
-  
-    MnvLatErrorBand2D* err_band = mc->GetLatErrorBand(err_name);
-    std::vector<TH2D*> err_hists = err_band->GetHists();
-
-    double avg_area = 0.0;
-    for (unsigned int i = 0; i < err_hists.size(); ++i){
-        std::cout<<err_hists[i]->Integral()<<std::endl;
-        avg_area +=err_hists[i]->Integral();
-    
-    }
-    std::cout<<var_name<<std::endl;
-    std::cout<<"Avg Error Area = "<<avg_area/(double)500<<std::endl;
-    std::cout<<"CV Area = "<<mc->Integral()<<std::endl;
-    std::cout<<err_hists.size()<<std::endl;
-
-    delete mc;
-    delete f_mc;
 }
 
 void CCProtonPi0_Plotter::Systematics_SetErrorSummaryGroups()
@@ -400,20 +380,10 @@ void CCProtonPi0_Plotter::Systematics_SetErrorSummaryGroups()
     //---------------------------------------------------------------------
     // (V) Other
     //---------------------------------------------------------------------
-    otherGroup.push_back("BckgConstraint");
+    otherGroup.push_back("BckgConstraint_WithPi0");
+    otherGroup.push_back("BckgConstraint_QELike");
+    otherGroup.push_back("BckgConstraint_SinglePiPlus");
     otherGroup.push_back("Unfolding");
-}
-
-int CCProtonPi0_Plotter::GetErrorSummaryGroup(std::string err_name)
-{
-    if (IsErrorInGroup(err_name, detGroup)) return 1;
-    else if (IsErrorInGroup(err_name, genieGroup)) return 2;
-    else if (IsErrorInGroup(err_name, fsiGroup)) return 3;
-    else if (IsErrorInGroup(err_name, fluxGroup)) return 4;
-    else if (IsErrorInGroup(err_name, otherGroup)) return 5;
-    else RunTimeError("Can not find Error Summary Group!");
-    
-    return -1;
 }
 
 bool CCProtonPi0_Plotter::IsErrorInGroup(std::string err_name, std::vector<std::string> errGroup)
@@ -440,7 +410,7 @@ TH1D* CCProtonPi0_Plotter::GetTotalErrorInGroup(MnvH1D* hist, std::vector<std::s
         }
     }
 
-    // Remove Latical Error Bands not in the Group
+    // Remove Lateral Error Bands not in the Group
     std::vector<std::string> lat_errors = tempHist->GetLatErrorBandNames();
     
     for (unsigned int i = 0; i < lat_errors.size(); ++i){
@@ -463,30 +433,5 @@ TH1D* CCProtonPi0_Plotter::GetTotalErrorInGroup(MnvH1D* hist, std::vector<std::s
     delete tempHist;
     
     return total_error;
-}
-
-void CCProtonPi0_Plotter::PrintVertErrorBand(MnvH1D* hist, std::string var_name, std::string err_name)
-{
-    // Print Header
-    std::cout<<std::endl;
-    std::cout<<var_name<<" "<<err_name<<std::endl;
-    std::cout.width(12); std::cout<<std::left<<"Universe";
-    std::cout.width(6); std::cout<<std::left<<"Bin";
-    std::cout.width(12); std::cout<<std::left<<"Content";
-    std::cout<<std::endl;
-
-    const MnvVertErrorBand* hist_err_band = hist->GetVertErrorBand(err_name);
-    const std::vector<TH1D*> hist_hists = hist_err_band->GetHists();
-
-    for (unsigned int j = 0; j < hist_hists.size(); ++j){
-        int nBins = hist_hists[j]->GetNbinsX();
-        for (int bin = 1; bin <= nBins; ++bin){
-            double hist_bin_content = hist_hists[j]->GetBinContent(bin);
-            std::cout.width(12); std::cout<<std::left<<j;
-            std::cout.width(6); std::cout<<std::left<<bin;
-            std::cout.width(12); std::cout<<std::left<<hist_bin_content;
-            std::cout<<std::endl;
-        }
-    }
 }
 

@@ -21,6 +21,7 @@
 #include "../../../Classes/NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 #include "../../../Classes/BinList/CCProtonPi0_BinList.h"
 #include "../../../Classes/Counter/CCProtonPi0_Counter.h"
+#include "../../../Classes/BckgConstrainer/CCProtonPi0_BckgConstrainer.h"
 
 using namespace PlotUtils;
 
@@ -96,26 +97,33 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         std::string rootDir;
 
         CCProtonPi0_BinList binList;
+        CCProtonPi0_BckgConstrainer BckgConstrainer;
 
-        void FillVertErrorBand_Flux(MnvH1D* h, double var);
-        void FillVertErrorBand_Genie(MnvH1D* h, double var);
-        void Calc_WeightFromSystematics();
-        void AddOtherErrorBands_FillWithCV();
-        void AddErrorBands_FillWithCV(MnvH1D* hist);
+        bool isMother_DIS_Fragment(int ind);
+        double GetBckgConstraint(std::string error_name, int hist_ind);
         double GetPercent(CCProtonPi0_Counter nAll, CCProtonPi0_Counter nOther);
+        int Get_nFS_pions();
+        void AddErrorBands_FillWithCV(MnvH1D* hist);
+        void AddOtherErrorBands_FillWithCV();
+        void Calc_WeightFromSystematics();
+        void FillHistogram(MnvH1D *hist, double var);
+        void FillHistogram(TH1D* hist, double var);
+        void FillMichelHistograms();
+        void FillSignalHistograms();
+        void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err_down, double err_up);
+        void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, std::vector<double> errors);
+        void FillVertErrorBand_Flux(MnvH1D* h, double var);
+        void FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_Genie(MnvH1D* h, double var);
+        void FillVertErrorBand_Genie_ByHand(MnvH1D* h, double var);
+        void PrintEventRecord();
+        void WriteCounter(CCProtonPi0_Counter Counter, CCProtonPi0_Counter PercentBase);
+        void initCVWeights();
         void initHistograms();
         void openTextFiles();
         void resetCounters();
-        void writeTextFile();
-        void WriteCounter(CCProtonPi0_Counter Counter, CCProtonPi0_Counter PercentBase);
         void writeHistograms();
-        void FillHistogram(MnvH1D *hist, double var);
-        void FillHistogram(TH1D* hist, double var);
-        void FillSignalHistograms();
-        void FillMichelHistograms();
-        int Get_nFS_pions();
-        bool isMother_DIS_Fragment(int ind);
-        void PrintEventRecord();
+        void writeTextFile();
 
         // Default Functions    
         void     Init(std::string playlist, TChain* fChain);
@@ -126,8 +134,22 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         std::string file_name;
         ofstream textFile;
 
+        bool fillErrors_ByHand;
+        bool applyBckgConstraints_CV;
+        bool applyBckgConstraints_Unv;
+        
+        double cv_wgt_SinglePiPlus;
+        double cv_wgt_QELike;
+        double cv_wgt_WithPi0;
+
+        double cv_err_SinglePiPlus;
+        double cv_err_QELike;
+        double cv_err_WithPi0;
+
         // Counters
         CCProtonPi0_Counter nAll;
+        CCProtonPi0_Counter nFidVol;
+        CCProtonPi0_Counter nFidVol_Out;
         CCProtonPi0_Counter nSignal;
         CCProtonPi0_Counter nSignalOut_Acceptance;
         CCProtonPi0_Counter nSignalOut_Kinematics;

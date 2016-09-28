@@ -5,8 +5,9 @@
 
 using namespace std;
 
-CCProtonPi0_BckgConstrainer::CCProtonPi0_BckgConstrainer()
+CCProtonPi0_BckgConstrainer::CCProtonPi0_BckgConstrainer(std::string in_file)
 {
+    input_file = in_file;
     ReadBckgConstraints();
     //PrintMap();
 }
@@ -56,7 +57,7 @@ double CCProtonPi0_BckgConstrainer::GetBckgConstraintErr(std::string error_name,
 void CCProtonPi0_BckgConstrainer::ReadBckgConstraints()
 {
     ifstream file;
-    file.open(Folder_List::BckgConstraints.c_str());
+    file.open(input_file.c_str());
 
     if (!file.is_open()){
         std::cout<<"WARNING! Cannot open input file "<<Folder_List::BckgConstraints<<std::endl;

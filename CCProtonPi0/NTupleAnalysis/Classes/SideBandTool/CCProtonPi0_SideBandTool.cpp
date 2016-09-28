@@ -276,6 +276,7 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     TH1D* h_QELike = new TH1D(QELike->GetCVHistoWithStatError());
     TH1D* h_SinglePiPlus = new TH1D(SinglePiPlus->GetCVHistoWithStatError());
     TH1D* h_Other = new TH1D(Other->GetCVHistoWithStatError());
+  
     // MC Total depend on the Modification
     //      If Raws - take the mc_total directly
     //      If Modified - Add all mc models;
@@ -289,6 +290,22 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
         h_mc_total->Add(h_SinglePiPlus);
         h_mc_total->Add(h_Other);
     }
+
+    // ------------------------------------------------------------------------
+    // Unique Plot for Single Error Band, Single Universe
+    //      Comment this section out   
+    // ------------------------------------------------------------------------
+    //std::string err_band = "GENIE_MaRES";
+    //int hist_ind = 1;
+    //TH1D* h_data = new TH1D(*(data->GetVertErrorBand(err_band)->GetHist(hist_ind)));
+    //TH1D* h_signal = new TH1D(*(signal->GetVertErrorBand(err_band)->GetHist(hist_ind)));
+    //TH1D* h_WithPi0 = new TH1D(*(WithPi0->GetVertErrorBand(err_band)->GetHist(hist_ind)));
+    //TH1D* h_QELike = new TH1D(*(QELike->GetVertErrorBand(err_band)->GetHist(hist_ind)));
+    //TH1D* h_SinglePiPlus = new TH1D(*(SinglePiPlus->GetVertErrorBand(err_band)->GetHist(hist_ind)));
+    //TH1D* h_Other = new TH1D(*(Other->GetVertErrorBand(err_band)->GetHist(hist_ind)));
+    //TH1D* h_mc_total = new TH1D(*(mc_total->GetVertErrorBand(err_band)->GetHist(hist_ind)));
+    //ColorHists(h_data, h_signal, h_WithPi0, h_QELike, h_SinglePiPlus, h_Other);
+   
 
     // Scale Histograms
     h_data->Scale(1,"width");
@@ -370,7 +387,7 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
         text->DrawLatex(0.6, 0.58, Form("Before Fit #chi^{2}/dof = %3.2f", ChiSq_before_fit[0]/(nPoints-nPars)));
         text->DrawLatex(0.6, 0.55, Form("After Fit #chi^{2} = %3.2f", ChiSq_after_fit[0]));
         text->DrawLatex(0.6, 0.52, Form("After Fit #chi^{2}/dof = %3.2f", ChiSq_after_fit[0]/(nPoints-nPars)));
-        text->DrawLatex(0.6, 0.49, Form("#color[4]{wgt(SinglePiPlus) = %3.2f#pm %3.2f}", wgt_SinglePiPlus[0], err_SinglePiPlus[0]));
+        text->DrawLatex(0.6, 0.49, Form("#color[4]{wgt(ChargedPion) = %3.2f#pm %3.2f}", wgt_SinglePiPlus[0], err_SinglePiPlus[0]));
         text->DrawLatex(0.6, 0.46, Form("wgt(QELike) = %3.2f#pm %3.2f", wgt_QELike[0], err_QELike[0]));
         text->DrawLatex(0.6, 0.43, Form("#color[2]{wgt(WithPi0) = %3.2f#pm %3.2f}", wgt_WithPi0[0], err_WithPi0[0]));
         delete text;
@@ -457,7 +474,7 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     delete c;
 }
 
-void CCProtonPi0_SideBandTool::ColorHists(MnvH1D* data, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other)
+void CCProtonPi0_SideBandTool::ColorHists(TH1D* data, TH1D* signal, TH1D* WithPi0, TH1D* QELike, TH1D* SinglePiPlus, TH1D* Other)
 {
     // MC
     signal->SetFillColor(kGreen);
@@ -546,7 +563,7 @@ void CCProtonPi0_SideBandTool::ApplyFitResults(XSec_Var &xsec_var)
     xsec_var.SinglePiPlus[1]->Scale(wgt_SinglePiPlus[0]);
 }
 
-double CCProtonPi0_SideBandTool::calc_ChiSq(MnvH1D* data, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other)
+double CCProtonPi0_SideBandTool::calc_ChiSq(TH1D* data, TH1D* signal, TH1D* WithPi0, TH1D* QELike, TH1D* SinglePiPlus, TH1D* Other)
 {
     double mc_ratio = POT_ratio;
     double chi_sq = 0.0;
@@ -674,14 +691,26 @@ double CCProtonPi0_SideBandTool::calc_Global_ChiSq(int unv)
 
 void CCProtonPi0_SideBandTool::GetStatistics(SideBand &sb)
 {
+    int first_bin;
+    int last_bin;
+    if (sb.name.compare("LowInvMass") == 0){
+        first_bin = 1;
+        last_bin = 6;
+    }else if (sb.name.compare("HighInvMass") == 0){
+        first_bin = 21;
+        last_bin = 50;
+    }else{
+        first_bin = 1;
+        last_bin = 50;
+    }
     for (unsigned int i = 0; i < sb.data_all_universes.size(); ++i){
-        sb.nData.push_back(sb.data_all_universes[i]->Integral());
-        sb.nMC.push_back(sb.mc_total_all_universes[i]->Integral());
-        sb.nSignal.push_back(sb.signal_all_universes[i]->Integral());
-        sb.nWithPi0.push_back(sb.WithPi0_all_universes[i]->Integral());
-        sb.nQELike.push_back(sb.QELike_all_universes[i]->Integral());
-        sb.nSinglePiPlus.push_back(sb.SinglePiPlus_all_universes[i]->Integral());
-        sb.nOther.push_back(sb.Other_all_universes[i]->Integral());
+        sb.nData.push_back(sb.data_all_universes[i]->Integral(first_bin, last_bin));
+        sb.nMC.push_back(sb.mc_total_all_universes[i]->Integral(first_bin, last_bin));
+        sb.nSignal.push_back(sb.signal_all_universes[i]->Integral(first_bin, last_bin));
+        sb.nWithPi0.push_back(sb.WithPi0_all_universes[i]->Integral(first_bin, last_bin));
+        sb.nQELike.push_back(sb.QELike_all_universes[i]->Integral(first_bin, last_bin));
+        sb.nSinglePiPlus.push_back(sb.SinglePiPlus_all_universes[i]->Integral(first_bin, last_bin));
+        sb.nOther.push_back(sb.Other_all_universes[i]->Integral(first_bin, last_bin));
     }
 }
 

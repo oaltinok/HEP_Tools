@@ -33,6 +33,10 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         //     Histograms
         //--------------------------------------------------------------------------
         std::vector<MnvH1D*> CV_weight;
+        std::vector<MnvH1D*> MaRES_shifts;
+        std::vector<MnvH1D*> MvRES_shifts;
+        std::vector<MnvH1D*> Rvn1pi_shifts;
+
         // Event Kinematics
         std::vector<MnvH1D*> Enu_1Track;
         std::vector<MnvH1D*> Enu_2Track;

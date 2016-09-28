@@ -52,7 +52,12 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin pi0_theta;
         CCProtonPi0_SingleBin QSq;
         CCProtonPi0_SingleBin beamE;
-      
+     
+        // Truth Histograms
+        CCProtonPi0_SingleBin mc_w;
+        CCProtonPi0_SingleBin mc_QSq;
+        CCProtonPi0_SingleBin mc_incomingE;
+
         // Standard Bins
         CCProtonPi0_SingleBin proton_theta;
         CCProtonPi0_SingleBin muon_thetaX;
@@ -101,7 +106,6 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin UnusedE;
         
         // Cut Histograms
-        CCProtonPi0_SingleBin mc_w;
         CCProtonPi0_SingleBin mc_Q2;
         CCProtonPi0_SingleBin eVis_nuclearTarget;
         CCProtonPi0_SingleBin eVis_other;

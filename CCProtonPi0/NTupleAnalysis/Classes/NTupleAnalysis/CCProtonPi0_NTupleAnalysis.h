@@ -69,7 +69,7 @@ class CCProtonPi0_NTupleAnalysis
         static const double neutron_mass;
 
         // Event Kinematics 
-        bool IsWLow(double true_W);
+        bool IsWInRange(double W);
         bool IsEnuInRange(double Enu);
 
         double Calc_Enu_Truth(double muon_E, double proton_E, double pi0_E);
@@ -122,7 +122,13 @@ class CCProtonPi0_NTupleAnalysis
             void AddVertErrorBandAndFillWithCV_Genie(MnvHistoType* h);
 
         template<class MnvHistoType>
-            void AddVertErrorBandAndFillWithCV_BckgConstraint(MnvHistoType* h);
+            void AddVertErrorBandAndFillWithCV_BckgConstraint_WithPi0(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_BckgConstraint_SinglePiPlus(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_BckgConstraint_QELike(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_MichelTrue(MnvHistoType* h);
@@ -193,7 +199,13 @@ class CCProtonPi0_NTupleAnalysis
             void AddVertErrorBand_Genie(MnvHistoType* h);
 
         template<class MnvHistoType>
-            void AddVertErrorBand_BckgConstraint(MnvHistoType* h);
+            void AddVertErrorBand_BckgConstraint_WithPi0(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_BckgConstraint_SinglePiPlus(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_BckgConstraint_QELike(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddVertErrorBand_MichelTrue(MnvHistoType* h);

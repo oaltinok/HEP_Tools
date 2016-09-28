@@ -1,9 +1,12 @@
 nAll	47755158.0	100.0
 
-nSignal	314622.0	0.7
-nSignalOut_Acceptance	1637447.0	3.4
-nSignalOut_Kinematics	95982.0	0.2
-nBckg	47440536.0	99.3
+nFidVol	11270118.0	23.6
+nFidVol_Out	36485040.0	76.4
+
+nSignal	314622.0	2.8
+nSignalOut_Acceptance	126042.0	1.1
+nSignalOut_Kinematics	95982.0	0.9
+nBckg	10955496.0	97.2
 
 nQuasi_Elastic	4068.0	1.3
 

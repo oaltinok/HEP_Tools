@@ -25,7 +25,7 @@ struct UniverseWeight
 class CCProtonPi0_BckgConstrainer 
 {
     public:
-        CCProtonPi0_BckgConstrainer();
+        CCProtonPi0_BckgConstrainer(std::string in_file);
         ~CCProtonPi0_BckgConstrainer();
 
         double GetBckgConstraint(std::string error_name, int hist_ind, std::string bckg_name);
@@ -36,6 +36,7 @@ class CCProtonPi0_BckgConstrainer
         void PrintMap();
         map< string, vector<UniverseWeight> > BckgWeights;
 
+        std::string input_file;
 };
 
 #endif

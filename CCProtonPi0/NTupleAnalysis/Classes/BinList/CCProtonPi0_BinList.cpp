@@ -44,9 +44,15 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     pi0_P.setBin(17,0.0,1.7);
     pi0_KE.setBin(17,0.0,1.7);
     pi0_theta.setBin(18, 0.0, 180.0);
-    QSq.setBin(40,0.0,4.0);
-    beamE.setBin(40,1,10.0);
-    
+    QSq.setBin(40,0.0,2.0);
+    beamE.setBin(40,0,20.0);
+    w.setBin(30,0.5,2.0);
+   
+    // Truth Histograms
+    mc_w.setBin(60,0.5,2.0);
+    mc_QSq.setBin(40,0.0,2.0);
+    mc_incomingE.setBin(40,0,20.0);
+
     // Standard Bins
     muon_theta.setBin(12,0.0,25.0);
     muon_thetaX.setBin(12,-0.6,0.6);
@@ -83,7 +89,6 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     W_Diff.setBin(100,-1,1);
     QSq_Diff.setBin(100,-1,1);
     Q2.setBin(40,0.0,4.0);
-    w.setBin(30,0.0,3.0);
     wSq.setBin(30,-1.0,5.0);
     vertex_energy.setBin(20,0.0,500.0);
     vertex_evis.setBin(20,0.0,500.0);
@@ -95,8 +100,6 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     UnusedE.setBin(20,0.0,1000.0);
     
     // Cut Histograms
-    mc_w.setBin(120,0.0,3.0);
-    mc_Q2.setBin(40,0.0,4.0);
     eVis_nuclearTarget.setBin(50,0.0,25.0);
     eVis_other.setBin(60,0.0,3000.0);
     bin_photonConvLength.setBin(50,0.0,100.0);
