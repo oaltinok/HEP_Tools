@@ -293,12 +293,23 @@ StatusCode CCProtonPi0::initialize()
     // Signal and Background
     // ------------------------------------------------------------------------
     declareBoolTruthBranch("isSignal");
+    declareBoolTruthBranch("isSignal_BeforeFSI");
     declareBoolTruthBranch("isSignalOut_Acceptance");
     declareBoolTruthBranch("isSignalOut_Kinematics");
     declareBoolTruthBranch("isSignal_EventRecord");
     declareBoolTruthBranch("isFidVol");
     declareBoolTruthBranch("isNC");
     declareBoolTruthBranch("ReconstructEvent");
+
+    // Cross Section Variables Before FSI
+    declareDoubleTruthBranch("muon_P_BeforeFSI", -1); 
+    declareDoubleTruthBranch("muon_theta_beam_BeforeFSI", -1); 
+    declareDoubleTruthBranch("pi0_P_BeforeFSI", -1); 
+    declareDoubleTruthBranch("pi0_KE_BeforeFSI", -1); 
+    declareDoubleTruthBranch("pi0_theta_beam_BeforeFSI", -1); 
+    declareDoubleTruthBranch("Enu_BeforeFSI", -1); 
+    declareDoubleTruthBranch("QSq_exp_BeforeFSI", -1); 
+    declareDoubleTruthBranch("W_exp_BeforeFSI", -1); 
 
     // BackgroundWithPi0
     declareIntTruthBranch("Bckg_nPi0_Primary", -1);
@@ -1460,13 +1471,40 @@ StatusCode CCProtonPi0::tagTruth( Minerva::GenMinInteraction* truthEvent ) const
     truthEvent->setIntData("vertex_module", vertex_module);
     truthEvent->setIntData("vertex_plane", vertex_plane);
 
+    //--------------------------------------------------------------   
+    // Other Studies
+    //--------------------------------------------------------------   
+    tagSignal_BeforeFSI(truthEvent);
+    //PrintZPositionMaterial();
+
     //--------------------------------------------------------------------------
     // Decide whether to Reconstruct the Event or NOT
     //    Set ReconstructEvent true to Reconstruct All Events
     //--------------------------------------------------------------------------
-    truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", true );
+    truthEvent->filtertaglist()->setOrAddFilterTag( "ReconstructEvent", true);
 
     return StatusCode::SUCCESS;
+}
+
+void CCProtonPi0::PrintZPositionMaterial() const
+{
+    G4Navigator* m_geantNav = new G4Navigator;
+    m_geantNav->SetWorldVolume(m_gigaCnvSvc->world());
+    
+    for (double z = 4293; z < 9987; ++z){
+        G4ThreeVector p(0.0, 0.0, z); // The point you want to look up
+        G4ThreeVector v(1,0,0); // Need a direction to pass to LocateGlobalPointAndSetup
+        G4VPhysicalVolume* physVol = m_geantNav->LocateGlobalPointAndSetup(p, &v);
+        G4Material* material = physVol->GetLogicalVolume()->GetMaterial();
+
+        std::string material_name = material->GetName();
+        //int material_nElements = material->GetNumberOfElements();
+        //double material_Z = material_nElements == 1 ? material->GetZ() : -1;
+        
+        debug()<<"pos_z = "<<z<<" Name = "<<material_name<<endmsg;
+    }
+
+    delete m_geantNav;
 }
 
 //==============================================================================

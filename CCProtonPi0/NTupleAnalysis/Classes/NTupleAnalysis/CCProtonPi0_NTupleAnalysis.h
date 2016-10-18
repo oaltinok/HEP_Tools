@@ -41,6 +41,8 @@ class CCProtonPi0_NTupleAnalysis
 
         std::string ana_folder;
         // Constants 
+        static const int nFSIType = 6;
+        static const int nIntType = 3;
         static const int nHistograms = 7;
         static const int nTopologies = 2;
         static const int n_universe = 100;

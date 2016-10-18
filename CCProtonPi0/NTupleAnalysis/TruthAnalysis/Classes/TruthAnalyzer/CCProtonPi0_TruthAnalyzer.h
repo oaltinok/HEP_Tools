@@ -42,15 +42,39 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         MnvH1D* QSq_mc_truth_all_signal;
         MnvH1D* W_mc_truth_all_signal;
 
-        // Michel Electron
-        TH2D* michel_ZX;
-        TH2D* michel_ZY;
-        TH1D* michel_dist_X;
-        TH1D* michel_dist_Y;
-        TH1D* michel_dist_Z;
-        TH1D* michel_dist_total;
-        TH1D* michel_pionP;
-        TH1D* michel_pion_dist;
+        // Cross Section Variables Before FSI
+        MnvH1D* muon_P_mc_truth_all_signal_BeforeFSI;
+        MnvH1D* muon_theta_mc_truth_all_signal_BeforeFSI;
+        MnvH1D* pi0_P_mc_truth_all_signal_BeforeFSI;
+        MnvH1D* pi0_KE_mc_truth_all_signal_BeforeFSI;
+        MnvH1D* pi0_theta_mc_truth_all_signal_BeforeFSI;
+        MnvH1D* Enu_mc_truth_all_signal_BeforeFSI;
+        MnvH1D* QSq_mc_truth_all_signal_BeforeFSI;
+        MnvH1D* W_mc_truth_all_signal_BeforeFSI;
+
+        // Cross Section Variables by FSI Type
+        std::vector<MnvH1D*> muon_P_mc_truth_all_signal_FSIType;
+        std::vector<MnvH1D*> muon_theta_mc_truth_all_signal_FSIType;
+        std::vector<MnvH1D*> pi0_P_mc_truth_all_signal_FSIType;
+        std::vector<MnvH1D*> pi0_KE_mc_truth_all_signal_FSIType;
+        std::vector<MnvH1D*> pi0_theta_mc_truth_all_signal_FSIType;
+        std::vector<MnvH1D*> QSq_mc_truth_all_signal_FSIType;
+        std::vector<MnvH1D*> W_mc_truth_all_signal_FSIType;
+        std::vector<MnvH1D*> Enu_mc_truth_all_signal_FSIType;
+ 
+        // Cross Section Variables by Interaction Type
+        std::vector<MnvH1D*> muon_P_mc_truth_all_signal_IntType;
+        std::vector<MnvH1D*> muon_theta_mc_truth_all_signal_IntType;
+        std::vector<MnvH1D*> pi0_P_mc_truth_all_signal_IntType;
+        std::vector<MnvH1D*> pi0_KE_mc_truth_all_signal_IntType;
+        std::vector<MnvH1D*> pi0_theta_mc_truth_all_signal_IntType;
+        std::vector<MnvH1D*> QSq_mc_truth_all_signal_IntType;
+        std::vector<MnvH1D*> W_mc_truth_all_signal_IntType;
+        std::vector<MnvH1D*> Enu_mc_truth_all_signal_IntType;
+       
+        // Test Histograms
+        TH1D* Test_pi0_P;
+        TH1D* Test_pi0_theta;
 
         // Signal Q2
         TH1D* mc_Q2_QE;
@@ -99,8 +123,10 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_BinList binList;
         CCProtonPi0_BckgConstrainer BckgConstrainer;
 
+        int GetFSIType();
+        int GetIntType();
+        void CountFSIType(int type);
         bool isMother_DIS_Fragment(int ind);
-        double GetBckgConstraint(std::string error_name, int hist_ind);
         double GetPercent(CCProtonPi0_Counter nAll, CCProtonPi0_Counter nOther);
         int Get_nFS_pions();
         void AddErrorBands_FillWithCV(MnvH1D* hist);
@@ -108,8 +134,12 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void Calc_WeightFromSystematics();
         void FillHistogram(MnvH1D *hist, double var);
         void FillHistogram(TH1D* hist, double var);
-        void FillMichelHistograms();
-        void FillSignalHistograms();
+        void FillSignal_Test();
+        void FillSignal_XSec_Variables();
+        void FillSignal_XSec_Variables_BeforeFSI();
+        void FillSignal_XSec_Variables_FSIType(int type);
+        void FillSignal_XSec_Variables_IntType(int type);
+        void FillSignal_InteractionType();
         void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err_down, double err_up);
         void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, std::vector<double> errors);
         void FillVertErrorBand_Flux(MnvH1D* h, double var);
@@ -118,7 +148,6 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void FillVertErrorBand_Genie_ByHand(MnvH1D* h, double var);
         void PrintEventRecord();
         void WriteCounter(CCProtonPi0_Counter Counter, CCProtonPi0_Counter PercentBase);
-        void initCVWeights();
         void initHistograms();
         void openTextFiles();
         void resetCounters();
@@ -133,27 +162,27 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         // Class Variables
         std::string file_name;
         ofstream textFile;
-
-        bool fillErrors_ByHand;
-        bool applyBckgConstraints_CV;
-        bool applyBckgConstraints_Unv;
+        ofstream logFile;
         
-        double cv_wgt_SinglePiPlus;
-        double cv_wgt_QELike;
-        double cv_wgt_WithPi0;
-
-        double cv_err_SinglePiPlus;
-        double cv_err_QELike;
-        double cv_err_WithPi0;
+        bool fillErrors_ByHand;
 
         // Counters
         CCProtonPi0_Counter nAll;
         CCProtonPi0_Counter nFidVol;
         CCProtonPi0_Counter nFidVol_Out;
         CCProtonPi0_Counter nSignal;
+        CCProtonPi0_Counter nSignal_BeforeFSI;
         CCProtonPi0_Counter nSignalOut_Acceptance;
         CCProtonPi0_Counter nSignalOut_Kinematics;
         CCProtonPi0_Counter nBckg;
+
+        // FSI
+        CCProtonPi0_Counter nFSI_NonInteracting;
+        CCProtonPi0_Counter nFSI_Elastic;
+        CCProtonPi0_Counter nFSI_Inelastic;
+        CCProtonPi0_Counter nFSI_ChargeExchange;
+        CCProtonPi0_Counter nFSI_MultiPi;
+        CCProtonPi0_Counter nFSI_NucleonToPi;
 
         // Signal Type
         CCProtonPi0_Counter nQE;
@@ -177,6 +206,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Bool_t          truth_isGamma1_conv_inside;
         Bool_t          truth_isGamma2_conv_inside;
         Bool_t          truth_isSignal;
+        Bool_t          truth_isSignal_BeforeFSI;
         Bool_t          truth_isSignalOut_Acceptance;
         Bool_t          truth_isSignalOut_Kinematics;
         Bool_t          truth_isSignal_EventRecord;
@@ -231,9 +261,12 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Int_t           truth_vertex_plane;
         Int_t           truth_vtx_michel_evis_most_pdg;
         Int_t           truth_vtx_michel_large_evis_most_pdg;
+        Double_t        truth_Enu_BeforeFSI;
         Double_t        truth_QSq_exp;
+        Double_t        truth_QSq_exp_BeforeFSI;
         Double_t        truth_WSq_exp;
         Double_t        truth_W_exp;
+        Double_t        truth_W_exp_BeforeFSI;
         Double_t        truth_allClusters_evis_pizero;
         Double_t        truth_blob1_evis_muon;
         Double_t        truth_blob1_evis_neutron;
@@ -261,14 +294,19 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        truth_michelPion_begin_dist_vtx;
         Double_t        truth_michelPion_length;
         Double_t        truth_muon_P;
+        Double_t        truth_muon_P_BeforeFSI;
         Double_t        truth_muon_theta;
         Double_t        truth_muon_thetaX_beam;
         Double_t        truth_muon_thetaY_beam;
         Double_t        truth_muon_theta_beam;
+        Double_t        truth_muon_theta_beam_BeforeFSI;
         Double_t        truth_pi0_KE;
+        Double_t        truth_pi0_KE_BeforeFSI;
         Double_t        truth_pi0_P;
+        Double_t        truth_pi0_P_BeforeFSI;
         Double_t        truth_pi0_theta;
         Double_t        truth_pi0_theta_beam;
+        Double_t        truth_pi0_theta_beam_BeforeFSI;
         Double_t        truth_proton_P;
         Double_t        truth_proton_theta;
         Double_t        truth_proton_theta_beam;
@@ -416,6 +454,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_isGamma1_conv_inside;   //!
         TBranch        *b_truth_isGamma2_conv_inside;   //!
         TBranch        *b_truth_isSignal;   //!
+        TBranch        *b_truth_isSignal_BeforeFSI;   //!
         TBranch        *b_truth_isSignalOut_Acceptance;   //!
         TBranch        *b_truth_isSignalOut_Kinematics;   //!
         TBranch        *b_truth_isSignal_EventRecord;   //!
@@ -470,9 +509,12 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_vertex_plane;   //!
         TBranch        *b_truth_vtx_michel_evis_most_pdg;   //!
         TBranch        *b_truth_vtx_michel_large_evis_most_pdg;   //!
+        TBranch        *b_truth_Enu_BeforeFSI;   //!
         TBranch        *b_truth_QSq_exp;   //!
+        TBranch        *b_truth_QSq_exp_BeforeFSI;   //!
         TBranch        *b_truth_WSq_exp;   //!
         TBranch        *b_truth_W_exp;   //!
+        TBranch        *b_truth_W_exp_BeforeFSI;   //!
         TBranch        *b_truth_allClusters_evis_pizero;   //!
         TBranch        *b_truth_blob1_evis_muon;   //!
         TBranch        *b_truth_blob1_evis_neutron;   //!
@@ -500,14 +542,19 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_michelPion_begin_dist_vtx;   //!
         TBranch        *b_truth_michelPion_length;   //!
         TBranch        *b_truth_muon_P;   //!
+        TBranch        *b_truth_muon_P_BeforeFSI;   //!
         TBranch        *b_truth_muon_theta;   //!
         TBranch        *b_truth_muon_thetaX_beam;   //!
         TBranch        *b_truth_muon_thetaY_beam;   //!
         TBranch        *b_truth_muon_theta_beam;   //!
+        TBranch        *b_truth_muon_theta_beam_BeforeFSI;   //!
         TBranch        *b_truth_pi0_KE;   //!
+        TBranch        *b_truth_pi0_KE_BeforeFSI;   //!
         TBranch        *b_truth_pi0_P;   //!
+        TBranch        *b_truth_pi0_P_BeforeFSI;   //!
         TBranch        *b_truth_pi0_theta;   //!
         TBranch        *b_truth_pi0_theta_beam;   //!
+        TBranch        *b_truth_pi0_theta_beam_BeforeFSI;   //!
         TBranch        *b_truth_proton_P;   //!
         TBranch        *b_truth_proton_theta;   //!
         TBranch        *b_truth_proton_theta_beam;   //!

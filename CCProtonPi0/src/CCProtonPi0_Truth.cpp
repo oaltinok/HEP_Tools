@@ -17,7 +17,7 @@ bool CCProtonPi0::isTrueVertexFiducial(Minerva::GenMinInteraction* truthEvent) c
 // tagSignal() 
 //      Tags Event as Signal or NOT
 //      Signal: CC-Neutrino Interaction inside Fiducial Volume, 
-//              FS Particles: Single Pi0, No Other (Proton and Neutrons are OK)
+//              Out of nucleus FS Particles: Single Pi0, No Other (Proton and Neutrons are OK)
 //      returns TRUE if it is a Signal Event    
 //------------------------------------------------------------------------------
 bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
@@ -85,28 +85,17 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     //                 MINOS Acceptance: Small Angle, High Momentum
     //                 Neutrino Energy Limit
     //--------------------------------------------------------------------------
-    int t_current = truthEvent->current();
-    int t_neutrinoPDG = truthEvent->incoming();
-
-    // CC-Neutrino Single Pi0
-    bool isCCNeutrino = (t_current == 1 && t_neutrinoPDG == PDG::nu_mu);
+    bool isCCNeutrino = isSignal_CCNeutrino(truthEvent);
     bool isFSGood = (N_pi0 == 1 && N_other == 0);
-
-    // Detector Acceptance
-    bool isFidVol = truthEvent->filtertaglist()->isFilterTagTrue("isFidVol");
-    bool isMINOS = muon_theta_beam <= m_muon_theta_max;
-    bool isAcceptanceGood = isFidVol && isMINOS;
-    
-    // Kinematics Cuts
-    double t_Enu = truthEvent->incomingEnergy(); 
-    double W_exp = truthEvent->getDoubleData("W_exp");
-    bool isEnuInRange = (t_Enu >= m_Enu_min) && (t_Enu <= m_Enu_max);
-    bool isWInRange = W_exp <= m_W_max;
-    bool isKinematicsGood = isEnuInRange && isWInRange;
+    bool isAcceptanceGood = isSignal_AcceptanceGood(truthEvent, muon_theta_beam);
+    bool isKinematicsGood = isSignal_KinematicsGood(truthEvent);
 
     bool isSignal = isCCNeutrino && isFSGood && isAcceptanceGood && isKinematicsGood;
     bool isSignalOut_Acceptance = isCCNeutrino && isFSGood && !isAcceptanceGood && isKinematicsGood;
     bool isSignalOut_Kinematics= isCCNeutrino && isFSGood && isAcceptanceGood && !isKinematicsGood;
+
+    double t_Enu = truthEvent->incomingEnergy(); 
+    double W_exp = truthEvent->getDoubleData("W_exp");
 
     debug()<<"isSignal = "<<isSignal<<endmsg;
     debug()<<"isAcceptanceGood = "<<isAcceptanceGood<<endmsg;
@@ -117,6 +106,150 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
     truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal", isSignal );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isSignalOut_Acceptance", isSignalOut_Acceptance );
     truthEvent->filtertaglist()->setOrAddFilterTag( "isSignalOut_Kinematics", isSignalOut_Kinematics);
+
+    return isSignal;
+}
+
+//------------------------------------------------------------------------------
+// tagSignal_BeforeFSI() 
+//      Tags Event as Signal or NOT
+//      Signal: CC-Neutrino Interaction inside Fiducial Volume, 
+//              FS Particles: Single Pi0, No Other (Proton and Neutrons are OK)
+//      returns TRUE if it is a Signal Event    
+//------------------------------------------------------------------------------
+bool CCProtonPi0::tagSignal_BeforeFSI(Minerva::GenMinInteraction* truthEvent) const
+{
+    debug()<<"tagSignal_BeforeFSI()"<<endmsg;
+
+    //--------------------------------------------------------------------------
+    // Get Event Record
+    //--------------------------------------------------------------------------
+    const Minerva::GenMinEventRecord* eventRecord = truthEvent->eventRecord();
+    const std::vector<int> eRecPartID = eventRecord->eRecPartID();
+    const std::vector<int> eRecPartStatus = eventRecord->eRecPartStatus();
+    const std::vector<int> eRecMother = eventRecord->eRecMother();
+    const std::vector<double> eRecPx = eventRecord->eRecMomentumPx();
+    const std::vector<double> eRecPy = eventRecord->eRecMomentumPy();
+    const std::vector<double> eRecPz = eventRecord->eRecMomentumPz();
+    const std::vector<double> eRecE = eventRecord->eRecEnergy();
+
+    //--------------------------------------------------------------------------
+    // Count the Number of FS Particles
+    //--------------------------------------------------------------------------
+    int particle_PDG;
+    int N_FSParticles = 0;
+    int N_proton    = 0;
+    int N_neutron   = 0;
+    int N_pi0       = 0;
+    int N_other     = 0;
+    int ind_pion = 0;
+    int ind_muon = 0;
+    double muon_theta_beam = 100;
+
+    // Get Number of Final State Particles
+    N_FSParticles = eRecPartID.size();
+
+    for (int part = 0; part < N_FSParticles; ++part) {
+
+        particle_PDG =  eRecPartID[part];
+
+        // Get Muon Angle
+        if ( particle_PDG == PDG::muon && eRecMother[part] == 0 ){
+            ind_muon = part;
+            double muonPx = eRecPx[part];
+            double muonPy = eRecPy[part];
+            double muonPz = eRecPz[part];
+            double muonE = eRecE[part];
+            Gaudi::LorentzVector muon_4P(muonPx, muonPy, muonPz, muonE);
+            muon_theta_beam = m_coordSysTool->thetaWRTBeam(muon_4P)*TMath::RadToDeg();
+            debug()<<"\tTheta(Muon) = "<<muon_theta_beam<<endmsg;
+        }
+
+        // Skip Particles whose Status is not 14
+        //      14 == Hadron created by interaction before FSI
+        if (eRecPartStatus[part] != 14) continue;
+
+        debug()<<"\tHadron PDG = "<<particle_PDG<<endmsg;
+
+        if (  particle_PDG == PDG::proton ) N_proton++;
+        else if ( particle_PDG == PDG::neutron ) N_neutron++;
+        else if ( particle_PDG == PDG::pi0 ){ 
+            N_pi0++;
+            ind_pion = part;
+        }else{
+            N_other++;
+        }
+    }
+    debug()<<"\tN(Proton) = "<<N_proton<<endmsg;
+    debug()<<"\tN(Neutron) = "<<N_neutron<<endmsg;
+    debug()<<"\tN(Pi0) = "<<N_pi0<<endmsg;
+    debug()<<"\tN(Other) = "<<N_other<<endmsg;
+
+    //--------------------------------------------------------------------------
+    // Find Signal --  Inside Fiducial Volume
+    //                 CC Neutrino Interaction
+    //                 FS Particles: muon, pi0, X (No Meson)
+    //                 MINOS Acceptance: Small Angle, High Momentum
+    //                 Neutrino Energy Limit
+    //--------------------------------------------------------------------------
+    bool isCCNeutrino = isSignal_CCNeutrino(truthEvent);
+    bool isFSGood = (N_pi0 == 1 && N_other == 0);
+    bool isAcceptanceGood = isSignal_AcceptanceGood(truthEvent, muon_theta_beam);
+    bool isKinematicsGood = isSignal_KinematicsGood(truthEvent);
+
+    bool isSignal = isCCNeutrino && isFSGood && isAcceptanceGood && isKinematicsGood;
+
+    debug()<<"\tisSignal = "<<isSignal<<endmsg;
+    debug()<<"\tisAcceptanceGood = "<<isAcceptanceGood<<endmsg;
+    debug()<<"\t\tmuon_theta_beam = "<<muon_theta_beam<<endmsg;
+    debug()<<"\tisKinematicsGood = "<<isKinematicsGood<<endmsg;
+
+    truthEvent->filtertaglist()->setOrAddFilterTag( "isSignal_BeforeFSI", isSignal );
+
+    // Now Save Cross Section Variables for Signal Events 
+    if (isSignal){
+        // Muon Variables
+        double muon_Px = eRecPx[ind_muon];
+        double muon_Py = eRecPy[ind_muon];
+        double muon_Pz = eRecPz[ind_muon];
+        double muon_E = eRecE[ind_muon];
+
+        Gaudi::LorentzVector muon_4P(muon_Px, muon_Py, muon_Pz, muon_E);
+        double muon_theta_beam = m_coordSysTool->thetaWRTBeam(muon_4P);
+        double muon_P = muon_4P.P();
+
+        debug()<<"\tP(muon) = "<<muon_4P<<endmsg;
+        debug()<<"\tTheta(muon) = "<<muon_theta_beam<<endmsg;
+
+        truthEvent->setDoubleData("muon_P_BeforeFSI",  muon_P);
+        truthEvent->setDoubleData("muon_theta_beam_BeforeFSI", muon_theta_beam);
+
+        // Pion Variables
+        double pi0_Px = eRecPx[ind_pion];
+        double pi0_Py = eRecPy[ind_pion];
+        double pi0_Pz = eRecPz[ind_pion];
+        double pi0_E = eRecE[ind_pion];
+
+        Gaudi::LorentzVector pi0_4P(pi0_Px, pi0_Py, pi0_Pz, pi0_E);
+        double pi0_theta_beam = m_coordSysTool->thetaWRTBeam(pi0_4P);
+
+        debug()<<"\tP(pi0) = "<<pi0_4P<<endmsg;
+        debug()<<"\tTheta(pi0) = "<<pi0_theta_beam<<endmsg;
+
+        truthEvent->setDoubleData("pi0_P_BeforeFSI",  pi0_4P.P());
+        truthEvent->setDoubleData("pi0_KE_BeforeFSI",  pi0_4P.E()-MinervaUnits::M_pi0);
+        truthEvent->setDoubleData("pi0_theta_beam_BeforeFSI", pi0_theta_beam);
+    
+        // Event Kinematics
+        // They are not changed due to Primary FS Lepton does not get affected from FSI
+        double Enu = truthEvent->incomingEnergy();
+        double QSq_exp = truthEvent->getDoubleData("QSq_exp");
+        double W_exp = truthEvent->getDoubleData("W_exp");
+
+        truthEvent->setDoubleData("Enu_BeforeFSI",  Enu);
+        truthEvent->setDoubleData("QSq_exp_BeforeFSI",  QSq_exp);
+        truthEvent->setDoubleData("W_exp_BeforeFSI", W_exp);
+    }
 
     return isSignal;
 }
@@ -1206,6 +1339,37 @@ void CCProtonPi0::saveMichelElectron(Minerva::GenMinInteraction* truthEvent, int
         }
     }
 }
+
+bool CCProtonPi0::isSignal_CCNeutrino(Minerva::GenMinInteraction* truthEvent) const 
+{
+    int t_current = truthEvent->current();
+    int t_neutrinoPDG = truthEvent->incoming();
+
+    bool isCCNeutrino = (t_current == 1 && t_neutrinoPDG == PDG::nu_mu);
+
+    return isCCNeutrino;
+}
+
+bool CCProtonPi0::isSignal_AcceptanceGood(Minerva::GenMinInteraction* truthEvent, double muon_theta_beam) const
+{
+    bool isFidVol = truthEvent->filtertaglist()->isFilterTagTrue("isFidVol");
+    bool isMINOS = muon_theta_beam <= m_muon_theta_max;
+    bool isAcceptanceGood = isFidVol && isMINOS;
+
+    return isAcceptanceGood;
+}
+
+bool CCProtonPi0::isSignal_KinematicsGood(Minerva::GenMinInteraction* truthEvent) const
+{
+    double t_Enu = truthEvent->incomingEnergy(); 
+    double W_exp = truthEvent->getDoubleData("W_exp");
+    bool isEnuInRange = (t_Enu >= m_Enu_min) && (t_Enu <= m_Enu_max);
+    bool isWInRange = W_exp <= m_W_max;
+    bool isKinematicsGood = isEnuInRange && isWInRange;
+
+    return isKinematicsGood;
+}
+
 
 #endif
 

@@ -30,11 +30,11 @@ namespace Folder_List
     // Background Constraints
     const std::string BckgConstraints = input + "BckgConstraints/" + "Weights_All_Universes.txt";
     const std::string BckgConstraints_TruthAnalysis = "../" + input + "BckgConstraints/" + "Weights_All_Universes.txt";
-    
-//-------------------------------------------------------------------------
-    // Data files on /pnfs/minerva/persistent/ Disk
+
     //-------------------------------------------------------------------------
-    const std::string rootOut = "/pnfs/minerva/persistent/users/oaltinok/NTupleAnalysis/";
+    // Data files on /minerva/data/ Disk
+    //-------------------------------------------------------------------------
+    const std::string rootOut = "/minerva/data/users/oaltinok/NTupleAnalysis/";
     const std::string MC = "MC/";
     const std::string Data = "Data/";
     const std::string ParticleCannon = "ParticleCannon/";
@@ -69,8 +69,8 @@ namespace Folder_List
     const std::string rootDir_Truth_data = "";
 
     // Set Other Studies ROOT Dir
-    const std::string rootDir_PC_mc = "/pnfs/minerva/persistent/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Steel.root"; 
-    const std::string rootDir_PC_data = "/pnfs/minerva/persistent/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Carbon.root"; 
+    const std::string rootDir_PC_mc = "/minerva/data/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Steel.root"; 
+    const std::string rootDir_PC_data = "/minerva/data/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Carbon.root"; 
    
     // Set Flux File ROOT Dir
     const std::string rootDir_Flux_new = rootOut + Flux + "fhc_flux_constrained.root";

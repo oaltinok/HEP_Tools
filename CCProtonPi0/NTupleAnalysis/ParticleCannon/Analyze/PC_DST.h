@@ -32,8 +32,13 @@ class PC_DST {
         void InitHistograms();
         void writeHistograms();
         void getEnergy();
+        double getPlaneEnergy(int module, int plane);
+        double getPlaneZ(int module, int plane);
 
         // Histograms
+        TH1D* plane_energy;
+        TH1D* plane_z;
+        TH1D* nPlanes;
         TH1D* error;
         TH1D* evis;
         TH1D* reco_energy;
@@ -45,7 +50,8 @@ class PC_DST {
         TH2D* evis_true;
 
         // Custom Variables
-        static const double low_activity_E = 1;
+        static const double low_activity_E;
+        static const double E_MINOS_Threshold;
         string rootDir;
         TFile* f;
 

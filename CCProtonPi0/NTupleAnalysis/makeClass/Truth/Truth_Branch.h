@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Aug 17 09:31:04 2016 by ROOT version 5.34/05
+// Tue Oct 11 09:52:43 2016 by ROOT version 5.34/05
 // from TChain Truth/
 //////////////////////////////////////////////////////////
 
@@ -25,6 +25,7 @@ public :
    Bool_t          truth_isGamma1_conv_inside;
    Bool_t          truth_isGamma2_conv_inside;
    Bool_t          truth_isSignal;
+   Bool_t          truth_isSignal_BeforeFSI;
    Bool_t          truth_isSignalOut_Acceptance;
    Bool_t          truth_isSignalOut_Kinematics;
    Bool_t          truth_isSignal_EventRecord;
@@ -79,9 +80,12 @@ public :
    Int_t           truth_vertex_plane;
    Int_t           truth_vtx_michel_evis_most_pdg;
    Int_t           truth_vtx_michel_large_evis_most_pdg;
+   Double_t        truth_Enu_BeforeFSI;
    Double_t        truth_QSq_exp;
+   Double_t        truth_QSq_exp_BeforeFSI;
    Double_t        truth_WSq_exp;
    Double_t        truth_W_exp;
+   Double_t        truth_W_exp_BeforeFSI;
    Double_t        truth_allClusters_evis_pizero;
    Double_t        truth_blob1_evis_muon;
    Double_t        truth_blob1_evis_neutron;
@@ -109,14 +113,19 @@ public :
    Double_t        truth_michelPion_begin_dist_vtx;
    Double_t        truth_michelPion_length;
    Double_t        truth_muon_P;
+   Double_t        truth_muon_P_BeforeFSI;
    Double_t        truth_muon_theta;
    Double_t        truth_muon_thetaX_beam;
    Double_t        truth_muon_thetaY_beam;
    Double_t        truth_muon_theta_beam;
+   Double_t        truth_muon_theta_beam_BeforeFSI;
    Double_t        truth_pi0_KE;
+   Double_t        truth_pi0_KE_BeforeFSI;
    Double_t        truth_pi0_P;
+   Double_t        truth_pi0_P_BeforeFSI;
    Double_t        truth_pi0_theta;
    Double_t        truth_pi0_theta_beam;
+   Double_t        truth_pi0_theta_beam_BeforeFSI;
    Double_t        truth_proton_P;
    Double_t        truth_proton_theta;
    Double_t        truth_proton_theta_beam;
@@ -264,6 +273,7 @@ public :
    TBranch        *b_truth_isGamma1_conv_inside;   //!
    TBranch        *b_truth_isGamma2_conv_inside;   //!
    TBranch        *b_truth_isSignal;   //!
+   TBranch        *b_truth_isSignal_BeforeFSI;   //!
    TBranch        *b_truth_isSignalOut_Acceptance;   //!
    TBranch        *b_truth_isSignalOut_Kinematics;   //!
    TBranch        *b_truth_isSignal_EventRecord;   //!
@@ -318,9 +328,12 @@ public :
    TBranch        *b_truth_vertex_plane;   //!
    TBranch        *b_truth_vtx_michel_evis_most_pdg;   //!
    TBranch        *b_truth_vtx_michel_large_evis_most_pdg;   //!
+   TBranch        *b_truth_Enu_BeforeFSI;   //!
    TBranch        *b_truth_QSq_exp;   //!
+   TBranch        *b_truth_QSq_exp_BeforeFSI;   //!
    TBranch        *b_truth_WSq_exp;   //!
    TBranch        *b_truth_W_exp;   //!
+   TBranch        *b_truth_W_exp_BeforeFSI;   //!
    TBranch        *b_truth_allClusters_evis_pizero;   //!
    TBranch        *b_truth_blob1_evis_muon;   //!
    TBranch        *b_truth_blob1_evis_neutron;   //!
@@ -348,14 +361,19 @@ public :
    TBranch        *b_truth_michelPion_begin_dist_vtx;   //!
    TBranch        *b_truth_michelPion_length;   //!
    TBranch        *b_truth_muon_P;   //!
+   TBranch        *b_truth_muon_P_BeforeFSI;   //!
    TBranch        *b_truth_muon_theta;   //!
    TBranch        *b_truth_muon_thetaX_beam;   //!
    TBranch        *b_truth_muon_thetaY_beam;   //!
    TBranch        *b_truth_muon_theta_beam;   //!
+   TBranch        *b_truth_muon_theta_beam_BeforeFSI;   //!
    TBranch        *b_truth_pi0_KE;   //!
+   TBranch        *b_truth_pi0_KE_BeforeFSI;   //!
    TBranch        *b_truth_pi0_P;   //!
+   TBranch        *b_truth_pi0_P_BeforeFSI;   //!
    TBranch        *b_truth_pi0_theta;   //!
    TBranch        *b_truth_pi0_theta_beam;   //!
+   TBranch        *b_truth_pi0_theta_beam_BeforeFSI;   //!
    TBranch        *b_truth_proton_P;   //!
    TBranch        *b_truth_proton_theta;   //!
    TBranch        *b_truth_proton_theta_beam;   //!
@@ -532,7 +550,7 @@ Truth_Branch::Truth_Branch(TTree *tree) : fChain(0)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("Truth","");
-      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_94/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/Truth");
+      chain->Add("/pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_98/minerva1/grid/central_value/minerva/ana/v10r8p9/00/01/02/00/SIM_minerva_00010200_Subruns_0001-0002-0003-0004-0005_CCProtonPi0_Ana_Tuple_v10r8p9-oaltinok.root/Truth");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -585,6 +603,7 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_isGamma1_conv_inside", &truth_isGamma1_conv_inside, &b_truth_isGamma1_conv_inside);
    fChain->SetBranchAddress("truth_isGamma2_conv_inside", &truth_isGamma2_conv_inside, &b_truth_isGamma2_conv_inside);
    fChain->SetBranchAddress("truth_isSignal", &truth_isSignal, &b_truth_isSignal);
+   fChain->SetBranchAddress("truth_isSignal_BeforeFSI", &truth_isSignal_BeforeFSI, &b_truth_isSignal_BeforeFSI);
    fChain->SetBranchAddress("truth_isSignalOut_Acceptance", &truth_isSignalOut_Acceptance, &b_truth_isSignalOut_Acceptance);
    fChain->SetBranchAddress("truth_isSignalOut_Kinematics", &truth_isSignalOut_Kinematics, &b_truth_isSignalOut_Kinematics);
    fChain->SetBranchAddress("truth_isSignal_EventRecord", &truth_isSignal_EventRecord, &b_truth_isSignal_EventRecord);
@@ -639,9 +658,12 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_vertex_plane", &truth_vertex_plane, &b_truth_vertex_plane);
    fChain->SetBranchAddress("truth_vtx_michel_evis_most_pdg", &truth_vtx_michel_evis_most_pdg, &b_truth_vtx_michel_evis_most_pdg);
    fChain->SetBranchAddress("truth_vtx_michel_large_evis_most_pdg", &truth_vtx_michel_large_evis_most_pdg, &b_truth_vtx_michel_large_evis_most_pdg);
+   fChain->SetBranchAddress("truth_Enu_BeforeFSI", &truth_Enu_BeforeFSI, &b_truth_Enu_BeforeFSI);
    fChain->SetBranchAddress("truth_QSq_exp", &truth_QSq_exp, &b_truth_QSq_exp);
+   fChain->SetBranchAddress("truth_QSq_exp_BeforeFSI", &truth_QSq_exp_BeforeFSI, &b_truth_QSq_exp_BeforeFSI);
    fChain->SetBranchAddress("truth_WSq_exp", &truth_WSq_exp, &b_truth_WSq_exp);
    fChain->SetBranchAddress("truth_W_exp", &truth_W_exp, &b_truth_W_exp);
+   fChain->SetBranchAddress("truth_W_exp_BeforeFSI", &truth_W_exp_BeforeFSI, &b_truth_W_exp_BeforeFSI);
    fChain->SetBranchAddress("truth_allClusters_evis_pizero", &truth_allClusters_evis_pizero, &b_truth_allClusters_evis_pizero);
    fChain->SetBranchAddress("truth_blob1_evis_muon", &truth_blob1_evis_muon, &b_truth_blob1_evis_muon);
    fChain->SetBranchAddress("truth_blob1_evis_neutron", &truth_blob1_evis_neutron, &b_truth_blob1_evis_neutron);
@@ -669,14 +691,19 @@ void Truth_Branch::Init(TTree *tree)
    fChain->SetBranchAddress("truth_michelPion_begin_dist_vtx", &truth_michelPion_begin_dist_vtx, &b_truth_michelPion_begin_dist_vtx);
    fChain->SetBranchAddress("truth_michelPion_length", &truth_michelPion_length, &b_truth_michelPion_length);
    fChain->SetBranchAddress("truth_muon_P", &truth_muon_P, &b_truth_muon_P);
+   fChain->SetBranchAddress("truth_muon_P_BeforeFSI", &truth_muon_P_BeforeFSI, &b_truth_muon_P_BeforeFSI);
    fChain->SetBranchAddress("truth_muon_theta", &truth_muon_theta, &b_truth_muon_theta);
    fChain->SetBranchAddress("truth_muon_thetaX_beam", &truth_muon_thetaX_beam, &b_truth_muon_thetaX_beam);
    fChain->SetBranchAddress("truth_muon_thetaY_beam", &truth_muon_thetaY_beam, &b_truth_muon_thetaY_beam);
    fChain->SetBranchAddress("truth_muon_theta_beam", &truth_muon_theta_beam, &b_truth_muon_theta_beam);
+   fChain->SetBranchAddress("truth_muon_theta_beam_BeforeFSI", &truth_muon_theta_beam_BeforeFSI, &b_truth_muon_theta_beam_BeforeFSI);
    fChain->SetBranchAddress("truth_pi0_KE", &truth_pi0_KE, &b_truth_pi0_KE);
+   fChain->SetBranchAddress("truth_pi0_KE_BeforeFSI", &truth_pi0_KE_BeforeFSI, &b_truth_pi0_KE_BeforeFSI);
    fChain->SetBranchAddress("truth_pi0_P", &truth_pi0_P, &b_truth_pi0_P);
+   fChain->SetBranchAddress("truth_pi0_P_BeforeFSI", &truth_pi0_P_BeforeFSI, &b_truth_pi0_P_BeforeFSI);
    fChain->SetBranchAddress("truth_pi0_theta", &truth_pi0_theta, &b_truth_pi0_theta);
    fChain->SetBranchAddress("truth_pi0_theta_beam", &truth_pi0_theta_beam, &b_truth_pi0_theta_beam);
+   fChain->SetBranchAddress("truth_pi0_theta_beam_BeforeFSI", &truth_pi0_theta_beam_BeforeFSI, &b_truth_pi0_theta_beam_BeforeFSI);
    fChain->SetBranchAddress("truth_proton_P", &truth_proton_P, &b_truth_proton_P);
    fChain->SetBranchAddress("truth_proton_theta", &truth_proton_theta, &b_truth_proton_theta);
    fChain->SetBranchAddress("truth_proton_theta_beam", &truth_proton_theta_beam, &b_truth_proton_theta_beam);

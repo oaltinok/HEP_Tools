@@ -55,6 +55,21 @@ struct XSec
     MnvH1D* mc_reco_bckg;
     MnvH2D* response;
     MnvH1D* eff;
+
+    // MC Truth BeforeFSI
+    MnvH1D* efficiency_corrected_BeforeFSI;
+    MnvH1D* flux_integrated_BeforeFSI;
+    MnvH1D* xsec_BeforeFSI;
+    
+    // MC Truth FSI Type
+    std::vector<MnvH1D*> efficiency_corrected_FSIType;
+    std::vector<MnvH1D*> flux_integrated_FSIType;
+    std::vector<MnvH1D*> xsec_FSIType;
+
+    // MC Truth Int Type
+    std::vector<MnvH1D*> efficiency_corrected_IntType;
+    std::vector<MnvH1D*> flux_integrated_IntType;
+    std::vector<MnvH1D*> xsec_IntType;
 };
 
 class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
@@ -110,7 +125,11 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void RebinFluxHistogram();
         void RebinFluxHistogram(TH1* rebinned, TH1* reference);
         void Calc_CrossSection(XSec &var);
-        void Style_XSec(XSec &var);
+        void Calc_CrossSection_BeforeFSI(XSec &var);
+        void Calc_CrossSection_FSIType(XSec &var);
+        void Calc_CrossSection_IntType(XSec &var);
+        void AddLabels_XSecHist(XSec &var);
+        void Scale_XSecHist(MnvH1D* xsec_hist, double smallest_bin_width);
         void Calc_Normalized_NBackground();
         void NormalizeHistogram(TH1D* h);
         void NormalizeHistogram(MnvH1D* h);
@@ -134,8 +153,8 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name);
         MnvH1D* Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name, int nIter);
         MnvH1D* Efficiency_Divide(MnvH1D* unfolded, MnvH1D* eff, std::string var_name);
-        MnvH1D* Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name);
-        MnvH1D* Calc_FinalCrossSection(MnvH1D* flux_integrated, std::string var_name);
+        MnvH1D* Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name, std::string hist_name);
+        MnvH1D* Calc_FinalCrossSection(MnvH1D* flux_integrated, std::string var_name, std::string hist_name);
 };
 
 

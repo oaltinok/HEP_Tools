@@ -67,10 +67,10 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotHistograms();
 
     private:
+        rootDir rootDir_PC;
         rootDir rootDir_GENIEXSec;
         rootDir rootDir_Truth;
         rootDir rootDir_CrossSection;
-        rootDir rootDir_OtherStudies;
         rootDir rootDir_CutHists;
         rootDir rootDir_Interaction;
         rootDir rootDir_Muon;
@@ -103,6 +103,9 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
         void PlotXSecVar(std::string var_name, std::string data_var, std::string mc_var, std::string plotDir, std::string plotName);
         void PlotXSecVar_WithMiniBoone(std::string var_name, std::string plotDir);
+        void PlotXSecVar_BeforeFSI(std::string var_name, std::string plotDir);
+        void PlotXSecVar_FSIType(std::string var_name, std::string plotDir);
+        void PlotXSecVar_IntType(std::string var_name, std::string plotDir);
         
         void plotCrossSection();
         void plotOriginalData();
@@ -143,6 +146,8 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void PlotTotalEnuXSec();
         void plotGENIEXSec();
         void plotOtherStudies();
+        void plotPC_MINOS_Pi0();
+        void plotPC_MINOS_Pi0(std::string rootDir_Steel, std::string rootDir_Carbon, std::string var, std::string label);
         void plot_InvMass_TruthMatch_Stacked(bool isSignal, bool isStacked);
         void plot_Michel_TruthMatch(std::string var);
         void plot_SignalKinematics(std::string var, std::string type, bool isStacked);
@@ -158,6 +163,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void SavePi0InvMassPoints();
         void NormalizeToNormBinWidth(MnvH1D* hist);
         double GetSmallestBinWidth(MnvH1D* hist);
+        TH1D* GetBinNormalizedTH1D(MnvH1D* hist, bool WithSystError = false);
         
         // Flux Study
         double GetFluxHistContent(MnvH1D* hist, double low1, double low2);
@@ -196,6 +202,9 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec = false);
         void DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);
         void DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGraph* otherData, std::string var_name, std::string ext_data_name, std::string plotDir);
+        void DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D* mc_BeforeFSI, std::string var_name,  std::string plotDir);
+        void DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_FSIType, std::string var_name,  std::string plotDir);
+        void DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_IntType, std::string var_name,  std::string plotDir);
         void DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());

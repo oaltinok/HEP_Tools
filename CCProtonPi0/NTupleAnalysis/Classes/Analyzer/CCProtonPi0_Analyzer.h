@@ -502,6 +502,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         Bool_t          truth_isGamma1_conv_inside;
         Bool_t          truth_isGamma2_conv_inside;
         Bool_t          truth_isSignal;
+        Bool_t          truth_isSignal_BeforeFSI;
         Bool_t          truth_isSignalOut_Acceptance;
         Bool_t          truth_isSignalOut_Kinematics;
         Bool_t          truth_isSignal_EventRecord;
@@ -556,9 +557,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         Int_t           truth_vertex_plane;
         Int_t           truth_vtx_michel_evis_most_pdg;
         Int_t           truth_vtx_michel_large_evis_most_pdg;
+        Double_t        truth_Enu_BeforeFSI;
         Double_t        truth_QSq_exp;
+        Double_t        truth_QSq_exp_BeforeFSI;
         Double_t        truth_WSq_exp;
         Double_t        truth_W_exp;
+        Double_t        truth_W_exp_BeforeFSI;
         Double_t        truth_allClusters_evis_pizero;
         Double_t        truth_blob1_evis_muon;
         Double_t        truth_blob1_evis_neutron;
@@ -586,14 +590,19 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         Double_t        truth_michelPion_begin_dist_vtx;
         Double_t        truth_michelPion_length;
         Double_t        truth_muon_P;
+        Double_t        truth_muon_P_BeforeFSI;
         Double_t        truth_muon_theta;
         Double_t        truth_muon_thetaX_beam;
         Double_t        truth_muon_thetaY_beam;
         Double_t        truth_muon_theta_beam;
+        Double_t        truth_muon_theta_beam_BeforeFSI;
         Double_t        truth_pi0_KE;
+        Double_t        truth_pi0_KE_BeforeFSI;
         Double_t        truth_pi0_P;
+        Double_t        truth_pi0_P_BeforeFSI;
         Double_t        truth_pi0_theta;
         Double_t        truth_pi0_theta_beam;
+        Double_t        truth_pi0_theta_beam_BeforeFSI;
         Double_t        truth_proton_P;
         Double_t        truth_proton_theta;
         Double_t        truth_proton_theta_beam;
@@ -1247,6 +1256,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_isGamma1_conv_inside;   //!
         TBranch        *b_truth_isGamma2_conv_inside;   //!
         TBranch        *b_truth_isSignal;   //!
+        TBranch        *b_truth_isSignal_BeforeFSI;   //!
         TBranch        *b_truth_isSignalOut_Acceptance;   //!
         TBranch        *b_truth_isSignalOut_Kinematics;   //!
         TBranch        *b_truth_isSignal_EventRecord;   //!
@@ -1301,9 +1311,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_vertex_plane;   //!
         TBranch        *b_truth_vtx_michel_evis_most_pdg;   //!
         TBranch        *b_truth_vtx_michel_large_evis_most_pdg;   //!
+        TBranch        *b_truth_Enu_BeforeFSI;   //!
         TBranch        *b_truth_QSq_exp;   //!
+        TBranch        *b_truth_QSq_exp_BeforeFSI;   //!
         TBranch        *b_truth_WSq_exp;   //!
         TBranch        *b_truth_W_exp;   //!
+        TBranch        *b_truth_W_exp_BeforeFSI;   //!
         TBranch        *b_truth_allClusters_evis_pizero;   //!
         TBranch        *b_truth_blob1_evis_muon;   //!
         TBranch        *b_truth_blob1_evis_neutron;   //!
@@ -1331,14 +1344,19 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_truth_michelPion_begin_dist_vtx;   //!
         TBranch        *b_truth_michelPion_length;   //!
         TBranch        *b_truth_muon_P;   //!
+        TBranch        *b_truth_muon_P_BeforeFSI;   //!
         TBranch        *b_truth_muon_theta;   //!
         TBranch        *b_truth_muon_thetaX_beam;   //!
         TBranch        *b_truth_muon_thetaY_beam;   //!
         TBranch        *b_truth_muon_theta_beam;   //!
+        TBranch        *b_truth_muon_theta_beam_BeforeFSI;   //!
         TBranch        *b_truth_pi0_KE;   //!
+        TBranch        *b_truth_pi0_KE_BeforeFSI;   //!
         TBranch        *b_truth_pi0_P;   //!
+        TBranch        *b_truth_pi0_P_BeforeFSI;   //!
         TBranch        *b_truth_pi0_theta;   //!
         TBranch        *b_truth_pi0_theta_beam;   //!
+        TBranch        *b_truth_pi0_theta_beam_BeforeFSI;   //!
         TBranch        *b_truth_proton_P;   //!
         TBranch        *b_truth_proton_theta;   //!
         TBranch        *b_truth_proton_theta_beam;   //!
@@ -1889,6 +1907,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         TBranch        *b_prong_part_charge;   //!
         TBranch        *b_prong_part_pid;   //!
 
-};
 
+};
 #endif
+

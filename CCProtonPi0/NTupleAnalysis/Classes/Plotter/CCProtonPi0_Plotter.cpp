@@ -238,16 +238,81 @@ void CCProtonPi0_Plotter::plotOtherStudies()
 {
     std::cout<<"Plotting Other Studies..."<<std::endl;
     std::string plotDir = Folder_List::plotDir_OtherStudies;
+   
+    TFile* f = new TFile(Folder_List::rootDir_Truth_mc_Test.c_str());
+    TH1D* hist1D = new TH1D( * dynamic_cast<TH1D*>(f->Get("Test_pi0_P")) );
+    Draw1DHist(hist1D, "Test_pi0_P", plotDir);
 
-    Draw2DHist(rootDir_Truth, "michel_ZX", plotDir);
-    Draw2DHist(rootDir_Truth, "michel_ZY", plotDir);
-    Draw1DHist(rootDir_Truth, "michel_dist_X", plotDir);
-    Draw1DHist(rootDir_Truth, "michel_dist_Y", plotDir);
-    Draw1DHist(rootDir_Truth, "michel_dist_Z", plotDir);
-    Draw1DHist(rootDir_Truth, "michel_dist_total", plotDir);
-    Draw1DHist(rootDir_Truth, "michel_pionP", plotDir);
-    Draw1DHist(rootDir_Truth, "michel_pion_dist", plotDir);
+    hist1D = new TH1D( * dynamic_cast<TH1D*>(f->Get("Test_pi0_theta")) );
+    Draw1DHist(hist1D, "Test_pi0_theta", plotDir);
 
+    std::cout<<"Plotting Other Studies Finished!"<<std::endl;
+}
+
+void CCProtonPi0_Plotter::plotPC_MINOS_Pi0()
+{
+    std::string rootDir_Steel_1 = "/minerva/data/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Steel_1.root"; 
+    std::string rootDir_Steel_2 = "/minerva/data/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Steel_2.root"; 
+    std::string rootDir_Carbon_1 = "/minerva/data/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Carbon_1.root"; 
+    std::string rootDir_Carbon_2 = "/minerva/data/users/oaltinok/NTupleAnalysis/ParticleCannon/PC_Carbon_2.root"; 
+ 
+    plotPC_MINOS_Pi0(rootDir_Steel_1, rootDir_Carbon_1, "plane_energy", "Energy_1_1");
+    plotPC_MINOS_Pi0(rootDir_Steel_1, rootDir_Carbon_1, "nPlanes", "Energy_1_1");
+    plotPC_MINOS_Pi0(rootDir_Steel_1, rootDir_Carbon_1, "plane_z", "Energy_1_1");
+ 
+    plotPC_MINOS_Pi0(rootDir_Steel_2, rootDir_Carbon_2, "plane_energy", "Energy_2_0");
+    plotPC_MINOS_Pi0(rootDir_Steel_2, rootDir_Carbon_2, "nPlanes", "Energy_2_0");
+    plotPC_MINOS_Pi0(rootDir_Steel_2, rootDir_Carbon_2, "plane_z", "Energy_2_0");
+
+}
+
+void CCProtonPi0_Plotter::plotPC_MINOS_Pi0(std::string rootDir_Steel, std::string rootDir_Carbon, std::string var, std::string label)
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    
+    TFile* f_Root_Steel = new TFile(rootDir_Steel.c_str());
+    TFile* f_Root_Carbon = new TFile(rootDir_Carbon.c_str());
+    
+    // Create Canvas
+    TCanvas* c1 = new TCanvas("c","c",1280,800);
+    THStack *hs = new THStack("hs",var.c_str());
+
+    TH1D* h_steel = (TH1D*)f_Root_Steel->Get(var.c_str());
+    h_steel->SetFillColor(kRed);
+    h_steel->SetLineColor(kRed);
+    h_steel->SetLineWidth(3);
+    h_steel->SetFillStyle(3010);
+
+    TH1D* h_carbon = (TH1D*)f_Root_Carbon->Get(var.c_str());
+    h_carbon->SetFillColor(kBlue);
+    h_carbon->SetLineColor(kBlue);
+    h_carbon->SetLineWidth(3);
+    h_carbon->SetFillStyle(3010);
+
+    hs->Add(h_steel);
+    hs->Add(h_carbon);
+    
+    hs->Draw("nostack");
+    hs->GetXaxis()->SetTitle(var.c_str());
+    hs->GetYaxis()->SetTitle("N(Events)");
+
+    // Add Legend
+    TLegend *legend = new TLegend(0.7,0.68,0.9,0.9);  
+    legend->AddEntry(h_steel, "Steel", "f");
+    legend->AddEntry(h_carbon, "Carbon", "f");
+    legend->SetTextSize(0.05);
+    legend->Draw();
+
+    std::string out_name = plotDir + var + "_" + label + ".png"; 
+
+    c1->Print(out_name.c_str(),"png");
+
+    delete f_Root_Steel;
+    delete f_Root_Carbon;
+    delete hs;
+    delete legend;
+    delete c1;
+    
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
 
@@ -708,42 +773,66 @@ void CCProtonPi0_Plotter::plotXSec()
     if (plot_muon_P){
         plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_CrossSection;
         PlotXSecVar("muon_P", "xsec", "xsec", plotDir, "xsec_data_MC" );
+        PlotXSecVar_BeforeFSI("muon_P", plotDir);
+        PlotXSecVar_FSIType("muon_P", plotDir);
+        PlotXSecVar_IntType("muon_P", plotDir);
     }
   
     if (plot_muon_theta){
         plotDir = Folder_List::xsec_muon_theta + Folder_List::plotDir_CrossSection;
         PlotXSecVar("muon_theta", "xsec", "xsec", plotDir, "xsec_data_MC" );
+        PlotXSecVar_BeforeFSI("muon_theta", plotDir);
+        PlotXSecVar_FSIType("muon_theta", plotDir);
+        PlotXSecVar_IntType("muon_theta", plotDir);
     }
   
     if (plot_pi0_P){
         plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_CrossSection;
         PlotXSecVar("pi0_P", "xsec", "xsec", plotDir, "xsec_data_MC" );
         PlotXSecVar_WithMiniBoone("pi0_P", plotDir);
+        PlotXSecVar_BeforeFSI("pi0_P", plotDir);
+        PlotXSecVar_FSIType("pi0_P", plotDir);
+        PlotXSecVar_IntType("pi0_P", plotDir);
     }
 
     if (plot_pi0_KE){
         plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_CrossSection;
         PlotXSecVar("pi0_KE", "xsec", "xsec", plotDir, "xsec_data_MC" );
+        PlotXSecVar_BeforeFSI("pi0_KE", plotDir);
+        PlotXSecVar_FSIType("pi0_KE", plotDir);
+        PlotXSecVar_IntType("pi0_KE", plotDir);
     }
  
     if (plot_pi0_theta){
         plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_CrossSection;
         PlotXSecVar("pi0_theta", "xsec", "xsec", plotDir, "xsec_data_MC" );
+        PlotXSecVar_BeforeFSI("pi0_theta", plotDir);
+        PlotXSecVar_FSIType("pi0_theta", plotDir);
+        PlotXSecVar_IntType("pi0_theta", plotDir);
     }
 
     if (plot_QSq){
         plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_CrossSection;
         PlotXSecVar("QSq", "xsec", "xsec", plotDir, "xsec_data_MC" );
+        PlotXSecVar_BeforeFSI("QSq", plotDir);
+        PlotXSecVar_FSIType("QSq", plotDir);
+        PlotXSecVar_IntType("QSq", plotDir);
     }
 
     if (plot_W){
         plotDir = Folder_List::xsec_W + Folder_List::plotDir_CrossSection;
         PlotXSecVar("W", "xsec", "xsec", plotDir, "xsec_data_MC" );
+        PlotXSecVar_BeforeFSI("W", plotDir);
+        PlotXSecVar_FSIType("W", plotDir);
+        PlotXSecVar_IntType("W", plotDir);
     }
 
     if (plot_Enu){
         plotDir = Folder_List::xsec_Enu + Folder_List::plotDir_CrossSection;
         PlotXSecVar("Enu", "xsec", "xsec", plotDir, "xsec_data_MC" );
+        PlotXSecVar_BeforeFSI("Enu", plotDir);
+        PlotXSecVar_FSIType("Enu", plotDir);
+        PlotXSecVar_IntType("Enu", plotDir);
     }
 
     std::cout<<"Plotting Cross Sections Finished!"<<std::endl;
@@ -1759,11 +1848,11 @@ void CCProtonPi0_Plotter::SavePi0InvMassPoints()
 void CCProtonPi0_Plotter::setRootDirs()
 {
     // Set Other Studies ROOT Dir
+    rootDir_PC.mc = Folder_List::rootDir_PC_mc;
+    rootDir_PC.data = Folder_List::rootDir_PC_data;
+
     rootDir_Truth.mc = Folder_List::rootDir_Truth_mc;
     rootDir_Truth.data = Folder_List::rootDir_Truth_data;
-
-    rootDir_OtherStudies.mc = Folder_List::rootDir_OtherStudies_mc; 
-    rootDir_OtherStudies.data = Folder_List::rootDir_OtherStudies_data;
 
     rootDir_CrossSection.mc = Folder_List::rootDir_CrossSection_mc;
     rootDir_CrossSection.data = Folder_List::rootDir_CrossSection_data;
@@ -2131,6 +2220,96 @@ void CCProtonPi0_Plotter::PlotXSecVar(std::string var_name, std::string data_var
     delete f_xsec_data;
 }
 
+void CCProtonPi0_Plotter::PlotXSecVar_BeforeFSI(std::string var_name, std::string plotDir)
+{
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+
+    std::string data_var = var_name + "_xsec";
+    std::string mc_var = var_name + "_xsec";
+    std::string mc_var_BeforeFSI = var_name + "_xsec_BeforeFSI";
+
+    MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
+    MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
+    MnvH1D* mc_BeforeFSI = GetMnvH1D(f_xsec_mc, mc_var_BeforeFSI);
+
+    // Remove Error Bands from MC
+    mc->ClearAllErrorBands();
+    mc_BeforeFSI->ClearAllErrorBands();
+
+    DrawDataMC_BeforeFSI(data, mc, mc_BeforeFSI, var_name, plotDir);
+  
+    delete data;
+    delete mc;
+    delete mc_BeforeFSI;
+    delete f_xsec_mc;
+    delete f_xsec_data;
+}
+
+void CCProtonPi0_Plotter::PlotXSecVar_IntType(std::string var_name, std::string plotDir)
+{
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+
+    std::string data_var = var_name + "_xsec";
+    std::string mc_var = var_name + "_xsec";
+    std::string hist_name;
+
+    MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
+    MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
+    mc->ClearAllErrorBands();
+   
+    MnvH1D* temp = NULL;
+    std::vector<MnvH1D*> mc_IntType;
+    for (int i = 0; i < nIntType; ++i){
+        hist_name = var_name + "_xsec_IntType_" + std::to_string((long long int)i);
+        temp = GetMnvH1D(f_xsec_mc, hist_name);
+        temp->ClearAllErrorBands();
+        mc_IntType.push_back(temp);
+    }
+
+    DrawDataMC_IntType(data, mc, mc_IntType, var_name, plotDir);
+  
+    mc_IntType.clear();
+
+    delete data;
+    delete mc;
+    delete f_xsec_mc;
+    delete f_xsec_data;
+}
+
+void CCProtonPi0_Plotter::PlotXSecVar_FSIType(std::string var_name, std::string plotDir)
+{
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+
+    std::string data_var = var_name + "_xsec";
+    std::string mc_var = var_name + "_xsec";
+    std::string hist_name;
+
+    MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
+    MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
+    mc->ClearAllErrorBands();
+   
+    MnvH1D* temp = NULL;
+    std::vector<MnvH1D*> mc_FSIType;
+    for (int i = 0; i < nFSIType; ++i){
+        hist_name = var_name + "_xsec_FSIType_" + std::to_string((long long int)i);
+        temp = GetMnvH1D(f_xsec_mc, hist_name);
+        temp->ClearAllErrorBands();
+        mc_FSIType.push_back(temp);
+    }
+
+    DrawDataMC_FSIType(data, mc, mc_FSIType, var_name, plotDir);
+  
+    mc_FSIType.clear();
+
+    delete data;
+    delete mc;
+    delete f_xsec_mc;
+    delete f_xsec_data;
+}
+
 void CCProtonPi0_Plotter::PlotXSecVar_WithMiniBoone(std::string var_name, std::string plotDir)
 {
     TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
@@ -2201,13 +2380,13 @@ void CCProtonPi0_Plotter::UnfoldingStudy()
 
 void CCProtonPi0_Plotter::Systematics()
 {
-    Systematics_CheckErrorSummary(rootDir_CrossSection.mc, "h_flux_rebinned");
-    Systematics_CheckErrorSummary(rootDir_CutHists.mc, "invMass_mc_reco_all");
+    //Systematics_CheckErrorSummary(rootDir_CrossSection.mc, "h_flux_rebinned");
+    //Systematics_CheckErrorSummary(rootDir_CutHists.mc, "invMass_mc_reco_all");
     //Systematics_CheckErrorSummary(rootDir_CrossSection.mc, "invMass_mc_reco_all");
     
-    //Systematics_XSec();
+    Systematics_XSec();
     //Systematics_invMass();
-
+    
     //Systematics_WriteTables("muon_P");
     //Systematics_WriteTables("muon_theta");
     //Systematics_WriteTables("pi0_P");

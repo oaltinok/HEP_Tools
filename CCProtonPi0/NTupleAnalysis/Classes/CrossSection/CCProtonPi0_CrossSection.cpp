@@ -36,6 +36,7 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
 {
     Calc_Normalized_NBackground();
 
+    // Regular Cross Section Calculation
     Calc_CrossSection(muon_P);   
     Calc_CrossSection(muon_theta);   
     Calc_CrossSection(pi0_P);   
@@ -44,7 +45,37 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection(QSq);   
     Calc_CrossSection(W);   
     Calc_CrossSection(Enu);   
-    
+ 
+    // Before FSI Cross Section Calculation
+    Calc_CrossSection_BeforeFSI(muon_P);   
+    Calc_CrossSection_BeforeFSI(muon_theta);   
+    Calc_CrossSection_BeforeFSI(pi0_P);   
+    Calc_CrossSection_BeforeFSI(pi0_KE);   
+    Calc_CrossSection_BeforeFSI(pi0_theta);   
+    Calc_CrossSection_BeforeFSI(QSq);   
+    Calc_CrossSection_BeforeFSI(W);   
+    Calc_CrossSection_BeforeFSI(Enu);   
+  
+    // FSI Type Cross Section Calculation
+    Calc_CrossSection_FSIType(muon_P);   
+    Calc_CrossSection_FSIType(muon_theta);   
+    Calc_CrossSection_FSIType(pi0_P);   
+    Calc_CrossSection_FSIType(pi0_KE);   
+    Calc_CrossSection_FSIType(pi0_theta);   
+    Calc_CrossSection_FSIType(QSq);   
+    Calc_CrossSection_FSIType(W);   
+    Calc_CrossSection_FSIType(Enu);   
+ 
+    // Int Type Cross Section Calculation
+    Calc_CrossSection_IntType(muon_P);   
+    Calc_CrossSection_IntType(muon_theta);   
+    Calc_CrossSection_IntType(pi0_P);   
+    Calc_CrossSection_IntType(pi0_KE);   
+    Calc_CrossSection_IntType(pi0_theta);   
+    Calc_CrossSection_IntType(QSq);   
+    Calc_CrossSection_IntType(W);   
+    Calc_CrossSection_IntType(Enu);   
+
     writeHistograms();
 }
 
@@ -59,29 +90,89 @@ void CCProtonPi0_CrossSection::Calc_CrossSection(XSec &var)
     var.efficiency_corrected = Efficiency_Divide(var.unfolded, var.eff, var.name);   
 
     // Integrate Flux
-    var.flux_integrated = Integrate_Flux(var.efficiency_corrected, var.name);
+    var.flux_integrated = Integrate_Flux(var.efficiency_corrected, var.name, "_flux_integrated");
     
     // Calculate Final Cross Section
-    var.xsec = Calc_FinalCrossSection(var.flux_integrated, var.name); 
+    var.xsec = Calc_FinalCrossSection(var.flux_integrated, var.name, "_xsec"); 
  
-    Style_XSec(var);
+    AddLabels_XSecHist(var);
+    Scale_XSecHist(var.xsec, var.smallest_bin_width);
+
     std::cout<<"Done!"<<std::endl;
     std::cout<<"-----------------------------------------------------------------------"<<std::endl;
 }
 
-void CCProtonPi0_CrossSection::Style_XSec(XSec &var)
+void CCProtonPi0_CrossSection::Calc_CrossSection_BeforeFSI(XSec &var)
+{
+    std::cout<<"\n-----------------------------------------------------------------------"<<std::endl;
+    std::cout<<"Calculating Cross Section for "<<var.name<<" Before FSI"<<std::endl;
+
+    // Integrate Flux
+    var.flux_integrated_BeforeFSI = Integrate_Flux(var.efficiency_corrected_BeforeFSI, var.name, "_flux_integrated_BeforeFSI");
+    
+    // Calculate Final Cross Section
+    var.xsec_BeforeFSI = Calc_FinalCrossSection(var.flux_integrated_BeforeFSI, var.name, "_xsec_BeforeFSI"); 
+ 
+    Scale_XSecHist(var.xsec_BeforeFSI, var.smallest_bin_width);
+
+    std::cout<<"Done!"<<std::endl;
+    std::cout<<"-----------------------------------------------------------------------"<<std::endl;
+}
+
+void CCProtonPi0_CrossSection::Calc_CrossSection_FSIType(XSec &var)
+{
+    std::cout<<"\n-----------------------------------------------------------------------"<<std::endl;
+
+    for (int i = 0; i < nFSIType; ++i){
+        std::cout<<"Calculating Cross Section for "<<var.name<<" FSI Type "<<i<<std::endl;
+
+        // Integrate Flux
+        var.flux_integrated_FSIType[i] = Integrate_Flux(var.efficiency_corrected_FSIType[i], var.name, Form("%s_%d", "_flux_integrated_FSIType",i));
+
+        // Calculate Final Cross Section
+        var.xsec_FSIType[i] = Calc_FinalCrossSection(var.flux_integrated_FSIType[i], var.name, Form("%s_%d","_xsec_FSIType",i)); 
+
+        Scale_XSecHist(var.xsec_FSIType[i], var.smallest_bin_width);
+    }
+    std::cout<<"Done!"<<std::endl;
+    std::cout<<"-----------------------------------------------------------------------"<<std::endl;
+}
+
+void CCProtonPi0_CrossSection::Calc_CrossSection_IntType(XSec &var)
+{
+    std::cout<<"\n-----------------------------------------------------------------------"<<std::endl;
+
+    for (int i = 0; i < nIntType; ++i){
+        std::cout<<"Calculating Cross Section for "<<var.name<<" Int Type "<<i<<std::endl;
+
+        // Integrate Flux
+        var.flux_integrated_IntType[i] = Integrate_Flux(var.efficiency_corrected_IntType[i], var.name, Form("%s_%d", "_flux_integrated_IntType",i));
+
+        // Calculate Final Cross Section
+        var.xsec_IntType[i] = Calc_FinalCrossSection(var.flux_integrated_IntType[i], var.name, Form("%s_%d","_xsec_IntType",i)); 
+
+        Scale_XSecHist(var.xsec_IntType[i], var.smallest_bin_width);
+    }
+    std::cout<<"Done!"<<std::endl;
+    std::cout<<"-----------------------------------------------------------------------"<<std::endl;
+}
+
+void CCProtonPi0_CrossSection::AddLabels_XSecHist(XSec &var)
 {
     // Add Labels
     var.xsec->SetTitle(var.plot_title.c_str());
     var.xsec->GetXaxis()->SetTitle(var.plot_xlabel.c_str());
     var.xsec->GetYaxis()->SetTitle(var.plot_ylabel.c_str());
-    
+}
+
+void CCProtonPi0_CrossSection::Scale_XSecHist(MnvH1D* xsec_hist, double smallest_bin_width)
+{
     // Scale Cross Section Result to match with Label  
-    var.xsec->SetNormBinWidth(var.smallest_bin_width);
-    double norm_bin_width = var.xsec->GetNormBinWidth();
+    xsec_hist->SetNormBinWidth(smallest_bin_width);
+    double norm_bin_width = xsec_hist->GetNormBinWidth();
     double quote_width = 1.0; // per Unit (degree, GeV, GeV^2 etc...) 
     double scale = quote_width/norm_bin_width; 
-    var.xsec->Scale(scale);
+    xsec_hist->Scale(scale);
 }
 
 void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
@@ -309,13 +400,13 @@ MnvH1D* CCProtonPi0_CrossSection::Efficiency_Divide(MnvH1D* unfolded, MnvH1D* ef
     return efficiency_corrected;
 }
 
-MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name)
+MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name, std::string hist_name)
 {
     std::cout<<"Integrating Flux for "<<var_name<<std::endl;
 
     MnvH1D* flux_integrated = new MnvH1D (*data_efficiency_corrected); 
    
-    std::string hist_name = var_name + "_flux_integrated";
+    hist_name = var_name + hist_name;
     flux_integrated->SetName(hist_name.c_str());
     flux_integrated->SetTitle("Flux Integrated Data");
 
@@ -332,10 +423,10 @@ MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_correct
     return flux_integrated;
 }
 
-MnvH1D* CCProtonPi0_CrossSection::Calc_FinalCrossSection(MnvH1D* flux_integrated, std::string var_name)
+MnvH1D* CCProtonPi0_CrossSection::Calc_FinalCrossSection(MnvH1D* flux_integrated, std::string var_name, std::string hist_name)
 {
     MnvH1D* h_xs = new MnvH1D(*flux_integrated);
-    std::string hist_name = var_name + "_xsec";
+    hist_name = var_name + hist_name;
     h_xs->SetName(hist_name.c_str());
 
     // Set POT
@@ -434,6 +525,18 @@ void CCProtonPi0_CrossSection::initFluxHistograms()
 
 void CCProtonPi0_CrossSection::initHistograms(XSec &var)
 {
+    MnvH1D* temp = NULL;
+    for (int i = 0; i < nFSIType; ++i){
+        var.efficiency_corrected_FSIType.push_back(temp);
+        var.flux_integrated_FSIType.push_back(temp);
+        var.xsec_FSIType.push_back(temp);
+    }
+    for (int i = 0; i < nIntType; ++i){
+        var.efficiency_corrected_IntType.push_back(temp);
+        var.flux_integrated_IntType.push_back(temp);
+        var.xsec_IntType.push_back(temp);
+    }
+    
     std::string hist_name;
     
     if (m_isMC){ 
@@ -462,6 +565,19 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
     var.eff->SetName(hist_name.c_str());
     var.eff->Divide(var.mc_truth_signal, var.mc_truth_all_signal);
 
+    // All Signal Before FSI is on Truth File
+    hist_name = var.name + "_mc_truth_all_signal_BeforeFSI";
+    var.efficiency_corrected_BeforeFSI = GetMnvH1D(f_truth, hist_name);
+    for (int i = 0; i < nFSIType; ++i){
+        hist_name = var.name + "_mc_truth_all_signal_FSIType_" + std::to_string((long long int)i);
+        var.efficiency_corrected_FSIType[i] = GetMnvH1D(f_truth, hist_name);
+    }
+ 
+    for (int i = 0; i < nIntType; ++i){
+        hist_name = var.name + "_mc_truth_all_signal_IntType_" + std::to_string((long long int)i);
+        var.efficiency_corrected_IntType[i] = GetMnvH1D(f_truth, hist_name);
+    }
+
     hist_name = var.name + "_response";
     var.response = GetMnvH2D(var.f_mc, hist_name);
 
@@ -473,6 +589,13 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
         var.mc_truth_all_signal->ClearAllErrorBands();
         var.mc_truth_signal->ClearAllErrorBands();
         var.eff->ClearAllErrorBands();
+        var.efficiency_corrected_BeforeFSI->ClearAllErrorBands();
+        for (int i = 0; i < nFSIType; ++i){
+            var.efficiency_corrected_FSIType[i]->ClearAllErrorBands();
+        }
+        for (int i = 0; i < nIntType; ++i){
+            var.efficiency_corrected_IntType[i]->ClearAllErrorBands();
+        }
         var.response->ClearAllErrorBands();
     }
 }
@@ -507,7 +630,6 @@ void CCProtonPi0_CrossSection::AddErrorBands_FluxHistogram()
     // Flux Histogram have only Flux Error Bands -- Other Error Bands are added and filled with CV
     AddVertErrorBands_FluxHistogram(h_flux_rebinned);
     AddLatErrorBands_FluxHistogram(h_flux_rebinned);
-    
 }
 
 void CCProtonPi0_CrossSection::IntegrateAllFluxUniverses()
@@ -588,8 +710,6 @@ void CCProtonPi0_CrossSection::RebinFluxHistogram(TH1* rebinned, TH1* reference)
 void CCProtonPi0_CrossSection::writeHistograms(XSec &var)
 {
     // Data Histograms
-    var.xsec->Write();
-    
     var.all->SetNormBinWidth(var.smallest_bin_width);
     var.all->Write();
     
@@ -605,9 +725,43 @@ void CCProtonPi0_CrossSection::writeHistograms(XSec &var)
     var.efficiency_corrected->SetNormBinWidth(var.smallest_bin_width);
     var.efficiency_corrected->Write();
 
+    var.efficiency_corrected_BeforeFSI->SetNormBinWidth(var.smallest_bin_width);
+    var.efficiency_corrected_BeforeFSI->Write();
+    
+    for (int i = 0; i < nFSIType; ++i){
+        var.efficiency_corrected_FSIType[i]->SetNormBinWidth(var.smallest_bin_width);
+        var.efficiency_corrected_FSIType[i]->Write();
+    }
+    for (int i = 0; i < nIntType; ++i){
+        var.efficiency_corrected_IntType[i]->SetNormBinWidth(var.smallest_bin_width);
+        var.efficiency_corrected_IntType[i]->Write();
+    }
+
     var.flux_integrated->SetNormBinWidth(var.smallest_bin_width);
     var.flux_integrated->Write();
-   
+ 
+    var.flux_integrated_BeforeFSI->SetNormBinWidth(var.smallest_bin_width);
+    var.flux_integrated_BeforeFSI->Write();
+ 
+    for (int i = 0; i < nFSIType; ++i){
+        var.flux_integrated_FSIType[i]->SetNormBinWidth(var.smallest_bin_width);
+        var.flux_integrated_FSIType[i]->Write();
+    }
+    for (int i = 0; i < nIntType; ++i){
+        var.flux_integrated_IntType[i]->SetNormBinWidth(var.smallest_bin_width);
+        var.flux_integrated_IntType[i]->Write();
+    }
+ 
+    var.xsec->Write();
+    var.xsec_BeforeFSI->Write();
+
+    for (int i = 0; i < nFSIType; ++i){
+        var.xsec_FSIType[i]->Write();
+    }
+    for (int i = 0; i < nIntType; ++i){
+        var.xsec_IntType[i]->Write();
+    }
+
     // MC Truth Histograms
     var.mc_truth_all_signal->SetNormBinWidth(var.smallest_bin_width);
     var.mc_truth_all_signal->Write();

@@ -506,9 +506,12 @@ void CCProtonPi0_Plotter::DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGr
 
     MnvH1D* tempData = new MnvH1D(*data);
     MnvH1D* tempMC = new MnvH1D(*mc);
-      
+ 
     plotter->headroom = 1.75;
-    plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", false, NULL, NULL, false, true);
+    plotter->data_line_width = 2;
+    plotter->data_marker_size = 1.5;
+    gStyle->SetEndErrorSize(6);
+    plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "N", false, NULL, NULL, false, true);
 
     otherData->SetMarkerColor(4);
     otherData->SetMarkerSize(1.5);
@@ -535,6 +538,288 @@ void CCProtonPi0_Plotter::DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGr
     delete plotter;
     delete tempData;
     delete tempMC;
+}
+
+void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_IntType, std::string var_name,  std::string plotDir)
+{
+    std::cout<<"Plotting for "<<var_name<<std::endl;
+    
+    TCanvas* c = new TCanvas("c","c",1280,800);
+  
+    // I may use mc for area normalization later, but for now it is silenced
+    (void) mc;
+
+    TH1D* h_RES_Delta = GetBinNormalizedTH1D(mc_IntType[0]);
+    h_RES_Delta->SetLineWidth(1);
+    h_RES_Delta->SetLineColor(kGray+1);
+    h_RES_Delta->SetFillColor(kGray+1);
+    h_RES_Delta->SetFillStyle(1001);
+ 
+    TH1D* h_RES_Other = GetBinNormalizedTH1D(mc_IntType[1]);
+    h_RES_Other->SetLineWidth(1);
+    h_RES_Other->SetLineColor(kGreen+2);
+    h_RES_Other->SetFillColor(kGreen+2);
+    h_RES_Other->SetFillStyle(1001);
+  
+    TH1D* h_NonRES = GetBinNormalizedTH1D(mc_IntType[2]);
+    h_NonRES->SetLineWidth(1);
+    h_NonRES->SetLineColor(kRed+1);
+    h_NonRES->SetFillColor(kRed+1);
+    h_NonRES->SetFillStyle(1001);
+ 
+    THStack *hs = new THStack("hs",var_name.c_str());
+    hs->Add(h_NonRES);
+    hs->Add(h_RES_Other);
+    hs->Add(h_RES_Delta);
+   
+    double hs_max = hs->GetMaximum();
+    hs->SetMaximum(hs_max * 2.0);
+    hs->Draw("HIST");
+    hs->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
+    hs->GetYaxis()->SetTitle(data->GetYaxis()->GetTitle());
+
+    TH1D* h_data = GetBinNormalizedTH1D(data, true); 
+    h_data->SetMarkerStyle(20);
+    h_data->SetMarkerSize(1);
+    h_data->SetMarkerColor(kBlack);
+    h_data->SetLineWidth(2);
+    h_data->SetLineColor(kBlack);
+
+    TH1D* h_data_StatOnly = GetBinNormalizedTH1D(data, false); 
+    h_data_StatOnly->SetMarkerStyle(20);
+    h_data_StatOnly->SetMarkerSize(1);
+    h_data_StatOnly->SetMarkerColor(kBlack);
+    h_data_StatOnly->SetLineWidth(2);
+    h_data_StatOnly->SetLineColor(kBlack);
+    
+    h_data->Draw("SAME E1 X0");
+    h_data_StatOnly->Draw("SAME E1 X0");
+
+    // ------------------------------------------------------------------------
+    // Plot Labels 
+    // ------------------------------------------------------------------------
+    TLegend *legend = new TLegend(0.6,0.7,0.8,0.9);  
+    legend->AddEntry(h_data, "Data (3.33e20 POT)", "lep" );
+    legend->AddEntry(h_RES_Delta, "Delta resonance","f");
+    legend->AddEntry(h_RES_Other, "Other resonances","f");
+    legend->AddEntry(h_NonRES, "Non-Resonant","f");
+    legend->Draw();
+ 
+    // Add Text
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+ 
+    text.DrawLatex(0.2, 0.85, "#color[4]{POT Normalized}");
+
+    std::string data_err_text = "Data: inner errors statistical";
+    text.DrawLatex(0.6, 0.65, data_err_text.c_str());
+
+    // Plot Output
+    gStyle->SetEndErrorSize(6);
+    gStyle->SetOptStat(0); 
+    c->Update();
+    std::string out_name;
+    out_name = plotDir + var_name + "_xsec_IntType" + ".png"; 
+
+    c->Print(out_name.c_str(),"png");
+
+    delete legend;
+    delete c;
+}
+
+void CCProtonPi0_Plotter::DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_FSIType, std::string var_name,  std::string plotDir)
+{
+    std::cout<<"Plotting for "<<var_name<<std::endl;
+    
+    TCanvas* c = new TCanvas("c","c",1280,800);
+    
+    std::string norm_label;
+    double mc_ratio = GetMCNormalization(norm_label, false, data, mc);
+      
+    TH1D* h_NonInteracting = GetBinNormalizedTH1D(mc_FSIType[0]);
+    h_NonInteracting->Scale(mc_ratio);
+    h_NonInteracting->SetLineWidth(1);
+    h_NonInteracting->SetLineColor(kRed+1);
+    h_NonInteracting->SetFillColor(kRed+1);
+    h_NonInteracting->SetFillStyle(1001);
+ 
+    TH1D* h_Elastic = GetBinNormalizedTH1D(mc_FSIType[1]);
+    h_Elastic->Scale(mc_ratio);
+    h_Elastic->SetLineWidth(1);
+    h_Elastic->SetLineColor(kOrange+6);
+    h_Elastic->SetFillColor(kOrange+6);
+    h_Elastic->SetFillStyle(1001);
+  
+    TH1D* h_Inelastic = GetBinNormalizedTH1D(mc_FSIType[2]);
+    h_Inelastic->Scale(mc_ratio);
+    h_Inelastic->SetLineWidth(1);
+    h_Inelastic->SetLineColor(kGray+1);
+    h_Inelastic->SetFillColor(kGray+1);
+    h_Inelastic->SetFillStyle(1001);
+  
+    TH1D* h_Cex = GetBinNormalizedTH1D(mc_FSIType[3]);
+    h_Cex->Scale(mc_ratio);
+    h_Cex->SetLineWidth(1);
+    h_Cex->SetLineColor(kGreen+2);
+    h_Cex->SetFillColor(kGreen+2);
+    h_Cex->SetFillStyle(1001);
+ 
+    TH1D* h_MultiPion = GetBinNormalizedTH1D(mc_FSIType[4]);
+    h_MultiPion->Scale(mc_ratio);
+    h_MultiPion->SetLineWidth(1);
+    h_MultiPion->SetLineColor(kCyan+1);
+    h_MultiPion->SetFillColor(kCyan+1);
+    h_MultiPion->SetFillStyle(1001);
+ 
+    TH1D* h_Other = GetBinNormalizedTH1D(mc_FSIType[5]);
+    h_Other->Scale(mc_ratio);
+    h_Other->SetLineWidth(1);
+    h_Other->SetLineColor(kMagenta+1);
+    h_Other->SetFillColor(kMagenta+1);
+    h_Other->SetFillStyle(1001);
+
+    THStack *hs = new THStack("hs",var_name.c_str());
+    hs->Add(h_NonInteracting);
+    hs->Add(h_Elastic);
+    hs->Add(h_Inelastic);
+    hs->Add(h_Other);
+    hs->Add(h_Cex);
+    hs->Add(h_MultiPion);
+   
+    double hs_max = hs->GetMaximum();
+    hs->SetMaximum(hs_max * 2.0);
+    hs->Draw("HIST");
+    hs->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
+    hs->GetYaxis()->SetTitle(data->GetYaxis()->GetTitle());
+
+    TH1D* h_data = GetBinNormalizedTH1D(data, true); 
+    h_data->SetMarkerStyle(20);
+    h_data->SetMarkerSize(1);
+    h_data->SetMarkerColor(kBlack);
+    h_data->SetLineWidth(2);
+    h_data->SetLineColor(kBlack);
+
+    TH1D* h_data_StatOnly = GetBinNormalizedTH1D(data, false); 
+    h_data_StatOnly->SetMarkerStyle(20);
+    h_data_StatOnly->SetMarkerSize(1);
+    h_data_StatOnly->SetMarkerColor(kBlack);
+    h_data_StatOnly->SetLineWidth(2);
+    h_data_StatOnly->SetLineColor(kBlack);
+    
+    h_data->Draw("SAME E1 X0");
+    h_data_StatOnly->Draw("SAME E1 X0");
+
+    // ------------------------------------------------------------------------
+    // Plot Labels 
+    // ------------------------------------------------------------------------
+    TLegend *legend = new TLegend(0.6,0.6,0.8,0.9);  
+    legend->AddEntry(h_data, "Data (3.33e20 POT)", "lep" );
+    legend->AddEntry(h_MultiPion, "Multi-#pi #rightarrow #pi^{0}","f");
+    legend->AddEntry(h_Cex, "#pi^{#pm} #rightarrow #pi^{0}","f");
+    legend->AddEntry(h_Other, "Other #pi^{0} production","f");
+    legend->AddEntry(h_Inelastic, "#pi^{0} Inelastic","f");
+    legend->AddEntry(h_Elastic, "#pi^{0} Elastic","f");
+    legend->AddEntry(h_NonInteracting, "#pi^{0} Non-interacting","f");
+    legend->Draw();
+ 
+    // Add Text
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+ 
+    text.DrawLatex(0.2, 0.85, "#color[4]{Area Normalized}");
+
+    std::string data_err_text = "Data: inner errors statistical";
+    text.DrawLatex(0.6, 0.55, data_err_text.c_str());
+
+    // Plot Output
+    gStyle->SetEndErrorSize(6);
+    gStyle->SetOptStat(0); 
+    c->Update();
+    std::string out_name;
+    out_name = plotDir + var_name + "_xsec_FSIType" + ".png"; 
+
+    c->Print(out_name.c_str(),"png");
+
+    delete legend;
+    delete c;
+}
+
+void CCProtonPi0_Plotter::DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D* mc_BeforeFSI, std::string var_name,  std::string plotDir)
+{
+    std::cout<<"Plotting for "<<var_name<<std::endl;
+    
+    double mc_ratio = 1.0;
+
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    MnvH1D* tempData = new MnvH1D(*data);
+    MnvH1D* tempMC = new MnvH1D(*mc);
+ 
+    plotter->headroom = 1.75;
+    plotter->data_line_width = 2;
+    plotter->data_marker_size = 1.5;
+    gStyle->SetEndErrorSize(6);
+    plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "N", false, NULL, NULL, false, true);
+
+    TH1D* h_mc_BeforeFSI = GetBinNormalizedTH1D(mc_BeforeFSI);
+    h_mc_BeforeFSI->SetLineColor(kBlue);
+    h_mc_BeforeFSI->SetLineWidth(3);
+    h_mc_BeforeFSI->SetFillStyle(0);
+    
+    h_mc_BeforeFSI->Draw("SAME HIST");
+
+    // ------------------------------------------------------------------------
+    // Plot Labels 
+    // ------------------------------------------------------------------------
+    // Add Normalization Labels
+    plotter->AddHistoTitle(data->GetTitle());
+    AddNormBox(plotter, true, mc_ratio);
+ 
+    // Add Legend
+    tempData->SetMarkerStyle(plotter->data_marker);
+    tempData->SetMarkerSize(plotter->data_marker_size);
+    tempData->SetMarkerColor(plotter->data_color);
+    tempData->SetLineWidth(plotter->data_line_width);
+
+    tempMC->SetLineColor(plotter->mc_color);
+    tempMC->SetLineWidth(plotter->mc_line_width);
+
+    TLegend *legend = new TLegend(0.6,0.8,0.8,0.9);  
+    legend->AddEntry(tempData, "Data", "lep" );
+    legend->AddEntry(tempMC, "GENIE w/ FSI", "l");
+    legend->AddEntry(h_mc_BeforeFSI, "GENIE w/o FSI","l");
+    legend->Draw();
+ 
+    // Add Error Explanation Text
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+
+    std::string data_err_text = "Data: inner errors statistical";
+    std::string mc_err_text = "GENIE w/ FSI: statistical errors only";
+    text.DrawLatex(0.55, 0.70, data_err_text.c_str());
+    text.DrawLatex(0.55, 0.66, mc_err_text.c_str());
+
+    // Plot Output
+    gStyle->SetOptStat(0); 
+    c->Update();
+    std::string out_name;
+    out_name = plotDir + var_name + "_xsec_BeforeFSI" + ".png"; 
+
+    c->Print(out_name.c_str(),"png");
+
+    delete legend;
+    delete c;
+    delete plotter;
+    delete tempData;
+    delete tempMC;
+    delete h_mc_BeforeFSI;
 }
 
 void CCProtonPi0_Plotter::DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec)
@@ -1523,6 +1808,22 @@ double CCProtonPi0_Plotter::GetSmallestBinWidth(MnvH1D* hist)
     }
 
     return smallest;
+}
+
+TH1D* CCProtonPi0_Plotter::GetBinNormalizedTH1D(MnvH1D* hist, bool WithSystError)
+{
+    MnvH1D* tempHist = new MnvH1D(*hist);
+    TH1D* h = NULL;
+    
+    NormalizeToNormBinWidth(tempHist);
+    
+    if (WithSystError){
+        h = new TH1D(tempHist->GetCVHistoWithError());
+    }else{
+        h = new TH1D(tempHist->GetCVHistoWithStatError());
+    }
+    delete tempHist;
+    return h;
 }
 
 #endif

@@ -5,6 +5,9 @@
 
 using namespace std;
 
+const double PC_DST::low_activity_E = 1.0;
+const double PC_DST::E_MINOS_Threshold = 15.0;
+
 void PC_DST::Loop(string playlist)
 {
     // Create Chain and Initialize
@@ -27,12 +30,53 @@ void PC_DST::Loop(string playlist)
         }
         // Progress Message on Terminal
         if (jentry%10000 == 0) cout<<"\tEntry "<<jentry<<endl;
+        if (jentry == 50000) break;
 
-        getEnergy();
-      
+        double n_planes = 0;
+        for (int module = 95; module <= 114; ++module){
+            for (int plane = 1; plane <= 2; ++plane){
+                double E_Plane = getPlaneEnergy(module,plane);
+                if (E_Plane >= 1.0){
+                    plane_energy->Fill(E_Plane);
+                }
+
+                if (E_Plane >= E_MINOS_Threshold){
+                    n_planes++;
+                    double Z_Plane = getPlaneZ(module, plane);
+                    plane_z->Fill(Z_Plane);
+                }
+            }
+        }
+
+        nPlanes->Fill(n_planes);
     }
 
     writeHistograms();
+}
+
+double PC_DST::getPlaneEnergy(int module, int plane)
+{
+    double energy = 0.0;
+
+    for (int i = 0; i < n_clusters_id; ++i){
+        if (module == clus_id_module[i] && plane == clus_id_plane[i]){
+            energy += clus_id_energy[i];
+        }
+    }
+
+    return energy;
+}
+
+double PC_DST::getPlaneZ(int module, int plane)
+{
+    for (int i = 0; i < n_clusters_id; ++i){
+        if (module == clus_id_module[i] && plane == clus_id_plane[i]){
+            return clus_id_z[i];
+        }
+    }
+
+    std::cout<<"Could not find Module, Check Energy Threshold Again!"<<std::endl;
+    return -1;
 }
 
 void PC_DST::getEnergy()
@@ -178,6 +222,9 @@ void PC_DST::writeHistograms()
     std::cout<<">> Writing "<<rootDir<<std::endl;
     f->cd();
 
+    plane_z->Write();
+    plane_energy->Write();
+    nPlanes->Write();
     error->Write();
     evis->Write();
     reco_energy->Write();
@@ -194,7 +241,10 @@ void PC_DST::writeHistograms()
 PC_DST::PC_DST()
 {
     // Open Output ROOT File
-    rootDir = Folder_List::rootOut + Folder_List::ParticleCannon + "PC_Test.root";
+    //rootDir = Folder_List::rootOut + Folder_List::ParticleCannon + "PC_Steel_1.root";
+    //rootDir = Folder_List::rootOut + Folder_List::ParticleCannon + "PC_Steel_2.root";
+    //rootDir = Folder_List::rootOut + Folder_List::ParticleCannon + "PC_Carbon_1.root";
+    rootDir = Folder_List::rootOut + Folder_List::ParticleCannon + "PC_Carbon_2.root";
  
     cout<<"\tRoot File: "<<rootDir<<endl;
     f = new TFile(rootDir.c_str(),"RECREATE");
@@ -204,6 +254,18 @@ PC_DST::PC_DST()
 
 void PC_DST::InitHistograms()
 {
+    plane_z = new TH1D("plane_z","Plane Z Position",80,9000,10000);
+    plane_z->GetXaxis()->SetTitle("Plane Z Position [mm]");
+    plane_z->GetYaxis()->SetTitle("N(Events)");
+
+    plane_energy = new TH1D("plane_energy","Visible Energy in Single Plane",25,0,50);
+    plane_energy->GetXaxis()->SetTitle("E_{Visible} [MeV]");
+    plane_energy->GetYaxis()->SetTitle("N(Events)");
+
+    nPlanes = new TH1D("nPlanes","N(Planes) Transversed",20,0,20);
+    nPlanes->GetXaxis()->SetTitle("N(Planes)");
+    nPlanes->GetYaxis()->SetTitle("N(Events)");
+
     evis = new TH1D("evis","Visible Energy",40,0,850);
     evis->GetXaxis()->SetTitle("E_{Visible}");
     evis->GetYaxis()->SetTitle("N(Events)");

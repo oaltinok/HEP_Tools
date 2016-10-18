@@ -345,8 +345,14 @@ class CCProtonPi0 : public MinervaAnalysisTool
         bool setPi0Data( Minerva::PhysicsEvent *event) const;
         bool setProtonData( Minerva::PhysicsEvent *event ) const;
         bool tagSignal( Minerva::GenMinInteraction* truthEvent) const;
+        bool tagSignal_BeforeFSI( Minerva::GenMinInteraction* truthEvent) const;
         bool vertexInFiducialVolume(Minerva::PhysicsEvent *event) const;
         bool vertexInRecoVolume(Minerva::PhysicsEvent *event) const;
+
+        bool isSignal_CCNeutrino(Minerva::GenMinInteraction* truthEvent) const;
+        bool isSignal_AcceptanceGood(Minerva::GenMinInteraction* truthEvent, double muon_theta_beam) const;
+        bool isSignal_KinematicsGood(Minerva::GenMinInteraction* truthEvent) const;
+
 
         void Calc_TrueEventKinematics(Minerva::GenMinInteraction* truthEvent) const;
         double Calc_QSq(double Enu, double muon_E, double muon_P, double muon_angle_beam) const;
@@ -357,6 +363,7 @@ class CCProtonPi0 : public MinervaAnalysisTool
         void SaveExtraEnergyLeftover(Minerva::PhysicsEvent *event) const;
         int getMichelPion(std::vector<int>& piList, int ID ) const;
         std::pair<int,double> OneParLineFitBlob(const Minerva::IDBlob* blob, Minerva::PhysicsEvent *event) const;
+        void PrintZPositionMaterial() const;
         void ApplyAttenuationCorrection(Minerva::IDBlob* blob) const;
         void Calculate_dEdx( Minerva::PhysicsEvent* event, const Minerva::IDBlob* blob, unsigned int blob_number) const;
         void ColorUnusedIDClusters(Minerva::PhysicsEvent *event) const;

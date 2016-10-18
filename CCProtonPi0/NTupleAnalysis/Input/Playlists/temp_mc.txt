@@ -1,0 +1,10 @@
+##############################
+#==========================
+# N Good Files: 0
+# POT Used: Use PlotUtils::POTCounter instead
+#--------------------------
+# Time Created: 2016-10-11_09:45:29 
+# Command Used: /minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Tools/ProductionScripts/pot_scripts/FindAnaFilesWithoutMeta.py --dir /pnfs/minerva/persistent/users/oaltinok/CCProtonPi0/MC/v2_98/minerva13E/grid/central_value/minerva/ana --batch --ana_tool CCProtonPi0 --output Playlists/temp_mc.txt --remove
+#==========================
+##############################
+
