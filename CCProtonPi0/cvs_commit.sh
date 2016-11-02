@@ -1,40 +1,25 @@
-CCPROTONPI0_V="v2_98"
+CCPROTONPI0_V="v2_99"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
-	Signal Before FSI Included
-		Tagging signal before FSI using GENIE event record
-		Saving cross section variables before FSI
-			Muon momentum and angle
-			Pion momentum, kinetic energy, and angle
-			QSq, W, and neutrino energy
+	No major changes
 
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Before FSI Addition
-		Cross Section Calculation
-		Comparison Plots for:		
-			Data vs GENIE w/ FSI and GENIE w/o FSI
+	File Structure Changed — Again!
+		pnfs is creating problems for analysis output
+		/minerva/data seems to stay for analysis output for some more time
+		I revert back to use /minerva/data
 	
-	FSI Type Addition
-		FSI Type determined during TruthAnalysis
-			I may move this to ana stage for performance
-			This version will keep it in TruthAnalysis stage
-		Cross Section Calculation
-		Comparison Plots for:
-			Data vs different FSI Types
+	Corrected Flux Integration Stage
+		Scaling Flux Universes by their own Integrals
 
-	Interaction Type Addition
-		Cross Section Calculation
-		Comparison Plots for:
-			Data vs different Interaction Types
+	GENIE Tuning Included
+		GENIE needs to be modified using Aaron M. and Phil R. studies.
+		Included the updated event weights and systematics for
+			MaRES, MvRES, Rvn1pi, Rvp1pi
 
-	Folder Structure Changed
-		Bluearc (/minerva/data) is going away
-		New output:  /pnfs/minerva/persistent/	
-
-	Particle Cannon 
-		Generated and Analyzed pi0 in MINOS-like system
-
+	GENIE Tuning Special Plots
+		Collected under Plotter/CCProtonPi0_Plotter_GENIE_Tuning.cpp
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

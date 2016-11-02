@@ -416,7 +416,17 @@ MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_correct
         std::cout<<"Flux Integration for Neutrino Energy!"<<std::endl; 
         flux_integrated->Divide(data_efficiency_corrected, h_flux_rebinned);
     }else{
+        // Scale All Universes with Central Value
         flux_integrated->Scale(1/cv_flux_integral);
+
+        // Rescale Flux Universes with their own integrals
+        MnvVertErrorBand* flux_err = flux_integrated->GetVertErrorBand("Flux");
+        std::vector<TH1D*> flux_unv = flux_err->GetHists();
+        for (unsigned int i = 0; i < flux_unv.size(); ++i){
+            flux_unv[i]->Scale(cv_flux_integral);
+            flux_unv[i]->Scale(1/unv_flux_integral[i]);
+        }
+
     }
     std::cout<<"Done!"<<std::endl;
 

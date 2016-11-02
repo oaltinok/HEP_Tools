@@ -175,6 +175,12 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void PlotFluxRebinned(std::string plotDir);
         void PlotFluxRebinned(MnvH1D* original, MnvH1D* rebinned, std::string plotDir);
 
+        // GENIE Tuning Study
+        void GENIE_Tuning_Study();
+        void XSecVars_GENIE_Tuning_Ratios();
+        void XSecVars_CVWeight();
+        void GENIE_Tuning_Ratio(std::string var_name);
+
         // --------------------------------------------------------------------
         // Plottting Macros - Implemented in CCProtonPi0_Plotter_Macros.cpp
         // --------------------------------------------------------------------

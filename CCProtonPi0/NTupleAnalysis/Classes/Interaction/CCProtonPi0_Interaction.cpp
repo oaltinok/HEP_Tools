@@ -34,25 +34,66 @@ void CCProtonPi0_Interaction::initHistograms()
     MnvH1D* temp = NULL;
 
     for (int i = 0; i < nHistograms; i++){
-        temp = new MnvH1D( Form("%s_%d","CV_weight",i),"Central Value Weights", 50,0.5,1.5);
-        temp->GetXaxis()->SetTitle("Central Value Weights");
+        temp = new MnvH1D( Form("%s_%d","CV_weight_Delta",i),"Central Value Weight -- Delta", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Central Value Weight -- Delta");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        CV_weight_Delta.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","CV_weight_CCRES",i),"Central Value Weight -- CCRES", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Central Value Weight -- CCRES");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        CV_weight_CCRES.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","CV_weight_NonRes1pi",i),"Central Value Weight -- NonRes1pi", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Central Value Weight -- NonRes1pi");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        CV_weight_NonRes1pi.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","CV_weight",i),"Central Value Weight", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Central Value Weight");
         temp->GetYaxis()->SetTitle("N(Events)");
         CV_weight.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","MaRES_shifts",i),"MaRES 1#sigma Shifts", 80,0.0,2.0);
-        temp->GetXaxis()->SetTitle("MaRES 1#sigma Shifts");
+        temp = new MnvH1D( Form("%s_%d","genie_wgt_Theta_Delta2Npi",i),"Theta_Delta2Npi GENIE 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Theta_Delta2Npi GENIE 1#sigma Weights");
         temp->GetYaxis()->SetTitle("N(Events)");
-        MaRES_shifts.push_back(temp);
+        genie_wgt_Theta_Delta2Npi.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","MvRES_shifts",i),"MvRES 1#sigma Shifts", 80,0.0,2.0);
-        temp->GetXaxis()->SetTitle("MvRES 1#sigma Shifts");
+        temp = new MnvH1D( Form("%s_%d","updated_wgt_Theta_Delta2Npi",i),"Theta_Delta2Npi Updated 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Theta_Delta2Npi Updated 1#sigma Weights");
         temp->GetYaxis()->SetTitle("N(Events)");
-        MvRES_shifts.push_back(temp);
+        updated_wgt_Theta_Delta2Npi.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","Rvn1pi_shifts",i),"Rvn1pi 1#sigma Shifts", 80,0.0,2.0);
-        temp->GetXaxis()->SetTitle("Rvn1pi 1#sigma Shifts");
+        temp = new MnvH1D( Form("%s_%d","genie_wgt_MaRES",i),"MaRES GENIE 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("MaRES GENIE 1#sigma Weights");
         temp->GetYaxis()->SetTitle("N(Events)");
-        Rvn1pi_shifts.push_back(temp);
+        genie_wgt_MaRES.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","updated_wgt_MaRES",i),"MaRES Updated 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("MaRES Updated 1#sigma Weights");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        updated_wgt_MaRES.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","genie_wgt_MvRES",i),"MvRES GENIE 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("MvRES GENIE 1#sigma Weights");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        genie_wgt_MvRES.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","updated_wgt_MvRES",i),"MvRES Updated 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("MvRES Updated 1#sigma Weights");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        updated_wgt_MvRES.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","genie_wgt_Rvn1pi",i),"Rvn1pi GENIE 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Rvn1pi GENIE 1#sigma Weights");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        genie_wgt_Rvn1pi.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","updated_wgt_Rvn1pi",i),"Rvn1pi Updated 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Rvn1pi Updated 1#sigma Weights");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        updated_wgt_Rvn1pi.push_back(temp);
+
 
         temp = new MnvH1D( Form("%s_%d","Enu",i),"Reconstructed Beam Energy - All Events", binList.size_Enu, binList.a_Enu);
         temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - All Events [GeV]");
@@ -191,6 +232,181 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("Total Extra Energy [MeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
         extra_total_energy_2Track.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","muon_P_GENIE_Tuning",i),"P_{#mu} -- GENIE_Tuning",binList.size_muon_P, binList.a_muon_P);
+        temp->GetXaxis()->SetTitle("P_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        muon_P_GENIE_Tuning.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","muon_P_NO_GENIE_Tuning",i),"P_{#mu} -- NO_GENIE_Tuning",binList.size_muon_P, binList.a_muon_P);
+        temp->GetXaxis()->SetTitle("P_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        muon_P_NO_GENIE_Tuning.push_back(temp);
+ 
+        temp = new MnvH1D(Form("%s_%d","muon_P_Delta",i),"P_{#mu} -- Delta",binList.size_muon_P, binList.a_muon_P);
+        temp->GetXaxis()->SetTitle("P_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        muon_P_Delta.push_back(temp);
+  
+        temp = new MnvH1D(Form("%s_%d","muon_P_CCRES",i),"P_{#mu} -- CCRES",binList.size_muon_P, binList.a_muon_P);
+        temp->GetXaxis()->SetTitle("P_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        muon_P_CCRES.push_back(temp);
+   
+        temp = new MnvH1D(Form("%s_%d","muon_P_NonRes1pi",i),"P_{#mu} -- NonRes1pi",binList.size_muon_P, binList.a_muon_P);
+        temp->GetXaxis()->SetTitle("P_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        muon_P_NonRes1pi.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","muon_theta_GENIE_Tuning",i),"#theta_{#mu} -- GENIE_Tuning",binList.size_muon_theta, binList.a_muon_theta);
+        temp->GetXaxis()->SetTitle("#theta_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        muon_theta_GENIE_Tuning.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","muon_theta_NO_GENIE_Tuning",i),"#theta_{#mu} -- NO_GENIE_Tuning",binList.size_muon_theta, binList.a_muon_theta);
+        temp->GetXaxis()->SetTitle("#theta_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        muon_theta_NO_GENIE_Tuning.push_back(temp);
+ 
+        temp = new MnvH1D(Form("%s_%d","muon_theta_Delta",i),"#theta_{#mu} -- Delta",binList.size_muon_theta, binList.a_muon_theta);
+        temp->GetXaxis()->SetTitle("#theta_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        muon_theta_Delta.push_back(temp);
+  
+        temp = new MnvH1D(Form("%s_%d","muon_theta_CCRES",i),"#theta_{#mu} -- CCRES",binList.size_muon_theta, binList.a_muon_theta);
+        temp->GetXaxis()->SetTitle("#theta_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        muon_theta_CCRES.push_back(temp);
+   
+        temp = new MnvH1D(Form("%s_%d","muon_theta_NonRes1pi",i),"#theta_{#mu} -- NonRes1pi",binList.size_muon_theta, binList.a_muon_theta);
+        temp->GetXaxis()->SetTitle("#theta_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        muon_theta_NonRes1pi.push_back(temp);
+   
+        temp = new MnvH1D(Form("%s_%d","pi0_P_GENIE_Tuning",i),"P_{#pi} -- GENIE_Tuning",binList.size_pi0_P, binList.a_pi0_P);
+        temp->GetXaxis()->SetTitle("P_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_P_GENIE_Tuning.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","pi0_P_NO_GENIE_Tuning",i),"P_{#pi} -- NO_GENIE_Tuning",binList.size_pi0_P, binList.a_pi0_P);
+        temp->GetXaxis()->SetTitle("P_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_P_NO_GENIE_Tuning.push_back(temp);
+ 
+        temp = new MnvH1D(Form("%s_%d","pi0_P_Delta",i),"P_{#pi} -- Delta",binList.size_pi0_P, binList.a_pi0_P);
+        temp->GetXaxis()->SetTitle("P_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_P_Delta.push_back(temp);
+  
+        temp = new MnvH1D(Form("%s_%d","pi0_P_CCRES",i),"P_{#pi} -- CCRES",binList.size_pi0_P, binList.a_pi0_P);
+        temp->GetXaxis()->SetTitle("P_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_P_CCRES.push_back(temp);
+   
+        temp = new MnvH1D(Form("%s_%d","pi0_P_NonRes1pi",i),"P_{#pi} -- NonRes1pi",binList.size_pi0_P, binList.a_pi0_P);
+        temp->GetXaxis()->SetTitle("P_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_P_NonRes1pi.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","pi0_KE_GENIE_Tuning",i),"T_{#pi} -- GENIE_Tuning",binList.size_pi0_KE, binList.a_pi0_KE);
+        temp->GetXaxis()->SetTitle("T_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_KE_GENIE_Tuning.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","pi0_KE_NO_GENIE_Tuning",i),"T_{#pi} -- NO_GENIE_Tuning",binList.size_pi0_KE, binList.a_pi0_KE);
+        temp->GetXaxis()->SetTitle("T_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_KE_NO_GENIE_Tuning.push_back(temp);
+ 
+        temp = new MnvH1D(Form("%s_%d","pi0_KE_Delta",i),"T_{#pi} -- Delta",binList.size_pi0_KE, binList.a_pi0_KE);
+        temp->GetXaxis()->SetTitle("T_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_KE_Delta.push_back(temp);
+  
+        temp = new MnvH1D(Form("%s_%d","pi0_KE_CCRES",i),"T_{#pi} -- CCRES",binList.size_pi0_KE, binList.a_pi0_KE);
+        temp->GetXaxis()->SetTitle("T_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_KE_CCRES.push_back(temp);
+   
+        temp = new MnvH1D(Form("%s_%d","pi0_KE_NonRes1pi",i),"P_{#mu} -- NonRes1pi",binList.size_pi0_KE, binList.a_pi0_KE);
+        temp->GetXaxis()->SetTitle("P_{#mu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_KE_NonRes1pi.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","pi0_theta_GENIE_Tuning",i),"#theta_{#pi} -- GENIE_Tuning",binList.size_pi0_theta, binList.a_pi0_theta);
+        temp->GetXaxis()->SetTitle("#theta_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_theta_GENIE_Tuning.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","pi0_theta_NO_GENIE_Tuning",i),"#theta_{#pi} -- NO_GENIE_Tuning",binList.size_pi0_theta, binList.a_pi0_theta);
+        temp->GetXaxis()->SetTitle("#theta_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_theta_NO_GENIE_Tuning.push_back(temp);
+ 
+        temp = new MnvH1D(Form("%s_%d","pi0_theta_Delta",i),"#theta_{#pi} -- Delta",binList.size_pi0_theta, binList.a_pi0_theta);
+        temp->GetXaxis()->SetTitle("#theta_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_theta_Delta.push_back(temp);
+  
+        temp = new MnvH1D(Form("%s_%d","pi0_theta_CCRES",i),"#theta_{#pi} -- CCRES",binList.size_pi0_theta, binList.a_pi0_theta);
+        temp->GetXaxis()->SetTitle("#theta_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_theta_CCRES.push_back(temp);
+   
+        temp = new MnvH1D(Form("%s_%d","pi0_theta_NonRes1pi",i),"#theta_{#pi} -- NonRes1pi",binList.size_pi0_theta, binList.a_pi0_theta);
+        temp->GetXaxis()->SetTitle("#theta_{#pi} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_theta_NonRes1pi.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","QSq_GENIE_Tuning",i),"Q^{2} -- GENIE_Tuning",binList.size_QSq, binList.a_QSq);
+        temp->GetXaxis()->SetTitle("Q^{2} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        QSq_GENIE_Tuning.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","QSq_NO_GENIE_Tuning",i),"Q^{2} -- NO_GENIE_Tuning",binList.size_QSq, binList.a_QSq);
+        temp->GetXaxis()->SetTitle("Q^{2} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        QSq_NO_GENIE_Tuning.push_back(temp);
+ 
+        temp = new MnvH1D(Form("%s_%d","QSq_Delta",i),"Q^{2} -- Delta",binList.size_QSq, binList.a_QSq);
+        temp->GetXaxis()->SetTitle("Q^{2} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        QSq_Delta.push_back(temp);
+  
+        temp = new MnvH1D(Form("%s_%d","QSq_CCRES",i),"Q^{2} -- CCRES",binList.size_QSq, binList.a_QSq);
+        temp->GetXaxis()->SetTitle("Q^{2} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        QSq_CCRES.push_back(temp);
+   
+        temp = new MnvH1D(Form("%s_%d","QSq_NonRes1pi",i),"Q^{2} -- NonRes1pi",binList.size_QSq, binList.a_QSq);
+        temp->GetXaxis()->SetTitle("Q^{2} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        QSq_NonRes1pi.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","Enu_GENIE_Tuning",i),"E_{#nu} -- GENIE_Tuning",binList.size_Enu, binList.a_Enu);
+        temp->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        Enu_GENIE_Tuning.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","Enu_NO_GENIE_Tuning",i),"E_{#nu} -- NO_GENIE_Tuning",binList.size_Enu, binList.a_Enu);
+        temp->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        Enu_NO_GENIE_Tuning.push_back(temp);
+ 
+        temp = new MnvH1D(Form("%s_%d","Enu_Delta",i),"E_{#nu} -- Delta",binList.size_Enu, binList.a_Enu);
+        temp->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        Enu_Delta.push_back(temp);
+  
+        temp = new MnvH1D(Form("%s_%d","Enu_CCRES",i),"E_{#nu} -- CCRES",binList.size_Enu, binList.a_Enu);
+        temp->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        Enu_CCRES.push_back(temp);
+   
+        temp = new MnvH1D(Form("%s_%d","Enu_NonRes1pi",i),"E_{#nu} -- NonRes1pi",binList.size_Enu, binList.a_Enu);
+        temp->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        Enu_NonRes1pi.push_back(temp);
     }
 
     // Cross Section Variables
@@ -765,9 +981,61 @@ void CCProtonPi0_Interaction::writeHistograms()
 
     for (int i = 0; i < nHistograms; i++){
         CV_weight[i]->Write();
-        MaRES_shifts[i]->Write();
-        MvRES_shifts[i]->Write();
-        Rvn1pi_shifts[i]->Write();
+        CV_weight_Delta[i]->Write();
+        CV_weight_CCRES[i]->Write();
+        CV_weight_NonRes1pi[i]->Write();
+        genie_wgt_Theta_Delta2Npi[i]->Write();
+        updated_wgt_Theta_Delta2Npi[i]->Write();
+        genie_wgt_MaRES[i]->Write();
+        updated_wgt_MaRES[i]->Write();
+        genie_wgt_MvRES[i]->Write();
+        updated_wgt_MvRES[i]->Write();
+        genie_wgt_Rvn1pi[i]->Write();
+        updated_wgt_Rvn1pi[i]->Write();
+
+        // Cross Section Variables with Different CV Weights
+        muon_P_GENIE_Tuning[i]->Write();
+        muon_P_NO_GENIE_Tuning[i]->Write();
+        muon_P_Delta[i]->Write();
+        muon_P_CCRES[i]->Write();
+        muon_P_NonRes1pi[i]->Write();
+
+        muon_theta_GENIE_Tuning[i]->Write();
+        muon_theta_NO_GENIE_Tuning[i]->Write();
+        muon_theta_Delta[i]->Write();
+        muon_theta_CCRES[i]->Write();
+        muon_theta_NonRes1pi[i]->Write();
+
+        pi0_P_GENIE_Tuning[i]->Write();
+        pi0_P_NO_GENIE_Tuning[i]->Write();
+        pi0_P_Delta[i]->Write();
+        pi0_P_CCRES[i]->Write();
+        pi0_P_NonRes1pi[i]->Write();
+
+        pi0_KE_GENIE_Tuning[i]->Write();
+        pi0_KE_NO_GENIE_Tuning[i]->Write();
+        pi0_KE_Delta[i]->Write();
+        pi0_KE_CCRES[i]->Write();
+        pi0_KE_NonRes1pi[i]->Write();
+
+        pi0_theta_GENIE_Tuning[i]->Write();
+        pi0_theta_NO_GENIE_Tuning[i]->Write();
+        pi0_theta_Delta[i]->Write();
+        pi0_theta_CCRES[i]->Write();
+        pi0_theta_NonRes1pi[i]->Write();
+
+        QSq_GENIE_Tuning[i]->Write();
+        QSq_NO_GENIE_Tuning[i]->Write();
+        QSq_Delta[i]->Write();
+        QSq_CCRES[i]->Write();
+        QSq_NonRes1pi[i]->Write();
+
+        Enu_GENIE_Tuning[i]->Write();
+        Enu_NO_GENIE_Tuning[i]->Write();
+        Enu_Delta[i]->Write();
+        Enu_CCRES[i]->Write();
+        Enu_NonRes1pi[i]->Write();
+
         // Event Kinematics
         Enu[i]->Write();
         Enu_1Track[i]->Write();

@@ -31,10 +31,10 @@ namespace Folder_List
     const std::string BckgConstraints = input + "BckgConstraints/" + "Weights_All_Universes.txt";
     const std::string BckgConstraints_TruthAnalysis = "../" + input + "BckgConstraints/" + "Weights_All_Universes.txt";
     
-//-------------------------------------------------------------------------
-    // Data files on /pnfs/minerva/persistent/ Disk
     //-------------------------------------------------------------------------
-    const std::string rootOut = "/pnfs/minerva/persistent/users/oaltinok/NTupleAnalysis/";
+    // Data files on /minerva/data/users/oaltinok/NTupleAnalysis Disk
+    //-------------------------------------------------------------------------
+    const std::string rootOut = "/minerva/data/users/oaltinok/NTupleAnalysis/";
     const std::string MC = "MC/";
     const std::string Data = "Data/";
     const std::string ParticleCannon = "ParticleCannon/";

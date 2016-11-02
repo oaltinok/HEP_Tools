@@ -573,7 +573,7 @@ void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vect
     hs->Add(h_RES_Delta);
    
     double hs_max = hs->GetMaximum();
-    hs->SetMaximum(hs_max * 2.0);
+    hs->SetMaximum(hs_max * 1.75);
     hs->Draw("HIST");
     hs->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
     hs->GetYaxis()->SetTitle(data->GetYaxis()->GetTitle());
@@ -688,7 +688,7 @@ void CCProtonPi0_Plotter::DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vect
     hs->Add(h_MultiPion);
    
     double hs_max = hs->GetMaximum();
-    hs->SetMaximum(hs_max * 2.0);
+    hs->SetMaximum(hs_max * 1.75);
     hs->Draw("HIST");
     hs->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
     hs->GetYaxis()->SetTitle(data->GetYaxis()->GetTitle());

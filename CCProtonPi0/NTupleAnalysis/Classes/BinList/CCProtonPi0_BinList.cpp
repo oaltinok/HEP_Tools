@@ -46,10 +46,10 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     pi0_theta.setBin(18, 0.0, 180.0);
     QSq.setBin(40,0.0,2.0);
     beamE.setBin(40,0,20.0);
-    w.setBin(30,0.5,2.0);
+    w.setBin(15,0.5,2.0);
    
     // Truth Histograms
-    mc_w.setBin(60,0.5,2.0);
+    mc_w.setBin(60,0.0,3.0);
     mc_QSq.setBin(40,0.0,2.0);
     mc_incomingE.setBin(40,0,20.0);
 

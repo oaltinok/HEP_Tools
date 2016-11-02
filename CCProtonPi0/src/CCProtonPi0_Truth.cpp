@@ -267,7 +267,7 @@ void CCProtonPi0::Calc_TrueEventKinematics(Minerva::GenMinInteraction* truthEven
     
     double QSq = Calc_QSq(neutrino_E, muon_E, muon_P, muon_theta_beam);
     double WSq = Calc_WSq(neutrino_E, QSq, muon_E);
-    double W = WSq > 0.0 ? sqrt(WSq) : 0.0;
+    double W = WSq > 0.0 ? sqrt(WSq) : -1.0;
 
     debug()<<"True Event Kinematics"<<endmsg;
     debug()<<"\tmuon_E = "<<muon_E<<" muon_P = "<<muon_P<<" muon_theta_beam = "<<muon_theta_beam<<endmsg;

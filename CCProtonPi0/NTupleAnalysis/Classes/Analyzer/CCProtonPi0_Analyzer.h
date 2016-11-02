@@ -59,6 +59,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         bool getCutStatistics();
         void Increment_nCut(vector<CCProtonPi0_Cut> &nCut, bool study1, bool study2);
         void fillData();
+        void fill_XSecVars_DifferentWeights();
         void fill_BackgroundSubtractionHists();
         void fill_W();
         void fill_Enu();
@@ -80,6 +81,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         bool IsInvMassInRange(double invMass);
         bool IsOpeningAngleSmallAndEnergyLow(double E_g1, double E_g2);
         void FillHistogram(vector<MnvH1D*> &hist, double var);
+        void FillHistogram(vector<MnvH1D*> &hist, double var, double wgt);
         void FillHistogram(MnvH1D* hist, double var);
         void FillHistogram(MnvH2D* hist, double xval, double yval);
         void FillHistogram(TH1D* hist, double var);
@@ -230,7 +232,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
 
         void CorrectNTupleVariables();
         void CorrectEMShowerCalibration();
-        void Calc_WeightFromSystematics();
+        void CalcEventWeight();
         void AddErrorBands_Data();
         double GetMINOSCorrection();
         void GetDeltaPolarization();
@@ -260,7 +262,6 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void GetMichelStatistics();
         void GetMichelStatistics_Showers();
         double GetBckgConstraint(std::string error_name, int hist_ind);
-        void Study_GENIE_Weights();
 
         //  Muon Specific Functions
         void fillMuonMC();
@@ -288,6 +289,22 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void fillPi0Blob_Evis_Fractions();
         void fillPi0Blob_Evis_Total(); 
 
+        // GENIE Tuning
+        double updated_genie_wgt_Theta_Delta2Npi[7];
+        double updated_genie_wgt_MaRES[7];
+        double updated_genie_wgt_MvRES[7];
+        double updated_genie_wgt_NormCCRES[7];
+        double updated_genie_wgt_Rvn1pi[7];
+        double updated_genie_wgt_Rvp1pi[7];
+        
+        void initGENIESystematics();
+        void UpdateGENIESystematics(); 
+        void Study_GENIE_Weights();
+        double GetMaResWeight( double newMaRes );
+        double GetMvResWeight( double newMvRes );
+        bool IsGenieCCRes();
+        bool IsGenieNonRes1pi();
+        
         // Helper Functions
         double CalcSphereVolume(double r);
 
@@ -320,6 +337,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         bool m_isModeReduce;
         bool isScanRun;
         bool isDataAnalysis;
+        bool applyGENIETuning;
         bool applyBckgConstraints_CV;
         bool applyBckgConstraints_Unv;
         bool applyProtonScore;
@@ -342,6 +360,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double EM_Data_peak;
         double EM_correction;
         double cvweight;
+        double cvweight_Delta;
+        double cvweight_CCRES;
+        double cvweight_NonRes1pi;
         double latest_ScanID;
         double minProtonScore_LLR;
         double minPhotonDistance_1;

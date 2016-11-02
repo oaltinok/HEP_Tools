@@ -20,8 +20,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     // Cross Sections
     //--------------------------------------------------------------------------
-    plotCrossSection();
-    plotCrossSection_Check();
+    //plotCrossSection();
+    //plotCrossSection_Check();
     
     //--------------------------------------------------------------------------
     //  Data vs MC
@@ -35,7 +35,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     //  MC Only
     //--------------------------------------------------------------------------
-    //plotInteraction_MCOnly();
+    plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
     //plotPion_MCOnly();
@@ -48,6 +48,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
+    //GENIE_Tuning_Study();
     //Systematics();
 }
 
@@ -895,6 +896,22 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     std::string plotDir = Folder_List::plotDir_Interaction;
 
     plot_SignalKinematics();
+    DrawStackedMC(rootDir_Interaction,"CV_weight",plotDir);
+    DrawStackedMC(rootDir_Interaction,"CV_weight_Delta",plotDir);
+    DrawStackedMC(rootDir_Interaction,"CV_weight_CCRES",plotDir);
+    DrawStackedMC(rootDir_Interaction,"CV_weight_NonRes1pi",plotDir);
+
+    DrawStackedMC(rootDir_Interaction,"genie_wgt_Theta_Delta2Npi",plotDir);
+    DrawStackedMC(rootDir_Interaction,"updated_wgt_Theta_Delta2Npi",plotDir);
+
+    DrawStackedMC(rootDir_Interaction,"genie_wgt_MaRES",plotDir);
+    DrawStackedMC(rootDir_Interaction,"updated_wgt_MaRES",plotDir);
+
+    DrawStackedMC(rootDir_Interaction,"genie_wgt_MvRES",plotDir);
+    DrawStackedMC(rootDir_Interaction,"updated_wgt_MvRES",plotDir);
+
+    DrawStackedMC(rootDir_Interaction,"genie_wgt_Rvn1pi",plotDir);
+    DrawStackedMC(rootDir_Interaction,"updated_wgt_Rvn1pi",plotDir);
 
     //plotTruth_Enu();
     //plotTruth_QSq();
@@ -935,11 +952,7 @@ void CCProtonPi0_Plotter::plotInteraction_DataMC()
     //DrawDataMC(rootDir_Interaction,"deltaInvMass",plotDir);
     //DrawDataMC(rootDir_Interaction,"nProtons",plotDir);
 
-    //DrawStackedMC(rootDir_Interaction,"CV_weight",plotDir);
-    DrawStackedMC(rootDir_Interaction,"MaRES_shifts",plotDir);
-    DrawStackedMC(rootDir_Interaction,"MvRES_shifts",plotDir);
-    DrawStackedMC(rootDir_Interaction,"Rvn1pi_shifts",plotDir);
-//    DrawDataStackedMC(rootDir_Interaction,"Enu_1Track",plotDir);
+    //    DrawDataStackedMC(rootDir_Interaction,"Enu_1Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"Enu_2Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"Enu",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"QSq",plotDir);
@@ -2384,16 +2397,16 @@ void CCProtonPi0_Plotter::Systematics()
     //Systematics_CheckErrorSummary(rootDir_CutHists.mc, "invMass_mc_reco_all");
     //Systematics_CheckErrorSummary(rootDir_CrossSection.mc, "invMass_mc_reco_all");
     
-    Systematics_XSec();
+    //Systematics_XSec();
     //Systematics_invMass();
     
-    //Systematics_WriteTables("muon_P");
-    //Systematics_WriteTables("muon_theta");
-    //Systematics_WriteTables("pi0_P");
-    //Systematics_WriteTables("pi0_KE");
-    //Systematics_WriteTables("pi0_theta");
-    //Systematics_WriteTables("QSq");
-    //Systematics_WriteTables("Enu");
+    Systematics_WriteTables("muon_P");
+    Systematics_WriteTables("muon_theta");
+    Systematics_WriteTables("pi0_P");
+    Systematics_WriteTables("pi0_KE");
+    Systematics_WriteTables("pi0_theta");
+    Systematics_WriteTables("QSq");
+    Systematics_WriteTables("Enu");
 }
 
 void CCProtonPi0_Plotter::PlotDelta()
@@ -2425,6 +2438,7 @@ void CCProtonPi0_Plotter::plot_SystematicsInfo()
     Draw1DHist(rootDir_Interaction,"Err_PionResponse",plotDir);
     Draw1DHist(rootDir_Interaction,"Err_MuonTracking",plotDir);
 }
+
 
 #endif
 

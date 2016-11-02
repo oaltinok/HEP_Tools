@@ -70,6 +70,22 @@ class CCProtonPi0_NTupleAnalysis
         static const double proton_mass;
         static const double neutron_mass;
 
+        // GENIE Tuning
+        static const double genieMaRes;
+        static const double genieMaRes1sig;
+        // GENIE central value MvRES from electroproduction data fit
+        static const double genieMvRes;
+        static const double genieMvRes1sig;
+        // Reduced MvRES error from electroproduction data fit
+        static const double electroProdMvRes1sig;
+        // Pion production parameters and errors from deuterium fit
+        static const double deuteriumMaRes;
+        static const double deuteriumMaRes1sig;
+        static const double deuteriumNonResNorm;
+        static const double deuteriumNonResNorm1sig;
+        static const double deuteriumResNorm;
+        static const double deuteriumResNorm1sig;
+
         // Event Kinematics 
         bool IsWInRange(double W);
         bool IsEnuInRange(double Enu);

@@ -123,6 +123,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_BinList binList;
         CCProtonPi0_BckgConstrainer BckgConstrainer;
 
+        bool applyGENIETuning;
         int GetFSIType();
         int GetIntType();
         void CountFSIType(int type);
@@ -131,7 +132,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         int Get_nFS_pions();
         void AddErrorBands_FillWithCV(MnvH1D* hist);
         void AddOtherErrorBands_FillWithCV();
-        void Calc_WeightFromSystematics();
+        void CalcEventWeight();
         void FillHistogram(MnvH1D *hist, double var);
         void FillHistogram(TH1D* hist, double var);
         void FillSignal_Test();
@@ -153,6 +154,21 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void resetCounters();
         void writeHistograms();
         void writeTextFile();
+
+        // GENIE Tuning
+        void initGENIESystematics();
+        void UpdateGENIESystematics(); 
+        double GetMaResWeight( double newMaRes );
+        double GetMvResWeight( double newMvRes );
+        bool IsGenieCCRes();
+        bool IsGenieNonRes1pi();
+
+        double updated_genie_wgt_Theta_Delta2Npi[7];
+        double updated_genie_wgt_MaRES[7];
+        double updated_genie_wgt_MvRES[7];
+        double updated_genie_wgt_NormCCRES[7];
+        double updated_genie_wgt_Rvn1pi[7];
+        double updated_genie_wgt_Rvp1pi[7];
 
         // Default Functions    
         void     Init(std::string playlist, TChain* fChain);

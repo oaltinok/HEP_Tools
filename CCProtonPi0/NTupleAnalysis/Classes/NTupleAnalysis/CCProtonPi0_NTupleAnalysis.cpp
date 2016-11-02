@@ -6,7 +6,7 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v2_98";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v2_99";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
@@ -31,6 +31,22 @@ const double CCProtonPi0_NTupleAnalysis::pi0_mass = 134.98;     // MeV
 const double CCProtonPi0_NTupleAnalysis::piplus_mass = 139.57;  // MeV
 const double CCProtonPi0_NTupleAnalysis::proton_mass = 938.27;  // MeV
 const double CCProtonPi0_NTupleAnalysis::neutron_mass = 939.57; // MeV
+
+// GENIE Tuning
+const double CCProtonPi0_NTupleAnalysis::genieMaRes              = 1.12;
+const double CCProtonPi0_NTupleAnalysis::genieMaRes1sig          = 0.2 * genieMaRes;
+// GENIE central value MvRES from electroproduction data fit
+const double CCProtonPi0_NTupleAnalysis::genieMvRes              = 0.84;
+const double CCProtonPi0_NTupleAnalysis::genieMvRes1sig          = 0.1 * genieMvRes;
+// Reduced MvRES error from electroproduction data fit
+const double CCProtonPi0_NTupleAnalysis::electroProdMvRes1sig    = 0.03 * genieMvRes;
+// Pion production parameters and errors from deuterium fit
+const double CCProtonPi0_NTupleAnalysis::deuteriumMaRes          = 0.94;
+const double CCProtonPi0_NTupleAnalysis::deuteriumMaRes1sig      = 0.05;
+const double CCProtonPi0_NTupleAnalysis::deuteriumNonResNorm     = 0.46;
+const double CCProtonPi0_NTupleAnalysis::deuteriumNonResNorm1sig = 0.04;
+const double CCProtonPi0_NTupleAnalysis::deuteriumResNorm        = 1.15;
+const double CCProtonPi0_NTupleAnalysis::deuteriumResNorm1sig    = 0.07;
 
 // Flux Correction
 const bool CCProtonPi0_NTupleAnalysis::applyNuEConstraint = true;
