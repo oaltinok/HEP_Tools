@@ -8,17 +8,20 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
-    nMaxEvents = 5;
+    nMaxEvents = 100;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
     isDataAnalysis  = true;
     isScanRun = false;
+    fillErrors_ByHand = true; // Affects only Vertical Error Bands - Lateral Bands always filled ByHand
+    
     applyGENIETuning = false;
+    reduce_err_MaRES = false;
+    reduce_err_Rvn1pi = false;
+
     applyBckgConstraints_CV = true;
     applyBckgConstraints_Unv = true;
-    writeFSParticleMomentum = false;
-    fillErrors_ByHand = true; // Affects only Vertical Error Bands - Lateral Bands always filled ByHand
 
     // Side Band Control
     NoSideBand = true;
@@ -268,9 +271,6 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         if(truth_isSignalOut_Acceptance) nSignalOut_Acceptance.increment();
         if(truth_isSignalOut_Kinematics) nSignalOut_Kinematics.increment();
 
-        if (truth_isBckg_withMichel) counter1.increment();
-        else counter2.increment();
-
         //Study_ProtonSystematics();
         //Study_GENIE_Weights();
     } // end for-loop
@@ -331,8 +331,6 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
 
     initCVWeights();
 
-    initGENIESystematics();
-    
     cout<<"Initialization Finished!\n"<<endl;
 }
 
@@ -459,7 +457,6 @@ void CCProtonPi0_Analyzer::fillData()
     fill_W();
 
     // Fill Reconstructed Information
-    fill_XSecVars_DifferentWeights();
     fillInteractionReco();
     fillMuonReco();
     fillPi0Reco();
@@ -974,7 +971,7 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
     if(truth_isSignal){
         // Fill for selected sample
         //  false means -- Not MINOS match only
-        //FillSignalCharacteristics(false);
+        FillSignalCharacteristics(false);
 
         // Short Proton True Information
         if (nProtonCandidates == 0){
@@ -1858,17 +1855,10 @@ void CCProtonPi0_Analyzer::CalcEventWeight()
             cvweight_Delta *= ( 1.0 + truth_genie_wgt_Theta_Delta2Npi[4] ) / 2.0;
             cvweight *= cvweight_Delta;
 
-            // CC Resonance re-weighting from deuterium fit
-            if ( IsGenieCCRes() ) {
-                cvweight_CCRES *= deuteriumResNorm;
-                cvweight_CCRES *= GetMaResWeight(deuteriumMaRes);
-                cvweight *= cvweight_CCRES;
-            }
-            
-            if ( IsGenieNonRes1pi() ){
-                cvweight_NonRes1pi *= 1+(57.0/50)*(truth_genie_wgt_Rvn1pi[2]-1); // From Phil R.
-                cvweight *= cvweight_NonRes1pi;
-            }
+            // NonRES 1pi constraint
+            cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvn1pi[2] - 1); // From Phil R.
+            cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvp1pi[2] - 1); // From Phil R.
+            cvweight *= cvweight_NonRes1pi;
 
             UpdateGENIESystematics();
         }
@@ -2388,6 +2378,18 @@ bool CCProtonPi0_Analyzer::IsOpeningAngleSmallAndEnergyLow(double E_g1, double E
     else return false;
 }
 
+int CCProtonPi0_Analyzer::CountEventRecordParticles(int pdg)
+{
+    int count = 0;
+    for (int i = 0; i < mc_er_nPart; ++i){
+        // Count only Primary Particles
+        if (mc_er_status[i] != 14 ) continue;
+
+        if (mc_er_ID[i] == pdg) count++;
+    }
+    return count;
+}
+
 int CCProtonPi0_Analyzer::CountFSParticles(int pdg, double P_limit)
 {
     int count = 0;
@@ -2464,8 +2466,8 @@ void CCProtonPi0_Analyzer::Study_ProtonSystematics()
 void CCProtonPi0_Analyzer::setCounterNames()
 {
     // Single Use Counters 
-    counter1.setName("N/A");
-    counter2.setName("N/A");
+    counter1.setName("N(Rvn1pi)");
+    counter2.setName("N(Rvp1pi)");
     counter3.setName("N/A");
     counter4.setName("N/A");
 
@@ -2495,18 +2497,6 @@ void CCProtonPi0_Analyzer::initCVWeights()
     std::cout<<"CV Background Weight Errors = "<<cv_err_SinglePiPlus<<" "<<cv_err_QELike<<" "<<cv_err_WithPi0<<std::endl;
 }
 
-void CCProtonPi0_Analyzer::initGENIESystematics()
-{
-    for (int i = 0; i < 7; ++i){
-        updated_genie_wgt_Theta_Delta2Npi[i] = truth_genie_wgt_Theta_Delta2Npi[i];
-        updated_genie_wgt_MaRES[i] = truth_genie_wgt_MaRES[i];
-        updated_genie_wgt_MvRES[i] = truth_genie_wgt_MvRES[i];
-        updated_genie_wgt_NormCCRES[i] = truth_genie_wgt_NormCCRES[i];
-        updated_genie_wgt_Rvn1pi[i] = truth_genie_wgt_Rvn1pi[i];
-        updated_genie_wgt_Rvp1pi[i] = truth_genie_wgt_Rvp1pi[i];
-    }
-}
-
 void CCProtonPi0_Analyzer::Study_GENIE_Weights()
 {
     std::cout<<"MaRES, MvRES and Rvn1pi Shifts"<<std::endl;
@@ -2534,79 +2524,16 @@ bool CCProtonPi0_Analyzer::IsGenieCCRes()
     return mc_current == 1 && mc_intType == 2;
 }
 
-bool CCProtonPi0_Analyzer::IsGenieNonRes1pi()
+bool CCProtonPi0_Analyzer::IsGenieRvn1pi()
 {
-    // GENIE Rvn1pi/Rvp1pi weights are non-unity for Rvn1pi/Rvp1pi interactions only
-    // The {-3,-2,-1,0,+1,+2,+3} sigma weights for Rvn1pi/Rvp1pi interactions are { 0.0, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5 }
-    return truth_genie_wgt_Rvn1pi[2] < 1.0 || truth_genie_wgt_Rvp1pi[2] < 1.0;
+    // Weight is NOT equal to 1 for Rvn1pi events
+    return truth_genie_wgt_Rvn1pi[2] != 1;
 }
 
-void CCProtonPi0_Analyzer::fill_XSecVars_DifferentWeights()
-{   
-    // Get Muon Theta From Nodes
-    double reco_muon_theta = GetCorrectedMuonTheta();
-
-    // Default cvweight -- With GENIE Tuning
-    //std::cout<<"cvweight = "<<cvweight<<std::endl;
-    FillHistogram(interaction.muon_P_GENIE_Tuning, muon_P * MeV_to_GeV, cvweight); 
-    FillHistogram(interaction.muon_theta_GENIE_Tuning, reco_muon_theta * TMath::RadToDeg(), cvweight); 
-    FillHistogram(interaction.pi0_P_GENIE_Tuning, pi0_P * MeV_to_GeV, cvweight); 
-    FillHistogram(interaction.pi0_KE_GENIE_Tuning, pi0_KE * MeV_to_GeV, cvweight); 
-    FillHistogram(interaction.pi0_theta_GENIE_Tuning, pi0_theta_beam * TMath::RadToDeg(), cvweight); 
-    FillHistogram(interaction.QSq_GENIE_Tuning, m_QSq * MeVSq_to_GeVSq, cvweight); 
-    FillHistogram(interaction.Enu_GENIE_Tuning, m_Enu * MeV_to_GeV, cvweight); 
-
-    // Remove All GENIE Tuning Weights
-    double cvweight_NO_GENIE_Tuning = cvweight;
-    cvweight_NO_GENIE_Tuning = cvweight_NO_GENIE_Tuning / cvweight_Delta;
-    cvweight_NO_GENIE_Tuning = cvweight_NO_GENIE_Tuning / cvweight_CCRES;
-    cvweight_NO_GENIE_Tuning = cvweight_NO_GENIE_Tuning / cvweight_NonRes1pi;
-    cvweight_NO_GENIE_Tuning = m_isMC ? cvweight_NO_GENIE_Tuning : 1.0;
-    //std::cout<<"cvweight_NO_GENIE_Tuning = "<<cvweight_NO_GENIE_Tuning<<std::endl;
-    
-    FillHistogram(interaction.muon_P_NO_GENIE_Tuning, muon_P * MeV_to_GeV, cvweight_NO_GENIE_Tuning); 
-    FillHistogram(interaction.muon_theta_NO_GENIE_Tuning, reco_muon_theta * TMath::RadToDeg(), cvweight_NO_GENIE_Tuning); 
-    FillHistogram(interaction.pi0_P_NO_GENIE_Tuning, pi0_P * MeV_to_GeV, cvweight_NO_GENIE_Tuning); 
-    FillHistogram(interaction.pi0_KE_NO_GENIE_Tuning, pi0_KE * MeV_to_GeV, cvweight_NO_GENIE_Tuning); 
-    FillHistogram(interaction.pi0_theta_NO_GENIE_Tuning, pi0_theta_beam * TMath::RadToDeg(), cvweight_NO_GENIE_Tuning); 
-    FillHistogram(interaction.QSq_NO_GENIE_Tuning, m_QSq * MeVSq_to_GeVSq, cvweight_NO_GENIE_Tuning); 
-    FillHistogram(interaction.Enu_NO_GENIE_Tuning, m_Enu * MeV_to_GeV, cvweight_NO_GENIE_Tuning); 
-
-    // Add Only Delta
-    double cvweight_Only_Delta =  m_isMC ? cvweight_NO_GENIE_Tuning * cvweight_Delta : 1.0;
-    //std::cout<<"cvweight_Only_Delta = "<<cvweight_Only_Delta<<std::endl;
-
-    FillHistogram(interaction.muon_P_Delta, muon_P * MeV_to_GeV, cvweight_Only_Delta); 
-    FillHistogram(interaction.muon_theta_Delta, reco_muon_theta * TMath::RadToDeg(), cvweight_Only_Delta); 
-    FillHistogram(interaction.pi0_P_Delta, pi0_P * MeV_to_GeV, cvweight_Only_Delta); 
-    FillHistogram(interaction.pi0_KE_Delta, pi0_KE * MeV_to_GeV, cvweight_Only_Delta); 
-    FillHistogram(interaction.pi0_theta_Delta, pi0_theta_beam * TMath::RadToDeg(), cvweight_Only_Delta); 
-    FillHistogram(interaction.QSq_Delta, m_QSq * MeVSq_to_GeVSq, cvweight_Only_Delta); 
-    FillHistogram(interaction.Enu_Delta, m_Enu * MeV_to_GeV, cvweight_Only_Delta); 
-
-    // Add Only CCRES
-    double cvweight_Only_CCRES = m_isMC ? cvweight_NO_GENIE_Tuning * cvweight_CCRES : 1.0;
-    //std::cout<<"cvweight_Only_CCRES = "<<cvweight_Only_CCRES<<std::endl;
-
-    FillHistogram(interaction.muon_P_CCRES, muon_P * MeV_to_GeV, cvweight_Only_CCRES); 
-    FillHistogram(interaction.muon_theta_CCRES, reco_muon_theta * TMath::RadToDeg(), cvweight_Only_CCRES); 
-    FillHistogram(interaction.pi0_P_CCRES, pi0_P * MeV_to_GeV, cvweight_Only_CCRES); 
-    FillHistogram(interaction.pi0_KE_CCRES, pi0_KE * MeV_to_GeV, cvweight_Only_CCRES); 
-    FillHistogram(interaction.pi0_theta_CCRES, pi0_theta_beam * TMath::RadToDeg(), cvweight_Only_CCRES); 
-    FillHistogram(interaction.QSq_CCRES, m_QSq * MeVSq_to_GeVSq, cvweight_Only_CCRES); 
-    FillHistogram(interaction.Enu_CCRES, m_Enu * MeV_to_GeV, cvweight_Only_CCRES); 
-
-    // Add Only NonRes1pi
-    double cvweight_Only_NonRes1pi = m_isMC ? cvweight_NO_GENIE_Tuning * cvweight_NonRes1pi : 1.0;
-    //std::cout<<"cvweight_Only_NonRes1pi = "<<cvweight_Only_NonRes1pi<<std::endl;
-    
-    FillHistogram(interaction.muon_P_NonRes1pi, muon_P * MeV_to_GeV, cvweight_Only_NonRes1pi); 
-    FillHistogram(interaction.muon_theta_NonRes1pi, reco_muon_theta * TMath::RadToDeg(), cvweight_Only_NonRes1pi); 
-    FillHistogram(interaction.pi0_P_NonRes1pi, pi0_P * MeV_to_GeV, cvweight_Only_NonRes1pi); 
-    FillHistogram(interaction.pi0_KE_NonRes1pi, pi0_KE * MeV_to_GeV, cvweight_Only_NonRes1pi); 
-    FillHistogram(interaction.pi0_theta_NonRes1pi, pi0_theta_beam * TMath::RadToDeg(), cvweight_Only_NonRes1pi); 
-    FillHistogram(interaction.QSq_NonRes1pi, m_QSq * MeVSq_to_GeVSq, cvweight_Only_NonRes1pi); 
-    FillHistogram(interaction.Enu_NonRes1pi, m_Enu * MeV_to_GeV, cvweight_Only_NonRes1pi); 
+bool CCProtonPi0_Analyzer::IsGenieRvp1pi()
+{
+    // Weight is NOT equal to 1 for Rvp1pi events
+    return truth_genie_wgt_Rvp1pi[2] != 1;
 }
 
 #endif //CCProtonPi0_Analyzer_cpp

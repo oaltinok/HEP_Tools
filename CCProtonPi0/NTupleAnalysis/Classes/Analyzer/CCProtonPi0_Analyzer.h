@@ -92,13 +92,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillHistogramWithVertErrors(MnvH2D* hist, double xval, double yval);
         void FillHistogramWithVertErrors(vector<MnvH1D*> &hist, double var);
 
-
         // Vertical Error Band
         void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, std::vector<double> errors);
         void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err_down, double err_up);
         void FillVertErrorBand_ByHand(MnvH2D* h, double xval, double yval, std::string error_name, std::vector<double> errors);
         void FillVertErrorBand_ByHand(MnvH2D* h, double xval, double yval, std::string error_name, double err_down, double err_up);
-
         void FillVertErrorBand_Flux(MnvH1D* h, double var);
         void FillVertErrorBand_Flux(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var);
@@ -257,6 +255,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void fill_SideBand_InvMass();
         void fill_SideBand_Other();
         int CountFSParticles(int pdg, double P_limit = 0.0);
+        int CountEventRecordParticles(int pdg);
         void PrintFSParticles();
         void setCounterNames();
         void GetMichelStatistics();
@@ -293,17 +292,17 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double updated_genie_wgt_Theta_Delta2Npi[7];
         double updated_genie_wgt_MaRES[7];
         double updated_genie_wgt_MvRES[7];
-        double updated_genie_wgt_NormCCRES[7];
         double updated_genie_wgt_Rvn1pi[7];
         double updated_genie_wgt_Rvp1pi[7];
         
-        void initGENIESystematics();
+        void initUpdatedGenieWeights();
         void UpdateGENIESystematics(); 
         void Study_GENIE_Weights();
         double GetMaResWeight( double newMaRes );
         double GetMvResWeight( double newMvRes );
         bool IsGenieCCRes();
-        bool IsGenieNonRes1pi();
+        bool IsGenieRvn1pi();
+        bool IsGenieRvp1pi();
         
         // Helper Functions
         double CalcSphereVolume(double r);
@@ -338,6 +337,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         bool isScanRun;
         bool isDataAnalysis;
         bool applyGENIETuning;
+        bool reduce_err_MaRES;
+        bool reduce_err_Rvn1pi;
         bool applyBckgConstraints_CV;
         bool applyBckgConstraints_Unv;
         bool applyProtonScore;

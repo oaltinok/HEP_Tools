@@ -35,7 +35,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //--------------------------------------------------------------------------
     //  MC Only
     //--------------------------------------------------------------------------
-    plotInteraction_MCOnly();
+    //plotTruth();
+    //plotInteraction_MCOnly();
     //plotMuon_MCOnly();
     //plotProton_MCOnly();
     //plotPion_MCOnly();
@@ -48,7 +49,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
-    //GENIE_Tuning_Study();
+    GENIE_Tuning_Study();
     //Systematics();
 }
 
@@ -92,7 +93,7 @@ void CCProtonPi0_Plotter::CheckAllUniverses(std::string test_name, MnvH1D* data,
         double data_content = data->GetBinContent(i);
         double mc_content = mc->GetBinContent(i);
         double ratio = data_content/mc_content;
-        if (isnan(ratio)) continue;
+        if (isnan(ratio) || mc_content < EPSILON || data_content < EPSILON) continue;
         else if ( fabs(ratio - 1.0) > EPSILON){
             std::cout<<"-----------------------------------------------------------"<<std::endl;
             std::cout<<"\tClosure Test Failed for "<<test_name<<std::endl;
@@ -888,6 +889,29 @@ void CCProtonPi0_Plotter::plotTruth_ShortProton()
     Draw1DHist(rootDir_Interaction,"proton_true_P_1Track",plotDir);
     Draw1DHist(rootDir_Interaction,"proton_true_KE_1Track",plotDir);
     Draw1DHist(rootDir_Interaction,"proton_true_theta_1Track",plotDir);
+}
+
+void CCProtonPi0_Plotter::plotTruth()
+{
+    std::cout<<"Plotting Truth Histograms"<<std::endl;
+    std::string plotDir = Folder_List::plotDir_Truth;
+
+    DrawStackedMC(rootDir_Truth, "CV_weight", plotDir);
+    DrawStackedMC(rootDir_Truth, "CV_weight_Delta", plotDir);
+    DrawStackedMC(rootDir_Truth, "CV_weight_CCRES", plotDir);
+    DrawStackedMC(rootDir_Truth, "CV_weight_NonRes1pi", plotDir);
+
+    DrawStackedMC(rootDir_Truth, "genie_wgt_Theta_Delta2Npi", plotDir);
+    DrawStackedMC(rootDir_Truth, "updated_wgt_Theta_Delta2Npi", plotDir);
+
+    DrawStackedMC(rootDir_Truth, "genie_wgt_MaRES", plotDir);
+    DrawStackedMC(rootDir_Truth, "updated_wgt_MaRES", plotDir);
+
+    DrawStackedMC(rootDir_Truth, "genie_wgt_MvRES", plotDir);
+    DrawStackedMC(rootDir_Truth, "updated_wgt_MvRES", plotDir);
+
+    DrawStackedMC(rootDir_Truth, "genie_wgt_Rvn1pi", plotDir);
+    DrawStackedMC(rootDir_Truth, "updated_wgt_Rvn1pi", plotDir);
 }
 
 void CCProtonPi0_Plotter::plotInteraction_MCOnly()

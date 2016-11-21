@@ -72,6 +72,19 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> W_mc_truth_all_signal_IntType;
         std::vector<MnvH1D*> Enu_mc_truth_all_signal_IntType;
        
+        std::vector<MnvH1D*> CV_weight;
+        std::vector<MnvH1D*> CV_weight_Delta;
+        std::vector<MnvH1D*> CV_weight_CCRES;
+        std::vector<MnvH1D*> CV_weight_NonRes1pi;
+        std::vector<MnvH1D*> genie_wgt_Theta_Delta2Npi;
+        std::vector<MnvH1D*> updated_wgt_Theta_Delta2Npi;
+        std::vector<MnvH1D*> genie_wgt_MaRES;
+        std::vector<MnvH1D*> updated_wgt_MaRES;
+        std::vector<MnvH1D*> genie_wgt_MvRES;
+        std::vector<MnvH1D*> updated_wgt_MvRES;
+        std::vector<MnvH1D*> genie_wgt_Rvn1pi;
+        std::vector<MnvH1D*> updated_wgt_Rvn1pi;
+
         // Test Histograms
         TH1D* Test_pi0_P;
         TH1D* Test_pi0_theta;
@@ -124,6 +137,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_BckgConstrainer BckgConstrainer;
 
         bool applyGENIETuning;
+        bool reduce_err_MaRES;
+        bool reduce_err_Rvn1pi;
+
         int GetFSIType();
         int GetIntType();
         void CountFSIType(int type);
@@ -133,6 +149,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void AddErrorBands_FillWithCV(MnvH1D* hist);
         void AddOtherErrorBands_FillWithCV();
         void CalcEventWeight();
+        int GetBackgroundTypeInd();
+        void FillGENIE_Tuning();
+        void FillHistogram(vector<MnvH1D*> &hist, double var);
         void FillHistogram(MnvH1D *hist, double var);
         void FillHistogram(TH1D* hist, double var);
         void FillSignal_Test();
@@ -156,19 +175,13 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void writeTextFile();
 
         // GENIE Tuning
-        void initGENIESystematics();
+        void initUpdatedGenieWeights();
         void UpdateGENIESystematics(); 
         double GetMaResWeight( double newMaRes );
         double GetMvResWeight( double newMvRes );
         bool IsGenieCCRes();
-        bool IsGenieNonRes1pi();
-
-        double updated_genie_wgt_Theta_Delta2Npi[7];
-        double updated_genie_wgt_MaRES[7];
-        double updated_genie_wgt_MvRES[7];
-        double updated_genie_wgt_NormCCRES[7];
-        double updated_genie_wgt_Rvn1pi[7];
-        double updated_genie_wgt_Rvp1pi[7];
+        bool IsGenieRvn1pi();
+        bool IsGenieRvp1pi();
 
         // Default Functions    
         void     Init(std::string playlist, TChain* fChain);
@@ -212,6 +225,14 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Counter nNon_RES;
 
         double cvweight;
+        double cvweight_Delta;
+        double cvweight_CCRES;
+        double cvweight_NonRes1pi;
+        double updated_genie_wgt_Theta_Delta2Npi[7];
+        double updated_genie_wgt_MaRES[7];
+        double updated_genie_wgt_MvRES[7];
+        double updated_genie_wgt_Rvn1pi[7];
+        double updated_genie_wgt_Rvp1pi[7];
 
         // NTuple Truth Branch
         TTree          *fChain;   //!pointer to the analyzed TTree or TChain

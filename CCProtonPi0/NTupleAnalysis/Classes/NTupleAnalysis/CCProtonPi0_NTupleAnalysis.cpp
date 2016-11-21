@@ -6,7 +6,7 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v2_99";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v3_00";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
@@ -26,11 +26,11 @@ const double CCProtonPi0_NTupleAnalysis::mSq_to_cmSq = pow(10,4);
 const double CCProtonPi0_NTupleAnalysis::mm_to_cm = pow(10,-1);
 const double CCProtonPi0_NTupleAnalysis::rad_to_deg = 180.0/M_PI;
 
-const double CCProtonPi0_NTupleAnalysis::muon_mass = 105.66;    // MeV
-const double CCProtonPi0_NTupleAnalysis::pi0_mass = 134.98;     // MeV
-const double CCProtonPi0_NTupleAnalysis::piplus_mass = 139.57;  // MeV
-const double CCProtonPi0_NTupleAnalysis::proton_mass = 938.27;  // MeV
-const double CCProtonPi0_NTupleAnalysis::neutron_mass = 939.57; // MeV
+const double CCProtonPi0_NTupleAnalysis::muon_mass = 105.6583;      // MeV
+const double CCProtonPi0_NTupleAnalysis::pi0_mass = 134.9766;       // MeV
+const double CCProtonPi0_NTupleAnalysis::piplus_mass = 139.5701;    // MeV
+const double CCProtonPi0_NTupleAnalysis::proton_mass = 938.272013;  // MeV
+const double CCProtonPi0_NTupleAnalysis::neutron_mass = 939.56536;  // MeV
 
 // GENIE Tuning
 const double CCProtonPi0_NTupleAnalysis::genieMaRes              = 1.12;

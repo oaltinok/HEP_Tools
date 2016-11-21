@@ -45,49 +45,6 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> genie_wgt_Rvn1pi;
         std::vector<MnvH1D*> updated_wgt_Rvn1pi;
 
-        // Cross Section Variables with Different CV Weights
-        std::vector<MnvH1D*> muon_P_GENIE_Tuning;
-        std::vector<MnvH1D*> muon_P_NO_GENIE_Tuning;
-        std::vector<MnvH1D*> muon_P_Delta;
-        std::vector<MnvH1D*> muon_P_CCRES;
-        std::vector<MnvH1D*> muon_P_NonRes1pi;
- 
-        std::vector<MnvH1D*> muon_theta_GENIE_Tuning;
-        std::vector<MnvH1D*> muon_theta_NO_GENIE_Tuning;
-        std::vector<MnvH1D*> muon_theta_Delta;
-        std::vector<MnvH1D*> muon_theta_CCRES;
-        std::vector<MnvH1D*> muon_theta_NonRes1pi;
-  
-        std::vector<MnvH1D*> pi0_P_GENIE_Tuning;
-        std::vector<MnvH1D*> pi0_P_NO_GENIE_Tuning;
-        std::vector<MnvH1D*> pi0_P_Delta;
-        std::vector<MnvH1D*> pi0_P_CCRES;
-        std::vector<MnvH1D*> pi0_P_NonRes1pi;
-   
-        std::vector<MnvH1D*> pi0_KE_GENIE_Tuning;
-        std::vector<MnvH1D*> pi0_KE_NO_GENIE_Tuning;
-        std::vector<MnvH1D*> pi0_KE_Delta;
-        std::vector<MnvH1D*> pi0_KE_CCRES;
-        std::vector<MnvH1D*> pi0_KE_NonRes1pi;
-    
-        std::vector<MnvH1D*> pi0_theta_GENIE_Tuning;
-        std::vector<MnvH1D*> pi0_theta_NO_GENIE_Tuning;
-        std::vector<MnvH1D*> pi0_theta_Delta;
-        std::vector<MnvH1D*> pi0_theta_CCRES;
-        std::vector<MnvH1D*> pi0_theta_NonRes1pi;
-  
-        std::vector<MnvH1D*> QSq_GENIE_Tuning;
-        std::vector<MnvH1D*> QSq_NO_GENIE_Tuning;
-        std::vector<MnvH1D*> QSq_Delta;
-        std::vector<MnvH1D*> QSq_CCRES;
-        std::vector<MnvH1D*> QSq_NonRes1pi;
- 
-        std::vector<MnvH1D*> Enu_GENIE_Tuning;
-        std::vector<MnvH1D*> Enu_NO_GENIE_Tuning;
-        std::vector<MnvH1D*> Enu_Delta;
-        std::vector<MnvH1D*> Enu_CCRES;
-        std::vector<MnvH1D*> Enu_NonRes1pi;
-
         // Event Kinematics
         std::vector<MnvH1D*> Enu_1Track;
         std::vector<MnvH1D*> Enu_2Track;

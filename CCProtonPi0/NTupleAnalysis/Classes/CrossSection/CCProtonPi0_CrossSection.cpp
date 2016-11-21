@@ -246,8 +246,9 @@ void CCProtonPi0_CrossSection::NormalizeHistogram(TH1D* h)
     int NBins = h->GetNbinsX();
     double area = h->Integral();
     double nOverFlow = h->GetBinContent(NBins+1);
+    double nUnderFlow = h->GetBinContent(0);
     text_out<<"\t\tBefore Norm = "<<area<<std::endl;
-    h->Scale(1/(area+nOverFlow));
+    h->Scale(1/(area+nOverFlow+nUnderFlow));
     text_out<<"\t\tAfter Norm = "<<h->Integral()<<std::endl;
     text_out<<"\tDone!"<<std::endl;
 }
@@ -258,8 +259,9 @@ void CCProtonPi0_CrossSection::NormalizeHistogram(MnvH1D* h)
     int NBins = h->GetNbinsX();
     double area = h->Integral();
     double nOverFlow = h->GetBinContent(NBins+1);
+    double nUnderFlow = h->GetBinContent(0);
     text_out<<"\t\tBefore Norm = "<<area<<std::endl;
-    h->Scale(1/(area+nOverFlow),"",false); // Scale only on CentralValue
+    h->Scale(1/(area+nOverFlow+nUnderFlow),"",false); // Scale only on CentralValue
     text_out<<"\t\tAfter Norm = "<<h->Integral()<<std::endl;
     text_out<<"\tDone!"<<std::endl;
 }

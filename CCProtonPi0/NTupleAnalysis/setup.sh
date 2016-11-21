@@ -21,6 +21,7 @@ DefaultPlotFolder_List=(Muon
 		Proton
 		Pion
 	    SideBand	
+	    Truth	
 		Interaction
         CutHists
         Systematics 

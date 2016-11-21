@@ -1,0 +1,105 @@
+
+[1mRooFit v3.55 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2012 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+Initializing FluxReweighter for Flux Error Band
+Applying flux constraint to nu histogram
+Applying flux constraint to nubar histogram
+Data Playlists Selected!
+
+======================================================================
+Plotting Histograms...
+======================================================================
+Initializing FluxReweighter for Flux Error Band
+Applying flux constraint to nu histogram
+Applying flux constraint to nubar histogram
+POT Data = 3.33153e+20
+POT MC = 2.21867e+21
+POT Ratio = 0.150159
+Plotting Original Data...
+Plotting for W_data_MC
+Plotting for W_data_MC
+Plotting Original Data Finished!
+Plotting Background Estimated...
+Plotting for W_bckg_estimated_data_MC
+Plotting for W_bckg_estimated_data_MC
+Plotting Background Estimated Finished!
+Plotting Background Subtracted...
+Plotting for W_bckg_subtracted_data_MC
+Plotting for W_bckg_subtracted_data_MC
+Plotting for invMass_invMass_data_MC
+Plotting for invMass_invMass_data_MC
+Plotting Background Subtracted Finished!
+Plotting Unfolded...
+Plotting for W_unfolded_data_MC
+Plotting for W_unfolded_data_MC
+Plotting Unfolded Finished!
+Plotting Efficiency Corrected...
+Plotting for W_efficiency_corrected_data_MC
+Plotting for W_efficiency_corrected_data_MC
+Plotting Efficiency Corrected Finished!
+Plotting Integrated Flux...
+Plotting for W_flux_integrated_data_MC
+Plotting for W_flux_integrated_data_MC
+Plotting Flux Integrated Finished!
+Plotting Cross Sections...
+Plotting for W_xsec_data_MC
+Plotting for W_xsec_data_MC
+Plotting for W
+Plotting for W
+Plotting for W
+Plotting Cross Sections Finished!
+Plotting Cross Section Check for W
+Plotting for W_check_bckg_estimated
+Plotting for W_check_bckg_estimated
+Plotting for W_check_bckg_subtracted
+Plotting for W_check_bckg_subtracted
+-----------------------------------------------------------
+	Closure Test Failed for Subtracted Background
+	Central Value
+	Bin = 0
+	Data = 1.11022e-16 MC = 0
+	Data/MC = inf
+-----------------------------------------------------------
+	Closure Test Failed for Subtracted Background
+	Central Value
+	Bin = 1
+	Data = 2.22045e-16 MC = 0
+	Data/MC = inf
+-----------------------------------------------------------
+	Closure Test Failed for Subtracted Background
+	Central Value
+	Bin = 6
+	Data = 2.22045e-16 MC = 0
+	Data/MC = inf
+Plotting for W_check_unfolded
+Plotting for W_check_unfolded
+Plotting for W_check_efficiency_corrected
+Plotting for W_check_efficiency_corrected
+-----------------------------------------------------------
+	Closure Test Failed for Efficiency Corrected
+	Central Value
+	Bin = 4
+	Data = 0 MC = 0.821563
+	Data/MC = 0
+-----------------------------------------------------------
+	Closure Test Failed for Efficiency Corrected
+	Central Value
+	Bin = 5
+	Data = 0 MC = 2.00868
+	Data/MC = 0
+-----------------------------------------------------------
+	Closure Test Failed for Efficiency Corrected
+	Central Value
+	Bin = 6
+	Data = 0 MC = 8.69724
+	Data/MC = 0
+-----------------------------------------------------------
+	Closure Test Failed for Efficiency Corrected
+	Central Value
+	Bin = 13
+	Data = 0 MC = 25.086
+	Data/MC = 0
+Plotting Cross Section Check Finished!
+Time to Complete = 0' 14" or 14 seconds

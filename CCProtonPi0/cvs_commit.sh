@@ -1,25 +1,23 @@
-CCPROTONPI0_V="v2_99"
+CCPROTONPI0_V="v3_00"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
 	No major changes
 
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	File Structure Changed — Again!
-		pnfs is creating problems for analysis output
-		/minerva/data seems to stay for analysis output for some more time
-		I revert back to use /minerva/data
-	
-	Corrected Flux Integration Stage
-		Scaling Flux Universes by their own Integrals
+	GENIE Tuning Corrections
+		NonRes1pi modification applied to both Rvn1pi and Rvp1pi
+		Uncertainties for Rvn1pi and Rvp1pi
+		XSec Variables with different cvweights removed
+			Hist filling only with different cvweight does not make sense without Side Band Fit
 
-	GENIE Tuning Included
-		GENIE needs to be modified using Aaron M. and Phil R. studies.
-		Included the updated event weights and systematics for
-			MaRES, MvRES, Rvn1pi, Rvp1pi
+	GENIE Tuning Modifications
+		No longer using updated MaRES and CCRES Normalization for event weights
+		No longer using updated MaRES and MvRES uncertainties 
+		No longer using updated Rvn1pi and Rvp1pi uncertainties 
 
-	GENIE Tuning Special Plots
-		Collected under Plotter/CCProtonPi0_Plotter_GENIE_Tuning.cpp
+	GENIE Tuning Study Plots 
+		Plots to compare Nominal vs Tuned in Data and MC
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

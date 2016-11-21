@@ -144,6 +144,7 @@ namespace Folder_List
     const std::string plotDir_OtherStudies = output + plotOut + "OtherStudies/";
     const std::string plotDir_Systematics = output + plotOut + "Systematics/";
     const std::string plotDir_CutHists = output + plotOut + "CutHists/";
+    const std::string plotDir_Truth = output + plotOut + "Truth/";
     const std::string plotDir_Interaction = output + plotOut + "Interaction/";
     const std::string plotDir_Muon = output + plotOut + "Muon/";
     const std::string plotDir_Proton = output + plotOut + "Proton/";
