@@ -99,6 +99,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_nProtonCandidates;
         vector<MnvH1D*> hCut_nShowerCandidates;
         vector<MnvH1D*> hCut_pi0invMass;
+        vector<MnvH1D*> hCut_W;
         vector<MnvH1D*> SideBand_muon_P;
         vector<MnvH1D*> SideBand_muon_theta;
         vector<MnvH1D*> SideBand_pi0_P;
@@ -116,6 +117,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_1Track_gamma1ConvDist;
         vector<MnvH1D*> hCut_1Track_gamma2ConvDist;
         vector<MnvH1D*> hCut_1Track_neutrinoE;
+        vector<MnvH1D*> hCut_1Track_W;
 
         // 2Track
         vector<MnvH1D*> hCut_2Track_nShowerCandidates;
@@ -127,46 +129,44 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         vector<MnvH1D*> hCut_2Track_neutrinoE;
         vector<MnvH1D*> hCut_2Track_protonScore_LLR;
         vector<MnvH1D*> hCut_2Track_deltaInvMass;
+        vector<MnvH1D*> hCut_2Track_W;
  
         // Selected Signal 
         // Signal Q2
-        TH1D* mc_Q2_QE;
+        TH1D* truth_QSq_QE;
 
-        TH1D* mc_Q2_RES_1232;
-        TH1D* mc_Q2_RES_1535;
-        TH1D* mc_Q2_RES_1520;
-        TH1D* mc_Q2_RES_Other;
+        TH1D* truth_QSq_RES_1232;
+        TH1D* truth_QSq_RES_1535;
+        TH1D* truth_QSq_RES_1520;
+        TH1D* truth_QSq_RES_Other;
 
-        TH1D* mc_Q2_DIS_1_pi;
-        TH1D* mc_Q2_DIS_2_pi;
-        TH1D* mc_Q2_DIS_Multi_pi;
-        TH1D* mc_Q2_Non_RES;
+        TH1D* truth_QSq_DIS;
+        TH1D* truth_QSq_2p2h;
+        TH1D* truth_QSq_Non_RES;
 
         // Signal incomingE
-        TH1D* mc_incomingE_QE;
+        TH1D* truth_Enu_QE;
 
-        TH1D* mc_incomingE_RES_1232;
-        TH1D* mc_incomingE_RES_1535;
-        TH1D* mc_incomingE_RES_1520;
-        TH1D* mc_incomingE_RES_Other;
+        TH1D* truth_Enu_RES_1232;
+        TH1D* truth_Enu_RES_1535;
+        TH1D* truth_Enu_RES_1520;
+        TH1D* truth_Enu_RES_Other;
 
-        TH1D* mc_incomingE_DIS_1_pi;
-        TH1D* mc_incomingE_DIS_2_pi;
-        TH1D* mc_incomingE_DIS_Multi_pi;
-        TH1D* mc_incomingE_Non_RES;
+        TH1D* truth_Enu_DIS;
+        TH1D* truth_Enu_2p2h;
+        TH1D* truth_Enu_Non_RES;
 
         // Signal w
-        TH1D* mc_w_QE;
+        TH1D* truth_w_QE;
 
-        TH1D* mc_w_RES_1232;
-        TH1D* mc_w_RES_1535;
-        TH1D* mc_w_RES_1520;
-        TH1D* mc_w_RES_Other;
+        TH1D* truth_w_RES_1232;
+        TH1D* truth_w_RES_1535;
+        TH1D* truth_w_RES_1520;
+        TH1D* truth_w_RES_Other;
 
-        TH1D* mc_w_DIS_1_pi;
-        TH1D* mc_w_DIS_2_pi;
-        TH1D* mc_w_DIS_Multi_pi;
-        TH1D* mc_w_Non_RES;
+        TH1D* truth_w_DIS;
+        TH1D* truth_w_2p2h;
+        TH1D* truth_w_Non_RES;
 
         // Pi0 Invariant Mass
         TH1D* pi0_invMass_1Track;

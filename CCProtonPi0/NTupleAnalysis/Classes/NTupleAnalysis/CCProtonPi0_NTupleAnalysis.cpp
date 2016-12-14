@@ -6,13 +6,15 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "v3_00";
+const std::string CCProtonPi0_NTupleAnalysis::version = "v3_01";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
 const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33153e+20;
 const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.21867e+21; 
+const double CCProtonPi0_NTupleAnalysis::mc_2p2h_POT = 2.56925e+21;
 const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
+const double CCProtonPi0_NTupleAnalysis::POT_ratio_2p2h = mc_POT/mc_2p2h_POT;
 
 const double CCProtonPi0_NTupleAnalysis::max_muon_theta = 25; // degree
 const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
@@ -66,7 +68,14 @@ CCProtonPi0_NTupleAnalysis::CCProtonPi0_NTupleAnalysis()
     processed_minerva1 = false;
     processed_minerva7 = false;
     processed_minerva9 = false;
-    processed_minerva13 = false;
+    processed_minerva13A = false;
+    processed_minerva13B = false;
+    processed_minerva13C = false;
+    processed_minerva13D = false;
+    processed_minerva13E = false;
+    processed_2p2h = false;
+
+    init2p2hFitResults();
 }
 
 void CCProtonPi0_NTupleAnalysis::OpenTextFile(std::string file_name, std::ofstream &file)
@@ -108,6 +117,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data(MnvHistoType* h)
     AddVertErrorBandAndFillWithCV_MichelTrue(h);
     AddVertErrorBandAndFillWithCV_MichelFake(h);
     AddVertErrorBandAndFillWithCV_TargetMass(h);
+    AddVertErrorBandAndFillWithCV_2p2h(h);
     AddVertErrorBandAndFillWithCV_Unfolding(h);
     AddVertErrorBandAndFillWithCV_MuonTracking(h);
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
@@ -147,6 +157,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram(MnvHistoType* h
     AddVertErrorBandAndFillWithCV_MichelTrue(h);
     AddVertErrorBandAndFillWithCV_MichelFake(h);
     AddVertErrorBandAndFillWithCV_TargetMass(h);
+    AddVertErrorBandAndFillWithCV_2p2h(h);
     AddVertErrorBandAndFillWithCV_Unfolding(h);
     AddVertErrorBandAndFillWithCV_MuonTracking(h);
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
@@ -253,6 +264,14 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_TargetMass(MnvHis
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_TargetMass<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_TargetMass<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_2p2h(MnvHistoType* h)
+{
+    h->AddVertErrorBandAndFillWithCV("2p2h", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_2p2h<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_2p2h<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Unfolding(MnvHistoType* h)
@@ -397,6 +416,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC(MnvHistoType* h)
     AddVertErrorBand_MichelTrue(h);
     AddVertErrorBand_MichelFake(h);
     AddVertErrorBand_TargetMass(h);
+    AddVertErrorBand_2p2h(h);
     AddVertErrorBand_Unfolding(h);
     AddVertErrorBand_MuonTracking(h);
     AddVertErrorBand_ProtonTracking(h);
@@ -503,6 +523,14 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_TargetMass(MnvHistoType* h)
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_TargetMass<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_TargetMass<MnvH2D>(MnvH2D* h);
+
+     template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_2p2h(MnvHistoType* h)
+{
+    h->AddVertErrorBand("2p2h", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_2p2h<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_2p2h<MnvH2D>(MnvH2D* h);
 
      template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_Unfolding(MnvHistoType* h)
@@ -615,10 +643,12 @@ template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_EM_EnergyScale<MnvH1D>
 template void CCProtonPi0_NTupleAnalysis::AddLatErrorBand_EM_EnergyScale<MnvH2D>(MnvH2D* h);
 
 
-std::string CCProtonPi0_NTupleAnalysis::GetPlaylist(const int run)
+std::string CCProtonPi0_NTupleAnalysis::GetPlaylist(const int run, int type)
 {
     std::string playlist;
-    if (run >= 10200 && run <= 10249) playlist = "minerva1";
+
+    if ( IsEvent2p2h(type) ) playlist = "minerva_2p2h";
+    else if (run >= 10200 && run <= 10249) playlist = "minerva1";
     else if (run >= 10250 && run <= 10254) playlist = "minerva7";
     else if (run >= 10255 && run <= 10259) playlist = "minerva9";
     else if (run >= 12200 && run <= 12209) playlist = "minerva13A";
@@ -626,14 +656,14 @@ std::string CCProtonPi0_NTupleAnalysis::GetPlaylist(const int run)
     else if (run >= 13200 && run <= 13299) playlist = "minerva13C";
     else if (run >= 14201 && run <= 14209) playlist = "minerva13D";
     else if (run >= 14210 && run <= 14229) playlist = "minerva13E";
-    else std::cout<<"WARNING: NO Playlist Found!"<<std::endl;
+    else RunTimeError("ERROR: NO Playlist Found!");
 
     return playlist;
 }
 
-void CCProtonPi0_NTupleAnalysis::UpdateFluxReweighter(int run)
+void CCProtonPi0_NTupleAnalysis::UpdateFluxReweighter(int run, int type)
 {
-    std::string playlist = GetPlaylist(run);
+    std::string playlist = GetPlaylist(run, type);
 
     if (!processed_minerva1 && playlist.compare("minerva1") == 0){
         std::cout<<"Playlist: minerva1"<<std::endl;
@@ -647,10 +677,32 @@ void CCProtonPi0_NTupleAnalysis::UpdateFluxReweighter(int run)
         std::cout<<"Playlist: minerva9"<<std::endl;
         ReInitFluxReweighter(FluxReweighter::minervaLE_FHC);
         processed_minerva9 = true;
-    }else if (!processed_minerva13 && playlist.find("minerva13") != std::string::npos){
-        std::cout<<"Playlist: minerva13"<<std::endl;
+    }else if (!processed_minerva13A && playlist.compare("minerva13A") == 0){
+        std::cout<<"Playlist: minerva13A"<<std::endl;
         ReInitFluxReweighter(FluxReweighter::minerva13);
-        processed_minerva13 = true;
+        processed_minerva13A = true;
+    }else if (!processed_minerva13B && playlist.compare("minerva13B") == 0){
+        std::cout<<"Playlist: minerva13B"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minerva13);
+        processed_minerva13B = true;
+    }else if (!processed_minerva13C && playlist.compare("minerva13C") == 0){
+        std::cout<<"Playlist: minerva13C"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minerva13);
+        processed_minerva13C = true;
+    }else if (!processed_minerva13D && playlist.compare("minerva13D") == 0){
+        std::cout<<"Playlist: minerva13D"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minerva13);
+        processed_minerva13D = true;
+    }else if (!processed_minerva13E && playlist.compare("minerva13E") == 0){
+        std::cout<<"Playlist: minerva13E"<<std::endl;
+        ReInitFluxReweighter(FluxReweighter::minerva13);
+        processed_minerva13E = true;
+    }else if ( processed_minerva1 && processed_minerva13C && processed_minerva7 && processed_minerva9 ){
+        if (!processed_2p2h && playlist.compare("minerva_2p2h") == 0){
+            std::cout<<"Playlist: 2p2h"<<std::endl;
+            ReInitFluxReweighter(FluxReweighter::minerva13);
+            processed_2p2h = true;
+        }
     }
 }
 
@@ -850,7 +902,73 @@ std::vector<double> CCProtonPi0_NTupleAnalysis::GetFluxError(double Enu, int nuP
     return flux_error;
 }
 
+bool CCProtonPi0_NTupleAnalysis::IsEvent2p2h(int type)
+{
+    if ( type == 8 ) return true;
+    else return false;
+}
 
+// This is the 2D Gaussian weight function for 2p2h Weights 
+// Central Value= fit_2p2h_CV;
+// +-1sigma = fit_2p2h_np, fit_2p2h_nn;
+double CCProtonPi0_NTupleAnalysis::Get_2p2h_wgt(Double_t* neutrino_4P, Double_t* muon_4P, std::vector<double> fit_results)
+{
+    // Calculate q0 & q3
+    double q0 = neutrino_4P[3] - muon_4P[3]; 
+    double q3_x = neutrino_4P[0] - muon_4P[0]; 
+    double q3_y = neutrino_4P[1] - muon_4P[1]; 
+    double q3_z = neutrino_4P[2] - muon_4P[2]; 
+    double q3 = HEP_Functions::calcMomentum(q3_x, q3_y, q3_z);  
+    
+    // Convert to GeV
+    q0 = q0 * MeV_to_GeV;
+    q3 = q3 * MeV_to_GeV;
+
+    // 2D Gaussian Parameters
+    double norm = fit_results[0];
+    double meanq0 = fit_results[1];
+    double meanq3 = fit_results[2];
+    double sigmaq0 = fit_results[3];
+    double sigmaq3 = fit_results[4];
+    double corr = fit_results[5];
+
+    double z =  std::pow((q0 - meanq0),2) / std::pow(sigmaq0,2) + 
+                std::pow((q3 - meanq3),2) / std::pow(sigmaq3,2) -
+                2*corr*(q0-meanq0)*(q3-meanq3)/ (sigmaq0 * sigmaq3);
+
+    double ret = norm*exp( -0.5 * z / (1 - std::pow(corr,2)) );
+
+    // The 2d gaussian +1: the function used for the "no scale down" fits
+    ret = 1+ ret;
+    
+    //std::cout<<"2p2h Weight for q0 = "<<q0<<" q3 = "<<q3<<std::endl;
+    //std::cout<<"\t"<<ret<<std::endl;
+    return ret;
+}
+
+void CCProtonPi0_NTupleAnalysis::init2p2hFitResults()
+{
+    fit_2p2h_CV.push_back(18.5896);
+    fit_2p2h_CV.push_back(0.256895);
+    fit_2p2h_CV.push_back(0.509694);
+    fit_2p2h_CV.push_back(0.0528243);
+    fit_2p2h_CV.push_back(0.125003);
+    fit_2p2h_CV.push_back(0.949053);
+    
+    fit_2p2h_np.push_back(19.2035);
+    fit_2p2h_np.push_back(0.238834);
+    fit_2p2h_np.push_back(0.494791);
+    fit_2p2h_np.push_back(0.0557671);
+    fit_2p2h_np.push_back(0.127039);
+    fit_2p2h_np.push_back(0.889579);
+
+    fit_2p2h_nn.push_back(78.0529);
+    fit_2p2h_nn.push_back(0.284221);
+    fit_2p2h_nn.push_back(0.52907);
+    fit_2p2h_nn.push_back(0.0551371);
+    fit_2p2h_nn.push_back(0.121867);
+    fit_2p2h_nn.push_back(0.981287);
+}
 
 #endif
 

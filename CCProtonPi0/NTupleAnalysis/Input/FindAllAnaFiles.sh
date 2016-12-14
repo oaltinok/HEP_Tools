@@ -4,6 +4,7 @@
 #
 DATATYPE=$1
 CCPROTONPI0_V="v2_98"
+#CCPROTONPI0_V="Nieves_2p2h"
 
 input_error()
 {

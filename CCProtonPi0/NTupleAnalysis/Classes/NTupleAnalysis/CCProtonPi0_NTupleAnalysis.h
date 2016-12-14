@@ -52,7 +52,9 @@ class CCProtonPi0_NTupleAnalysis
         static const double EPSILON;
         static const double data_POT;
         static const double mc_POT;
+        static const double mc_2p2h_POT;
         static const double POT_ratio;
+        static const double POT_ratio_2p2h;
         static const double SENTINEL;
         static const double MeV_to_GeV; 
         static const double MeVSq_to_GeVSq;
@@ -86,9 +88,18 @@ class CCProtonPi0_NTupleAnalysis
         static const double deuteriumResNorm;
         static const double deuteriumResNorm1sig;
 
+        // 2p2h Events
+        std::vector<double> fit_2p2h_CV;
+        std::vector<double> fit_2p2h_np;
+        std::vector<double> fit_2p2h_nn;
+        void init2p2hFitResults();
+        double Get_2p2h_wgt(Double_t* neutrino_4P, Double_t* muon_4P, std::vector<double> fit_results);
+        
         // Event Kinematics 
         bool IsWInRange(double W);
         bool IsEnuInRange(double Enu);
+
+        bool IsEvent2p2h(int type);
 
         double Calc_Enu_Truth(double muon_E, double proton_E, double pi0_E);
         double Calc_QSq(double Enu, double muon_E, double muon_P, double muon_angle_beam); 
@@ -104,15 +115,20 @@ class CCProtonPi0_NTupleAnalysis
         bool processed_minerva1;
         bool processed_minerva7;
         bool processed_minerva9;
-        bool processed_minerva13;
+        bool processed_minerva13A;
+        bool processed_minerva13B;
+        bool processed_minerva13C;
+        bool processed_minerva13D;
+        bool processed_minerva13E;
+        bool processed_2p2h;
 
-        void UpdateFluxReweighter(const int run);
+        void UpdateFluxReweighter(const int run, int type);
         void ReInitFluxReweighter(enum FluxReweighter::EPlaylist playlist);
         double GetFluxWeight(double Enu, int nuPDG);
         std::vector<double> GetFluxError(double Enu, int nuPDG);
 
         void OpenTextFile(std::string file_name, std::ofstream &file);
-        std::string GetPlaylist(const int run);
+        std::string GetPlaylist(const int run, int type);
         void printBins(const TH1* hist, const std::string var_name, bool useLowEdge = true);
         void RunTimeError(std::string message);
 
@@ -156,6 +172,9 @@ class CCProtonPi0_NTupleAnalysis
 
         template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_TargetMass(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_2p2h(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_Unfolding(MnvHistoType* h);
@@ -233,6 +252,9 @@ class CCProtonPi0_NTupleAnalysis
 
         template<class MnvHistoType>
             void AddVertErrorBand_TargetMass(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_2p2h(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddVertErrorBand_Unfolding(MnvHistoType* h);

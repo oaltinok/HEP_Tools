@@ -897,9 +897,12 @@ void CCProtonPi0_Plotter::plotTruth()
     std::string plotDir = Folder_List::plotDir_Truth;
 
     DrawStackedMC(rootDir_Truth, "CV_weight", plotDir);
+    DrawStackedMC(rootDir_Truth, "CV_weight_2p2h", plotDir);
     DrawStackedMC(rootDir_Truth, "CV_weight_Delta", plotDir);
     DrawStackedMC(rootDir_Truth, "CV_weight_CCRES", plotDir);
     DrawStackedMC(rootDir_Truth, "CV_weight_NonRes1pi", plotDir);
+
+    DrawStackedMC(rootDir_Truth, "h_err_2p2h", plotDir);
 
     DrawStackedMC(rootDir_Truth, "genie_wgt_Theta_Delta2Npi", plotDir);
     DrawStackedMC(rootDir_Truth, "updated_wgt_Theta_Delta2Npi", plotDir);
@@ -914,16 +917,17 @@ void CCProtonPi0_Plotter::plotTruth()
     DrawStackedMC(rootDir_Truth, "updated_wgt_Rvn1pi", plotDir);
 }
 
-void CCProtonPi0_Plotter::plotInteraction_MCOnly()
+void CCProtonPi0_Plotter::plot_CV_weights()
 {
-    std::cout<<"Plotting Interaction MC Only"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Interaction;
 
-    plot_SignalKinematics();
     DrawStackedMC(rootDir_Interaction,"CV_weight",plotDir);
+    DrawStackedMC(rootDir_Interaction,"CV_weight_2p2h",plotDir);
     DrawStackedMC(rootDir_Interaction,"CV_weight_Delta",plotDir);
     DrawStackedMC(rootDir_Interaction,"CV_weight_CCRES",plotDir);
     DrawStackedMC(rootDir_Interaction,"CV_weight_NonRes1pi",plotDir);
+
+    DrawStackedMC(rootDir_Interaction,"err_2p2h",plotDir);
 
     DrawStackedMC(rootDir_Interaction,"genie_wgt_Theta_Delta2Npi",plotDir);
     DrawStackedMC(rootDir_Interaction,"updated_wgt_Theta_Delta2Npi",plotDir);
@@ -936,10 +940,24 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
 
     DrawStackedMC(rootDir_Interaction,"genie_wgt_Rvn1pi",plotDir);
     DrawStackedMC(rootDir_Interaction,"updated_wgt_Rvn1pi",plotDir);
+}
 
-    //plotTruth_Enu();
-    //plotTruth_QSq();
-    //plotTruth_W();
+void CCProtonPi0_Plotter::plotInteraction_MCOnly()
+{
+    std::cout<<"Plotting Interaction MC Only"<<std::endl;
+    std::string plotDir = Folder_List::plotDir_Interaction;
+
+    //plot_SignalKinematics();
+    //plot_CV_weights();
+
+    //DrawStackedMC(rootDir_Interaction,"Enu",plotDir);
+    //DrawStackedMC(rootDir_Interaction,"QSq",plotDir);
+    //DrawStackedMC(rootDir_Interaction,"W",plotDir);
+    //DrawStackedMC(rootDir_Interaction,"deltaInvMass",plotDir);
+
+    plotTruth_Enu();
+    plotTruth_QSq();
+    plotTruth_W();
     //plotTruth_ShortProton();
 
     //DrawSignalMC(rootDir_Interaction, "W_1Track", plotDir);
@@ -979,14 +997,14 @@ void CCProtonPi0_Plotter::plotInteraction_DataMC()
     //    DrawDataStackedMC(rootDir_Interaction,"Enu_1Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"Enu_2Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"Enu",plotDir);
-//    DrawDataStackedMC(rootDir_Interaction,"QSq",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"QSq",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"QSq_1Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"QSq_2Track",plotDir);
 //    //DrawDataStackedMC(rootDir_Interaction,"WSq",plotDir);
-//    DrawDataStackedMC(rootDir_Interaction,"W",plotDir);
-//    DrawDataStackedMC(rootDir_Interaction,"W_1Track",plotDir);
-//    DrawDataStackedMC(rootDir_Interaction,"W_2Track",plotDir);
-//    //DrawDataStackedMC(rootDir_Interaction,"deltaInvMass",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"W",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"W_1Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"W_2Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"deltaInvMass",plotDir);
 //
 //    DrawDataStackedMC(rootDir_Interaction,"vertex_energy_1Track",plotDir);
 //    //DrawDataStackedMC(rootDir_Interaction,"vertex_evis_1Track",plotDir);
@@ -1012,7 +1030,7 @@ void CCProtonPi0_Plotter::plotMuon_MCOnly()
 
     Draw1DHist(rootDir_Muon,"E_error",plotDir);
     Draw1DHist(rootDir_Muon,"E_Diff",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Muon, "reco_E_true_E", plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Muon, "reco_E_true_E", plotDir);
 
     //Draw1DHist(rootDir_Muon,"muon_P_shift", plotDir);
     //Draw1DHist(rootDir_Truth,"muon_P_mc_truth_all_signal", plotDir);
@@ -1020,14 +1038,14 @@ void CCProtonPi0_Plotter::plotMuon_MCOnly()
 
     //DrawSignalMC(rootDir_Muon, "P", plotDir);
     //DrawStackedMC(rootDir_Muon, "P", plotDir);
-    //DrawStackedMC(rootDir_Muon, "theta", plotDir);
     //DrawSignalMC(rootDir_Muon, "theta", plotDir);
-    //DrawStackedMC(rootDir_Muon, "cos_theta", plotDir);
+    //DrawStackedMC(rootDir_Muon, "theta", plotDir);
     //DrawSignalMC(rootDir_Muon, "cos_theta", plotDir);
+    //DrawStackedMC(rootDir_Muon, "cos_theta", plotDir);
 
-    //Draw1DHist(rootDir_Muon,"P_error",plotDir);
-    //Draw1DHist(rootDir_Muon,"theta_error",plotDir);
-    //Draw1DHis(rootDir_Muon,"theta_Diff",plotDir);
+    Draw1DHist(rootDir_Muon,"P_error",plotDir);
+    Draw1DHist(rootDir_Muon,"theta_error",plotDir);
+    Draw1DHist(rootDir_Muon,"theta_Diff",plotDir);
     //Draw1DHist(rootDir_Muon,"cos_theta_error",plotDir);
 
     //DrawNormalizedMigrationHistogram(rootDir_Muon, "muon_P_response", plotDir);
@@ -1058,24 +1076,24 @@ void CCProtonPi0_Plotter::plotProton_MCOnly()
 
     Draw1DHist(rootDir_Proton,"E_error",plotDir);
     Draw1DHist(rootDir_Proton,"E_Diff",plotDir);
-    DrawNormalizedMigrationHistogram(rootDir_Proton, "reco_E_true_E", plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Proton, "reco_E_true_E", plotDir);
 
-    //Draw1DHist(rootDir_Proton,"P_error",plotDir);
-    //Draw1DHist(rootDir_Proton,"P_Diff",plotDir);
+    Draw1DHist(rootDir_Proton,"P_error",plotDir);
+    Draw1DHist(rootDir_Proton,"P_Diff",plotDir);
     //DrawNormalizedMigrationHistogram(rootDir_Proton, "proton_P_response", plotDir);
     
-    //Draw1DHist(rootDir_Proton,"theta_error",plotDir);
+    Draw1DHist(rootDir_Proton,"theta_error",plotDir);
     //DrawNormalizedMigrationHistogram(rootDir_Proton, "proton_theta_response", plotDir);
     
     //Draw1DHist(rootDir_Proton,"E_error",plotDir);
     //Draw1DHist(rootDir_Proton,"E_Diff",plotDir);
     
     // Energy Shift Uncertainty
-    Draw1DHist(rootDir_Proton,"energy_shift_BetheBloch",plotDir);
-    Draw1DHist(rootDir_Proton,"energy_shift_Birks",plotDir);
-    Draw1DHist(rootDir_Proton,"energy_shift_MEU",plotDir);
-    Draw1DHist(rootDir_Proton,"energy_shift_Mass",plotDir);
-    Draw1DHist(rootDir_Proton,"energy_shift_Nominal",plotDir);
+    //Draw1DHist(rootDir_Proton,"energy_shift_BetheBloch",plotDir);
+    //Draw1DHist(rootDir_Proton,"energy_shift_Birks",plotDir);
+    //Draw1DHist(rootDir_Proton,"energy_shift_MEU",plotDir);
+    //Draw1DHist(rootDir_Proton,"energy_shift_Mass",plotDir);
+    //Draw1DHist(rootDir_Proton,"energy_shift_Nominal",plotDir);
 
     std::cout<<"Plotting Proton MC Only Finished!\n"<<std::endl;
 }
@@ -1116,7 +1134,7 @@ void CCProtonPi0_Plotter::plotPion_MCOnly()
     //DrawStackedMC(rootDir_Pion,"invMass",plotDir);
     //DrawStackedMC(rootDir_Pion,"cos_openingAngle",plotDir);
     //DrawStackedMC(rootDir_Pion,"P",plotDir);
-    //DrawStackedMC(rootDir_Pion,"E",plotDir);
+    //DrawStackedMC(rootDir_Pion,"KE",plotDir);
     //DrawStackedMC(rootDir_Pion,"theta",plotDir);
     // DrawStackedMC(rootDir_Pion,"phi",plotDir);
 
@@ -1190,8 +1208,8 @@ void CCProtonPi0_Plotter::plotTruth_Pion()
     DrawNormalizedMigrationHistogram(rootDir_Pion, "reco_E_true_E", plotDir);
     
 
-//    Draw1DHist(rootDir_Pion,"P_error",plotDir);
-//    Draw1DHist(rootDir_Pion,"P_Diff",plotDir);
+    Draw1DHist(rootDir_Pion,"P_error",plotDir);
+    Draw1DHist(rootDir_Pion,"P_Diff",plotDir);
 //    DrawNormalizedMigrationHistogram(rootDir_Pion, "pi0_P_response", plotDir);
 //    
 //    Draw1DHist(rootDir_Pion,"KE_error",plotDir);
@@ -1570,23 +1588,27 @@ void CCProtonPi0_Plotter::plot_Michel_TruthMatch(std::string var)
 
 void CCProtonPi0_Plotter::plot_SignalKinematics()
 {
-    plot_SignalKinematics("mc_incomingE", "all", true);
-    plot_SignalKinematics("mc_Q2", "all", true);
-    plot_SignalKinematics("mc_w", "all", true);
+    plot_SignalKinematics("truth_Enu", "all", true);
+    plot_SignalKinematics("truth_QSq", "all", true);
+    plot_SignalKinematics("truth_w", "all", true);
  
-    plot_SignalKinematics("mc_incomingE", "minos", true);
-    plot_SignalKinematics("mc_Q2", "minos", true);
-    plot_SignalKinematics("mc_w", "minos", true);
+    plot_SignalKinematics("truth_Enu", "minos", true);
+    plot_SignalKinematics("truth_QSq", "minos", true);
+    plot_SignalKinematics("truth_w", "minos", true);
  
+    plot_SignalKinematics("truth_Enu", "selected", true);
+    plot_SignalKinematics("truth_QSq", "selected", true);
+    plot_SignalKinematics("truth_w", "selected", true);
+
     plot_SignalKinematics("mc_incomingE", "selected", true);
     plot_SignalKinematics("mc_Q2", "selected", true);
     plot_SignalKinematics("mc_w", "selected", true);
   
-    plot_SignalKinematics("truth_Enu", "selected", true);
-    plot_SignalKinematics("truth_QSq", "selected", true);
-    plot_SignalKinematics("truth_w", "selected", true);
-   
     plot_SignalKinematics("reco_w", "selected", true);
+ 
+    plot_SignalKinematics("reco_bckg_Enu", "selected", true);
+    plot_SignalKinematics("reco_bckg_QSq", "selected", true);
+    plot_SignalKinematics("reco_bckg_w", "selected", true);
 }
 
 void CCProtonPi0_Plotter::plot_SignalKinematics(std::string var, std::string type, bool isStacked)
@@ -1606,6 +1628,12 @@ void CCProtonPi0_Plotter::plot_SignalKinematics(std::string var, std::string typ
         std::cout<<"Wrong Signal Type Specified!"<<std::endl;
         std::cout<<"Signal Types: all, minos, selected"<<std::endl;
         return;
+    }
+
+    bool isBckg = false;
+    std::size_t found = var.find("bckg");
+    if (found != std::string::npos){
+        isBckg = true;
     }
 
     std::string plotDir = Folder_List::plotDir_Interaction;
@@ -1658,41 +1686,44 @@ void CCProtonPi0_Plotter::plot_SignalKinematics(std::string var, std::string typ
     h_Non_Res->SetLineWidth(2);
     h_Non_Res->SetFillStyle(3001);
 
-    var_name = var + "_DIS_1_pi";
-    TH1D* h_DIS_1_pi = (TH1D*)f_Root->Get(var_name.c_str());
-    h_DIS_1_pi->SetFillColor(kAzure);
-    h_DIS_1_pi->SetLineColor(kAzure);
-    h_DIS_1_pi->SetLineWidth(2);
-    h_DIS_1_pi->SetFillStyle(3001);
+    var_name = var + "_DIS";
+    TH1D* h_DIS = (TH1D*)f_Root->Get(var_name.c_str());
+    h_DIS->SetFillColor(kAzure);
+    h_DIS->SetLineColor(kAzure);
+    h_DIS->SetLineWidth(2);
+    h_DIS->SetFillStyle(3001);
 
-    var_name = var + "_DIS_2_pi";
-    TH1D* h_DIS_2_pi = (TH1D*)f_Root->Get(var_name.c_str());
-    h_DIS_2_pi->SetFillColor(kAzure+1);
-    h_DIS_2_pi->SetLineColor(kAzure+1);
-    h_DIS_2_pi->SetLineWidth(2);
-    h_DIS_2_pi->SetFillStyle(3001);
+    var_name = var + "_2p2h";
+    TH1D* h_2p2h = (TH1D*)f_Root->Get(var_name.c_str());
+    h_2p2h->SetFillColor(kBlack);
+    h_2p2h->SetLineColor(kBlack);
+    h_2p2h->SetLineWidth(2);
+    h_2p2h->SetFillStyle(3001);
 
-    var_name = var + "_DIS_Multi_pi";
-    TH1D* h_DIS_Multi_pi = (TH1D*)f_Root->Get(var_name.c_str());
-    h_DIS_Multi_pi->SetFillColor(kAzure+2);
-    h_DIS_Multi_pi->SetLineColor(kAzure+2);
-    h_DIS_Multi_pi->SetLineWidth(2);
-    h_DIS_Multi_pi->SetFillStyle(3001);
+    TH1D* h_Coh = NULL;
+    if (isBckg){
+        var_name = var + "_Coh";
+        h_Coh = (TH1D*)f_Root->Get(var_name.c_str());
+        h_Coh->SetFillColor(kCyan);
+        h_Coh->SetLineColor(kCyan);
+        h_Coh->SetLineWidth(2);
+        h_Coh->SetFillStyle(3001);
+    }
 
     legend->AddEntry(h_RES_1232, "RES: #Delta(1232)", "f");
     legend->AddEntry(h_RES_1535, "RES: N(1535)", "f");
     legend->AddEntry(h_RES_1520, "RES: N(1520)", "f");
     legend->AddEntry(h_RES_Other, "RES: Other", "f");
     legend->AddEntry(h_Non_Res, "Non Res", "f");
-    legend->AddEntry(h_DIS_1_pi, "DIS: 1 #pi", "f");
-    legend->AddEntry(h_DIS_2_pi, "DIS: 2 #pi", "f");
-    legend->AddEntry(h_DIS_Multi_pi, "DIS: Multi #pi", "f");
+    legend->AddEntry(h_DIS, "DIS", "f");
+    legend->AddEntry(h_2p2h, "Valencia 2p2h", "f");
     legend->AddEntry(h_QE, "QE", "f");
+    if (isBckg) legend->AddEntry(h_Coh, "Coh", "f");
 
+    if (isBckg) hs->Add(h_Coh);
     hs->Add(h_QE);
-    hs->Add(h_DIS_Multi_pi);
-    hs->Add(h_DIS_2_pi);
-    hs->Add(h_DIS_1_pi);
+    hs->Add(h_2p2h);
+    hs->Add(h_DIS);
     hs->Add(h_Non_Res);
     hs->Add(h_RES_Other);
     hs->Add(h_RES_1520);
@@ -1714,16 +1745,16 @@ void CCProtonPi0_Plotter::plot_SignalKinematics(std::string var, std::string typ
     std::string out_name = plotDir + var + plot_type; 
     c1->Print(out_name.c_str(),"png");
 
-//    ofstream text;
-//    out_name = plotDir + var + ".txt"; 
-//    text.open(out_name.c_str());
-//
-//    int nBins = h_RES_1232->GetNbinsX();
-//    for (int i = 1; i <= nBins; i++){
-//        text<<h_RES_1232->GetBinLowEdge(i)<<" ";
-//        text<<h_RES_1232->GetBinContent(i)<<std::endl;
-//    }
-//    text.close();
+    //ofstream text;
+    //out_name = plotDir + var + "_" + type + ".txt"; 
+    //text.open(out_name.c_str());
+
+    //int nBins = h_RES_1232->GetNbinsX();
+    //for (int i = 1; i <= nBins; i++){
+    //    text<<h_RES_1232->GetBinLowEdge(i)<<" ";
+    //    text<<h_RES_1232->GetBinContent(i)<<std::endl;
+    //}
+    //text.close();
 
     delete f_Root;
     delete hs;

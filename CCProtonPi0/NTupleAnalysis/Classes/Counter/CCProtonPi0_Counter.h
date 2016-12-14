@@ -9,7 +9,7 @@ class CCProtonPi0_Counter
     public:
         CCProtonPi0_Counter();
         void setName(std::string inputName);
-        void increment(); 
+        void increment(double wgt = 1.0); 
         void print();
         double getCount();
         std::string getName();

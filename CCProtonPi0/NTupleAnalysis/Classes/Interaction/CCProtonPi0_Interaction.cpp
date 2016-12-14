@@ -34,6 +34,11 @@ void CCProtonPi0_Interaction::initHistograms()
     MnvH1D* temp = NULL;
 
     for (int i = 0; i < nHistograms; i++){
+        temp = new MnvH1D( Form("%s_%d","CV_weight_2p2h",i),"Central Value Weight -- 2p2h", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Central Value Weight -- 2p2h");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        CV_weight_2p2h.push_back(temp);
+
         temp = new MnvH1D( Form("%s_%d","CV_weight_Delta",i),"Central Value Weight -- Delta", 80,0.0,2.0);
         temp->GetXaxis()->SetTitle("Central Value Weight -- Delta");
         temp->GetYaxis()->SetTitle("N(Events)");
@@ -53,6 +58,11 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("Central Value Weight");
         temp->GetYaxis()->SetTitle("N(Events)");
         CV_weight.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","err_2p2h",i),"2p2h 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("2p2h 1#sigma Weights");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        err_2p2h.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","genie_wgt_Theta_Delta2Npi",i),"Theta_Delta2Npi GENIE 1#sigma Weights", 80,0.0,2.0);
         temp->GetXaxis()->SetTitle("Theta_Delta2Npi GENIE 1#sigma Weights");
@@ -510,17 +520,13 @@ void CCProtonPi0_Interaction::initHistograms()
     mc_Q2_RES_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     mc_Q2_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_1_pi = new TH1D("mc_Q2_DIS_1_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_DIS_1_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+    mc_Q2_DIS = new TH1D("mc_Q2_DIS","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    mc_Q2_DIS->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_DIS->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_2_pi = new TH1D("mc_Q2_DIS_2_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_DIS_2_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
-
-    mc_Q2_DIS_Multi_pi = new TH1D("mc_Q2_DIS_Multi_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_DIS_Multi_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+    mc_Q2_2p2h = new TH1D("mc_Q2_2p2h","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    mc_Q2_2p2h->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    mc_Q2_2p2h->GetYaxis()->SetTitle("N(Events)");
 
     mc_Q2_Non_RES = new TH1D("mc_Q2_Non_RES","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     mc_Q2_Non_RES->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
@@ -549,21 +555,56 @@ void CCProtonPi0_Interaction::initHistograms()
     truth_QSq_RES_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     truth_QSq_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    truth_QSq_DIS_1_pi = new TH1D("truth_QSq_DIS_1_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    truth_QSq_DIS_1_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_DIS = new TH1D("truth_QSq_DIS","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    truth_QSq_DIS->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    truth_QSq_DIS->GetYaxis()->SetTitle("N(Events)");
 
-    truth_QSq_DIS_2_pi = new TH1D("truth_QSq_DIS_2_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    truth_QSq_DIS_2_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
-
-    truth_QSq_DIS_Multi_pi = new TH1D("truth_QSq_DIS_Multi_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    truth_QSq_DIS_Multi_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_2p2h = new TH1D("truth_QSq_2p2h","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    truth_QSq_2p2h->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    truth_QSq_2p2h->GetYaxis()->SetTitle("N(Events)");
 
     truth_QSq_Non_RES = new TH1D("truth_QSq_Non_RES","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     truth_QSq_Non_RES->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     truth_QSq_Non_RES->GetYaxis()->SetTitle("N(Events)");
+
+    // ------------------------------------------------------------------------
+    // Background Truth Q2
+    // ------------------------------------------------------------------------
+    reco_bckg_QSq_QE = new TH1D("reco_bckg_QSq_QE","Q^{2} for Background Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    reco_bckg_QSq_QE->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    reco_bckg_QSq_QE->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_QSq_RES_1232 = new TH1D("reco_bckg_QSq_RES_1232","Q^{2} for Background Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    reco_bckg_QSq_RES_1232->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    reco_bckg_QSq_RES_1232->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_QSq_RES_1535 = new TH1D("reco_bckg_QSq_RES_1535","Q^{2} for Background Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    reco_bckg_QSq_RES_1535->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    reco_bckg_QSq_RES_1535->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_QSq_RES_1520 = new TH1D("reco_bckg_QSq_RES_1520","Q^{2} for Background Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    reco_bckg_QSq_RES_1520->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    reco_bckg_QSq_RES_1520->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_QSq_RES_Other = new TH1D("reco_bckg_QSq_RES_Other","Q^{2} for Background Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    reco_bckg_QSq_RES_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    reco_bckg_QSq_RES_Other->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_QSq_DIS = new TH1D("reco_bckg_QSq_DIS","Q^{2} for Background Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    reco_bckg_QSq_DIS->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    reco_bckg_QSq_DIS->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_QSq_2p2h = new TH1D("reco_bckg_QSq_2p2h","Q^{2} for Background Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    reco_bckg_QSq_2p2h->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    reco_bckg_QSq_2p2h->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_QSq_Non_RES = new TH1D("reco_bckg_QSq_Non_RES","Q^{2} for Background Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    reco_bckg_QSq_Non_RES->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    reco_bckg_QSq_Non_RES->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_QSq_Coh = new TH1D("reco_bckg_QSq_Coh","Q^{2} for Background Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    reco_bckg_QSq_Coh->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    reco_bckg_QSq_Coh->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal incomingE
@@ -588,17 +629,13 @@ void CCProtonPi0_Interaction::initHistograms()
     mc_incomingE_RES_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     mc_incomingE_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_1_pi = new TH1D("mc_incomingE_DIS_1_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_DIS_1_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+    mc_incomingE_DIS = new TH1D("mc_incomingE_DIS","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    mc_incomingE_DIS->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_DIS->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_2_pi = new TH1D("mc_incomingE_DIS_2_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_DIS_2_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
-
-    mc_incomingE_DIS_Multi_pi = new TH1D("mc_incomingE_DIS_Multi_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_DIS_Multi_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+    mc_incomingE_2p2h = new TH1D("mc_incomingE_2p2h","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    mc_incomingE_2p2h->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    mc_incomingE_2p2h->GetYaxis()->SetTitle("N(Events)");
 
     mc_incomingE_Non_RES = new TH1D("mc_incomingE_Non_RES","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     mc_incomingE_Non_RES->GetXaxis()->SetTitle("E_{#nu} [GeV]");
@@ -627,22 +664,56 @@ void CCProtonPi0_Interaction::initHistograms()
     truth_Enu_RES_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     truth_Enu_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    truth_Enu_DIS_1_pi = new TH1D("truth_Enu_DIS_1_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    truth_Enu_DIS_1_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_DIS = new TH1D("truth_Enu_DIS","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    truth_Enu_DIS->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    truth_Enu_DIS->GetYaxis()->SetTitle("N(Events)");
 
-    truth_Enu_DIS_2_pi = new TH1D("truth_Enu_DIS_2_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    truth_Enu_DIS_2_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
-
-    truth_Enu_DIS_Multi_pi = new TH1D("truth_Enu_DIS_Multi_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    truth_Enu_DIS_Multi_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_2p2h = new TH1D("truth_Enu_2p2h","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    truth_Enu_2p2h->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    truth_Enu_2p2h->GetYaxis()->SetTitle("N(Events)");
 
     truth_Enu_Non_RES = new TH1D("truth_Enu_Non_RES","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     truth_Enu_Non_RES->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     truth_Enu_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
+    // ------------------------------------------------------------------------
+    // Background Truth incomingE
+    // ------------------------------------------------------------------------
+    reco_bckg_Enu_QE = new TH1D("reco_bckg_Enu_QE","E_{#nu} for Background Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    reco_bckg_Enu_QE->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    reco_bckg_Enu_QE->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_Enu_RES_1232 = new TH1D("reco_bckg_Enu_RES_1232","E_{#nu} for Background Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    reco_bckg_Enu_RES_1232->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    reco_bckg_Enu_RES_1232->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_Enu_RES_1535 = new TH1D("reco_bckg_Enu_RES_1535","E_{#nu} for Background Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    reco_bckg_Enu_RES_1535->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    reco_bckg_Enu_RES_1535->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_Enu_RES_1520 = new TH1D("reco_bckg_Enu_RES_1520","E_{#nu} for Background Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    reco_bckg_Enu_RES_1520->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    reco_bckg_Enu_RES_1520->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_Enu_RES_Other = new TH1D("reco_bckg_Enu_RES_Other","E_{#nu} for Background Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    reco_bckg_Enu_RES_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    reco_bckg_Enu_RES_Other->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_Enu_DIS = new TH1D("reco_bckg_Enu_DIS","E_{#nu} for Background Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    reco_bckg_Enu_DIS->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    reco_bckg_Enu_DIS->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_Enu_2p2h = new TH1D("reco_bckg_Enu_2p2h","E_{#nu} for Background Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    reco_bckg_Enu_2p2h->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    reco_bckg_Enu_2p2h->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_Enu_Non_RES = new TH1D("reco_bckg_Enu_Non_RES","E_{#nu} for Background Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    reco_bckg_Enu_Non_RES->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    reco_bckg_Enu_Non_RES->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_Enu_Coh = new TH1D("reco_bckg_Enu_Coh","E_{#nu} for Background Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    reco_bckg_Enu_Coh->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    reco_bckg_Enu_Coh->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal w
@@ -667,17 +738,13 @@ void CCProtonPi0_Interaction::initHistograms()
     mc_w_RES_Other->GetXaxis()->SetTitle("W [GeV]");
     mc_w_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_DIS_1_pi = new TH1D("mc_w_DIS_1_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_DIS_1_pi->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+    mc_w_DIS = new TH1D("mc_w_DIS","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_DIS->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_DIS->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_DIS_2_pi = new TH1D("mc_w_DIS_2_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_DIS_2_pi->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
-
-    mc_w_DIS_Multi_pi = new TH1D("mc_w_DIS_Multi_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_DIS_Multi_pi->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+    mc_w_2p2h = new TH1D("mc_w_2p2h","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    mc_w_2p2h->GetXaxis()->SetTitle("W [GeV]");
+    mc_w_2p2h->GetYaxis()->SetTitle("N(Events)");
 
     mc_w_Non_RES = new TH1D("mc_w_Non_RES","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     mc_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
@@ -706,22 +773,56 @@ void CCProtonPi0_Interaction::initHistograms()
     truth_w_RES_Other->GetXaxis()->SetTitle("W [GeV]");
     truth_w_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    truth_w_DIS_1_pi = new TH1D("truth_w_DIS_1_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    truth_w_DIS_1_pi->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_w_DIS = new TH1D("truth_w_DIS","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    truth_w_DIS->GetXaxis()->SetTitle("W [GeV]");
+    truth_w_DIS->GetYaxis()->SetTitle("N(Events)");
 
-    truth_w_DIS_2_pi = new TH1D("truth_w_DIS_2_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    truth_w_DIS_2_pi->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
-
-    truth_w_DIS_Multi_pi = new TH1D("truth_w_DIS_Multi_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    truth_w_DIS_Multi_pi->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_w_2p2h = new TH1D("truth_w_2p2h","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    truth_w_2p2h->GetXaxis()->SetTitle("W [GeV]");
+    truth_w_2p2h->GetYaxis()->SetTitle("N(Events)");
 
     truth_w_Non_RES = new TH1D("truth_w_Non_RES","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     truth_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
     truth_w_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
+    // ------------------------------------------------------------------------
+    // Background Truth w
+    // ------------------------------------------------------------------------
+    reco_bckg_w_QE = new TH1D("reco_bckg_w_QE","W for Background Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_bckg_w_QE->GetXaxis()->SetTitle("W [GeV]");
+    reco_bckg_w_QE->GetYaxis()->SetTitle("N(Events)");
+ 
+    reco_bckg_w_RES_1232 = new TH1D("reco_bckg_w_RES_1232","W for Background Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_bckg_w_RES_1232->GetXaxis()->SetTitle("W [GeV]");
+    reco_bckg_w_RES_1232->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_w_RES_1535 = new TH1D("reco_bckg_w_RES_1535","W for Background Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_bckg_w_RES_1535->GetXaxis()->SetTitle("W [GeV]");
+    reco_bckg_w_RES_1535->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_w_RES_1520 = new TH1D("reco_bckg_w_RES_1520","W for Background Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_bckg_w_RES_1520->GetXaxis()->SetTitle("W [GeV]");
+    reco_bckg_w_RES_1520->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_w_RES_Other = new TH1D("reco_bckg_w_RES_Other","W for Background Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_bckg_w_RES_Other->GetXaxis()->SetTitle("W [GeV]");
+    reco_bckg_w_RES_Other->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_w_DIS = new TH1D("reco_bckg_w_DIS","W for Background Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_bckg_w_DIS->GetXaxis()->SetTitle("W [GeV]");
+    reco_bckg_w_DIS->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_w_2p2h = new TH1D("reco_bckg_w_2p2h","W for Background Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_bckg_w_2p2h->GetXaxis()->SetTitle("W [GeV]");
+    reco_bckg_w_2p2h->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_w_Non_RES = new TH1D("reco_bckg_w_Non_RES","W for Background Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_bckg_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
+    reco_bckg_w_Non_RES->GetYaxis()->SetTitle("N(Events)");
+
+    reco_bckg_w_Coh = new TH1D("reco_bckg_w_Coh","W for Background Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_bckg_w_Coh->GetXaxis()->SetTitle("W [GeV]");
+    reco_bckg_w_Coh->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal w
@@ -746,17 +847,13 @@ void CCProtonPi0_Interaction::initHistograms()
     reco_w_RES_Other->GetXaxis()->SetTitle("W [GeV]");
     reco_w_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    reco_w_DIS_1_pi = new TH1D("reco_w_DIS_1_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    reco_w_DIS_1_pi->GetXaxis()->SetTitle("W [GeV]");
-    reco_w_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+    reco_w_DIS = new TH1D("reco_w_DIS","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_w_DIS->GetXaxis()->SetTitle("W [GeV]");
+    reco_w_DIS->GetYaxis()->SetTitle("N(Events)");
 
-    reco_w_DIS_2_pi = new TH1D("reco_w_DIS_2_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    reco_w_DIS_2_pi->GetXaxis()->SetTitle("W [GeV]");
-    reco_w_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
-
-    reco_w_DIS_Multi_pi = new TH1D("reco_w_DIS_Multi_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    reco_w_DIS_Multi_pi->GetXaxis()->SetTitle("W [GeV]");
-    reco_w_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
+    reco_w_2p2h = new TH1D("reco_w_2p2h","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    reco_w_2p2h->GetXaxis()->SetTitle("W [GeV]");
+    reco_w_2p2h->GetYaxis()->SetTitle("N(Events)");
 
     reco_w_Non_RES = new TH1D("reco_w_Non_RES","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     reco_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
@@ -806,9 +903,11 @@ void CCProtonPi0_Interaction::writeHistograms()
 
     for (int i = 0; i < nHistograms; i++){
         CV_weight[i]->Write();
+        CV_weight_2p2h[i]->Write();
         CV_weight_Delta[i]->Write();
         CV_weight_CCRES[i]->Write();
         CV_weight_NonRes1pi[i]->Write();
+        err_2p2h[i]->Write();
         genie_wgt_Theta_Delta2Npi[i]->Write();
         updated_wgt_Theta_Delta2Npi[i]->Write();
         genie_wgt_MaRES[i]->Write();
@@ -926,9 +1025,8 @@ void CCProtonPi0_Interaction::writeHistograms()
     mc_Q2_RES_1520->Write();
     mc_Q2_RES_Other->Write();
    
-    mc_Q2_DIS_1_pi->Write();
-    mc_Q2_DIS_2_pi->Write();
-    mc_Q2_DIS_Multi_pi->Write();
+    mc_Q2_DIS->Write();
+    mc_Q2_2p2h->Write();
     mc_Q2_Non_RES->Write();
  
     truth_QSq_QE->Write();
@@ -937,10 +1035,20 @@ void CCProtonPi0_Interaction::writeHistograms()
     truth_QSq_RES_1520->Write();
     truth_QSq_RES_Other->Write();
    
-    truth_QSq_DIS_1_pi->Write();
-    truth_QSq_DIS_2_pi->Write();
-    truth_QSq_DIS_Multi_pi->Write();
+    truth_QSq_DIS->Write();
+    truth_QSq_2p2h->Write();
     truth_QSq_Non_RES->Write();
+ 
+    reco_bckg_QSq_QE->Write();
+    reco_bckg_QSq_RES_1232->Write();
+    reco_bckg_QSq_RES_1535->Write();
+    reco_bckg_QSq_RES_1520->Write();
+    reco_bckg_QSq_RES_Other->Write();
+   
+    reco_bckg_QSq_DIS->Write();
+    reco_bckg_QSq_2p2h->Write();
+    reco_bckg_QSq_Non_RES->Write();
+    reco_bckg_QSq_Coh->Write();
 
     // Signal incomingE
     mc_incomingE_QE->Write();
@@ -949,9 +1057,8 @@ void CCProtonPi0_Interaction::writeHistograms()
     mc_incomingE_RES_1520->Write();
     mc_incomingE_RES_Other->Write();
    
-    mc_incomingE_DIS_1_pi->Write();
-    mc_incomingE_DIS_2_pi->Write();
-    mc_incomingE_DIS_Multi_pi->Write();
+    mc_incomingE_DIS->Write();
+    mc_incomingE_2p2h->Write();
     mc_incomingE_Non_RES->Write();
  
     truth_Enu_QE->Write();
@@ -960,10 +1067,20 @@ void CCProtonPi0_Interaction::writeHistograms()
     truth_Enu_RES_1520->Write();
     truth_Enu_RES_Other->Write();
    
-    truth_Enu_DIS_1_pi->Write();
-    truth_Enu_DIS_2_pi->Write();
-    truth_Enu_DIS_Multi_pi->Write();
+    truth_Enu_DIS->Write();
+    truth_Enu_2p2h->Write();
     truth_Enu_Non_RES->Write();
+ 
+    reco_bckg_Enu_QE->Write();
+    reco_bckg_Enu_RES_1232->Write();
+    reco_bckg_Enu_RES_1535->Write();
+    reco_bckg_Enu_RES_1520->Write();
+    reco_bckg_Enu_RES_Other->Write();
+   
+    reco_bckg_Enu_DIS->Write();
+    reco_bckg_Enu_2p2h->Write();
+    reco_bckg_Enu_Non_RES->Write();
+    reco_bckg_Enu_Coh->Write();
 
     // Signal w
     mc_w_QE->Write();
@@ -972,9 +1089,8 @@ void CCProtonPi0_Interaction::writeHistograms()
     mc_w_RES_1520->Write();
     mc_w_RES_Other->Write();
    
-    mc_w_DIS_1_pi->Write();
-    mc_w_DIS_2_pi->Write();
-    mc_w_DIS_Multi_pi->Write();
+    mc_w_DIS->Write();
+    mc_w_2p2h->Write();
     mc_w_Non_RES->Write();
 
     truth_w_QE->Write();
@@ -983,10 +1099,20 @@ void CCProtonPi0_Interaction::writeHistograms()
     truth_w_RES_1520->Write();
     truth_w_RES_Other->Write();
    
-    truth_w_DIS_1_pi->Write();
-    truth_w_DIS_2_pi->Write();
-    truth_w_DIS_Multi_pi->Write();
+    truth_w_DIS->Write();
+    truth_w_2p2h->Write();
     truth_w_Non_RES->Write();
+
+    reco_bckg_w_QE->Write();
+    reco_bckg_w_RES_1232->Write();
+    reco_bckg_w_RES_1535->Write();
+    reco_bckg_w_RES_1520->Write();
+    reco_bckg_w_RES_Other->Write();
+   
+    reco_bckg_w_DIS->Write();
+    reco_bckg_w_2p2h->Write();
+    reco_bckg_w_Non_RES->Write();
+    reco_bckg_w_Coh->Write();
 
     // Signal reco w
     reco_w_QE->Write();
@@ -995,9 +1121,8 @@ void CCProtonPi0_Interaction::writeHistograms()
     reco_w_RES_1520->Write();
     reco_w_RES_Other->Write();
    
-    reco_w_DIS_1_pi->Write();
-    reco_w_DIS_2_pi->Write();
-    reco_w_DIS_Multi_pi->Write();
+    reco_w_DIS->Write();
+    reco_w_2p2h->Write();
     reco_w_Non_RES->Write();
 
     Polarization_data->Write();

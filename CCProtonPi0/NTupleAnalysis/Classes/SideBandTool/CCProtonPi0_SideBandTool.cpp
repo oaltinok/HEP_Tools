@@ -262,8 +262,8 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, XSec_Var &xsec_var, int ind, s
 void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string var_name, MnvH1D* data, MnvH1D* mc_total, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other)
 {
     std::string type;
-    if (ind == 0) type = "Raw";
-    else type = "Modified";
+    if (ind == 0) type = "Nominal";
+    else type = "Fitted";
 
     std::string norm = "POT";
     std::string plot_title = "Side Band: " + sb_name + " " + type + " " + norm + " Normalized";

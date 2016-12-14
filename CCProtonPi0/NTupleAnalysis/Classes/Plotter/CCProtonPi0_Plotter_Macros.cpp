@@ -21,7 +21,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC(rootDir &dir, std::string var_name, 
     // POT Normalized Plots 
     // ------------------------------------------------------------------------
     DrawDataStackedMC_BckgAll(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
-    //DrawDataStackedMC_BckgType(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
+    DrawDataStackedMC_BckgType(dir, var_name,plotDir, true, nCutArrows, cutArrow1, cutArrow2);
 
     // ------------------------------------------------------------------------
     // Area Normalized Plots 
@@ -43,7 +43,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     double max_bin;
     double bin_width;
     double area_mc = 0;
-    
+
     // ------------------------------------------------------------------------
     // Get Data Histogram
     // ------------------------------------------------------------------------
@@ -67,17 +67,17 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     TObjArray* mc_hists = new TObjArray;
     MnvH1D* temp;
 
-    // Get All Background
-    var = Form("%s_%d",var_name.c_str(),2);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Background");
-    mc_hists->Add(temp);
-    area_mc += temp->Integral() * mc_ratio;
-    
     // Get Signal
     var = Form("%s_%d",var_name.c_str(),1);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Signal");
+    mc_hists->Add(temp);
+    area_mc += temp->Integral() * mc_ratio;
+
+    // Get All Background
+    var = Form("%s_%d",var_name.c_str(),2);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Background");
     mc_hists->Add(temp);
     area_mc += temp->Integral() * mc_ratio;
 
@@ -89,7 +89,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     ApplyStyle(plotter);
     //plotter->axis_minimum = 0.1;
     plotter->axis_minimum = 0.0;
-    plotter->DrawDataStackedMC(data,mc_hists,mc_ratio,"TR","Data",2,1);
+    plotter->DrawDataStackedMC(data,mc_hists,mc_ratio,"TR","Data",3,-1);
 
     // Add Plot Labels
     plotter->AddHistoTitle(data[0].GetTitle());
@@ -145,7 +145,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
     double hist_max = 0;
     double max_bin;
     double bin_width;
-    
+
     // ------------------------------------------------------------------------
     // Get Data Histogram
     // ------------------------------------------------------------------------
@@ -367,7 +367,7 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
 
     MnvH1D* tempData = new MnvH1D(*data);
     MnvH1D* tempMC = new MnvH1D(*mc);
-    
+
     // ------------------------------------------------------------------------
     // Neutrino Energy Comparison Only
     //tempData->SetMaximum(80);
@@ -377,16 +377,16 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     // ------------------------------------------------------------------------
 
 
-//    void MnvPlotter::DrawDataMCWithErrorBand    (   const MnvH1D *  dataHist,
-//            const MnvH1D *  mcHist,
-//            const Double_t  mcScale = 1.0,
-//            const std::string &     legPos = "L",
-//            const bool  useHistTitles = false,
-//            const MnvH1D *  bkgdHist = NULL,
-//            const MnvH1D *  dataBkgdHist = NULL,
-//            const bool  covAreaNormalize = false,
-//            const bool  statPlusSys = false  
-//            )   
+    //    void MnvPlotter::DrawDataMCWithErrorBand    (   const MnvH1D *  dataHist,
+    //            const MnvH1D *  mcHist,
+    //            const Double_t  mcScale = 1.0,
+    //            const std::string &     legPos = "L",
+    //            const bool  useHistTitles = false,
+    //            const MnvH1D *  bkgdHist = NULL,
+    //            const MnvH1D *  dataBkgdHist = NULL,
+    //            const bool  covAreaNormalize = false,
+    //            const bool  statPlusSys = false  
+    //            )   
     plotter->headroom = 1.75;
     plotter->data_line_width = 2;
     plotter->data_marker_size = 1.5;
@@ -430,7 +430,7 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     TH1D* h_mc_total = new TH1D(tempMC->GetCVHistoWithStatError());
     // Scale Histograms
     h_mc_total->Scale(mc_ratio);
-    
+
     TH1D* h_data_mc_ratio = new TH1D(*h_data);
     h_data_mc_ratio->Divide(h_mc_total); 
 
@@ -495,7 +495,7 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
 void CCProtonPi0_Plotter::DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGraph* otherData, std::string var_name, std::string ext_data_name, std::string plotDir)
 {
     std::cout<<"Plotting for "<<var_name<<std::endl;
-    
+
     double mc_ratio = 1.0;
 
     // ------------------------------------------------------------------------
@@ -506,7 +506,7 @@ void CCProtonPi0_Plotter::DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGr
 
     MnvH1D* tempData = new MnvH1D(*data);
     MnvH1D* tempMC = new MnvH1D(*mc);
- 
+
     plotter->headroom = 1.75;
     plotter->data_line_width = 2;
     plotter->data_marker_size = 1.5;
@@ -543,9 +543,9 @@ void CCProtonPi0_Plotter::DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGr
 void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_IntType, std::string var_name,  std::string plotDir)
 {
     std::cout<<"Plotting for "<<var_name<<std::endl;
-    
+
     TCanvas* c = new TCanvas("c","c",1280,800);
-  
+
     // I may use mc for area normalization later, but for now it is silenced
     (void) mc;
 
@@ -554,24 +554,24 @@ void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vect
     h_RES_Delta->SetLineColor(kGray+1);
     h_RES_Delta->SetFillColor(kGray+1);
     h_RES_Delta->SetFillStyle(1001);
- 
+
     TH1D* h_RES_Other = GetBinNormalizedTH1D(mc_IntType[1]);
     h_RES_Other->SetLineWidth(1);
     h_RES_Other->SetLineColor(kGreen+2);
     h_RES_Other->SetFillColor(kGreen+2);
     h_RES_Other->SetFillStyle(1001);
-  
+
     TH1D* h_NonRES = GetBinNormalizedTH1D(mc_IntType[2]);
     h_NonRES->SetLineWidth(1);
     h_NonRES->SetLineColor(kRed+1);
     h_NonRES->SetFillColor(kRed+1);
     h_NonRES->SetFillStyle(1001);
- 
+
     THStack *hs = new THStack("hs",var_name.c_str());
     hs->Add(h_NonRES);
     hs->Add(h_RES_Other);
     hs->Add(h_RES_Delta);
-   
+
     double hs_max = hs->GetMaximum();
     hs->SetMaximum(hs_max * 1.75);
     hs->Draw("HIST");
@@ -591,7 +591,7 @@ void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vect
     h_data_StatOnly->SetMarkerColor(kBlack);
     h_data_StatOnly->SetLineWidth(2);
     h_data_StatOnly->SetLineColor(kBlack);
-    
+
     h_data->Draw("SAME E1 X0");
     h_data_StatOnly->Draw("SAME E1 X0");
 
@@ -604,12 +604,12 @@ void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vect
     legend->AddEntry(h_RES_Other, "Other resonances","f");
     legend->AddEntry(h_NonRES, "Non-Resonant","f");
     legend->Draw();
- 
+
     // Add Text
     TLatex text;
     text.SetNDC();
     text.SetTextSize(0.03);
- 
+
     text.DrawLatex(0.2, 0.85, "#color[4]{POT Normalized}");
 
     std::string data_err_text = "Data: inner errors statistical";
@@ -631,47 +631,47 @@ void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vect
 void CCProtonPi0_Plotter::DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_FSIType, std::string var_name,  std::string plotDir)
 {
     std::cout<<"Plotting for "<<var_name<<std::endl;
-    
+
     TCanvas* c = new TCanvas("c","c",1280,800);
-    
+
     std::string norm_label;
     double mc_ratio = GetMCNormalization(norm_label, false, data, mc);
-      
+
     TH1D* h_NonInteracting = GetBinNormalizedTH1D(mc_FSIType[0]);
     h_NonInteracting->Scale(mc_ratio);
     h_NonInteracting->SetLineWidth(1);
     h_NonInteracting->SetLineColor(kRed+1);
     h_NonInteracting->SetFillColor(kRed+1);
     h_NonInteracting->SetFillStyle(1001);
- 
+
     TH1D* h_Elastic = GetBinNormalizedTH1D(mc_FSIType[1]);
     h_Elastic->Scale(mc_ratio);
     h_Elastic->SetLineWidth(1);
     h_Elastic->SetLineColor(kOrange+6);
     h_Elastic->SetFillColor(kOrange+6);
     h_Elastic->SetFillStyle(1001);
-  
+
     TH1D* h_Inelastic = GetBinNormalizedTH1D(mc_FSIType[2]);
     h_Inelastic->Scale(mc_ratio);
     h_Inelastic->SetLineWidth(1);
     h_Inelastic->SetLineColor(kGray+1);
     h_Inelastic->SetFillColor(kGray+1);
     h_Inelastic->SetFillStyle(1001);
-  
+
     TH1D* h_Cex = GetBinNormalizedTH1D(mc_FSIType[3]);
     h_Cex->Scale(mc_ratio);
     h_Cex->SetLineWidth(1);
     h_Cex->SetLineColor(kGreen+2);
     h_Cex->SetFillColor(kGreen+2);
     h_Cex->SetFillStyle(1001);
- 
+
     TH1D* h_MultiPion = GetBinNormalizedTH1D(mc_FSIType[4]);
     h_MultiPion->Scale(mc_ratio);
     h_MultiPion->SetLineWidth(1);
     h_MultiPion->SetLineColor(kCyan+1);
     h_MultiPion->SetFillColor(kCyan+1);
     h_MultiPion->SetFillStyle(1001);
- 
+
     TH1D* h_Other = GetBinNormalizedTH1D(mc_FSIType[5]);
     h_Other->Scale(mc_ratio);
     h_Other->SetLineWidth(1);
@@ -686,7 +686,7 @@ void CCProtonPi0_Plotter::DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vect
     hs->Add(h_Other);
     hs->Add(h_Cex);
     hs->Add(h_MultiPion);
-   
+
     double hs_max = hs->GetMaximum();
     hs->SetMaximum(hs_max * 1.75);
     hs->Draw("HIST");
@@ -706,7 +706,7 @@ void CCProtonPi0_Plotter::DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vect
     h_data_StatOnly->SetMarkerColor(kBlack);
     h_data_StatOnly->SetLineWidth(2);
     h_data_StatOnly->SetLineColor(kBlack);
-    
+
     h_data->Draw("SAME E1 X0");
     h_data_StatOnly->Draw("SAME E1 X0");
 
@@ -722,12 +722,12 @@ void CCProtonPi0_Plotter::DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vect
     legend->AddEntry(h_Elastic, "#pi^{0} Elastic","f");
     legend->AddEntry(h_NonInteracting, "#pi^{0} Non-interacting","f");
     legend->Draw();
- 
+
     // Add Text
     TLatex text;
     text.SetNDC();
     text.SetTextSize(0.03);
- 
+
     text.DrawLatex(0.2, 0.85, "#color[4]{Area Normalized}");
 
     std::string data_err_text = "Data: inner errors statistical";
@@ -749,7 +749,7 @@ void CCProtonPi0_Plotter::DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vect
 void CCProtonPi0_Plotter::DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D* mc_BeforeFSI, std::string var_name,  std::string plotDir)
 {
     std::cout<<"Plotting for "<<var_name<<std::endl;
-    
+
     double mc_ratio = 1.0;
 
     // ------------------------------------------------------------------------
@@ -760,7 +760,7 @@ void CCProtonPi0_Plotter::DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D*
 
     MnvH1D* tempData = new MnvH1D(*data);
     MnvH1D* tempMC = new MnvH1D(*mc);
- 
+
     plotter->headroom = 1.75;
     plotter->data_line_width = 2;
     plotter->data_marker_size = 1.5;
@@ -771,7 +771,7 @@ void CCProtonPi0_Plotter::DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D*
     h_mc_BeforeFSI->SetLineColor(kBlue);
     h_mc_BeforeFSI->SetLineWidth(3);
     h_mc_BeforeFSI->SetFillStyle(0);
-    
+
     h_mc_BeforeFSI->Draw("SAME HIST");
 
     // ------------------------------------------------------------------------
@@ -780,7 +780,7 @@ void CCProtonPi0_Plotter::DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D*
     // Add Normalization Labels
     plotter->AddHistoTitle(data->GetTitle());
     AddNormBox(plotter, true, mc_ratio);
- 
+
     // Add Legend
     tempData->SetMarkerStyle(plotter->data_marker);
     tempData->SetMarkerSize(plotter->data_marker_size);
@@ -795,7 +795,7 @@ void CCProtonPi0_Plotter::DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D*
     legend->AddEntry(tempMC, "GENIE w/ FSI", "l");
     legend->AddEntry(h_mc_BeforeFSI, "GENIE w/o FSI","l");
     legend->Draw();
- 
+
     // Add Error Explanation Text
     TLatex text;
     text.SetNDC();
@@ -924,7 +924,7 @@ void CCProtonPi0_Plotter::DrawMnvH1D(rootDir& dir, std::string var_name, std::st
 
     TFile* f = new TFile(root_dir.c_str());
     MnvH1D* hist1D = (MnvH1D*)f->Get(var_name.c_str());
-    
+
     DrawMnvH1D(hist1D, var_name, plotDir);
     delete f;
 }
@@ -970,7 +970,13 @@ void CCProtonPi0_Plotter::Draw1DHist(TH1* hist1D, std::string var_name, std::str
     TLatex text;
     text.SetNDC();
     text.SetTextSize(0.03);
-    text.DrawLatex(0.15,0.85,Form("%s%3.2f", "Peak at ",max_bin_location));
+    text.DrawLatex(0.20,0.85,Form("%s%3.2f", "Peak at ",max_bin_location));
+
+    // Calculate FWHM
+    int bin1 = hist1D->FindFirstBinAbove(hist1D->GetMaximum()/2);
+    int bin2 = hist1D->FindLastBinAbove(hist1D->GetMaximum()/2);
+    double fwhm = hist1D->GetBinCenter(bin2) - hist1D->GetBinCenter(bin1);
+    text.DrawLatex(0.20,0.8,Form("%s%3.2f", "FWHM = ",fwhm));
 
     // Add Pi0 InvMass Line
     std::size_t found = var_name.find("invMass");
@@ -1064,7 +1070,7 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
     hist2D->GetYaxis()->SetTitleOffset(1.8);
     hist2D->Draw("colz");
     gPad->Update();
-    
+
     TPaveStats* ps = (TPaveStats *)hist2D->GetListOfFunctions()->FindObject("stats");
     ps->SetX1NDC(0.15);
     ps->SetX2NDC(0.55);
@@ -1245,7 +1251,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgType(rootDir &dir, std::string var_n
     ApplyStyle(plotter);
     //plotter->axis_minimum = 0.1;
     plotter->axis_minimum = 0.0;
-    plotter->DrawStackedMC(mc_hists,1,"TR",0);
+    plotter->DrawStackedMC(mc_hists,1,"TR",3);
 
     // Add Pi0 InvMass Line
     std::size_t found = var_name.find("invMass");
@@ -1496,6 +1502,18 @@ double CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_
     double max_bin;
     MnvH1D* temp;
 
+    // Get Signal
+    var = Form("%s_%d",var_name.c_str(),1);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Signal");
+    bin_width = temp->GetBinWidth(1);
+    max_bin = temp->GetMaximumBin();
+    hist_max = hist_max + temp->GetBinContent(max_bin);
+    temp->SetLineColor(kGreen);
+    temp->SetFillColor(kGreen);
+    mc_hists->Add(temp);
+    area_mc += temp->Integral();
+
     // Get Bckg: WithPi0
     var = Form("%s_%d",var_name.c_str(),3);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
@@ -1537,18 +1555,6 @@ double CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_
     hist_max = hist_max + temp->GetBinContent(max_bin);
     temp->SetLineColor(kGray);
     temp->SetFillColor(kGray);
-    mc_hists->Add(temp);
-    area_mc += temp->Integral();
-
-    // Get Signal
-    var = Form("%s_%d",var_name.c_str(),1);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Signal");
-    bin_width = temp->GetBinWidth(1);
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    temp->SetLineColor(kGreen);
-    temp->SetFillColor(kGreen);
     mc_hists->Add(temp);
     area_mc += temp->Integral();
 
@@ -1747,7 +1753,7 @@ void CCProtonPi0_Plotter::DrawBackgroundSubtraction(bool isMC)
     ApplyStyle(plotter);
     plotter->axis_minimum = 0.0;
     plotter->DrawDataStackedMC(data,mc_hists,mc_ratio,"TR","Data",2,1);
-   
+
     TH1D* fit_result = (TH1D*)f->Get("data_fit_result");
 
     // Plot Options
@@ -1768,7 +1774,7 @@ void CCProtonPi0_Plotter::DrawBackgroundSubtraction(bool isMC)
     plotter->AddPlotLabel(Form("Area(Data) = %3.2f",area_data), x_pos, y_pos, text_size, kBlue, 62, 1); 
     plotter->AddPlotLabel(Form("Area(MC) = %3.2f",area_mc), x_pos, y_pos-text_size, text_size, kBlue, 62, 1); 
     plotter->AddPlotLabel(Form("Area(Fit) = %3.2f",area_fit), x_pos, y_pos-(2*text_size), text_size, kBlue, 62, 1); 
-    
+
     // Add Cut Arrows
     CutArrow pi0invMass_min(60,"R"); 
     CutArrow pi0invMass_max(200,"L"); 
@@ -1814,9 +1820,9 @@ TH1D* CCProtonPi0_Plotter::GetBinNormalizedTH1D(MnvH1D* hist, bool WithSystError
 {
     MnvH1D* tempHist = new MnvH1D(*hist);
     TH1D* h = NULL;
-    
+
     NormalizeToNormBinWidth(tempHist);
-    
+
     if (WithSystError){
         h = new TH1D(tempHist->GetCVHistoWithError());
     }else{

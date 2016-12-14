@@ -88,6 +88,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillHistogram(TH2D* hist, double xval, double yval);
         void FillHistogram(TH3D* hist, double xval, double yval, double var3);
 
+        void Test_GENIE_DIS();
         void FillHistogramWithVertErrors(MnvH1D* hist, double var);
         void FillHistogramWithVertErrors(MnvH2D* hist, double xval, double yval);
         void FillHistogramWithVertErrors(vector<MnvH1D*> &hist, double var);
@@ -142,6 +143,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillVertErrorBand_TargetMass(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_TargetMass_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_TargetMass_ByHand(MnvH2D* h, double xval, double yval);
+
+        void Get2p2hErr();
+        void FillVertErrorBand_2p2h(MnvH1D* h, double var);
+        void FillVertErrorBand_2p2h(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_2p2h_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_2p2h_ByHand(MnvH2D* h, double xval, double yval);
 
         double GetUnfoldingErr();
         void FillVertErrorBand_Unfolding(MnvH1D* h, double var);
@@ -241,6 +248,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         //  Interaction Specific Functions
         void FillSignalCharacteristics(bool isMinosMatched);
         void FillSignalCharacteristics_Reco();
+        void FillBackgroundCharacteristics();
         int Get_nFS_pions();
         bool isMother_DIS_Fragment(int ind);
         void fillInteractionMC();
@@ -261,7 +269,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void GetMichelStatistics();
         void GetMichelStatistics_Showers();
         double GetBckgConstraint(std::string error_name, int hist_ind);
-
+        std::vector<int> GetPrimaryParticles();
+        
         //  Muon Specific Functions
         void fillMuonMC();
         void fillMuonReco();
@@ -289,6 +298,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void fillPi0Blob_Evis_Total(); 
 
         // GENIE Tuning
+        double err_2p2h;
         double updated_genie_wgt_Theta_Delta2Npi[7];
         double updated_genie_wgt_MaRES[7];
         double updated_genie_wgt_MvRES[7];
@@ -301,6 +311,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double GetMaResWeight( double newMaRes );
         double GetMvResWeight( double newMvRes );
         bool IsGenieCCRes();
+        bool IsGenieNonRES();
         bool IsGenieRvn1pi();
         bool IsGenieRvp1pi();
         
@@ -336,7 +347,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         bool m_isModeReduce;
         bool isScanRun;
         bool isDataAnalysis;
-        bool applyGENIETuning;
+        bool applyGENIETuning_Delta;
+        bool applyGENIETuning_NonRes;
+        bool reduce_err_Delta;
         bool reduce_err_MaRES;
         bool reduce_err_Rvn1pi;
         bool applyBckgConstraints_CV;
@@ -364,6 +377,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double cvweight_Delta;
         double cvweight_CCRES;
         double cvweight_NonRes1pi;
+        double cvweight_2p2h;
         double latest_ScanID;
         double minProtonScore_LLR;
         double minPhotonDistance_1;
@@ -382,6 +396,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Counter nMichel_Total_Found_Improved;
         CCProtonPi0_Counter nMichel_Truth_Found;
         CCProtonPi0_Counter nMichel_Truth_Found_Improved;
+        CCProtonPi0_Counter n2p2h;
         CCProtonPi0_Counter counter1;
         CCProtonPi0_Counter counter2;
         CCProtonPi0_Counter counter3;

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <string>
+#include <cstdlib>
 #include "Cintex/Cintex.h"
 
 #include "../Classes/NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
@@ -8,8 +9,12 @@
 
 using namespace std;
 
-int main()
+void CheckCommand(int argc);
+
+int main(int argc, char *argv[])
 {
+    CheckCommand(argc);
+
     time_t timeStart; time(&timeStart);
     time_t timeEnd;
     double timeDiff;
@@ -34,3 +39,10 @@ int main()
     return 0;
 }
 
+void CheckCommand(int argc)
+{
+    if (argc != 1){
+        std::cout<<"Wrong Usage! -- Make sure you want to process Truth Tree!"<<std::endl;
+        exit(1);
+    }
+}

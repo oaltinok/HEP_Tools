@@ -143,6 +143,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotTruth_ShortProton();
 
         // Other Plots 
+        void plot_CV_weights();
         void plot_SystematicsInfo();
         void PlotTotalEnuXSec();
         void plotGENIEXSec();
@@ -179,7 +180,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // GENIE Tuning Study
         void GENIE_Tuning_Study();
         void XSecVars_GENIE_Tuning_Ratios();
-        void GENIE_Tuning_GetHistograms(std::string var_name, std::string data_var, std::string mc_var, TH1D* &data_nominal, TH1D* &data_tuned, TH1D* &mc_nominal, TH1D* &mc_tuned );
+        void GENIE_Tuning_GetHistograms(std::string var_name, std::string data_var, std::string mc_var, TH1D* &data_nominal, TH1D* &data_tuned_v2, TH1D* &data_tuned_v3, TH1D* &mc_nominal, TH1D* &mc_tuned_v2, TH1D* &mc_tuned_v3);
         void GENIE_Tuning_Ratio(std::string var_name, std::string data_var, std::string mc_var);
         void GENIE_Tuning_DataMC_Ratio(std::string var_name, std::string data_var, std::string mc_var);
 

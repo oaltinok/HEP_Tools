@@ -15,9 +15,9 @@ void CCProtonPi0_Counter::setName(std::string inputName)
     name = inputName;
 }
 
-void CCProtonPi0_Counter::increment()
+void CCProtonPi0_Counter::increment(double wgt)
 {
-    count++;
+    count = count + wgt;
 }
 
 void CCProtonPi0_Counter::print()

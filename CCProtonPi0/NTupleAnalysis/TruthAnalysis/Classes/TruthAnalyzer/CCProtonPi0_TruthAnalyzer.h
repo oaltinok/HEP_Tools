@@ -73,9 +73,11 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> Enu_mc_truth_all_signal_IntType;
        
         std::vector<MnvH1D*> CV_weight;
+        std::vector<MnvH1D*> CV_weight_2p2h;
         std::vector<MnvH1D*> CV_weight_Delta;
         std::vector<MnvH1D*> CV_weight_CCRES;
         std::vector<MnvH1D*> CV_weight_NonRes1pi;
+        std::vector<MnvH1D*> h_err_2p2h;
         std::vector<MnvH1D*> genie_wgt_Theta_Delta2Npi;
         std::vector<MnvH1D*> updated_wgt_Theta_Delta2Npi;
         std::vector<MnvH1D*> genie_wgt_MaRES;
@@ -90,43 +92,40 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         TH1D* Test_pi0_theta;
 
         // Signal Q2
-        TH1D* mc_Q2_QE;
+        TH1D* truth_QSq_QE;
 
-        TH1D* mc_Q2_RES_1232;
-        TH1D* mc_Q2_RES_1535;
-        TH1D* mc_Q2_RES_1520;
-        TH1D* mc_Q2_RES_Other;
+        TH1D* truth_QSq_RES_1232;
+        TH1D* truth_QSq_RES_1535;
+        TH1D* truth_QSq_RES_1520;
+        TH1D* truth_QSq_RES_Other;
 
-        TH1D* mc_Q2_DIS_1_pi;
-        TH1D* mc_Q2_DIS_2_pi;
-        TH1D* mc_Q2_DIS_Multi_pi;
-        TH1D* mc_Q2_Non_RES;
+        TH1D* truth_QSq_DIS;
+        TH1D* truth_QSq_Non_RES;
+        TH1D* truth_QSq_2p2h;
 
         // Signal incomingE
-        TH1D* mc_incomingE_QE;
+        TH1D* truth_Enu_QE;
 
-        TH1D* mc_incomingE_RES_1232;
-        TH1D* mc_incomingE_RES_1535;
-        TH1D* mc_incomingE_RES_1520;
-        TH1D* mc_incomingE_RES_Other;
+        TH1D* truth_Enu_RES_1232;
+        TH1D* truth_Enu_RES_1535;
+        TH1D* truth_Enu_RES_1520;
+        TH1D* truth_Enu_RES_Other;
 
-        TH1D* mc_incomingE_DIS_1_pi;
-        TH1D* mc_incomingE_DIS_2_pi;
-        TH1D* mc_incomingE_DIS_Multi_pi;
-        TH1D* mc_incomingE_Non_RES;
+        TH1D* truth_Enu_DIS;
+        TH1D* truth_Enu_Non_RES;
+        TH1D* truth_Enu_2p2h;
 
         // Signal w
-        TH1D* mc_w_QE;
+        TH1D* truth_w_QE;
 
-        TH1D* mc_w_RES_1232;
-        TH1D* mc_w_RES_1535;
-        TH1D* mc_w_RES_1520;
-        TH1D* mc_w_RES_Other;
+        TH1D* truth_w_RES_1232;
+        TH1D* truth_w_RES_1535;
+        TH1D* truth_w_RES_1520;
+        TH1D* truth_w_RES_Other;
 
-        TH1D* mc_w_DIS_1_pi;
-        TH1D* mc_w_DIS_2_pi;
-        TH1D* mc_w_DIS_Multi_pi;
-        TH1D* mc_w_Non_RES;
+        TH1D* truth_w_DIS;
+        TH1D* truth_w_Non_RES;
+        TH1D* truth_w_2p2h;
 
 
     private :
@@ -136,7 +135,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_BinList binList;
         CCProtonPi0_BckgConstrainer BckgConstrainer;
 
-        bool applyGENIETuning;
+        bool applyGENIETuning_Delta;
+        bool applyGENIETuning_NonRes;
+        bool reduce_err_Delta;
         bool reduce_err_MaRES;
         bool reduce_err_Rvn1pi;
 
@@ -180,6 +181,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         double GetMaResWeight( double newMaRes );
         double GetMvResWeight( double newMvRes );
         bool IsGenieCCRes();
+        bool IsGenieNonRES();
         bool IsGenieRvn1pi();
         bool IsGenieRvp1pi();
 
@@ -219,20 +221,29 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Counter nRES_1535;
         CCProtonPi0_Counter nRES_1520;
         CCProtonPi0_Counter nRES_Other;
-        CCProtonPi0_Counter nDIS_1_pi;
-        CCProtonPi0_Counter nDIS_2_pi;
-        CCProtonPi0_Counter nDIS_Multi_pi;
+        CCProtonPi0_Counter nDIS;
+        CCProtonPi0_Counter n2p2h;
         CCProtonPi0_Counter nNon_RES;
 
+        // Temp
+        CCProtonPi0_Counter nTempCounter1;
+        CCProtonPi0_Counter nTempCounter2;
+        
         double cvweight;
+        double cvweight_2p2h;
         double cvweight_Delta;
         double cvweight_CCRES;
         double cvweight_NonRes1pi;
+        double err_2p2h;
         double updated_genie_wgt_Theta_Delta2Npi[7];
         double updated_genie_wgt_MaRES[7];
         double updated_genie_wgt_MvRES[7];
         double updated_genie_wgt_Rvn1pi[7];
         double updated_genie_wgt_Rvp1pi[7];
+
+        void Get2p2hErr();
+        void FillVertErrorBand_2p2h(MnvH1D* h, double var);
+        void FillVertErrorBand_2p2h_ByHand(MnvH1D* h, double var);
 
         // NTuple Truth Branch
         TTree          *fChain;   //!pointer to the analyzed TTree or TChain

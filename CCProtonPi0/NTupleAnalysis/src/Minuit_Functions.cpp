@@ -96,7 +96,7 @@ void FitMinuit()
     // Set starting values and step sizes for parameters
     //      Start from 1.0 and step 0.01
     ptMinuit->mnparm(0, "WithPi0", 1.0, 0.01, 0.5, 2.0 , ierflg);
-    ptMinuit->mnparm(1, "QELike", 1.0, 0.01, 0.5, 2.0, ierflg);
+    ptMinuit->mnparm(1, "QELike", 1.0, 0.01, 0.2, 2.0, ierflg);
     ptMinuit->mnparm(2, "SinglePiPlus", 1.0, 0.01, 0.5, 2.0, ierflg);
 
     // Now ready for minimization step

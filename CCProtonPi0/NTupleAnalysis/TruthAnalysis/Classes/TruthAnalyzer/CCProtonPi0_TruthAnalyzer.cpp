@@ -13,7 +13,10 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 
     fillErrors_ByHand = true;
     
-    applyGENIETuning = true;
+    applyGENIETuning_Delta = true;
+    reduce_err_Delta = true;
+
+    applyGENIETuning_NonRes = false;
     reduce_err_MaRES = false;
     reduce_err_Rvn1pi = false;
 
@@ -52,24 +55,24 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
             break;
         }
 
-        nAll.increment();
+        CalcEventWeight();
 
-        if (truth_isFidVol) nFidVol.increment();
-        else nFidVol_Out.increment();
+        nAll.increment(cvweight);
+
+        if (truth_isFidVol) nFidVol.increment(cvweight);
+        else nFidVol_Out.increment(cvweight);
 
         // Count Events Only inside the Fidicual Volume
         if (truth_isFidVol){
 
-            CalcEventWeight();
-
             FillGENIE_Tuning();
             // Count Signal Out due to Acceptance or Kinematics
-            if (truth_isSignalOut_Acceptance) nSignalOut_Acceptance.increment();
-            if (truth_isSignalOut_Kinematics) nSignalOut_Kinematics.increment();
+            if (truth_isSignalOut_Acceptance) nSignalOut_Acceptance.increment(cvweight);
+            if (truth_isSignalOut_Kinematics) nSignalOut_Kinematics.increment(cvweight);
 
             // Count Signal and Background inside Fiducial Volume
-            if (truth_isSignal) nSignal.increment();
-            else nBckg.increment();
+            if (truth_isSignal) nSignal.increment(cvweight);
+            else nBckg.increment(cvweight);
 
             if (truth_isSignal){
                 // Detailed Interaction breakout
@@ -90,11 +93,11 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
                 int IntType = GetIntType();
                 FillSignal_XSec_Variables_IntType(IntType);
 
-                //FillSignal_Test();
+                FillSignal_Test();
             }
 
             if (truth_isSignal_BeforeFSI){
-                nSignal_BeforeFSI.increment();
+                nSignal_BeforeFSI.increment(cvweight);
                 FillSignal_XSec_Variables_BeforeFSI();
             }
         }
@@ -110,17 +113,17 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 void CCProtonPi0_TruthAnalyzer::CountFSIType(int type)
 {
     switch (type) {
-        case 0: nFSI_NonInteracting.increment();
+        case 0: nFSI_NonInteracting.increment(cvweight);
                 break;
-        case 1: nFSI_Elastic.increment();
+        case 1: nFSI_Elastic.increment(cvweight);
                 break;
-        case 2: nFSI_Inelastic.increment();
+        case 2: nFSI_Inelastic.increment(cvweight);
                 break;
-        case 3: nFSI_ChargeExchange.increment();
+        case 3: nFSI_ChargeExchange.increment(cvweight);
                 break;
-        case 4: nFSI_MultiPi.increment();
+        case 4: nFSI_MultiPi.increment(cvweight);
                 break;
-        case 5: nFSI_NucleonToPi.increment();
+        case 5: nFSI_NucleonToPi.increment(cvweight);
                 break;
         default: RunTimeError("Wrong FSI Type");
     }
@@ -266,12 +269,14 @@ void CCProtonPi0_TruthAnalyzer::writeTextFile()
     WriteCounter(nRES_Other, nSignal);
     textFile<<std::endl;
    
-    WriteCounter(nDIS_1_pi, nSignal);
-    WriteCounter(nDIS_2_pi, nSignal);
-    WriteCounter(nDIS_Multi_pi, nSignal);
+    WriteCounter(nDIS, nSignal);
     WriteCounter(nNon_RES, nSignal);
+    WriteCounter(n2p2h, nSignal);
     textFile<<std::endl;
-   
+  
+    WriteCounter(nTempCounter1, nAll);
+    WriteCounter(nTempCounter2, nAll);
+
     textFile.close();
 }
 
@@ -313,7 +318,10 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() :
 void CCProtonPi0_TruthAnalyzer::resetCounters() 
 {
     nAll.setName("nAll");
-   
+
+    nTempCounter1.setName("Muon");
+    nTempCounter2.setName("AntiMuon");
+
     nFidVol.setName("nFidVol");
     nFidVol_Out.setName("nFidVol_Out");
 
@@ -339,10 +347,9 @@ void CCProtonPi0_TruthAnalyzer::resetCounters()
     nRES_1520.setName("nSignal_RES_1520");
     nRES_Other.setName("nSignal_RES_Other");
     
-    nDIS_1_pi.setName("nSignal_DIS_1pi");
-    nDIS_2_pi.setName("nSignal_DIS_2pi");
-    nDIS_Multi_pi.setName("nSignal_DIS_Multi_pi");
-    nNon_RES.setName("nSignal_Non_RES");
+    nDIS.setName("nSignal_DIS");
+    nNon_RES.setName("nSignal_NonRES");
+    n2p2h.setName("nSignal_2p2h");
 }
 
 
@@ -366,6 +373,11 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
 {
     MnvH1D* temp = NULL;
     for (int i = 0; i < nHistograms; i++){
+        temp = new MnvH1D( Form("%s_%d","CV_weight_2p2h",i),"Central Value Weight -- 2p2h", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Central Value Weight -- 2p2h");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        CV_weight_2p2h.push_back(temp);
+
         temp = new MnvH1D( Form("%s_%d","CV_weight_Delta",i),"Central Value Weight -- Delta", 80,0.0,2.0);
         temp->GetXaxis()->SetTitle("Central Value Weight -- Delta");
         temp->GetYaxis()->SetTitle("N(Events)");
@@ -385,6 +397,11 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetXaxis()->SetTitle("Central Value Weight");
         temp->GetYaxis()->SetTitle("N(Events)");
         CV_weight.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","h_err_2p2h",i),"2p2h 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("2p2h 1#sigma Weights");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        h_err_2p2h.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","genie_wgt_Theta_Delta2Npi",i),"Theta_Delta2Npi GENIE 1#sigma Weights", 80,0.0,2.0);
         temp->GetXaxis()->SetTitle("Theta_Delta2Npi GENIE 1#sigma Weights");
@@ -446,12 +463,14 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     muon_P_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(muon_P_mc_truth_all_signal);
     AddVertErrorBand_Genie(muon_P_mc_truth_all_signal);
+    AddVertErrorBand_2p2h(muon_P_mc_truth_all_signal);
 
     muon_theta_mc_truth_all_signal = new MnvH1D( "muon_theta_mc_truth_all_signal","Muon Theta for Signal Events",binList.size_muon_theta, binList.a_muon_theta);
     muon_theta_mc_truth_all_signal->GetXaxis()->SetTitle("Theta");
     muon_theta_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(muon_theta_mc_truth_all_signal);
     AddVertErrorBand_Genie(muon_theta_mc_truth_all_signal);
+    AddVertErrorBand_2p2h(muon_theta_mc_truth_all_signal);
 
     // ------------------------------------------------------------------------
     // Pi0 Variables
@@ -461,18 +480,21 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     pi0_P_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(pi0_P_mc_truth_all_signal);
     AddVertErrorBand_Genie(pi0_P_mc_truth_all_signal);
+    AddVertErrorBand_2p2h(pi0_P_mc_truth_all_signal);
 
     pi0_KE_mc_truth_all_signal = new MnvH1D( "pi0_KE_mc_truth_all_signal","Pi0 Kinetic Energy for Signal Events",binList.size_pi0_KE, binList.a_pi0_KE);
     pi0_KE_mc_truth_all_signal->GetXaxis()->SetTitle("Kinetic Energy [GeV]");
     pi0_KE_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(pi0_KE_mc_truth_all_signal);
     AddVertErrorBand_Genie(pi0_KE_mc_truth_all_signal);
+    AddVertErrorBand_2p2h(pi0_KE_mc_truth_all_signal);
 
     pi0_theta_mc_truth_all_signal = new MnvH1D( "pi0_theta_mc_truth_all_signal","Pi0 Theta for Signal Events",binList.size_pi0_theta, binList.a_pi0_theta);
     pi0_theta_mc_truth_all_signal->GetXaxis()->SetTitle("Theta");
     pi0_theta_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(pi0_theta_mc_truth_all_signal);
     AddVertErrorBand_Genie(pi0_theta_mc_truth_all_signal);
+    AddVertErrorBand_2p2h(pi0_theta_mc_truth_all_signal);
 
     // ------------------------------------------------------------------------
     // Neutrino Energy, Q2 & W
@@ -482,18 +504,21 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     Enu_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(Enu_mc_truth_all_signal);
     AddVertErrorBand_Genie(Enu_mc_truth_all_signal);
+    AddVertErrorBand_2p2h(Enu_mc_truth_all_signal);
 
     QSq_mc_truth_all_signal = new MnvH1D( "QSq_mc_truth_all_signal","Q^{2} for Signal Events",binList.size_QSq, binList.a_QSq);
     QSq_mc_truth_all_signal->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(QSq_mc_truth_all_signal);
     AddVertErrorBand_Genie(QSq_mc_truth_all_signal);
+    AddVertErrorBand_2p2h(QSq_mc_truth_all_signal);
 
     W_mc_truth_all_signal = new MnvH1D( "W_mc_truth_all_signal","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
     W_mc_truth_all_signal->GetXaxis()->SetTitle("W [GeV]");
     W_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(W_mc_truth_all_signal);
     AddVertErrorBand_Genie(W_mc_truth_all_signal);
+    AddVertErrorBand_2p2h(W_mc_truth_all_signal);
 
     // ------------------------------------------------------------------------
     // Muon Variables -- Before FSI
@@ -503,12 +528,14 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     muon_P_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(muon_P_mc_truth_all_signal_BeforeFSI);
     AddVertErrorBand_Genie(muon_P_mc_truth_all_signal_BeforeFSI);
+    AddVertErrorBand_2p2h(muon_P_mc_truth_all_signal_BeforeFSI);
 
     muon_theta_mc_truth_all_signal_BeforeFSI = new MnvH1D( "muon_theta_mc_truth_all_signal_BeforeFSI","Muon Theta for Signal Events",binList.size_muon_theta, binList.a_muon_theta);
     muon_theta_mc_truth_all_signal_BeforeFSI->GetXaxis()->SetTitle("Theta");
     muon_theta_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(muon_theta_mc_truth_all_signal_BeforeFSI);
     AddVertErrorBand_Genie(muon_theta_mc_truth_all_signal_BeforeFSI);
+    AddVertErrorBand_2p2h(muon_theta_mc_truth_all_signal_BeforeFSI);
 
     // ------------------------------------------------------------------------
     // Pi0 Variables -- Before FSI
@@ -518,18 +545,21 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     pi0_P_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(pi0_P_mc_truth_all_signal_BeforeFSI);
     AddVertErrorBand_Genie(pi0_P_mc_truth_all_signal_BeforeFSI);
+    AddVertErrorBand_2p2h(pi0_P_mc_truth_all_signal_BeforeFSI);
 
     pi0_KE_mc_truth_all_signal_BeforeFSI = new MnvH1D( "pi0_KE_mc_truth_all_signal_BeforeFSI","Pi0 Kinetic Energy for Signal Events",binList.size_pi0_KE, binList.a_pi0_KE);
     pi0_KE_mc_truth_all_signal_BeforeFSI->GetXaxis()->SetTitle("Kinetic Energy [GeV]");
     pi0_KE_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(pi0_KE_mc_truth_all_signal_BeforeFSI);
     AddVertErrorBand_Genie(pi0_KE_mc_truth_all_signal_BeforeFSI);
+    AddVertErrorBand_2p2h(pi0_KE_mc_truth_all_signal_BeforeFSI);
 
     pi0_theta_mc_truth_all_signal_BeforeFSI = new MnvH1D( "pi0_theta_mc_truth_all_signal_BeforeFSI","Pi0 Theta for Signal Events",binList.size_pi0_theta, binList.a_pi0_theta);
     pi0_theta_mc_truth_all_signal_BeforeFSI->GetXaxis()->SetTitle("Theta");
     pi0_theta_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(pi0_theta_mc_truth_all_signal_BeforeFSI);
     AddVertErrorBand_Genie(pi0_theta_mc_truth_all_signal_BeforeFSI);
+    AddVertErrorBand_2p2h(pi0_theta_mc_truth_all_signal_BeforeFSI);
 
     // ------------------------------------------------------------------------
     // Neutrino Energy, Q2 & W -- Before FSI
@@ -539,18 +569,21 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     Enu_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(Enu_mc_truth_all_signal_BeforeFSI);
     AddVertErrorBand_Genie(Enu_mc_truth_all_signal_BeforeFSI);
+    AddVertErrorBand_2p2h(Enu_mc_truth_all_signal_BeforeFSI);
 
     QSq_mc_truth_all_signal_BeforeFSI = new MnvH1D( "QSq_mc_truth_all_signal_BeforeFSI","Q^{2} for Signal Events",binList.size_QSq, binList.a_QSq);
     QSq_mc_truth_all_signal_BeforeFSI->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
     QSq_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(QSq_mc_truth_all_signal_BeforeFSI);
     AddVertErrorBand_Genie(QSq_mc_truth_all_signal_BeforeFSI);
+    AddVertErrorBand_2p2h(QSq_mc_truth_all_signal_BeforeFSI);
 
     W_mc_truth_all_signal_BeforeFSI = new MnvH1D( "W_mc_truth_all_signal_BeforeFSI","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
     W_mc_truth_all_signal_BeforeFSI->GetXaxis()->SetTitle("W [GeV]");
     W_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBand_Flux(W_mc_truth_all_signal_BeforeFSI);
     AddVertErrorBand_Genie(W_mc_truth_all_signal_BeforeFSI);
+    AddVertErrorBand_2p2h(W_mc_truth_all_signal_BeforeFSI);
 
     // ------------------------------------------------------------------------
     // FSI Type 
@@ -561,6 +594,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         muon_P_mc_truth_all_signal_FSIType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","muon_theta_mc_truth_all_signal_FSIType",i),"Muon Theta for Signal Events",binList.size_muon_theta, binList.a_muon_theta);
@@ -568,6 +602,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         muon_theta_mc_truth_all_signal_FSIType.push_back(temp);
         
         temp = new MnvH1D( Form("%s_%d","pi0_P_mc_truth_all_signal_FSIType",i),"Pi0 Momentum for Signal Events",binList.size_pi0_P, binList.a_pi0_P);
@@ -575,6 +610,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         pi0_P_mc_truth_all_signal_FSIType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","pi0_KE_mc_truth_all_signal_FSIType",i),"Pi0 Kinetic Energy for Signal Events",binList.size_pi0_KE, binList.a_pi0_KE);
@@ -582,6 +618,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         pi0_KE_mc_truth_all_signal_FSIType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","pi0_theta_mc_truth_all_signal_FSIType",i), "Pi0 Theta for Signal Events",binList.size_pi0_theta, binList.a_pi0_theta);
@@ -589,6 +626,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         pi0_theta_mc_truth_all_signal_FSIType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","Enu_mc_truth_all_signal_FSIType",i),"Neutrino Energy for Signal Events",binList.size_Enu, binList.a_Enu);
@@ -596,6 +634,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         Enu_mc_truth_all_signal_FSIType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d", "QSq_mc_truth_all_signal_FSIType",i),"Q^{2} for Signal Events",binList.size_QSq, binList.a_QSq);
@@ -603,6 +642,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         QSq_mc_truth_all_signal_FSIType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d", "W_mc_truth_all_signal_FSIType",i), "W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
@@ -610,6 +650,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         W_mc_truth_all_signal_FSIType.push_back(temp);
     }
 
@@ -622,6 +663,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         muon_P_mc_truth_all_signal_IntType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","muon_theta_mc_truth_all_signal_IntType",i),"Muon Theta for Signal Events",binList.size_muon_theta, binList.a_muon_theta);
@@ -629,6 +671,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         muon_theta_mc_truth_all_signal_IntType.push_back(temp);
         
         temp = new MnvH1D( Form("%s_%d","pi0_P_mc_truth_all_signal_IntType",i),"Pi0 Momentum for Signal Events",binList.size_pi0_P, binList.a_pi0_P);
@@ -636,6 +679,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         pi0_P_mc_truth_all_signal_IntType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","pi0_KE_mc_truth_all_signal_IntType",i),"Pi0 Kinetic Energy for Signal Events",binList.size_pi0_KE, binList.a_pi0_KE);
@@ -643,6 +687,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         pi0_KE_mc_truth_all_signal_IntType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","pi0_theta_mc_truth_all_signal_IntType",i), "Pi0 Theta for Signal Events",binList.size_pi0_theta, binList.a_pi0_theta);
@@ -650,6 +695,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         pi0_theta_mc_truth_all_signal_IntType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","Enu_mc_truth_all_signal_IntType",i),"Neutrino Energy for Signal Events",binList.size_Enu, binList.a_Enu);
@@ -657,6 +703,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         Enu_mc_truth_all_signal_IntType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d", "QSq_mc_truth_all_signal_IntType",i),"Q^{2} for Signal Events",binList.size_QSq, binList.a_QSq);
@@ -664,6 +711,7 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         QSq_mc_truth_all_signal_IntType.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d", "W_mc_truth_all_signal_IntType",i), "W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
@@ -671,125 +719,114 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBand_Flux(temp);
         AddVertErrorBand_Genie(temp);
+        AddVertErrorBand_2p2h(temp);
         W_mc_truth_all_signal_IntType.push_back(temp);
     }
 
     // ------------------------------------------------------------------------
     // Signal Q2
     // ------------------------------------------------------------------------
-    mc_Q2_QE = new TH1D("mc_Q2_QE","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_QE->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_QE->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_QE = new TH1D("truth_QSq_QE","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    truth_QSq_QE->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    truth_QSq_QE->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_RES_1232 = new TH1D("mc_Q2_RES_1232","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_RES_1232->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_RES_1232->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_RES_1232 = new TH1D("truth_QSq_RES_1232","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    truth_QSq_RES_1232->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    truth_QSq_RES_1232->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_RES_1535 = new TH1D("mc_Q2_RES_1535","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_RES_1535->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_RES_1535->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_RES_1535 = new TH1D("truth_QSq_RES_1535","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    truth_QSq_RES_1535->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    truth_QSq_RES_1535->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_RES_1520 = new TH1D("mc_Q2_RES_1520","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_RES_1520->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_RES_1520->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_RES_1520 = new TH1D("truth_QSq_RES_1520","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    truth_QSq_RES_1520->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    truth_QSq_RES_1520->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_RES_Other = new TH1D("mc_Q2_RES_Other","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_RES_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_RES_Other->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_RES_Other = new TH1D("truth_QSq_RES_Other","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    truth_QSq_RES_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    truth_QSq_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_1_pi = new TH1D("mc_Q2_DIS_1_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_DIS_1_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_DIS = new TH1D("truth_QSq_DIS","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    truth_QSq_DIS->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    truth_QSq_DIS->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_2_pi = new TH1D("mc_Q2_DIS_2_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_DIS_2_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_Non_RES = new TH1D("truth_QSq_Non_RES","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    truth_QSq_Non_RES->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    truth_QSq_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
-    mc_Q2_DIS_Multi_pi = new TH1D("mc_Q2_DIS_Multi_pi","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_DIS_Multi_pi->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
-
-    mc_Q2_Non_RES = new TH1D("mc_Q2_Non_RES","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
-    mc_Q2_Non_RES->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    mc_Q2_Non_RES->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_2p2h = new TH1D("truth_QSq_2p2h","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
+    truth_QSq_2p2h->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+    truth_QSq_2p2h->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal incomingE
     // ------------------------------------------------------------------------
-    mc_incomingE_QE = new TH1D("mc_incomingE_QE","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_QE->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_QE->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_QE = new TH1D("truth_Enu_QE","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    truth_Enu_QE->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    truth_Enu_QE->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_RES_1232 = new TH1D("mc_incomingE_RES_1232","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_RES_1232->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_RES_1232->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_RES_1232 = new TH1D("truth_Enu_RES_1232","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    truth_Enu_RES_1232->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    truth_Enu_RES_1232->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_RES_1535 = new TH1D("mc_incomingE_RES_1535","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_RES_1535->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_RES_1535->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_RES_1535 = new TH1D("truth_Enu_RES_1535","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    truth_Enu_RES_1535->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    truth_Enu_RES_1535->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_RES_1520 = new TH1D("mc_incomingE_RES_1520","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_RES_1520->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_RES_1520->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_RES_1520 = new TH1D("truth_Enu_RES_1520","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    truth_Enu_RES_1520->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    truth_Enu_RES_1520->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_RES_Other = new TH1D("mc_incomingE_RES_Other","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_RES_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_RES_Other->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_RES_Other = new TH1D("truth_Enu_RES_Other","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    truth_Enu_RES_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    truth_Enu_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_1_pi = new TH1D("mc_incomingE_DIS_1_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_DIS_1_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_DIS = new TH1D("truth_Enu_DIS","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    truth_Enu_DIS->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    truth_Enu_DIS->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_2_pi = new TH1D("mc_incomingE_DIS_2_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_DIS_2_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_Non_RES = new TH1D("truth_Enu_Non_RES","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    truth_Enu_Non_RES->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    truth_Enu_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
-    mc_incomingE_DIS_Multi_pi = new TH1D("mc_incomingE_DIS_Multi_pi","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_DIS_Multi_pi->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
-
-    mc_incomingE_Non_RES = new TH1D("mc_incomingE_Non_RES","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
-    mc_incomingE_Non_RES->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    mc_incomingE_Non_RES->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_2p2h = new TH1D("truth_Enu_2p2h","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
+    truth_Enu_2p2h->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    truth_Enu_2p2h->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Signal w
     // ------------------------------------------------------------------------
-    mc_w_QE = new TH1D("mc_w_QE","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_QE->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_QE->GetYaxis()->SetTitle("N(Events)");
+    truth_w_QE = new TH1D("truth_w_QE","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    truth_w_QE->GetXaxis()->SetTitle("W [GeV]");
+    truth_w_QE->GetYaxis()->SetTitle("N(Events)");
  
-    mc_w_RES_1232 = new TH1D("mc_w_RES_1232","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_RES_1232->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_RES_1232->GetYaxis()->SetTitle("N(Events)");
+    truth_w_RES_1232 = new TH1D("truth_w_RES_1232","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    truth_w_RES_1232->GetXaxis()->SetTitle("W [GeV]");
+    truth_w_RES_1232->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_RES_1535 = new TH1D("mc_w_RES_1535","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_RES_1535->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_RES_1535->GetYaxis()->SetTitle("N(Events)");
+    truth_w_RES_1535 = new TH1D("truth_w_RES_1535","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    truth_w_RES_1535->GetXaxis()->SetTitle("W [GeV]");
+    truth_w_RES_1535->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_RES_1520 = new TH1D("mc_w_RES_1520","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_RES_1520->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_RES_1520->GetYaxis()->SetTitle("N(Events)");
+    truth_w_RES_1520 = new TH1D("truth_w_RES_1520","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    truth_w_RES_1520->GetXaxis()->SetTitle("W [GeV]");
+    truth_w_RES_1520->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_RES_Other = new TH1D("mc_w_RES_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_RES_Other->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_RES_Other->GetYaxis()->SetTitle("N(Events)");
+    truth_w_RES_Other = new TH1D("truth_w_RES_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    truth_w_RES_Other->GetXaxis()->SetTitle("W [GeV]");
+    truth_w_RES_Other->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_DIS_1_pi = new TH1D("mc_w_DIS_1_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_DIS_1_pi->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_DIS_1_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_w_DIS = new TH1D("truth_w_DIS","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    truth_w_DIS->GetXaxis()->SetTitle("W [GeV]");
+    truth_w_DIS->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_DIS_2_pi = new TH1D("mc_w_DIS_2_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_DIS_2_pi->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_DIS_2_pi->GetYaxis()->SetTitle("N(Events)");
+    truth_w_Non_RES = new TH1D("truth_w_Non_RES","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    truth_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
+    truth_w_Non_RES->GetYaxis()->SetTitle("N(Events)");
 
-    mc_w_DIS_Multi_pi = new TH1D("mc_w_DIS_Multi_pi","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_DIS_Multi_pi->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_DIS_Multi_pi->GetYaxis()->SetTitle("N(Events)");
-
-    mc_w_Non_RES = new TH1D("mc_w_Non_RES","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
-    mc_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
-    mc_w_Non_RES->GetYaxis()->SetTitle("N(Events)");
+    truth_w_2p2h = new TH1D("truth_w_2p2h","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
+    truth_w_2p2h->GetXaxis()->SetTitle("W [GeV]");
+    truth_w_2p2h->GetYaxis()->SetTitle("N(Events)");
 
 }
 
@@ -836,9 +873,11 @@ void CCProtonPi0_TruthAnalyzer::FillHistogram(MnvH1D* hist, double var)
     if (fillErrors_ByHand){
         FillVertErrorBand_Flux_ByHand(hist, var);
         FillVertErrorBand_Genie_ByHand(hist, var);
+        FillVertErrorBand_2p2h_ByHand(hist, var);
     }else{
         FillVertErrorBand_Flux(hist, var);
         FillVertErrorBand_Genie(hist, var);
+        FillVertErrorBand_2p2h(hist, var);
     }
 }
 
@@ -892,19 +931,11 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
     h->FillVertErrorBand("GENIE_Rvp2pi"            ,var, truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           , cvweight);
     h->FillVertErrorBand("GENIE_VecFFCCQEshape"    ,var, truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   , cvweight);
 
-    if(applyGENIETuning){ 
-        h->FillVertErrorBand("GENIE_Theta_Delta2Npi"   ,var, updated_genie_wgt_Theta_Delta2Npi[2]  , updated_genie_wgt_Theta_Delta2Npi[4]  , cvweight);
-        h->FillVertErrorBand("GENIE_MaRES"             ,var, updated_genie_wgt_MaRES[2]            , updated_genie_wgt_MaRES[4]            , cvweight);
-        h->FillVertErrorBand("GENIE_MvRES"             ,var, updated_genie_wgt_MvRES[2]            , updated_genie_wgt_MvRES[4]            , cvweight);
-        h->FillVertErrorBand("GENIE_Rvn1pi"            ,var, updated_genie_wgt_Rvn1pi[2]           , updated_genie_wgt_Rvn1pi[4]           , cvweight);
-        h->FillVertErrorBand("GENIE_Rvp1pi"            ,var, updated_genie_wgt_Rvp1pi[2]           , updated_genie_wgt_Rvp1pi[4]           , cvweight);
-    }else{
-        h->FillVertErrorBand("GENIE_Theta_Delta2Npi"   ,var, truth_genie_wgt_Theta_Delta2Npi[2]  , truth_genie_wgt_Theta_Delta2Npi[4]  , cvweight);
-        h->FillVertErrorBand("GENIE_MaRES"             ,var, truth_genie_wgt_MaRES[2]            , truth_genie_wgt_MaRES[4]            , cvweight);
-        h->FillVertErrorBand("GENIE_MvRES"             ,var, truth_genie_wgt_MvRES[2]            , truth_genie_wgt_MvRES[4]            , cvweight);
-        h->FillVertErrorBand("GENIE_Rvn1pi"            ,var, truth_genie_wgt_Rvn1pi[2]           , truth_genie_wgt_Rvn1pi[4]           , cvweight);
-        h->FillVertErrorBand("GENIE_Rvp1pi"            ,var, truth_genie_wgt_Rvp1pi[2]           , truth_genie_wgt_Rvp1pi[4]           , cvweight);
-    }
+    h->FillVertErrorBand("GENIE_Theta_Delta2Npi"   ,var, updated_genie_wgt_Theta_Delta2Npi[2]  , updated_genie_wgt_Theta_Delta2Npi[4]  , cvweight);
+    h->FillVertErrorBand("GENIE_MaRES"             ,var, updated_genie_wgt_MaRES[2]            , updated_genie_wgt_MaRES[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_MvRES"             ,var, updated_genie_wgt_MvRES[2]            , updated_genie_wgt_MvRES[4]            , cvweight);
+    h->FillVertErrorBand("GENIE_Rvn1pi"            ,var, updated_genie_wgt_Rvn1pi[2]           , updated_genie_wgt_Rvn1pi[4]           , cvweight);
+    h->FillVertErrorBand("GENIE_Rvp1pi"            ,var, updated_genie_wgt_Rvp1pi[2]           , updated_genie_wgt_Rvp1pi[4]           , cvweight);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie_ByHand(MnvH1D* h, double var)
@@ -940,19 +971,11 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie_ByHand(MnvH1D* h, double
     FillVertErrorBand_ByHand(h, var, "GENIE_Rvp2pi"            , truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           );
     FillVertErrorBand_ByHand(h, var, "GENIE_VecFFCCQEshape"    , truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   );
 
-    if (applyGENIETuning){
-        FillVertErrorBand_ByHand(h, var, "GENIE_Theta_Delta2Npi"   , updated_genie_wgt_Theta_Delta2Npi[2]  , updated_genie_wgt_Theta_Delta2Npi[4]  );
-        FillVertErrorBand_ByHand(h, var, "GENIE_MaRES"             , updated_genie_wgt_MaRES[2]            , updated_genie_wgt_MaRES[4]            );
-        FillVertErrorBand_ByHand(h, var, "GENIE_MvRES"             , updated_genie_wgt_MvRES[2]            , updated_genie_wgt_MvRES[4]            );
-        FillVertErrorBand_ByHand(h, var, "GENIE_Rvn1pi"            , updated_genie_wgt_Rvn1pi[2]           , updated_genie_wgt_Rvn1pi[4]           );
-        FillVertErrorBand_ByHand(h, var, "GENIE_Rvp1pi"            , updated_genie_wgt_Rvp1pi[2]           , updated_genie_wgt_Rvp1pi[4]           );
-    }else{
-        FillVertErrorBand_ByHand(h, var, "GENIE_Theta_Delta2Npi"   , truth_genie_wgt_Theta_Delta2Npi[2]  , truth_genie_wgt_Theta_Delta2Npi[4]  );
-        FillVertErrorBand_ByHand(h, var, "GENIE_MaRES"             , truth_genie_wgt_MaRES[2]            , truth_genie_wgt_MaRES[4]            );
-        FillVertErrorBand_ByHand(h, var, "GENIE_MvRES"             , truth_genie_wgt_MvRES[2]            , truth_genie_wgt_MvRES[4]            );
-        FillVertErrorBand_ByHand(h, var, "GENIE_Rvn1pi"            , truth_genie_wgt_Rvn1pi[2]           , truth_genie_wgt_Rvn1pi[4]           );
-        FillVertErrorBand_ByHand(h, var, "GENIE_Rvp1pi"            , truth_genie_wgt_Rvp1pi[2]           , truth_genie_wgt_Rvp1pi[4]           );
-    }
+    FillVertErrorBand_ByHand(h, var, "GENIE_Theta_Delta2Npi"   , updated_genie_wgt_Theta_Delta2Npi[2]  , updated_genie_wgt_Theta_Delta2Npi[4]  );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MaRES"             , updated_genie_wgt_MaRES[2]            , updated_genie_wgt_MaRES[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_MvRES"             , updated_genie_wgt_MvRES[2]            , updated_genie_wgt_MvRES[4]            );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Rvn1pi"            , updated_genie_wgt_Rvn1pi[2]           , updated_genie_wgt_Rvn1pi[4]           );
+    FillVertErrorBand_ByHand(h, var, "GENIE_Rvp1pi"            , updated_genie_wgt_Rvp1pi[2]           , updated_genie_wgt_Rvp1pi[4]           );
 }
 
 void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, double err_down, double err_up)
@@ -1004,10 +1027,11 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_ByHand(MnvH1D* h, double var, 
 
 void CCProtonPi0_TruthAnalyzer::CalcEventWeight()
 {
-    UpdateFluxReweighter(mc_run); 
+    UpdateFluxReweighter(mc_run, mc_intType); 
 
     // Reset cvweight
     cvweight = 1.0;
+    cvweight_2p2h = 1.0;
     cvweight_Delta = 1.0;
     cvweight_CCRES = 1.0;
     cvweight_NonRes1pi = 1.0;
@@ -1015,18 +1039,31 @@ void CCProtonPi0_TruthAnalyzer::CalcEventWeight()
     // Replace cvweight with Flux Weight
     cvweight = GetFluxWeight(mc_incomingE * MeV_to_GeV, mc_incoming);
 
-    if (applyGENIETuning){
+    // 2p2h Event Weights
+    if ( IsEvent2p2h(mc_intType) ){
+        cvweight_2p2h = Get_2p2h_wgt(mc_incomingPartVec, mc_primFSLepton, fit_2p2h_CV) * POT_ratio_2p2h;
+        cvweight *= cvweight_2p2h;
+        // Calc 2p2h Uncertainty 
+        Get2p2hErr();
+    }else{
+        // 2p2h Uncertainty is 0.0 for other events 
+        err_2p2h = 0.0;
+    }
+
+    if (applyGENIETuning_Delta){
         // Delta decay non-isotropy weighting per DocDB 9850.  Weight is 1.0 for non-delta resonance interactions.
         cvweight_Delta *= ( 1.0 + truth_genie_wgt_Theta_Delta2Npi[4] ) / 2.0;
         cvweight *= cvweight_Delta;
+    }
 
+    if (applyGENIETuning_NonRes){
         // NonRES 1pi constraint
         cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvn1pi[2] - 1); // From Phil R.
         cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvp1pi[2] - 1); // From Phil R.
         cvweight *= cvweight_NonRes1pi;
-
-        UpdateGENIESystematics();
     }
+    
+    UpdateGENIESystematics();
 }
 
 void CCProtonPi0_TruthAnalyzer::AddOtherErrorBands_FillWithCV()
@@ -1130,7 +1167,7 @@ void CCProtonPi0_TruthAnalyzer::FillSignal_Test()
         logFile<<std::endl;
     }
     logFile<<std::endl;
-    std::cout<<std::endl;
+    logFile<<std::endl;
 }
 
 void CCProtonPi0_TruthAnalyzer::FillSignal_XSec_Variables_IntType(int type)
@@ -1184,55 +1221,47 @@ void CCProtonPi0_TruthAnalyzer::FillSignal_XSec_Variables()
 void CCProtonPi0_TruthAnalyzer::FillSignal_InteractionType()
 {
     if (mc_intType == 1){
-        nQE.increment();
-        FillHistogram(mc_Q2_QE, truth_QSq_exp * MeVSq_to_GeVSq);
-        FillHistogram(mc_incomingE_QE, mc_incomingE * MeV_to_GeV);
-        FillHistogram(mc_w_QE, truth_W_exp * MeV_to_GeV);
+        nQE.increment(cvweight);
+        FillHistogram(truth_QSq_QE, truth_QSq_exp * MeVSq_to_GeVSq);
+        FillHistogram(truth_Enu_QE, mc_incomingE * MeV_to_GeV);
+        FillHistogram(truth_w_QE, truth_W_exp * MeV_to_GeV);
     }else if (mc_intType == 2){
         if (mc_resID == 0){ 
-            nRES_1232.increment(); 
-            FillHistogram(mc_Q2_RES_1232, truth_QSq_exp * MeVSq_to_GeVSq);
-            FillHistogram(mc_incomingE_RES_1232, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_RES_1232, truth_W_exp * MeV_to_GeV);
+            nRES_1232.increment(cvweight); 
+            FillHistogram(truth_QSq_RES_1232, truth_QSq_exp * MeVSq_to_GeVSq);
+            FillHistogram(truth_Enu_RES_1232, mc_incomingE * MeV_to_GeV);
+            FillHistogram(truth_w_RES_1232, truth_W_exp * MeV_to_GeV);
         }else if (mc_resID == 1){
-            nRES_1535.increment(); 
-            FillHistogram(mc_Q2_RES_1535, truth_QSq_exp * MeVSq_to_GeVSq);
-            FillHistogram(mc_incomingE_RES_1535, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_RES_1535, truth_W_exp * MeV_to_GeV);
+            nRES_1535.increment(cvweight); 
+            FillHistogram(truth_QSq_RES_1535, truth_QSq_exp * MeVSq_to_GeVSq);
+            FillHistogram(truth_Enu_RES_1535, mc_incomingE * MeV_to_GeV);
+            FillHistogram(truth_w_RES_1535, truth_W_exp * MeV_to_GeV);
         }else if (mc_resID == 2){
-            nRES_1520.increment(); 
-            FillHistogram(mc_Q2_RES_1520, truth_QSq_exp * MeVSq_to_GeVSq);
-            FillHistogram(mc_incomingE_RES_1520, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_RES_1520, truth_W_exp * MeV_to_GeV);
+            nRES_1520.increment(cvweight); 
+            FillHistogram(truth_QSq_RES_1520, truth_QSq_exp * MeVSq_to_GeVSq);
+            FillHistogram(truth_Enu_RES_1520, mc_incomingE * MeV_to_GeV);
+            FillHistogram(truth_w_RES_1520, truth_W_exp * MeV_to_GeV);
         }else{
-            nRES_Other.increment(); 
-            FillHistogram(mc_Q2_RES_Other, truth_QSq_exp * MeVSq_to_GeVSq);
-            FillHistogram(mc_incomingE_RES_Other, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_RES_Other, truth_W_exp * MeV_to_GeV);
+            nRES_Other.increment(cvweight); 
+            FillHistogram(truth_QSq_RES_Other, truth_QSq_exp * MeVSq_to_GeVSq);
+            FillHistogram(truth_Enu_RES_Other, mc_incomingE * MeV_to_GeV);
+            FillHistogram(truth_w_RES_Other, truth_W_exp * MeV_to_GeV);
         }
+    }else if ( IsGenieNonRES() ){
+        nNon_RES.increment(cvweight);
+        FillHistogram(truth_QSq_Non_RES, truth_QSq_exp * MeVSq_to_GeVSq);
+        FillHistogram(truth_Enu_Non_RES, mc_incomingE * MeV_to_GeV);
+        FillHistogram(truth_w_Non_RES, truth_W_exp * MeV_to_GeV);
     }else if (mc_intType == 3){
-        int nFS_pions = Get_nFS_pions();
-        if (mc_w*MeV_to_GeV < 1.7 ){
-            nNon_RES.increment();
-            FillHistogram(mc_Q2_Non_RES, truth_QSq_exp * MeVSq_to_GeVSq);
-            FillHistogram(mc_incomingE_Non_RES, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_Non_RES, truth_W_exp * MeV_to_GeV);
-        }else if (nFS_pions == 1){
-            nDIS_1_pi.increment();
-            FillHistogram(mc_Q2_DIS_1_pi, truth_QSq_exp * MeVSq_to_GeVSq);
-            FillHistogram(mc_incomingE_DIS_1_pi, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_DIS_1_pi, truth_W_exp * MeV_to_GeV);
-        }else if (nFS_pions == 2){
-            nDIS_2_pi.increment();
-            FillHistogram(mc_Q2_DIS_2_pi, truth_QSq_exp * MeVSq_to_GeVSq);
-            FillHistogram(mc_incomingE_DIS_2_pi, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_DIS_2_pi, truth_W_exp * MeV_to_GeV);
-        }else if (nFS_pions > 2){
-            nDIS_Multi_pi.increment();
-            FillHistogram(mc_Q2_DIS_Multi_pi, truth_QSq_exp * MeVSq_to_GeVSq);
-            FillHistogram(mc_incomingE_DIS_Multi_pi, mc_incomingE * MeV_to_GeV);
-            FillHistogram(mc_w_DIS_Multi_pi, truth_W_exp * MeV_to_GeV);
-        }
+        nDIS.increment(cvweight);
+        FillHistogram(truth_QSq_DIS, truth_QSq_exp * MeVSq_to_GeVSq);
+        FillHistogram(truth_Enu_DIS, mc_incomingE * MeV_to_GeV);
+        FillHistogram(truth_w_DIS, truth_W_exp * MeV_to_GeV);
+    }else if ( IsEvent2p2h(mc_intType) ){
+        n2p2h.increment(cvweight);
+        FillHistogram(truth_QSq_2p2h, truth_QSq_exp * MeVSq_to_GeVSq);
+        FillHistogram(truth_Enu_2p2h, mc_incomingE * MeV_to_GeV);
+        FillHistogram(truth_w_2p2h, truth_W_exp * MeV_to_GeV);
     }else{
         std::cout<<"WARNING! Signal Event with different interaction Type!"<<std::endl;
     }
@@ -1298,6 +1327,18 @@ bool CCProtonPi0_TruthAnalyzer::IsGenieCCRes()
     return mc_current == 1 && mc_intType == 2;
 }
 
+bool CCProtonPi0_TruthAnalyzer::IsGenieNonRES()
+{
+    // NonRES 1pi 
+    if ( IsGenieRvn1pi() || IsGenieRvp1pi() ) return true;
+
+    // NonRES 2pi
+    if ( truth_genie_wgt_Rvn2pi[2] != 1 || truth_genie_wgt_Rvp2pi[2] != 1) return true;
+
+    return false;
+}
+
+
 bool CCProtonPi0_TruthAnalyzer::IsGenieRvn1pi()
 {
     // Weight is NOT equal to 1 for Rvn1pi events
@@ -1331,9 +1372,11 @@ void CCProtonPi0_TruthAnalyzer::UpdateGENIESystematics()
     // ------------------------------------------------------------------------
     // Now Overwrite them with updated values
     // ------------------------------------------------------------------------
-    // Delta decay non-isotropy weights per DocDB 9850
-    updated_genie_wgt_Theta_Delta2Npi[2] = 2.0 / (1.0 + truth_genie_wgt_Theta_Delta2Npi[4]);
-    updated_genie_wgt_Theta_Delta2Npi[4] = 2.0 * truth_genie_wgt_Theta_Delta2Npi[4] / ( 1.0 + truth_genie_wgt_Theta_Delta2Npi[4]); 
+    if (reduce_err_Delta){
+        // Delta decay non-isotropy weights per DocDB 9850
+        updated_genie_wgt_Theta_Delta2Npi[2] = 2.0 / (1.0 + truth_genie_wgt_Theta_Delta2Npi[4]);
+        updated_genie_wgt_Theta_Delta2Npi[4] = 2.0 * truth_genie_wgt_Theta_Delta2Npi[4] / ( 1.0 + truth_genie_wgt_Theta_Delta2Npi[4]); 
+    }
 
     // CC Resonance errors from deuterium and electroproduction data fits
     // MaRES and MvRES errors controlled together
@@ -1378,10 +1421,14 @@ void CCProtonPi0_TruthAnalyzer::UpdateGENIESystematics()
 void CCProtonPi0_TruthAnalyzer::FillGENIE_Tuning()
 {
     FillHistogram(CV_weight, cvweight);
+    FillHistogram(CV_weight_2p2h, cvweight_2p2h);
     FillHistogram(CV_weight_Delta, cvweight_Delta);
     FillHistogram(CV_weight_CCRES, cvweight_CCRES);
     FillHistogram(CV_weight_NonRes1pi, cvweight_NonRes1pi);
 
+    FillHistogram(h_err_2p2h, 1-err_2p2h);
+    FillHistogram(h_err_2p2h, 1+err_2p2h);
+    
     FillHistogram(genie_wgt_Theta_Delta2Npi, truth_genie_wgt_Theta_Delta2Npi[2]);
     FillHistogram(genie_wgt_Theta_Delta2Npi, truth_genie_wgt_Theta_Delta2Npi[4]);
 
@@ -1405,6 +1452,37 @@ void CCProtonPi0_TruthAnalyzer::FillGENIE_Tuning()
 
     FillHistogram(updated_wgt_Rvn1pi, updated_genie_wgt_Rvn1pi[2]);
     FillHistogram(updated_wgt_Rvn1pi, updated_genie_wgt_Rvn1pi[4]);
+}
+
+void CCProtonPi0_TruthAnalyzer::Get2p2hErr()
+{
+    // Get weights using different fits
+    double wgt_cv = Get_2p2h_wgt(mc_incomingPartVec, mc_primFSLepton, fit_2p2h_CV);  
+    double wgt_np = Get_2p2h_wgt(mc_incomingPartVec, mc_primFSLepton, fit_2p2h_np);  
+    double wgt_nn = Get_2p2h_wgt(mc_incomingPartVec, mc_primFSLepton, fit_2p2h_nn);  
+
+    // Calculate differences
+    double err_np = (wgt_np - wgt_cv) / wgt_cv;
+    double err_nn = (wgt_nn - wgt_cv) / wgt_cv;
+
+    // Make sure 0 is 0
+    err_np = err_np < EPSILON ? 0.0 : err_np;
+    err_nn = err_nn < EPSILON ? 0.0 : err_np;
+
+    // Get the average difference
+    err_2p2h = (err_np + err_nn) / 2.0;
+}
+
+void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_2p2h(MnvH1D* h, double var)
+{
+    double correctionErr = err_2p2h;
+    h->FillVertErrorBand("2p2h", var, 1-correctionErr, 1+correctionErr, cvweight);
+}
+
+void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_2p2h_ByHand(MnvH1D* h, double var)
+{
+    double correctionErr = err_2p2h;
+    FillVertErrorBand_ByHand(h, var, "2p2h", 1-correctionErr, 1+correctionErr);
 }
 
 void CCProtonPi0_TruthAnalyzer::writeHistograms()
@@ -1461,9 +1539,11 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
 
     for (int i = 0; i < nHistograms; i++){
         CV_weight[i]->Write();
+        CV_weight_2p2h[i]->Write();
         CV_weight_Delta[i]->Write();
         CV_weight_CCRES[i]->Write();
         CV_weight_NonRes1pi[i]->Write();
+        h_err_2p2h[i]->Write();
         genie_wgt_Theta_Delta2Npi[i]->Write();
         updated_wgt_Theta_Delta2Npi[i]->Write();
         genie_wgt_MaRES[i]->Write();
@@ -1475,40 +1555,37 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     }
 
     // Signal Q2
-    mc_Q2_QE->Write();
-    mc_Q2_RES_1232->Write();
-    mc_Q2_RES_1535->Write();
-    mc_Q2_RES_1520->Write();
-    mc_Q2_RES_Other->Write();
+    truth_QSq_QE->Write();
+    truth_QSq_RES_1232->Write();
+    truth_QSq_RES_1535->Write();
+    truth_QSq_RES_1520->Write();
+    truth_QSq_RES_Other->Write();
    
-    mc_Q2_DIS_1_pi->Write();
-    mc_Q2_DIS_2_pi->Write();
-    mc_Q2_DIS_Multi_pi->Write();
-    mc_Q2_Non_RES->Write();
+    truth_QSq_DIS->Write();
+    truth_QSq_Non_RES->Write();
+    truth_QSq_2p2h->Write();
  
     // Signal incomingE
-    mc_incomingE_QE->Write();
-    mc_incomingE_RES_1232->Write();
-    mc_incomingE_RES_1535->Write();
-    mc_incomingE_RES_1520->Write();
-    mc_incomingE_RES_Other->Write();
+    truth_Enu_QE->Write();
+    truth_Enu_RES_1232->Write();
+    truth_Enu_RES_1535->Write();
+    truth_Enu_RES_1520->Write();
+    truth_Enu_RES_Other->Write();
    
-    mc_incomingE_DIS_1_pi->Write();
-    mc_incomingE_DIS_2_pi->Write();
-    mc_incomingE_DIS_Multi_pi->Write();
-    mc_incomingE_Non_RES->Write();
+    truth_Enu_DIS->Write();
+    truth_Enu_Non_RES->Write();
+    truth_Enu_2p2h->Write();
  
     // Signal w
-    mc_w_QE->Write();
-    mc_w_RES_1232->Write();
-    mc_w_RES_1535->Write();
-    mc_w_RES_1520->Write();
-    mc_w_RES_Other->Write();
+    truth_w_QE->Write();
+    truth_w_RES_1232->Write();
+    truth_w_RES_1535->Write();
+    truth_w_RES_1520->Write();
+    truth_w_RES_Other->Write();
    
-    mc_w_DIS_1_pi->Write();
-    mc_w_DIS_2_pi->Write();
-    mc_w_DIS_Multi_pi->Write();
-    mc_w_Non_RES->Write();
+    truth_w_DIS->Write();
+    truth_w_Non_RES->Write();
+    truth_w_2p2h->Write();
   
     f->Close();
 }
