@@ -400,12 +400,18 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     TLatex text;
     text.SetNDC();
     text.SetTextSize(0.03);
+//
+//    int ndf;
+//    double chiSq = plotter->Chi2DataMC( tempData, tempMC, ndf, mc_ratio);
+//    char *chiSq_text = Form("#chi^{2}/ndf = %3.2f/%d = %3.2f", chiSq, ndf, chiSq/(double)ndf); 
+//
+//    text.DrawLatex(0.20,0.87,chiSq_text);
 
-    int ndf;
-    double chiSq = plotter->Chi2DataMC( tempData, tempMC, ndf, mc_ratio);
-    char *chiSq_text = Form("#chi^{2}/ndf = %3.2f/%d = %3.2f", chiSq, ndf, chiSq/(double)ndf); 
-
-    text.DrawLatex(0.20,0.87,chiSq_text);
+    tempMC->Scale(mc_ratio);
+    double area_data = tempData->Integral("width");
+    double area_mc = tempMC->Integral("width");
+    char *area_text = Form("Area(Data/MC) = %3.2f", area_data/area_mc); 
+    text.DrawLatex(0.20,0.87,area_text);
 
     // Add Error Explanation Text
     std::string data_err_text = "Data: inner errors statistical";
@@ -429,7 +435,7 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     TH1D* h_data = new TH1D(tempData->GetCVHistoWithStatError());
     TH1D* h_mc_total = new TH1D(tempMC->GetCVHistoWithStatError());
     // Scale Histograms
-    h_mc_total->Scale(mc_ratio);
+    //h_mc_total->Scale(mc_ratio);
 
     TH1D* h_data_mc_ratio = new TH1D(*h_data);
     h_data_mc_ratio->Divide(h_mc_total); 
@@ -513,11 +519,18 @@ void CCProtonPi0_Plotter::DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGr
     gStyle->SetEndErrorSize(6);
     plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "N", false, NULL, NULL, false, true);
 
-    otherData->SetMarkerColor(4);
-    otherData->SetMarkerSize(1.5);
-    otherData->SetMarkerStyle(21);
+    // Draw With Blue Square Markers
+    //otherData->SetMarkerColor(4);
+    //otherData->SetMarkerSize(1.5);
+    //otherData->SetMarkerStyle(21);
 
-    otherData->Draw("SAMEP");
+    //otherData->Draw("SAMEP");
+
+    // Draw With Blue Line 
+    otherData->SetLineColor(4);
+    otherData->SetLineWidth(2);
+
+    otherData->Draw("SAMEL");
 
     // ------------------------------------------------------------------------
     // Plot Labels 
@@ -1151,7 +1164,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     var = Form("%s_%d",var_name.c_str(),2);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Background");
-
+    
     // Get Stats
     double nBckg = temp->GetEntries(); 
     max_bin = temp->GetMaximumBin();
@@ -1251,7 +1264,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgType(rootDir &dir, std::string var_n
     ApplyStyle(plotter);
     //plotter->axis_minimum = 0.1;
     plotter->axis_minimum = 0.0;
-    plotter->DrawStackedMC(mc_hists,1,"TR",3);
+    plotter->DrawStackedMC(mc_hists,1,"TR",0);
 
     // Add Pi0 InvMass Line
     std::size_t found = var_name.find("invMass");
@@ -1536,10 +1549,21 @@ double CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_
     mc_hists->Add(temp);
     area_mc += temp->Integral();
 
+//    // Get Bckg: 2p2h 
+//    var = Form("%s_%d",var_name.c_str(),10);
+//    temp = (MnvH1D*)f_mc->Get(var.c_str());
+//    temp->SetTitle("Bckg: 2p2h");
+//    max_bin = temp->GetMaximumBin();
+//    hist_max = hist_max + temp->GetBinContent(max_bin);
+//    temp->SetLineColor(kBlack);
+//    temp->SetFillColor(kBlack);
+//    mc_hists->Add(temp);
+//    area_mc += temp->Integral();
+
     // Get Bckg: SinglePiPlus
     var = Form("%s_%d",var_name.c_str(),5);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Bckg: 1#pi^{+}");
+    temp->SetTitle("Bckg: #pi^{#pm}");
     max_bin = temp->GetMaximumBin();
     hist_max = hist_max + temp->GetBinContent(max_bin);
     temp->SetLineColor(kBlue);
@@ -1557,6 +1581,7 @@ double CCProtonPi0_Plotter::FormTObjArray_BckgType(TFile* f_mc, std::string var_
     temp->SetFillColor(kGray);
     mc_hists->Add(temp);
     area_mc += temp->Integral();
+
 
     return area_mc;
 }
@@ -1830,6 +1855,153 @@ TH1D* CCProtonPi0_Plotter::GetBinNormalizedTH1D(MnvH1D* hist, bool WithSystError
     }
     delete tempHist;
     return h;
+}
+
+void CCProtonPi0_Plotter::DrawDataStackedMC_WithSignalTypes(rootDir &dir, std::string var_name, std::string plotDir)
+{
+    std::string var;
+
+    double mc_ratio = POT_ratio;
+
+    // Open ROOT Files
+    TFile* f_data = new TFile(dir.data.c_str());
+    TFile* f_mc = new TFile(dir.mc.c_str());
+
+    // Get Data Histogram
+    var = var_name + "_0";
+    TH1D* h_data = GetBinNormalizedTH1D(GetMnvH1D(f_data,var)); 
+    h_data->SetMarkerStyle(20);
+    h_data->SetMarkerSize(1);
+    h_data->SetMarkerColor(kBlack);
+    h_data->SetLineWidth(2);
+    h_data->SetLineColor(kBlack);
+
+    // Get Signal: Delta RES
+    var = var_name + "_7";
+    TH1D* h_signal_delta_res = GetBinNormalizedTH1D(GetMnvH1D(f_mc,var));
+    h_signal_delta_res->Scale(mc_ratio);
+    h_signal_delta_res->SetLineWidth(1);
+    h_signal_delta_res->SetLineColor(kGreen);
+    h_signal_delta_res->SetFillColor(kGreen);
+    h_signal_delta_res->SetFillStyle(3001);
+
+    // Get Signal: Other RES
+    var = var_name + "_8";
+    TH1D* h_signal_other_res = GetBinNormalizedTH1D(GetMnvH1D(f_mc,var));
+    h_signal_other_res->Scale(mc_ratio);
+    h_signal_other_res->SetLineWidth(1);
+    h_signal_other_res->SetLineColor(kGreen+2);
+    h_signal_other_res->SetFillColor(kGreen+2);
+    h_signal_other_res->SetFillStyle(3001);
+
+    // Get Signal: Non-RES
+    var = var_name + "_9";
+    TH1D* h_signal_non_res = GetBinNormalizedTH1D(GetMnvH1D(f_mc,var));
+    h_signal_non_res->Scale(mc_ratio);
+    h_signal_non_res->SetLineWidth(1);
+    h_signal_non_res->SetLineColor(kGreen+4);
+    h_signal_non_res->SetFillColor(kGreen+4);
+    h_signal_non_res->SetFillStyle(3001);
+  
+    // Get Background: With Pi0
+    var = var_name + "_3";
+    TH1D* h_bckg_with_pi0 = GetBinNormalizedTH1D(GetMnvH1D(f_mc,var));
+    h_bckg_with_pi0->Scale(mc_ratio);
+    h_bckg_with_pi0->SetLineWidth(1);
+    h_bckg_with_pi0->SetLineColor(kRed);
+    h_bckg_with_pi0->SetFillColor(kRed);
+    h_bckg_with_pi0->SetFillStyle(3001);
+
+    // Get Background: QELike 
+    var = var_name + "_4";
+    TH1D* h_bckg_qelike = GetBinNormalizedTH1D(GetMnvH1D(f_mc,var));
+    h_bckg_qelike->Scale(mc_ratio);
+    h_bckg_qelike->SetLineWidth(1);
+    h_bckg_qelike->SetLineColor(kOrange);
+    h_bckg_qelike->SetFillColor(kOrange);
+    h_bckg_qelike->SetFillStyle(3001);
+
+    // Get Background: With PiPlus 
+    var = var_name + "_5";
+    TH1D* h_bckg_piplus = GetBinNormalizedTH1D(GetMnvH1D(f_mc,var));
+    h_bckg_piplus->Scale(mc_ratio);
+    h_bckg_piplus->SetLineWidth(1);
+    h_bckg_piplus->SetLineColor(kBlue);
+    h_bckg_piplus->SetFillColor(kBlue);
+    h_bckg_piplus->SetFillStyle(3001);
+
+    // Get Background: With PiPlus 
+    var = var_name + "_6";
+    TH1D* h_bckg_other = GetBinNormalizedTH1D(GetMnvH1D(f_mc,var));
+    h_bckg_other->Scale(mc_ratio);
+    h_bckg_other->SetLineWidth(1);
+    h_bckg_other->SetLineColor(kGray);
+    h_bckg_other->SetFillColor(kGray);
+    h_bckg_other->SetFillStyle(3001);
+
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    THStack *hs = new THStack("hs",var_name.c_str());
+    hs->Add(h_signal_delta_res);
+    hs->Add(h_signal_other_res);
+    hs->Add(h_signal_non_res);
+    hs->Add(h_bckg_with_pi0);
+    hs->Add(h_bckg_qelike);
+    hs->Add(h_bckg_piplus);
+    hs->Add(h_bckg_other);
+
+    double hs_max = hs->GetMaximum();
+    hs->SetMaximum(hs_max * 1.5);
+    hs->Draw("HIST");
+    hs->SetTitle(h_data->GetTitle());
+    hs->GetXaxis()->SetTitle(h_data->GetXaxis()->GetTitle());
+    hs->GetYaxis()->SetTitle(h_data->GetYaxis()->GetTitle());
+
+    h_data->Draw("SAME E1 X0");
+
+    // ------------------------------------------------------------------------
+    // Plot Labels 
+    // ------------------------------------------------------------------------
+    TLegend *legend = new TLegend(0.6,0.6,0.9,0.9);  
+    legend->AddEntry(h_data, "Data (3.33e20 POT)", "lep" );
+    legend->AddEntry(h_signal_delta_res, "Signal: #Delta Res","f");
+    legend->AddEntry(h_signal_other_res, "Signal: Other Res","f");
+    legend->AddEntry(h_signal_non_res, "Signal: Non-Res","f");
+    legend->AddEntry(h_bckg_with_pi0, "Bckg: #pi^{0} + X","f");
+    legend->AddEntry(h_bckg_qelike, "Bckg: QE Like","f");
+    legend->AddEntry(h_bckg_piplus, "Bckg: With Charged #pi","f");
+    legend->AddEntry(h_bckg_other, "Bckg: Other","f");
+    legend->Draw();
+
+    // Add Text
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+
+    text.DrawLatex(0.2, 0.85, "#color[4]{POT Normalized}");
+
+    std::size_t found = var_name.find("W");
+    if (found != std::string::npos){
+        TLine deltaMass;
+        deltaMass.SetLineWidth(3);
+        deltaMass.SetLineColor(kBlue);
+        deltaMass.DrawLine(1.232,0,1.232,hs_max * 1.2);
+    }
+
+    // Plot Output
+    gStyle->SetEndErrorSize(6);
+    gStyle->SetOptStat(0); 
+    c->Update();
+    std::string out_name;
+    out_name = plotDir + var_name + "_xsec_IntType" + ".png"; 
+
+    c->Print(out_name.c_str(),"png");
+
+    delete legend;
+    delete c;
+
+    delete f_data;
+    delete f_mc;
 }
 
 #endif

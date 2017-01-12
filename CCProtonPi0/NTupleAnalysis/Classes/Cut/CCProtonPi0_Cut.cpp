@@ -23,12 +23,12 @@ string CCProtonPi0_Cut::get_Name()
 	return name;
 }
 
-void CCProtonPi0_Cut::increment(bool isSignal, bool isStudy1_true, bool isStudy2_true)
+void CCProtonPi0_Cut::increment(bool isSignal, bool isStudy1_true, bool isStudy2_true, double wgt)
 {
-    nEvent.increment();
-    if(isSignal) nSignal.increment();
-    if(isStudy1_true) nStudy1.increment();
-    if(isStudy2_true) nStudy2.increment();
+    nEvent.increment(wgt);
+    if(isSignal) nSignal.increment(wgt);
+    if(isStudy1_true) nStudy1.increment(wgt);
+    if(isStudy2_true) nStudy2.increment(wgt);
 }
 
 

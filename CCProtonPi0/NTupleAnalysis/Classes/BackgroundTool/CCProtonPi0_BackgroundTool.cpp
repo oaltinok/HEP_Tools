@@ -59,30 +59,30 @@ void CCProtonPi0_BackgroundTool::initSingleBackground(vector<Background> &b, str
     }
 }
 
-void CCProtonPi0_BackgroundTool::updateBackground(Background &b, bool withMichel)
+void CCProtonPi0_BackgroundTool::updateBackground(Background &b, bool withMichel, double wgt)
 {
     // Increment Events with that Background
-    b.nAll++;
+    b.nAll = b.nAll + wgt;
 
     // Increment Events with Michel
-    if(withMichel) b.nWithMichel++;
+    if(withMichel) b.nWithMichel = b.nWithMichel + wgt;
 }
 
 
-void CCProtonPi0_BackgroundTool::fillBackgroundCompact(bool WithPi0, bool QELike, bool SinglePiPlus, bool Other)
+void CCProtonPi0_BackgroundTool::fillBackgroundCompact(bool WithPi0, bool QELike, bool SinglePiPlus, bool Other, double wgt)
 {
     // ----------------------------------------------------------------------------------
     // Fill Table 0 for Inclusive
     // ----------------------------------------------------------------------------------
     int ind = 0;
     // Update Total Background
-    updateBackground(bckg_compact_Total[ind]);
+    updateBackground(bckg_compact_Total[ind], false, wgt);
 
     // Update Each Background
-    if (WithPi0) updateBackground(bckg_compact_WithPi0[ind]);
-    else if (QELike) updateBackground(bckg_compact_QELike[ind]);
-    else if (SinglePiPlus) updateBackground(bckg_compact_SinglePiPlus[ind]);
-    else if (Other) updateBackground(bckg_compact_Other[ind]);
+    if (WithPi0) updateBackground(bckg_compact_WithPi0[ind], false, wgt);
+    else if (QELike) updateBackground(bckg_compact_QELike[ind], false, wgt);
+    else if (SinglePiPlus) updateBackground(bckg_compact_SinglePiPlus[ind], false, wgt);
+    else if (Other) updateBackground(bckg_compact_Other[ind], false, wgt);
     else cout<<"WARNING! No BackgroundCompact Found"<<endl;
 
     // ----------------------------------------------------------------------------------
@@ -90,29 +90,29 @@ void CCProtonPi0_BackgroundTool::fillBackgroundCompact(bool WithPi0, bool QELike
     // ----------------------------------------------------------------------------------
     ind = nTracks;
     // Update Total Background
-    updateBackground(bckg_compact_Total[ind]);
+    updateBackground(bckg_compact_Total[ind], false, wgt);
 
     // Update Each Background
-    if (WithPi0) updateBackground(bckg_compact_WithPi0[ind]);
-    else if (QELike) updateBackground(bckg_compact_QELike[ind]);
-    else if (SinglePiPlus) updateBackground(bckg_compact_SinglePiPlus[ind]);
-    else if (Other) updateBackground(bckg_compact_Other[ind]);
+    if (WithPi0) updateBackground(bckg_compact_WithPi0[ind], false, wgt);
+    else if (QELike) updateBackground(bckg_compact_QELike[ind], false, wgt);
+    else if (SinglePiPlus) updateBackground(bckg_compact_SinglePiPlus[ind], false, wgt);
+    else if (Other) updateBackground(bckg_compact_Other[ind], false, wgt);
     else cout<<"WARNING! No BackgroundCompact Found"<<endl;
 }
 
-void CCProtonPi0_BackgroundTool::fillBackgroundWithPi0(bool NoPi0, bool SinglePi0, bool MultiPi0, bool withMichel)
+void CCProtonPi0_BackgroundTool::fillBackgroundWithPi0(bool NoPi0, bool SinglePi0, bool MultiPi0, bool withMichel, double wgt)
 {
     // ----------------------------------------------------------------------------------
     // Fill Table 0 for Inclusive
     // ----------------------------------------------------------------------------------
     int ind = 0;
     // Update Total Background
-    updateBackground(bckg_Total_WithPi0[ind],withMichel);
+    updateBackground(bckg_Total_WithPi0[ind],withMichel, wgt);
 
     // Update Each Background
-    if (NoPi0) updateBackground(bckg_NoPi0[ind],withMichel);
-    else if (SinglePi0) updateBackground(bckg_SinglePi0[ind],withMichel);
-    else if (MultiPi0) updateBackground(bckg_MultiPi0[ind],withMichel);
+    if (NoPi0) updateBackground(bckg_NoPi0[ind],withMichel, wgt);
+    else if (SinglePi0) updateBackground(bckg_SinglePi0[ind],withMichel, wgt);
+    else if (MultiPi0) updateBackground(bckg_MultiPi0[ind],withMichel, wgt);
     else cout<<"WARNING! No BackgroundWithPi0 Found"<<endl;
 
     // ----------------------------------------------------------------------------------
@@ -120,35 +120,35 @@ void CCProtonPi0_BackgroundTool::fillBackgroundWithPi0(bool NoPi0, bool SinglePi
     // ----------------------------------------------------------------------------------
     ind = nTracks;
     // Update Total Background
-    updateBackground(bckg_Total_WithPi0[ind],withMichel);
+    updateBackground(bckg_Total_WithPi0[ind],withMichel, wgt);
 
     // Update Each Background
-    if (NoPi0) updateBackground(bckg_NoPi0[ind],withMichel);
-    else if (SinglePi0) updateBackground(bckg_SinglePi0[ind],withMichel);
-    else if (MultiPi0) updateBackground(bckg_MultiPi0[ind],withMichel);
+    if (NoPi0) updateBackground(bckg_NoPi0[ind],withMichel, wgt);
+    else if (SinglePi0) updateBackground(bckg_SinglePi0[ind],withMichel, wgt);
+    else if (MultiPi0) updateBackground(bckg_MultiPi0[ind],withMichel, wgt);
     else cout<<"WARNING! No BackgroundWithPi0 Found"<<endl;
 }
 
-void CCProtonPi0_BackgroundTool::fillBackground(bool NC, bool AntiNeutrino, bool QELike, bool SingleChargedPion, bool SingleChargedPion_ChargeExchanged, bool DoublePionWithPi0, bool DoublePionWithoutPi0,  bool MultiPionWithPi0, bool MultiPionWithoutPi0, bool Other, bool withMichel)
+void CCProtonPi0_BackgroundTool::fillBackground(bool NC, bool AntiNeutrino, bool QELike, bool SingleChargedPion, bool SingleChargedPion_ChargeExchanged, bool DoublePionWithPi0, bool DoublePionWithoutPi0,  bool MultiPionWithPi0, bool MultiPionWithoutPi0, bool Other, bool withMichel, double wgt)
 {
     // ----------------------------------------------------------------------------------
     // Fill Table 0 for Inclusive
     // ----------------------------------------------------------------------------------
     int ind = 0;
     // Update Total Background
-    updateBackground(bckg_Total[ind],withMichel);
+    updateBackground(bckg_Total[ind],withMichel, wgt);
 
     // Update Each Background
-    if (NC) updateBackground(bckg_NC[ind],withMichel);
-    else if (AntiNeutrino) updateBackground(bckg_AntiNeutrino[ind],withMichel);
-    else if (QELike) updateBackground(bckg_QELike[ind],withMichel);
-    else if (SingleChargedPion) updateBackground(bckg_SingleChargedPion[ind],withMichel);
-    else if (SingleChargedPion_ChargeExchanged) updateBackground(bckg_SingleChargedPion_ChargeExchanged[ind],withMichel);
-    else if (DoublePionWithPi0) updateBackground(bckg_DoublePionWithPi0[ind],withMichel);
-    else if (DoublePionWithoutPi0) updateBackground(bckg_DoublePionWithoutPi0[ind],withMichel);
-    else if (MultiPionWithPi0) updateBackground(bckg_MultiPionWithPi0[ind],withMichel);
-    else if (MultiPionWithoutPi0) updateBackground(bckg_MultiPionWithoutPi0[ind],withMichel);
-    else if (Other) updateBackground(bckg_Other[ind],withMichel);
+    if (NC) updateBackground(bckg_NC[ind],withMichel, wgt);
+    else if (AntiNeutrino) updateBackground(bckg_AntiNeutrino[ind],withMichel, wgt);
+    else if (QELike) updateBackground(bckg_QELike[ind],withMichel, wgt);
+    else if (SingleChargedPion) updateBackground(bckg_SingleChargedPion[ind],withMichel, wgt);
+    else if (SingleChargedPion_ChargeExchanged) updateBackground(bckg_SingleChargedPion_ChargeExchanged[ind],withMichel, wgt);
+    else if (DoublePionWithPi0) updateBackground(bckg_DoublePionWithPi0[ind],withMichel, wgt);
+    else if (DoublePionWithoutPi0) updateBackground(bckg_DoublePionWithoutPi0[ind],withMichel, wgt);
+    else if (MultiPionWithPi0) updateBackground(bckg_MultiPionWithPi0[ind],withMichel, wgt);
+    else if (MultiPionWithoutPi0) updateBackground(bckg_MultiPionWithoutPi0[ind],withMichel, wgt);
+    else if (Other) updateBackground(bckg_Other[ind],withMichel, wgt);
     else cout<<"WARNING! No Background Type Found!"<<endl;
 
     // ----------------------------------------------------------------------------------
@@ -156,19 +156,19 @@ void CCProtonPi0_BackgroundTool::fillBackground(bool NC, bool AntiNeutrino, bool
     // ----------------------------------------------------------------------------------
     ind = nTracks;
     // Update Total Background
-    updateBackground(bckg_Total[ind],withMichel);
+    updateBackground(bckg_Total[ind],withMichel, wgt);
 
     // Update Each Background
-    if (NC) updateBackground(bckg_NC[ind],withMichel);
-    else if (AntiNeutrino) updateBackground(bckg_AntiNeutrino[ind],withMichel);
-    else if (QELike) updateBackground(bckg_QELike[ind],withMichel);
-    else if (SingleChargedPion) updateBackground(bckg_SingleChargedPion[ind],withMichel);
-    else if (SingleChargedPion_ChargeExchanged) updateBackground(bckg_SingleChargedPion_ChargeExchanged[ind],withMichel);
-    else if (DoublePionWithPi0) updateBackground(bckg_DoublePionWithPi0[ind],withMichel);
-    else if (DoublePionWithoutPi0) updateBackground(bckg_DoublePionWithoutPi0[ind],withMichel);
-    else if (MultiPionWithPi0) updateBackground(bckg_MultiPionWithPi0[ind],withMichel);
-    else if (MultiPionWithoutPi0) updateBackground(bckg_MultiPionWithoutPi0[ind],withMichel);
-    else if (Other) updateBackground(bckg_Other[ind],withMichel);
+    if (NC) updateBackground(bckg_NC[ind],withMichel, wgt);
+    else if (AntiNeutrino) updateBackground(bckg_AntiNeutrino[ind],withMichel, wgt);
+    else if (QELike) updateBackground(bckg_QELike[ind],withMichel, wgt);
+    else if (SingleChargedPion) updateBackground(bckg_SingleChargedPion[ind],withMichel, wgt);
+    else if (SingleChargedPion_ChargeExchanged) updateBackground(bckg_SingleChargedPion_ChargeExchanged[ind],withMichel, wgt);
+    else if (DoublePionWithPi0) updateBackground(bckg_DoublePionWithPi0[ind],withMichel, wgt);
+    else if (DoublePionWithoutPi0) updateBackground(bckg_DoublePionWithoutPi0[ind],withMichel, wgt);
+    else if (MultiPionWithPi0) updateBackground(bckg_MultiPionWithPi0[ind],withMichel, wgt);
+    else if (MultiPionWithoutPi0) updateBackground(bckg_MultiPionWithoutPi0[ind],withMichel, wgt);
+    else if (Other) updateBackground(bckg_Other[ind],withMichel, wgt);
     else cout<<"WARNING! No Background Type Found!"<<endl;
 }
 

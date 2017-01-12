@@ -8,7 +8,8 @@
 
 using namespace PlotUtils;
 
-CCProtonPi0_Interaction::CCProtonPi0_Interaction(bool isModeReduce, bool isMC) {
+CCProtonPi0_Interaction::CCProtonPi0_Interaction(bool isModeReduce, bool isMC) 
+{
     std::cout<<"Initializing CCProtonPi0_Interaction"<<std::endl;
     
     if(isModeReduce){
@@ -104,7 +105,6 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         updated_wgt_Rvn1pi.push_back(temp);
 
-
         temp = new MnvH1D( Form("%s_%d","Enu",i),"Reconstructed Beam Energy - All Events", binList.size_Enu, binList.a_Enu);
         temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - All Events [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
@@ -186,8 +186,8 @@ void CCProtonPi0_Interaction::initHistograms()
         vertex_evis_2Track.push_back(temp);
 
          
-        temp = new MnvH1D( Form("%s_%d","deltaInvMass",i),"Reconstructed #Delta^{+} Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed #Delta^{+} Inv. Mass [GeV]");
+        temp = new MnvH1D( Form("%s_%d","deltaInvMass",i),"Reconstructed p#pi^{0} Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
+        temp->GetXaxis()->SetTitle("Reconstructed p#pi^{0} Inv. Mass [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV] ",binList.deltaInvMass.get_width()));
         deltaInvMass.push_back(temp);
 
@@ -242,6 +242,41 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("Total Extra Energy [MeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
         extra_total_energy_2Track.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","W_p_pi0",i),"Reconstructed p#pi^{0} Invariant Mass",30,0.5,2.0);
+        temp->GetXaxis()->SetTitle("Reconstructed p#pi^{0} Inv. Mass [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        W_p_pi0.push_back(temp);
+    
+        temp = new MnvH1D(Form("%s_%d","W_All",i),"Reconstructed W All Events",30,0.5,2.0);
+        temp->GetXaxis()->SetTitle("Reconstructed W[GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        W_All.push_back(temp);
+     
+        temp = new MnvH1D(Form("%s_%d","W_1",i),"Reconstructed W 1 Track Events",30,0.5,2.0);
+        temp->GetXaxis()->SetTitle("Reconstructed W[GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        W_1.push_back(temp);
+ 
+        temp = new MnvH1D(Form("%s_%d","W_2",i),"Reconstructed W 2 Track Events",30,0.5,2.0);
+        temp->GetXaxis()->SetTitle("Reconstructed W[GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        W_2.push_back(temp);
+
+        temp = new MnvH1D(Form("%s_%d","QSq_All",i),"Q^{2} for All Events", binList.size_QSq, binList.a_QSq);
+        temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        QSq_All.push_back(temp);
+ 
+        temp = new MnvH1D(Form("%s_%d","QSq_LowEnu",i),"Q^{2} for E_{#nu} < 4 GeV", binList.size_QSq, binList.a_QSq);
+        temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        QSq_LowEnu.push_back(temp);
+ 
+        temp = new MnvH1D(Form("%s_%d","QSq_HighEnu",i),"Q^{2} for E_{#nu} > 4 GeV", binList.size_QSq, binList.a_QSq);
+        temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        QSq_HighEnu.push_back(temp);
     }
 
     // Cross Section Variables
@@ -951,7 +986,17 @@ void CCProtonPi0_Interaction::writeHistograms()
         extra_rejected_energy_2Track[i]->Write();
         extra_total_energy_2Track[i]->Write();
     }
-    
+   
+    for (int i = 0; i < 10; ++i){
+        W_p_pi0[i]->Write();
+        W_All[i]->Write();
+        W_1[i]->Write();
+        W_2[i]->Write();
+        QSq_All[i]->Write();
+        QSq_LowEnu[i]->Write();
+        QSq_HighEnu[i]->Write();
+    }
+
     QSq_all->Write();
     QSq_mc_truth_signal->Write();
     QSq_mc_reco_all->Write();

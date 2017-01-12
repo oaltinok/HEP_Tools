@@ -51,6 +51,8 @@ void CCProtonPi0_Plotter::plotHistograms()
     //UnfoldingStudy();
     GENIE_Tuning_Study();
     //Systematics();
+    //W_Studies();
+    //QSq_Studies();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -241,13 +243,13 @@ void CCProtonPi0_Plotter::plotOtherStudies()
     std::cout<<"Plotting Other Studies..."<<std::endl;
     std::string plotDir = Folder_List::plotDir_OtherStudies;
    
-    TFile* f = new TFile(Folder_List::rootDir_Truth_mc_Test.c_str());
-    TH1D* hist1D = new TH1D( * dynamic_cast<TH1D*>(f->Get("Test_pi0_P")) );
-    Draw1DHist(hist1D, "Test_pi0_P", plotDir);
+    TFile* f = new TFile(Folder_List::rootDir_CutHists_mc.c_str());
 
-    hist1D = new TH1D( * dynamic_cast<TH1D*>(f->Get("Test_pi0_theta")) );
-    Draw1DHist(hist1D, "Test_pi0_theta", plotDir);
-
+    MnvH1D* h_QELike = GetMnvH1D(f, "hCut_pi0invMass_4");
+    MnvH1D* h_2p2h = GetMnvH1D(f, "hCut_pi0invMass_10");
+    
+    DrawDataMC(h_QELike, h_2p2h, "QELike_2p2h", plotDir, true);
+    
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
 
@@ -948,16 +950,16 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     std::string plotDir = Folder_List::plotDir_Interaction;
 
     //plot_SignalKinematics();
-    //plot_CV_weights();
+    plot_CV_weights();
 
     //DrawStackedMC(rootDir_Interaction,"Enu",plotDir);
     //DrawStackedMC(rootDir_Interaction,"QSq",plotDir);
     //DrawStackedMC(rootDir_Interaction,"W",plotDir);
     //DrawStackedMC(rootDir_Interaction,"deltaInvMass",plotDir);
 
-    plotTruth_Enu();
-    plotTruth_QSq();
-    plotTruth_W();
+    //plotTruth_Enu();
+    //plotTruth_QSq();
+    //plotTruth_W();
     //plotTruth_ShortProton();
 
     //DrawSignalMC(rootDir_Interaction, "W_1Track", plotDir);
@@ -1006,14 +1008,14 @@ void CCProtonPi0_Plotter::plotInteraction_DataMC()
     DrawDataStackedMC(rootDir_Interaction,"W_2Track",plotDir);
     DrawDataStackedMC(rootDir_Interaction,"deltaInvMass",plotDir);
 //
-//    DrawDataStackedMC(rootDir_Interaction,"vertex_energy_1Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"vertex_energy_1Track",plotDir);
 //    //DrawDataStackedMC(rootDir_Interaction,"vertex_evis_1Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"extra_leftover_energy_1Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"extra_muon_energy_1Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"extra_rejected_energy_1Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"extra_total_energy_1Track",plotDir);
 //
-//    DrawDataStackedMC(rootDir_Interaction,"vertex_energy_2Track",plotDir);
+    DrawDataStackedMC(rootDir_Interaction,"vertex_energy_2Track",plotDir);
 //    //DrawDataStackedMC(rootDir_Interaction,"vertex_evis_2Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"extra_leftover_energy_2Track",plotDir);
 //    DrawDataStackedMC(rootDir_Interaction,"extra_muon_energy_2Track",plotDir);
@@ -1036,10 +1038,10 @@ void CCProtonPi0_Plotter::plotMuon_MCOnly()
     //Draw1DHist(rootDir_Truth,"muon_P_mc_truth_all_signal", plotDir);
     //Draw1DHist(rootDir_Truth,"muon_theta_mc_truth_all_signal", plotDir);
 
-    //DrawSignalMC(rootDir_Muon, "P", plotDir);
-    //DrawStackedMC(rootDir_Muon, "P", plotDir);
-    //DrawSignalMC(rootDir_Muon, "theta", plotDir);
-    //DrawStackedMC(rootDir_Muon, "theta", plotDir);
+    DrawSignalMC(rootDir_Muon, "P", plotDir);
+    DrawStackedMC(rootDir_Muon, "P", plotDir);
+    DrawSignalMC(rootDir_Muon, "theta", plotDir);
+    DrawStackedMC(rootDir_Muon, "theta", plotDir);
     //DrawSignalMC(rootDir_Muon, "cos_theta", plotDir);
     //DrawStackedMC(rootDir_Muon, "cos_theta", plotDir);
 
@@ -1216,7 +1218,7 @@ void CCProtonPi0_Plotter::plotTruth_Pion()
 //    Draw1DHist(rootDir_Pion,"KE_Diff",plotDir);
 //    DrawNormalizedMigrationHistogram(rootDir_Pion, "pi0_KE_response", plotDir);
 //
-//    Draw1DHist(rootDir_Pion,"theta_error",plotDir);
+    Draw1DHist(rootDir_Pion,"theta_error",plotDir);
 //    DrawNormalizedMigrationHistogram(rootDir_Pion, "pi0_theta_response", plotDir);
 
     std::cout<<"Plotting Pion True Finished!\n"<<std::endl;
@@ -2495,5 +2497,128 @@ void CCProtonPi0_Plotter::plot_SystematicsInfo()
 }
 
 
+void CCProtonPi0_Plotter::W_Studies()
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    // W Distributions
+    //DrawDataStackedMC(rootDir_Interaction,"W",plotDir);
+    //DrawDataStackedMC(rootDir_Interaction,"W_1Track",plotDir);
+    //DrawDataStackedMC(rootDir_Interaction,"W_2Track",plotDir);
+    //DrawDataStackedMC(rootDir_Interaction,"deltaInvMass",plotDir);
+
+    // W Quality
+    //Draw1DHist(rootDir_Interaction,"W_Error",plotDir);
+    //Draw1DHist(rootDir_Interaction,"W_Diff",plotDir);
+    //Draw2DHist(rootDir_Interaction, "W_response", plotDir);
+
+    //DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "W_p_pi0", plotDir);
+    //DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "W_All", plotDir);
+    //DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "W_1", plotDir);
+    //DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "W_2", plotDir);
+
+    //printBins_W();
+    init_W_FitResults();
+    plot_W_FitResults();
+}
+
+void CCProtonPi0_Plotter::QSq_Studies()
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    // QSq Distributions
+    //DrawDataStackedMC(rootDir_Interaction,"QSq",plotDir);
+    //DrawDataStackedMC(rootDir_Interaction,"QSq_1Track",plotDir);
+    //DrawDataStackedMC(rootDir_Interaction,"QSq_2Track",plotDir);
+
+    // QSq Quality
+    //Draw1DHist(rootDir_Interaction,"QSq_Error",plotDir);
+    //Draw1DHist(rootDir_Interaction,"QSq_Diff",plotDir);
+    //Draw2DHist(rootDir_Interaction, "QSq_response", plotDir);
+    //Save2DHistPoints(rootDir_Interaction, "QSq_response", plotDir);
+
+    DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "QSq_All", plotDir);
+    DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "QSq_LowEnu", plotDir);
+    DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "QSq_HighEnu", plotDir);
+
+    Draw_QSq_MaRES();
+}
+
+void CCProtonPi0_Plotter::Draw_QSq_MaRES()
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    TFile* f_data = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_mc = new TFile(rootDir_CrossSection.mc.c_str());
+
+    MnvH1D* data = GetMnvH1D(f_data, "QSq_xsec");
+    MnvH1D* mc = GetMnvH1D(f_mc, "QSq_xsec");
+
+    MnvPlotter* plotter = new MnvPlotter();
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    // First Plot Data vs MC with Nominal MaRES
+    plotter->headroom = 1.75;
+    plotter->data_line_width = 2;
+    plotter->data_marker_size = 1.5;
+    gStyle->SetEndErrorSize(6);
+    plotter->DrawDataMCWithErrorBand(data, mc, 1.0, "N", false, NULL, NULL, false, true);
+
+    MnvVertErrorBand* mc_err_band = mc->PopVertErrorBand("GENIE_MaRES");
+
+    std::vector<TH1D*> mc_errs = mc_err_band->GetHists();
+
+    double norm_bin_width = data->GetNormBinWidth();
+
+    for (unsigned int i = 0; i < mc_errs.size(); ++i){
+        mc_errs[i]->Scale(norm_bin_width,"width");
+        mc_errs[i]->SetLineColor(kBlue);
+        mc_errs[i]->SetLineWidth(2);
+        mc_errs[i]->Draw("HIST SAME");
+    }
+
+    data->SetMarkerStyle(20);
+    data->SetMarkerSize(1);
+    data->SetMarkerColor(kBlack);
+    data->SetLineWidth(2);
+    data->SetLineColor(kBlack);
+
+    mc->SetLineWidth(3);
+    mc->SetLineColor(kRed);
+    mc->SetFillColor(kWhite);
+
+
+    TLegend *legend = new TLegend(0.65,0.7,0.9,0.9);  
+    legend->AddEntry(data, "Data (3.33e20 POT)", "lep");
+    legend->AddEntry(mc, "Simulation", "l");
+    legend->AddEntry(mc_errs[0], "MaRES -1#sigma", "l");
+    legend->AddEntry(mc_errs[1], "MaRES +1#sigma", "l");
+    legend->Draw();
+ 
+    // Save Plot 
+    c->Update();
+    c->Print(Form("%s%s",plotDir.c_str(),"QSq_MaRES.png"), "png");
+
+    delete data;
+    delete mc;
+    delete c;
+    delete plotter;
+    delete f_data;
+    delete f_mc;
+}
+
+double CCProtonPi0_Plotter::Calc_ChiSq_dof(double* data, double* expected, int nPoints, int nPars)
+{
+    double ChiSq = 0.0;
+    
+    for (int i = 0; i < nPoints; ++i){
+        ChiSq += std::pow((data[i]-expected[i]),2) / expected[i];
+    }
+
+    double dof = nPoints - nPars;
+    double ChiSq_dof = ChiSq / dof;
+
+    return ChiSq_dof;
+}
 #endif
 

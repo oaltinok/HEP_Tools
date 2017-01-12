@@ -76,6 +76,17 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> extra_rejected_energy_2Track;
         std::vector<MnvH1D*> extra_total_energy_2Track;
 
+        // W Study
+        std::vector<MnvH1D*> W_p_pi0;
+        std::vector<MnvH1D*> W_All;
+        std::vector<MnvH1D*> W_1;
+        std::vector<MnvH1D*> W_2;
+
+        // QSq Study
+        std::vector<MnvH1D*> QSq_All;
+        std::vector<MnvH1D*> QSq_LowEnu;
+        std::vector<MnvH1D*> QSq_HighEnu;
+
         // QSq
         MnvH1D* QSq_all;
         MnvH1D* QSq_mc_reco_all;

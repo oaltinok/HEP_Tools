@@ -8,23 +8,23 @@ void CCProtonPi0_Plotter::GENIE_Tuning_Study()
 }
 
 // Returns "new" TH1D's
-void CCProtonPi0_Plotter::GENIE_Tuning_GetHistograms(std::string var_name, std::string data_var, std::string mc_var, TH1D* &data_nominal, TH1D* &data_tuned_v3, TH1D* &data_tuned_v4, TH1D* &mc_nominal, TH1D* &mc_tuned_v3, TH1D* &mc_tuned_v4)
+void CCProtonPi0_Plotter::GENIE_Tuning_GetHistograms(std::string var_name, std::string data_var, std::string mc_var, TH1D* &data_nominal, TH1D* &data_tuned_test, TH1D* &data_tuned_best, TH1D* &mc_nominal, TH1D* &mc_tuned_test, TH1D* &mc_tuned_best)
 {
-    std::string data_dir_nominal = "/minerva/data/users/oaltinok/NTupleAnalysis_GENIE_Nominal/Data/Analyzed/CrossSection.root";
-    std::string data_dir_tuned_v3 = "/minerva/data/users/oaltinok/NTupleAnalysis_GENIE_Tuning_v3/Data/Analyzed/CrossSection.root";
-    std::string data_dir_tuned_v4 = "/minerva/data/users/oaltinok/NTupleAnalysis_GENIE_Tuning_v4/Data/Analyzed/CrossSection.root";
+    std::string data_dir_nominal = "/minerva/data/users/oaltinok/NTupleAnalysis_Nominal/Data/Analyzed/CrossSection.root";
+    std::string data_dir_tuned_test = "/minerva/data/users/oaltinok/NTupleAnalysis_AllNonRES/Data/Analyzed/CrossSection.root";
+    std::string data_dir_tuned_best = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/Data/Analyzed/CrossSection.root";
 
-    std::string mc_dir_nominal = "/minerva/data/users/oaltinok/NTupleAnalysis_GENIE_Nominal/MC/Analyzed/CrossSection.root";
-    std::string mc_dir_tuned_v3 = "/minerva/data/users/oaltinok/NTupleAnalysis_GENIE_Tuning_v3/MC/Analyzed/CrossSection.root";
-    std::string mc_dir_tuned_v4 = "/minerva/data/users/oaltinok/NTupleAnalysis_GENIE_Tuning_v4/MC/Analyzed/CrossSection.root";
+    std::string mc_dir_nominal = "/minerva/data/users/oaltinok/NTupleAnalysis_Nominal/MC/Analyzed/CrossSection.root";
+    std::string mc_dir_tuned_test = "/minerva/data/users/oaltinok/NTupleAnalysis_AllNonRES/MC/Analyzed/CrossSection.root";
+    std::string mc_dir_tuned_best = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/MC/Analyzed/CrossSection.root";
 
     TFile* f_data_nominal = new TFile(data_dir_nominal.c_str());
-    TFile* f_data_tuned_v3 = new TFile(data_dir_tuned_v3.c_str());
-    TFile* f_data_tuned_v4 = new TFile(data_dir_tuned_v4.c_str());
+    TFile* f_data_tuned_test = new TFile(data_dir_tuned_test.c_str());
+    TFile* f_data_tuned_best = new TFile(data_dir_tuned_best.c_str());
 
     TFile* f_mc_nominal = new TFile(mc_dir_nominal.c_str());
-    TFile* f_mc_tuned_v3 = new TFile(mc_dir_tuned_v3.c_str());
-    TFile* f_mc_tuned_v4 = new TFile(mc_dir_tuned_v4.c_str());
+    TFile* f_mc_tuned_test = new TFile(mc_dir_tuned_test.c_str());
+    TFile* f_mc_tuned_best = new TFile(mc_dir_tuned_best.c_str());
 
     MnvH1D* temp = NULL;
 
@@ -34,13 +34,13 @@ void CCProtonPi0_Plotter::GENIE_Tuning_GetHistograms(std::string var_name, std::
     delete temp;
 
     // Get Data Histogram After Tuning
-    temp = GetMnvH1D(f_data_tuned_v3, var_name + "_" + data_var);
-    data_tuned_v3 = GetBinNormalizedTH1D(temp);
+    temp = GetMnvH1D(f_data_tuned_test, var_name + "_" + data_var);
+    data_tuned_test = GetBinNormalizedTH1D(temp);
     delete temp;
 
     // Get Data Histogram After Tuning
-    temp = GetMnvH1D(f_data_tuned_v4, var_name + "_" + data_var);
-    data_tuned_v4 = GetBinNormalizedTH1D(temp);
+    temp = GetMnvH1D(f_data_tuned_best, var_name + "_" + data_var);
+    data_tuned_best = GetBinNormalizedTH1D(temp);
     delete temp;
 
     // Get MC Histogram Before Tuning
@@ -49,21 +49,21 @@ void CCProtonPi0_Plotter::GENIE_Tuning_GetHistograms(std::string var_name, std::
     delete temp;
 
     // Get MC Histogram After Tuning
-    temp = GetMnvH1D(f_mc_tuned_v3, var_name + "_" + mc_var);
-    mc_tuned_v3 = GetBinNormalizedTH1D(temp);
+    temp = GetMnvH1D(f_mc_tuned_test, var_name + "_" + mc_var);
+    mc_tuned_test = GetBinNormalizedTH1D(temp);
     delete temp;
 
     // Get MC Histogram After Tuning
-    temp = GetMnvH1D(f_mc_tuned_v4, var_name + "_" + mc_var);
-    mc_tuned_v4 = GetBinNormalizedTH1D(temp);
+    temp = GetMnvH1D(f_mc_tuned_best, var_name + "_" + mc_var);
+    mc_tuned_best = GetBinNormalizedTH1D(temp);
     delete temp;
 
     delete f_data_nominal;
-    delete f_data_tuned_v3;
-    delete f_data_tuned_v4;
+    delete f_data_tuned_test;
+    delete f_data_tuned_best;
     delete f_mc_nominal;
-    delete f_mc_tuned_v3;
-    delete f_mc_tuned_v4;
+    delete f_mc_tuned_test;
+    delete f_mc_tuned_best;
 }
 
 void CCProtonPi0_Plotter::GENIE_Tuning_DataMC_Ratio(std::string var_name, std::string data_var, std::string mc_var)
@@ -71,31 +71,31 @@ void CCProtonPi0_Plotter::GENIE_Tuning_DataMC_Ratio(std::string var_name, std::s
     std::string plotDir = Folder_List::plotDir_OtherStudies;
 
     TH1D* data_nominal = NULL;
-    TH1D* data_tuned_v3 = NULL;
-    TH1D* data_tuned_v4 = NULL;
+    TH1D* data_tuned_test = NULL;
+    TH1D* data_tuned_best = NULL;
 
     TH1D* mc_nominal = NULL;
-    TH1D* mc_tuned_v3 = NULL;
-    TH1D* mc_tuned_v4 = NULL;
+    TH1D* mc_tuned_test = NULL;
+    TH1D* mc_tuned_best = NULL;
 
-    GENIE_Tuning_GetHistograms(var_name, data_var, mc_var, data_nominal, data_tuned_v3, data_tuned_v4, mc_nominal, mc_tuned_v3, mc_tuned_v4);
+    GENIE_Tuning_GetHistograms(var_name, data_var, mc_var, data_nominal, data_tuned_test, data_tuned_best, mc_nominal, mc_tuned_test, mc_tuned_best);
 
     // Get Ratios
     TH1D* ratio_nominal = (TH1D*) data_nominal->Clone();
-    TH1D* ratio_v3 = (TH1D*) data_tuned_v3->Clone();
-    TH1D* ratio_v4 = (TH1D*) data_tuned_v4->Clone();
+    TH1D* ratio_test = (TH1D*) data_tuned_test->Clone();
+    TH1D* ratio_best = (TH1D*) data_tuned_best->Clone();
 
     // Divide Histograms
     ratio_nominal->Divide(mc_nominal);
-    ratio_v3->Divide(mc_tuned_v3);
-    ratio_v4->Divide(mc_tuned_v4);
+    ratio_test->Divide(mc_tuned_test);
+    ratio_best->Divide(mc_tuned_best);
     
     delete data_nominal;
-    delete data_tuned_v3;
-    delete data_tuned_v4;
+    delete data_tuned_test;
+    delete data_tuned_best;
     delete mc_nominal;
-    delete mc_tuned_v3;
-    delete mc_tuned_v4;
+    delete mc_tuned_test;
+    delete mc_tuned_best;
 
     // Create Canvas
     TCanvas* c = new TCanvas("c","c",1280,800);
@@ -111,25 +111,25 @@ void CCProtonPi0_Plotter::GENIE_Tuning_DataMC_Ratio(std::string var_name, std::s
     ratio_nominal->SetLineWidth(3);
     ratio_nominal->SetFillColor(kWhite);
 
-    ratio_v3->GetYaxis()->SetTitle("Ratio");
-    ratio_v3->SetMinimum(0.5);
-    ratio_v3->SetMaximum(1.5);
-    ratio_v3->SetLineColor(kRed);
-    ratio_v3->SetLineWidth(3);
-    ratio_v3->SetFillColor(kWhite);
+    ratio_test->GetYaxis()->SetTitle("Ratio");
+    ratio_test->SetMinimum(0.5);
+    ratio_test->SetMaximum(1.5);
+    ratio_test->SetLineColor(kRed);
+    ratio_test->SetLineWidth(3);
+    ratio_test->SetFillColor(kWhite);
 
-    ratio_v4->GetYaxis()->SetTitle("Ratio");
-    ratio_v4->SetMinimum(0.5);
-    ratio_v4->SetMaximum(1.5);
-    ratio_v4->SetLineColor(kBlue);
-    ratio_v4->SetLineWidth(3);
-    ratio_v4->SetFillColor(kWhite);
+    ratio_best->GetYaxis()->SetTitle("Ratio");
+    ratio_best->SetMinimum(0.5);
+    ratio_best->SetMaximum(1.5);
+    ratio_best->SetLineColor(kBlue);
+    ratio_best->SetLineWidth(3);
+    ratio_best->SetFillColor(kWhite);
 
 
     // Plot
     ratio_nominal->Draw("HIST");
-    ratio_v3->Draw("HIST SAME");
-    ratio_v4->Draw("HIST SAME");
+    ratio_test->Draw("HIST SAME");
+    ratio_best->Draw("HIST SAME");
     gPad->Update();
     gStyle->SetOptStat(0); 
     c->Update();
@@ -139,14 +139,14 @@ void CCProtonPi0_Plotter::GENIE_Tuning_DataMC_Ratio(std::string var_name, std::s
     ratio_1.SetLineWidth(2);
     ratio_1.SetLineStyle(7);
     ratio_1.SetLineColor(kGreen+3);
-    double line_min = ratio_v3->GetBinLowEdge(1);
-    double line_max = ratio_v3->GetBinLowEdge(ratio_v3->GetNbinsX()+1);
+    double line_min = ratio_test->GetBinLowEdge(1);
+    double line_max = ratio_test->GetBinLowEdge(ratio_test->GetNbinsX()+1);
     ratio_1.DrawLine(line_min,1,line_max,1);
 
     TLegend *legend = new TLegend(0.4,0.7,0.9,0.9);  
     legend->AddEntry(ratio_nominal, "Nominal(Data/GENIE)", "l" );
-    legend->AddEntry(ratio_v3, "Tuned+2p2h(Data/GENIE)", "l" );
-    legend->AddEntry(ratio_v4, "Only 2p2h(Data/GENIE)", "l" );
+    legend->AddEntry(ratio_test, "All NonRES1pi(Data/GENIE)", "l" );
+    legend->AddEntry(ratio_best, "Best(Data/GENIE)", "l" );
     legend->SetTextSize(0.04);
     legend->Draw();
  
@@ -156,8 +156,8 @@ void CCProtonPi0_Plotter::GENIE_Tuning_DataMC_Ratio(std::string var_name, std::s
     delete legend;
     delete c;
     delete ratio_nominal;
-    delete ratio_v3;
-    delete ratio_v4;
+    delete ratio_test;
+    delete ratio_best;
 }
 
 void CCProtonPi0_Plotter::GENIE_Tuning_Ratio(std::string var_name, std::string data_var, std::string mc_var)
@@ -165,34 +165,34 @@ void CCProtonPi0_Plotter::GENIE_Tuning_Ratio(std::string var_name, std::string d
     std::string plotDir = Folder_List::plotDir_OtherStudies;
 
     TH1D* data_nominal = NULL;
-    TH1D* data_tuned_v3 = NULL;
-    TH1D* data_tuned_v4 = NULL;
+    TH1D* data_tuned_test = NULL;
+    TH1D* data_tuned_best = NULL;
 
     TH1D* mc_nominal = NULL;
-    TH1D* mc_tuned_v3 = NULL;
-    TH1D* mc_tuned_v4 = NULL;
+    TH1D* mc_tuned_test = NULL;
+    TH1D* mc_tuned_best = NULL;
 
 
-    GENIE_Tuning_GetHistograms(var_name, data_var, mc_var, data_nominal, data_tuned_v3, data_tuned_v4, mc_nominal, mc_tuned_v3, mc_tuned_v4);
+    GENIE_Tuning_GetHistograms(var_name, data_var, mc_var, data_nominal, data_tuned_test, data_tuned_best, mc_nominal, mc_tuned_test, mc_tuned_best);
 
     // Get Ratios
-    TH1D* mc_ratio_v3 = (TH1D*) mc_tuned_v3->Clone();
-    TH1D* mc_ratio_v4 = (TH1D*) mc_tuned_v4->Clone();
+    TH1D* mc_ratio_test = (TH1D*) mc_tuned_test->Clone();
+    TH1D* mc_ratio_best = (TH1D*) mc_tuned_best->Clone();
 
-    TH1D* data_ratio_v3 = (TH1D*) data_tuned_v3->Clone();
-    TH1D* data_ratio_v4 = (TH1D*) data_tuned_v4->Clone();
+    TH1D* data_ratio_test = (TH1D*) data_tuned_test->Clone();
+    TH1D* data_ratio_best = (TH1D*) data_tuned_best->Clone();
 
     // Divide Histograms
-    mc_ratio_v3->Divide(mc_nominal);
-    mc_ratio_v4->Divide(mc_nominal);
-    data_ratio_v3->Divide(data_nominal);
-    data_ratio_v4->Divide(data_nominal);
+    mc_ratio_test->Divide(mc_nominal);
+    mc_ratio_best->Divide(mc_nominal);
+    data_ratio_test->Divide(data_nominal);
+    data_ratio_best->Divide(data_nominal);
     delete data_nominal;
-    delete data_tuned_v3;
-    delete data_tuned_v4;
+    delete data_tuned_test;
+    delete data_tuned_best;
     delete mc_nominal;
-    delete mc_tuned_v3;
-    delete mc_tuned_v4;
+    delete mc_tuned_test;
+    delete mc_tuned_best;
 
     // Create Canvas
     TCanvas* c = new TCanvas("c","c",1280,800);
@@ -201,40 +201,40 @@ void CCProtonPi0_Plotter::GENIE_Tuning_Ratio(std::string var_name, std::string d
     pad->SetTopMargin(0.30);
 
     // Style Histograms
-    mc_ratio_v3->GetYaxis()->SetTitle("Ratio");
-    mc_ratio_v3->SetMinimum(0.5);
-    mc_ratio_v3->SetMaximum(1.5);
-    mc_ratio_v3->SetLineColor(kRed);
-    mc_ratio_v3->SetLineWidth(3);
-    mc_ratio_v3->SetFillColor(kWhite);
+    mc_ratio_test->GetYaxis()->SetTitle("Ratio");
+    mc_ratio_test->SetMinimum(0.5);
+    mc_ratio_test->SetMaximum(1.5);
+    mc_ratio_test->SetLineColor(kRed);
+    mc_ratio_test->SetLineWidth(3);
+    mc_ratio_test->SetFillColor(kWhite);
 
-    mc_ratio_v4->SetMinimum(0.5);
-    mc_ratio_v4->SetMaximum(1.5);
-    mc_ratio_v4->SetLineColor(kRed);
-    mc_ratio_v4->SetLineWidth(3);
-    mc_ratio_v4->SetLineStyle(2);
-    mc_ratio_v4->SetFillColor(kWhite);
+    mc_ratio_best->SetMinimum(0.5);
+    mc_ratio_best->SetMaximum(1.5);
+    mc_ratio_best->SetLineColor(kRed);
+    mc_ratio_best->SetLineWidth(3);
+    mc_ratio_best->SetLineStyle(2);
+    mc_ratio_best->SetFillColor(kWhite);
 
-    data_ratio_v3->SetMinimum(0.5);
-    data_ratio_v3->SetMaximum(1.5);
-    data_ratio_v3->SetLineColor(kBlack);
-    data_ratio_v3->SetLineWidth(3);
-    data_ratio_v3->SetFillColor(kWhite);
+    data_ratio_test->SetMinimum(0.5);
+    data_ratio_test->SetMaximum(1.5);
+    data_ratio_test->SetLineColor(kBlack);
+    data_ratio_test->SetLineWidth(3);
+    data_ratio_test->SetFillColor(kWhite);
 
-    data_ratio_v4->SetMinimum(0.5);
-    data_ratio_v4->SetMaximum(1.5);
-    data_ratio_v4->SetLineColor(kBlack);
-    data_ratio_v4->SetLineWidth(3);
-    data_ratio_v4->SetLineStyle(2);
-    data_ratio_v4->SetFillColor(kWhite);
+    data_ratio_best->SetMinimum(0.5);
+    data_ratio_best->SetMaximum(1.5);
+    data_ratio_best->SetLineColor(kBlack);
+    data_ratio_best->SetLineWidth(3);
+    data_ratio_best->SetLineStyle(2);
+    data_ratio_best->SetFillColor(kWhite);
 
     gStyle->SetEndErrorSize(6);
 
     // Plot
-    mc_ratio_v3->Draw("HIST ");
-    mc_ratio_v4->Draw("HIST SAME");
-    data_ratio_v3->Draw("HIST SAME");
-    data_ratio_v4->Draw("HIST SAME");
+    mc_ratio_test->Draw("HIST ");
+    mc_ratio_best->Draw("HIST SAME");
+    data_ratio_test->Draw("HIST SAME");
+    data_ratio_best->Draw("HIST SAME");
     gPad->Update();
     gStyle->SetOptStat(0); 
     c->Update();
@@ -244,15 +244,15 @@ void CCProtonPi0_Plotter::GENIE_Tuning_Ratio(std::string var_name, std::string d
     ratio_1.SetLineWidth(2);
     ratio_1.SetLineStyle(7);
     ratio_1.SetLineColor(kGreen+3);
-    double line_min = mc_ratio_v3->GetBinLowEdge(1);
-    double line_max = mc_ratio_v3->GetBinLowEdge(mc_ratio_v3->GetNbinsX()+1);
+    double line_min = mc_ratio_test->GetBinLowEdge(1);
+    double line_max = mc_ratio_test->GetBinLowEdge(mc_ratio_test->GetNbinsX()+1);
     ratio_1.DrawLine(line_min,1,line_max,1);
 
     TLegend *legend = new TLegend(0.4,0.7,0.9,0.9);  
-    legend->AddEntry(mc_ratio_v3, "GENIE(Tuned+2p2h) / GENIE", "l");
-    legend->AddEntry(mc_ratio_v4, "GENIE(Only 2p2h) / GENIE", "l");
-    legend->AddEntry(data_ratio_v3, "Data(Tuned+2p2h) / Data", "l");
-    legend->AddEntry(data_ratio_v4, "Data(Only 2p2h) / Data", "l");
+    legend->AddEntry(mc_ratio_test, "GENIE(All NonRES1pi) / GENIE", "l");
+    legend->AddEntry(mc_ratio_best, "GENIE(Best) / GENIE", "l");
+    legend->AddEntry(data_ratio_test, "Data(All NonRES1pi) / Data", "l");
+    legend->AddEntry(data_ratio_best, "Data(Best) / Data", "l");
     legend->SetTextSize(0.04);
     legend->Draw();
  
@@ -261,10 +261,10 @@ void CCProtonPi0_Plotter::GENIE_Tuning_Ratio(std::string var_name, std::string d
 
     delete c;
     delete legend;
-    delete mc_ratio_v3;
-    delete mc_ratio_v4;
-    delete data_ratio_v3;
-    delete data_ratio_v4;
+    delete mc_ratio_test;
+    delete mc_ratio_best;
+    delete data_ratio_test;
+    delete data_ratio_best;
 }
 
 void CCProtonPi0_Plotter::XSecVars_GENIE_Tuning_Ratios()

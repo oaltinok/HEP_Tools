@@ -43,7 +43,7 @@ class CCProtonPi0_NTupleAnalysis
         // Constants 
         static const int nFSIType = 6;
         static const int nIntType = 3;
-        static const int nHistograms = 7;
+        static const int nHistograms = 11;
         static const int nTopologies = 2;
         static const int n_universe = 100;
         static const int n_lateral_universes = 500;
@@ -129,7 +129,7 @@ class CCProtonPi0_NTupleAnalysis
 
         void OpenTextFile(std::string file_name, std::ofstream &file);
         std::string GetPlaylist(const int run, int type);
-        void printBins(const TH1* hist, const std::string var_name, bool useLowEdge = true);
+        void printBins(const TH1* hist, const std::string var_name, bool useLowEdge = false);
         void RunTimeError(std::string message);
 
         // Returns a "new" MnvH1D or MnvH2D 

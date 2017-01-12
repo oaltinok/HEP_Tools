@@ -184,6 +184,8 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         bool IsGenieNonRES();
         bool IsGenieRvn1pi();
         bool IsGenieRvp1pi();
+        bool IsGenie_NonRES_n_piplus();
+        std::vector<int> GetPrimaryParticles();
 
         // Default Functions    
         void     Init(std::string playlist, TChain* fChain);

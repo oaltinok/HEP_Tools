@@ -24,7 +24,7 @@ Class: CCProtonPi0_Cut
 
 #include <iostream>
 #include <string>
-#include "CCProtonPi0_CutStat.h"
+#include "../Counter/CCProtonPi0_Counter.h"
 
 class CCProtonPi0_Cut{
 	public:
@@ -37,12 +37,12 @@ class CCProtonPi0_Cut{
 		// Get Functions
 		std::string get_Name();
         
-        void increment(bool isSignal, bool isStudy1_true = true, bool isStudy2_true = true);
+        void increment(bool isSignal, bool isStudy1_true = true, bool isStudy2_true = true, double wgt = 1.0);
         
-        CCProtonPi0_CutStat nEvent;
-        CCProtonPi0_CutStat nSignal;
-        CCProtonPi0_CutStat nStudy1; // Number of the Events which is studied
-        CCProtonPi0_CutStat nStudy2; // Number of the Events which is studied
+        CCProtonPi0_Counter nEvent;
+        CCProtonPi0_Counter nSignal;
+        CCProtonPi0_Counter nStudy1; // Number of the Events which is studied
+        CCProtonPi0_Counter nStudy2; // Number of the Events which is studied
 		  
 	private:
 		std::string name;

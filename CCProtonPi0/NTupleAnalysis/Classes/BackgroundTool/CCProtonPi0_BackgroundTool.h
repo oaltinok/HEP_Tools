@@ -33,8 +33,8 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
         
         void set_nTracks(int input);
         void writeBackgroundTable();
-        void fillBackgroundWithPi0(bool NoPi0, bool SinglePi0, bool MultiPi0, bool withMichel);
-        void fillBackgroundCompact(bool WithPi0, bool QELike, bool SinglePiPlus, bool Other);
+        void fillBackgroundWithPi0(bool NoPi0, bool SinglePi0, bool MultiPi0, bool withMichel, double wgt = 1.0);
+        void fillBackgroundCompact(bool WithPi0, bool QELike, bool SinglePiPlus, bool Other, double wgt = 1.0);
         
         void fillBackground(bool NC,
                             bool AntiNeutrino,
@@ -46,7 +46,8 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
                             bool MultiPionWithPi0,
                             bool MultiPionWithoutPi0,
                             bool Other,
-                            bool withMichel);
+                            bool withMichel,
+                            double wgt = 1.0);
     private:
         static const int nTables = 3;
         int nTracks;
@@ -83,7 +84,7 @@ class CCProtonPi0_BackgroundTool : public CCProtonPi0_NTupleAnalysis
         vector<Background> bckg_Other;
         vector<Background> bckg_Total;
 
-        void updateBackground(Background &b, bool withMichel = false);
+        void updateBackground(Background &b, bool withMichel = false, double wgt = 1.0);
         double calcPercent(double nEvents, double nBase);
         void formBackgroundVectors();
         void initBackgrounds();

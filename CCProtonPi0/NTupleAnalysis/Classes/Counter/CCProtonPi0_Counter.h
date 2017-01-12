@@ -12,6 +12,7 @@ class CCProtonPi0_Counter
         void increment(double wgt = 1.0); 
         void print();
         double getCount();
+        double calcPercent(double reference);
         std::string getName();
 
         bool isCounted;

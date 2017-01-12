@@ -35,6 +35,12 @@ std::string CCProtonPi0_Counter::getName()
     return name;
 }
 
+double CCProtonPi0_Counter::calcPercent(double reference)
+{
+    double percent = (count / reference)*100;
+    return percent;
+}
+
 
 #endif
 

@@ -10,7 +10,7 @@ using namespace PlotUtils;
 
 CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProtonPi0_NTupleAnalysis()
 {
-    cout<<"Initializing CCProtonPi0_CutList"<<endl;
+    std::cout<<"Initializing CCProtonPi0_CutList"<<std::endl;
 
     m_isMC = isMC;
 
@@ -19,13 +19,13 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
         if (isMC) rootDir = Folder_List::rootDir_CutHists_mc;
         else rootDir = Folder_List::rootDir_CutHists_data;       
 
-        cout<<"\tRoot File: "<<rootDir<<endl;
+        std::cout<<"\tRoot File: "<<rootDir<<std::endl;
 
         // Create Root File 
         f = new TFile(rootDir.c_str(),"RECREATE");
         //f = new TFile(rootDir.c_str(),"CREATE");
         if (!f->IsOpen()){
-            cout<<"File already exists! Exiting!..."<<endl;
+            std::cout<<"File already exists! Exiting!..."<<std::endl;
             exit(1);
         }
 
@@ -37,10 +37,10 @@ CCProtonPi0_CutList::CCProtonPi0_CutList(bool isModeReduce, bool isMC) : CCProto
 
         initHistograms();
     }else{
-        cout<<"\tNTuple Analysis Mode -- Will not create ROOT & Text Files"<<endl;
+        std::cout<<"\tNTuple Analysis Mode -- Will not create ROOT & Text Files"<<std::endl;
     }
 
-    cout<<"Done!"<<endl;
+    std::cout<<"Done!"<<std::endl;
 }
 
 /*
@@ -655,7 +655,7 @@ void CCProtonPi0_CutList::writeCutTableHeader(ofstream &file)
     file.width(12); file<<"Eff(All)"<<" ";      
     file.width(12); file<<"Eff(MINOS)"<<" ";      
     file.width(12); file<<"Purity"<<" ";
-    file<<endl;
+    file<<std::endl;
 }
 
 double CCProtonPi0_CutList::getCutEfficiency(CCProtonPi0_Cut& currentCut, CCProtonPi0_Cut& effBase) const
@@ -763,7 +763,7 @@ void CCProtonPi0_CutList::write2TrackCuts()
     writeCutTableRows(cutText_2Track, nCutVector_2Track, false);
 }
 
-void CCProtonPi0_CutList::writeCutTableRows(ofstream &file, vector<CCProtonPi0_Cut> &nCutVector, bool isAll)
+void CCProtonPi0_CutList::writeCutTableRows(ofstream &file, std::vector<CCProtonPi0_Cut> &nCutVector, bool isAll)
 {
     // First Element on the nCutVector is the All Events
     CCProtonPi0_Cut eff_base_all = nCutVector[0];
@@ -817,7 +817,7 @@ void CCProtonPi0_CutList::writeSingleRow(ofstream &file, CCProtonPi0_Cut& curren
     // Purity
     file.width(12); file<<purity<<" ";
 
-    file<<endl;
+    file<<std::endl;
 }
 
 CCProtonPi0_CutList::~CCProtonPi0_CutList()

@@ -89,47 +89,47 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         // Cut Histograms
         // -------------------------------------------------------------------------
         // Common
-        vector<MnvH1D*> hCut_nVertices;
-        vector<MnvH1D*> hCut_nTracks;
-        vector<MnvH1D*> hCut_nTracks2;
-        vector<MnvH1D*> hCut_nTracks_Close;
-        vector<MnvH1D*> hCut_nTracks_Far;
-        vector<MnvH1D*> hCut_nTracks_Discarded;
-        vector<MnvH1D*> hCut_Michel;
-        vector<MnvH1D*> hCut_nProtonCandidates;
-        vector<MnvH1D*> hCut_nShowerCandidates;
-        vector<MnvH1D*> hCut_pi0invMass;
-        vector<MnvH1D*> hCut_W;
-        vector<MnvH1D*> SideBand_muon_P;
-        vector<MnvH1D*> SideBand_muon_theta;
-        vector<MnvH1D*> SideBand_pi0_P;
-        vector<MnvH1D*> SideBand_pi0_KE;
-        vector<MnvH1D*> SideBand_pi0_theta;
-        vector<MnvH1D*> SideBand_neutrino_E;
-        vector<MnvH1D*> SideBand_QSq;
-        vector<MnvH1D*> SideBand_W;
+        std::vector<MnvH1D*> hCut_nVertices;
+        std::vector<MnvH1D*> hCut_nTracks;
+        std::vector<MnvH1D*> hCut_nTracks2;
+        std::vector<MnvH1D*> hCut_nTracks_Close;
+        std::vector<MnvH1D*> hCut_nTracks_Far;
+        std::vector<MnvH1D*> hCut_nTracks_Discarded;
+        std::vector<MnvH1D*> hCut_Michel;
+        std::vector<MnvH1D*> hCut_nProtonCandidates;
+        std::vector<MnvH1D*> hCut_nShowerCandidates;
+        std::vector<MnvH1D*> hCut_pi0invMass;
+        std::vector<MnvH1D*> hCut_W;
+        std::vector<MnvH1D*> SideBand_muon_P;
+        std::vector<MnvH1D*> SideBand_muon_theta;
+        std::vector<MnvH1D*> SideBand_pi0_P;
+        std::vector<MnvH1D*> SideBand_pi0_KE;
+        std::vector<MnvH1D*> SideBand_pi0_theta;
+        std::vector<MnvH1D*> SideBand_neutrino_E;
+        std::vector<MnvH1D*> SideBand_QSq;
+        std::vector<MnvH1D*> SideBand_W;
 
         // 1Track
-        vector<MnvH1D*> hCut_1Track_nShowerCandidates;
-        vector<MnvH1D*> hCut_1Track_eVis_nuclearTarget;
-        vector<MnvH1D*> hCut_1Track_eVis_other;
-        vector<MnvH1D*> hCut_1Track_pi0invMass;
-        vector<MnvH1D*> hCut_1Track_gamma1ConvDist;
-        vector<MnvH1D*> hCut_1Track_gamma2ConvDist;
-        vector<MnvH1D*> hCut_1Track_neutrinoE;
-        vector<MnvH1D*> hCut_1Track_W;
+        std::vector<MnvH1D*> hCut_1Track_nShowerCandidates;
+        std::vector<MnvH1D*> hCut_1Track_eVis_nuclearTarget;
+        std::vector<MnvH1D*> hCut_1Track_eVis_other;
+        std::vector<MnvH1D*> hCut_1Track_pi0invMass;
+        std::vector<MnvH1D*> hCut_1Track_gamma1ConvDist;
+        std::vector<MnvH1D*> hCut_1Track_gamma2ConvDist;
+        std::vector<MnvH1D*> hCut_1Track_neutrinoE;
+        std::vector<MnvH1D*> hCut_1Track_W;
 
         // 2Track
-        vector<MnvH1D*> hCut_2Track_nShowerCandidates;
-        vector<MnvH1D*> hCut_2Track_eVis_nuclearTarget;
-        vector<MnvH1D*> hCut_2Track_eVis_other;
-        vector<MnvH1D*> hCut_2Track_pi0invMass;
-        vector<MnvH1D*> hCut_2Track_gamma1ConvDist;
-        vector<MnvH1D*> hCut_2Track_gamma2ConvDist;
-        vector<MnvH1D*> hCut_2Track_neutrinoE;
-        vector<MnvH1D*> hCut_2Track_protonScore_LLR;
-        vector<MnvH1D*> hCut_2Track_deltaInvMass;
-        vector<MnvH1D*> hCut_2Track_W;
+        std::vector<MnvH1D*> hCut_2Track_nShowerCandidates;
+        std::vector<MnvH1D*> hCut_2Track_eVis_nuclearTarget;
+        std::vector<MnvH1D*> hCut_2Track_eVis_other;
+        std::vector<MnvH1D*> hCut_2Track_pi0invMass;
+        std::vector<MnvH1D*> hCut_2Track_gamma1ConvDist;
+        std::vector<MnvH1D*> hCut_2Track_gamma2ConvDist;
+        std::vector<MnvH1D*> hCut_2Track_neutrinoE;
+        std::vector<MnvH1D*> hCut_2Track_protonScore_LLR;
+        std::vector<MnvH1D*> hCut_2Track_deltaInvMass;
+        std::vector<MnvH1D*> hCut_2Track_W;
  
         // Selected Signal 
         // Signal Q2
@@ -235,16 +235,16 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         void write1TrackCuts();
         void write2TrackCuts();
         void writeCutTableHeader(std::ofstream &file);
-        void writeCutTableRows(std::ofstream &file, vector<CCProtonPi0_Cut> &nCutVector, bool isAll);
+        void writeCutTableRows(std::ofstream &file, std::vector<CCProtonPi0_Cut> &nCutVector, bool isAll);
         void writeSingleRow(std::ofstream &file, CCProtonPi0_Cut &currentCut, CCProtonPi0_Cut &eff_base_all, CCProtonPi0_Cut &eff_base_MINOS);
         double getCutEfficiency(CCProtonPi0_Cut &currentCut, CCProtonPi0_Cut &effBase) const;
         double getCutEfficiency(CCProtonPi0_Cut &currentCut, double effBase) const;
         double getCutPurity(CCProtonPi0_Cut &currentCut) const;
 
         bool m_isMC;
-        vector<CCProtonPi0_Cut> nCutVector_All;
-        vector<CCProtonPi0_Cut> nCutVector_1Track;
-        vector<CCProtonPi0_Cut> nCutVector_2Track;
+        std::vector<CCProtonPi0_Cut> nCutVector_All;
+        std::vector<CCProtonPi0_Cut> nCutVector_1Track;
+        std::vector<CCProtonPi0_Cut> nCutVector_2Track;
         
         CCProtonPi0_BinList binList;
         
@@ -253,7 +253,7 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         std::ofstream cutText_2Track;
         
         TFile* f;
-        string rootDir;
+        std::string rootDir;
 
         // Number of Signal Events from Truth Info
         double nTrueSignal;

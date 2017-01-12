@@ -16,7 +16,7 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
     applyGENIETuning_Delta = true;
     reduce_err_Delta = true;
 
-    applyGENIETuning_NonRes = false;
+    applyGENIETuning_NonRes = true;
     reduce_err_MaRES = false;
     reduce_err_Rvn1pi = false;
 
@@ -1056,7 +1056,7 @@ void CCProtonPi0_TruthAnalyzer::CalcEventWeight()
         cvweight *= cvweight_Delta;
     }
 
-    if (applyGENIETuning_NonRes){
+    if (applyGENIETuning_NonRes && IsGenie_NonRES_n_piplus()){
         // NonRES 1pi constraint
         cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvn1pi[2] - 1); // From Phil R.
         cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvp1pi[2] - 1); // From Phil R.
@@ -1338,7 +1338,6 @@ bool CCProtonPi0_TruthAnalyzer::IsGenieNonRES()
     return false;
 }
 
-
 bool CCProtonPi0_TruthAnalyzer::IsGenieRvn1pi()
 {
     // Weight is NOT equal to 1 for Rvn1pi events
@@ -1349,6 +1348,33 @@ bool CCProtonPi0_TruthAnalyzer::IsGenieRvp1pi()
 {
     // Weight is NOT equal to 1 for Rvp1pi events
     return truth_genie_wgt_Rvp1pi[2] != 1;
+}
+
+bool CCProtonPi0_TruthAnalyzer::IsGenie_NonRES_n_piplus()
+{
+    if ( IsGenieRvn1pi() || IsGenieRvp1pi() ){
+        std::vector<int> prim_part = GetPrimaryParticles();
+
+        if (prim_part.empty()) return false;
+
+        if (prim_part[0] == 2112 && prim_part[1] == 211) return true;
+        else return false;
+    }else{
+        return false;
+    }
+}
+
+std::vector<int> CCProtonPi0_TruthAnalyzer::GetPrimaryParticles()
+{
+    std::vector<int> prim_part;
+
+    for (int i = 0; i < mc_er_nPart; ++i){
+        if (mc_er_status[i] == 14){ 
+            prim_part.push_back(mc_er_ID[i]);
+        }
+    }
+
+    return prim_part;
 }
 
 void CCProtonPi0_TruthAnalyzer::initUpdatedGenieWeights()

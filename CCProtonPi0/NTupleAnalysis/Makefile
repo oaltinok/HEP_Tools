@@ -22,7 +22,8 @@ PLOTTERCPP = Classes/Plotter/CCProtonPi0_Plotter.cpp
 UNFOLDINGSTUDYCPP = Classes/Plotter/CCProtonPi0_Plotter_UnfoldingStudy.cpp
 SYSTEMATICSCPP = Classes/Plotter/CCProtonPi0_Plotter_Systematics.cpp
 GENIETUNINGCPP = Classes/Plotter/CCProtonPi0_Plotter_GENIE_Tuning.cpp
-ALLPLOTTERCPP = $(PLOTTERMACROSCPP) $(PLOTTERCPP) $(UNFOLDINGSTUDYCPP) $(SYSTEMATICSCPP) $(GENIETUNINGCPP)
+WFITCPP = Classes/Plotter/CCProtonPi0_Plotter_W_Fit.cpp
+ALLPLOTTERCPP = $(PLOTTERMACROSCPP) $(PLOTTERCPP) $(UNFOLDINGSTUDYCPP) $(SYSTEMATICSCPP) $(GENIETUNINGCPP) $(WFITCPP)
 
 # Class: Analyzer
 ANALYZERCPP = Classes/Analyzer/CCProtonPi0_Analyzer.cpp

@@ -78,6 +78,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void writeFSParticle4P(Long64_t nEntry);
         void UpdateScanFileName();
         int GetBackgroundTypeInd();
+        int GetSignalTypeInd();
         bool IsInvMassInRange(double invMass);
         bool IsOpeningAngleSmallAndEnergyLow(double E_g1, double E_g2);
         void FillHistogram(vector<MnvH1D*> &hist, double var);
@@ -270,7 +271,9 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void GetMichelStatistics_Showers();
         double GetBckgConstraint(std::string error_name, int hist_ind);
         std::vector<int> GetPrimaryParticles();
-        
+        void Study_W();
+        void Study_QSq();
+
         //  Muon Specific Functions
         void fillMuonMC();
         void fillMuonReco();
@@ -314,6 +317,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         bool IsGenieNonRES();
         bool IsGenieRvn1pi();
         bool IsGenieRvp1pi();
+        bool IsGenie_NonRES_n_piplus();
         
         // Helper Functions
         double CalcSphereVolume(double r);
@@ -387,6 +391,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double min_Delta_invMass;
         double max_Delta_invMass;
         double nMaxEvents;
+        void updateCounters();
+        void update_EventTypeCounters(int i);
+        void printCounters();
+        void writeEventTypeTable();
+        void writeEventTypeTableLine(CCProtonPi0_Counter &counter, CCProtonPi0_Counter &base);
         vector<double> PDG_pi0_Mother;
         vector<double> PDG_pi0_GrandMother;
         CCProtonPi0_Counter nSignalOut_Acceptance;
@@ -397,6 +406,16 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Counter nMichel_Truth_Found;
         CCProtonPi0_Counter nMichel_Truth_Found_Improved;
         CCProtonPi0_Counter n2p2h;
+        CCProtonPi0_Counter nAll[3];
+        CCProtonPi0_Counter nAll_Signal[3];
+        CCProtonPi0_Counter nAll_Bckg[3];
+        CCProtonPi0_Counter nSignal_Delta_RES[3];
+        CCProtonPi0_Counter nSignal_Other_RES[3];
+        CCProtonPi0_Counter nSignal_Non_RES[3];
+        CCProtonPi0_Counter nBckg_WithPi0[3];
+        CCProtonPi0_Counter nBckg_QELike[3];
+        CCProtonPi0_Counter nBckg_PiPlus[3];
+        CCProtonPi0_Counter nBckg_Other[3];
         CCProtonPi0_Counter counter1;
         CCProtonPi0_Counter counter2;
         CCProtonPi0_Counter counter3;
@@ -418,10 +437,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double mean_Data_2Track;
 
         // Files
-        string scanFileName;
-        string failFile;
+        std::string scanFileName;
+        std::string failFile; 
         ofstream failText; 
         ofstream roundupText;
+        ofstream eventTypeTable;
         ifstream DSTFileList;
 
         // -------------------------------------------------------------------------

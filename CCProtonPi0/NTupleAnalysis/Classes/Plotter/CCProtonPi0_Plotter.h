@@ -143,6 +143,8 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotTruth_ShortProton();
 
         // Other Plots 
+        void QSq_Studies();
+        void Draw_QSq_MaRES();
         void plot_CV_weights();
         void plot_SystematicsInfo();
         void PlotTotalEnuXSec();
@@ -159,6 +161,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
 
         // Helper Functions
+        void NormalizeHistogram(MnvH1D* h);
         void ApplyStyle(MnvPlotter* plotter);
         void ApplyStyle_Errors(MnvPlotter* plotter, bool groupErrors);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, double hist_max, double arrow_length);
@@ -166,7 +169,26 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void NormalizeToNormBinWidth(MnvH1D* hist);
         double GetSmallestBinWidth(MnvH1D* hist);
         TH1D* GetBinNormalizedTH1D(MnvH1D* hist, bool WithSystError = false);
-        
+
+        // W Study
+        double pars_MC_deltaRES[3];
+        double pars_MC_otherRES[3];
+        double pars_MC_nonRES_G1[3];
+        double pars_MC_nonRES_G2[3];
+
+        void W_Studies();
+        void init_W_FitResults();
+        void Get_BreitWigner(double* pars, double* x, double* y, int nPoints);
+        void Get_Gaussian(double* pars, double* x, double* y, int nPoints);
+        void plot_W_FitResults();
+        void W_Fit_Data(std::string fit_name, double* pars_deltaRES, double* pars_otherRES, double* pars_nonRES_G1, double* pars_nonRES_G2, int nPars);
+        void W_Fit_MC();
+        void W_Fit_MC_DeltaRES();
+        void W_Fit_MC_OtherRES();
+        void W_Fit_MC_NonRES();
+        void printBins_W();
+        double Calc_ChiSq_dof(double* data, double* expected, int nPoints, int nPars);
+
         // Flux Study
         double GetFluxHistContent(MnvH1D* hist, double low1, double low2);
         double Integrate(MnvH1D* hist, int start, int end);
@@ -218,6 +240,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataStackedMC(rootDir &dir, std::string var_name, std::string plotDir, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
+        void DrawDataStackedMC_WithSignalTypes(rootDir &dir, std::string var_name, std::string plotDir);
 
         // Other
         void PlotDelta();
