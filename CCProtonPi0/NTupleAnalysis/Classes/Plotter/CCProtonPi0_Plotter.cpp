@@ -49,10 +49,10 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotOtherStudies();
     //plotGENIEXSec();
     //UnfoldingStudy();
-    GENIE_Tuning_Study();
+    //GENIE_Tuning_Study();
     //Systematics();
     //W_Studies();
-    //QSq_Studies();
+    QSq_Studies();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -2518,8 +2518,10 @@ void CCProtonPi0_Plotter::W_Studies()
     //DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "W_2", plotDir);
 
     //printBins_W();
-    init_W_FitResults();
-    plot_W_FitResults();
+    //init_W_FitResults();
+    //plot_W_FitResults();
+    plot_W_FitMinuit(1.0,1.0,1.0);
+    plot_W_FitMinuit(0.931897,0.01,1.78231);
 }
 
 void CCProtonPi0_Plotter::QSq_Studies()
@@ -2537,9 +2539,9 @@ void CCProtonPi0_Plotter::QSq_Studies()
     //Draw2DHist(rootDir_Interaction, "QSq_response", plotDir);
     //Save2DHistPoints(rootDir_Interaction, "QSq_response", plotDir);
 
-    DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "QSq_All", plotDir);
-    DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "QSq_LowEnu", plotDir);
-    DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "QSq_HighEnu", plotDir);
+    //DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "QSq_All", plotDir);
+    //DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "QSq_LowEnu", plotDir);
+    //DrawDataStackedMC_WithSignalTypes(rootDir_Interaction, "QSq_HighEnu", plotDir);
 
     Draw_QSq_MaRES();
 }
@@ -2548,61 +2550,85 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES()
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
 
-    TFile* f_data = new TFile(rootDir_CrossSection.data.c_str());
-    TFile* f_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    CCProtonPi0_QSqFitter QSqFitter;
+    int ind = QSqFitter.GetMinChiSq();
 
-    MnvH1D* data = GetMnvH1D(f_data, "QSq_xsec");
-    MnvH1D* mc = GetMnvH1D(f_mc, "QSq_xsec");
+    TFile* f_data = new TFile(Folder_List::rootDir_Interaction_data.c_str());
+    TFile* f_mc = new TFile(Folder_List::rootDir_Interaction_mc.c_str());
 
-    MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
-
-    // First Plot Data vs MC with Nominal MaRES
-    plotter->headroom = 1.75;
-    plotter->data_line_width = 2;
-    plotter->data_marker_size = 1.5;
-    gStyle->SetEndErrorSize(6);
-    plotter->DrawDataMCWithErrorBand(data, mc, 1.0, "N", false, NULL, NULL, false, true);
-
-    MnvVertErrorBand* mc_err_band = mc->PopVertErrorBand("GENIE_MaRES");
-
-    std::vector<TH1D*> mc_errs = mc_err_band->GetHists();
-
-    double norm_bin_width = data->GetNormBinWidth();
-
-    for (unsigned int i = 0; i < mc_errs.size(); ++i){
-        mc_errs[i]->Scale(norm_bin_width,"width");
-        mc_errs[i]->SetLineColor(kBlue);
-        mc_errs[i]->SetLineWidth(2);
-        mc_errs[i]->Draw("HIST SAME");
-    }
-
+    TH1D* data = new TH1D( * dynamic_cast<TH1D*>(f_data->Get("QSq_HighMaRES_0")));
+    TH1D* mc_1sigma = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s%d","QSq_HighMaRES_",50))));
+    TH1D* mc_2sigma = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s%d","QSq_HighMaRES_",100))));
+    TH1D* mc_best = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s%d","QSq_HighMaRES_",ind))));
+    TH1D* mc_cv = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s%d","QSq_HighMaRES_",0))));
+ 
     data->SetMarkerStyle(20);
     data->SetMarkerSize(1);
     data->SetMarkerColor(kBlack);
     data->SetLineWidth(2);
     data->SetLineColor(kBlack);
 
-    mc->SetLineWidth(3);
-    mc->SetLineColor(kRed);
-    mc->SetFillColor(kWhite);
+    mc_cv->Scale(POT_ratio);
+    mc_cv->SetLineWidth(3);
+    mc_cv->SetLineColor(kRed);
+    mc_cv->SetFillColor(kWhite);
 
+    mc_best->Scale(POT_ratio);
+    mc_best->SetLineWidth(3);
+    mc_best->SetLineColor(kBlue);
+    mc_best->SetFillColor(kWhite);
 
-    TLegend *legend = new TLegend(0.65,0.7,0.9,0.9);  
+    mc_1sigma->Scale(POT_ratio);
+    mc_1sigma->SetLineWidth(2);
+    mc_1sigma->SetLineStyle(7);
+    mc_1sigma->SetLineColor(6); // Magenta
+    mc_1sigma->SetFillColor(kWhite);
+
+    mc_2sigma->Scale(POT_ratio);
+    mc_2sigma->SetLineWidth(2);
+    mc_2sigma->SetLineStyle(7);
+    mc_2sigma->SetLineColor(7); // Teal
+    mc_2sigma->SetFillColor(kWhite);
+
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    data->SetMaximum(data->GetMaximum()*1.75);
+    data->Draw("E1 X0");
+    mc_cv->Draw("HIST SAME");
+    mc_best->Draw("HIST SAME");
+    //mc_1sigma->Draw("HIST SAME");
+    //mc_2sigma->Draw("HIST SAME");
+
+    // TLegend
+    TLegend *legend = new TLegend(0.65,0.75,0.9,0.9);  
     legend->AddEntry(data, "Data (3.33e20 POT)", "lep");
-    legend->AddEntry(mc, "Simulation", "l");
-    legend->AddEntry(mc_errs[0], "MaRES -1#sigma", "l");
-    legend->AddEntry(mc_errs[1], "MaRES +1#sigma", "l");
+    legend->AddEntry(mc_cv, "GENIE CV", "l");
+    legend->AddEntry(mc_best, "MaRES Best", "l");
+    //legend->AddEntry(mc_1sigma, "MaRES +1#sigma", "l");
+    //legend->AddEntry(mc_2sigma, "MaRES +2#sigma", "l");
     legend->Draw();
  
+    // Add Text
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+    text.DrawLatex(0.65,0.66,Form("%s%3.2f%s", "GENIE MaRES = ", 1.12," GeV"));
+    text.DrawLatex(0.65,0.62,Form("%s%3.2f", "GENIE MaRES #chi^{2}/19 = ", QSqFitter.ChiSqVector_up[0]));
+    text.DrawLatex(0.65,0.58,Form("%s%3.2f%s", "Best MaRES = ", QSqFitter.MaRESVector_up[ind]," GeV"));
+    text.DrawLatex(0.65,0.54,Form("%s%3.2f", "Best MaRES #chi^{2}/19 = ", QSqFitter.ChiSqVector_up[ind]));
+
+
     // Save Plot 
+    gStyle->SetOptStat(0); 
     c->Update();
     c->Print(Form("%s%s",plotDir.c_str(),"QSq_MaRES.png"), "png");
 
     delete data;
-    delete mc;
+    delete mc_cv;
+    delete mc_best;
+    delete mc_1sigma;
+    delete mc_2sigma;
     delete c;
-    delete plotter;
     delete f_data;
     delete f_mc;
 }

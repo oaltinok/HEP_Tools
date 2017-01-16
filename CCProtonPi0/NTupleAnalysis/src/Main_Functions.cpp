@@ -8,6 +8,7 @@ const string runOption_Plot = "plot";
 const string runOption_Reduce = "reduce";
 const string runOption_CrossSection = "calc";
 const string runOption_FitSideBand = "fit";
+const string runOption_FitW = "fitW";
 
 const string typeOption_mc = "mc";
 const string typeOption_data = "data";
@@ -70,6 +71,7 @@ int GetMode(int argc, char* argv[])
     if (argc == 2){
         if (runSelect.compare(runOption_Plot) == 0) return 10;
         else if (runSelect.compare(runOption_FitSideBand) == 0) return 20;
+        else if (runSelect.compare(runOption_FitW) == 0) return 30;
         else return 0;
     }
      

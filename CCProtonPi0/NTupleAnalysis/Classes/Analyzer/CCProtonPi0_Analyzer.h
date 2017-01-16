@@ -40,6 +40,7 @@
 #include "../RandNumGenerator/CCProtonPi0_RandNumGenerator.h"
 #include "../BckgConstrainer/CCProtonPi0_BckgConstrainer.h"
 #include "../Counter/CCProtonPi0_Counter.h"
+#include "../QSqFitter/CCProtonPi0_QSqFitter.h"
 
 class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
 {
@@ -421,6 +422,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Counter counter3;
         CCProtonPi0_Counter counter4;
         CCProtonPi0_BckgConstrainer BckgConstrainer;
+        CCProtonPi0_QSqFitter QSqFitter;
 
         // Central Value Background Constraints
         double cv_wgt_SinglePiPlus;

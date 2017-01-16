@@ -24,6 +24,103 @@ void CCProtonPi0_Plotter::init_W_FitResults()
     pars_MC_nonRES_G2[2] = 0.3686;
 }
 
+void CCProtonPi0_Plotter::plot_W_FitMinuit(double wgt_DeltaRES, double wgt_OtherRES, double wgt_NonRES)
+{
+    // Get Background Subtracted Data
+    TFile* f_data = new TFile(rootDir_Interaction.data.c_str());
+    TFile* f_mc = new TFile(rootDir_Interaction.mc.c_str());
+    MnvH1D* data = GetMnvH1D(f_data, "W_All_0");
+    MnvH1D* mc_bckg = GetMnvH1D(f_mc, "W_All_2");
+
+    NormalizeHistogram(mc_bckg);
+    
+    const double nBckg = 2997.1; // Got number from Cross Section Calculation Log File
+    mc_bckg->Scale(nBckg);
+
+    data->Add(mc_bckg, -1); 
+
+    // Get MC Signal Types
+    MnvH1D* mc_DeltaRES = GetMnvH1D(f_mc, "W_All_7");
+    mc_DeltaRES->Scale(POT_ratio);
+    mc_DeltaRES->Scale(wgt_DeltaRES);
+    mc_DeltaRES->SetFillColor(kGray+1);
+    mc_DeltaRES->SetLineColor(kGray+1);
+    mc_DeltaRES->SetFillStyle(1001);
+
+    MnvH1D* mc_OtherRES = GetMnvH1D(f_mc, "W_All_8");
+    mc_OtherRES->Scale(POT_ratio);
+    mc_OtherRES->Scale(wgt_OtherRES);
+    mc_OtherRES->SetFillColor(kGreen+2);
+    mc_OtherRES->SetLineColor(kGreen+2);
+    mc_OtherRES->SetFillStyle(1001);
+
+    MnvH1D* mc_NonRES = GetMnvH1D(f_mc, "W_All_9");
+    mc_NonRES->Scale(POT_ratio);
+    mc_NonRES->Scale(wgt_NonRES);
+    mc_NonRES->SetFillColor(kRed+1);
+    mc_NonRES->SetLineColor(kRed+1);
+    mc_NonRES->SetFillStyle(1001);
+
+    TCanvas* c = new TCanvas("c","c",1280,800);
+    THStack *hs = new THStack("hs","W Minuit Fit");
+    hs->Add(mc_DeltaRES);
+    hs->Add(mc_OtherRES);
+    hs->Add(mc_NonRES);
+
+    double hs_max = hs->GetMaximum();
+    hs->SetMaximum(hs_max * 1.75);
+    hs->Draw("HIST");
+    hs->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
+    hs->GetYaxis()->SetTitle(data->GetYaxis()->GetTitle());
+
+    data->SetMarkerStyle(20);
+    data->SetMarkerSize(1);
+    data->SetMarkerColor(kBlack);
+    data->SetLineWidth(2);
+    data->SetLineColor(kBlack);
+    data->Draw("SAME E1 X0");
+
+    // ------------------------------------------------------------------------
+    // Plot Labels 
+    // ------------------------------------------------------------------------
+    TLegend *legend = new TLegend(0.6,0.7,0.8,0.9);  
+    legend->AddEntry(data, "Data (3.33e20 POT)", "lep" );
+    legend->AddEntry(mc_DeltaRES, "#Delta(1232) resonance","f");
+    legend->AddEntry(mc_OtherRES, "Other resonances","f");
+    legend->AddEntry(mc_NonRES, "Non-Resonant","f");
+    legend->Draw();
+
+    // Add Text
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+
+    text.DrawLatex(0.7, 0.64, Form("wgt(DeltaRES) = %3.2f", wgt_DeltaRES));
+    text.DrawLatex(0.7, 0.60, Form("wgt(OtherRES) = %3.2f", wgt_OtherRES));
+    text.DrawLatex(0.7, 0.56, Form("wgt(NonRES) = %3.2f", wgt_NonRES));
+
+    // Plot Output
+    gStyle->SetEndErrorSize(6);
+    gStyle->SetOptStat(0); 
+    c->Update();
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    std::string out_name;
+    std::string type;
+    if (wgt_DeltaRES == 1.0 && wgt_OtherRES == 1.0) type = "Nominal";
+    else type = "Fitted";
+    out_name = plotDir + "W_Fit_Minuit_" + type + ".png"; 
+
+    c->Print(out_name.c_str(),"png");
+
+//    delete mc_DeltaRES;
+//    delete mc_OtherRES;
+//    delete mc_NonRES;
+//    delete mc_bckg;
+//    delete data;
+//    delete f_data;
+//    delete f_mc;
+//    delete legend;
+}
 
 void CCProtonPi0_Plotter::plot_W_FitResults()
 {    
@@ -68,7 +165,11 @@ void CCProtonPi0_Plotter::printBins_W()
     MnvH1D* h_mc_W_All = GetMnvH1D(f_mc, "W_All_1");
     h_mc_W_All->Scale(POT_ratio);
     printBins(h_mc_W_All,"MC: W All");
- 
+  
+    MnvH1D* h_mc_W_All_7 = GetMnvH1D(f_mc, "W_All_7");
+    h_mc_W_All_7->Scale(POT_ratio);
+    printBins(h_mc_W_All_7,"MC: W Delta RES");
+
     MnvH1D* h_mc_W_All_8 = GetMnvH1D(f_mc, "W_All_8");
     h_mc_W_All_8->Scale(POT_ratio);
     printBins(h_mc_W_All_8,"MC: W Other RES");

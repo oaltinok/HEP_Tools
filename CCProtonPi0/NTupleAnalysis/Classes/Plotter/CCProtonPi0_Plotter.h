@@ -37,6 +37,7 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 #include "../BinList/CCProtonPi0_BinList.h"
+#include "../QSqFitter/CCProtonPi0_QSqFitter.h"
 
 using namespace PlotUtils;
 
@@ -177,6 +178,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         double pars_MC_nonRES_G2[3];
 
         void W_Studies();
+        void plot_W_FitMinuit(double wgt_DeltaRES, double wgt_OtherRES, double wgt_NonRES);
         void init_W_FitResults();
         void Get_BreitWigner(double* pars, double* x, double* y, int nPoints);
         void Get_Gaussian(double* pars, double* x, double* y, int nPoints);

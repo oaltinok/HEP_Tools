@@ -29,7 +29,9 @@ void Calculate_CrossSection(bool isMC);
 // See src/Minuit_Functions.cpp for definitions 
 void FitSideBands();
 void FitMinuit();
+void FitMinuit_W();
 void calc_ChiSq(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t iflag);
+void calc_ChiSq_W(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t iflag);
 double calc_ChiSq_SideBand(SideBand &sb, Double_t *par, int unv = 0, bool isPartial = false, int min_bin = 1, int max_bin = 1);
 
 int main(int argc, char *argv[] )
@@ -55,7 +57,7 @@ int main(int argc, char *argv[] )
     if ( nMode < 0) isMC = true;
     else isMC = false;
 
-    if (nMode != 10 || nMode != 20){
+    if (nMode != 10 || nMode != 20 || nMode != 30){
         if (isMC){
             cout<<"MC Playlists Selected!\n"<<endl;
             pl_reduce = "Input/Playlists/pl_MC_Merged.dat"; 
@@ -74,6 +76,7 @@ int main(int argc, char *argv[] )
     else if ( abs(nMode) == 3) Calculate_CrossSection(isMC);
     else if ( nMode == 10) Plot();
     else if ( nMode == 20) FitSideBands();
+    else if ( nMode == 30) FitMinuit_W();
     else{
         cout<<"Problem on Mode!, Returning"<<endl;
         return 0;

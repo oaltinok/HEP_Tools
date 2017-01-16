@@ -279,6 +279,19 @@ void CCProtonPi0_Interaction::initHistograms()
         QSq_HighEnu.push_back(temp);
     }
 
+    TH1D* h_temp;
+    for (int i = 0; i <= 100; ++i){
+        h_temp = new TH1D(Form("%s_%d","QSq_LowMaRES",i),"Q^{2}", 20, 0.0, 2.0);
+        h_temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+        h_temp->GetYaxis()->SetTitle("N(Events)");
+        QSq_LowMaRES.push_back(h_temp);
+
+        h_temp = new TH1D(Form("%s_%d","QSq_HighMaRES",i),"Q^{2}", 20, 0.0, 2.0);
+        h_temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
+        h_temp->GetYaxis()->SetTitle("N(Events)");
+        QSq_HighMaRES.push_back(h_temp);
+    }
+
     // Cross Section Variables
     QSq_all = new MnvH1D( "QSq_all","Data All Q^{2}", binList.size_QSq, binList.a_QSq);
     QSq_all->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
@@ -997,6 +1010,10 @@ void CCProtonPi0_Interaction::writeHistograms()
         QSq_HighEnu[i]->Write();
     }
 
+    for (int i = 0; i <=100; ++i){
+        QSq_LowMaRES[i]->Write();
+        QSq_HighMaRES[i]->Write();
+    }
     QSq_all->Write();
     QSq_mc_truth_signal->Write();
     QSq_mc_reco_all->Write();

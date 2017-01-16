@@ -1,4 +1,24 @@
 ===================================================================================================
+v3_03
+CCProtonPi0 Updates:
+	No major changes
+
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	W Fit using TMinuit
+
+	MaRES Fit using QSq Distribution
+		New Class: QSqFitter
+		Fill 101 Universes for each Up and Down Shift
+			Range up to 2 sigma shift
+		Get Event Weights by partitioning
+			0 to +1 sigma
+			+1 to +2 sigma
+			0 to -1 sigma
+			-1 to -2 sigma
+		Find Lowest ChiSq for Best MaRES Value
+				
+===================================================================================================
 v3_02
 CCProtonPi0 Updates:
 	No major changes

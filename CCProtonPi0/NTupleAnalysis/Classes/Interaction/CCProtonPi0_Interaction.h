@@ -86,6 +86,8 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> QSq_All;
         std::vector<MnvH1D*> QSq_LowEnu;
         std::vector<MnvH1D*> QSq_HighEnu;
+        std::vector<TH1D*> QSq_LowMaRES;
+        std::vector<TH1D*> QSq_HighMaRES;
 
         // QSq
         MnvH1D* QSq_all;

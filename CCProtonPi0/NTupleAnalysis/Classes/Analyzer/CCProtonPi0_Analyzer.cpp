@@ -8,11 +8,11 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
-    nMaxEvents = 1000;
+    nMaxEvents = 1;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
-    isDataAnalysis  = true;
+    isDataAnalysis = false;
     isScanRun = false;
     fillErrors_ByHand = true; // Affects only Vertical Error Bands - Lateral Bands always filled ByHand
     
@@ -320,7 +320,8 @@ CCProtonPi0_Analyzer::CCProtonPi0_Analyzer(bool isModeReduce, bool isMC) :
     pi0Blob(isModeReduce, isMC),
     bckgTool(isModeReduce),
     cutList(isModeReduce, isMC),
-    BckgConstrainer(Folder_List::BckgConstraints)
+    BckgConstrainer(Folder_List::BckgConstraints),
+    QSqFitter()
 {   
     cout<<"Initializing CCProtonPi0_Analyzer"<<endl;
 
@@ -2642,7 +2643,6 @@ bool CCProtonPi0_Analyzer::IsGenie_NonRES_n_piplus()
     }
 }
 
-
 void CCProtonPi0_Analyzer::Test_GENIE_DIS()
 {
     if ( mc_intType != 3 ) return;
@@ -2696,6 +2696,26 @@ void CCProtonPi0_Analyzer::Study_QSq()
         FillHistogram(interaction.QSq_LowEnu, QSq_reco);
     }else{
         FillHistogram(interaction.QSq_HighEnu, QSq_reco);
+    }
+
+    if (m_isMC){
+        std::vector<double> wgts_up = QSqFitter.GetWeights(truth_genie_wgt_MaRES[4], truth_genie_wgt_MaRES[5]);
+
+        for (unsigned int i = 0; i < wgts_up.size(); ++i){
+            double cvweight_MaRES = cvweight * wgts_up[i];
+            interaction.QSq_HighMaRES[i]->Fill(QSq_reco, cvweight_MaRES);
+        }
+
+        std::vector<double> wgts_dn = QSqFitter.GetWeights(truth_genie_wgt_MaRES[2], truth_genie_wgt_MaRES[1]);
+
+        for (unsigned int i = 0; i < wgts_dn.size(); ++i){
+            double cvweight_MaRES = cvweight * wgts_dn[i];
+            interaction.QSq_LowMaRES[i]->Fill(QSq_reco, cvweight_MaRES);
+        }
+
+    }else{
+        interaction.QSq_HighMaRES[0]->Fill(QSq_reco);
+        interaction.QSq_LowMaRES[0]->Fill(QSq_reco);
     }
 }
 
@@ -2791,6 +2811,8 @@ void CCProtonPi0_Analyzer::writeEventTypeTableLine(CCProtonPi0_Counter &counter,
     eventTypeTable.width(8); eventTypeTable<<counter.calcPercent(base.getCount());
     eventTypeTable<<std::endl; 
 }
+
+
 #endif //CCProtonPi0_Analyzer_cpp
 
 

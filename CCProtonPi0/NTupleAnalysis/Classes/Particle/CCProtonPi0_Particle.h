@@ -1,14 +1,3 @@
-/*
-================================================================================
-Class: CCProtonPi0_Particle
-    CCProtonPi0_Particle Class defines a particle which will be used in the analysis
-   
-    Uses ROOT and MINERvA Specific classes
-    
-    Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
-================================================================================
-*/
-
 #ifndef CCProtonPi0_Particle_h
 #define CCProtonPi0_Particle_h
 
