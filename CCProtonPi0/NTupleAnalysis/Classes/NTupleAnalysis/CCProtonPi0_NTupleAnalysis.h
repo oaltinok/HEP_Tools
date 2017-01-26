@@ -71,6 +71,8 @@ class CCProtonPi0_NTupleAnalysis
         static const double piplus_mass;
         static const double proton_mass;
         static const double neutron_mass;
+        static const double beam_theta;
+        static const double beam_phi;
 
         // GENIE Tuning
         static const double genieMaRes;
@@ -191,6 +193,15 @@ class CCProtonPi0_NTupleAnalysis
         template<class MnvHistoType>
             void AddVertErrorBandAndFillWithCV_PionResponse(MnvHistoType* h);
 
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_HighMaRES(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_LowMaRES(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBandAndFillWithCV_DeltaFactor(MnvHistoType* h);
+
         // Lateral Error Bands
         template<class MnvHistoType>
             void AddLatErrorBands_Data(MnvHistoType* h);
@@ -270,6 +281,15 @@ class CCProtonPi0_NTupleAnalysis
 
         template<class MnvHistoType>
             void AddVertErrorBand_PionResponse(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_HighMaRES(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_LowMaRES(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddVertErrorBand_DeltaFactor(MnvHistoType* h);
 
         // Lateral Error Bands
         template<class MnvHistoType>

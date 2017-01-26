@@ -61,20 +61,22 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> W_1Track;
         std::vector<MnvH1D*> W_2Track;
   
-        // Vertex & Extra Energy
-        std::vector<MnvH1D*> vertex_energy_1Track;
-        std::vector<MnvH1D*> vertex_evis_1Track;
+        // Extra Energy
         std::vector<MnvH1D*> extra_leftover_energy_1Track;
         std::vector<MnvH1D*> extra_muon_energy_1Track;
         std::vector<MnvH1D*> extra_rejected_energy_1Track;
         std::vector<MnvH1D*> extra_total_energy_1Track;
         
-        std::vector<MnvH1D*> vertex_energy_2Track;
-        std::vector<MnvH1D*> vertex_evis_2Track;
         std::vector<MnvH1D*> extra_leftover_energy_2Track;
         std::vector<MnvH1D*> extra_muon_energy_2Track;
         std::vector<MnvH1D*> extra_rejected_energy_2Track;
         std::vector<MnvH1D*> extra_total_energy_2Track;
+
+        // Background Subtraction for Studies
+        std::vector<MnvH1D*> pi0_invMass_All; 
+        std::vector<MnvH1D*> pi0_invMass_1Track;
+        std::vector<MnvH1D*> pi0_invMass_2Track;
+        std::vector<MnvH1D*> pi0_invMass_DeltaSuppression;
 
         // W Study
         std::vector<MnvH1D*> W_p_pi0;
@@ -84,10 +86,30 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
 
         // QSq Study
         std::vector<MnvH1D*> QSq_All;
-        std::vector<MnvH1D*> QSq_LowEnu;
-        std::vector<MnvH1D*> QSq_HighEnu;
+        std::vector<MnvH1D*> QSq_DeltaSuppression;
+        std::vector<TH1D*> pi0_invMass_LowMaRES; 
+        std::vector<TH1D*> pi0_invMass_HighMaRES; 
         std::vector<TH1D*> QSq_LowMaRES;
         std::vector<TH1D*> QSq_HighMaRES;
+        std::vector<TH1D*> QSq_LowMaRES_Bckg;
+        std::vector<TH1D*> QSq_HighMaRES_Bckg;
+
+        // 2p2h Study
+        std::vector<MnvH1D*> vertex_energy_All;
+        std::vector<MnvH1D*> vertex_energy_1Track;
+        std::vector<MnvH1D*> vertex_energy_2Track;
+
+        std::vector<MnvH1D*> vertex_evis_All;
+        std::vector<MnvH1D*> vertex_evis_1Track;
+        std::vector<MnvH1D*> vertex_evis_2Track;
+
+        std::vector<MnvH2D*> q3_q0_All;
+        std::vector<MnvH2D*> q3_q0_1Track;
+        std::vector<MnvH2D*> q3_q0_2Track;
+
+        std::vector<MnvH2D*> W_QSq_All;
+        std::vector<MnvH2D*> W_QSq_1Track;
+        std::vector<MnvH2D*> W_QSq_2Track;
 
         // QSq
         MnvH1D* QSq_all;

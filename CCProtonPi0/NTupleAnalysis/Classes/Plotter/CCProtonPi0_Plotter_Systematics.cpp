@@ -24,44 +24,132 @@ void CCProtonPi0_Plotter::Systematics_invMass()
 
 void CCProtonPi0_Plotter::Systematics_XSec()
 {
-    //Systematics_DrawErrorSummary("muon_P_xsec", "muon_P_xsec");
-    //Systematics_DrawErrorSummary("muon_theta_xsec", "muon_theta_xsec");
-    //Systematics_DrawErrorSummary("pi0_P_xsec", "pi0_P_xsec");
-    //Systematics_DrawErrorSummary("pi0_KE_xsec", "pi0_KE_xsec");
-    //Systematics_DrawErrorSummary("pi0_theta_xsec", "pi0_theta_xsec");
-    //Systematics_DrawErrorSummary("QSq_xsec", "QSq_xsec");
-    //Systematics_DrawErrorSummary("Enu_xsec", "Enu_xsec");
+    Systematics_DrawErrorSummary("muon_P_xsec", "muon_P_xsec");
+    Systematics_DrawErrorSummary("muon_theta_xsec", "muon_theta_xsec");
+    Systematics_DrawErrorSummary("pi0_P_xsec", "pi0_P_xsec");
+    Systematics_DrawErrorSummary("pi0_KE_xsec", "pi0_KE_xsec");
+    Systematics_DrawErrorSummary("pi0_theta_xsec", "pi0_theta_xsec");
+    Systematics_DrawErrorSummary("QSq_xsec", "QSq_xsec");
+    Systematics_DrawErrorSummary("Enu_xsec", "Enu_xsec");
     //Systematics_DrawErrorSummary("W_xsec", "W_xsec");
 
-    Systematics_DrawErrorBand_GENIE("muon_P_xsec");
-    Systematics_DrawErrorBand_GENIE("muon_theta_xsec");
-    Systematics_DrawErrorBand_GENIE("pi0_P_xsec");
-    Systematics_DrawErrorBand_GENIE("pi0_KE_xsec");
-    Systematics_DrawErrorBand_GENIE("pi0_theta_xsec");
-    Systematics_DrawErrorBand_GENIE("QSq_xsec");
-    //Systematics_DrawErrorBand_GENIE("W_xsec");
-    Systematics_DrawErrorBand_GENIE("Enu_xsec");
+    // Group I -- Detector
+    Systematics_DrawErrorSummary_Group("muon_P_xsec", "muon_P_xsec", detGroup, "Detector");
+    Systematics_DrawErrorSummary_Group("muon_theta_xsec", "muon_theta_xsec", detGroup, "Detector");
+    Systematics_DrawErrorSummary_Group("pi0_P_xsec", "pi0_P_xsec", detGroup, "Detector");
+    Systematics_DrawErrorSummary_Group("pi0_KE_xsec", "pi0_KE_xsec", detGroup, "Detector");
+    Systematics_DrawErrorSummary_Group("pi0_theta_xsec", "pi0_theta_xsec", detGroup, "Detector");
+    Systematics_DrawErrorSummary_Group("QSq_xsec", "QSq_xsec", detGroup, "Detector");
+    Systematics_DrawErrorSummary_Group("Enu_xsec", "Enu_xsec", detGroup, "Detector");
+    //Systematics_DrawErrorSummary_Group("W_xsec", "W_xsec", detGroup, "Detector");
+
+    // Group II -- GENIE Cross Section 
+    Systematics_DrawErrorSummary_Group("muon_P_xsec", "muon_P_xsec", genieGroup, "GENIE_XSec");
+    Systematics_DrawErrorSummary_Group("muon_theta_xsec", "muon_theta_xsec", genieGroup, "GENIE_XSec");
+    Systematics_DrawErrorSummary_Group("pi0_P_xsec", "pi0_P_xsec", genieGroup, "GENIE_XSec");
+    Systematics_DrawErrorSummary_Group("pi0_KE_xsec", "pi0_KE_xsec", genieGroup, "GENIE_XSec");
+    Systematics_DrawErrorSummary_Group("pi0_theta_xsec", "pi0_theta_xsec", genieGroup, "GENIE_XSec");
+    Systematics_DrawErrorSummary_Group("QSq_xsec", "QSq_xsec", genieGroup, "GENIE_XSec");
+    Systematics_DrawErrorSummary_Group("Enu_xsec", "Enu_xsec", genieGroup, "GENIE_XSec");
+    //Systematics_DrawErrorSummary_Group("W_xsec", "W_xsec", genieGroup, "GENIE_XSec");
+
+    // Group III -- GENIE FSI 
+    Systematics_DrawErrorSummary_Group("muon_P_xsec", "muon_P_xsec", fsiGroup, "GENIE_FSI");
+    Systematics_DrawErrorSummary_Group("muon_theta_xsec", "muon_theta_xsec", fsiGroup, "GENIE_FSI");
+    Systematics_DrawErrorSummary_Group("pi0_P_xsec", "pi0_P_xsec", fsiGroup, "GENIE_FSI");
+    Systematics_DrawErrorSummary_Group("pi0_KE_xsec", "pi0_KE_xsec", fsiGroup, "GENIE_FSI");
+    Systematics_DrawErrorSummary_Group("pi0_theta_xsec", "pi0_theta_xsec", fsiGroup, "GENIE_FSI");
+    Systematics_DrawErrorSummary_Group("QSq_xsec", "QSq_xsec", fsiGroup, "GENIE_FSI");
+    Systematics_DrawErrorSummary_Group("Enu_xsec", "Enu_xsec", fsiGroup, "GENIE_FSI");
+    //Systematics_DrawErrorSummary_Group("W_xsec", "W_xsec", fsiGroup, "GENIE_FSI");
+
+    // Group IV -- Flux 
+    Systematics_DrawErrorSummary_Group("muon_P_xsec", "muon_P_xsec", fluxGroup, "Flux");
+    Systematics_DrawErrorSummary_Group("muon_theta_xsec", "muon_theta_xsec", fluxGroup, "Flux");
+    Systematics_DrawErrorSummary_Group("pi0_P_xsec", "pi0_P_xsec", fluxGroup, "Flux");
+    Systematics_DrawErrorSummary_Group("pi0_KE_xsec", "pi0_KE_xsec", fluxGroup, "Flux");
+    Systematics_DrawErrorSummary_Group("pi0_theta_xsec", "pi0_theta_xsec", fluxGroup, "Flux");
+    Systematics_DrawErrorSummary_Group("QSq_xsec", "QSq_xsec", fluxGroup, "Flux");
+    Systematics_DrawErrorSummary_Group("Enu_xsec", "Enu_xsec", fluxGroup, "Flux");
+    //Systematics_DrawErrorSummary_Group("W_xsec", "W_xsec", fluxGroup, "Flux");
+
+    // Group V -- Other 
+    Systematics_DrawErrorSummary_Group("muon_P_xsec", "muon_P_xsec", otherGroup, "Other");
+    Systematics_DrawErrorSummary_Group("muon_theta_xsec", "muon_theta_xsec", otherGroup, "Other");
+    Systematics_DrawErrorSummary_Group("pi0_P_xsec", "pi0_P_xsec", otherGroup, "Other");
+    Systematics_DrawErrorSummary_Group("pi0_KE_xsec", "pi0_KE_xsec", otherGroup, "Other");
+    Systematics_DrawErrorSummary_Group("pi0_theta_xsec", "pi0_theta_xsec", otherGroup, "Other");
+    Systematics_DrawErrorSummary_Group("QSq_xsec", "QSq_xsec", otherGroup, "Other");
+    Systematics_DrawErrorSummary_Group("Enu_xsec", "Enu_xsec", otherGroup, "Other");
+    //Systematics_DrawErrorSummary_Group("W_xsec", "W_xsec", otherGroup, "Other");
+
+    //Systematics_DrawErrorBand_GENIE("muon_P_xsec");
+    //Systematics_DrawErrorBand_GENIE("muon_theta_xsec");
+    //Systematics_DrawErrorBand_GENIE("pi0_P_xsec");
+    //Systematics_DrawErrorBand_GENIE("pi0_KE_xsec");
+    //Systematics_DrawErrorBand_GENIE("pi0_theta_xsec");
+    //Systematics_DrawErrorBand_GENIE("QSq_xsec");
+    ////Systematics_DrawErrorBand_GENIE("W_xsec");
+    //Systematics_DrawErrorBand_GENIE("Enu_xsec");
 }
 
 void CCProtonPi0_Plotter::Systematics_DrawErrorSummary(std::string data_var, std::string mc_var)
 {
+    // Silence compiler warning
+    (void) mc_var;
+    
     std::string plotDir = Folder_List::plotDir_Systematics_Summary;
     TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
-    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    //TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
 
     MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
-    MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
+    //MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
     
     data_var = "data_" + data_var;
 
     DrawErrorSummary(data, data_var, plotDir);
-    DrawErrorSummary(mc, mc_var, plotDir);
-
-    Systematics_WriteTable_Fraction(data, data_var);
-    Systematics_WriteTable_BinByBin(data, data_var);
+    //DrawErrorSummary(mc, mc_var, plotDir);
 
     delete data;
-    delete mc;
+    //delete mc;
+}
+
+void CCProtonPi0_Plotter::Systematics_DrawErrorSummary_Group(std::string data_var, std::string mc_var, std::vector<std::string> errGroup, std::string group_name)
+{
+    // Silence compiler warning
+    (void) mc_var;
+ 
+    std::string plotDir = Folder_List::plotDir_Systematics_Summary;
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+
+    MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
+   
+    // Remove Vertical Error Bands not in the Group
+    std::vector<std::string> vert_errors = data->GetVertErrorBandNames();
+    
+    for (unsigned int i = 0; i < vert_errors.size(); ++i){
+        if (!IsErrorInGroup(vert_errors[i], errGroup)){ 
+            MnvVertErrorBand* non_group = data->PopVertErrorBand(vert_errors[i]);
+            delete non_group;
+        }
+    }
+
+    // Remove Lateral Error Bands not in the Group
+    std::vector<std::string> lat_errors = data->GetLatErrorBandNames();
+    
+    for (unsigned int i = 0; i < lat_errors.size(); ++i){
+        if (!IsErrorInGroup(lat_errors[i], errGroup)){ 
+            MnvLatErrorBand* non_group = data->PopLatErrorBand(lat_errors[i]);
+            delete non_group;
+        }
+    }
+
+    data_var = data_var + "_" + group_name;
+
+    DrawErrorSummary(data, data_var, plotDir, false);
+
+    delete data;
+    delete f_xsec_data;
 }
 
 void CCProtonPi0_Plotter::Systematics_DrawErrorBand_GENIE(std::string data_var)
@@ -158,41 +246,42 @@ void CCProtonPi0_Plotter::Systematics_WriteTables(std::string var_name)
     TFile* f_data = new TFile(rootDir_CrossSection.data.c_str());
 
     std::string var;
-    
+    MnvH1D* hist = NULL;
+
     // Original
-    var = var_name + "_" + "all";
-    MnvH1D* hist = GetMnvH1D(f_data, var);
-    Systematics_WriteTable_Fraction(hist, var);
-    Systematics_WriteTable_BinByBin(hist, var);
-    delete hist;
- 
-    // Background Subtracted 
-    var = var_name + "_" + "bckg_subtracted";
-    hist = GetMnvH1D(f_data, var);
-    Systematics_WriteTable_Fraction(hist, var);
-    Systematics_WriteTable_BinByBin(hist, var);
-    delete hist;
- 
-    // Unfolded 
-    var = var_name + "_" + "unfolded";
-    hist = GetMnvH1D(f_data, var);
-    Systematics_WriteTable_Fraction(hist, var);
-    Systematics_WriteTable_BinByBin(hist, var);
-    delete hist;
- 
-    // Efficiency Corrected 
-    var = var_name + "_" + "efficiency_corrected";
-    hist = GetMnvH1D(f_data, var);
-    Systematics_WriteTable_Fraction(hist, var);
-    Systematics_WriteTable_BinByBin(hist, var);
-    delete hist;
- 
-    // Flux Integrated 
-    var = var_name + "_" + "flux_integrated";
-    hist = GetMnvH1D(f_data, var);
-    Systematics_WriteTable_Fraction(hist, var);
-    Systematics_WriteTable_BinByBin(hist, var);
-    delete hist;
+//    var = var_name + "_" + "all";
+//    hist = GetMnvH1D(f_data, var);
+//    Systematics_WriteTable_Fraction(hist, var);
+//    Systematics_WriteTable_BinByBin(hist, var);
+//    delete hist;
+// 
+//    // Background Subtracted 
+//    var = var_name + "_" + "bckg_subtracted";
+//    hist = GetMnvH1D(f_data, var);
+//    Systematics_WriteTable_Fraction(hist, var);
+//    Systematics_WriteTable_BinByBin(hist, var);
+//    delete hist;
+// 
+//    // Unfolded 
+//    var = var_name + "_" + "unfolded";
+//    hist = GetMnvH1D(f_data, var);
+//    Systematics_WriteTable_Fraction(hist, var);
+//    Systematics_WriteTable_BinByBin(hist, var);
+//    delete hist;
+// 
+//    // Efficiency Corrected 
+//    var = var_name + "_" + "efficiency_corrected";
+//    hist = GetMnvH1D(f_data, var);
+//    Systematics_WriteTable_Fraction(hist, var);
+//    Systematics_WriteTable_BinByBin(hist, var);
+//    delete hist;
+// 
+//    // Flux Integrated 
+//    var = var_name + "_" + "flux_integrated";
+//    hist = GetMnvH1D(f_data, var);
+//    Systematics_WriteTable_Fraction(hist, var);
+//    Systematics_WriteTable_BinByBin(hist, var);
+//    delete hist;
  
     // Cross Section 
     var = var_name + "_" + "xsec";
@@ -384,6 +473,7 @@ void CCProtonPi0_Plotter::Systematics_SetErrorSummaryGroups()
     otherGroup.push_back("BckgConstraint_QELike");
     otherGroup.push_back("BckgConstraint_SinglePiPlus");
     otherGroup.push_back("Unfolding");
+    otherGroup.push_back("2p2h");
 }
 
 bool CCProtonPi0_Plotter::IsErrorInGroup(std::string err_name, std::vector<std::string> errGroup)
@@ -435,3 +525,11 @@ TH1D* CCProtonPi0_Plotter::GetTotalErrorInGroup(MnvH1D* hist, std::vector<std::s
     return total_error;
 }
 
+void CCProtonPi0_Plotter::Clear_ErrorSummaryGroups()
+{
+    detGroup.clear();
+    genieGroup.clear();
+    fsiGroup.clear();
+    fluxGroup.clear();
+    otherGroup.clear();
+}

@@ -67,17 +67,17 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     TObjArray* mc_hists = new TObjArray;
     MnvH1D* temp;
 
-    // Get Signal
-    var = Form("%s_%d",var_name.c_str(),1);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Signal");
-    mc_hists->Add(temp);
-    area_mc += temp->Integral() * mc_ratio;
-
     // Get All Background
     var = Form("%s_%d",var_name.c_str(),2);
     temp = (MnvH1D*)f_mc->Get(var.c_str());
     temp->SetTitle("Background");
+    mc_hists->Add(temp);
+    area_mc += temp->Integral() * mc_ratio;
+
+    // Get Signal
+    var = Form("%s_%d",var_name.c_str(),1);
+    temp = (MnvH1D*)f_mc->Get(var.c_str());
+    temp->SetTitle("Signal");
     mc_hists->Add(temp);
     area_mc += temp->Integral() * mc_ratio;
 
@@ -89,7 +89,8 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     ApplyStyle(plotter);
     //plotter->axis_minimum = 0.1;
     plotter->axis_minimum = 0.0;
-    plotter->DrawDataStackedMC(data,mc_hists,mc_ratio,"TR","Data",3,-1);
+    //plotter->DrawDataStackedMC(data,mc_hists,mc_ratio,"TR","Data",3,-1); // Signal First 
+    plotter->DrawDataStackedMC(data,mc_hists,mc_ratio,"TR","Data",2,1); // Bckg First
 
     // Add Plot Labels
     plotter->AddHistoTitle(data[0].GetTitle());
@@ -247,7 +248,7 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupError
     plotter->legend_text_size = 0.02;
     plotter->legend_n_columns = 2;
     plotter->height_nspaces_per_hist = 0.5;
-    plotter->width_xspace_per_letter = 0.1;
+    plotter->width_xspace_per_letter = 0.2;
 
     if (groupErrors){
         //-- define colors of the standard errors
@@ -275,7 +276,7 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     ApplyStyle_Errors(plotter, groupErrors);
 
     plotter->axis_maximum = 0.5;
-    plotter->DrawErrorSummary(hist,"TR", true, true, 0.0);
+    plotter->DrawErrorSummary(hist,"TR", false, false, 0.0);
 
     // Add Plot Labels
     plotter->AddHistoTitle(hist->GetTitle());
@@ -322,15 +323,27 @@ void CCProtonPi0_Plotter::DrawDataMC(rootDir& dir, std::string var_name, std::st
     //std::string var = Form("%s_%d",var_name.c_str(),0);
     std::string var = var_name;
 
-    // POT Normalized
     MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
-    DrawDataMC(data, mc, var_name, plotDir, true);
-
-    // Area Normalized
-    mc = (MnvH1D*)f_mc->Get(var.c_str());
-    data = (MnvH1D*)f_data->Get(var.c_str()); 
     DrawDataMC(data, mc, var_name, plotDir, false);
+}
+
+void CCProtonPi0_Plotter::DrawDataMC_Signal(rootDir& dir, std::string var_name, std::string plotDir, double nBckg)
+{
+    std::string rootDir_mc = dir.mc;
+    std::string rootDir_data = dir.data;
+
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+
+    std::string var = Form("%s_%d",var_name.c_str(),1);
+
+    MnvH1D* data = GetBckgSubtractedData(dir, var_name, nBckg);
+    MnvH1D* mc = GetMnvH1D(f_mc, var);
+    DrawDataMC(data, mc, var_name, plotDir, false);
+
+    delete data;
+    delete mc;
+    delete f_mc;
 }
 
 void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec)
@@ -927,6 +940,49 @@ void CCProtonPi0_Plotter::DrawMnvH1D(MnvH1D* hist1D, std::string var_name, std::
     delete hist1D;
 }
 
+void CCProtonPi0_Plotter::DrawMnvH2D(MnvH2D* hist2D, std::string var_name, std::string plotDir, bool isMC)
+{
+    std::string plot_label = isMC ? "MC" : "Data";
+
+    // Canvas
+    Double_t w = 800; 
+    Double_t h = 800;
+    TCanvas* c = new TCanvas("c","c",w,h);
+    c->SetWindowSize(w,h);
+
+    // Pad
+    TPad *p = new TPad("p","p",0.05,0.05,0.95,0.95);
+    p->Draw();
+
+    p->cd();
+    hist2D->GetYaxis()->SetTitleOffset(1.8);
+    hist2D->Draw("colz");
+    gPad->Update();
+
+    gStyle->SetOptStat(0); 
+    c->Update();
+
+    c->Print(Form("%s%s_%s%s",plotDir.c_str(),var_name.c_str(),plot_label.c_str(), ".png"), "png");
+
+    delete p;
+    delete c;
+}
+
+void CCProtonPi0_Plotter::DrawMnvH2D(std::string root_dir, std::string var_name, std::string plotDir)
+{
+    std::size_t found = root_dir.find("Data");
+    
+    bool isMC = (found == std::string::npos) ? true : false;
+
+    TFile* f = new TFile(root_dir.c_str());
+    MnvH2D* hist2D = GetMnvH2D(f, var_name);
+
+    DrawMnvH2D(hist2D, var_name, plotDir, isMC);
+
+    delete f;
+    delete hist2D;
+}
+
 void CCProtonPi0_Plotter::DrawMnvH1D(rootDir& dir, std::string var_name, std::string plotDir)
 {
     // Get Histogram
@@ -1059,7 +1115,7 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
 
     // Canvas
     Double_t w = 800; 
-    Double_t h = 800;
+    Double_t h = 80;
     TCanvas* c = new TCanvas("c","c",w,h);
     c->SetWindowSize(w,h);
 
@@ -2002,6 +2058,301 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_WithSignalTypes(rootDir &dir, std::s
 
     delete f_data;
     delete f_mc;
+}
+
+// Returns a "new" MnvH1D -- Do not forget to delete
+MnvH1D* CCProtonPi0_Plotter::GetBckgSubtractedData(rootDir& dir, std::string var_name, double nBckg)
+{
+    TFile* f_data = new TFile(dir.data.c_str());
+    TFile* f_mc  = new TFile(dir.mc.c_str());
+
+    // Get Data Histogram
+    std::string var = var_name + "_0";
+    MnvH1D* h_data = GetMnvH1D(f_data,var); 
+
+    // Get MC Background and Normalize
+    var = var_name + "_2";
+    MnvH1D* h_mc_bckg = GetMnvH1D(f_mc,var);
+    NormalizeHistogram(h_mc_bckg);
+    h_mc_bckg->Scale(nBckg);
+    
+    // Subtract Background
+    h_data->Add(h_mc_bckg, -1);
+
+    delete h_mc_bckg;
+    delete f_data;
+    delete f_mc;
+
+    return h_data;
+}
+
+// Returns a "new" MnvH2D -- Do not forget to delete
+MnvH2D* CCProtonPi0_Plotter::GetBckgSubtractedData_2D(rootDir& dir, std::string var_name, double nBckg)
+{
+    TFile* f_data = new TFile(dir.data.c_str());
+    TFile* f_mc  = new TFile(dir.mc.c_str());
+
+    // Get Data Histogram
+    std::string var = var_name + "_0";
+    MnvH2D* h_data = GetMnvH2D(f_data,var); 
+
+    // Get MC Background and Normalize
+    var = var_name + "_2";
+    MnvH2D* h_mc_bckg = GetMnvH2D(f_mc,var);
+    NormalizeHistogram(h_mc_bckg);
+    h_mc_bckg->Scale(nBckg);
+    
+    // Subtract Background
+    h_data->Add(h_mc_bckg, -1);
+
+    delete h_mc_bckg;
+    delete f_data;
+    delete f_mc;
+
+    return h_data;
+}
+
+void CCProtonPi0_Plotter::DrawDataStackedMC_Signal(rootDir &dir, std::string var_name, std::string plotDir, double nBckg)
+{
+    std::string var;
+
+    double mc_ratio = POT_ratio;
+
+    // Open ROOT Files
+    TFile* f_data = new TFile(dir.data.c_str());
+    TFile* f_mc = new TFile(dir.mc.c_str());
+
+    // Get Bckg Subtracted Data Histogram
+    MnvH1D* h_data = GetBckgSubtractedData(dir, var_name, nBckg); 
+    h_data->SetMarkerStyle(20);
+    h_data->SetMarkerSize(1);
+    h_data->SetMarkerColor(kBlack);
+    h_data->SetLineWidth(2);
+    h_data->SetLineColor(kBlack);
+
+    // Get Signal: Delta RES
+    var = var_name + "_7";
+    MnvH1D* h_signal_delta_res = GetMnvH1D(f_mc,var);
+    h_signal_delta_res->Scale(mc_ratio);
+    h_signal_delta_res->SetLineWidth(1);
+    h_signal_delta_res->SetLineColor(kGray+1);
+    h_signal_delta_res->SetFillColor(kGray+1);
+    h_signal_delta_res->SetFillStyle(1001);
+
+    // Get Signal: Other RES
+    var = var_name + "_8";
+    MnvH1D* h_signal_other_res = GetMnvH1D(f_mc,var);
+    h_signal_other_res->Scale(mc_ratio);
+    h_signal_other_res->SetLineWidth(1);
+    h_signal_other_res->SetLineColor(kGreen+2);
+    h_signal_other_res->SetFillColor(kGreen+2);
+    h_signal_other_res->SetFillStyle(1001);
+
+    // Get Signal: Non-RES
+    var = var_name + "_9";
+    MnvH1D* h_signal_non_res = GetMnvH1D(f_mc,var);
+    h_signal_non_res->Scale(mc_ratio);
+    h_signal_non_res->SetLineWidth(1);
+    h_signal_non_res->SetLineColor(kRed+1);
+    h_signal_non_res->SetFillColor(kRed+1);
+    h_signal_non_res->SetFillStyle(1001);
+
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    THStack *hs = new THStack("hs",var_name.c_str());
+    hs->Add(h_signal_delta_res);
+    hs->Add(h_signal_other_res);
+    hs->Add(h_signal_non_res);
+
+    double hs_max = hs->GetMaximum();
+    hs->SetMaximum(hs_max * 1.5);
+    hs->Draw("HIST");
+    hs->SetTitle(h_data->GetTitle());
+    hs->GetXaxis()->SetTitle(h_data->GetXaxis()->GetTitle());
+    hs->GetYaxis()->SetTitle(h_data->GetYaxis()->GetTitle());
+
+    h_data->Draw("SAME E1 X0");
+
+    // ------------------------------------------------------------------------
+    // Plot Labels 
+    // ------------------------------------------------------------------------
+    TLegend *legend = new TLegend(0.6,0.75,0.9,0.9);  
+    legend->AddEntry(h_data, "Data (3.33e20 POT)", "lep" );
+    legend->AddEntry(h_signal_delta_res, "Signal: #Delta Res","f");
+    legend->AddEntry(h_signal_other_res, "Signal: Other Res","f");
+    legend->AddEntry(h_signal_non_res, "Signal: Non-Res","f");
+    legend->Draw();
+
+    // Add Text
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+
+    text.DrawLatex(0.2, 0.85, "#color[4]{POT Normalized}");
+
+    std::size_t found = var_name.find("W");
+    if (found != std::string::npos){
+        TLine deltaMass;
+        deltaMass.SetLineWidth(3);
+        deltaMass.SetLineColor(kBlue);
+        deltaMass.DrawLine(1.232,0,1.232,hs_max * 1.2);
+    }
+
+    // Plot Output
+    gStyle->SetEndErrorSize(6);
+    gStyle->SetOptStat(0); 
+    c->Update();
+    std::string out_name;
+    out_name = plotDir + var_name + "_Signal" + ".png"; 
+
+    c->Print(out_name.c_str(),"png");
+
+    delete legend;
+    delete c;
+
+    delete f_data;
+    delete f_mc;
+}
+
+void CCProtonPi0_Plotter::DrawDataMCSignal_Diff(rootDir& dir, std::string var_name, std::string plotDir, double nBckg)
+{
+    std::string rootDir_mc = dir.mc;
+    std::string rootDir_data = dir.data;
+
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+
+    std::string var = Form("%s_%d",var_name.c_str(),1);
+
+    MnvH1D* data = GetBckgSubtractedData(dir, var_name, nBckg);
+    MnvH1D* mc = GetMnvH1D(f_mc, var);
+    mc->Scale(POT_ratio);
+   
+    data->Add(mc,-1);
+    data->SetLineWidth(1);
+    data->SetLineColor(kRed);
+    data->SetFillColor(kRed);
+    data->SetFillStyle(3010);
+
+    TCanvas* c = new TCanvas("c","c",1280,800);
+    data->Draw("HIST");
+
+    // Add Text
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+    text.DrawLatex(0.60,0.85,Form("%s%3.2f", "Area(Data-MC) = ", data->Integral()));
+    
+    // Save Plot 
+    //gStyle->SetOptStat(0); 
+    c->Update();
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_Diff.png"), "png");
+
+    delete c;
+    delete data;
+    delete mc;
+    delete f_mc;
+}
+
+void CCProtonPi0_Plotter::DrawDataMCSignal_Diff_2D(rootDir& dir, std::string var_name, std::string plotDir, double nBckg)
+{
+    std::string rootDir_mc = dir.mc;
+    std::string rootDir_data = dir.data;
+
+    TFile* f_mc = new TFile(rootDir_mc.c_str());
+
+    std::string var = Form("%s_%d",var_name.c_str(),1);
+
+    MnvH2D* data = GetBckgSubtractedData_2D(dir, var_name, nBckg);
+    MnvH2D* mc = GetMnvH2D(f_mc, var);
+    mc->Scale(POT_ratio);
+   
+    data->Add(mc,-1);
+   
+    // Canvas
+    Double_t w = 800; 
+    Double_t h = 800;
+    TCanvas* c = new TCanvas("c","c",w,h);
+    c->SetWindowSize(w,h);
+
+    // Pad
+    TPad *p = new TPad("p","p",0.05,0.05,0.95,0.95);
+    p->Draw();
+
+    p->cd();
+    data->GetYaxis()->SetTitleOffset(1.8);
+    data->Draw("colz");
+    gPad->Update();
+
+    gStyle->SetOptStat(0); 
+    c->Update();
+
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_Diff.png"), "png");
+
+    delete p;
+    delete c;
+
+    delete data;
+    delete mc;
+    delete f_mc;
+}
+
+double CCProtonPi0_Plotter::Get2DTotalFlow(MnvH2D* h)
+{
+    int nBins_X = h->GetNbinsX();
+    int nBins_Y = h->GetNbinsY();
+
+    double nTotalFlow = 0.0;
+    // First Count Overflow on X
+    for (int y = 1; y <= nBins_Y; ++y ){
+        nTotalFlow += h->GetBinContent(nBins_X+1, y);
+    }
+    for (int y = 1; y <= nBins_Y; ++y ){
+        nTotalFlow += h->GetBinContent(0, y);
+    }
+
+    // Second Count Overflow on Y
+    for (int x = 1; x <= nBins_X; ++x ){
+        nTotalFlow += h->GetBinContent(x, nBins_Y+1);
+    }
+    for (int x = 1; x <= nBins_X; ++x){
+        nTotalFlow += h->GetBinContent(x, 0);
+    }
+
+    // Third Count 4-Corners
+    nTotalFlow += h->GetBinContent(0,0);
+    nTotalFlow += h->GetBinContent(0,nBins_Y+1);
+    nTotalFlow += h->GetBinContent(nBins_X+1,nBins_Y+1);
+    nTotalFlow += h->GetBinContent(nBins_X+1,0);
+
+    return nTotalFlow;
+}
+
+void CCProtonPi0_Plotter::NormalizeHistogram(MnvH2D* h)
+{
+    std::cout<<"Normalizing MnvH2D"<<std::endl;
+    double area = h->Integral();
+    std::cout<<"\tArea Before = "<<area<<std::endl;
+    double nTotalFlow = Get2DTotalFlow(h);
+    h->Scale(1/(area+nTotalFlow)); // Scale only on CentralValue
+    std::cout<<"\tArea After= "<<h->Integral()<<std::endl;
+}
+
+void CCProtonPi0_Plotter::NormalizeHistogram(MnvH1D* h)
+{
+    int NBins = h->GetNbinsX();
+    double area = h->Integral();
+    double nOverFlow = h->GetBinContent(NBins+1);
+    double nUnderFlow = h->GetBinContent(0);
+    h->Scale(1/(area+nOverFlow+nUnderFlow),"",false); // Scale only on CentralValue
+}
+
+void CCProtonPi0_Plotter::NormalizeHistogram(TH1D* h)
+{
+    int NBins = h->GetNbinsX();
+    double area = h->Integral();
+    double nOverFlow = h->GetBinContent(NBins+1);
+    double nUnderFlow = h->GetBinContent(0);
+    h->Scale(1/(area+nOverFlow+nUnderFlow)); // Scale only on CentralValue
 }
 
 #endif

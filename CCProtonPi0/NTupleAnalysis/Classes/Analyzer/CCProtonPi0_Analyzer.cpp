@@ -8,11 +8,11 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false;
-    nMaxEvents = 1;
+    nMaxEvents = 10;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
-    isDataAnalysis = false;
+    isDataAnalysis = true;
     isScanRun = false;
     fillErrors_ByHand = true; // Affects only Vertical Error Bands - Lateral Bands always filled ByHand
     
@@ -225,7 +225,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         else msg_entry = 5000;
         if (jentry%msg_entry == 0) cout<<"\tEntry "<<jentry<<endl;
 
-        if (applyMaxEvents && jentry == nMaxEvents){
+        if (applyMaxEvents && jentry >= nMaxEvents){
             cout<<"\tReached Event Limit!"<<endl;
             break;
         }
@@ -276,9 +276,11 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         // Studies during for loop
         //--------------------------------------------------------------------------
         if (writeFSParticleMomentum) writeFSParticle4P(jentry);
-    
-        Study_W();
-        Study_QSq();
+  
+        //Study_BckgSubtraction();
+        //Study_W();
+        //Study_QSq();
+        //Study_2p2h();
         //Study_ProtonSystematics();
         //Study_GENIE_Weights();
     } // end for-loop
@@ -1105,17 +1107,13 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
         FillHistogram(interaction.W_2Track, m_W * MeV_to_GeV);
     }
 
-    // Vertex & Extra Energy
+    // Extra Energy
     if (nProtonCandidates == 0){
-        FillHistogram(interaction.vertex_energy_1Track, vertex_blob_energy);
-        FillHistogram(interaction.vertex_evis_1Track, vertex_blob_evis );
         FillHistogram(interaction.extra_leftover_energy_1Track, Extra_Energy_Leftover); 
         FillHistogram(interaction.extra_muon_energy_1Track, Extra_Energy_Muon); 
         FillHistogram(interaction.extra_rejected_energy_1Track, Extra_Energy_Rejected); 
         FillHistogram(interaction.extra_total_energy_1Track, Extra_Energy_Total);
     }else{
-        FillHistogram(interaction.vertex_evis_2Track, vertex_blob_evis );
-        FillHistogram(interaction.vertex_energy_2Track, vertex_blob_energy);
         FillHistogram(interaction.extra_leftover_energy_2Track, Extra_Energy_Leftover); 
         FillHistogram(interaction.extra_muon_energy_2Track, Extra_Energy_Muon); 
         FillHistogram(interaction.extra_rejected_energy_2Track, Extra_Energy_Rejected); 
@@ -1753,7 +1751,7 @@ void CCProtonPi0_Analyzer::FillHistogram(vector<MnvH1D*> &hist, double var, doub
             hist[1]->Fill(var, wgt);
 
             int ind = GetSignalTypeInd();
-            hist[ind]->Fill(var,cvweight);
+            hist[ind]->Fill(var, wgt);
         }else{
             // Fill Background
             hist[2]->Fill(var, wgt); // Always Fill ind == 2 -- All Background
@@ -1761,6 +1759,30 @@ void CCProtonPi0_Analyzer::FillHistogram(vector<MnvH1D*> &hist, double var, doub
             // Fill Background Type
             int ind = GetBackgroundTypeInd();
             hist[ind]->Fill(var, wgt);
+        }
+    }
+}
+
+void CCProtonPi0_Analyzer::FillHistogram(vector<MnvH2D*> &hist, double var1, double var2)
+{
+    // Always Fill hist[0]
+    hist[0]->Fill(var1, var2, cvweight);
+
+    // Fill others only if Analyzing MC
+    if (m_isMC){
+        // Fill Signal
+        if (truth_isSignal){
+            hist[1]->Fill(var1, var2, cvweight);
+ 
+            int ind = GetSignalTypeInd();
+            hist[ind]->Fill(var1, var2, cvweight);
+        }else{
+            // Fill Background
+            hist[2]->Fill(var1, var2,  cvweight); // Always Fill ind == 2 -- All Background
+
+            // Fill Background Type
+            int ind = GetBackgroundTypeInd();
+            hist[ind]->Fill(var1, var2, cvweight);
         }
     }
 }
@@ -2535,8 +2557,8 @@ void CCProtonPi0_Analyzer::Study_ProtonSystematics()
 void CCProtonPi0_Analyzer::setCounterNames()
 {
     // Single Use Counters 
-    counter1.setName("N(p pi0)");
-    counter2.setName("N(p pi+)");
+    counter1.setName("Bckg(All)");
+    counter2.setName("Bckg(CCRES)");
     counter3.setName("N(n pi+)");
     counter4.setName("N(Other)");
 
@@ -2629,6 +2651,12 @@ bool CCProtonPi0_Analyzer::IsGenieNonRES()
     return false;
 }
 
+bool CCProtonPi0_Analyzer::IsGenieDeltaRES()
+{
+    if (truth_genie_wgt_Theta_Delta2Npi[4] == 1.0) return false;
+    else return true;
+}
+
 bool CCProtonPi0_Analyzer::IsGenie_NonRES_n_piplus()
 {
     if ( IsGenieRvn1pi() || IsGenieRvp1pi() ){
@@ -2671,6 +2699,18 @@ std::vector<int> CCProtonPi0_Analyzer::GetPrimaryParticles()
     return prim_part;
 }
 
+void CCProtonPi0_Analyzer::Study_BckgSubtraction()
+{
+    // Fill Pi0 Inv Mass used in Background Subtraction during Studies
+    FillHistogram(interaction.pi0_invMass_All, pi0_invMass);
+    if ( nProtonCandidates == 0){
+        FillHistogram(interaction.pi0_invMass_1Track, pi0_invMass);
+    }else{
+        FillHistogram(interaction.pi0_invMass_2Track, pi0_invMass);
+    }
+}
+
+
 void CCProtonPi0_Analyzer::Study_W()
 {
     double W_reco = m_W * MeV_to_GeV;
@@ -2689,34 +2729,85 @@ void CCProtonPi0_Analyzer::Study_W()
 void CCProtonPi0_Analyzer::Study_QSq()
 {
     double QSq_reco = m_QSq * MeVSq_to_GeVSq;
-    double Enu_reco = m_Enu * MeV_to_GeV;
-
     FillHistogram(interaction.QSq_All, QSq_reco);
-    if ( Enu_reco < 4.0){
-        FillHistogram(interaction.QSq_LowEnu, QSq_reco);
-    }else{
-        FillHistogram(interaction.QSq_HighEnu, QSq_reco);
-    }
 
+    // ------------------------------------------------------------------------
+    // MaRES Fit
+    // ------------------------------------------------------------------------
     if (m_isMC){
         std::vector<double> wgts_up = QSqFitter.GetWeights(truth_genie_wgt_MaRES[4], truth_genie_wgt_MaRES[5]);
-
-        for (unsigned int i = 0; i < wgts_up.size(); ++i){
-            double cvweight_MaRES = cvweight * wgts_up[i];
-            interaction.QSq_HighMaRES[i]->Fill(QSq_reco, cvweight_MaRES);
-        }
-
         std::vector<double> wgts_dn = QSqFitter.GetWeights(truth_genie_wgt_MaRES[2], truth_genie_wgt_MaRES[1]);
 
-        for (unsigned int i = 0; i < wgts_dn.size(); ++i){
-            double cvweight_MaRES = cvweight * wgts_dn[i];
-            interaction.QSq_LowMaRES[i]->Fill(QSq_reco, cvweight_MaRES);
-        }
+        if (truth_isSignal){
+            // Weights Up
+            for (unsigned int i = 0; i < wgts_up.size(); ++i){
+                double cvweight_MaRES = cvweight * wgts_up[i];
+                interaction.QSq_HighMaRES[i]->Fill(QSq_reco, cvweight_MaRES);
+            }
 
+            // Weights Down
+            for (unsigned int i = 0; i < wgts_dn.size(); ++i){
+                double cvweight_MaRES = cvweight * wgts_dn[i];
+                interaction.QSq_LowMaRES[i]->Fill(QSq_reco, cvweight_MaRES);
+            }
+        }else{
+            // Weights Up
+            for (unsigned int i = 0; i < wgts_up.size(); ++i){
+                double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint("HighMaRES", i) : 1.0;
+                double wgtU = cvweight * wgt_bckg;
+                double cvweight_MaRES = wgtU * wgts_up[i];
+                interaction.QSq_HighMaRES_Bckg[i]->Fill(QSq_reco, cvweight_MaRES);
+                interaction.pi0_invMass_HighMaRES[i]->Fill(pi0_invMass, cvweight_MaRES);
+            }
+
+            // Weights Down
+            for (unsigned int i = 0; i < wgts_dn.size(); ++i){
+                double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint("LowMaRES", i) : 1.0;
+                double wgtU = cvweight * wgt_bckg;
+                double cvweight_MaRES = wgtU * wgts_dn[i];
+                interaction.QSq_LowMaRES_Bckg[i]->Fill(QSq_reco, cvweight_MaRES);
+                interaction.pi0_invMass_LowMaRES[i]->Fill(pi0_invMass, cvweight_MaRES);
+            }
+        }
     }else{
         interaction.QSq_HighMaRES[0]->Fill(QSq_reco);
         interaction.QSq_LowMaRES[0]->Fill(QSq_reco);
     }
+
+    if (!truth_isSignal){
+        counter1.increment(cvweight);
+        if (IsGenieCCRes())counter2.increment(cvweight);
+    }
+    // ------------------------------------------------------------------------
+    // Delta Suppression Function
+    // ------------------------------------------------------------------------
+    if (m_isMC){
+        // Update Weights
+        double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint("DeltaFactor", 1) : 1.0;
+        double wgtU = cvweight * wgt_bckg;
+        double deltaFactor = GetDeltaFactor(QSq_reco);
+        double cvweight_DeltaSuppression = wgtU * deltaFactor;
+        FillHistogram(interaction.QSq_DeltaSuppression, QSq_reco, cvweight_DeltaSuppression);
+        FillHistogram(interaction.pi0_invMass_DeltaSuppression, pi0_invMass, cvweight_DeltaSuppression);
+    }else{
+        FillHistogram(interaction.QSq_DeltaSuppression, QSq_reco);
+        FillHistogram(interaction.pi0_invMass_DeltaSuppression, pi0_invMass);
+    }
+}
+
+double CCProtonPi0_Analyzer::GetDeltaFactor(double QSq)
+{
+    double factor;
+
+    if (IsGenieCCRes()){
+        double A = 1.010;
+        double Q0 = 0.156; // GeV
+        factor = A / (1 + exp(1-(sqrt(QSq)/Q0)));
+    }else{
+        factor = 1.0;
+    }
+
+    return factor;
 }
 
 void CCProtonPi0_Analyzer::updateCounters()
@@ -2812,6 +2903,46 @@ void CCProtonPi0_Analyzer::writeEventTypeTableLine(CCProtonPi0_Counter &counter,
     eventTypeTable<<std::endl; 
 }
 
+double CCProtonPi0_Analyzer::Calc_q3()
+{
+    double nu_Px = 0.0;
+    double nu_Py = m_Enu * sin(beam_theta);
+    double nu_Pz = m_Enu * cos(beam_theta);
+
+    double dPx = nu_Px - muon_px;
+    double dPy = nu_Py - muon_py;
+    double dPz = nu_Pz - muon_pz;
+
+    double dP = HEP_Functions::calcMomentum(dPx, dPy, dPz);
+
+    return dP;
+}
+
+void CCProtonPi0_Analyzer::Study_2p2h()
+{
+    double W_reco = m_W * MeV_to_GeV;
+    double QSq_reco = m_QSq * MeVSq_to_GeVSq;
+    double q0_reco = (m_Enu - muon_E) * MeV_to_GeV;
+    double q3_reco = Calc_q3() * MeV_to_GeV;
+
+    // For All Events
+    FillHistogram(interaction.vertex_energy_All, vertex_blob_energy);
+    FillHistogram(interaction.vertex_evis_All, vertex_blob_evis );    
+    FillHistogram(interaction.q3_q0_All, q3_reco, q0_reco);    
+    FillHistogram(interaction.W_QSq_All, W_reco, QSq_reco);    
+    
+    if (nProtonCandidates == 0){
+        FillHistogram(interaction.vertex_energy_1Track, vertex_blob_energy);
+        FillHistogram(interaction.vertex_evis_1Track, vertex_blob_evis );
+        FillHistogram(interaction.q3_q0_1Track, q3_reco, q0_reco);    
+        FillHistogram(interaction.W_QSq_1Track, W_reco, QSq_reco);    
+    }else{
+        FillHistogram(interaction.vertex_energy_2Track, vertex_blob_energy);
+        FillHistogram(interaction.vertex_evis_2Track, vertex_blob_evis );
+        FillHistogram(interaction.q3_q0_2Track, q3_reco, q0_reco);    
+        FillHistogram(interaction.W_QSq_2Track, W_reco, QSq_reco);    
+    }
+}
 
 #endif //CCProtonPi0_Analyzer_cpp
 

@@ -198,19 +198,6 @@ void CCProtonPi0_Plotter::printBins_W()
     delete f_mc;
 }
 
-void CCProtonPi0_Plotter::NormalizeHistogram(MnvH1D* h)
-{
-    std::cout<<"\tNormalizing Background Shape on MnvH1D"<<std::endl;
-    int NBins = h->GetNbinsX();
-    double area = h->Integral();
-    double nOverFlow = h->GetBinContent(NBins+1);
-    double nUnderFlow = h->GetBinContent(0);
-    std::cout<<"\t\tBefore Norm = "<<area<<std::endl;
-    h->Scale(1/(area+nOverFlow+nUnderFlow),"",false); // Scale only on CentralValue
-    std::cout<<"\t\tAfter Norm = "<<h->Integral()<<std::endl;
-    std::cout<<"\tDone!"<<std::endl;
-}
-
 void CCProtonPi0_Plotter::W_Fit_Data(std::string fit_name, double* pars_deltaRES, double* pars_otherRES, double* pars_nonRES_G1, double* pars_nonRES_G2, int nPars)
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;

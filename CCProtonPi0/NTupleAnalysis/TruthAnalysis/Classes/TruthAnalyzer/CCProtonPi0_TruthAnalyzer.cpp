@@ -74,6 +74,9 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
             if (truth_isSignal) nSignal.increment(cvweight);
             else nBckg.increment(cvweight);
 
+            // For QSq Study
+            if ( !IsEnuInRange(mc_incomingE) ) continue;
+
             if (truth_isSignal){
                 // Detailed Interaction breakout
                 FillSignal_InteractionType(); // Also counts the N(Signal) in each type

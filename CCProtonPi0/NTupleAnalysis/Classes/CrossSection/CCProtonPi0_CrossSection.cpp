@@ -647,7 +647,9 @@ void CCProtonPi0_CrossSection::AddErrorBands_FluxHistogram()
 void CCProtonPi0_CrossSection::IntegrateAllFluxUniverses()
 {
     // Integrate for Central Value
-    cv_flux_integral = h_flux_minervaLE_FHC->Integral(4,30,"width");
+    //cv_flux_integral = h_flux_minervaLE_FHC->Integral(4,30,"width"); // Whole Range 1.5-20 GeV
+    //cv_flux_integral = h_flux_minervaLE_FHC->Integral(4,7,"width"); // Low Enu 1.5-3.5 GeV
+    cv_flux_integral = h_flux_minervaLE_FHC->Integral(7,30,"width"); // High Enu 3.5-20 GeV
     text_out<<"Signal Region Flux Integrals"<<std::endl;    
     text_out<<"\tCentral Value = "<<cv_flux_integral<<std::endl;    
     
@@ -656,7 +658,9 @@ void CCProtonPi0_CrossSection::IntegrateAllFluxUniverses()
     const std::vector<TH1D*> flux_err_band_universes = flux_err_band->GetHists();
 
     for (unsigned int i = 0; i < flux_err_band_universes.size(); ++i){
-        double temp_integral = flux_err_band_universes[i]->Integral(4,30,"width");
+        //double temp_integral = flux_err_band_universes[i]->Integral(4,30,"width"); // Whole Range 1.5-20 GeV
+        //double temp_integral = flux_err_band_universes[i]->Integral(4,7,"width"); // Low Enu 1.5-3.5 GeV
+        double temp_integral = flux_err_band_universes[i]->Integral(7,30,"width"); // High Enu 3.5-20 GeV
         unv_flux_integral.push_back(temp_integral);
         text_out<<"\tFlux Unv "<<i<<" = "<<temp_integral<<std::endl;
     }

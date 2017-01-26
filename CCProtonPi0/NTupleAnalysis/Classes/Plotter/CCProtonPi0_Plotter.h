@@ -144,8 +144,14 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotTruth_ShortProton();
 
         // Other Plots 
+        void BckgSubtraction_Studies();
         void QSq_Studies();
+        void Studies_2p2h();
+        void Draw_QSq_EnuFit(std::string data_dir, std::string mc_dir, std::string var_name, double* pars);
         void Draw_QSq_MaRES();
+        void Draw_QSq_MaRES_AreaNorm();
+        void Draw_QSq_EnuLimit();
+        void Draw_QSq_DeltaSuppression();
         void plot_CV_weights();
         void plot_SystematicsInfo();
         void PlotTotalEnuXSec();
@@ -162,7 +168,11 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotStandardHistograms(rootDir &dir, std::string plotDir);
 
         // Helper Functions
+        double Calc_Normalized_NBackground(std::string var_name);
+        double Get2DTotalFlow(MnvH2D* h);
+        void NormalizeHistogram(MnvH2D* h);
         void NormalizeHistogram(MnvH1D* h);
+        void NormalizeHistogram(TH1D* h);
         void ApplyStyle(MnvPlotter* plotter);
         void ApplyStyle_Errors(MnvPlotter* plotter, bool groupErrors);
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, double hist_max, double arrow_length);
@@ -180,6 +190,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void W_Studies();
         void plot_W_FitMinuit(double wgt_DeltaRES, double wgt_OtherRES, double wgt_NonRES);
         void init_W_FitResults();
+        void Get_Exponential(double* x, double* y, int nPoints, double a, double b);
         void Get_BreitWigner(double* pars, double* x, double* y, int nPoints);
         void Get_Gaussian(double* pars, double* x, double* y, int nPoints);
         void plot_W_FitResults();
@@ -190,6 +201,11 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void W_Fit_MC_NonRES();
         void printBins_W();
         double Calc_ChiSq_dof(double* data, double* expected, int nPoints, int nPars);
+        double Calc_ChiSq(TH1* data, TH1* MC);
+
+        // 2p2h Study
+
+
 
         // Flux Study
         double GetFluxHistContent(MnvH1D* hist, double low1, double low2);
@@ -214,6 +230,8 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // Default
         void DrawMnvH1D(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawMnvH1D(MnvH1D* hist1D, std::string var_name, std::string plotDir);
+        void DrawMnvH2D(std::string root_dir, std::string var_name, std::string plotDir);
+        void DrawMnvH2D(MnvH2D* hist2D, std::string var_name, std::string plotDir, bool isMC);
         void Draw1DHist(TH1* hist1D, std::string var_name, std::string plotDir, bool isLogScale = false);
 
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
@@ -233,6 +251,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // Data vs MC
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec = false);
+        void DrawDataMC_Signal(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);
         void DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);
         void DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGraph* otherData, std::string var_name, std::string ext_data_name, std::string plotDir);
         void DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D* mc_BeforeFSI, std::string var_name,  std::string plotDir);
@@ -243,8 +262,13 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataStackedMC_BckgAll(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_BckgType(rootDir &dir, std::string var_name, std::string plotDir, bool isPOTNorm, int nCutArrows = 0, CutArrow cutArrow1 = CutArrow(), CutArrow cutArrow2 = CutArrow());
         void DrawDataStackedMC_WithSignalTypes(rootDir &dir, std::string var_name, std::string plotDir);
+        void DrawDataStackedMC_Signal(rootDir &dir, std::string var_name, std::string plotDir, double nBckg);
+        void DrawDataMCSignal_Diff(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);
+        void DrawDataMCSignal_Diff_2D(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);
 
         // Other
+        MnvH1D* GetBckgSubtractedData(rootDir& dir, std::string var_name, double nBckg);
+        MnvH2D* GetBckgSubtractedData_2D(rootDir& dir, std::string var_name, double nBckg);
         void PlotDelta();
         void DrawBackgroundSubtraction(bool isMC);
         void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors = true);
@@ -288,6 +312,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         // Error Grouping
         bool IsErrorInGroup(std::string err_name, std::vector<std::string> errGroup);
         void Systematics_SetErrorSummaryGroups();
+        void Clear_ErrorSummaryGroups();
         
         // Macros & Plotting
         void Systematics();
@@ -297,6 +322,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void Systematics_DrawErrorSummary(std::string data_var, std::string mc_var);
         void Systematics_DrawErrorBand_GENIE(std::string mc_var);
         void Systematics_DrawErrorSummary_GENIE(MnvH1D* hist, std::string var_name, std::string error_name, double err_genie_total);
+        void Systematics_DrawErrorSummary_Group(std::string data_var, std::string mc_var, std::vector<std::string> errGroup, std::string group_name);
         // Tables
         void Systematics_WriteTables(std::string var_name);
         void Systematics_WriteTable_Fraction(MnvH1D* hist, std::string var_name);

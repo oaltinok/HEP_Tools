@@ -6,7 +6,7 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "Best";
+const std::string CCProtonPi0_NTupleAnalysis::version = "QSq_HighEnu";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
@@ -17,7 +17,9 @@ const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
 const double CCProtonPi0_NTupleAnalysis::POT_ratio_2p2h = mc_POT/mc_2p2h_POT;
 
 const double CCProtonPi0_NTupleAnalysis::max_muon_theta = 25; // degree
-const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
+//const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
+const double CCProtonPi0_NTupleAnalysis::min_Enu = 3500; // MeV
+//const double CCProtonPi0_NTupleAnalysis::max_Enu = 3500; // MeV
 const double CCProtonPi0_NTupleAnalysis::max_Enu = 20000; // MeV
 const double CCProtonPi0_NTupleAnalysis::max_W = 1800; // MeV
 
@@ -27,6 +29,8 @@ const double CCProtonPi0_NTupleAnalysis::MeVSq_to_GeVSq = pow(10,-6);
 const double CCProtonPi0_NTupleAnalysis::mSq_to_cmSq = pow(10,4);
 const double CCProtonPi0_NTupleAnalysis::mm_to_cm = pow(10,-1);
 const double CCProtonPi0_NTupleAnalysis::rad_to_deg = 180.0/M_PI;
+const double CCProtonPi0_NTupleAnalysis::beam_theta = -0.05887;  //rad 
+const double CCProtonPi0_NTupleAnalysis::beam_phi = M_PI_2;  //rad 
 
 const double CCProtonPi0_NTupleAnalysis::muon_mass = 105.6583;      // MeV
 const double CCProtonPi0_NTupleAnalysis::pi0_mass = 134.9766;       // MeV
@@ -123,6 +127,9 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data(MnvHistoType* h)
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
     AddVertErrorBandAndFillWithCV_NeutronResponse(h);
     AddVertErrorBandAndFillWithCV_PionResponse(h);
+    //AddVertErrorBandAndFillWithCV_HighMaRES(h);
+    //AddVertErrorBandAndFillWithCV_LowMaRES(h);
+    //AddVertErrorBandAndFillWithCV_DeltaFactor(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH2D>(MnvH2D* h);
@@ -314,6 +321,30 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_PionResp
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_PionResponse<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_HighMaRES(MnvHistoType* h)
+{
+    h->AddVertErrorBandAndFillWithCV("HighMaRES", 201);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_HighMaRES<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_HighMaRES<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_LowMaRES(MnvHistoType* h)
+{
+    h->AddVertErrorBandAndFillWithCV("LowMaRES", 201);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_LowMaRES<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_LowMaRES<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_DeltaFactor(MnvHistoType* h)
+{
+    h->AddVertErrorBandAndFillWithCV("DeltaFactor", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_DeltaFactor<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_DeltaFactor<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data(MnvHistoType* h)
 {
     AddLatErrorBandAndFillWithCV_ProtonEnergy_MassModel(h);
@@ -422,6 +453,9 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC(MnvHistoType* h)
     AddVertErrorBand_ProtonTracking(h);
     AddVertErrorBand_NeutronResponse(h);
     AddVertErrorBand_PionResponse(h);
+    //AddVertErrorBand_HighMaRES(h);
+    //AddVertErrorBand_LowMaRES(h);
+    //AddVertErrorBand_DeltaFactor(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC<MnvH2D>(MnvH2D* h);
@@ -571,6 +605,30 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_PionResponse(MnvHistoType* h)
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_PionResponse<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_PionResponse<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_HighMaRES(MnvHistoType* h)
+{
+    h->AddVertErrorBand("HighMaRES", 201);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_HighMaRES<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_HighMaRES<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_LowMaRES(MnvHistoType* h)
+{
+    h->AddVertErrorBand("LowMaRES", 201);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_LowMaRES<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_LowMaRES<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_DeltaFactor(MnvHistoType* h)
+{
+    h->AddVertErrorBand("DeltaFactor", 2);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_DeltaFactor<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_DeltaFactor<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_MC(MnvHistoType* h)
@@ -758,7 +816,8 @@ bool CCProtonPi0_NTupleAnalysis::IsWInRange(double W)
 
 bool CCProtonPi0_NTupleAnalysis::IsEnuInRange(double Enu)
 {
-    if (Enu >= min_Enu && Enu <= max_Enu) return true;
+    //if (Enu >= min_Enu && Enu <= max_Enu) return true;
+    if (Enu >= min_Enu && Enu < max_Enu) return true;
     else return false;
 }
 

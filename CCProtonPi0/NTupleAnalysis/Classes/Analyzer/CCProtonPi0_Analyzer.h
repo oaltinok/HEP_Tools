@@ -83,6 +83,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         bool IsInvMassInRange(double invMass);
         bool IsOpeningAngleSmallAndEnergyLow(double E_g1, double E_g2);
         void FillHistogram(vector<MnvH1D*> &hist, double var);
+        void FillHistogram(vector<MnvH2D*> &hist, double var1, double var2);
         void FillHistogram(vector<MnvH1D*> &hist, double var, double wgt);
         void FillHistogram(MnvH1D* hist, double var);
         void FillHistogram(MnvH2D* hist, double xval, double yval);
@@ -104,6 +105,21 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillVertErrorBand_Flux(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_Flux_ByHand(MnvH2D* h, double xval, double yval);
+
+        void FillVertErrorBand_HighMaRES(MnvH1D* h, double var);
+        void FillVertErrorBand_HighMaRES(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_HighMaRES_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_HighMaRES_ByHand(MnvH2D* h, double xval, double yval);
+
+        void FillVertErrorBand_LowMaRES(MnvH1D* h, double var);
+        void FillVertErrorBand_LowMaRES(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_LowMaRES_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_LowMaRES_ByHand(MnvH2D* h, double xval, double yval);
+
+        void FillVertErrorBand_DeltaFactor(MnvH1D* h, double var);
+        void FillVertErrorBand_DeltaFactor(MnvH2D* h, double xval, double yval);
+        void FillVertErrorBand_DeltaFactor_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_DeltaFactor_ByHand(MnvH2D* h, double xval, double yval);
 
         void FillVertErrorBand_Genie(MnvH1D* h, double var);
         void FillVertErrorBand_Genie(MnvH2D* h, double xval, double yval);
@@ -257,6 +273,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void fillInteractionReco();
         double calcDeltaInvariantMass();
         int GetEjectedNucleonCount();
+        double Calc_q3();
         double Calc_Enu();
         double Calc_Enu_Cal();
         TLorentzVector Get_Neutrino_4P(const double Enu) const;
@@ -272,8 +289,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void GetMichelStatistics_Showers();
         double GetBckgConstraint(std::string error_name, int hist_ind);
         std::vector<int> GetPrimaryParticles();
+        void Study_BckgSubtraction();
         void Study_W();
         void Study_QSq();
+        void Study_2p2h();
+        double GetDeltaFactor(double QSq);
 
         //  Muon Specific Functions
         void fillMuonMC();
@@ -315,6 +335,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double GetMaResWeight( double newMaRes );
         double GetMvResWeight( double newMvRes );
         bool IsGenieCCRes();
+        bool IsGenieDeltaRES();
         bool IsGenieNonRES();
         bool IsGenieRvn1pi();
         bool IsGenieRvp1pi();

@@ -28,7 +28,8 @@ class CCProtonPi0_QSqFitter: public CCProtonPi0_NTupleAnalysis
         int FindMinChiSq(std::vector<double> &ChiSqVector);
         void FillMaRESVector(std::vector<double> &MaRESVector, double one_sigma, double two_sigma);
         void FillChiSqVector(std::vector<double> &ChiSqVector, bool isUpShift);
-        double Calc_ChiSq_dof(TH1D* data, TH1D* MC);
+        void NormalizeHistogram(TH1D* h);
+        double Calc_ChiSq(TH1D* data, TH1D* MC);
         double Calc_Slope(double x1, double x2, double y1, double y2);
         double Calc_Constant(double m, double x, double y);
         double Calc_Weight(double m, double c, double x);
