@@ -4,9 +4,12 @@ function [] = plot_fit()
 
 %% Plot Only Fit Region
 % Create figure
-figure1 = figure;
+figure1 = figure('position', [100, 100, 900,900]);
 % Create axes
-axes1 = axes('Parent',figure1,'PlotBoxAspectRatio',[1 1 1],'FontSize',24,'FontWeight','bold');
+axes1 = axes('Parent',figure1,'PlotBoxAspectRatio',[1 1 1],...
+    'FontSize',32,'FontWeight','bold', ...
+    'LineWidth',3,'box', 'on');
+
 ylim([1.0 6.0]);
 hold on;
 
@@ -26,25 +29,25 @@ errorbar(evis_array,mean_array,mean_array./sqrt(count_array),...
     'MarkerEdgeColor',[0 0 0],...
     'Marker','o',...
     'LineStyle','none',...
-    'LineWidth',1,...
+    'LineWidth',3,...
     'DisplayName','MC Points with Statistical Error',...
     'Parent',axes1,...
     'Color',[0 0 0]);
 
 % Plot Low Energy Fit
 x = linspace(0,300,1000);
-y = linspace(3.10,3.10,1000);
-plot(x,y,'LineWidth',2,'Color','r','DisplayName','Jaewons kE = 3.10');
+y = linspace(3.2367,3.2367,1000);
+plot(x,y,'LineWidth',3,'Color','g','DisplayName','Weighted Mean k_E = 3.2367');
 
 % Plot Low Energy Fit
 x = linspace(0,300,1000);
-y = linspace(3.2367,3.2367,1000);
-plot(x,y,'LineWidth',2,'Color','g','DisplayName','Weighted Mean kE = 3.2367');
+y = linspace(3.10,3.10,1000);
+plot(x,y,'LineWidth',3,'Color','r','DisplayName','Jaewons k_E = 3.10');
 
 % Create xlabel
-xlabel('Visible Energy [MeV]','FontSize',24,'FontWeight','bold');
+xlabel('Visible Energy [MeV]','FontSize',48,'FontWeight','bold');
 % Create ylabel
-ylabel('E_{True}/E_{Visible} (kE)','FontSize',24,'FontWeight','bold');
+ylabel('E_{True}/E_{Visible} (k_E)','FontSize',48,'FontWeight','bold');
 % Create legend
 legend(axes1,'show');
 
