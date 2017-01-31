@@ -22,7 +22,8 @@ COUNTERCPP = ../Classes/Counter/CCProtonPi0_Counter.cpp
 BINLISTCPP = ../Classes/BinList/CCProtonPi0_BinList.cpp
 BCKGCONSTRAINERCPP = ../Classes/BckgConstrainer/CCProtonPi0_BckgConstrainer.cpp
 SINGLEBINCPP = ../Classes/SingleBin/CCProtonPi0_SingleBin.cpp
-HELPERCPP = $(BINLISTCPP) $(BCKGCONSTRAINERCPP) $(SINGLEBINCPP) $(COUNTERCPP)
+QSQFITTERCPP = ../Classes/QSqFitter/CCProtonPi0_QSqFitter.cpp
+HELPERCPP = $(BINLISTCPP) $(BCKGCONSTRAINERCPP) $(SINGLEBINCPP) $(COUNTERCPP) $(QSQFITTERCPP)
 
 # ALL Classes Required for the Package
 ALLCPP = $(MAINCPP) $(NTUPLEANALYSISCPP) $(TRUTHANALYZERALLCPP) $(HELPERCPP)

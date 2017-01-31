@@ -76,7 +76,6 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> pi0_invMass_All; 
         std::vector<MnvH1D*> pi0_invMass_1Track;
         std::vector<MnvH1D*> pi0_invMass_2Track;
-        std::vector<MnvH1D*> pi0_invMass_DeltaSuppression;
 
         // W Study
         std::vector<MnvH1D*> W_p_pi0;
@@ -85,14 +84,8 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> W_2;
 
         // QSq Study
-        std::vector<MnvH1D*> QSq_All;
-        std::vector<MnvH1D*> QSq_DeltaSuppression;
-        std::vector<TH1D*> pi0_invMass_LowMaRES; 
-        std::vector<TH1D*> pi0_invMass_HighMaRES; 
-        std::vector<TH1D*> QSq_LowMaRES;
-        std::vector<TH1D*> QSq_HighMaRES;
-        std::vector<TH1D*> QSq_LowMaRES_Bckg;
-        std::vector<TH1D*> QSq_HighMaRES_Bckg;
+        std::vector<MnvH1D*> QSq_CV;
+        std::vector<MnvH1D*> QSq_MaRES; // With Vert Error Bands
 
         // 2p2h Study
         std::vector<MnvH1D*> vertex_energy_All;
@@ -329,6 +322,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* reco_w_Non_RES;
 
     private:
+        bool m_isMC;
         void initHistograms();
         
         TFile* f;

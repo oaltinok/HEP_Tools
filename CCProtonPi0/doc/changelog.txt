@@ -1,4 +1,17 @@
 ===================================================================================================
+v3_06
+CCProtonPi0 Updates:
+	No major changes
+
+---------------------------------------------------------------------------------------------------
+NTupleAnalysis Updates:
+	QSq Studies Completed
+		MaRES Fit handled by Vertical Error Bands
+			Commented out in this version
+		DeltaFactor Fit handled by Vertical Error Bands
+			Active in this version
+
+===================================================================================================
 v3_05_QSq_Enu_Study
 CCProtonPi0 Updates:
 	No major changes

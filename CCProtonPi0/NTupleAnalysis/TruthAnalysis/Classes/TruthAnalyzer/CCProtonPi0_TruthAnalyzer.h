@@ -22,6 +22,7 @@
 #include "../../../Classes/BinList/CCProtonPi0_BinList.h"
 #include "../../../Classes/Counter/CCProtonPi0_Counter.h"
 #include "../../../Classes/BckgConstrainer/CCProtonPi0_BckgConstrainer.h"
+#include "../../../Classes/QSqFitter/CCProtonPi0_QSqFitter.h"
 
 using namespace PlotUtils;
 
@@ -134,6 +135,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
 
         CCProtonPi0_BinList binList;
         CCProtonPi0_BckgConstrainer BckgConstrainer;
+        CCProtonPi0_QSqFitter QSqFitter;
 
         bool applyGENIETuning_Delta;
         bool applyGENIETuning_NonRes;
@@ -167,6 +169,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_Genie(MnvH1D* h, double var);
         void FillVertErrorBand_Genie_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_DeltaFactor_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_HighMaRES_ByHand(MnvH1D* h, double var);
+        void FillVertErrorBand_LowMaRES_ByHand(MnvH1D* h, double var);
         void PrintEventRecord();
         void WriteCounter(CCProtonPi0_Counter Counter, CCProtonPi0_Counter PercentBase);
         void initHistograms();
@@ -174,6 +179,8 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void resetCounters();
         void writeHistograms();
         void writeTextFile();
+        double GetDeltaFactor(double QSq, double A, double Q0);
+        std::vector<double> GetDeltaFactorWeights();
 
         // GENIE Tuning
         void initUpdatedGenieWeights();

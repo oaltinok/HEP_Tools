@@ -15,6 +15,7 @@ void CCProtonPi0_Analyzer::AddErrorBands_Data()
     AddVertErrorBands_Data(interaction.QSq_all);
     AddVertErrorBands_Data(interaction.Enu_all);
     AddVertErrorBands_Data(interaction.W_all);
+    AddVertErrorBands_Data(interaction.QSq_MaRES[0]);
 
     AddLatErrorBands_Data(pi0.pi0_P_all);
     AddLatErrorBands_Data(pi0.pi0_KE_all);
@@ -612,22 +613,10 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_Flux_ByHand(MnvH2D* h, double xval,
     FillVertErrorBand_ByHand(h, xval, yval, "Flux", flux_errors);
 }
 
-void CCProtonPi0_Analyzer::FillVertErrorBand_HighMaRES(MnvH1D* h, double var)
-{
-    std::vector<double> wgts_up = QSqFitter.GetWeights(truth_genie_wgt_MaRES[4], truth_genie_wgt_MaRES[5]);
-    h->FillVertErrorBand("HighMaRES",  var, &wgts_up[0],  cvweight, 1.0);
-}
-
 void CCProtonPi0_Analyzer::FillVertErrorBand_HighMaRES_ByHand(MnvH1D* h, double var)
 {
     std::vector<double> wgts_up = QSqFitter.GetWeights(truth_genie_wgt_MaRES[4], truth_genie_wgt_MaRES[5]);
     FillVertErrorBand_ByHand(h, var, "HighMaRES", wgts_up);
-}
-
-void CCProtonPi0_Analyzer::FillVertErrorBand_HighMaRES(MnvH2D* h, double xval, double yval)
-{
-    std::vector<double> wgts_up = QSqFitter.GetWeights(truth_genie_wgt_MaRES[4], truth_genie_wgt_MaRES[5]);
-    h->FillVertErrorBand("HighMaRES",  xval, yval,  &wgts_up[0],  cvweight, 1.0);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_HighMaRES_ByHand(MnvH2D* h, double xval, double yval)
@@ -636,22 +625,10 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_HighMaRES_ByHand(MnvH2D* h, double 
     FillVertErrorBand_ByHand(h, xval, yval, "HighMaRES", wgts_up);
 }
 
-void CCProtonPi0_Analyzer::FillVertErrorBand_LowMaRES(MnvH1D* h, double var)
-{
-    std::vector<double> wgts_dn = QSqFitter.GetWeights(truth_genie_wgt_MaRES[2], truth_genie_wgt_MaRES[1]);
-    h->FillVertErrorBand("LowMaRES",  var, &wgts_dn[0],  cvweight, 1.0);
-}
-
 void CCProtonPi0_Analyzer::FillVertErrorBand_LowMaRES_ByHand(MnvH1D* h, double var)
 {
     std::vector<double> wgts_dn = QSqFitter.GetWeights(truth_genie_wgt_MaRES[2], truth_genie_wgt_MaRES[1]);
     FillVertErrorBand_ByHand(h, var, "LowMaRES", wgts_dn);
-}
-
-void CCProtonPi0_Analyzer::FillVertErrorBand_LowMaRES(MnvH2D* h, double xval, double yval)
-{
-    std::vector<double> wgts_dn = QSqFitter.GetWeights(truth_genie_wgt_MaRES[2], truth_genie_wgt_MaRES[1]);
-    h->FillVertErrorBand("LowMaRES",  xval, yval,  &wgts_dn[0],  cvweight, 1.0);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_LowMaRES_ByHand(MnvH2D* h, double xval, double yval)
@@ -660,32 +637,49 @@ void CCProtonPi0_Analyzer::FillVertErrorBand_LowMaRES_ByHand(MnvH2D* h, double x
     FillVertErrorBand_ByHand(h, xval, yval, "LowMaRES", wgts_dn);
 }
 
-void CCProtonPi0_Analyzer::FillVertErrorBand_DeltaFactor(MnvH1D* h, double var)
-{
-    double QSq_reco = m_QSq * MeVSq_to_GeVSq;
-    double deltaFactor = GetDeltaFactor(QSq_reco);
-    h->FillVertErrorBand("DeltaFactor", var, deltaFactor, deltaFactor, cvweight);
-}
-
 void CCProtonPi0_Analyzer::FillVertErrorBand_DeltaFactor_ByHand(MnvH1D* h, double var)
 {
-    double QSq_reco = m_QSq * MeVSq_to_GeVSq;
-    double deltaFactor = GetDeltaFactor(QSq_reco);
-    FillVertErrorBand_ByHand(h, var, "DeltaFactor", deltaFactor, deltaFactor);
-}
-
-void CCProtonPi0_Analyzer::FillVertErrorBand_DeltaFactor(MnvH2D* h, double xval, double yval)
-{
-    double QSq_reco = m_QSq * MeVSq_to_GeVSq;
-    double deltaFactor = GetDeltaFactor(QSq_reco);
-    h->FillVertErrorBand("DeltaFactor", xval, yval, deltaFactor, deltaFactor, cvweight);
+    std::vector<double> wgts = GetDeltaFactorWeights();
+    FillVertErrorBand_ByHand(h, var, "DeltaFactor", wgts);
 }
 
 void CCProtonPi0_Analyzer::FillVertErrorBand_DeltaFactor_ByHand(MnvH2D* h, double xval, double yval)
 {
+    std::vector<double> wgts = GetDeltaFactorWeights();
+    FillVertErrorBand_ByHand(h, xval, yval, "DeltaFactor", wgts);
+}
+
+std::vector<double> CCProtonPi0_Analyzer::GetDeltaFactorWeights()
+{
+    const double A = 1.0;
+    const double A_MINOS = 1.010;
+    const double Q0_MINOS = 0.156;
+    
+    // Vary Q0
+    std::vector<double> Q0_Vector;
+    for (double q0 = 0.050; q0 <= 0.155; q0 += 0.001){
+        Q0_Vector.push_back(q0);
+    }
+
+    // Fill Delta Factor Weights
+    //      First Element is MINOS Factor
+    std::vector<double> weights;
     double QSq_reco = m_QSq * MeVSq_to_GeVSq;
-    double deltaFactor = GetDeltaFactor(QSq_reco);
-    FillVertErrorBand_ByHand(h, xval, yval, "DeltaFactor", deltaFactor, deltaFactor);
+    double deltaFactor = GetDeltaFactor(QSq_reco, A_MINOS, Q0_MINOS);
+    weights.push_back(deltaFactor);
+
+    for (unsigned int i = 0; i < Q0_Vector.size(); ++i){
+        deltaFactor = GetDeltaFactor(QSq_reco, A, Q0_Vector[i]);
+        weights.push_back(deltaFactor);
+    }
+
+    // Debugging
+//    std::cout<<"Delta Weights Size = "<<weights.size()<<std::endl;
+//    for (unsigned int i = 0; i < weights.size(); ++i){
+//        std::cout<<weights[i]<<std::endl;
+//    }
+
+    return weights;
 }
 
 void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH1D* hist, double var)
@@ -709,9 +703,11 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH1D* hist, double var)
         FillVertErrorBand_MuonTracking_ByHand(hist, var);
         FillVertErrorBand_PionResponse_ByHand(hist, var);
         FillVertErrorBand_NeutronResponse_ByHand(hist, var);
+    
+        // QSq Study
         //FillVertErrorBand_HighMaRES_ByHand(hist, var);
         //FillVertErrorBand_LowMaRES_ByHand(hist, var);
-        //FillVertErrorBand_DeltaFactor_ByHand(hist, var);
+        FillVertErrorBand_DeltaFactor_ByHand(hist, var);
     }else{
         FillVertErrorBand_Genie(hist, var);
         FillVertErrorBand_Flux(hist, var);
@@ -751,6 +747,11 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH2D* hist, double xval
         FillVertErrorBand_MuonTracking_ByHand(hist, xval, yval);
         FillVertErrorBand_PionResponse_ByHand(hist, xval, yval);
         FillVertErrorBand_NeutronResponse_ByHand(hist, xval, yval);
+
+        // QSq Study
+        //FillVertErrorBand_HighMaRES_ByHand(hist, xval, yval);
+        //FillVertErrorBand_LowMaRES_ByHand(hist, xval, yval);
+        FillVertErrorBand_DeltaFactor_ByHand(hist, xval, yval);
     }else{
         FillVertErrorBand_Genie(hist, xval, yval);
         FillVertErrorBand_Flux(hist, xval, yval);

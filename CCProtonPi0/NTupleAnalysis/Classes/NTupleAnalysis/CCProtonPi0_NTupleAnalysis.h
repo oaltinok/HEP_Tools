@@ -149,6 +149,9 @@ class CCProtonPi0_NTupleAnalysis
             void AddVertErrorBands_TruthTree(MnvHistoType* h);
 
         template<class MnvHistoType>
+            void AddVertErrorBandsAndFillWithCV_TruthTree(MnvHistoType* h);
+
+        template<class MnvHistoType>
             void AddVertErrorBands_FluxHistogram(MnvHistoType* h);
 
         template<class MnvHistoType>
@@ -207,7 +210,7 @@ class CCProtonPi0_NTupleAnalysis
             void AddLatErrorBands_Data(MnvHistoType* h);
 
         template<class MnvHistoType>
-            void AddLatErrorBands_TruthTree(MnvHistoType* h);
+            void AddLatErrorBandsAndFillWithCV_TruthTree(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddLatErrorBands_FluxHistogram(MnvHistoType* h);

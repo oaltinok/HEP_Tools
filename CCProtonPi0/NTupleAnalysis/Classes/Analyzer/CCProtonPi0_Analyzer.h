@@ -106,18 +106,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillVertErrorBand_Flux_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_Flux_ByHand(MnvH2D* h, double xval, double yval);
 
-        void FillVertErrorBand_HighMaRES(MnvH1D* h, double var);
-        void FillVertErrorBand_HighMaRES(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_HighMaRES_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_HighMaRES_ByHand(MnvH2D* h, double xval, double yval);
 
-        void FillVertErrorBand_LowMaRES(MnvH1D* h, double var);
-        void FillVertErrorBand_LowMaRES(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_LowMaRES_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_LowMaRES_ByHand(MnvH2D* h, double xval, double yval);
 
-        void FillVertErrorBand_DeltaFactor(MnvH1D* h, double var);
-        void FillVertErrorBand_DeltaFactor(MnvH2D* h, double xval, double yval);
         void FillVertErrorBand_DeltaFactor_ByHand(MnvH1D* h, double var);
         void FillVertErrorBand_DeltaFactor_ByHand(MnvH2D* h, double xval, double yval);
 
@@ -293,7 +287,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void Study_W();
         void Study_QSq();
         void Study_2p2h();
-        double GetDeltaFactor(double QSq);
+        double GetDeltaFactor(double QSq, double A, double Q0);
+        std::vector<double> GetDeltaFactorWeights();
 
         //  Muon Specific Functions
         void fillMuonMC();

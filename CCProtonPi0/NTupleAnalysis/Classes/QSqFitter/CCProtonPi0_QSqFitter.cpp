@@ -11,7 +11,7 @@ const double CCProtonPi0_QSqFitter::x2_2sigma = 200.0;
 
 CCProtonPi0_QSqFitter::CCProtonPi0_QSqFitter()
 {
-    isDebug = false;
+    isDebug = true;
     FillMaRESVector(MaRESVector_dn, 0.8, 0.6);
     FillMaRESVector(MaRESVector_up, 1.2, 1.4);
 }
@@ -111,6 +111,15 @@ double CCProtonPi0_QSqFitter::Calc_Weight(double m, double c, double x)
     return y;
 }
 
+int CCProtonPi0_QSqFitter::GetMinChiSq_DeltaFactor()
+{
+    FillChiSqVector_DeltaFactor();
+    int min = FindMinChiSq(ChiSqVector_DeltaFactor);
+
+    std::cout<<"min = "<<min<<std::endl;
+    return min;
+}
+
 int CCProtonPi0_QSqFitter::GetMinChiSq()
 {
     FillChiSqVector(ChiSqVector_dn, false);
@@ -118,7 +127,7 @@ int CCProtonPi0_QSqFitter::GetMinChiSq()
     int min_dn = FindMinChiSq(ChiSqVector_dn);
     int min_up = FindMinChiSq(ChiSqVector_up);
 
-    std::cout<<"min_up = "<<min_up<<" min_dn = "<<min_dn<<std::endl;
+    std::cout<<"min_dn = "<<min_dn<<" min_up = "<<min_up<<std::endl;
     return min_up;
 }
 
@@ -146,94 +155,271 @@ void CCProtonPi0_QSqFitter::NormalizeHistogram(TH1D* h)
     h->Scale(1/(area+nOverFlow+nUnderFlow)); // Scale only on CentralValue
 }
 
-void CCProtonPi0_QSqFitter::FillChiSqVector(std::vector<double> &ChiSqVector, bool isUpShift)
+void CCProtonPi0_QSqFitter::FillChiSqVector_SB(std::vector<double> &ChiSqVector, bool isUpShift)
 {
-    std::string var_type = isUpShift ? "HighMaRES" : "LowMaRES";
+    // ------------------------------------------------------------------------
+    // Read Files
+    // ------------------------------------------------------------------------
+    std::string data_dir_SB_Michel = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/CutHistograms_Michel.root";
+    std::string data_dir_SB_pID = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/CutHistograms_pID.root";
+    std::string data_dir_SB_LowInvMass = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/CutHistograms_LowInvMass.root";
+    std::string data_dir_SB_HighInvMass = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/CutHistograms_HighInvMass.root";
+    std::string data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/Interaction.root";
+ 
+    std::string mc_dir_SB_Michel = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms_Michel.root";
+    std::string mc_dir_SB_pID = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms_pID.root";
+    std::string mc_dir_SB_LowInvMass = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms_LowInvMass.root";
+    std::string mc_dir_SB_HighInvMass = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms_HighInvMass.root";
+    std::string mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/Interaction.root";
    
-    std::string var_name = "QSq_" + var_type;
-    std::string bckg_name = "pi0_invMass_" + var_type;
+    TFile* f_data_SB_Michel = new TFile(data_dir_SB_Michel.c_str());
+    TFile* f_data_SB_pID = new TFile(data_dir_SB_pID.c_str());
+    TFile* f_data_SB_LowInvMass = new TFile(data_dir_SB_LowInvMass.c_str());
+    TFile* f_data_SB_HighInvMass = new TFile(data_dir_SB_HighInvMass.c_str());
+    TFile* f_data = new TFile(data_dir.c_str());
+ 
+    TFile* f_mc_SB_Michel = new TFile(mc_dir_SB_Michel.c_str());
+    TFile* f_mc_SB_pID = new TFile(mc_dir_SB_pID.c_str());
+    TFile* f_mc_SB_LowInvMass = new TFile(mc_dir_SB_LowInvMass.c_str());
+    TFile* f_mc_SB_HighInvMass = new TFile(mc_dir_SB_HighInvMass.c_str());
+    TFile* f_mc = new TFile(mc_dir.c_str());
 
-    TFile* f_data = new TFile(Folder_List::rootDir_Interaction_data.c_str());
-    TFile* f_mc = new TFile(Folder_List::rootDir_Interaction_mc.c_str());
+    // ------------------------------------------------------------------------
+    // Get Histograms
+    // ------------------------------------------------------------------------
+    MnvH1D* h_data_SB_Michel = GetMnvH1D(f_data_SB_Michel, "SideBand_QSq_0");
+    MnvH1D* h_data_SB_pID = GetMnvH1D(f_data_SB_pID, "SideBand_QSq_0");
+    MnvH1D* h_data_SB_LowInvMass = GetMnvH1D(f_data_SB_LowInvMass, "SideBand_QSq_0");
+    MnvH1D* h_data_SB_HighInvMass = GetMnvH1D(f_data_SB_HighInvMass, "SideBand_QSq_0");
+    MnvH1D* h_data = GetMnvH1D(f_data, "QSq_MaRES_0");
 
-    double nData_All;
-    double nData_Signal;
-    double nData_Bckg;
+    MnvH1D* h_mc_SB_Michel = GetMnvH1D(f_mc_SB_Michel, "SideBand_QSq_0");
+    MnvH1D* h_mc_SB_pID = GetMnvH1D(f_mc_SB_pID, "SideBand_QSq_0");
+    MnvH1D* h_mc_SB_LowInvMass = GetMnvH1D(f_mc_SB_LowInvMass, "SideBand_QSq_0");
+    MnvH1D* h_mc_SB_HighInvMass = GetMnvH1D(f_mc_SB_HighInvMass, "SideBand_QSq_0");
+    MnvH1D* h_mc = GetMnvH1D(f_mc, "QSq_MaRES_0");
 
-    for (int i = 0; i <= 200; ++i){
-        // --------------------------------------------------------------------
-        // Calculate Total N(Background) in this Universe
-        // --------------------------------------------------------------------
-        // Data is Same in Each Universe
-        TH1D* invMass_data = new TH1D( * dynamic_cast<TH1D*>(f_data->Get(Form("%s_%d", "pi0_invMass_All", 0))));
-        nData_All = invMass_data->Integral(); 
+    // ------------------------------------------------------------------------
+    // Get Universes
+    // ------------------------------------------------------------------------
+    std::string err_name = isUpShift ? "HighMaRES" : "LowMaRES";
 
-        TH1D* invMass_mc = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s_%d", bckg_name.c_str(), i))));
-        invMass_mc->Scale(POT_ratio);
-        nData_Bckg = invMass_mc->Integral();
+    MnvVertErrorBand* err_data_SB_Michel = h_data_SB_Michel->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_data_SB_pID = h_data_SB_pID->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_data_SB_LowInvMass = h_data_SB_LowInvMass->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_data_SB_HighInvMass = h_data_SB_HighInvMass->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_data = h_data->GetVertErrorBand(err_name);
 
-        invMass_data->Add(invMass_mc, -1);
-        nData_Signal = invMass_data->Integral();
-        delete invMass_mc;
-        delete invMass_data;
-        
-        //std::cout<<"nData_All = "<<nData_All<<std::endl;
-        //std::cout<<"nData_Signal = "<<nData_Signal<<std::endl;
-        //std::cout<<"nData_Bckg = "<<nData_Bckg<<std::endl;
+    MnvVertErrorBand* err_mc_SB_Michel = h_mc_SB_Michel->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_mc_SB_pID = h_mc_SB_pID->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_mc_SB_LowInvMass = h_mc_SB_LowInvMass->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_mc_SB_HighInvMass = h_mc_SB_HighInvMass->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_mc = h_mc->GetVertErrorBand(err_name);
 
-        // --------------------------------------------------------------------
-        // Background Subtract in this Universe 
-        // --------------------------------------------------------------------
-        // Get Background Subtracted Data
-        TH1D* h_data = new TH1D( * dynamic_cast<TH1D*>(f_data->Get(Form("%s_%d", var_name.c_str(), 0))));
-        TH1D* h_mc_bckg = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s_%s_%d", var_name.c_str(), "Bckg",i))));
-        NormalizeHistogram(h_mc_bckg);
-        h_mc_bckg->Scale(nData_Bckg);
-        h_data->Add(h_mc_bckg, -1);
-
-        // Get MC Signal
-        TH1D* h_mc_signal = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s_%d", var_name.c_str(), i))));
-        h_mc_signal->Scale(POT_ratio);
-        double ChiSq = Calc_ChiSq(h_data, h_mc_signal);
-        ChiSqVector.push_back(ChiSq);
-
-        delete h_data;
-        delete h_mc_signal;
-        delete h_mc_bckg;
+    std::vector<TH1D*> unv_data_SB_Michel = err_data_SB_Michel->GetHists();
+    std::vector<TH1D*> unv_data_SB_pID = err_data_SB_pID->GetHists();
+    std::vector<TH1D*> unv_data_SB_LowInvMass = err_data_SB_LowInvMass->GetHists();
+    std::vector<TH1D*> unv_data_SB_HighInvMass = err_data_SB_HighInvMass->GetHists();
+    std::vector<TH1D*> unv_data = err_data->GetHists();
+ 
+    std::vector<TH1D*> unv_mc_SB_Michel = err_mc_SB_Michel->GetHists();
+    std::vector<TH1D*> unv_mc_SB_pID = err_mc_SB_pID->GetHists();
+    std::vector<TH1D*> unv_mc_SB_LowInvMass = err_mc_SB_LowInvMass->GetHists();
+    std::vector<TH1D*> unv_mc_SB_HighInvMass = err_mc_SB_HighInvMass->GetHists();
+    std::vector<TH1D*> unv_mc = err_mc->GetHists();
+  
+    // ------------------------------------------------------------------------
+    // Calculate Global Chi Squre  
+    // ------------------------------------------------------------------------
+    for (int i = 0; i < 201; ++i){
+        double Global_ChiSq = 0.0;
+        //Global_ChiSq += Calc_ChiSq(unv_data_SB_Michel[i], unv_mc_SB_Michel[i]);
+        //Global_ChiSq += Calc_ChiSq(unv_data_SB_pID[i], unv_mc_SB_pID[i]);
+        //Global_ChiSq += Calc_ChiSq(unv_data_SB_LowInvMass[i], unv_mc_SB_LowInvMass[i]);
+        //Global_ChiSq += Calc_ChiSq(unv_data_SB_HighInvMass[i], unv_mc_SB_HighInvMass[i]);
+        Global_ChiSq += Calc_ChiSq(unv_data[i], unv_mc[i]);
+        ChiSqVector.push_back(Global_ChiSq);
     }
 
     if (isDebug){
-        std::cout<<"ChiSq Vector"<<std::endl;
+        std::cout<<"ChiSq Vector for "<<err_name<<std::endl;
         for (unsigned int i = 0; i < ChiSqVector.size(); ++i){
             std::cout<<"\t"<<i<<" "<<ChiSqVector[i]<<std::endl;
         }
     }
+
+    // Clean Memory
+    delete h_data_SB_Michel;
+    delete h_data_SB_pID;
+    delete h_data_SB_LowInvMass;
+    delete h_data_SB_HighInvMass;
+    delete h_data;
+
+    delete h_mc_SB_Michel;
+    delete h_mc_SB_pID;
+    delete h_mc_SB_LowInvMass;
+    delete h_mc_SB_HighInvMass;
+    delete h_mc;
+
+    delete f_data_SB_Michel;
+    delete f_data_SB_pID;
+    delete f_data_SB_LowInvMass;
+    delete f_data_SB_HighInvMass;
+    delete f_data;
+
+    delete f_mc_SB_Michel;
+    delete f_mc_SB_pID;
+    delete f_mc_SB_LowInvMass;
+    delete f_mc_SB_HighInvMass;
+    delete f_mc;
+}
+
+void CCProtonPi0_QSqFitter::FillChiSqVector_DeltaFactor()
+{
+    // ------------------------------------------------------------------------
+    // Read Files
+    // ------------------------------------------------------------------------
+    std::string data_dir = Folder_List::rootDir_CrossSection_data;
+    std::string mc_dir = Folder_List::rootDir_CrossSection_mc;
+   
+    TFile* f_data = new TFile(data_dir.c_str());
+    TFile* f_mc = new TFile(mc_dir.c_str());
+
+    // ------------------------------------------------------------------------
+    // Get Histograms
+    // ------------------------------------------------------------------------
+    MnvH1D* h_data = GetMnvH1D(f_data, "QSq_xsec");
+    MnvH1D* h_mc = GetMnvH1D(f_mc, "QSq_xsec");
+ 
+    // ------------------------------------------------------------------------
+    // Get Universes
+    // ------------------------------------------------------------------------
+    std::string err_name = "DeltaFactor";
+    MnvVertErrorBand* err_data = h_data->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_mc = h_mc->GetVertErrorBand(err_name);
+
+    std::vector<TH1D*> unv_data = err_data->GetHists();
+    std::vector<TH1D*> unv_mc = err_mc->GetHists();
+  
+    // ------------------------------------------------------------------------
+    // Calculate Chi Squre  
+    // ------------------------------------------------------------------------
+    for (unsigned int i = 0; i < unv_mc.size(); ++i){
+        double ChiSq = Calc_ChiSq_Delta(unv_data[i], unv_mc[i]);
+        ChiSqVector_DeltaFactor.push_back(ChiSq);
+    }
+
+    if (isDebug){
+        std::cout<<"ChiSq Vector for "<<err_name<<std::endl;
+        for (unsigned int i = 0; i < ChiSqVector_DeltaFactor.size(); ++i){
+            std::cout<<"\t"<<i<<" "<<ChiSqVector_DeltaFactor[i]<<std::endl;
+        }
+    }
+
+    // Clean Memory
+    delete h_data;
+    delete h_mc;
+    delete f_data;
+    delete f_mc;
+}
+
+double CCProtonPi0_QSqFitter::GetSmallestBinWidth(MnvH1D* hist)
+{
+    double smallest = 99999999;
+    int nBins = hist->GetNbinsX();
+    for (int i = 0; i <= nBins; ++i){
+        double current = hist->GetBinWidth(i);
+        if (current < smallest) smallest = current;
+    }
+
+    return smallest;
+}
+void CCProtonPi0_QSqFitter::FillChiSqVector(std::vector<double> &ChiSqVector, bool isUpShift)
+{
+    // ------------------------------------------------------------------------
+    // Read Files
+    // ------------------------------------------------------------------------
+    std::string data_dir = Folder_List::rootDir_CrossSection_data;
+    std::string mc_dir = Folder_List::rootDir_CrossSection_mc;
+   
+    TFile* f_data = new TFile(data_dir.c_str());
+    TFile* f_mc = new TFile(mc_dir.c_str());
+
+    // ------------------------------------------------------------------------
+    // Get Histograms
+    // ------------------------------------------------------------------------
+    MnvH1D* h_data = GetMnvH1D(f_data, "QSq_xsec");
+    MnvH1D* h_mc = GetMnvH1D(f_mc, "QSq_xsec");
+
+    // ------------------------------------------------------------------------
+    // Get Universes
+    // ------------------------------------------------------------------------
+    std::string err_name = isUpShift ? "HighMaRES" : "LowMaRES";
+
+    MnvVertErrorBand* err_data = h_data->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_mc = h_mc->GetVertErrorBand(err_name);
+
+    std::vector<TH1D*> unv_data = err_data->GetHists();
+    std::vector<TH1D*> unv_mc = err_mc->GetHists();
+  
+    // ------------------------------------------------------------------------
+    // Calculate Chi Squre  
+    // ------------------------------------------------------------------------
+    for (int i = 0; i < 201; ++i){
+        double ChiSq = Calc_ChiSq(unv_data[i], unv_mc[i]);
+        ChiSqVector.push_back(ChiSq);
+    }
+
+    if (isDebug){
+        std::cout<<"ChiSq Vector for "<<err_name<<std::endl;
+        for (unsigned int i = 0; i < ChiSqVector.size(); ++i){
+            std::cout<<"\t"<<i<<" "<<ChiSqVector[i]<<std::endl;
+        }
+    }
+
+    // Clean Memory
+    delete h_data;
+    delete h_mc;
+    delete f_data;
+    delete f_mc;
+
 }
 
 double CCProtonPi0_QSqFitter::Calc_ChiSq(TH1D* data, TH1D* MC)
 {
+    // Do not Scale MC for XSec
+    //MC->Scale(POT_ratio);
+
     int nBins = data->GetNbinsX();
     double ChiSq = 0.0;
 
-    for (int i = 3; i < nBins-5; ++i){
+    // Do not use first 2 bins
+    for (int i = 3; i <= nBins; ++i){
         double nData = data->GetBinContent(i);
         double nMC = MC->GetBinContent(i);
         
         ChiSq += std::pow((nData-nMC),2) / nMC;
     }
 
-    // Combine Last 5 Bins
-    double nData_Last5 = 0.0;
-    double nMC_Last5 = 0.0;
-    for (int i = nBins - 5; i <= nBins; ++i){
-        nData_Last5 += data->GetBinContent(i);
-        nMC_Last5 += MC->GetBinContent(i);
-    }
-
-    ChiSq += std::pow((nData_Last5-nMC_Last5),2) / nMC_Last5;
-
     return ChiSq;
 }
 
+double CCProtonPi0_QSqFitter::Calc_ChiSq_Delta(TH1D* data, TH1D* MC)
+{
+    // Do not Scale MC for XSec
+    //MC->Scale(POT_ratio);
+
+    //int nBins = data->GetNbinsX();
+    double ChiSq = 0.0;
+
+    for (int i = 1; i <= 2; ++i){
+        double nData = data->GetBinContent(i);
+        double nMC = MC->GetBinContent(i);
+        
+        ChiSq += std::pow((nData-nMC),2) / nMC;
+    }
+
+    return ChiSq;
+}
 #endif
 

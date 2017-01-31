@@ -148,10 +148,13 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void QSq_Studies();
         void Studies_2p2h();
         void Draw_QSq_EnuFit(std::string data_dir, std::string mc_dir, std::string var_name, double* pars);
-        void Draw_QSq_MaRES();
+        void Draw_QSq_MaRES_Fit();
+        void Draw_QSq_MaRES_Fit_SB();
+        void Draw_QSq_MaRES_Plots();
         void Draw_QSq_MaRES_AreaNorm();
         void Draw_QSq_EnuLimit();
         void Draw_QSq_DeltaSuppression();
+        void Draw_QSq_DeltaSuppression_AllPlots();
         void plot_CV_weights();
         void plot_SystematicsInfo();
         void PlotTotalEnuXSec();
@@ -202,6 +205,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void printBins_W();
         double Calc_ChiSq_dof(double* data, double* expected, int nPoints, int nPars);
         double Calc_ChiSq(TH1* data, TH1* MC);
+        double Calc_ChiSq(TH1* data, TH1* MC, int min_bin, int max_bin);
 
         // 2p2h Study
 

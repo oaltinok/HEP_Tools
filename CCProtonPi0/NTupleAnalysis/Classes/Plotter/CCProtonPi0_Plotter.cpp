@@ -245,13 +245,20 @@ void CCProtonPi0_Plotter::plotOtherStudies()
     std::cout<<"Plotting Other Studies..."<<std::endl;
     std::string plotDir = Folder_List::plotDir_OtherStudies;
    
-    TFile* f = new TFile(Folder_List::rootDir_CutHists_mc.c_str());
+    //DrawDataStackedMC_WithSignalTypes(rootDir_CutHists, "SideBand_QSq", plotDir);
+    //DrawDataStackedMC(rootDir_CutHists, "SideBand_QSq", plotDir);
+   
+    TFile* f = new TFile(rootDir_Interaction.mc.c_str());
 
-    MnvH1D* h_QELike = GetMnvH1D(f, "hCut_pi0invMass_4");
-    MnvH1D* h_2p2h = GetMnvH1D(f, "hCut_pi0invMass_10");
+    MnvH1D* mc =  GetMnvH1D(f, "QSq_MaRES_0");
+
+    std::vector<std::string> vert_errors = mc->GetVertErrorBandNames();
     
-    DrawDataMC(h_QELike, h_2p2h, "QELike_2p2h", plotDir, true);
-    
+    for (unsigned int i = 0; i < vert_errors.size(); ++i){
+        std::cout<<vert_errors[i]<<std::endl;
+    }
+
+
     std::cout<<"Plotting Other Studies Finished!"<<std::endl;
 }
 
@@ -2593,11 +2600,95 @@ void CCProtonPi0_Plotter::QSq_Studies()
     //Draw2DHist(rootDir_Interaction, "QSq_response", plotDir);
     //Save2DHistPoints(rootDir_Interaction, "QSq_response", plotDir);
 
-    Draw_QSq_EnuLimit();
-    //Draw_QSq_MaRES();
+    // Neutrino Energy Limit
+    //Draw_QSq_EnuLimit();
+    
+    // MaRES Fit
+    //Draw_QSq_MaRES_Plots();
+    //Draw_QSq_MaRES_Fit();
     //Draw_QSq_MaRES_AreaNorm();
-    //Draw_QSq_DeltaSuppression();
+    
+    // Delta Suppression 
+    Draw_QSq_DeltaSuppression();
+    //Draw_QSq_DeltaSuppression_AllPlots();
 }
+
+void CCProtonPi0_Plotter::Draw_QSq_MaRES_Plots()
+{
+    // Read Files
+    std::string data_dir_SB_Michel = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/CutHistograms_Michel.root";
+    std::string data_dir_SB_pID = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/CutHistograms_pID.root";
+    std::string data_dir_SB_LowInvMass = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/CutHistograms_LowInvMass.root";
+    std::string data_dir_SB_HighInvMass = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/CutHistograms_HighInvMass.root";
+    std::string data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/Interaction.root";
+ 
+    std::string mc_dir_SB_Michel = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms_Michel.root";
+    std::string mc_dir_SB_pID = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms_pID.root";
+    std::string mc_dir_SB_LowInvMass = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms_LowInvMass.root";
+    std::string mc_dir_SB_HighInvMass = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CutHistograms_HighInvMass.root";
+    std::string mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/Interaction.root";
+   
+    TFile* f_data_SB_Michel = new TFile(data_dir_SB_Michel.c_str());
+    TFile* f_data_SB_pID = new TFile(data_dir_SB_pID.c_str());
+    TFile* f_data_SB_LowInvMass = new TFile(data_dir_SB_LowInvMass.c_str());
+    TFile* f_data_SB_HighInvMass = new TFile(data_dir_SB_HighInvMass.c_str());
+    TFile* f_data = new TFile(data_dir.c_str());
+ 
+    TFile* f_mc_SB_Michel = new TFile(mc_dir_SB_Michel.c_str());
+    TFile* f_mc_SB_pID = new TFile(mc_dir_SB_pID.c_str());
+    TFile* f_mc_SB_LowInvMass = new TFile(mc_dir_SB_LowInvMass.c_str());
+    TFile* f_mc_SB_HighInvMass = new TFile(mc_dir_SB_HighInvMass.c_str());
+    TFile* f_mc = new TFile(mc_dir.c_str());
+
+
+    // Get Histograms
+    MnvH1D* h_data_SB_Michel = GetMnvH1D(f_data_SB_Michel, "SideBand_QSq_0");
+    MnvH1D* h_data_SB_pID = GetMnvH1D(f_data_SB_pID, "SideBand_QSq_0");
+    MnvH1D* h_data_SB_LowInvMass = GetMnvH1D(f_data_SB_LowInvMass, "SideBand_QSq_0");
+    MnvH1D* h_data_SB_HighInvMass = GetMnvH1D(f_data_SB_HighInvMass, "SideBand_QSq_0");
+    MnvH1D* h_data = GetMnvH1D(f_data, "QSq_MaRES_0");
+
+    MnvH1D* h_mc_SB_Michel = GetMnvH1D(f_mc_SB_Michel, "SideBand_QSq_0");
+    MnvH1D* h_mc_SB_pID = GetMnvH1D(f_mc_SB_pID, "SideBand_QSq_0");
+    MnvH1D* h_mc_SB_LowInvMass = GetMnvH1D(f_mc_SB_LowInvMass, "SideBand_QSq_0");
+    MnvH1D* h_mc_SB_HighInvMass = GetMnvH1D(f_mc_SB_HighInvMass, "SideBand_QSq_0");
+    MnvH1D* h_mc = GetMnvH1D(f_mc, "QSq_MaRES_0");
+
+    // Plot
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    DrawDataMC(h_data_SB_Michel, h_mc_SB_Michel, "QSq_Michel", plotDir, false);
+    DrawDataMC(h_data_SB_pID, h_mc_SB_pID, "QSq_pID", plotDir, false);
+    DrawDataMC(h_data_SB_LowInvMass, h_mc_SB_LowInvMass, "QSq_LowInvMass", plotDir, false);
+    DrawDataMC(h_data_SB_HighInvMass, h_mc_SB_HighInvMass, "QSq_HighInvMass", plotDir, false);
+    DrawDataMC(h_data, h_mc, "QSq_MaRES", plotDir, false);
+
+    // Clean Memory
+    delete h_data_SB_Michel;
+    delete h_data_SB_pID;
+    delete h_data_SB_LowInvMass;
+    delete h_data_SB_HighInvMass;
+    delete h_data;
+
+    delete h_mc_SB_Michel;
+    delete h_mc_SB_pID;
+    delete h_mc_SB_LowInvMass;
+    delete h_mc_SB_HighInvMass;
+    delete h_mc;
+
+    delete f_data_SB_Michel;
+    delete f_data_SB_pID;
+    delete f_data_SB_LowInvMass;
+    delete f_data_SB_HighInvMass;
+    delete f_data;
+
+    delete f_mc_SB_Michel;
+    delete f_mc_SB_pID;
+    delete f_mc_SB_LowInvMass;
+    delete f_mc_SB_HighInvMass;
+    delete f_mc;
+}
+
+
 
 void CCProtonPi0_Plotter::Draw_QSq_MaRES_AreaNorm()
 {
@@ -2661,105 +2752,198 @@ void CCProtonPi0_Plotter::Draw_QSq_DeltaSuppression()
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
 
-    TFile* f_data = new TFile(Folder_List::rootDir_Interaction_data.c_str());
-    TFile* f_mc = new TFile(Folder_List::rootDir_Interaction_mc.c_str());
-
-    // --------------------------------------------------------------------
-    // Calculate Total N(Background) in Central Value 
-    // --------------------------------------------------------------------
-    MnvH1D* invMass_mc_CV = GetMnvH1D(f_mc, Form("%s_%d", "pi0_invMass_All", 2));
-    invMass_mc_CV->Scale(POT_ratio);
-    double nData_Bckg_CV = invMass_mc_CV->Integral();
-    delete invMass_mc_CV;
-
-    // --------------------------------------------------------------------
-    // Calculate Total N(Background) in Best Universe 
-    // --------------------------------------------------------------------
-    MnvH1D* invMass_mc_Weighted = GetMnvH1D(f_mc, Form("%s_%d", "pi0_invMass_DeltaSuppression", 2));
-    invMass_mc_Weighted->Scale(POT_ratio);
-    double nData_Bckg_Weighted = invMass_mc_Weighted->Integral();
-    delete invMass_mc_Weighted;
-
-    std::cout<<"nBckg in CV = "<<nData_Bckg_CV<<std::endl;
-    std::cout<<"nBckg in Weighted = "<<nData_Bckg_Weighted<<std::endl;
+    TFile* f_data = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_mc = new TFile(rootDir_CrossSection.mc.c_str());
 
     // --------------------------------------------------------------------
     // Get Histograms 
     // --------------------------------------------------------------------
-    MnvH1D* data_cv = GetMnvH1D(f_data, Form("%s_%d", "QSq_DeltaSuppression", 0));
-    MnvH1D* mc_cv_bckg = GetMnvH1D(f_mc, Form("%s_%d", "QSq_All", 2));
-    MnvH1D* mc_cv = GetMnvH1D(f_mc, Form("%s_%d", "QSq_All", 1));
+    MnvH1D* data_cv = GetMnvH1D(f_data, "QSq_xsec");
+    MnvH1D* mc_cv = GetMnvH1D(f_mc, "QSq_xsec");
+  
+    TH1D* h_data_cv = GetBinNormalizedTH1D(data_cv);
+    TH1D* h_mc_cv = GetBinNormalizedTH1D(mc_cv);
+
+    // MINOS Factor -- First Universe 
+    MnvVertErrorBand* err_data = data_cv->GetVertErrorBand("DeltaFactor");
+    MnvVertErrorBand* err_mc = mc_cv->GetVertErrorBand("DeltaFactor");
+
+    std::vector<TH1D*> unv_data = err_data->GetHists();
+    std::vector<TH1D*> unv_mc = err_mc->GetHists();
+
+    TH1D* h_data_MINOS= (TH1D*)unv_data[0]->Clone();
+    TH1D* h_mc_MINOS = (TH1D*)unv_mc[0]->Clone();
  
-    MnvH1D* data_best = GetMnvH1D(f_data, Form("%s_%d", "QSq_DeltaSuppression", 0));
-    MnvH1D* mc_best_bckg = GetMnvH1D(f_mc, Form("%s_%d", "QSq_DeltaSuppression", 2));
-    MnvH1D* mc_best = GetMnvH1D(f_mc, Form("%s_%d", "QSq_DeltaSuppression", 1));
+    // Best Numbers -- Lowest ChiSq 
+    CCProtonPi0_QSqFitter QSqFitter;
+    int ind = QSqFitter.GetMinChiSq_DeltaFactor();
+    TH1D* h_data_Best = (TH1D*)unv_data[ind]->Clone();
+    TH1D* h_mc_Best = (TH1D*)unv_mc[ind]->Clone();
    
-    NormalizeHistogram(mc_cv_bckg);
-    mc_cv_bckg->Scale(nData_Bckg_CV);
-    data_cv->Add(mc_cv_bckg, -1); 
- 
-    NormalizeHistogram(mc_best_bckg);
-    mc_best_bckg->Scale(nData_Bckg_Weighted);
-    data_best->Add(mc_best_bckg, -1); 
+    // Bin Normalization 
+    double norm_bin_width = GetSmallestBinWidth(data_cv);
+    h_data_MINOS->Scale(norm_bin_width, "width");
+    h_data_Best->Scale(norm_bin_width, "width");
+    h_mc_MINOS->Scale(norm_bin_width, "width");
+    h_mc_Best->Scale(norm_bin_width, "width");
 
-    data_cv->SetMarkerStyle(20);
-    data_cv->SetMarkerSize(1);
-    data_cv->SetMarkerColor(kBlack);
-    data_cv->SetLineWidth(2);
-    data_cv->SetLineColor(kBlack);
+    h_data_cv->SetMarkerStyle(20);
+    h_data_cv->SetMarkerSize(1);
+    h_data_cv->SetMarkerColor(kBlack);
+    h_data_cv->SetLineWidth(2);
+    h_data_cv->SetLineColor(kBlack);
 
-    mc_cv->Scale(POT_ratio);
-    mc_cv->SetLineWidth(3);
-    mc_cv->SetLineColor(kRed);
-    mc_cv->SetFillColor(kWhite);
+    h_mc_cv->SetLineWidth(3);
+    h_mc_cv->SetLineColor(kRed);
+    h_mc_cv->SetFillColor(kWhite);
 
-    mc_best->Scale(POT_ratio);
-    mc_best->SetLineWidth(3);
-    mc_best->SetLineColor(kGreen+2);
-    mc_best->SetFillColor(kWhite);
+    h_mc_MINOS->SetLineWidth(3);
+    h_mc_MINOS->SetLineColor(kBlue);
+    h_mc_MINOS->SetFillColor(kWhite);
 
-    data_best->SetMarkerStyle(20);
-    data_best->SetMarkerSize(1);
-    data_best->SetMarkerColor(kBlue);
-    data_best->SetLineWidth(2);
-    data_best->SetLineColor(kBlue);
+    h_data_MINOS->SetMarkerStyle(20);
+    h_data_MINOS->SetMarkerSize(1);
+    h_data_MINOS->SetMarkerColor(kBlue);
+    h_data_MINOS->SetLineWidth(2);
+    h_data_MINOS->SetLineColor(kBlue);
+
+    h_mc_Best->SetLineWidth(3);
+    h_mc_Best->SetLineStyle(1);
+    h_mc_Best->SetLineColor(kGreen+2);
+    h_mc_Best->SetFillColor(kWhite);
+
+    h_data_Best->SetMarkerStyle(20);
+    h_data_Best->SetLineStyle(1);
+    h_data_Best->SetMarkerSize(1);
+    h_data_Best->SetMarkerColor(kGreen+2);
+    h_data_Best->SetLineWidth(2);
+    h_data_Best->SetLineColor(kGreen+2);
 
     TCanvas* c = new TCanvas("c","c",1280,800);
 
-    data_cv->SetMaximum(data_cv->GetMaximum()*1.5);
-    data_cv->SetMinimum(0.0);
-    data_cv->Draw("E1 X0");
-    mc_cv->Draw("HIST SAME");
-    data_best->Draw("E1 X0 SAME");
-    mc_best->Draw("HIST SAME");
+    h_data_cv->SetMaximum(h_data_cv->GetMaximum()*1.5);
+    h_data_cv->SetMinimum(0.0);
+    h_data_cv->Draw("E1 X0");
+    h_mc_cv->Draw("HIST SAME");
+    h_data_MINOS->Draw("E1 X0 SAME");
+    h_mc_MINOS->Draw("HIST SAME");
+    h_data_Best->Draw("E1 X0 SAME");
+    h_mc_Best->Draw("HIST SAME");
+
 
     // TLegend
-    TLegend *legend = new TLegend(0.65,0.75,0.9,0.9);  
-    legend->AddEntry(data_cv, "Bckg Subt. Data CV ", "lep");
-    legend->AddEntry(mc_cv, "GENIE Signal CV", "l");
-    legend->AddEntry(data_best, "Bckg Subt. Data #Delta Suppressed", "lep");
-    legend->AddEntry(mc_best, "GENIE Signal #Delta Suppressed", "l");
+    TLegend *legend = new TLegend(0.50,0.70,0.9,0.9);  
+    legend->AddEntry(h_data_cv, "CV Data d#sigma/dQ^{2}", "lep");
+    legend->AddEntry(h_mc_cv, "CV GENIE d#sigma/dQ^{2}", "l");
+    legend->AddEntry(h_data_MINOS, "#Delta Suppressed (MINOS) Data d#sigma/dQ^{2}", "lep");
+    legend->AddEntry(h_mc_MINOS, "#Delta Suppressed (MINOS) GENIE d#sigma/dQ^{2}", "l");
+    legend->AddEntry(h_data_Best, "#Delta Suppressed (Best) Data d#sigma/dQ^{2}", "lep");
+    legend->AddEntry(h_mc_Best, "#Delta Suppressed (Best) GENIE d#sigma/dQ^{2}", "l");
     legend->Draw();
 
      // Add Text
     TLatex text;
     text.SetNDC();
     text.SetTextSize(0.03);
-    text.DrawLatex(0.55,0.66,Form("%s%3.2f", "GENIE CV #chi^{2}/15 = ", Calc_ChiSq(data_cv, mc_cv)/15.0));
-    text.DrawLatex(0.55,0.62,Form("%s%3.2f", "#Delta Suppressed #chi^{2}/15 = ", Calc_ChiSq(data_best, mc_best)/15.0));
+    text.DrawLatex(0.55,0.66,Form("%s%3.2f", "GENIE CV #chi^{2} = ", Calc_ChiSq(h_data_cv, h_mc_cv,1,2)));
+    text.DrawLatex(0.55,0.62,Form("%s%3.2f", "#Delta Suppressed (MINOS) #chi^{2} = ", Calc_ChiSq(h_data_MINOS, h_mc_MINOS,1,2)));
+    text.DrawLatex(0.55,0.58,Form("%s%3.2f", "#Delta Suppressed (Best) #chi^{2} = ", Calc_ChiSq(h_data_Best, h_mc_Best,1,2)));
 
     // Save Plot 
     gStyle->SetOptStat(0); 
     c->Update();
     c->Print(Form("%s%s",plotDir.c_str(),"QSq_DeltaSuppressed.png"), "png");
 
+    delete h_data_cv;
     delete data_cv;
-    delete data_best;
-    delete mc_cv_bckg;
-    delete mc_best_bckg;
+    delete h_data_MINOS;
+    delete h_data_Best;
+    delete h_mc_cv;
     delete mc_cv;
-    delete mc_best;
+    delete h_mc_MINOS;
+    delete h_mc_Best;
     delete c;
+    delete f_data;
+    delete f_mc;
+}
+
+void CCProtonPi0_Plotter::Draw_QSq_DeltaSuppression_AllPlots()
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    TFile* f_data = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_mc = new TFile(rootDir_CrossSection.mc.c_str());
+
+    // --------------------------------------------------------------------
+    // Get Histograms 
+    // --------------------------------------------------------------------
+    MnvH1D* data_cv = GetMnvH1D(f_data, "QSq_xsec");
+    MnvH1D* mc_cv = GetMnvH1D(f_mc, "QSq_xsec");
+  
+    // MINOS Factor -- First Universe 
+    MnvVertErrorBand* err_data = data_cv->GetVertErrorBand("DeltaFactor");
+    MnvVertErrorBand* err_mc = mc_cv->GetVertErrorBand("DeltaFactor");
+
+    std::vector<TH1D*> unv_data = err_data->GetHists();
+    std::vector<TH1D*> unv_mc = err_mc->GetHists();
+
+    // Bin Normalization 
+    double norm_bin_width = GetSmallestBinWidth(data_cv);
+    for (unsigned int i = 0; i < unv_mc.size(); ++i){
+        TH1D* h_data = (TH1D*)unv_data[i]->Clone();
+        TH1D* h_mc = (TH1D*)unv_mc[i]->Clone();
+
+        h_data->Scale(norm_bin_width, "width");
+        h_mc->Scale(norm_bin_width, "width");
+        
+        h_data->SetMarkerStyle(20);
+        h_data->SetMarkerSize(1);
+        h_data->SetMarkerColor(kBlack);
+        h_data->SetLineWidth(2);
+        h_data->SetLineColor(kBlack);
+
+        h_mc->SetLineWidth(3);
+        h_mc->SetLineStyle(1);
+        h_mc->SetLineColor(kRed);
+        h_mc->SetFillColor(kWhite);
+
+        TCanvas* c = new TCanvas("c","c",1280,800);
+
+        h_data->SetMaximum(h_data->GetMaximum()*1.5);
+        h_data->SetMinimum(0.0);
+        h_data->Draw("E1 X0");
+        h_mc->Draw("HIST SAME");
+
+        // TLegend
+        TLegend *legend = new TLegend(0.65,0.80,0.9,0.9);  
+        legend->AddEntry(h_data, "Data d#sigma/dQ^{2}", "lep");
+        legend->AddEntry(h_mc, "GENIE d#sigma/dQ^{2}", "l");
+        legend->Draw();
+
+        // Add Text
+        TLatex text;
+        text.SetNDC();
+        text.SetTextSize(0.03);
+        text.DrawLatex(0.65,0.70,Form("%s%3.2f", "All Bins #chi^{2} = ", Calc_ChiSq(h_data, h_mc, 1, h_data->GetNbinsX())));
+        text.DrawLatex(0.65,0.66,Form("%s%3.2f", "Low Bins #chi^{2} = ", Calc_ChiSq(h_data, h_mc, 1, 2)));
+
+        // Save Plot 
+        gStyle->SetOptStat(0); 
+        c->Update();
+        std::string plot_number;
+        if (i < 10) plot_number = "00" + std::to_string((long long int) i);
+        else if (i < 100) plot_number = "0" + std::to_string((long long int)i);
+        else plot_number = std::to_string((long long int)i);
+        c->Print(Form("%s%s_%s%s",plotDir.c_str(),"QSq_DeltaSuppressed",plot_number.c_str(),".png"), "png");
+
+        delete h_data;
+        delete h_mc;
+        delete legend;
+        delete c;
+    }
+    
+    delete mc_cv;
+    delete data_cv;
     delete f_data;
     delete f_mc;
 }
@@ -2909,7 +3093,101 @@ void CCProtonPi0_Plotter::Get_Exponential(double* x, double* y, int nPoints, dou
     }
 }
 
-void CCProtonPi0_Plotter::Draw_QSq_MaRES()
+void CCProtonPi0_Plotter::Draw_QSq_MaRES_Fit()
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    TFile* f_data = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_mc = new TFile(rootDir_CrossSection.mc.c_str());
+
+    CCProtonPi0_QSqFitter QSqFitter;
+    int ind = QSqFitter.GetMinChiSq();
+
+    // --------------------------------------------------------------------
+    // Get Histograms 
+    // --------------------------------------------------------------------
+    // Central Value
+    MnvH1D* data_cv = GetMnvH1D(f_data, "QSq_xsec");
+    MnvH1D* mc_cv = GetMnvH1D(f_mc, "QSq_xsec");
+    
+    TH1D* h_data_cv = GetBinNormalizedTH1D(data_cv);
+    TH1D* h_mc_cv = GetBinNormalizedTH1D(mc_cv);
+
+    // Best MaRES -- Lowest Global ChiSq
+    MnvVertErrorBand* err_data = data_cv->GetVertErrorBand("HighMaRES");
+    MnvVertErrorBand* err_mc = mc_cv->GetVertErrorBand("HighMaRES");
+
+    std::vector<TH1D*> unv_data = err_data->GetHists();
+    std::vector<TH1D*> unv_mc = err_mc->GetHists();
+
+    TH1D* data_best = (TH1D*)unv_data[ind]->Clone();
+    TH1D* mc_best = (TH1D*)unv_mc[ind]->Clone();
+   
+    // Bin Normalization 
+    double norm_bin_width = GetSmallestBinWidth(data_cv);
+    data_best->Scale(norm_bin_width, "width");
+    mc_best->Scale(norm_bin_width, "width");
+
+    h_data_cv->SetMarkerStyle(20);
+    h_data_cv->SetMarkerSize(1);
+    h_data_cv->SetMarkerColor(kBlack);
+    h_data_cv->SetLineWidth(2);
+    h_data_cv->SetLineColor(kBlack);
+
+    h_mc_cv->SetLineWidth(3);
+    h_mc_cv->SetLineColor(kRed);
+    h_mc_cv->SetFillColor(kWhite);
+
+    mc_best->SetLineWidth(3);
+    mc_best->SetLineColor(kGreen+2);
+    mc_best->SetFillColor(kWhite);
+
+    data_best->SetMarkerStyle(20);
+    data_best->SetMarkerSize(1);
+    data_best->SetMarkerColor(kBlue);
+    data_best->SetLineWidth(2);
+    data_best->SetLineColor(kBlue);
+
+    TCanvas* c = new TCanvas("c","c",1280,800);
+
+    h_data_cv->SetMaximum(data_cv->GetMaximum()*1.5);
+    h_data_cv->Draw("E1 X0");
+    h_mc_cv->Draw("HIST SAME");
+    data_best->Draw("E1 X0 SAME");
+    mc_best->Draw("HIST SAME");
+
+    // TLegend
+    TLegend *legend = new TLegend(0.65,0.75,0.9,0.9);  
+    legend->AddEntry(h_data_cv, "CV Data d#sigma/dQ^{2}", "lep");
+    legend->AddEntry(h_mc_cv, "CV GENIE d#sigma/dQ^{2}", "l");
+    legend->AddEntry(data_best, "Best Data d#sigma/dQ^{2}", "lep");
+    legend->AddEntry(mc_best, "Best GENIE d#sigma/dQ^{2}", "l");
+    legend->Draw();
+ 
+    // Add Text
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+    text.DrawLatex(0.65,0.66,Form("%s%3.2f%s", "GENIE MaRES = ", 1.12," GeV"));
+    text.DrawLatex(0.65,0.62,Form("%s%3.2f", "GENIE MaRES #chi^{2} = ", QSqFitter.ChiSqVector_up[0]));
+    text.DrawLatex(0.65,0.58,Form("%s%3.2f%s", "Best MaRES = ", QSqFitter.MaRESVector_up[ind]," GeV"));
+    text.DrawLatex(0.65,0.54,Form("%s%3.2f", "Best MaRES #chi^{2} = ", QSqFitter.ChiSqVector_up[ind]));
+
+    // Save Plot 
+    gStyle->SetOptStat(0); 
+    c->Update();
+    c->Print(Form("%s%s",plotDir.c_str(),"QSq_MaRES_Fit.png"), "png");
+
+    delete data_cv;
+    delete data_best;
+    delete mc_cv;
+    delete mc_best;
+    delete c;
+    delete f_data;
+    delete f_mc;
+}
+
+void CCProtonPi0_Plotter::Draw_QSq_MaRES_Fit_SB()
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
 
@@ -2920,50 +3198,40 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES()
     int ind = QSqFitter.GetMinChiSq();
 
     // --------------------------------------------------------------------
-    // Calculate Total N(Background) in Central Value 
-    // --------------------------------------------------------------------
-    TH1D* invMass_mc_CV = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s_%d", "pi0_invMass_HighMaRES", 0))));
-    invMass_mc_CV->Scale(POT_ratio);
-    double nData_Bckg_CV = invMass_mc_CV->Integral();
-    delete invMass_mc_CV;
-
-    // --------------------------------------------------------------------
-    // Calculate Total N(Background) in Best Universe 
-    // --------------------------------------------------------------------
-    TH1D* invMass_mc_Best = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s_%d", "pi0_invMass_HighMaRES", ind))));
-    invMass_mc_Best->Scale(POT_ratio);
-    double nData_Bckg_Best = invMass_mc_Best->Integral();
-    delete invMass_mc_Best;
-
-    // --------------------------------------------------------------------
     // Get Histograms 
     // --------------------------------------------------------------------
-    TH1D* data_cv = new TH1D( * dynamic_cast<TH1D*>(f_data->Get("QSq_HighMaRES_0")));
-    TH1D* mc_cv_bckg = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s%d","QSq_HighMaRES_Bckg_",0))));
-    TH1D* mc_cv = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s%d","QSq_HighMaRES_",0))));
+    // Central Value
+    MnvH1D* data_cv = GetMnvH1D(f_data, "QSq_MaRES_0");
+    MnvH1D* mc_cv = GetMnvH1D(f_mc, "QSq_MaRES_0");
+    
+    TH1D* h_data_cv = GetBinNormalizedTH1D(data_cv);
+    TH1D* h_mc_cv = GetBinNormalizedTH1D(mc_cv);
+
+    // Best MaRES -- Lowest Global ChiSq
+    MnvVertErrorBand* err_data = data_cv->GetVertErrorBand("HighMaRES");
+    MnvVertErrorBand* err_mc = mc_cv->GetVertErrorBand("HighMaRES");
+
+    std::vector<TH1D*> unv_data = err_data->GetHists();
+    std::vector<TH1D*> unv_mc = err_mc->GetHists();
+
+    TH1D* data_best = (TH1D*)unv_data[ind]->Clone();
+    TH1D* mc_best = (TH1D*)unv_mc[ind]->Clone();
    
-    TH1D* data_best = new TH1D( * dynamic_cast<TH1D*>(f_data->Get("QSq_HighMaRES_0")));
-    TH1D* mc_best_bckg = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s%d","QSq_HighMaRES_Bckg_",ind))));
-    TH1D* mc_best = new TH1D( * dynamic_cast<TH1D*>(f_mc->Get(Form("%s%d","QSq_HighMaRES_",ind))));
- 
-    NormalizeHistogram(mc_cv_bckg);
-    mc_cv_bckg->Scale(nData_Bckg_CV);
-    data_cv->Add(mc_cv_bckg, -1); 
- 
-    NormalizeHistogram(mc_best_bckg);
-    mc_best_bckg->Scale(nData_Bckg_Best);
-    data_best->Add(mc_best_bckg, -1); 
+    // Bin Normalization 
+    double norm_bin_width = GetSmallestBinWidth(data_cv);
+    data_best->Scale(norm_bin_width, "width");
+    mc_best->Scale(norm_bin_width, "width");
 
-    data_cv->SetMarkerStyle(20);
-    data_cv->SetMarkerSize(1);
-    data_cv->SetMarkerColor(kBlack);
-    data_cv->SetLineWidth(2);
-    data_cv->SetLineColor(kBlack);
+    h_data_cv->SetMarkerStyle(20);
+    h_data_cv->SetMarkerSize(1);
+    h_data_cv->SetMarkerColor(kBlack);
+    h_data_cv->SetLineWidth(2);
+    h_data_cv->SetLineColor(kBlack);
 
-    mc_cv->Scale(POT_ratio);
-    mc_cv->SetLineWidth(3);
-    mc_cv->SetLineColor(kRed);
-    mc_cv->SetFillColor(kWhite);
+    h_mc_cv->Scale(POT_ratio);
+    h_mc_cv->SetLineWidth(3);
+    h_mc_cv->SetLineColor(kRed);
+    h_mc_cv->SetFillColor(kWhite);
 
     mc_best->Scale(POT_ratio);
     mc_best->SetLineWidth(3);
@@ -2978,16 +3246,16 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES()
 
     TCanvas* c = new TCanvas("c","c",1280,800);
 
-    data_cv->SetMaximum(data_cv->GetMaximum()*1.5);
-    data_cv->Draw("E1 X0");
-    mc_cv->Draw("HIST SAME");
+    h_data_cv->SetMaximum(data_cv->GetMaximum()*1.5);
+    h_data_cv->Draw("E1 X0");
+    h_mc_cv->Draw("HIST SAME");
     data_best->Draw("E1 X0 SAME");
     mc_best->Draw("HIST SAME");
 
     // TLegend
     TLegend *legend = new TLegend(0.65,0.75,0.9,0.9);  
-    legend->AddEntry(data_cv, "Bckg Subt. Data CV ", "lep");
-    legend->AddEntry(mc_cv, "GENIE Signal CV", "l");
+    legend->AddEntry(h_data_cv, "Bckg Subt. Data CV ", "lep");
+    legend->AddEntry(h_mc_cv, "GENIE Signal CV", "l");
     legend->AddEntry(data_best, "Bckg Subt. Data Best Fit", "lep");
     legend->AddEntry(mc_best, "GENIE Signal Best Fit", "l");
     legend->Draw();
@@ -3004,12 +3272,10 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES()
     // Save Plot 
     gStyle->SetOptStat(0); 
     c->Update();
-    c->Print(Form("%s%s",plotDir.c_str(),"QSq_MaRES.png"), "png");
+    c->Print(Form("%s%s",plotDir.c_str(),"QSq_MaRES_SB_Fit.png"), "png");
 
     delete data_cv;
     delete data_best;
-    delete mc_cv_bckg;
-    delete mc_best_bckg;
     delete mc_cv;
     delete mc_best;
     delete c;
@@ -3031,13 +3297,12 @@ double CCProtonPi0_Plotter::Calc_ChiSq_dof(double* data, double* expected, int n
     return ChiSq_dof;
 }
 
-double CCProtonPi0_Plotter::Calc_ChiSq(TH1* data, TH1* MC)
+double CCProtonPi0_Plotter::Calc_ChiSq(TH1* data, TH1* MC, int min_bin, int max_bin)
 {
-    int nBins = data->GetNbinsX();
     double ChiSq = 0.0;
     double nPoints = 0.0;
-
-    for (int i = 1; i < nBins-5; ++i){
+  
+    for (int i = min_bin; i <= max_bin; ++i){
         double nData = data->GetBinContent(i);
         double nMC = MC->GetBinContent(i);
        
@@ -3045,16 +3310,24 @@ double CCProtonPi0_Plotter::Calc_ChiSq(TH1* data, TH1* MC)
         nPoints++;
     }
 
-    // Combine Last 5 Bins
-    double nData_Last5 = 0.0;
-    double nMC_Last5 = 0.0;
-    for (int i = nBins - 5; i <= nBins; ++i){
-        nData_Last5 += data->GetBinContent(i);
-        nMC_Last5 += MC->GetBinContent(i);
-    }
+    std::cout<<"nPoints Used in ChiSq = "<<nPoints<<std::endl;
 
-    nPoints++;
-    ChiSq += std::pow((nData_Last5-nMC_Last5),2) / nMC_Last5;
+    return ChiSq;
+}
+
+double CCProtonPi0_Plotter::Calc_ChiSq(TH1* data, TH1* MC)
+{
+    int nBins = data->GetNbinsX();
+    double ChiSq = 0.0;
+    double nPoints = 0.0;
+   
+    for (int i = 1; i <= nBins; ++i){
+        double nData = data->GetBinContent(i);
+        double nMC = MC->GetBinContent(i);
+       
+        ChiSq += std::pow((nData-nMC),2) / nMC;
+        nPoints++;
+    }
 
     std::cout<<"nPoints Used in ChiSq = "<<nPoints<<std::endl;
 

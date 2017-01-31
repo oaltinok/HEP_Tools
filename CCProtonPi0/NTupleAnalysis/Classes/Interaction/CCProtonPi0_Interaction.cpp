@@ -11,7 +11,9 @@ using namespace PlotUtils;
 CCProtonPi0_Interaction::CCProtonPi0_Interaction(bool isModeReduce, bool isMC) 
 {
     std::cout<<"Initializing CCProtonPi0_Interaction"<<std::endl;
-    
+   
+    m_isMC = isMC;
+
     if(isModeReduce){
         std::cout<<"\tNTuple Reduce Mode -- Will not create ROOT Files"<<std::endl;
     }else{
@@ -120,7 +122,7 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - 2 Track [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
         Enu_2Track.push_back(temp);
-       
+      
         temp = new MnvH1D( Form("%s_%d","QSq",i),"Reconstructed Q^{2}", binList.size_QSq, binList.a_QSq);
         temp->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.Q2.get_width()));
@@ -243,15 +245,18 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         W_2.push_back(temp);
 
-        temp = new MnvH1D(Form("%s_%d","QSq_DeltaSuppression",i),"Q^{2}", 20, 0.0, 2.0);
+        temp = new MnvH1D(Form("%s_%d","QSq_CV",i),"Q^{2} for All Events",  binList.size_QSq, binList.a_QSq);
         temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
         temp->GetYaxis()->SetTitle("N(Events)");
-        QSq_DeltaSuppression.push_back(temp);
-
-        temp = new MnvH1D(Form("%s_%d","QSq_All",i),"Q^{2} for All Events", 20, 0.0, 2.0);
-        temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        QSq_All.push_back(temp);
+        QSq_CV.push_back(temp);
+ 
+        temp = new MnvH1D( Form("%s_%d","QSq_MaRES",i),"Reconstructed Q^{2}", binList.size_QSq, binList.a_QSq);
+        temp->GetXaxis()->SetTitle("Reconstructed Q^{2} [GeV^{2}]");
+        temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.Q2.get_width()));
+        if (m_isMC){
+            AddVertErrorBands_MC(temp);
+        }
+        QSq_MaRES.push_back(temp);    
 
         temp = new MnvH1D(Form("%s_%d","pi0_invMass_All",i),"#pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
         temp->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
@@ -267,11 +272,6 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
         pi0_invMass_2Track.push_back(temp);
-
-        temp = new MnvH1D(Form("%s_%d","pi0_invMass_DeltaSuppression",i),"#pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-        temp->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        pi0_invMass_DeltaSuppression.push_back(temp);
 
         // 2p2h Study
         temp = new MnvH1D( Form("%s_%d","vertex_energy_1Track",i),"Vertex Blob Energy (r = 90mm)",binList.vertex_energy.get_nBins(), binList.vertex_energy.get_min(), binList.vertex_energy.get_max() );
@@ -333,39 +333,6 @@ void CCProtonPi0_Interaction::initHistograms()
         temp2D->GetXaxis()->SetTitle("W [GeV]");
         temp2D->GetYaxis()->SetTitle("Q^{2} [GeV^{2}]");
         W_QSq_2Track.push_back(temp2D);
-    }
-
-    TH1D* h_temp;
-    for (int i = 0; i <= 200; ++i){
-        h_temp = new TH1D(Form("%s_%d","pi0_invMass_LowMaRES",i),"#pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-        h_temp->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-        h_temp->GetYaxis()->SetTitle("N(Events)");
-        pi0_invMass_LowMaRES.push_back(h_temp);
-
-        h_temp = new TH1D(Form("%s_%d","pi0_invMass_HighMaRES",i),"#pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-        h_temp->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-        h_temp->GetYaxis()->SetTitle("N(Events)");
-        pi0_invMass_HighMaRES.push_back(h_temp);
-
-        h_temp = new TH1D(Form("%s_%d","QSq_LowMaRES",i),"Q^{2}", 20, 0.0, 2.0);
-        h_temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-        h_temp->GetYaxis()->SetTitle("N(Events)");
-        QSq_LowMaRES.push_back(h_temp);
-
-        h_temp = new TH1D(Form("%s_%d","QSq_HighMaRES",i),"Q^{2}", 20, 0.0, 2.0);
-        h_temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-        h_temp->GetYaxis()->SetTitle("N(Events)");
-        QSq_HighMaRES.push_back(h_temp);
-
-        h_temp = new TH1D(Form("%s_%d","QSq_LowMaRES_Bckg",i),"Q^{2}", 20, 0.0, 2.0);
-        h_temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-        h_temp->GetYaxis()->SetTitle("N(Events)");
-        QSq_LowMaRES_Bckg.push_back(h_temp);
-
-        h_temp = new TH1D(Form("%s_%d","QSq_HighMaRES_Bckg",i),"Q^{2}", 20, 0.0, 2.0);
-        h_temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-        h_temp->GetYaxis()->SetTitle("N(Events)");
-        QSq_HighMaRES_Bckg.push_back(h_temp);
     }
 
     // Cross Section Variables
@@ -1087,25 +1054,15 @@ void CCProtonPi0_Interaction::writeHistograms()
         pi0_invMass_All[i]->Write();
         pi0_invMass_1Track[i]->Write();
         pi0_invMass_2Track[i]->Write();
-        pi0_invMass_DeltaSuppression[i]->Write();
 
         W_p_pi0[i]->Write();
         W_All[i]->Write();
         W_1[i]->Write();
         W_2[i]->Write();
-        QSq_All[i]->Write();
-        QSq_DeltaSuppression[i]->Write();
+        QSq_CV[i]->Write();
+        QSq_MaRES[i]->Write();
     }
-   
-    for (int i = 0; i <= 200; ++i){
-        pi0_invMass_LowMaRES[i]->Write();
-        pi0_invMass_HighMaRES[i]->Write();
-        QSq_LowMaRES[i]->Write();
-        QSq_HighMaRES[i]->Write();
-        QSq_LowMaRES_Bckg[i]->Write();
-        QSq_HighMaRES_Bckg[i]->Write();
-    }
-    
+      
     QSq_all->Write();
     QSq_mc_truth_signal->Write();
     QSq_mc_reco_all->Write();

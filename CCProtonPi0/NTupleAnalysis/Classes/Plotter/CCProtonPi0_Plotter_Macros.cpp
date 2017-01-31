@@ -351,7 +351,7 @@ void CCProtonPi0_Plotter::DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_n
     // POT Normalized
     DrawDataMC_WithRatio(data, mc, var_name, plotDir, true, isXSec);
     // Area Normalized
-    DrawDataMC_WithRatio(data, mc, var_name, plotDir, false, isXSec);
+    //DrawDataMC_WithRatio(data, mc, var_name, plotDir, false, isXSec);
 }
 
 void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec)
@@ -1884,6 +1884,7 @@ void CCProtonPi0_Plotter::NormalizeToNormBinWidth(MnvH1D* hist)
     double norm_bin_width = hist->GetNormBinWidth();
     hist->Scale(norm_bin_width,"width");
 }
+
 
 double CCProtonPi0_Plotter::GetSmallestBinWidth(MnvH1D* hist)
 {

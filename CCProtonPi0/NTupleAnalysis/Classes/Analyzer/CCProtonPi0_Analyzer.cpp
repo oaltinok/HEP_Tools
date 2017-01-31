@@ -7,12 +7,12 @@ using namespace std;
 
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
-    applyMaxEvents = false;
+    applyMaxEvents = true;
     nMaxEvents = 10;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
-    isDataAnalysis = true;
+    isDataAnalysis = false;
     isScanRun = false;
     fillErrors_ByHand = true; // Affects only Vertical Error Bands - Lateral Bands always filled ByHand
     
@@ -279,7 +279,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
   
         //Study_BckgSubtraction();
         //Study_W();
-        //Study_QSq();
+        Study_QSq();
         //Study_2p2h();
         //Study_ProtonSystematics();
         //Study_GENIE_Weights();
@@ -2729,79 +2729,35 @@ void CCProtonPi0_Analyzer::Study_W()
 void CCProtonPi0_Analyzer::Study_QSq()
 {
     double QSq_reco = m_QSq * MeVSq_to_GeVSq;
-    FillHistogram(interaction.QSq_All, QSq_reco);
+
+    // Central Value Fill
+    FillHistogram(interaction.QSq_CV, QSq_reco);
 
     // ------------------------------------------------------------------------
-    // MaRES Fit
+    //  MaRES Fit -- MaRES Change handled in Vertical Error Bands
     // ------------------------------------------------------------------------
-    if (m_isMC){
-        std::vector<double> wgts_up = QSqFitter.GetWeights(truth_genie_wgt_MaRES[4], truth_genie_wgt_MaRES[5]);
-        std::vector<double> wgts_dn = QSqFitter.GetWeights(truth_genie_wgt_MaRES[2], truth_genie_wgt_MaRES[1]);
+    //FillHistogramWithVertErrors(interaction.QSq_MaRES, QSq_reco);
 
-        if (truth_isSignal){
-            // Weights Up
-            for (unsigned int i = 0; i < wgts_up.size(); ++i){
-                double cvweight_MaRES = cvweight * wgts_up[i];
-                interaction.QSq_HighMaRES[i]->Fill(QSq_reco, cvweight_MaRES);
-            }
-
-            // Weights Down
-            for (unsigned int i = 0; i < wgts_dn.size(); ++i){
-                double cvweight_MaRES = cvweight * wgts_dn[i];
-                interaction.QSq_LowMaRES[i]->Fill(QSq_reco, cvweight_MaRES);
-            }
-        }else{
-            // Weights Up
-            for (unsigned int i = 0; i < wgts_up.size(); ++i){
-                double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint("HighMaRES", i) : 1.0;
-                double wgtU = cvweight * wgt_bckg;
-                double cvweight_MaRES = wgtU * wgts_up[i];
-                interaction.QSq_HighMaRES_Bckg[i]->Fill(QSq_reco, cvweight_MaRES);
-                interaction.pi0_invMass_HighMaRES[i]->Fill(pi0_invMass, cvweight_MaRES);
-            }
-
-            // Weights Down
-            for (unsigned int i = 0; i < wgts_dn.size(); ++i){
-                double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint("LowMaRES", i) : 1.0;
-                double wgtU = cvweight * wgt_bckg;
-                double cvweight_MaRES = wgtU * wgts_dn[i];
-                interaction.QSq_LowMaRES_Bckg[i]->Fill(QSq_reco, cvweight_MaRES);
-                interaction.pi0_invMass_LowMaRES[i]->Fill(pi0_invMass, cvweight_MaRES);
-            }
-        }
-    }else{
-        interaction.QSq_HighMaRES[0]->Fill(QSq_reco);
-        interaction.QSq_LowMaRES[0]->Fill(QSq_reco);
+        
+    // Vary Q0
+    std::vector<double> Q0_Vector;
+    Q0_Vector.push_back(0.156); // MINOS
+    for (double q0 = 0.050; q0 <= 0.155; q0 += 0.001){
+        Q0_Vector.push_back(q0);
     }
 
-    if (!truth_isSignal){
-        counter1.increment(cvweight);
-        if (IsGenieCCRes())counter2.increment(cvweight);
+    for (unsigned int i = 0; i <= Q0_Vector.size(); ++i){
+        std::cout<<i<<" "<<Q0_Vector[i]<<std::endl;
     }
-    // ------------------------------------------------------------------------
-    // Delta Suppression Function
-    // ------------------------------------------------------------------------
-    if (m_isMC){
-        // Update Weights
-        double wgt_bckg = applyBckgConstraints_Unv ? GetBckgConstraint("DeltaFactor", 1) : 1.0;
-        double wgtU = cvweight * wgt_bckg;
-        double deltaFactor = GetDeltaFactor(QSq_reco);
-        double cvweight_DeltaSuppression = wgtU * deltaFactor;
-        FillHistogram(interaction.QSq_DeltaSuppression, QSq_reco, cvweight_DeltaSuppression);
-        FillHistogram(interaction.pi0_invMass_DeltaSuppression, pi0_invMass, cvweight_DeltaSuppression);
-    }else{
-        FillHistogram(interaction.QSq_DeltaSuppression, QSq_reco);
-        FillHistogram(interaction.pi0_invMass_DeltaSuppression, pi0_invMass);
-    }
+
+
 }
 
-double CCProtonPi0_Analyzer::GetDeltaFactor(double QSq)
+double CCProtonPi0_Analyzer::GetDeltaFactor(double QSq, double A, double Q0)
 {
     double factor;
 
     if (IsGenieCCRes()){
-        double A = 1.010;
-        double Q0 = 0.156; // GeV
         factor = A / (1 + exp(1-(sqrt(QSq)/Q0)));
     }else{
         factor = 1.0;

@@ -6,7 +6,7 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "QSq_HighEnu";
+const std::string CCProtonPi0_NTupleAnalysis::version = "DeltaFactor";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
@@ -17,11 +17,12 @@ const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
 const double CCProtonPi0_NTupleAnalysis::POT_ratio_2p2h = mc_POT/mc_2p2h_POT;
 
 const double CCProtonPi0_NTupleAnalysis::max_muon_theta = 25; // degree
-//const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
-const double CCProtonPi0_NTupleAnalysis::min_Enu = 3500; // MeV
-//const double CCProtonPi0_NTupleAnalysis::max_Enu = 3500; // MeV
+const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
 const double CCProtonPi0_NTupleAnalysis::max_Enu = 20000; // MeV
+//const double CCProtonPi0_NTupleAnalysis::min_Enu = 3500; // MeV -- QSq Enu Study
+//const double CCProtonPi0_NTupleAnalysis::max_Enu = 3500; // MeV -- QSq Enu Study
 const double CCProtonPi0_NTupleAnalysis::max_W = 1800; // MeV
+
 
 const double CCProtonPi0_NTupleAnalysis::SENTINEL = -9.9;
 const double CCProtonPi0_NTupleAnalysis::MeV_to_GeV = pow(10,-3);
@@ -127,9 +128,11 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data(MnvHistoType* h)
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
     AddVertErrorBandAndFillWithCV_NeutronResponse(h);
     AddVertErrorBandAndFillWithCV_PionResponse(h);
+
+    // QSq Study
     //AddVertErrorBandAndFillWithCV_HighMaRES(h);
     //AddVertErrorBandAndFillWithCV_LowMaRES(h);
-    //AddVertErrorBandAndFillWithCV_DeltaFactor(h);
+    AddVertErrorBandAndFillWithCV_DeltaFactor(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH2D>(MnvH2D* h);
@@ -137,6 +140,20 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH2D>(MnvH2D*
 // Truth Tree Only have GENIE and Flux Errors, others are handled as Data
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree(MnvHistoType* h)
+{
+    AddVertErrorBand_Flux(h);
+    AddVertErrorBand_Genie(h);
+    AddVertErrorBand_2p2h(h);
+
+    //AddVertErrorBand_HighMaRES(h);
+    //AddVertErrorBand_LowMaRES(h);
+    AddVertErrorBand_DeltaFactor(h);
+}
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree<MnvH2D>(MnvH2D* h);
+    
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddVertErrorBandsAndFillWithCV_TruthTree(MnvHistoType* h)
 {
     AddVertErrorBandAndFillWithCV_BckgConstraint_WithPi0(h);
     AddVertErrorBandAndFillWithCV_BckgConstraint_SinglePiPlus(h);
@@ -150,8 +167,8 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree(MnvHistoType* h)
     AddVertErrorBandAndFillWithCV_NeutronResponse(h);
     AddVertErrorBandAndFillWithCV_PionResponse(h);
 }
-template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree<MnvH1D>(MnvH1D* h);
-template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree<MnvH2D>(MnvH2D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandsAndFillWithCV_TruthTree<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandsAndFillWithCV_TruthTree<MnvH2D>(MnvH2D* h);
 
 // Flux Histogram have Flux Errors, others are handled as Data
     template<class MnvHistoType>
@@ -170,6 +187,11 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram(MnvHistoType* h
     AddVertErrorBandAndFillWithCV_ProtonTracking(h);
     AddVertErrorBandAndFillWithCV_NeutronResponse(h);
     AddVertErrorBandAndFillWithCV_PionResponse(h);
+
+    // QSq Study
+    //AddVertErrorBandAndFillWithCV_HighMaRES(h);
+    //AddVertErrorBandAndFillWithCV_LowMaRES(h);
+    AddVertErrorBandAndFillWithCV_DeltaFactor(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram<MnvH2D>(MnvH2D* h);
@@ -339,7 +361,7 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_LowMaRES
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_DeltaFactor(MnvHistoType* h)
 {
-    h->AddVertErrorBandAndFillWithCV("DeltaFactor", 2);
+    h->AddVertErrorBandAndFillWithCV("DeltaFactor", 106);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_DeltaFactor<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_DeltaFactor<MnvH2D>(MnvH2D* h);
@@ -360,12 +382,12 @@ template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_Data<MnvH2D>(MnvH2D* 
 
 // All Truth Tree Lateral Error Bands are Handled as Data
     template<class MnvHistoType>
-void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_TruthTree(MnvHistoType* h)
+void CCProtonPi0_NTupleAnalysis::AddLatErrorBandsAndFillWithCV_TruthTree(MnvHistoType* h)
 {
     AddLatErrorBands_Data(h);
 }
-template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_TruthTree<MnvH1D>(MnvH1D* h);
-template void CCProtonPi0_NTupleAnalysis::AddLatErrorBands_TruthTree<MnvH2D>(MnvH2D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandsAndFillWithCV_TruthTree<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLatErrorBandsAndFillWithCV_TruthTree<MnvH2D>(MnvH2D* h);
 
 // All Flux Histogram Lateral Error Bands are Handled as Data
     template<class MnvHistoType>
@@ -453,9 +475,11 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC(MnvHistoType* h)
     AddVertErrorBand_ProtonTracking(h);
     AddVertErrorBand_NeutronResponse(h);
     AddVertErrorBand_PionResponse(h);
+
+    // QSq Study
     //AddVertErrorBand_HighMaRES(h);
     //AddVertErrorBand_LowMaRES(h);
-    //AddVertErrorBand_DeltaFactor(h);
+    AddVertErrorBand_DeltaFactor(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC<MnvH2D>(MnvH2D* h);
@@ -625,7 +649,7 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_LowMaRES<MnvH2D>(MnvH
     template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_DeltaFactor(MnvHistoType* h)
 {
-    h->AddVertErrorBand("DeltaFactor", 2);
+    h->AddVertErrorBand("DeltaFactor", 106);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_DeltaFactor<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_DeltaFactor<MnvH2D>(MnvH2D* h);
@@ -816,8 +840,7 @@ bool CCProtonPi0_NTupleAnalysis::IsWInRange(double W)
 
 bool CCProtonPi0_NTupleAnalysis::IsEnuInRange(double Enu)
 {
-    //if (Enu >= min_Enu && Enu <= max_Enu) return true;
-    if (Enu >= min_Enu && Enu < max_Enu) return true;
+    if (Enu >= min_Enu && Enu <= max_Enu) return true;
     else return false;
 }
 
