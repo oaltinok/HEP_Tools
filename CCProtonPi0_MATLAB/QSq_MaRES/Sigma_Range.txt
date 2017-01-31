@@ -1,0 +1,15 @@
+>> FindSigmaRange(3)
+
+ans =
+
+    1.7389
+    1.1161
+    0.0021
+
+>> FindSigmaRange(5)
+
+ans =
+
+    1.9018
+    0.7910
+    0.1643
