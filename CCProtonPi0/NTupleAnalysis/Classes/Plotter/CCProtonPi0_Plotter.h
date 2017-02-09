@@ -18,16 +18,22 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 
 #ifndef CCProtonPi0_Plotter_H
 #define CCProtonPi0_Plotter_H
+#include <numeric>
 
-#include <TVectorD.h>
-#include <TStyle.h>
-#include <TPaveStats.h>
-#include <TPad.h>
-#include <TLegend.h>
-#include <THStack.h>
-#include <TGraph.h>
 #include <TCanvas.h>
+#include <TF1.h>
+#include <TFile.h>
+#include <TGraph.h>
+#include <THStack.h>
 #include <TLatex.h>
+#include <TLegend.h>
+#include <TLine.h>
+#include <TPad.h>
+#include <TPaveStats.h>
+#include <TPaveText.h>
+#include <TStyle.h>
+#include <TVectorD.h>
+#include <TVirtualFitter.h>
 #include <PlotUtils/MnvPlotter.h>
 #include <PlotUtils/MnvFluxConstraint.h>
 #include <PlotUtils/POTCounter.h>
@@ -68,6 +74,8 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotHistograms();
 
     private:
+        bool thesisStyle;
+
         rootDir rootDir_PC;
         rootDir rootDir_GENIEXSec;
         rootDir rootDir_Truth;
@@ -148,7 +156,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void QSq_Studies();
         void Studies_2p2h();
         void Draw_QSq_EnuFit(std::string data_dir, std::string mc_dir, std::string var_name, double* pars);
-        void Draw_QSq_MaRES_Fit();
+        void Draw_QSq_MaRES_Fit(bool isAreaNorm);
         void Draw_QSq_MaRES_Fit_SB();
         void Draw_QSq_MaRES_Plots();
         void Draw_QSq_MaRES_AreaNorm();
@@ -178,6 +186,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void NormalizeHistogram(TH1D* h);
         void ApplyStyle(MnvPlotter* plotter);
         void ApplyStyle_Errors(MnvPlotter* plotter, bool groupErrors);
+        void ApplyStyle_Thesis();
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, double hist_max, double arrow_length);
         void SavePi0InvMassPoints();
         void NormalizeToNormBinWidth(MnvH1D* hist);
@@ -206,10 +215,9 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         double Calc_ChiSq_dof(double* data, double* expected, int nPoints, int nPars);
         double Calc_ChiSq(TH1* data, TH1* MC);
         double Calc_ChiSq(TH1* data, TH1* MC, int min_bin, int max_bin);
-
-        // 2p2h Study
-
-
+        void DeltaRes_Studies();
+        void expo_fit(const std::string& fileName, const std::string& histName);
+        double user_expo(double* x, double* par);
 
         // Flux Study
         double GetFluxHistContent(MnvH1D* hist, double low1, double low2);
@@ -236,6 +244,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawMnvH1D(MnvH1D* hist1D, std::string var_name, std::string plotDir);
         void DrawMnvH2D(std::string root_dir, std::string var_name, std::string plotDir);
         void DrawMnvH2D(MnvH2D* hist2D, std::string var_name, std::string plotDir, bool isMC);
+        void DrawMnvH2D_Signal(rootDir root_dir, std::string var_name, std::string plotDir, double nBckg, bool isMC);
         void Draw1DHist(TH1* hist1D, std::string var_name, std::string plotDir, bool isLogScale = false);
 
         void Draw1DHist(rootDir &dir, std::string var_name, std::string plotDir, bool isLogScale = false);
@@ -254,6 +263,8 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
         // Data vs MC
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
+        void DrawDataMC_Thesis(rootDir& dir, std::string var_name, std::string plotDir);
+        void DrawDataMC_Thesis(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec = false);
         void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec = false);
         void DrawDataMC_Signal(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);
         void DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);

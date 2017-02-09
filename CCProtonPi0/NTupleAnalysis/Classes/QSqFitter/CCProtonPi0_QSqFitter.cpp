@@ -11,7 +11,7 @@ const double CCProtonPi0_QSqFitter::x2_2sigma = 200.0;
 
 CCProtonPi0_QSqFitter::CCProtonPi0_QSqFitter()
 {
-    isDebug = true;
+    isDebug = false;
     FillMaRESVector(MaRESVector_dn, 0.8, 0.6);
     FillMaRESVector(MaRESVector_up, 1.2, 1.4);
 }
@@ -120,15 +120,26 @@ int CCProtonPi0_QSqFitter::GetMinChiSq_DeltaFactor()
     return min;
 }
 
-int CCProtonPi0_QSqFitter::GetMinChiSq()
+int CCProtonPi0_QSqFitter::GetMinChiSq(bool isAreaNorm)
 {
-    FillChiSqVector(ChiSqVector_dn, false);
-    FillChiSqVector(ChiSqVector_up, true);
-    int min_dn = FindMinChiSq(ChiSqVector_dn);
-    int min_up = FindMinChiSq(ChiSqVector_up);
+    if (isAreaNorm){
+        FillChiSqVector_AreaNorm(ChiSqVector_dn, false);
+        FillChiSqVector_AreaNorm(ChiSqVector_up, true);
+        int min_dn = FindMinChiSq(ChiSqVector_dn);
+        int min_up = FindMinChiSq(ChiSqVector_up);
 
-    std::cout<<"min_dn = "<<min_dn<<" min_up = "<<min_up<<std::endl;
-    return min_up;
+        std::cout<<"Minimum ChiSqs for Area Normalized"<<std::endl;
+        std::cout<<"min_dn = "<<min_dn<<" min_up = "<<min_up<<std::endl;
+        return min_up;
+    }else{
+        FillChiSqVector(ChiSqVector_dn, false);
+        FillChiSqVector(ChiSqVector_up, true);
+        int min_dn = FindMinChiSq(ChiSqVector_dn);
+        int min_up = FindMinChiSq(ChiSqVector_up);
+
+        std::cout<<"min_dn = "<<min_dn<<" min_up = "<<min_up<<std::endl;
+        return min_up;
+    }
 }
 
 int CCProtonPi0_QSqFitter::FindMinChiSq(std::vector<double> &ChiSqVector)
@@ -334,6 +345,7 @@ double CCProtonPi0_QSqFitter::GetSmallestBinWidth(MnvH1D* hist)
 
     return smallest;
 }
+
 void CCProtonPi0_QSqFitter::FillChiSqVector(std::vector<double> &ChiSqVector, bool isUpShift)
 {
     // ------------------------------------------------------------------------
@@ -385,6 +397,58 @@ void CCProtonPi0_QSqFitter::FillChiSqVector(std::vector<double> &ChiSqVector, bo
 
 }
 
+void CCProtonPi0_QSqFitter::FillChiSqVector_AreaNorm(std::vector<double> &ChiSqVector, bool isUpShift)
+{
+    // ------------------------------------------------------------------------
+    // Read Files
+    // ------------------------------------------------------------------------
+    std::string data_dir = Folder_List::rootDir_CrossSection_data;
+    std::string mc_dir = Folder_List::rootDir_CrossSection_mc;
+   
+    TFile* f_data = new TFile(data_dir.c_str());
+    TFile* f_mc = new TFile(mc_dir.c_str());
+
+    // ------------------------------------------------------------------------
+    // Get Histograms
+    // ------------------------------------------------------------------------
+    MnvH1D* h_data = GetMnvH1D(f_data, "QSq_xsec");
+    MnvH1D* h_mc = GetMnvH1D(f_mc, "QSq_xsec");
+
+    // ------------------------------------------------------------------------
+    // Get Universes
+    // ------------------------------------------------------------------------
+    std::string err_name = isUpShift ? "HighMaRES" : "LowMaRES";
+
+    MnvVertErrorBand* err_data = h_data->GetVertErrorBand(err_name);
+    MnvVertErrorBand* err_mc = h_mc->GetVertErrorBand(err_name);
+
+    std::vector<TH1D*> unv_data = err_data->GetHists();
+    std::vector<TH1D*> unv_mc = err_mc->GetHists();
+  
+    // ------------------------------------------------------------------------
+    // Calculate Chi Squre  
+    // ------------------------------------------------------------------------
+    for (int i = 0; i < 201; ++i){
+        AreaNormalize(unv_data[i], unv_mc[i]);
+        double ChiSq = Calc_ChiSq(unv_data[i], unv_mc[i]);
+        ChiSqVector.push_back(ChiSq);
+    }
+
+    if (isDebug){
+        std::cout<<"ChiSq Vector for "<<err_name<<std::endl;
+        for (unsigned int i = 0; i < ChiSqVector.size(); ++i){
+            std::cout<<"\t"<<i<<" "<<ChiSqVector[i]<<std::endl;
+        }
+    }
+
+    // Clean Memory
+    delete h_data;
+    delete h_mc;
+    delete f_data;
+    delete f_mc;
+
+}
+
 double CCProtonPi0_QSqFitter::Calc_ChiSq(TH1D* data, TH1D* MC)
 {
     // Do not Scale MC for XSec
@@ -402,6 +466,18 @@ double CCProtonPi0_QSqFitter::Calc_ChiSq(TH1D* data, TH1D* MC)
     }
 
     return ChiSq;
+}
+
+void CCProtonPi0_QSqFitter::AreaNormalize(TH1D* data, TH1D* MC)
+{
+    // Do not Scale MC for XSec
+    //MC->Scale(POT_ratio);
+
+    int nBins = data->GetNbinsX();
+    double area_data = data->Integral(3,nBins,"width");
+    double area_mc = MC->Integral(3,nBins,"width");
+    double ratio = area_data/area_mc;
+    MC->Scale(ratio);
 }
 
 double CCProtonPi0_QSqFitter::Calc_ChiSq_Delta(TH1D* data, TH1D* MC)

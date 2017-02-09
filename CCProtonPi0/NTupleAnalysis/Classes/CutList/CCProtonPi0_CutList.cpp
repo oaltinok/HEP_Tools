@@ -546,15 +546,15 @@ void CCProtonPi0_CutList::initHistograms()
     double max_cos_angle = 1.0;
     signal_gamma_E_cos_openingAngle = new TH2D( "signal_gamma_E_cos_openingAngle","Signal E_{#gamma}+E_{#gamma} vs. cos(#theta_{#gamma#gamma})",nBins, min_photon_E, max_photon_E, nBins, min_cos_angle, max_cos_angle);
     signal_gamma_E_cos_openingAngle->GetXaxis()->SetTitle("E_{#gamma_{1}}+E_{#gamma_{2}} [GeV]");
-    signal_gamma_E_cos_openingAngle->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma}");
+    signal_gamma_E_cos_openingAngle->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma})");
 
     bckg_gamma_E_cos_openingAngle = new TH2D( "bckg_gamma_E_cos_openingAngle","Background E_{#gamma}+E_{#gamma} vs. cos(#theta_{#gamma#gamma})",nBins, min_photon_E, max_photon_E, nBins, min_cos_angle, max_cos_angle);
     bckg_gamma_E_cos_openingAngle->GetXaxis()->SetTitle("E_{#gamma_{1}}+E_{#gamma_{2}} [GeV]");
-    bckg_gamma_E_cos_openingAngle->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma}");
+    bckg_gamma_E_cos_openingAngle->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma})");
 
     bckg_signal_diff_E_cos_openingAngle = new TH2D( "bckg_signal_diff_E_cos_openingAngle","Background - Signal E_{#gamma}+E_{#gamma} vs. cos(#theta_{#gamma#gamma})",nBins, min_photon_E, max_photon_E, nBins, min_cos_angle, max_cos_angle);
     bckg_signal_diff_E_cos_openingAngle->GetXaxis()->SetTitle("E_{#gamma_{1}}+E_{#gamma_{2}} [GeV]");
-    bckg_signal_diff_E_cos_openingAngle->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma}");
+    bckg_signal_diff_E_cos_openingAngle->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma})");
 
     double min_convLength = 0.0 ;
     double max_convLength = 100.0;

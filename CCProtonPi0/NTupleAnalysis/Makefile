@@ -12,7 +12,8 @@ MAINCPP = main.cpp
 MINUITFUNCSCPP = src/Minuit_Functions.cpp
 MINUITFUNCSWCPP = src/Minuit_Functions_W.cpp
 MAINFUNCSCPP = src/Main_Functions.cpp
-ALLMAINCPP = $(MAINCPP) $(MINUITFUNCSCPP) $(MINUITFUNCSWCPP) $(MAINFUNCSCPP)
+ROOTFITTERQSQ = src/ROOT_Fitter_QSq.cpp
+ALLMAINCPP = $(MAINCPP) $(MINUITFUNCSCPP) $(MINUITFUNCSWCPP) $(MAINFUNCSCPP) $(ROOTFITTERQSQ)
 
 # Class: Base Class
 NTUPLEANALYSISCPP = Classes/NTupleAnalysis/CCProtonPi0_NTupleAnalysis.cpp
@@ -24,7 +25,8 @@ UNFOLDINGSTUDYCPP = Classes/Plotter/CCProtonPi0_Plotter_UnfoldingStudy.cpp
 SYSTEMATICSCPP = Classes/Plotter/CCProtonPi0_Plotter_Systematics.cpp
 GENIETUNINGCPP = Classes/Plotter/CCProtonPi0_Plotter_GENIE_Tuning.cpp
 WFITCPP = Classes/Plotter/CCProtonPi0_Plotter_W_Fit.cpp
-ALLPLOTTERCPP = $(PLOTTERMACROSCPP) $(PLOTTERCPP) $(UNFOLDINGSTUDYCPP) $(SYSTEMATICSCPP) $(GENIETUNINGCPP) $(WFITCPP)
+QSQCPP = Classes/Plotter/CCProtonPi0_Plotter_QSq.cpp
+ALLPLOTTERCPP = $(PLOTTERMACROSCPP) $(PLOTTERCPP) $(UNFOLDINGSTUDYCPP) $(SYSTEMATICSCPP) $(GENIETUNINGCPP) $(WFITCPP) $(QSQCPP)
 
 # Class: Analyzer
 ANALYZERCPP = Classes/Analyzer/CCProtonPi0_Analyzer.cpp

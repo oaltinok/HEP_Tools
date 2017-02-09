@@ -11,6 +11,7 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 #include <string>
 #include <ctime>
 #include <iostream>
+#include <string>
 #include <TROOT.h>
 
 #include "Cintex/Cintex.h"
@@ -30,6 +31,8 @@ void Calculate_CrossSection(bool isMC);
 void FitSideBands();
 void FitMinuit();
 void FitMinuit_W();
+void Fit(std::string fileName, std::string plotName);
+void Fit_QSq();
 void calc_ChiSq(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t iflag);
 void calc_ChiSq_W(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t iflag);
 double calc_ChiSq_SideBand(SideBand &sb, Double_t *par, int unv = 0, bool isPartial = false, int min_bin = 1, int max_bin = 1);
@@ -57,7 +60,7 @@ int main(int argc, char *argv[] )
     if ( nMode < 0) isMC = true;
     else isMC = false;
 
-    if (nMode != 10 || nMode != 20 || nMode != 30){
+    if (nMode != 10 || nMode != 20 || nMode != 30 || nMode != 40){
         if (isMC){
             cout<<"MC Playlists Selected!\n"<<endl;
             pl_reduce = "Input/Playlists/pl_MC_Merged.dat"; 
@@ -77,6 +80,7 @@ int main(int argc, char *argv[] )
     else if ( nMode == 10) Plot();
     else if ( nMode == 20) FitSideBands();
     else if ( nMode == 30) FitMinuit_W();
+    else if ( nMode == 40) Fit_QSq();
     else{
         cout<<"Problem on Mode!, Returning"<<endl;
         return 0;

@@ -6,7 +6,7 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "DeltaFactor";
+const std::string CCProtonPi0_NTupleAnalysis::version = "DeltaSupp";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
@@ -18,9 +18,9 @@ const double CCProtonPi0_NTupleAnalysis::POT_ratio_2p2h = mc_POT/mc_2p2h_POT;
 
 const double CCProtonPi0_NTupleAnalysis::max_muon_theta = 25; // degree
 const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
+//const double CCProtonPi0_NTupleAnalysis::max_Enu = 4000; // MeV -- QSq Enu Study
 const double CCProtonPi0_NTupleAnalysis::max_Enu = 20000; // MeV
-//const double CCProtonPi0_NTupleAnalysis::min_Enu = 3500; // MeV -- QSq Enu Study
-//const double CCProtonPi0_NTupleAnalysis::max_Enu = 3500; // MeV -- QSq Enu Study
+//const double CCProtonPi0_NTupleAnalysis::min_Enu = 4000; // MeV -- QSq Enu Study
 const double CCProtonPi0_NTupleAnalysis::max_W = 1800; // MeV
 
 
@@ -132,7 +132,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data(MnvHistoType* h)
     // QSq Study
     //AddVertErrorBandAndFillWithCV_HighMaRES(h);
     //AddVertErrorBandAndFillWithCV_LowMaRES(h);
-    AddVertErrorBandAndFillWithCV_DeltaFactor(h);
+    //AddVertErrorBandAndFillWithCV_DeltaFactor(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH2D>(MnvH2D* h);
@@ -147,7 +147,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree(MnvHistoType* h)
 
     //AddVertErrorBand_HighMaRES(h);
     //AddVertErrorBand_LowMaRES(h);
-    AddVertErrorBand_DeltaFactor(h);
+    //AddVertErrorBand_DeltaFactor(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_TruthTree<MnvH2D>(MnvH2D* h);
@@ -191,7 +191,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram(MnvHistoType* h
     // QSq Study
     //AddVertErrorBandAndFillWithCV_HighMaRES(h);
     //AddVertErrorBandAndFillWithCV_LowMaRES(h);
-    AddVertErrorBandAndFillWithCV_DeltaFactor(h);
+    //AddVertErrorBandAndFillWithCV_DeltaFactor(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_FluxHistogram<MnvH2D>(MnvH2D* h);
@@ -479,7 +479,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC(MnvHistoType* h)
     // QSq Study
     //AddVertErrorBand_HighMaRES(h);
     //AddVertErrorBand_LowMaRES(h);
-    AddVertErrorBand_DeltaFactor(h);
+    //AddVertErrorBand_DeltaFactor(h);
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC<MnvH2D>(MnvH2D* h);
@@ -841,6 +841,7 @@ bool CCProtonPi0_NTupleAnalysis::IsWInRange(double W)
 bool CCProtonPi0_NTupleAnalysis::IsEnuInRange(double Enu)
 {
     if (Enu >= min_Enu && Enu <= max_Enu) return true;
+    //if (Enu >= min_Enu && Enu < max_Enu) return true; // QSq Study
     else return false;
 }
 

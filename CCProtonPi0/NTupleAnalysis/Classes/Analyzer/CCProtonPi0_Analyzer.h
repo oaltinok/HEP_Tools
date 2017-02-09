@@ -59,7 +59,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         //  Runtime and CCProtonPi0_Analyzer Functions
         bool getCutStatistics();
         void Increment_nCut(vector<CCProtonPi0_Cut> &nCut, bool study1, bool study2);
-        void fillData();
+        void fill_XSecVars();
         void fill_XSecVars_DifferentWeights();
         void fill_BackgroundSubtractionHists();
         void fill_W();
@@ -253,6 +253,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void AddErrorBands_Data();
         double GetMINOSCorrection();
         void GetDeltaPolarization();
+        void GetDelta_pi_angles();
         void GetDeltaTransverse();
         TVector3 GetNeutrinoCrossMuon(bool isTruth);
         TLorentzVector GetDelta4P(bool isTruth);
@@ -286,6 +287,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void Study_BckgSubtraction();
         void Study_W();
         void Study_QSq();
+        void Study_DeltaResonance();
         void Study_2p2h();
         double GetDeltaFactor(double QSq, double A, double Q0);
         std::vector<double> GetDeltaFactorWeights();

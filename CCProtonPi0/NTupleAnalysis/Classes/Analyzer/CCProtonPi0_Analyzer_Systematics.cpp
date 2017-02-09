@@ -707,7 +707,7 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH1D* hist, double var)
         // QSq Study
         //FillVertErrorBand_HighMaRES_ByHand(hist, var);
         //FillVertErrorBand_LowMaRES_ByHand(hist, var);
-        FillVertErrorBand_DeltaFactor_ByHand(hist, var);
+        //FillVertErrorBand_DeltaFactor_ByHand(hist, var);
     }else{
         FillVertErrorBand_Genie(hist, var);
         FillVertErrorBand_Flux(hist, var);
@@ -751,7 +751,7 @@ void CCProtonPi0_Analyzer::FillHistogramWithVertErrors(MnvH2D* hist, double xval
         // QSq Study
         //FillVertErrorBand_HighMaRES_ByHand(hist, xval, yval);
         //FillVertErrorBand_LowMaRES_ByHand(hist, xval, yval);
-        FillVertErrorBand_DeltaFactor_ByHand(hist, xval, yval);
+        //FillVertErrorBand_DeltaFactor_ByHand(hist, xval, yval);
     }else{
         FillVertErrorBand_Genie(hist, xval, yval);
         FillVertErrorBand_Flux(hist, xval, yval);

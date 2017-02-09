@@ -65,6 +65,9 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
         // Count Events Only inside the Fidicual Volume
         if (truth_isFidVol){
 
+            // QSq Study
+            //if ( !IsEnuInRange(mc_incomingE)) continue;
+
             FillGENIE_Tuning();
             // Count Signal Out due to Acceptance or Kinematics
             if (truth_isSignalOut_Acceptance) nSignalOut_Acceptance.increment(cvweight);
@@ -460,12 +463,12 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     // Muon Variables
     // ------------------------------------------------------------------------
     muon_P_mc_truth_all_signal = new MnvH1D( "muon_P_mc_truth_all_signal","Muon Momentum for Signal Events",binList.size_muon_P, binList.a_muon_P);
-    muon_P_mc_truth_all_signal->GetXaxis()->SetTitle("Momentum [GeV]");
+    muon_P_mc_truth_all_signal->GetXaxis()->SetTitle("P_{#mu} [GeV]");
     muon_P_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(muon_P_mc_truth_all_signal);
 
     muon_theta_mc_truth_all_signal = new MnvH1D( "muon_theta_mc_truth_all_signal","Muon Theta for Signal Events",binList.size_muon_theta, binList.a_muon_theta);
-    muon_theta_mc_truth_all_signal->GetXaxis()->SetTitle("Theta");
+    muon_theta_mc_truth_all_signal->GetXaxis()->SetTitle("#theta_{#mu} [deg]");
     muon_theta_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(muon_theta_mc_truth_all_signal);
 
@@ -473,17 +476,17 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     // Pi0 Variables
     // ------------------------------------------------------------------------
     pi0_P_mc_truth_all_signal = new MnvH1D( "pi0_P_mc_truth_all_signal","Pi0 Momentum for Signal Events",binList.size_pi0_P, binList.a_pi0_P);
-    pi0_P_mc_truth_all_signal->GetXaxis()->SetTitle("Momentum [GeV]");
+    pi0_P_mc_truth_all_signal->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
     pi0_P_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(pi0_P_mc_truth_all_signal);
 
     pi0_KE_mc_truth_all_signal = new MnvH1D( "pi0_KE_mc_truth_all_signal","Pi0 Kinetic Energy for Signal Events",binList.size_pi0_KE, binList.a_pi0_KE);
-    pi0_KE_mc_truth_all_signal->GetXaxis()->SetTitle("Kinetic Energy [GeV]");
+    pi0_KE_mc_truth_all_signal->GetXaxis()->SetTitle("T_{#pi^{0}} [GeV]");
     pi0_KE_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(pi0_KE_mc_truth_all_signal);
     
     pi0_theta_mc_truth_all_signal = new MnvH1D( "pi0_theta_mc_truth_all_signal","Pi0 Theta for Signal Events",binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_mc_truth_all_signal->GetXaxis()->SetTitle("Theta");
+    pi0_theta_mc_truth_all_signal->GetXaxis()->SetTitle("#theta_{#pi^{0}}[deg]");
     pi0_theta_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(pi0_theta_mc_truth_all_signal);
 
@@ -814,7 +817,7 @@ void CCProtonPi0_TruthAnalyzer::FillHistogram(MnvH1D* hist, double var)
 
         //FillVertErrorBand_HighMaRES_ByHand(hist, var);
         //FillVertErrorBand_LowMaRES_ByHand(hist, var);
-        FillVertErrorBand_DeltaFactor_ByHand(hist, var);
+        //FillVertErrorBand_DeltaFactor_ByHand(hist, var);
     }else{
         FillVertErrorBand_Flux(hist, var);
         FillVertErrorBand_Genie(hist, var);

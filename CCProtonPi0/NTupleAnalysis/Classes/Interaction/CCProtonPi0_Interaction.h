@@ -76,6 +76,7 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> pi0_invMass_All; 
         std::vector<MnvH1D*> pi0_invMass_1Track;
         std::vector<MnvH1D*> pi0_invMass_2Track;
+        std::vector<MnvH1D*> pi0_invMass_DeltaRES;
 
         // W Study
         std::vector<MnvH1D*> W_p_pi0;
@@ -137,7 +138,6 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> vertex_z;
         
         // Other Event Parameters 
-        std::vector<MnvH1D*> deltaInvMass;
         TH1D* normal_rand_numbers;
         TH1D* em_shift_rand_numbers;
         TH1D* muonP_shift_rand_numbers;
@@ -145,9 +145,16 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* Birks_shift_rand_numbers;
 
         // Delta Resonance
-        MnvH1D* Polarization_data;
-        MnvH1D* Polarization_mc;
-        
+        std::vector<MnvH1D*> deltaInvMass;
+        std::vector<MnvH1D*> Polarization;
+        std::vector<MnvH1D*> Delta_pi_theta;
+        std::vector<MnvH1D*> Delta_pi_P;
+        std::vector<MnvH1D*> Delta_pi_phi;
+        std::vector<MnvH2D*> Delta_pi_phi_theta;
+        std::vector<MnvH2D*> Delta_pi_P_theta;
+        TH1D* resID;
+        TH1D* resID_theta;
+
         MnvH1D* DeltaTransverse_data;
         MnvH1D* DeltaTransverse_mc;
         MnvH2D* DeltaTransverse_mc_res;

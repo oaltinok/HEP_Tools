@@ -321,12 +321,11 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     TCanvas* c = new TCanvas("c","c",1280,1280);
     
     // Upper Pad is the Data vs MC
-    TPad *pad1 = new TPad("pad1", "pad1", 0, 0.3, 1, 1.0); 
+    TPad *pad1 = new TPad("pad1", "pad1", 0.05, 0.3, 1, 1.0); 
     pad1->SetBottomMargin(0); // Top and Bottom Plots attached
     pad1->Draw();               
     pad1->cd(); // pad1 is the current pad
-   
-    // Plot MC Models as THStack
+      // Plot MC Models as THStack
     THStack* hs = new THStack("hs",plot_title.c_str());
     hs->Add(h_WithPi0);  
     hs->Add(h_QELike);  
@@ -334,24 +333,35 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     hs->Add(h_Other);  
     hs->Add(h_signal);  
 
-    // Add MC Stacked 
     hs->Draw("HIST");
-    hs->GetYaxis()->SetTitle("N(Events)");
-    hs->GetXaxis()->SetTitle("");
-    h_data->GetXaxis()->SetTitle("");
 
+    // Styling
+    gStyle->SetOptTitle(0);
+    gStyle->SetOptStat(0); 
+
+    hs->GetYaxis()->SetTitle("N(Events)");
+    hs->GetYaxis()->SetTitleFont(62);
+    hs->GetYaxis()->SetTitleSize(0.06);
+    //hs->GetYaxis()->CenterTitle();
+    //hs->GetYaxis()->SetTitleOffset(1.2);
+    hs->GetYaxis()->SetLabelFont(42);
+    hs->GetYaxis()->SetLabelSize(0.05);
+ 
     // Add Data Plot
+    h_data->GetXaxis()->SetTitle("");
+    h_data->SetMaximum(h_data->GetMaximum()*1.5);
     h_data->Draw("SAME E1 X0");
 
     // Add Legend
-    TLegend *legend = new TLegend(0.7,0.68,0.9,0.9);  
+    TLegend *legend = new TLegend(0.6,0.65,0.9,0.9);  
     legend->AddEntry(h_data, "Data");
     legend->AddEntry(h_signal, "Signal", "f");
     legend->AddEntry(h_Other, "Bckg: Other", "f");
     legend->AddEntry(h_SinglePiPlus, "Bckg: 1 #pi^{+}", "f");
     legend->AddEntry(h_QELike, "Bckg: QE Like", "f");
     legend->AddEntry(h_WithPi0, "Bckg: #pi^{0} + X", "f");
-    legend->SetTextSize(0.03);
+    legend->SetTextSize(0.04);
+    legend->SetTextFont(42);
     legend->Draw();
 
     // Add Pi0 InvMass Lines
@@ -359,57 +369,54 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
         double hist_max = h_data->GetMaximum();
         hs->SetMaximum(hist_max * 1.2);
         TLine pi0Mass;
-        pi0Mass.SetLineWidth(2);
+        pi0Mass.SetLineWidth(3);
         pi0Mass.SetLineColor(kBlue);
         pi0Mass.DrawLine(134.98,0,134.98,hist_max);
 
         TLine pi0Mass_min;
-        pi0Mass_min.SetLineWidth(2);
+        pi0Mass_min.SetLineWidth(3);
         pi0Mass_min.SetLineColor(kBlack);
         pi0Mass_min.DrawLine(60.0,0,60.0,hist_max);
 
         TLine pi0Mass_max;
-        pi0Mass_max.SetLineWidth(2);
+        pi0Mass_max.SetLineWidth(3);
         pi0Mass_max.SetLineColor(kBlack);
         pi0Mass_max.DrawLine(200.0,0,200.0,hist_max);
     }
 
     // Add Weights as Text to Modified Plot 
-    if (ind != 0){
-        int nPars = 3;
-        int nPoints = 136;
+    //if (ind != 0){
+    //    int nPars = 3;
+    //    int nPoints = 136;
 
-        TLatex* text = new TLatex;
-        text->SetTextSize(0.03);
-        text->SetNDC();
-        text->DrawLatex(0.6, 0.64, Form("Fit Results with %d points, %d pars", nPoints, nPars));
-        text->DrawLatex(0.6, 0.61, Form("Before Fit #chi^{2} = %3.2f", ChiSq_before_fit[0]));
-        text->DrawLatex(0.6, 0.58, Form("Before Fit #chi^{2}/dof = %3.2f", ChiSq_before_fit[0]/(nPoints-nPars)));
-        text->DrawLatex(0.6, 0.55, Form("After Fit #chi^{2} = %3.2f", ChiSq_after_fit[0]));
-        text->DrawLatex(0.6, 0.52, Form("After Fit #chi^{2}/dof = %3.2f", ChiSq_after_fit[0]/(nPoints-nPars)));
-        text->DrawLatex(0.6, 0.49, Form("#color[4]{wgt(ChargedPion) = %3.2f#pm %3.2f}", wgt_SinglePiPlus[0], err_SinglePiPlus[0]));
-        text->DrawLatex(0.6, 0.46, Form("wgt(QELike) = %3.2f#pm %3.2f", wgt_QELike[0], err_QELike[0]));
-        text->DrawLatex(0.6, 0.43, Form("#color[2]{wgt(WithPi0) = %3.2f#pm %3.2f}", wgt_WithPi0[0], err_WithPi0[0]));
-        delete text;
-    }
+    //    TLatex* text = new TLatex;
+    //    text->SetTextSize(0.03);
+    //    text->SetNDC();
+    //    text->DrawLatex(0.6, 0.64, Form("Fit Results with %d points, %d pars", nPoints, nPars));
+    //    text->DrawLatex(0.6, 0.61, Form("Before Fit #chi^{2} = %3.2f", ChiSq_before_fit[0]));
+    //    text->DrawLatex(0.6, 0.58, Form("Before Fit #chi^{2}/dof = %3.2f", ChiSq_before_fit[0]/(nPoints-nPars)));
+    //    text->DrawLatex(0.6, 0.55, Form("After Fit #chi^{2} = %3.2f", ChiSq_after_fit[0]));
+    //    text->DrawLatex(0.6, 0.52, Form("After Fit #chi^{2}/dof = %3.2f", ChiSq_after_fit[0]/(nPoints-nPars)));
+    //    text->DrawLatex(0.6, 0.49, Form("#color[4]{wgt(ChargedPion) = %3.2f#pm %3.2f}", wgt_SinglePiPlus[0], err_SinglePiPlus[0]));
+    //    text->DrawLatex(0.6, 0.46, Form("wgt(QELike) = %3.2f#pm %3.2f", wgt_QELike[0], err_QELike[0]));
+    //    text->DrawLatex(0.6, 0.43, Form("#color[2]{wgt(WithPi0) = %3.2f#pm %3.2f}", wgt_WithPi0[0], err_WithPi0[0]));
+    //    delete text;
+    //}
     
-    // Add Plot-Area and Plot-ChiSq
-    double area_data = h_data->Integral("width");
-    double area_mc = h_mc_total->Integral("width");
-    TLatex* areaText = new TLatex;
-    areaText->SetNDC();
-    areaText->SetTextSize(0.03);
-    areaText->SetTextColor(kBlue);
-    areaText->DrawLatex(0.15, 0.87,Form("Area(Data)/Area(MC) = %3.2f",area_data/area_mc));
+    // Add Plot-ChiSq
+    TLatex* text = new TLatex;
+    text->SetNDC();
+    text->SetTextSize(0.04);
+    text->SetTextColor(kBlue);
     double plot_chisq = calc_ChiSq(data, signal, WithPi0, QELike, SinglePiPlus, Other);
     double nPoints = h_data->GetNbinsX();
-    areaText->DrawLatex(0.15, 0.83, Form("Plot #chi^{2} = %3.2f", plot_chisq));
-    areaText->DrawLatex(0.15, 0.79, Form("Plot #chi^{2}/dof = %3.2f", plot_chisq/nPoints));
-    delete areaText;
+    text->DrawLatex(0.15, 0.85, Form("Plot #chi^{2} = %3.2f", plot_chisq));
+    text->DrawLatex(0.15, 0.81, Form("Plot #chi^{2}/dof = %3.2f", plot_chisq/nPoints));
+    delete text;
 
     // Plot Lower Plot: Data vs MC Ratio
     c->cd(); // Go back to default Canvas before creating 2nd Pad
-    TPad *pad2 = new TPad("pad2", "pad2", 0, 0.05, 1, 0.3);
+    TPad *pad2 = new TPad("pad2", "pad2", 0.05, 0.05, 1, 0.3);
     pad2->SetTopMargin(0);
     pad2->SetBottomMargin(0.2);
     pad2->Draw();
@@ -421,29 +428,31 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
 
     // Style Ratio Plot
     h_data_mc_ratio->SetTitle("");
-    h_data_mc_ratio->GetXaxis()->SetTitle(h_mc_total->GetXaxis()->GetTitle());
-    h_data_mc_ratio->GetYaxis()->SetTitle("N(Data)/N(MC)");
     h_data_mc_ratio->SetLineColor(kRed);
     h_data_mc_ratio->SetLineWidth(3);
     h_data_mc_ratio->SetFillColor(kWhite);
     h_data_mc_ratio->SetMinimum(0.5);
     h_data_mc_ratio->SetMaximum(1.5);
-    h_data_mc_ratio->SetStats(0);
-
-    // Y axis ratio plot settings
-    h_data_mc_ratio->GetYaxis()->SetNdivisions(505);
-    h_data_mc_ratio->GetYaxis()->SetTitleSize(30);
-    h_data_mc_ratio->GetYaxis()->SetTitleFont(43);
-    h_data_mc_ratio->GetYaxis()->SetTitleOffset(1.55);
-    h_data_mc_ratio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-    h_data_mc_ratio->GetYaxis()->SetLabelSize(30);
 
     // X axis ratio plot settings
-    h_data_mc_ratio->GetXaxis()->SetTitleSize(30);
-    h_data_mc_ratio->GetXaxis()->SetTitleFont(43);
-    h_data_mc_ratio->GetXaxis()->SetTitleOffset(4.);
-    h_data_mc_ratio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-    h_data_mc_ratio->GetXaxis()->SetLabelSize(30);
+    h_data_mc_ratio->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    h_data_mc_ratio->GetXaxis()->SetNdivisions(408);
+    h_data_mc_ratio->GetXaxis()->CenterTitle();
+    h_data_mc_ratio->GetXaxis()->SetTitleFont(62);
+    h_data_mc_ratio->GetXaxis()->SetTitleSize(0.18);
+    //h_data_mc_ratio->GetXaxis()->SetTitleOffset(1.2);
+    h_data_mc_ratio->GetXaxis()->SetLabelFont(42); // Absolute font size in pixel (precision 3)
+    h_data_mc_ratio->GetXaxis()->SetLabelSize(0.12);
+
+    // Y axis ratio plot settings
+    h_data_mc_ratio->GetYaxis()->CenterTitle();
+    h_data_mc_ratio->GetYaxis()->SetNdivisions(408);
+    h_data_mc_ratio->GetYaxis()->SetTitle("Data/MC");
+    h_data_mc_ratio->GetYaxis()->SetTitleFont(62);
+    h_data_mc_ratio->GetYaxis()->SetTitleSize(0.18);
+    h_data_mc_ratio->GetYaxis()->SetTitleOffset(0.35);
+    h_data_mc_ratio->GetYaxis()->SetLabelFont(42); // Absolute font size in pixel (precision 3)
+    h_data_mc_ratio->GetYaxis()->SetLabelSize(0.12);
 
     // Add Ratio Plot
     h_data_mc_ratio->Draw("HIST");
@@ -457,9 +466,7 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     double line_max = h_data->GetBinLowEdge(h_data->GetNbinsX()+1);
     ratio_1.DrawLine(line_min,1,line_max,1);
 
-
     // Plot Output
-    gStyle->SetOptStat(0); 
     c->Update();
     std::string plotDir = Folder_List::plotDir_SideBand;
     std::string out_name;

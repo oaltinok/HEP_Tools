@@ -109,17 +109,17 @@ void CCProtonPi0_Interaction::initHistograms()
         updated_wgt_Rvn1pi.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","Enu",i),"Reconstructed Beam Energy - All Events", binList.size_Enu, binList.a_Enu);
-        temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - All Events [GeV]");
+        temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
         Enu.push_back(temp);
  
         temp = new MnvH1D( Form("%s_%d","Enu_1Track",i),"Reconstructed Beam Energy - 1 Track", binList.size_Enu, binList.a_Enu);
-        temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - 1Track [GeV]");
+        temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
         Enu_1Track.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","Enu_2Track",i),"Reconstructed Beam Energy - 2 Track", binList.size_Enu, binList.a_Enu);
-        temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} - 2 Track [GeV]");
+        temp->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.beamE.get_width()));
         Enu_2Track.push_back(temp);
       
@@ -167,12 +167,7 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("Reconstructed W [GeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.w.get_width()));
         W_2Track.push_back(temp);
-         
-        temp = new MnvH1D( Form("%s_%d","deltaInvMass",i),"Reconstructed p#pi^{0} Invariant Mass",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed p#pi^{0} Inv. Mass [GeV]");
-        temp->GetYaxis()->SetTitle(Form("Events / %3.2f [MeV] ",binList.deltaInvMass.get_width()));
-        deltaInvMass.push_back(temp);
-
+        
         temp = new MnvH1D( Form("%s_%d","vertex_z",i),"Reconstructed Interaction Vertex",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
         temp->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.vertex_z.get_width()));
@@ -273,6 +268,48 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         pi0_invMass_2Track.push_back(temp);
 
+        temp = new MnvH1D(Form("%s_%d","pi0_invMass_DeltaRES",i),"#pi^{0} Invariant Mass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        pi0_invMass_DeltaRES.push_back(temp);
+
+        // Delta Resonance Study
+        temp = new MnvH1D( Form("%s_%d","deltaInvMass",i),"Reconstructed p#pi^{0} Invariant Mass",15, 0.5, 2.0);
+        temp->GetXaxis()->SetTitle("Reconstructed p#pi^{0} Inv. Mass [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        deltaInvMass.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","Polarization",i),"Pion Polarization in #Delta Rest Frame",10,-1,1);
+        temp->GetXaxis()->SetTitle("Polarization");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        Polarization.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","Delta_pi_theta",i),"cos(#theta_{#pi^{0}}) in #Delta Rest Frame",10,-1.0,1.0);
+        temp->GetXaxis()->SetTitle("cos(#theta)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        Delta_pi_theta.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","Delta_pi_phi",i),"#phi_{#pi^{0}} in #Delta Rest Frame",10,0.0,180.0);
+        temp->GetXaxis()->SetTitle("#phi");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        Delta_pi_phi.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","Delta_pi_P",i),"P_{#pi^{0}} in #Delta Rest Frame",10,0.0,1.0);
+        temp->GetXaxis()->SetTitle("#pi^{0} Momentum in #Delta Rest Frame [GeV]");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        Delta_pi_P.push_back(temp);
+
+        temp2D = new MnvH2D( Form("%s_%d","Delta_pi_phi_theta",i),"#phi_{#pi^{0}} vs #theta_{#pi^{0}}in #Delta Rest Frame",10,0.0,180.0,10,-1.0,1.0);
+        temp2D->GetXaxis()->SetTitle("#phi");
+        temp2D->GetYaxis()->SetTitle("cos(#theta)");
+        Delta_pi_phi_theta.push_back(temp2D);
+
+        temp2D = new MnvH2D( Form("%s_%d","Delta_pi_P_theta",i),"P_{#pi^{0}} vs #theta_{#pi^{0}}in #Delta Rest Frame",10,-1.0,1.0,10,0.0,1.0);
+        temp2D->GetXaxis()->SetTitle("Pion Momentum in #Delta Rest Frame [GeV]");
+        temp2D->GetYaxis()->SetTitle("cos(#theta)");
+        Delta_pi_P_theta.push_back(temp2D);
+
+
         // 2p2h Study
         temp = new MnvH1D( Form("%s_%d","vertex_energy_1Track",i),"Vertex Blob Energy (r = 90mm)",binList.vertex_energy.get_nBins(), binList.vertex_energy.get_min(), binList.vertex_energy.get_max() );
         temp->GetXaxis()->SetTitle("Vertex Blob Energy [MeV]");
@@ -334,6 +371,15 @@ void CCProtonPi0_Interaction::initHistograms()
         temp2D->GetYaxis()->SetTitle("Q^{2} [GeV^{2}]");
         W_QSq_2Track.push_back(temp2D);
     }
+
+    resID = new TH1D( "resID","Resonance ID",10,0.0,10.0);
+    resID->GetXaxis()->SetTitle("RES ID");
+    resID->GetYaxis()->SetTitle("N(Events)");
+
+    resID_theta = new TH1D( "resID_theta","Resonance ID",10,0.0,10.0);
+    resID_theta->GetXaxis()->SetTitle("RES ID");
+    resID_theta->GetYaxis()->SetTitle("N(Events)");
+
 
     // Cross Section Variables
     QSq_all = new MnvH1D( "QSq_all","Data All Q^{2}", binList.size_QSq, binList.a_QSq);
@@ -496,13 +542,6 @@ void CCProtonPi0_Interaction::initHistograms()
     proton_true_theta_1Track->GetXaxis()->SetTitle("True #theta_{p} [Degree]");
     proton_true_theta_1Track->GetYaxis()->SetTitle(Form("Protons / %3.1f [Degree]",binList.angle.get_width()));
 
-    Polarization_data = new MnvH1D( "Polarization_data","Pion Polarization in #Delta Rest Frame",10,-1,1);
-    Polarization_data->GetXaxis()->SetTitle("Polarization");
-    Polarization_data->GetYaxis()->SetTitle("N(Events)");
-
-    Polarization_mc = new MnvH1D( "Polarization_mc","Pion Polarization in #Delta Rest Frame",10,-1,1);
-    Polarization_mc->GetXaxis()->SetTitle("Polarization");
-    Polarization_mc->GetYaxis()->SetTitle("N(Events)");
 
     DeltaTransverse_data = new MnvH1D( "DeltaTransverse_data","Delta Transverse Momentum (Double Transverse)",21,-500,500);
     DeltaTransverse_data->GetXaxis()->SetTitle("Delta Transverse Momentum [MeV]");
@@ -1022,6 +1061,13 @@ void CCProtonPi0_Interaction::writeHistograms()
         W_1Track[i]->Write();
         W_2Track[i]->Write();
        
+        Polarization[i]->Write();
+        Delta_pi_theta[i]->Write();
+        Delta_pi_P[i]->Write();
+        Delta_pi_phi[i]->Write();
+        Delta_pi_phi_theta[i]->Write();
+        Delta_pi_P_theta[i]->Write();
+
         // 2p2h Study 
         vertex_energy_All[i]->Write();
         vertex_energy_1Track[i]->Write();
@@ -1054,6 +1100,7 @@ void CCProtonPi0_Interaction::writeHistograms()
         pi0_invMass_All[i]->Write();
         pi0_invMass_1Track[i]->Write();
         pi0_invMass_2Track[i]->Write();
+        pi0_invMass_DeltaRES[i]->Write();
 
         W_p_pi0[i]->Write();
         W_All[i]->Write();
@@ -1062,7 +1109,10 @@ void CCProtonPi0_Interaction::writeHistograms()
         QSq_CV[i]->Write();
         QSq_MaRES[i]->Write();
     }
-      
+    
+    resID->Write();
+    resID_theta->Write();
+
     QSq_all->Write();
     QSq_mc_truth_signal->Write();
     QSq_mc_reco_all->Write();
@@ -1236,8 +1286,6 @@ void CCProtonPi0_Interaction::writeHistograms()
     reco_w_2p2h->Write();
     reco_w_Non_RES->Write();
 
-    Polarization_data->Write();
-    Polarization_mc->Write();
     DeltaTransverse_data->Write();
     DeltaTransverse_mc->Write();
     DeltaTransverse_mc_res->Write();
