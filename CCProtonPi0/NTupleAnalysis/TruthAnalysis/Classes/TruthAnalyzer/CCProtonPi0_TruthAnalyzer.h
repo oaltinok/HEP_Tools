@@ -43,6 +43,16 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         MnvH1D* QSq_mc_truth_all_signal;
         MnvH1D* W_mc_truth_all_signal;
 
+        // Cross Section Variables After FSI
+        MnvH1D* muon_P_mc_truth_all_signal_AfterFSI;
+        MnvH1D* muon_theta_mc_truth_all_signal_AfterFSI;
+        MnvH1D* pi0_P_mc_truth_all_signal_AfterFSI;
+        MnvH1D* pi0_KE_mc_truth_all_signal_AfterFSI;
+        MnvH1D* pi0_theta_mc_truth_all_signal_AfterFSI;
+        MnvH1D* Enu_mc_truth_all_signal_AfterFSI;
+        MnvH1D* QSq_mc_truth_all_signal_AfterFSI;
+        MnvH1D* W_mc_truth_all_signal_AfterFSI;
+
         // Cross Section Variables Before FSI
         MnvH1D* muon_P_mc_truth_all_signal_BeforeFSI;
         MnvH1D* muon_theta_mc_truth_all_signal_BeforeFSI;
@@ -137,6 +147,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_BckgConstrainer BckgConstrainer;
         CCProtonPi0_QSqFitter QSqFitter;
 
+        bool applyGENIETuning_DeltaSuppression;
         bool applyGENIETuning_Delta;
         bool applyGENIETuning_NonRes;
         bool reduce_err_Delta;

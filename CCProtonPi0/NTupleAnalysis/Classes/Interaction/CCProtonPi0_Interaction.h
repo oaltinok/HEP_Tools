@@ -33,11 +33,14 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         //     Histograms
         //--------------------------------------------------------------------------
         std::vector<MnvH1D*> CV_weight;
+        std::vector<MnvH1D*> CV_weight_Flux;
         std::vector<MnvH1D*> CV_weight_2p2h;
         std::vector<MnvH1D*> CV_weight_Delta;
         std::vector<MnvH1D*> CV_weight_CCRES;
         std::vector<MnvH1D*> CV_weight_NonRes1pi;
         std::vector<MnvH1D*> err_2p2h;
+        std::vector<MnvH1D*> genie_wgt_VecFFCCQEshape;
+        std::vector<MnvH1D*> genie_wgt_NormDISCC;
         std::vector<MnvH1D*> genie_wgt_Theta_Delta2Npi;
         std::vector<MnvH1D*> updated_wgt_Theta_Delta2Npi;
         std::vector<MnvH1D*> genie_wgt_MaRES;
@@ -104,6 +107,10 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH2D*> W_QSq_All;
         std::vector<MnvH2D*> W_QSq_1Track;
         std::vector<MnvH2D*> W_QSq_2Track;
+
+        // Flux Study
+        TH2D* Enu_flux_wgt;
+        TH2D* Enu_cvweight;
 
         // QSq
         MnvH1D* QSq_all;

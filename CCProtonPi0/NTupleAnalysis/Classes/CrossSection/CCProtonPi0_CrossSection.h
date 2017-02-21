@@ -56,6 +56,11 @@ struct XSec
     MnvH2D* response;
     MnvH1D* eff;
 
+    // MC Truth AfterFSI 
+    MnvH1D* efficiency_corrected_AfterFSI;
+    MnvH1D* flux_integrated_AfterFSI;
+    MnvH1D* xsec_AfterFSI;
+
     // MC Truth BeforeFSI
     MnvH1D* efficiency_corrected_BeforeFSI;
     MnvH1D* flux_integrated_BeforeFSI;
@@ -90,6 +95,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         // Flux File
         MnvH1D* h_flux_minervaLE_FHC;
         MnvH1D* h_flux_rebinned;
+        MnvH1D* h_flux_rebinned_BeforeFSI;
         double cv_flux_integral;
         std::vector<double> unv_flux_integral;
 
@@ -124,7 +130,9 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void AddErrorBands_FluxHistogram();
         void RebinFluxHistogram();
         void RebinFluxHistogram(TH1* rebinned, TH1* reference);
+        void RebinFluxHistogram_BeforeFSI(TH1* rebinned, TH1* reference);
         void Calc_CrossSection(XSec &var);
+        void Calc_CrossSection_AfterFSI(XSec &var);
         void Calc_CrossSection_BeforeFSI(XSec &var);
         void Calc_CrossSection_FSIType(XSec &var);
         void Calc_CrossSection_IntType(XSec &var);

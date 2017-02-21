@@ -89,6 +89,9 @@ class CCProtonPi0_NTupleAnalysis
         static const double deuteriumNonResNorm1sig;
         static const double deuteriumResNorm;
         static const double deuteriumResNorm1sig;
+        // Delta Suppression 
+        static const double DeltaFactor_A;
+        static const double DeltaFactor_Q0;
 
         // 2p2h Events
         std::vector<double> fit_2p2h_CV;

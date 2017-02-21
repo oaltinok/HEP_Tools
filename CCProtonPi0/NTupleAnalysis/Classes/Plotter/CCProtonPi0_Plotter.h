@@ -27,6 +27,7 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 #include <THStack.h>
 #include <TLatex.h>
 #include <TLegend.h>
+#include <TColor.h>
 #include <TLine.h>
 #include <TPad.h>
 #include <TPaveStats.h>
@@ -162,6 +163,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void Draw_QSq_MaRES_AreaNorm();
         void Draw_QSq_EnuLimit();
         void Draw_QSq_DeltaSuppression();
+        void Draw_QSq_DeltaSuppression_v2(std::string var_name);
         void Draw_QSq_DeltaSuppression_AllPlots();
         void plot_CV_weights();
         void plot_SystematicsInfo();
@@ -185,6 +187,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void NormalizeHistogram(MnvH1D* h);
         void NormalizeHistogram(TH1D* h);
         void ApplyStyle(MnvPlotter* plotter);
+        void ApplyStyle_Legend(TLegend* legend);
         void ApplyStyle_Errors(MnvPlotter* plotter, bool groupErrors);
         void ApplyStyle_Thesis();
         void AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, double hist_max, double arrow_length);
@@ -235,6 +238,10 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void GENIE_Tuning_GetHistograms(std::string var_name, std::string data_var, std::string mc_var, TH1D* &data_nominal, TH1D* &data_tuned_v2, TH1D* &data_tuned_v3, TH1D* &mc_nominal, TH1D* &mc_tuned_v2, TH1D* &mc_tuned_v3);
         void GENIE_Tuning_Ratio(std::string var_name, std::string data_var, std::string mc_var);
         void GENIE_Tuning_DataMC_Ratio(std::string var_name, std::string data_var, std::string mc_var);
+        void Draw_Comparison_Nominal();
+        void Draw_Comparison_Nominal(std::string var_name);
+        void Draw_Comparison_DeltaFactor();
+        void Draw_Comparison_DeltaFactor(std::string var_name);
 
         // --------------------------------------------------------------------
         // Plottting Macros - Implemented in CCProtonPi0_Plotter_Macros.cpp
@@ -270,6 +277,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);
         void DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGraph* otherData, std::string var_name, std::string ext_data_name, std::string plotDir);
         void DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D* mc_BeforeFSI, std::string var_name,  std::string plotDir);
+        void DrawDataMC_PaperStyle(MnvH1D* data, MnvH1D* mc, MnvH1D* mc_BeforeFSI, std::string var_name,  std::string plotDir);
         void DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_FSIType, std::string var_name,  std::string plotDir);
         void DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_IntType, std::string var_name,  std::string plotDir);
         void DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);
@@ -287,6 +295,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void PlotDelta();
         void DrawBackgroundSubtraction(bool isMC);
         void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors = true);
+        void DrawErrorSummary_PaperStyle(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors = true);
         void DrawTGraph(rootDir &dir, std::string var_name, std::string plotDir);
         void DrawEfficiencyCurve(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);

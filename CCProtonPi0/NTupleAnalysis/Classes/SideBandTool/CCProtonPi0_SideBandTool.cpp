@@ -346,10 +346,12 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     //hs->GetYaxis()->SetTitleOffset(1.2);
     hs->GetYaxis()->SetLabelFont(42);
     hs->GetYaxis()->SetLabelSize(0.05);
- 
+
+    double hist_max = hs->GetMaximum();
+    hs->SetMaximum(hist_max * 1.5);
+
     // Add Data Plot
     h_data->GetXaxis()->SetTitle("");
-    h_data->SetMaximum(h_data->GetMaximum()*1.5);
     h_data->Draw("SAME E1 X0");
 
     // Add Legend
@@ -364,25 +366,23 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     legend->SetTextFont(42);
     legend->Draw();
 
-    // Add Pi0 InvMass Lines
-    if (var_name.compare("pi0_InvMass") == 0){
-        double hist_max = h_data->GetMaximum();
-        hs->SetMaximum(hist_max * 1.2);
-        TLine pi0Mass;
-        pi0Mass.SetLineWidth(3);
-        pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,hist_max);
-
-        TLine pi0Mass_min;
-        pi0Mass_min.SetLineWidth(3);
-        pi0Mass_min.SetLineColor(kBlack);
-        pi0Mass_min.DrawLine(60.0,0,60.0,hist_max);
-
-        TLine pi0Mass_max;
-        pi0Mass_max.SetLineWidth(3);
-        pi0Mass_max.SetLineColor(kBlack);
-        pi0Mass_max.DrawLine(200.0,0,200.0,hist_max);
-    }
+//    // Add Pi0 InvMass Lines
+//    TLine line;
+//    line.SetLineWidth(3);
+//    line.SetLineColor(kBlack);
+//
+//    TArrow arrow;
+//    arrow.SetLineWidth(4);
+//    arrow.SetLineStyle(1);
+//    arrow.SetLineColor(1); 
+//    
+//    // Low Inv Mass Region
+//    line.DrawLine(60.0,0,60.0,hist_max);
+//    arrow.DrawArrow(60.0,hist_max,60-20,hist_max,0.01,">");     
+//
+//    // High Inv Mass Region
+//    line.DrawLine(200.0,0,200.0,hist_max);
+//    arrow.DrawArrow(200.0,hist_max,200+20,hist_max,0.01,">");     
 
     // Add Weights as Text to Modified Plot 
     //if (ind != 0){
@@ -409,9 +409,9 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     text->SetTextSize(0.04);
     text->SetTextColor(kBlue);
     double plot_chisq = calc_ChiSq(data, signal, WithPi0, QELike, SinglePiPlus, Other);
-    double nPoints = h_data->GetNbinsX();
-    text->DrawLatex(0.15, 0.85, Form("Plot #chi^{2} = %3.2f", plot_chisq));
-    text->DrawLatex(0.15, 0.81, Form("Plot #chi^{2}/dof = %3.2f", plot_chisq/nPoints));
+    double nPoints = h_data->GetNbinsX()-1;
+    //text->DrawLatex(0.15, 0.85, Form("Plot #chi^{2} = %3.2f", plot_chisq));
+    text->DrawLatex(0.15, 0.85, Form("Plot #chi^{2}/dof = %3.2f", plot_chisq/nPoints));
     delete text;
 
     // Plot Lower Plot: Data vs MC Ratio

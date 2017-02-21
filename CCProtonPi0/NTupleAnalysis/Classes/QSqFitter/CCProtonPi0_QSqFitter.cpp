@@ -351,9 +351,9 @@ void CCProtonPi0_QSqFitter::FillChiSqVector(std::vector<double> &ChiSqVector, bo
     // ------------------------------------------------------------------------
     // Read Files
     // ------------------------------------------------------------------------
-    std::string data_dir = Folder_List::rootDir_CrossSection_data;
-    std::string mc_dir = Folder_List::rootDir_CrossSection_mc;
-   
+    std::string data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_MaRES_Fit_XSecs/Data/Analyzed/CrossSection.root";
+    std::string mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_MaRES_Fit_XSecs/MC/Analyzed/CrossSection.root";
+
     TFile* f_data = new TFile(data_dir.c_str());
     TFile* f_mc = new TFile(mc_dir.c_str());
 
@@ -402,9 +402,9 @@ void CCProtonPi0_QSqFitter::FillChiSqVector_AreaNorm(std::vector<double> &ChiSqV
     // ------------------------------------------------------------------------
     // Read Files
     // ------------------------------------------------------------------------
-    std::string data_dir = Folder_List::rootDir_CrossSection_data;
-    std::string mc_dir = Folder_List::rootDir_CrossSection_mc;
-   
+    std::string data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_MaRES_Fit_XSecs/Data/Analyzed/CrossSection.root";
+    std::string mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_MaRES_Fit_XSecs/MC/Analyzed/CrossSection.root";
+
     TFile* f_data = new TFile(data_dir.c_str());
     TFile* f_mc = new TFile(mc_dir.c_str());
 
@@ -488,7 +488,7 @@ double CCProtonPi0_QSqFitter::Calc_ChiSq_Delta(TH1D* data, TH1D* MC)
     //int nBins = data->GetNbinsX();
     double ChiSq = 0.0;
 
-    for (int i = 1; i <= 2; ++i){
+    for (int i = 1; i <= 3; ++i){
         double nData = data->GetBinContent(i);
         double nMC = MC->GetBinContent(i);
         

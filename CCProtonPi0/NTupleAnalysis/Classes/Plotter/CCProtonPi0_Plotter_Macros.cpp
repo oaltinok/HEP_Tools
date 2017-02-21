@@ -1,6 +1,6 @@
 /*
    See CCProtonPi0_Plotter.h header for Class Information
-   */
+*/
 
 #ifndef CCProtonPi0_Plotter_Macros_cpp
 #define CCProtonPi0_Plotter_Macros_cpp
@@ -103,9 +103,11 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     // Add Normalization Labels
     TLatex text;
     text.SetNDC();
+    text.SetTextColor(kBlue);
     text.SetTextSize(0.03);
-    text.DrawLatex(0.20,0.87,"POT Normalized");
-    text.DrawLatex(0.20,0.83,"Data POT: 3.33E+20");
+    text.SetTextAlign(22);
+    text.DrawLatex(0.30,0.87,"POT Normalized");
+    text.DrawLatex(0.30,0.83,"Data POT: 3.33E+20");
 
  
     // If Cut Histogram - Add Cut Arrows
@@ -235,12 +237,36 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
 
 void CCProtonPi0_Plotter::ApplyStyle(MnvPlotter* plotter)
 {
-    plotter->hist_min_zero = false;
-    plotter->mc_line_width = 0;
-    plotter->axis_title_size_x = 0.04;
-    plotter->axis_title_size_y = 0.04;
-    plotter->axis_label_size = 0.03;
-    plotter->legend_text_size = 0.02;
+    gStyle->SetCanvasDefW(640);
+    gStyle->SetCanvasDefH(480); // 4x3 aspect ratio
+    gStyle->SetPadRightMargin(0.05);
+
+    gStyle->SetStripDecimals(false);
+    plotter->legend_text_size  = 0.045;
+    plotter->legend_text_font = 42; // default 62 (bold)
+    //plotter->data_marker_size = 1.3;
+    plotter->axis_title_font_x   = 42;
+    plotter->axis_title_size_x   = 0.06;
+    plotter->axis_title_offset_x = 1.1;
+    plotter->axis_title_font_y   = 42;
+    plotter->axis_title_size_y   = 0.06;
+    plotter->axis_title_offset_y = 1.1;
+    plotter->axis_label_size = 0.05;
+    plotter->axis_label_font = 42;
+
+    gStyle->SetEndErrorSize(4);
+
+    //gStyle->SetAxisColor(kGray + 1,  "XY");
+    //gStyle->SetLabelColor(kGray + 1, "XY");
+    //gStyle->SetFrameLineColor(kGray + 1);
+    
+//    plotter->hist_min_zero = false;
+//    plotter->mc_line_width = 0;
+//    plotter->axis_title_size_x = 0.04;
+//    plotter->axis_title_size_y = 0.04;
+//    plotter->axis_label_size = 0.03;
+//    plotter->legend_text_size = 0.02;
+
 }
 
 void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupErrors)
@@ -251,7 +277,7 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupError
     //plotter->axis_title_size_y = 0.04;
     //plotter->axis_label_size = 0.03;
     plotter->legend_text_size = 0.04;
-    plotter->legend_n_columns = 1;
+    plotter->legend_n_columns = 2;
     plotter->height_nspaces_per_hist = 0.9;
     plotter->width_xspace_per_letter = 0.2;
     plotter->legend_offset_x = -0.2;
@@ -266,11 +292,116 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupError
         //plotter->error_color_map["GENIE"] = kGreen+2;
 
         plotter->error_summary_group_map["Detector"] = detGroup;
-        plotter->error_summary_group_map["Cross Section Model"] = genieGroup;   
+        plotter->error_summary_group_map["X-Sec Model"] = genieGroup;   
         plotter->error_summary_group_map["FSI Model"] = fsiGroup;   
         plotter->error_summary_group_map["Flux"] = fluxGroup;
         plotter->error_summary_group_map["Other"] = otherGroup;
     }
+}
+
+void CCProtonPi0_Plotter::DrawErrorSummary_PaperStyle(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors)
+{
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    plotter->SetRootEnv();
+    ApplyStyle(plotter);
+
+    TCanvas* c = new TCanvas("c");
+
+    ApplyStyle_Errors(plotter, groupErrors);
+
+    plotter->axis_maximum = 0.5;
+
+    //bool MnvPlotter::DrawErrorSummary   (   MnvH1D *    h,
+    //        const std::string &     legPos = "TR",
+    //        const bool  includeStat = true,
+    //        const bool  solidLinesOnly = true,
+    //        const double    ignoreThreshold = 0.00001,
+    //        const bool  covAreaNormalize = false,
+    //        const std::string &     errorGroupName = "",
+    //        const bool  asfrac = true,
+    //        const std::string &     Ytitle = "",
+    //        bool    ignoreUngrouped = false  
+    //        )   
+    plotter->DrawErrorSummary(hist, "N", true, false, 0.0);
+
+    // Add Normalization Labels
+    TPaveText* text = new TPaveText(0.18, 0.80, 0.54, 0.90, "NDC");
+    text->AddText("#scale[1.15]{c)  #nu_{#mu} + CH #rightarrow #mu^{-} + #pi^{0} + X}");
+    text->AddText("#scale[0.85]{POT Normalized}");
+    text->SetTextColor(kBlue);
+    text->SetFillColor(kWhite);
+    text->SetTextFont(42);
+    text->Draw("SAME");
+
+    // ------------------------------------------------------------------------
+    // Legend 
+    // ------------------------------------------------------------------------
+    TH1D* h_total = GetBinNormalizedTH1D(hist);
+    h_total->SetLineWidth(2);
+    h_total->SetLineColor(kBlack);
+    h_total->SetLineStyle(kSolid);
+
+    TH1D* h_stat = GetBinNormalizedTH1D(hist);
+    h_stat->SetLineWidth(2);
+    h_stat->SetLineColor(kBlack);
+    h_stat->SetLineStyle(kDashed);
+
+    TH1D* h_detector = GetBinNormalizedTH1D(hist);
+    h_detector->SetLineWidth(2); 
+    h_detector->SetLineColor(kBlue+2);
+    h_detector->SetLineStyle(3);
+ 
+    TH1D* h_xsec = GetBinNormalizedTH1D(hist);
+    h_xsec->SetLineWidth(2); 
+    h_xsec->SetLineColor(kRed+2);
+    h_xsec->SetLineStyle(5);       
+  
+    TH1D* h_fsi = GetBinNormalizedTH1D(hist);
+    h_fsi->SetLineWidth(2); 
+    h_fsi->SetLineColor(kMagenta+2);
+    h_fsi->SetLineStyle(9);       
+   
+    TH1D* h_flux = GetBinNormalizedTH1D(hist);
+    h_flux->SetLineWidth(2); 
+    h_flux->SetLineColor(TColor::GetColor("#8b4513"));
+    h_flux->SetLineStyle(6);       
+    
+    TH1D* h_other = GetBinNormalizedTH1D(hist);
+    h_other->SetLineWidth(2); 
+    h_other->SetLineColor(kGreen+3);
+    h_other->SetLineStyle(7);       
+   
+    TLegend *legend = new TLegend(0.52,0.74,0.94,0.90);  
+    ApplyStyle_Legend(legend);
+    legend->SetNColumns(2);
+    legend->SetTextSize(0.038);
+    legend->AddEntry(h_total, "Total Error", "l" );
+    legend->AddEntry(h_stat, "Statistical", "l" );
+    legend->SetColumnSeparation(0.06);
+    legend->SetEntrySeparation(0.12);
+    legend->AddEntry(h_detector, "Detector", "l");
+    legend->AddEntry(h_xsec, "X-Sec Model", "l");
+    legend->AddEntry(h_fsi, "FSI Model", "l");
+    legend->AddEntry(h_flux, "Flux", "l");
+    legend->AddEntry(h_other, "Other", "l");
+    legend->Draw();
+
+    // Print Plot
+    std::string out_name = plotDir + "Errors_" + var_name + ".pdf";
+    c->Print(out_name.c_str(), "pdf");
+
+    delete h_total;
+    delete h_stat;
+    delete h_detector;
+    delete h_xsec;
+    delete h_fsi;
+    delete h_flux;
+    delete h_other;
+    delete c;
+    delete plotter;
 }
 
 void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors)
@@ -297,9 +428,6 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     //        bool    ignoreUngrouped = false  
     //        )   
     plotter->DrawErrorSummary(hist,"TR", true, true, 0.0);
-
-    // Add Plot Labels
-    plotter->AddHistoTitle(hist->GetTitle());
 
     // Print Plot
     std::string out_name = plotDir + "Errors_" + var_name + ".png";
@@ -365,7 +493,10 @@ void CCProtonPi0_Plotter::DrawDataMC_Thesis(MnvH1D* data, MnvH1D* mc, std::strin
 
     tempData->GetXaxis()->SetNdivisions(408);
     tempMC->GetXaxis()->SetNdivisions(408);
-    
+   
+    tempData->SetTitle("Data (3.33e20 POT)");
+    tempMC->SetTitle("Simulation");
+
     //tempData->GetXaxis()->SetTitle("P_{#mu} [GeV]");
     //tempMC->GetXaxis()->SetTitle("P_{#mu} [GeV]");
 
@@ -386,15 +517,15 @@ void CCProtonPi0_Plotter::DrawDataMC_Thesis(MnvH1D* data, MnvH1D* mc, std::strin
     //            const bool  statPlusSys = false  
     //            const bool isSmooth = false
     //            )   
-    //plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", false, NULL, NULL, false, true, isXSec);
-    plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", false, NULL, NULL, false, true, false);
+    plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", true, NULL, NULL, false, true, false);
 
     // Add Normalization Labels
-    //TLatex text;
-    //text.SetNDC();
-    //text.SetTextSize(0.03);
-    //text.DrawLatex(0.20,0.87,"POT Normalized");
-    //text.DrawLatex(0.20,0.83,Form("Data POT: 3.33E+20"));
+    TLatex text;
+    text.SetNDC();
+    text.SetTextColor(kBlue);
+    text.SetTextSize(0.03);
+    text.SetTextAlign(22);
+    text.DrawLatex(0.30,0.87,"POT Normalized");
 
     // Plot Output
     gStyle->SetOptStat(0); 
@@ -664,210 +795,105 @@ void CCProtonPi0_Plotter::DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGr
     delete tempMC;
 }
 
-void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_IntType, std::string var_name,  std::string plotDir)
-{
-    std::cout<<"Plotting for "<<var_name<<std::endl;
-
-    TCanvas* c = new TCanvas("c","c",800,800);
-
-    // I may use mc for area normalization later, but for now it is silenced
-    (void) mc;
-
-    TH1D* h_RES_Delta = GetBinNormalizedTH1D(mc_IntType[0]);
-    h_RES_Delta->SetLineWidth(1);
-    h_RES_Delta->SetLineColor(kGray+1);
-    h_RES_Delta->SetFillColor(kGray+1);
-    h_RES_Delta->SetFillStyle(1001);
-
-    TH1D* h_RES_Other = GetBinNormalizedTH1D(mc_IntType[1]);
-    h_RES_Other->SetLineWidth(1);
-    h_RES_Other->SetLineColor(kGreen+2);
-    h_RES_Other->SetFillColor(kGreen+2);
-    h_RES_Other->SetFillStyle(1001);
-
-    TH1D* h_NonRES = GetBinNormalizedTH1D(mc_IntType[2]);
-    h_NonRES->SetLineWidth(1);
-    h_NonRES->SetLineColor(kRed+1);
-    h_NonRES->SetFillColor(kRed+1);
-    h_NonRES->SetFillStyle(1001);
-
-    THStack *hs = new THStack("hs",var_name.c_str());
-    hs->Add(h_NonRES);
-    hs->Add(h_RES_Other);
-    hs->Add(h_RES_Delta);
-
-    double hs_max = hs->GetMaximum();
-    hs->SetMaximum(hs_max * 1.75);
-    hs->Draw("HIST");
-    hs->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
-    hs->GetYaxis()->SetTitle(data->GetYaxis()->GetTitle());
-
-    if (thesisStyle){
-        hs->GetXaxis()->SetTitleFont(62);
-        hs->GetXaxis()->SetTitleSize(0.06);
-        hs->GetXaxis()->CenterTitle();
-        hs->GetXaxis()->SetTitleOffset(1.15);
-        hs->GetXaxis()->SetLabelFont(42);
-        hs->GetXaxis()->SetLabelSize(0.05);
-        hs->GetXaxis()->SetNdivisions(408);
-
-        hs->GetYaxis()->SetTitleFont(62);
-        hs->GetYaxis()->SetTitleSize(0.06);
-        //hs->GetYaxis()->CenterTitle();
-        hs->GetYaxis()->SetTitleOffset(1.1);
-        hs->GetYaxis()->SetLabelFont(42);
-        hs->GetYaxis()->SetLabelSize(0.05);
-        TGaxis::SetMaxDigits(3);
-    }
-
-    TH1D* h_data = GetBinNormalizedTH1D(data, true); 
-    h_data->SetMarkerStyle(20);
-    h_data->SetMarkerSize(1);
-    h_data->SetMarkerColor(kBlack);
-    h_data->SetLineWidth(2);
-    h_data->SetLineColor(kBlack);
-
-    TH1D* h_data_StatOnly = GetBinNormalizedTH1D(data, false); 
-    h_data_StatOnly->SetMarkerStyle(20);
-    h_data_StatOnly->SetMarkerSize(1);
-    h_data_StatOnly->SetMarkerColor(kBlack);
-    h_data_StatOnly->SetLineWidth(2);
-    h_data_StatOnly->SetLineColor(kBlack);
-
-    h_data->Draw("SAME E1 X0");
-    h_data_StatOnly->Draw("SAME E1 X0");
-
-    // ------------------------------------------------------------------------
-    // Plot Labels 
-    // ------------------------------------------------------------------------
-    TLegend *legend = new TLegend(0.4,0.7,0.9,0.9);  
-    legend->SetTextFont(42);
-    legend->SetTextSize(0.04);
-    legend->AddEntry(h_data, "Data (3.33e20 POT)", "lep" );
-    legend->AddEntry(h_RES_Delta, "Delta resonance","f");
-    legend->AddEntry(h_RES_Other, "Other resonances","f");
-    legend->AddEntry(h_NonRES, "Non-Resonant","f");
-    legend->Draw();
-
-    // Plot Output
-    gStyle->SetEndErrorSize(6);
-    gStyle->SetOptStat(0); 
-    c->Update();
-    std::string out_name;
-    out_name = plotDir + var_name + "_xsec_IntType" + ".png"; 
-
-    c->Print(out_name.c_str(),"png");
-
-    delete legend;
-    delete c;
-}
-
 void CCProtonPi0_Plotter::DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_FSIType, std::string var_name,  std::string plotDir)
 {
     std::cout<<"Plotting for "<<var_name<<std::endl;
 
-    TCanvas* c = new TCanvas("c","c",800,800);
+    MnvPlotter* plotter = new MnvPlotter();
+    plotter->SetRootEnv();
+    ApplyStyle(plotter);
+    plotter->mc_line_width = 1;
 
-    std::string norm_label;
-    double mc_ratio = GetMCNormalization(norm_label, false, data, mc);
+    TCanvas* c = new TCanvas("c");
 
-    TH1D* h_NonInteracting = GetBinNormalizedTH1D(mc_FSIType[0]);
-    h_NonInteracting->Scale(mc_ratio);
+    MnvH1D* h_data = new MnvH1D (*data);
+    TH1D* h_data_stat_only = GetBinNormalizedTH1D(h_data, false);
+    h_data_stat_only->SetMarkerStyle(20);
+    h_data_stat_only->SetMarkerSize(1);
+    h_data_stat_only->SetMarkerColor(kBlack);
+    h_data_stat_only->SetLineWidth(1);
+    h_data_stat_only->SetLineColor(kBlack);
+
+    MnvH1D* h_NonInteracting = new MnvH1D (*mc_FSIType[0]);
+    h_NonInteracting->SetTitle("#pi^{0} Non-interacting");
     h_NonInteracting->SetLineWidth(1);
     h_NonInteracting->SetLineColor(kRed+1);
     h_NonInteracting->SetFillColor(kRed+1);
     h_NonInteracting->SetFillStyle(1001);
 
-    TH1D* h_Elastic = GetBinNormalizedTH1D(mc_FSIType[1]);
-    h_Elastic->Scale(mc_ratio);
+    MnvH1D* h_Elastic = new MnvH1D (*mc_FSIType[1]);
+    h_Elastic->SetTitle("#pi^{0} Elastic");
     h_Elastic->SetLineWidth(1);
     h_Elastic->SetLineColor(kOrange+6);
     h_Elastic->SetFillColor(kOrange+6);
     h_Elastic->SetFillStyle(1001);
 
-    TH1D* h_Inelastic = GetBinNormalizedTH1D(mc_FSIType[2]);
-    h_Inelastic->Scale(mc_ratio);
+    MnvH1D* h_Inelastic = new MnvH1D(*mc_FSIType[2]);
+    h_Inelastic->SetTitle("#pi^{0} Inelastic");
     h_Inelastic->SetLineWidth(1);
     h_Inelastic->SetLineColor(kGray+1);
     h_Inelastic->SetFillColor(kGray+1);
     h_Inelastic->SetFillStyle(1001);
 
-    TH1D* h_Cex = GetBinNormalizedTH1D(mc_FSIType[3]);
-    h_Cex->Scale(mc_ratio);
+    MnvH1D* h_Cex = new MnvH1D(*mc_FSIType[3]);
+    h_Cex->SetTitle("#pi^{#pm} #rightarrow #pi^{0}");
     h_Cex->SetLineWidth(1);
-    h_Cex->SetLineColor(kGreen+2);
-    h_Cex->SetFillColor(kGreen+2);
+    h_Cex->SetLineColor(kGreen-2);
+    h_Cex->SetFillColor(kGreen-2);
     h_Cex->SetFillStyle(1001);
 
-    TH1D* h_MultiPion = GetBinNormalizedTH1D(mc_FSIType[4]);
-    h_MultiPion->Scale(mc_ratio);
+    MnvH1D* h_MultiPion = new MnvH1D(*mc_FSIType[4]);
+    h_MultiPion->SetTitle("Multi-#pi #rightarrow #pi^{0}");
     h_MultiPion->SetLineWidth(1);
-    h_MultiPion->SetLineColor(kCyan+1);
-    h_MultiPion->SetFillColor(kCyan+1);
+    h_MultiPion->SetLineColor(kCyan-8);
+    h_MultiPion->SetFillColor(kCyan-8);
     h_MultiPion->SetFillStyle(1001);
 
-    TH1D* h_Other = GetBinNormalizedTH1D(mc_FSIType[5]);
-    h_Other->Scale(mc_ratio);
+    MnvH1D* h_Other = new MnvH1D(*mc_FSIType[5]);
+    h_Other->SetTitle("Other #pi^{0} production");
     h_Other->SetLineWidth(1);
     h_Other->SetLineColor(kMagenta+1);
     h_Other->SetFillColor(kMagenta+1);
     h_Other->SetFillStyle(1001);
 
-    THStack *hs = new THStack("hs",var_name.c_str());
-    hs->Add(h_NonInteracting);
-    hs->Add(h_Elastic);
-    hs->Add(h_Inelastic);
-    hs->Add(h_Other);
-    hs->Add(h_Cex);
-    hs->Add(h_MultiPion);
-    double hs_max = hs->GetMaximum();
-    hs->SetMaximum(hs_max * 1.75);
-    hs->Draw("HIST");
-    hs->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
-    hs->GetYaxis()->SetTitle(data->GetYaxis()->GetTitle());
+    TObjArray* mc_hists = new TObjArray;
+    mc_hists->Add(h_NonInteracting);
+    mc_hists->Add(h_Elastic);
+    mc_hists->Add(h_Inelastic);
+    mc_hists->Add(h_Other);
+    mc_hists->Add(h_Cex);
+    mc_hists->Add(h_MultiPion);
 
-    if (thesisStyle){
-        hs->GetXaxis()->SetTitleFont(62);
-        hs->GetXaxis()->SetTitleSize(0.06);
-        hs->GetXaxis()->CenterTitle();
-        hs->GetXaxis()->SetTitleOffset(1.15);
-        hs->GetXaxis()->SetLabelFont(42);
-        hs->GetXaxis()->SetLabelSize(0.05);
-        hs->GetXaxis()->SetNdivisions(408);
+    std::string norm_label;
+    double mc_ratio = GetMCNormalization(norm_label, false, data, mc);
 
-        hs->GetYaxis()->SetTitleFont(62);
-        hs->GetYaxis()->SetTitleSize(0.06);
-        //hs->GetYaxis()->CenterTitle();
-        hs->GetYaxis()->SetTitleOffset(1.1);
-        hs->GetYaxis()->SetLabelFont(42);
-        hs->GetYaxis()->SetLabelSize(0.05);
-        TGaxis::SetMaxDigits(3);
-    }
+    /*
+       void MnvPlotter::DrawDataStackedMC(
+            const MnvH1D *  dataHist,
+            const TObjArray *    mcHists,
+            const Double_t   mcScale = 1.0,
+            const std::string &  legPos = "L",
+            const std::string &  dataName = "Data",
+            const Int_t  mcBaseColor = 2,
+            const Int_t  mcColorOffset = 1,
+            const Int_t  mcFillStyle = 3001,
+            const char *     xaxislabel = "",
+            const char *     yaxislabel = "",
+            bool     cov_area_normalize = false   
+       )    
+    */
+    
+    plotter->DrawDataStackedMC(h_data, mc_hists, mc_ratio , "N", "Data (3.33e20 POT)", 0, 0, 1001);
 
-    TH1D* h_data = GetBinNormalizedTH1D(data, true); 
-    h_data->SetMarkerStyle(20);
-    h_data->SetMarkerSize(1);
-    h_data->SetMarkerColor(kBlack);
-    h_data->SetLineWidth(2);
-    h_data->SetLineColor(kBlack);
-
-    TH1D* h_data_StatOnly = GetBinNormalizedTH1D(data, false); 
-    h_data_StatOnly->SetMarkerStyle(20);
-    h_data_StatOnly->SetMarkerSize(1);
-    h_data_StatOnly->SetMarkerColor(kBlack);
-    h_data_StatOnly->SetLineWidth(2);
-    h_data_StatOnly->SetLineColor(kBlack);
-
-    h_data->Draw("SAME E1 X0");
-    h_data_StatOnly->Draw("SAME E1 X0");
+    h_data_stat_only->Draw("SAME E1 X0");
 
     // ------------------------------------------------------------------------
-    // Plot Labels 
+    // Legend 
     // ------------------------------------------------------------------------
-    TLegend *legend = new TLegend(0.40,0.6,0.90,0.9);  
-    legend->SetTextFont(42);
-    legend->SetTextSize(0.04);
-    legend->AddEntry(h_data, "Data (3.33e20 POT)", "lep" );
+    TLegend *legend = new TLegend(0.55,0.36,0.90,0.85);  
+    ApplyStyle_Legend(legend);
+    legend->SetTextSize(0.05);
+    legend->AddEntry(h_data_stat_only, "Data #scale[0.85]{(3.33e20 POT)}", "lep" );
     legend->AddEntry(h_MultiPion, "Multi-#pi #rightarrow #pi^{0}","f");
     legend->AddEntry(h_Cex, "#pi^{#pm} #rightarrow #pi^{0}","f");
     legend->AddEntry(h_Other, "Other #pi^{0} production","f");
@@ -876,18 +902,223 @@ void CCProtonPi0_Plotter::DrawDataMC_FSIType(MnvH1D* data, MnvH1D* mc, std::vect
     legend->AddEntry(h_NonInteracting, "#pi^{0} Non-interacting","f");
     legend->Draw();
 
+
+    // Add Normalization Labels
+    TPaveText* text = new TPaveText(0.18, 0.80, 0.54, 0.90, "NDC");
+    text->AddText("#scale[1.15]{c)  #nu_{#mu} + CH #rightarrow #mu^{-} + #pi^{0} + X}");
+    text->AddText("#scale[0.85]{Area Normalized}");
+    text->SetTextColor(kBlue);
+    text->SetFillColor(kWhite);
+    text->SetTextFont(42);
+    text->Draw("SAME");
+
     // Plot Output
-    gStyle->SetEndErrorSize(6);
+    //gStyle->SetEndErrorSize(4);
+    //gStyle->SetOptStat(0); 
+    c->Update();
+    std::string out_name;
+    out_name = plotDir + var_name + "_xsec_FSIType" + ".pdf"; 
+
+    c->Print(out_name.c_str(),"pdf");
+
+    delete h_data;
+    delete h_data_stat_only;
+    delete h_NonInteracting;
+    delete h_Elastic;
+    delete h_Inelastic;
+    delete h_Cex;
+    delete h_MultiPion;
+    delete h_Other;
+    delete mc_hists;
+    delete legend;
+    delete c;
+    delete plotter;
+}
+
+void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vector<MnvH1D*> mc_IntType, std::string var_name,  std::string plotDir)
+{
+    std::cout<<"Plotting for "<<var_name<<std::endl;
+
+    MnvPlotter* plotter = new MnvPlotter();
+    plotter->SetRootEnv();
+    ApplyStyle(plotter);
+    plotter->mc_line_width = 1;
+
+    TCanvas* c = new TCanvas("c");
+
+    // I may use mc for area normalization later, but for now it is silenced
+    (void) mc;
+
+    MnvH1D* h_data = new MnvH1D (*data);
+    TH1D* h_data_stat_only = GetBinNormalizedTH1D(h_data, false);
+    h_data_stat_only->SetMarkerStyle(20);
+    h_data_stat_only->SetMarkerSize(1);
+    h_data_stat_only->SetMarkerColor(kBlack);
+    h_data_stat_only->SetLineWidth(1);
+    h_data_stat_only->SetLineColor(kBlack);
+
+    MnvH1D* h_RES_Delta = new MnvH1D (*mc_IntType[0]);
+    h_RES_Delta->SetLineWidth(1);
+    h_RES_Delta->SetLineColor(17);
+    h_RES_Delta->SetFillColor(17);
+    h_RES_Delta->SetFillStyle(1001);
+
+    MnvH1D* h_RES_Other = new MnvH1D (*mc_IntType[1]);
+    h_RES_Other->SetLineWidth(1);
+    h_RES_Other->SetLineColor(kGreen+2);
+    h_RES_Other->SetFillColor(kGreen+2);
+    h_RES_Other->SetFillStyle(1001);
+
+    MnvH1D* h_NonRES = new MnvH1D (*mc_IntType[2]);
+    h_NonRES->SetLineWidth(1);
+    h_NonRES->SetLineColor(kRed+2);
+    h_NonRES->SetFillColor(kRed+2);
+    h_NonRES->SetFillStyle(1001);
+
+    TObjArray* mc_hists = new TObjArray;
+    mc_hists->Add(h_NonRES);
+    mc_hists->Add(h_RES_Other);
+    mc_hists->Add(h_RES_Delta);
+
+    /*
+       void MnvPlotter::DrawDataStackedMC(
+            const MnvH1D *  dataHist,
+            const TObjArray *    mcHists,
+            const Double_t   mcScale = 1.0,
+            const std::string &  legPos = "L",
+            const std::string &  dataName = "Data",
+            const Int_t  mcBaseColor = 2,
+            const Int_t  mcColorOffset = 1,
+            const Int_t  mcFillStyle = 3001,
+            const char *     xaxislabel = "",
+            const char *     yaxislabel = "",
+            bool     cov_area_normalize = false   
+       )    
+    */
+    plotter->DrawDataStackedMC(h_data, mc_hists, 1.0, "N", "Data (3.33e20 POT)", 0, 0, 1001);
+
+    h_data_stat_only->Draw("SAME E1 X0");
+
+    // ------------------------------------------------------------------------
+    // Legend 
+    // ------------------------------------------------------------------------
+    TLegend *legend = new TLegend(0.55,0.57,0.90,0.85);  
+    ApplyStyle_Legend(legend);
+    legend->SetTextSize(0.05);
+    legend->AddEntry(h_data_stat_only, "Data #scale[0.85]{(3.33e20 POT)}", "lep" );
+    legend->AddEntry(h_RES_Delta, "Delta resonance","f");
+    legend->AddEntry(h_RES_Other, "Other resonances","f");
+    legend->AddEntry(h_NonRES, "Non-Resonant","f");
+    legend->Draw();
+
+    // Add Normalization Labels
+    TPaveText* text = new TPaveText(0.18, 0.80, 0.54, 0.90, "NDC");
+    text->AddText("#scale[1.15]{c)  #nu_{#mu} + CH #rightarrow #mu^{-} + #pi^{0} + X}");
+    text->AddText("#scale[0.85]{POT Normalized}");
+    text->SetTextColor(kBlue);
+    text->SetFillColor(kWhite);
+    text->SetTextFont(42);
+    text->Draw("SAME");
+
+    // Plot Output
+    c->Update();
+    std::string out_name;
+    out_name = plotDir + var_name + "_xsec_IntType" + ".pdf"; 
+
+    c->Print(out_name.c_str(),"pdf");
+
+    delete h_data;
+    delete h_data_stat_only;
+    delete h_RES_Delta;
+    delete h_RES_Other;
+    delete h_NonRES;
+    delete mc_hists;
+    delete legend;
+    delete c;
+    delete plotter;
+}
+
+void CCProtonPi0_Plotter::DrawDataMC_PaperStyle(MnvH1D* data, MnvH1D* mc, MnvH1D* mc_BeforeFSI, std::string var_name,  std::string plotDir)
+{
+    std::cout<<"Plotting for "<<var_name<<std::endl;
+
+    double mc_ratio = 1.0;
+
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    plotter->SetRootEnv();
+    ApplyStyle(plotter);
+
+    TCanvas* c = new TCanvas("c");
+
+    MnvH1D* tempData = new MnvH1D(*data);
+    MnvH1D* tempMC = new MnvH1D(*mc);
+
+    if (var_name.compare("Enu_xsec") == 0){
+        tempData->GetXaxis()->SetRangeUser(0.0, 10.0);
+        tempMC->GetXaxis()->SetRangeUser(0.0, 10.0);
+    }
+
+    plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "N", false, NULL, NULL, false, true, true);
+
+    TH1D* h_mc_BeforeFSI = GetBinNormalizedTH1D(mc_BeforeFSI);
+    h_mc_BeforeFSI->SetLineColor(kRed);
+    h_mc_BeforeFSI->SetLineWidth(2);
+    h_mc_BeforeFSI->SetLineStyle(2);
+    h_mc_BeforeFSI->SetFillStyle(0);
+
+    h_mc_BeforeFSI->Smooth(2);
+    h_mc_BeforeFSI->Draw("SAME HISTC");
+
+    // ------------------------------------------------------------------------
+    // Plot Labels 
+    // ------------------------------------------------------------------------
+
+    // Add Legend
+    tempData->SetMarkerStyle(plotter->data_marker);
+    tempData->SetMarkerSize(plotter->data_marker_size);
+    tempData->SetMarkerColor(plotter->data_color);
+    tempData->SetLineColor(plotter->data_color);
+    tempData->SetLineWidth(plotter->data_line_width);
+
+    tempMC->SetLineColor(plotter->mc_color);
+    tempMC->SetLineWidth(plotter->mc_line_width);
+
+    TLegend *legend = new TLegend(0.53,0.62,0.80,0.85);  
+    ApplyStyle_Legend(legend);    
+    legend->SetTextSize(0.06);
+    legend->AddEntry(tempData, "Data #scale[0.85]{(3.33e20 POT)}", "lep" );
+    legend->AddEntry(tempMC, "GENIE w/ FSI", "l");
+    legend->AddEntry(h_mc_BeforeFSI, "GENIE w/o FSI","l");
+    legend->Draw();
+
+    // Add Normalization Labels
+    TPaveText* text = new TPaveText(0.18, 0.80, 0.54, 0.90, "NDC");
+    text->AddText("#scale[1.15]{c)  #nu_{#mu} + CH #rightarrow #mu^{-} + #pi^{0} + X}");
+    text->AddText("#scale[0.85]{POT Normalized}");
+    text->SetTextColor(kBlue);
+    text->SetFillColor(kWhite);
+    text->SetTextFont(42);
+    text->Draw("SAME");
+
+    // Plot Output
     gStyle->SetOptStat(0); 
     c->Update();
     std::string out_name;
-    out_name = plotDir + var_name + "_xsec_FSIType" + ".png"; 
+    out_name = plotDir + var_name + "_xsec_BeforeFSI" + ".pdf"; 
 
-    c->Print(out_name.c_str(),"png");
+    c->Print(out_name.c_str(),"pdf");
 
     delete legend;
     delete c;
+    delete plotter;
+    delete tempData;
+    delete tempMC;
+    delete h_mc_BeforeFSI;
 }
+
 
 void CCProtonPi0_Plotter::DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D* mc_BeforeFSI, std::string var_name,  std::string plotDir)
 {
@@ -933,10 +1164,9 @@ void CCProtonPi0_Plotter::DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D*
     tempMC->SetLineColor(plotter->mc_color);
     tempMC->SetLineWidth(plotter->mc_line_width);
 
-    TLegend *legend = new TLegend(0.55,0.75,0.9,0.9);  
-    legend->SetTextFont(42);
-    legend->SetTextSize(0.04);
-    legend->AddEntry(tempData, "Data", "lep" );
+    TLegend *legend = new TLegend(0.40,0.7,0.90,0.9);  
+    ApplyStyle_Legend(legend);    
+    legend->AddEntry(tempData, "Data (3.33e20 POT)", "lep" );
     legend->AddEntry(tempMC, "GENIE w/ FSI", "l");
     legend->AddEntry(h_mc_BeforeFSI, "GENIE w/o FSI","l");
     legend->Draw();
@@ -944,9 +1174,10 @@ void CCProtonPi0_Plotter::DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D*
     // Add Normalization Labels
     TLatex text;
     text.SetNDC();
+    text.SetTextColor(kBlue);
     text.SetTextSize(0.03);
-    text.DrawLatex(0.20,0.87,"POT Normalized");
-    text.DrawLatex(0.20,0.83,Form("Data POT: 3.33E+20"));
+    text.SetTextAlign(22);
+    text.DrawLatex(0.30,0.87,"POT Normalized");
 
     // Plot Output
     gStyle->SetOptStat(0); 
@@ -1276,7 +1507,7 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
         hist2D->GetXaxis()->SetLabelSize(0.04);
         hist2D->GetXaxis()->SetNdivisions(408);
 
-        hist2D->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma})");
+        //hist2D->GetYaxis()->SetTitle("cos(#theta_{#gamma#gamma})");
         hist2D->GetYaxis()->SetTitleFont(62);
         hist2D->GetYaxis()->SetTitleSize(0.06);
         //hist2D->GetYaxis()->CenterTitle();
@@ -1287,7 +1518,8 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
 
     gStyle->SetPaintTextFormat("2.0f"); 
     hist2D->GetYaxis()->SetTitleOffset(1.8);
-    hist2D->Draw("colz text");
+    //hist2D->Draw("colz text");
+    hist2D->Draw("colz");
 
     gPad->Update();
 
@@ -1507,6 +1739,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_GammaByPDG(rootDir &dir, std::string var
     TCanvas* c = new TCanvas("c","c",1280,800);
     THStack* hs = new THStack("hs",Form("%s by Particle for Gamma %d",var_name.c_str(),gammaID));
     TLegend* legend = new TLegend(0.7,0.8,0.9,0.9);
+    ApplyStyle_Legend(legend);    
 
     //c->SetLogy();
     // Legend
@@ -2142,6 +2375,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_WithSignalTypes(rootDir &dir, std::s
     // Plot Labels 
     // ------------------------------------------------------------------------
     TLegend *legend = new TLegend(0.6,0.6,0.9,0.9);  
+    ApplyStyle_Legend(legend);    
     legend->AddEntry(h_data, "Data (3.33e20 POT)", "lep" );
     legend->AddEntry(h_signal_delta_res, "Signal: #Delta Res","f");
     legend->AddEntry(h_signal_other_res, "Signal: Other Res","f");
@@ -2156,7 +2390,6 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_WithSignalTypes(rootDir &dir, std::s
     TLatex text;
     text.SetNDC();
     text.SetTextSize(0.03);
-
     text.DrawLatex(0.2, 0.85, "#color[4]{POT Normalized}");
 
     std::size_t found = var_name.find("W");
@@ -2300,6 +2533,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_Signal(rootDir &dir, std::string var
     // Plot Labels 
     // ------------------------------------------------------------------------
     TLegend *legend = new TLegend(0.6,0.75,0.9,0.9);  
+    ApplyStyle_Legend(legend);    
     legend->AddEntry(h_data, "Data (3.33e20 POT)", "lep" );
     legend->AddEntry(h_signal_delta_res, "Signal: #Delta Res","f");
     legend->AddEntry(h_signal_other_res, "Signal: Other Res","f");
@@ -2349,30 +2583,34 @@ void CCProtonPi0_Plotter::DrawDataMCSignal_Diff(rootDir& dir, std::string var_na
     MnvH1D* data = GetBckgSubtractedData(dir, var_name, nBckg);
     MnvH1D* mc = GetMnvH1D(f_mc, var);
     mc->Scale(POT_ratio);
-   
-    data->Add(mc,-1);
-    data->SetLineWidth(1);
-    data->SetLineColor(kRed);
-    data->SetFillColor(kRed);
-    data->SetFillStyle(3010);
+ 
+    MnvH1D* diff = new MnvH1D(*data);
+
+    diff->Add(mc,-1);
+    MnvH1D* ratio = new MnvH1D(*diff); 
+    ratio->Scale(1/mc->Integral());
+    ratio->SetLineWidth(3);
+    ratio->SetLineColor(kRed);
+    ratio->SetFillColor(kWhite);
+    //ratio->SetFillStyle(3010);
+    ratio->SetFillStyle(0);
+
+    ratio->SetMinimum(0.0);
+    ratio->GetYaxis()->SetTitle("(Data-MC)/Area(MC)");
 
     TCanvas* c = new TCanvas("c","c",1280,800);
-    data->Draw("HIST");
+    ratio->Draw("HIST");
 
-    // Add Text
-    TLatex text;
-    text.SetNDC();
-    text.SetTextSize(0.03);
-    text.DrawLatex(0.60,0.85,Form("%s%3.2f", "Area(Data-MC) = ", data->Integral()));
-    
     // Save Plot 
     //gStyle->SetOptStat(0); 
     c->Update();
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_Diff.png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_Ratio.png"), "png");
 
     delete c;
     delete data;
     delete mc;
+    delete ratio;
+    delete diff;
     delete f_mc;
 }
 
@@ -2388,8 +2626,11 @@ void CCProtonPi0_Plotter::DrawDataMCSignal_Diff_2D(rootDir& dir, std::string var
     MnvH2D* data = GetBckgSubtractedData_2D(dir, var_name, nBckg);
     MnvH2D* mc = GetMnvH2D(f_mc, var);
     mc->Scale(POT_ratio);
-   
-    data->Add(mc,-1);
+ 
+    MnvH2D* diff = new MnvH2D (*data);
+    diff->Add(mc,-1);
+    MnvH2D* ratio = new MnvH2D (*diff);
+    ratio->Scale(1/mc->Integral());
    
     // Canvas
     Double_t w = 800; 
@@ -2402,20 +2643,21 @@ void CCProtonPi0_Plotter::DrawDataMCSignal_Diff_2D(rootDir& dir, std::string var
     p->Draw();
 
     p->cd();
-    data->GetYaxis()->SetTitleOffset(1.8);
-    data->SetMinimum(-50);
-    data->SetMaximum(50);
-    data->Draw("colz");
+    ratio->GetYaxis()->SetTitleOffset(1.8);
+    ratio->SetMinimum(0.0);
+    //ratio->SetMaximum(2.0);
+    ratio->Draw("colz");
     gPad->Update();
 
     gStyle->SetOptStat(0); 
     c->Update();
 
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_Diff.png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_Ratio.png"), "png");
 
     delete p;
     delete c;
 
+    delete ratio;
     delete data;
     delete mc;
     delete f_mc;
@@ -2496,12 +2738,19 @@ void CCProtonPi0_Plotter::ApplyStyle_Thesis()
     gStyle->SetPadTopMargin(0.09);
     gStyle->SetPadBottomMargin(0.15);
     gStyle->SetPadLeftMargin(0.15);
-    gStyle->SetPadRightMargin(0.15);
     gStyle->SetFrameLineWidth(2);
     gStyle->SetHistLineWidth(2);
 
-    gStyle->SetEndErrorSize(2);
-    gStyle->SetErrorX(0.5);
+    //gStyle->SetEndErrorSize(2);
+}
+
+void CCProtonPi0_Plotter::ApplyStyle_Legend(TLegend* legend)
+{
+    legend->SetBorderSize(0);
+    legend->SetFillColor(-1);
+    legend->SetFillStyle(0);
+    legend->SetTextFont(42);
+    legend->SetTextSize(0.04);
 }
 
 #endif

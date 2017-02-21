@@ -286,9 +286,12 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES_AreaNorm()
 void CCProtonPi0_Plotter::Draw_QSq_MaRES_Fit(bool isAreaNorm)
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
+ 
+    std::string data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_MaRES_Fit_XSecs/Data/Analyzed/CrossSection.root";
+    std::string mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_MaRES_Fit_XSecs/MC/Analyzed/CrossSection.root";
 
-    TFile* f_data = new TFile(rootDir_CrossSection.data.c_str());
-    TFile* f_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    TFile* f_data = new TFile(data_dir.c_str());
+    TFile* f_mc = new TFile(mc_dir.c_str());
 
     CCProtonPi0_QSqFitter QSqFitter;
     int ind = QSqFitter.GetMinChiSq(isAreaNorm);
@@ -304,7 +307,7 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES_Fit(bool isAreaNorm)
     if (isAreaNorm) norm_label = "Area"; 
     else norm_label = "POT"; 
 
-    TH1D* h_data_cv = GetBinNormalizedTH1D(data_cv);
+    TH1D* h_data_cv = GetBinNormalizedTH1D(data_cv, true);
     TH1D* h_mc_cv = GetBinNormalizedTH1D(mc_cv);
 
     // Best MaRES -- Lowest Global ChiSq
@@ -343,7 +346,7 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES_Fit(bool isAreaNorm)
     h_data_cv->SetMarkerStyle(20);
     h_data_cv->SetMarkerSize(1);
     h_data_cv->SetMarkerColor(kBlack);
-    h_data_cv->SetLineWidth(2);
+    h_data_cv->SetLineWidth(1);
     h_data_cv->SetLineColor(kBlack);
 
     h_mc_cv->SetLineWidth(3);
@@ -351,18 +354,40 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES_Fit(bool isAreaNorm)
     h_mc_cv->SetFillColor(kWhite);
 
     mc_best->SetLineWidth(3);
-    mc_best->SetLineColor(kGreen+2);
+    mc_best->SetLineColor(kBlue);
     mc_best->SetLineStyle(1);
     mc_best->SetFillColor(kWhite);
 
     data_best->SetMarkerStyle(20);
     data_best->SetMarkerSize(1);
     data_best->SetMarkerColor(kBlue);
-    data_best->SetLineWidth(2);
+    data_best->SetLineWidth(1);
     data_best->SetLineStyle(1);
     data_best->SetLineColor(kBlue);
 
-    TCanvas* c = new TCanvas("c","c",1280,800);
+    TCanvas* c = new TCanvas("c","c",640,480);
+
+    if (thesisStyle){
+        h_data_cv->GetXaxis()->SetTitleFont(62);
+        h_data_cv->GetXaxis()->SetTitleSize(0.06);
+        h_data_cv->GetXaxis()->CenterTitle();
+        h_data_cv->GetXaxis()->SetTitleOffset(1.15);
+        h_data_cv->GetXaxis()->SetLabelFont(42);
+        h_data_cv->GetXaxis()->SetLabelSize(0.05);
+        h_data_cv->GetXaxis()->SetNdivisions(408);
+
+        h_data_cv->GetYaxis()->SetTitleFont(62);
+        h_data_cv->GetYaxis()->SetTitleSize(0.06);
+        //h_data_cv->GetYaxis()->CenterTitle();
+        h_data_cv->GetYaxis()->SetTitleOffset(1.1);
+        h_data_cv->GetYaxis()->SetLabelFont(42);
+        h_data_cv->GetYaxis()->SetLabelSize(0.05);
+        TGaxis::SetMaxDigits(3);
+        
+        gStyle->SetEndErrorSize(4);
+        gStyle->SetStripDecimals(false);
+        gStyle->SetPadRightMargin(0.05);
+    }
 
     h_data_cv->SetMaximum(data_cv->GetMaximum()*1.5);
     h_data_cv->Draw("E1 X0");
@@ -370,27 +395,33 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES_Fit(bool isAreaNorm)
     data_best->Draw("E1 X0 SAME");
     mc_best->Draw("HIST SAME");
 
+    // Add Normalization Labels
+    TLatex text;
+    text.SetNDC();
+    text.SetTextColor(kBlue);
+    text.SetTextSize(0.03);
+    text.SetTextAlign(22);
+    text.DrawLatex(0.30,0.87,"POT Normalized");
+
     // TLegend
-    TLegend *legend = new TLegend(0.65,0.75,0.9,0.9);  
-    legend->AddEntry(h_data_cv, "CV Data d#sigma/dQ^{2}", "lep");
-    legend->AddEntry(h_mc_cv, "CV GENIE d#sigma/dQ^{2}", "l");
-    legend->AddEntry(data_best, "Best Data d#sigma/dQ^{2}", "lep");
-    legend->AddEntry(mc_best, "Best GENIE d#sigma/dQ^{2}", "l");
+    TLegend *legend = new TLegend(0.45,0.60,0.9,0.9);  
+    ApplyStyle_Legend(legend);
+    legend->AddEntry(h_data_cv, "Data (M_{A}^{RES} = 1.12 GeV)", "lep");
+    legend->AddEntry(h_mc_cv, "GENIE (M_{A}^{RES} = 1.12 GeV)", "l");
+    legend->AddEntry(data_best, "Data (M_{A}^{RES} = 1.50 GeV)", "lep");
+    legend->AddEntry(mc_best, "GENIE (M_{A}^{RES} = 1.50 GeV)", "l");
     legend->Draw();
  
     // Add Text
-    TLatex text;
-    text.SetNDC();
-    text.SetTextSize(0.03);
-    text.DrawLatex(0.65,0.66,Form("%s%3.2f%s", "GENIE MaRES = ", 1.12," GeV"));
-    text.DrawLatex(0.65,0.62,Form("%s%3.2f", "GENIE MaRES #chi^{2} = ", QSqFitter.ChiSqVector_up[0]));
-    text.DrawLatex(0.65,0.58,Form("%s%3.2f%s", "Best MaRES = ", QSqFitter.MaRESVector_up[ind]," GeV"));
-    text.DrawLatex(0.65,0.54,Form("%s%3.2f", "Best MaRES #chi^{2} = ", QSqFitter.ChiSqVector_up[ind]));
+    //text.DrawLatex(0.65,0.66,Form("%s%3.2f%s", "GENIE MaRES = ", 1.12," GeV"));
+    //text.DrawLatex(0.65,0.62,Form("%s%3.2f", "GENIE MaRES #chi^{2} = ", QSqFitter.ChiSqVector_up[0]));
+    //text.DrawLatex(0.65,0.58,Form("%s%3.2f%s", "Best MaRES = ", QSqFitter.MaRESVector_up[ind]," GeV"));
+    //text.DrawLatex(0.65,0.54,Form("%s%3.2f", "Best MaRES #chi^{2} = ", QSqFitter.ChiSqVector_up[ind]));
 
     // Save Plot 
     gStyle->SetOptStat(0); 
     c->Update();
-    c->Print(Form("%s%s_%s%s",plotDir.c_str(),"QSq_MaRES_Fit",norm_label.c_str(), ".png"), "png");
+    c->Print(Form("%s%s_%s%s",plotDir.c_str(),"QSq_MaRES_Fit",norm_label.c_str(), ".pdf"), "pdf");
 
     delete data_cv;
     delete data_best;
@@ -499,6 +530,119 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES_Fit_SB()
     delete f_mc;
 }
 
+void CCProtonPi0_Plotter::Draw_QSq_DeltaSuppression_v2(std::string var_name)
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    std::string data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/Data/Analyzed/CrossSection.root";
+    std::string mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/MC/Analyzed/CrossSection.root";
+
+    TFile* f_data_best = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_mc_best = new TFile(rootDir_CrossSection.mc.c_str());
+
+    TFile* f_data_cv = new TFile(data_dir.c_str());
+    TFile* f_mc_cv = new TFile(mc_dir.c_str());
+
+    // --------------------------------------------------------------------
+    // Get Histograms 
+    // --------------------------------------------------------------------
+    MnvH1D* data_cv = GetMnvH1D(f_data_cv, var_name);
+    MnvH1D* mc_cv = GetMnvH1D(f_mc_cv, var_name);
+  
+    TH1D* h_data_cv = GetBinNormalizedTH1D(data_cv);
+    TH1D* h_mc_cv = GetBinNormalizedTH1D(mc_cv);
+
+    MnvH1D* data_best = GetMnvH1D(f_data_best, var_name);
+    MnvH1D* mc_best = GetMnvH1D(f_mc_best, var_name);
+  
+    TH1D* h_data_best = GetBinNormalizedTH1D(data_best);
+    TH1D* h_mc_best = GetBinNormalizedTH1D(mc_best);
+
+    h_data_cv->SetMarkerStyle(20);
+    h_data_cv->SetMarkerSize(1);
+    h_data_cv->SetMarkerColor(kBlack);
+    h_data_cv->SetLineWidth(2);
+    h_data_cv->SetLineColor(kBlack);
+
+    h_mc_cv->SetLineWidth(3);
+    h_mc_cv->SetLineColor(kRed);
+    h_mc_cv->SetFillColor(kWhite);
+
+    h_data_best->SetMarkerStyle(20);
+    h_data_best->SetLineStyle(1);
+    h_data_best->SetMarkerSize(1);
+    h_data_best->SetMarkerColor(kBlue);
+    h_data_best->SetLineWidth(2);
+    h_data_best->SetLineColor(kBlue);
+
+    h_mc_best->SetLineWidth(3);
+    h_mc_best->SetLineStyle(1);
+    h_mc_best->SetLineColor(kBlue);
+    h_mc_best->SetFillColor(kWhite);
+    
+    TCanvas* c = new TCanvas("c","c",800,800);
+
+    if (thesisStyle){
+        h_data_cv->GetXaxis()->SetTitleFont(62);
+        h_data_cv->GetXaxis()->SetTitleSize(0.06);
+        h_data_cv->GetXaxis()->CenterTitle();
+        h_data_cv->GetXaxis()->SetTitleOffset(1.15);
+        h_data_cv->GetXaxis()->SetLabelFont(42);
+        h_data_cv->GetXaxis()->SetLabelSize(0.05);
+        h_data_cv->GetXaxis()->SetNdivisions(408);
+
+        h_data_cv->GetYaxis()->SetTitleFont(62);
+        h_data_cv->GetYaxis()->SetTitleSize(0.06);
+        //h_data_cv->GetYaxis()->CenterTitle();
+        h_data_cv->GetYaxis()->SetTitleOffset(1.1);
+        h_data_cv->GetYaxis()->SetLabelFont(42);
+        h_data_cv->GetYaxis()->SetLabelSize(0.05);
+        TGaxis::SetMaxDigits(3);
+    }
+
+    h_data_cv->SetMaximum(h_data_cv->GetMaximum()*1.75);
+    h_data_cv->SetMinimum(0.0);
+    h_data_cv->Draw("E1 X0");
+    h_mc_cv->Draw("HIST SAME");
+    h_data_best->Draw("E1 X0 SAME");
+    h_mc_best->Draw("HIST SAME");
+
+    // TLegend
+    TLegend *legend = new TLegend(0.50,0.70,0.9,0.9);  
+    legend->SetTextSize(0.03);
+    legend->AddEntry(h_data_cv, "CV Data d#sigma/dQ^{2}", "lep");
+    legend->AddEntry(h_mc_cv, "CV GENIE d#sigma/dQ^{2}", "l");
+    legend->AddEntry(h_data_best, "#Delta Supp. Data d#sigma/dQ^{2}", "lep");
+    legend->AddEntry(h_mc_best, "#Delta Supp. GENIE d#sigma/dQ^{2}", "l");
+    legend->Draw();
+
+    // Add Text
+    int nBins = h_data_cv->GetNbinsX();
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize(0.03);
+    text.DrawLatex(0.17,0.85,Form("%s%3.2f", "GENIE CV #chi^{2} = ", Calc_ChiSq(h_data_cv, h_mc_cv,1,nBins)));
+    text.DrawLatex(0.17,0.81,Form("%s%3.2f", "#Delta Supp. #chi^{2} = ", Calc_ChiSq(h_data_best, h_mc_best,1,nBins)));
+
+    // Save Plot 
+    gStyle->SetOptStat(0); 
+    c->Update();
+    std::string plot_name = var_name + "_DeltaSuppressed.png";
+    c->Print(Form("%s%s",plotDir.c_str(),plot_name.c_str()), "png");
+
+    delete h_data_cv;
+    delete data_cv;
+    delete h_data_best;
+    delete h_mc_cv;
+    delete mc_cv;
+    delete h_mc_best;
+    delete c;
+    delete f_data_cv;
+    delete f_data_best;
+    delete f_mc_cv;
+    delete f_mc_best;
+}
+
 void CCProtonPi0_Plotter::Draw_QSq_DeltaSuppression()
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
@@ -596,9 +740,9 @@ void CCProtonPi0_Plotter::Draw_QSq_DeltaSuppression()
     TLatex text;
     text.SetNDC();
     text.SetTextSize(0.03);
-    text.DrawLatex(0.55,0.66,Form("%s%3.2f", "GENIE CV #chi^{2} = ", Calc_ChiSq(h_data_cv, h_mc_cv,1,2)));
-    text.DrawLatex(0.55,0.62,Form("%s%3.2f", "#Delta Suppressed (MINOS) #chi^{2} = ", Calc_ChiSq(h_data_MINOS, h_mc_MINOS,1,2)));
-    text.DrawLatex(0.55,0.58,Form("%s%3.2f", "#Delta Suppressed (Best) #chi^{2} = ", Calc_ChiSq(h_data_Best, h_mc_Best,1,2)));
+    text.DrawLatex(0.55,0.66,Form("%s%3.2f", "GENIE CV #chi^{2} = ", Calc_ChiSq(h_data_cv, h_mc_cv,1,3)));
+    text.DrawLatex(0.55,0.62,Form("%s%3.2f", "#Delta Suppressed (MINOS) #chi^{2} = ", Calc_ChiSq(h_data_MINOS, h_mc_MINOS,1,3)));
+    text.DrawLatex(0.55,0.58,Form("%s%3.2f", "#Delta Suppressed (Best) #chi^{2} = ", Calc_ChiSq(h_data_Best, h_mc_Best,1,3)));
 
     // Save Plot 
     gStyle->SetOptStat(0); 

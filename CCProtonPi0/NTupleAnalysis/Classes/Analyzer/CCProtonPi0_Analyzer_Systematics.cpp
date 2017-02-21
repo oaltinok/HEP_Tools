@@ -664,12 +664,12 @@ std::vector<double> CCProtonPi0_Analyzer::GetDeltaFactorWeights()
     // Fill Delta Factor Weights
     //      First Element is MINOS Factor
     std::vector<double> weights;
-    double QSq_reco = m_QSq * MeVSq_to_GeVSq;
-    double deltaFactor = GetDeltaFactor(QSq_reco, A_MINOS, Q0_MINOS);
+    double QSq = truth_QSq_exp * MeVSq_to_GeVSq;
+    double deltaFactor = GetDeltaFactor(QSq, A_MINOS, Q0_MINOS);
     weights.push_back(deltaFactor);
 
     for (unsigned int i = 0; i < Q0_Vector.size(); ++i){
-        deltaFactor = GetDeltaFactor(QSq_reco, A, Q0_Vector[i]);
+        deltaFactor = GetDeltaFactor(QSq, A, Q0_Vector[i]);
         weights.push_back(deltaFactor);
     }
 

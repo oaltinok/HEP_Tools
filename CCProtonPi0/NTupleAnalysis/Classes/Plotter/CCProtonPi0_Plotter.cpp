@@ -57,7 +57,7 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotGENIEXSec();
     //UnfoldingStudy();
     //GENIE_Tuning_Study();
-    //Systematics();
+    Systematics();
     //W_Studies();
     //QSq_Studies();
     //Studies_2p2h();
@@ -226,26 +226,26 @@ void CCProtonPi0_Plotter::plotCrossSection_Check()
     plotDir = Folder_List::xsec_muon_P + Folder_List::plotDir_Check;
     plotCrossSection_Check("muon_P", plotDir);
 
-    //plotDir = Folder_List::xsec_muon_theta + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("muon_theta", plotDir);
+    plotDir = Folder_List::xsec_muon_theta + Folder_List::plotDir_Check;
+    plotCrossSection_Check("muon_theta", plotDir);
 
-    //plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("pi0_P", plotDir);
+    plotDir = Folder_List::xsec_pi0_P + Folder_List::plotDir_Check;
+    plotCrossSection_Check("pi0_P", plotDir);
 
-    //plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("pi0_KE", plotDir);
+    plotDir = Folder_List::xsec_pi0_KE + Folder_List::plotDir_Check;
+    plotCrossSection_Check("pi0_KE", plotDir);
 
-    //plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("pi0_theta", plotDir);
+    plotDir = Folder_List::xsec_pi0_theta + Folder_List::plotDir_Check;
+    plotCrossSection_Check("pi0_theta", plotDir);
 
-    //plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("QSq", plotDir);
+    plotDir = Folder_List::xsec_QSq + Folder_List::plotDir_Check;
+    plotCrossSection_Check("QSq", plotDir);
 
-    //plotDir = Folder_List::xsec_W + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("W", plotDir);
+    plotDir = Folder_List::xsec_W + Folder_List::plotDir_Check;
+    plotCrossSection_Check("W", plotDir);
 
-    //plotDir = Folder_List::xsec_Enu + Folder_List::plotDir_Check;
-    //plotCrossSection_Check("Enu", plotDir);
+    plotDir = Folder_List::xsec_Enu + Folder_List::plotDir_Check;
+    plotCrossSection_Check("Enu", plotDir);
 }
 
 void CCProtonPi0_Plotter::plotOtherStudies()
@@ -941,12 +941,16 @@ void CCProtonPi0_Plotter::plot_CV_weights()
     std::string plotDir = Folder_List::plotDir_Interaction;
 
     DrawStackedMC(rootDir_Interaction,"CV_weight",plotDir);
+    DrawStackedMC(rootDir_Interaction,"CV_weight_Flux",plotDir);
     DrawStackedMC(rootDir_Interaction,"CV_weight_2p2h",plotDir);
     DrawStackedMC(rootDir_Interaction,"CV_weight_Delta",plotDir);
     DrawStackedMC(rootDir_Interaction,"CV_weight_CCRES",plotDir);
     DrawStackedMC(rootDir_Interaction,"CV_weight_NonRes1pi",plotDir);
 
     DrawStackedMC(rootDir_Interaction,"err_2p2h",plotDir);
+
+    DrawStackedMC(rootDir_Interaction, "genie_wgt_VecFFCCQEshape", plotDir);
+    DrawStackedMC(rootDir_Interaction, "genie_wgt_NormDISCC", plotDir);
 
     DrawStackedMC(rootDir_Interaction,"genie_wgt_Theta_Delta2Npi",plotDir);
     DrawStackedMC(rootDir_Interaction,"updated_wgt_Theta_Delta2Npi",plotDir);
@@ -966,8 +970,11 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     std::cout<<"Plotting Interaction MC Only"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Interaction;
 
-    plot_SignalKinematics();
-    //plot_CV_weights();
+    //plot_SignalKinematics();
+    plot_CV_weights();
+
+    Draw2DHist(rootDir_Interaction,"Enu_flux_wgt",plotDir);
+    Draw2DHist(rootDir_Interaction,"Enu_cvweight",plotDir);
 
     //DrawStackedMC(rootDir_Interaction,"Enu",plotDir);
     //DrawStackedMC(rootDir_Interaction,"QSq",plotDir);
@@ -2333,8 +2340,8 @@ void CCProtonPi0_Plotter::PlotXSecVar(std::string var_name, std::string data_var
     // Rename for Error Summary
     data_var = "data_" + data_var;
     mc_var = "mc_" + mc_var;
-    DrawErrorSummary(data, data_var, plotDir);
-    DrawErrorSummary(mc, mc_var, plotDir);
+    DrawErrorSummary_PaperStyle(data, data_var, plotDir);
+    DrawErrorSummary_PaperStyle(mc, mc_var, plotDir);
 
     delete data;
     delete mc;
@@ -2348,7 +2355,7 @@ void CCProtonPi0_Plotter::PlotXSecVar_BeforeFSI(std::string var_name, std::strin
     TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
 
     std::string data_var = var_name + "_xsec";
-    std::string mc_var = var_name + "_xsec";
+    std::string mc_var = var_name + "_xsec_AfterFSI";
     std::string mc_var_BeforeFSI = var_name + "_xsec_BeforeFSI";
 
     MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
@@ -2359,7 +2366,8 @@ void CCProtonPi0_Plotter::PlotXSecVar_BeforeFSI(std::string var_name, std::strin
     mc->ClearAllErrorBands();
     mc_BeforeFSI->ClearAllErrorBands();
 
-    DrawDataMC_BeforeFSI(data, mc, mc_BeforeFSI, var_name, plotDir);
+    //DrawDataMC_BeforeFSI(data, mc, mc_BeforeFSI, var_name, plotDir);
+    DrawDataMC_PaperStyle(data, mc, mc_BeforeFSI, var_name, plotDir);
   
     delete data;
     delete mc;
@@ -2473,7 +2481,7 @@ void CCProtonPi0_Plotter::plotCrossSection()
     //plotOriginalData();
     //plotBackgroundEstimated();
     //plotBackgroundSubtracted();
-    plotUnfolded();
+    //plotUnfolded();
     //plotEfficiencyCorrected();
     //plotFluxIntegrated();
     plotXSec();
@@ -2506,16 +2514,16 @@ void CCProtonPi0_Plotter::Systematics()
     //Systematics_CheckErrorSummary(rootDir_CutHists.mc, "invMass_mc_reco_all");
     //Systematics_CheckErrorSummary(rootDir_CrossSection.mc, "invMass_mc_reco_all");
     
-    Systematics_XSec();
+    //Systematics_XSec();
     //Systematics_invMass();
     
     Systematics_WriteTables("muon_P");
-    Systematics_WriteTables("muon_theta");
-    Systematics_WriteTables("pi0_P");
-    Systematics_WriteTables("pi0_KE");
-    Systematics_WriteTables("pi0_theta");
-    Systematics_WriteTables("QSq");
-    Systematics_WriteTables("Enu");
+//    Systematics_WriteTables("muon_theta");
+//    Systematics_WriteTables("pi0_P");
+//    Systematics_WriteTables("pi0_KE");
+//    Systematics_WriteTables("pi0_theta");
+//    Systematics_WriteTables("QSq");
+//    Systematics_WriteTables("Enu");
    
 }
 
@@ -2648,13 +2656,21 @@ void CCProtonPi0_Plotter::QSq_Studies()
     
     // MaRES Fit
     //Draw_QSq_MaRES_Plots();
-    //Draw_QSq_MaRES_Fit(false); // POT
+    Draw_QSq_MaRES_Fit(false); // POT
     //Draw_QSq_MaRES_Fit(true); // Area
     //Draw_QSq_MaRES_AreaNorm();
     
     // Delta Suppression 
     //Draw_QSq_DeltaSuppression();
     //Draw_QSq_DeltaSuppression_AllPlots();
+    //Draw_QSq_DeltaSuppression_v2("muon_P_xsec");
+    //Draw_QSq_DeltaSuppression_v2("muon_theta_xsec");
+    //Draw_QSq_DeltaSuppression_v2("pi0_P_xsec");
+    //Draw_QSq_DeltaSuppression_v2("pi0_KE_xsec");
+    //Draw_QSq_DeltaSuppression_v2("pi0_theta_xsec");
+    //Draw_QSq_DeltaSuppression_v2("QSq_xsec");
+    //Draw_QSq_DeltaSuppression_v2("Enu_xsec");
+    //Draw_QSq_DeltaSuppression_v2("W_xsec");
 }
 
 double CCProtonPi0_Plotter::Calc_ChiSq_dof(double* data, double* expected, int nPoints, int nPars)
@@ -2768,7 +2784,6 @@ void CCProtonPi0_Plotter::Studies_2p2h()
     DrawDataMCSignal_Diff_2D(rootDir_Interaction, "W_QSq_1Track", plotDir, 1288.07);
     DrawDataMCSignal_Diff_2D(rootDir_Interaction, "W_QSq_2Track", plotDir, 1709.03);
     DrawDataMCSignal_Diff_2D(rootDir_Interaction, "W_QSq_All", plotDir, 2997.1);
-
 }
 
 #endif

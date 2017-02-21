@@ -7,7 +7,7 @@ using namespace std;
 
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
-    applyMaxEvents = false;
+    applyMaxEvents = false; 
     nMaxEvents = 100;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
@@ -16,6 +16,8 @@ void CCProtonPi0_Analyzer::specifyRunTime()
     isScanRun = false;
     fillErrors_ByHand = true; // Affects only Vertical Error Bands - Lateral Bands always filled ByHand
     
+    applyGENIETuning_DeltaSuppression = false;
+
     applyGENIETuning_Delta = true;
     reduce_err_Delta = true;
     
@@ -114,7 +116,7 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         counter4.isCounted = false;
 
         // Update scanFileName if running for scan
-        if(isScanRun) UpdateScanFileName();
+        //if(isScanRun) UpdateScanFileName();
 
         // Progress Message on Terminal
         int msg_entry;
@@ -242,7 +244,7 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         interaction.isErrHistFilled_MuonTracking = false;
 
         // Update scanFileName if running for scan
-        if(isScanRun) UpdateScanFileName();
+        //if(isScanRun) UpdateScanFileName();
 
         CalcEventWeight();
         Calc_EventKinematics();
@@ -270,33 +272,37 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             if (m_isMC){
                 FillLatErrorBands_ByHand();
             }
-        }else{
-            // Fill Reconstructed Information
-            fillInteractionReco();
-            fillMuonReco();
-            fillPi0Reco();
-            fillPi0BlobReco();
-            if(nProtonCandidates > 0) fillProtonReco();
+        }
 
-            // Fill Truth Information if Exist and Set Errors
-            if( m_isMC ){
-                fillInteractionMC();
-                fillMuonMC();
-                if(nProtonCandidates > 0) fillProtonMC();
-                fillPi0MC();
-                fillPi0BlobMC();
-            }
+        // Fill Reconstructed Information
+        fillInteractionReco();
+        fillMuonReco();
+        fillPi0Reco();
+        fillPi0BlobReco();
+        if(nProtonCandidates > 0) fillProtonReco();
+
+        // Fill Truth Information if Exist and Set Errors
+        if( m_isMC ){
+            fillInteractionMC();
+            fillMuonMC();
+            if(nProtonCandidates > 0) fillProtonMC();
+            fillPi0MC();
+            fillPi0BlobMC();
         }
 
         //--------------------------------------------------------------------------
         // Studies during for loop
         //--------------------------------------------------------------------------
         if (writeFSParticleMomentum) writeFSParticle4P(jentry);
- 
+        if ( isScanRun && nProtonCandidates > 0 && pi0_KE > 400) {
+            writeScanFile(); 
+        }
+
+        //Study_Flux();
         //Study_BckgSubtraction();
         //Study_W();
         //Study_QSq();
-        //Study_2p2h();
+        Study_2p2h();
         //Study_ProtonSystematics();
         //Study_GENIE_Weights();
         //Study_DeltaResonance();
@@ -1053,6 +1059,7 @@ void CCProtonPi0_Analyzer::fillInteractionMC()
 void CCProtonPi0_Analyzer::fillInteractionReco()
 {
     FillHistogram(interaction.CV_weight, cvweight);
+    FillHistogram(interaction.CV_weight_Flux, cvweight_Flux);
     FillHistogram(interaction.CV_weight_2p2h, cvweight_2p2h);
     FillHistogram(interaction.CV_weight_Delta, cvweight_Delta);
     FillHistogram(interaction.CV_weight_CCRES, cvweight_CCRES);
@@ -1060,7 +1067,13 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
 
     FillHistogram(interaction.err_2p2h, 1-err_2p2h);
     FillHistogram(interaction.err_2p2h, 1+err_2p2h);
-    
+
+    FillHistogram(interaction.genie_wgt_VecFFCCQEshape, truth_genie_wgt_VecFFCCQEshape[2]);
+    FillHistogram(interaction.genie_wgt_VecFFCCQEshape, truth_genie_wgt_VecFFCCQEshape[4]);
+
+    FillHistogram(interaction.genie_wgt_NormDISCC, truth_genie_wgt_NormDISCC[2]);
+    FillHistogram(interaction.genie_wgt_NormDISCC, truth_genie_wgt_NormDISCC[4]);
+
     FillHistogram(interaction.genie_wgt_Theta_Delta2Npi, truth_genie_wgt_Theta_Delta2Npi[2]);
     FillHistogram(interaction.genie_wgt_Theta_Delta2Npi, truth_genie_wgt_Theta_Delta2Npi[4]);
 
@@ -1149,14 +1162,21 @@ double CCProtonPi0_Analyzer::calcDeltaInvariantMass()
 void CCProtonPi0_Analyzer::writeScanFile()
 {
     if(isScanRun){
+        //// Constants for Roundup List
+        //const string arachne_html = "http://minerva05.fnal.gov/Arachne/arachne.html?filename=";
+        //const string entryString  = "&entry=";
+        //const string other        = "&slice=-1&filetype=dst";
+        ////http://minerva05.fnal.gov/Arachne/arachne.html?det=MV&recoVer=v10r6p13&run=3596&subrun=6&gate=597&slice=7
+        //roundupText<<arachne_html<<scanFileName<<entryString<<truth_eventID<<other<<" ";
+        //roundupText<<mc_run<<" ^ "<<mc_subrun<<" ^ "<<ev_gate<<" ^ "<<mc_incomingE<<endl;
 
+
+        //http://minerva05.fnal.gov/Arachne/arachne.html?det=MV&recoVer=v10r8p4&run=2000&subrun=2&gate=179&slice=-1
         // Constants for Roundup List
-        const string arachne_html = "http://minerva05.fnal.gov/Arachne/arachne.html?filename=";
-        const string entryString  = "&entry=";
-        const string other        = "&slice=-1&filetype=dst";
-        //http://minerva05.fnal.gov/Arachne/arachne.html?det=MV&recoVer=v10r6p13&run=3596&subrun=6&gate=597&slice=7
-        roundupText<<arachne_html<<scanFileName<<entryString<<truth_eventID<<other<<" ";
-        roundupText<<mc_run<<" ^ "<<mc_subrun<<" ^ "<<ev_gate<<" ^ "<<mc_incomingE<<endl;
+        const string arachne_html = "http://minerva05.fnal.gov/Arachne/arachne.html?det=MV&recoVer=v10r8p4";
+        roundupText<<arachne_html<<"&run="<<ev_run<<"&subrun="<<ev_subrun<<"&gate="<<ev_gate<<"&slice="<<slice_numbers[0]<<" ";
+        roundupText<<ev_run<<" | "<<ev_subrun<<" | "<<ev_gate<<" "<<gamma1_E<<" "<<gamma2_E<<endl;
+
     }else{
         cout<<"WARNING! ScanRun is NOT Activated! Are you sure what you are doing?"<<endl;    
     }
@@ -1191,14 +1211,14 @@ void CCProtonPi0_Analyzer::openTextFiles()
         temp_fName = Folder_List::output + Folder_List::textOut + "ArachneRoundup.txt";
         OpenTextFile(temp_fName, roundupText);
 
-        std::string playlistDST = "Input/Playlists/pl_Scan.dat";
-        DSTFileList.open( playlistDST.c_str() );
-        if( !DSTFileList.is_open() ){
-            cerr<<"Cannot open input text file: "<<playlistDST<<endl;
-            exit(1);
-        }else{
-            cout<<"\t"<<playlistDST<<endl;
-        }
+        //std::string playlistDST = "Input/Playlists/pl_Scan.dat";
+        //DSTFileList.open( playlistDST.c_str() );
+        //if( !DSTFileList.is_open() ){
+            //cerr<<"Cannot open input text file: "<<playlistDST<<endl;
+            //exit(1);
+        //}else{
+            //cout<<"\t"<<playlistDST<<endl;
+        //}
     }
 
     cout<<"Done!"<<endl;
@@ -1877,6 +1897,7 @@ void CCProtonPi0_Analyzer::CalcEventWeight()
 
         // Reset cvweight
         cvweight = 1.0;
+        cvweight_Flux = 1.0;
         cvweight_Delta = 1.0;
         cvweight_CCRES = 1.0;
         cvweight_NonRes1pi = 1.0;
@@ -1885,7 +1906,8 @@ void CCProtonPi0_Analyzer::CalcEventWeight()
         UpdateFluxReweighter(mc_run, mc_intType); 
 
         // Replace cvweight with Flux Weight
-        cvweight = GetFluxWeight(mc_incomingE * MeV_to_GeV, mc_incoming);
+        cvweight_Flux = GetFluxWeight(mc_incomingE * MeV_to_GeV, mc_incoming);
+        cvweight *= cvweight_Flux;
 
         // Update cvweight with MINOS Efficiency Correction
         const double minos_eff_correction = GetMINOSCorrection();
@@ -1922,6 +1944,13 @@ void CCProtonPi0_Analyzer::CalcEventWeight()
             cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvn1pi[2] - 1); // From Phil R.
             cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvp1pi[2] - 1); // From Phil R.
             cvweight *= cvweight_NonRes1pi;
+        }
+
+        if ( applyGENIETuning_DeltaSuppression && IsGenieCCRes() ){
+            // Delta Suppression Factor
+            double QSq = truth_QSq_exp * MeVSq_to_GeVSq;
+            cvweight_CCRES *= GetDeltaFactor(QSq, DeltaFactor_A, DeltaFactor_Q0);
+            cvweight *= cvweight_CCRES;
         }
 
         UpdateGENIESystematics();
@@ -2670,10 +2699,10 @@ void CCProtonPi0_Analyzer::Study_ProtonSystematics()
 void CCProtonPi0_Analyzer::setCounterNames()
 {
     // Single Use Counters 
-    counter1.setName("Events(Enu>10)");
-    counter2.setName("Events(Enu<10)");
-    counter3.setName("Events(All)");
-    counter4.setName("N(Other)");
+    counter1.setName("LowAngle(QSq < 0.6)");
+    counter2.setName("LowAngle(QSq > 0.6)");
+    counter3.setName("HighAngle(QSq < 0.6))");
+    counter4.setName("HighAngle(QSq > 0.6)");
 
     n2p2h.setName("N(2p2h)");
     for (int i = 0; i < 3; ++i){
@@ -3038,6 +3067,13 @@ void CCProtonPi0_Analyzer::Study_2p2h()
         FillHistogram(interaction.q3_q0_2Track, q3_reco, q0_reco);    
         FillHistogram(interaction.W_QSq_2Track, W_reco, QSq_reco);    
     }
+}
+
+void CCProtonPi0_Analyzer::Study_Flux()
+{
+    double Enu = mc_incomingE * MeV_to_GeV;
+    FillHistogram(interaction.Enu_flux_wgt, Enu, cvweight_Flux);
+    FillHistogram(interaction.Enu_cvweight, Enu, cvweight);
 }
 
 #endif //CCProtonPi0_Analyzer_cpp

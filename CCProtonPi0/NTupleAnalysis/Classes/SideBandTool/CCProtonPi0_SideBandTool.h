@@ -13,6 +13,7 @@
 #include "TLegend.h"
 #include "TStyle.h"
 #include "TLine.h"
+#include "TArrow.h"
 #include "TMinuit.h"
 #include <PlotUtils/MnvPlotter.h>
 

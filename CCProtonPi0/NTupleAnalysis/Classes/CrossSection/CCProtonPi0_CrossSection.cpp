@@ -45,7 +45,17 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection(QSq);   
     Calc_CrossSection(W);   
     Calc_CrossSection(Enu);   
- 
+  
+    // After FSI Cross Section Calculation
+    Calc_CrossSection_AfterFSI(muon_P);   
+    Calc_CrossSection_AfterFSI(muon_theta);   
+    Calc_CrossSection_AfterFSI(pi0_P);   
+    Calc_CrossSection_AfterFSI(pi0_KE);   
+    Calc_CrossSection_AfterFSI(pi0_theta);   
+    Calc_CrossSection_AfterFSI(QSq);   
+    Calc_CrossSection_AfterFSI(W);   
+    Calc_CrossSection_AfterFSI(Enu);   
+
     // Before FSI Cross Section Calculation
     Calc_CrossSection_BeforeFSI(muon_P);   
     Calc_CrossSection_BeforeFSI(muon_theta);   
@@ -97,6 +107,23 @@ void CCProtonPi0_CrossSection::Calc_CrossSection(XSec &var)
  
     AddLabels_XSecHist(var);
     Scale_XSecHist(var.xsec, var.smallest_bin_width);
+
+    std::cout<<"Done!"<<std::endl;
+    std::cout<<"-----------------------------------------------------------------------"<<std::endl;
+}
+
+void CCProtonPi0_CrossSection::Calc_CrossSection_AfterFSI(XSec &var)
+{
+    std::cout<<"\n-----------------------------------------------------------------------"<<std::endl;
+    std::cout<<"Calculating Cross Section for "<<var.name<<" After FSI"<<std::endl;
+
+    // Integrate Flux
+    var.flux_integrated_AfterFSI = Integrate_Flux(var.efficiency_corrected_AfterFSI, var.name, "_flux_integrated_AfterFSI");
+    
+    // Calculate Final Cross Section
+    var.xsec_AfterFSI = Calc_FinalCrossSection(var.flux_integrated_AfterFSI, var.name, "_xsec_AfterFSI"); 
+ 
+    Scale_XSecHist(var.xsec_AfterFSI, var.smallest_bin_width);
 
     std::cout<<"Done!"<<std::endl;
     std::cout<<"-----------------------------------------------------------------------"<<std::endl;
@@ -415,8 +442,15 @@ MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_correct
     // Divide by total integral except Enu
     // Enu divided bin by bin
     if (var_name.compare("Enu") == 0 ){
-        std::cout<<"Flux Integration for Neutrino Energy!"<<std::endl; 
-        flux_integrated->Divide(data_efficiency_corrected, h_flux_rebinned);
+        std::size_t isBeforeFSI = hist_name.find("BeforeFSI");
+        std::size_t isAfterFSI = hist_name.find("AfterFSI");
+        if (isBeforeFSI == std::string::npos && isAfterFSI == std::string::npos){
+            std::cout<<"Flux Integration for Neutrino Energy!"<<std::endl; 
+            flux_integrated->Divide(data_efficiency_corrected, h_flux_rebinned);
+        }else{
+            std::cout<<"Flux Integration for Neutrino Energy with Fine Binning!"<<std::endl; 
+            flux_integrated->Divide(data_efficiency_corrected, h_flux_rebinned_BeforeFSI);
+        }
     }else{
         // Scale All Universes with Central Value
         flux_integrated->Scale(1/cv_flux_integral);
@@ -577,9 +611,14 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
     var.eff->SetName(hist_name.c_str());
     var.eff->Divide(var.mc_truth_signal, var.mc_truth_all_signal);
 
+    // All Signal After FSI is on Truth File
+    hist_name = var.name + "_mc_truth_all_signal_AfterFSI";
+    var.efficiency_corrected_AfterFSI = GetMnvH1D(f_truth, hist_name);
+
     // All Signal Before FSI is on Truth File
     hist_name = var.name + "_mc_truth_all_signal_BeforeFSI";
     var.efficiency_corrected_BeforeFSI = GetMnvH1D(f_truth, hist_name);
+   
     for (int i = 0; i < nFSIType; ++i){
         hist_name = var.name + "_mc_truth_all_signal_FSIType_" + std::to_string((long long int)i);
         var.efficiency_corrected_FSIType[i] = GetMnvH1D(f_truth, hist_name);
@@ -601,6 +640,7 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
         var.mc_truth_all_signal->ClearAllErrorBands();
         var.mc_truth_signal->ClearAllErrorBands();
         var.eff->ClearAllErrorBands();
+        var.efficiency_corrected_AfterFSI->ClearAllErrorBands();
         var.efficiency_corrected_BeforeFSI->ClearAllErrorBands();
         for (int i = 0; i < nFSIType; ++i){
             var.efficiency_corrected_FSIType[i]->ClearAllErrorBands();
@@ -642,6 +682,9 @@ void CCProtonPi0_CrossSection::AddErrorBands_FluxHistogram()
     // Flux Histogram have only Flux Error Bands -- Other Error Bands are added and filled with CV
     AddVertErrorBands_FluxHistogram(h_flux_rebinned);
     AddLatErrorBands_FluxHistogram(h_flux_rebinned);
+
+    AddVertErrorBands_FluxHistogram(h_flux_rebinned_BeforeFSI);
+    AddLatErrorBands_FluxHistogram(h_flux_rebinned_BeforeFSI);
 }
 
 void CCProtonPi0_CrossSection::IntegrateAllFluxUniverses()
@@ -668,7 +711,9 @@ void CCProtonPi0_CrossSection::IntegrateAllFluxUniverses()
 
 void CCProtonPi0_CrossSection::RebinFluxHistogram()
 {
+    // ------------------------------------------------------------------------
     // Create an empty MnvH1D and Fill it with Central Value 
+    // ------------------------------------------------------------------------
     h_flux_rebinned = new MnvH1D( "h_flux_rebinned","Flux (rebinned)", binList.size_Enu, binList.a_Enu);
     h_flux_rebinned->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     h_flux_rebinned->GetYaxis()->SetTitle("#nu_{#mu} s/cm^{2}/P.O.T./GeV");
@@ -691,11 +736,14 @@ void CCProtonPi0_CrossSection::RebinFluxHistogram()
     if (rebinned_flux_err_unv.size() != reference_flux_err_unv.size()){
         RunTimeError("h_flux_rebinned have wrong N(Universes) in Flux Error Band");
     }
+
     for (unsigned int unv = 0; unv < reference_flux_err_unv.size(); ++unv){
         RebinFluxHistogram(rebinned_flux_err_unv[unv], reference_flux_err_unv[unv]); 
     }
 
+    // ------------------------------------------------------------------------
     // Check Rebinned Flux Histogram Integrals -- For Testing
+    // ------------------------------------------------------------------------
     text_out<<"Testing! -- Rebinned Flux Integrals"<<std::endl;
     // Integrate for Central Value
     text_out<<"Signal Region Flux Integrals"<<std::endl;    
@@ -709,6 +757,17 @@ void CCProtonPi0_CrossSection::RebinFluxHistogram()
         text_out<<"\tFlux Unv "<<i<<" = "<<temp_integral<<std::endl;
     }
 
+    // ------------------------------------------------------------------------
+    // Before and After FSI -- Fine Binned Simulation
+    // ------------------------------------------------------------------------
+    h_flux_rebinned_BeforeFSI = new MnvH1D( "h_flux_rebinned_BeforeFSI","Flux (rebinned_BeforeFSI)", 20, 0.0, 10.0);
+    h_flux_rebinned_BeforeFSI->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    h_flux_rebinned_BeforeFSI->GetYaxis()->SetTitle("#nu_{#mu} s/cm^{2}/P.O.T./GeV");
+
+    RebinFluxHistogram_BeforeFSI(h_flux_rebinned_BeforeFSI, h_flux_minervaLE_FHC);
+
+    // Add Flux error band and fill with CV
+    h_flux_rebinned_BeforeFSI->AddVertErrorBandAndFillWithCV("Flux", reference_flux_err_unv.size());
 }
 
 void CCProtonPi0_CrossSection::RebinFluxHistogram(TH1* rebinned, TH1* reference)
@@ -720,6 +779,14 @@ void CCProtonPi0_CrossSection::RebinFluxHistogram(TH1* rebinned, TH1* reference)
         double content = GetFluxHistContent(reference,low,up);
         double bin_width = rebinned->GetBinWidth(i);
         rebinned->SetBinContent(i,content/bin_width);
+    }
+}
+
+void CCProtonPi0_CrossSection::RebinFluxHistogram_BeforeFSI(TH1* rebinned, TH1* reference)
+{
+    for (int i = 1; i <= 20; i++){
+        double flux = reference->GetBinContent(i);
+        rebinned->SetBinContent(i,flux);
     }
 }
 
@@ -741,6 +808,9 @@ void CCProtonPi0_CrossSection::writeHistograms(XSec &var)
     var.efficiency_corrected->SetNormBinWidth(var.smallest_bin_width);
     var.efficiency_corrected->Write();
 
+    var.efficiency_corrected_AfterFSI->SetNormBinWidth(var.smallest_bin_width);
+    var.efficiency_corrected_AfterFSI->Write();
+
     var.efficiency_corrected_BeforeFSI->SetNormBinWidth(var.smallest_bin_width);
     var.efficiency_corrected_BeforeFSI->Write();
     
@@ -755,6 +825,9 @@ void CCProtonPi0_CrossSection::writeHistograms(XSec &var)
 
     var.flux_integrated->SetNormBinWidth(var.smallest_bin_width);
     var.flux_integrated->Write();
+  
+    var.flux_integrated_AfterFSI->SetNormBinWidth(var.smallest_bin_width);
+    var.flux_integrated_AfterFSI->Write();
  
     var.flux_integrated_BeforeFSI->SetNormBinWidth(var.smallest_bin_width);
     var.flux_integrated_BeforeFSI->Write();
@@ -769,6 +842,7 @@ void CCProtonPi0_CrossSection::writeHistograms(XSec &var)
     }
  
     var.xsec->Write();
+    var.xsec_AfterFSI->Write();
     var.xsec_BeforeFSI->Write();
 
     for (int i = 0; i < nFSIType; ++i){
@@ -805,6 +879,7 @@ void CCProtonPi0_CrossSection::writeHistograms()
 
     h_flux_minervaLE_FHC->Write();
     h_flux_rebinned->Write();
+    h_flux_rebinned_BeforeFSI->Write();
 
     // Pi0 Invariant Mass
     invMass_all->Write();

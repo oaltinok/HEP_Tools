@@ -1,24 +1,18 @@
-CCPROTONPI0_V="v3_07"
+CCPROTONPI0_V="v3_08"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
 	No major changes
 
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Thesis Style Plots
-		Major changes to Plot Styles
-			Square Plots
-			Larger Fonts
-			No Statistics Box
-			No unnecessary text on plots		
-			Corrected Axis Titles
-			etc..
+	CC-RES Suppression Event Reweighing
+		Turned off by default
 
-	Studies Cont’d
-		ROOT Fitter for QSq Enu Fits
-			Thanks to Trung
-	
-		Disabled all QSq Study Functions
+	Plot styles exactly matched with 
+        PRD 94, 052005 (2016) 
+
+	TruthAnalyzer
+		BeforeFSI and After FSI using finer binning
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

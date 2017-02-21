@@ -286,6 +286,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         std::vector<int> GetPrimaryParticles();
         void Study_BckgSubtraction();
         void Study_W();
+        void Study_Flux();
         void Study_QSq();
         void Study_DeltaResonance();
         void Study_2p2h();
@@ -371,6 +372,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         bool isScanRun;
         bool isDataAnalysis;
         bool applyGENIETuning_Delta;
+        bool applyGENIETuning_DeltaSuppression;
         bool applyGENIETuning_NonRes;
         bool reduce_err_Delta;
         bool reduce_err_MaRES;
@@ -397,6 +399,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double EM_Data_peak;
         double EM_correction;
         double cvweight;
+        double cvweight_Flux;
         double cvweight_Delta;
         double cvweight_CCRES;
         double cvweight_NonRes1pi;

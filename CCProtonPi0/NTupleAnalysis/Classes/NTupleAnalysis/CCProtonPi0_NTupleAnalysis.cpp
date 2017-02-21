@@ -6,7 +6,7 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "DeltaSupp";
+const std::string CCProtonPi0_NTupleAnalysis::version = "DeltaSuppressed";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
@@ -54,6 +54,9 @@ const double CCProtonPi0_NTupleAnalysis::deuteriumNonResNorm     = 0.46;
 const double CCProtonPi0_NTupleAnalysis::deuteriumNonResNorm1sig = 0.04;
 const double CCProtonPi0_NTupleAnalysis::deuteriumResNorm        = 1.15;
 const double CCProtonPi0_NTupleAnalysis::deuteriumResNorm1sig    = 0.07;
+// Delta Suppression
+const double CCProtonPi0_NTupleAnalysis::DeltaFactor_A = 1.0;
+const double CCProtonPi0_NTupleAnalysis::DeltaFactor_Q0 = 0.116;
 
 // Flux Correction
 const bool CCProtonPi0_NTupleAnalysis::applyNuEConstraint = true;

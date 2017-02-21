@@ -38,6 +38,11 @@ void CCProtonPi0_Interaction::initHistograms()
     MnvH2D* temp2D = NULL;
 
     for (int i = 0; i < nHistograms; i++){
+        temp = new MnvH1D( Form("%s_%d","CV_weight_Flux",i),"Central Value Weight -- Flux", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("Central Value Weight -- Flux");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        CV_weight_Flux.push_back(temp);
+
         temp = new MnvH1D( Form("%s_%d","CV_weight_2p2h",i),"Central Value Weight -- 2p2h", 80,0.0,2.0);
         temp->GetXaxis()->SetTitle("Central Value Weight -- 2p2h");
         temp->GetYaxis()->SetTitle("N(Events)");
@@ -67,6 +72,17 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("2p2h 1#sigma Weights");
         temp->GetYaxis()->SetTitle("N(Events)");
         err_2p2h.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","genie_wgt_VecFFCCQEshape",i),"VecFFCCQEshape GENIE 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("VecFFCCQEshape GENIE 1#sigma Weights");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        genie_wgt_VecFFCCQEshape.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","genie_wgt_NormDISCC",i),"NormDISCC GENIE 1#sigma Weights", 80,0.0,2.0);
+        temp->GetXaxis()->SetTitle("NormDISCC GENIE 1#sigma Weights");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        genie_wgt_NormDISCC.push_back(temp);
+
 
         temp = new MnvH1D( Form("%s_%d","genie_wgt_Theta_Delta2Npi",i),"Theta_Delta2Npi GENIE 1#sigma Weights", 80,0.0,2.0);
         temp->GetXaxis()->SetTitle("Theta_Delta2Npi GENIE 1#sigma Weights");
@@ -380,6 +396,13 @@ void CCProtonPi0_Interaction::initHistograms()
     resID_theta->GetXaxis()->SetTitle("RES ID");
     resID_theta->GetYaxis()->SetTitle("N(Events)");
 
+    Enu_flux_wgt = new TH2D( "Enu_flux_wgt","Data All E_{#nu}", binList.size_Enu, binList.a_Enu, 20, 0.0, 2.0);
+    Enu_flux_wgt->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_flux_wgt->GetYaxis()->SetTitle("wgt(Flux)");
+
+    Enu_cvweight = new TH2D( "Enu_cvweight","Data All E_{#nu}", binList.size_Enu, binList.a_Enu, 20, 0.0, 2.0);
+    Enu_cvweight->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_cvweight->GetYaxis()->SetTitle("cvweight");
 
     // Cross Section Variables
     QSq_all = new MnvH1D( "QSq_all","Data All Q^{2}", binList.size_QSq, binList.a_QSq);
@@ -417,36 +440,36 @@ void CCProtonPi0_Interaction::initHistograms()
     AddLatErrorBands_MC(QSq_response);
 
     Enu_all = new MnvH1D( "Enu_all","Data All E_{#nu}", binList.size_Enu, binList.a_Enu);
-    Enu_all->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_all->GetXaxis()->SetTitle("E_{#nu} (GeV)");
     Enu_all->GetYaxis()->SetTitle("N(Events)");
 
     Enu_mc_truth_signal = new MnvH1D( "Enu_mc_truth_signal","MC Truth Signal E_{#nu}", binList.size_Enu, binList.a_Enu);
-    Enu_mc_truth_signal->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_mc_truth_signal->GetXaxis()->SetTitle("E_{#nu} (GeV)");
     Enu_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(Enu_mc_truth_signal);
     AddLatErrorBands_MC(Enu_mc_truth_signal);
 
     Enu_mc_reco_all = new MnvH1D( "Enu_mc_reco_all","MC All Reconstructed E_{#nu}", binList.size_Enu, binList.a_Enu);
-    Enu_mc_reco_all->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_mc_reco_all->GetXaxis()->SetTitle("E_{#nu} (GeV)");
     Enu_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(Enu_mc_reco_all);
     AddLatErrorBands_MC(Enu_mc_reco_all);
 
     Enu_mc_reco_signal = new MnvH1D( "Enu_mc_reco_signal","MC Reconstructed Signal E_{#nu}", binList.size_Enu, binList.a_Enu);
-    Enu_mc_reco_signal->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_mc_reco_signal->GetXaxis()->SetTitle("E_{#nu} (GeV)");
     Enu_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(Enu_mc_reco_signal);
     AddLatErrorBands_MC(Enu_mc_reco_signal);
 
     Enu_mc_reco_bckg = new MnvH1D( "Enu_mc_reco_bckg","MC Reconstructed Background E_{#nu}", binList.size_Enu, binList.a_Enu);
-    Enu_mc_reco_bckg->GetXaxis()->SetTitle("E_{#nu} [GeV]");
+    Enu_mc_reco_bckg->GetXaxis()->SetTitle("E_{#nu} (GeV)");
     Enu_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_MC(Enu_mc_reco_bckg);
     AddLatErrorBands_MC(Enu_mc_reco_bckg);
 
     Enu_response = new MnvH2D( "Enu_response","Signal E_{#nu}", binList.size_Enu, binList.a_Enu, binList.size_Enu, binList.a_Enu);
-    Enu_response->GetXaxis()->SetTitle("Reconstructed E_{#nu} [GeV]");
-    Enu_response->GetYaxis()->SetTitle("True E_{#nu} [GeV]");
+    Enu_response->GetXaxis()->SetTitle("Reconstructed E_{#nu} (GeV)");
+    Enu_response->GetYaxis()->SetTitle("True E_{#nu} (GeV)");
     AddVertErrorBands_MC(Enu_response);
     AddLatErrorBands_MC(Enu_response);
 
@@ -1033,11 +1056,14 @@ void CCProtonPi0_Interaction::writeHistograms()
 
     for (int i = 0; i < nHistograms; i++){
         CV_weight[i]->Write();
+        CV_weight_Flux[i]->Write();
         CV_weight_2p2h[i]->Write();
         CV_weight_Delta[i]->Write();
         CV_weight_CCRES[i]->Write();
         CV_weight_NonRes1pi[i]->Write();
         err_2p2h[i]->Write();
+        genie_wgt_VecFFCCQEshape[i]->Write();
+        genie_wgt_NormDISCC[i]->Write();
         genie_wgt_Theta_Delta2Npi[i]->Write();
         updated_wgt_Theta_Delta2Npi[i]->Write();
         genie_wgt_MaRES[i]->Write();
@@ -1299,6 +1325,10 @@ void CCProtonPi0_Interaction::writeHistograms()
     Err_NeutronResponse->Write();
     Err_PionResponse->Write();
     Err_MuonTracking->Write();
+
+    // Flux Study
+    Enu_flux_wgt->Write();
+    Enu_cvweight->Write();
 
     f->Close();
 }
