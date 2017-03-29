@@ -234,6 +234,12 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         std::vector<double> muonP_random_shifts;
         std::vector<double> muon_theta_random_shifts;
         std::vector< std::vector<double> > Birks_random_shifts2D;
+        
+        // Delta RES - Polarization
+        double m_delta_pi_theta_reco;
+        double m_delta_pi_theta_true;
+        double m_delta_pi_phi_reco;
+        double m_delta_pi_phi_true;
 
         // Proton Systematics
         void FillProtonEnergyShiftVector(std::vector<double> &energy_shifts, Double_t shifts[10]);
@@ -253,7 +259,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void AddErrorBands_Data();
         double GetMINOSCorrection();
         void GetDeltaPolarization();
-        void GetDelta_pi_angles();
+        void GetDelta_pi_angles(bool isTruth);
         void GetDeltaTransverse();
         TVector3 GetNeutrinoCrossMuon(bool isTruth);
         TLorentzVector GetDelta4P(bool isTruth);
@@ -266,7 +272,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         bool isMother_DIS_Fragment(int ind);
         void fillInteractionMC();
         void fillInteractionReco();
-        double calcDeltaInvariantMass();
+        double calcDeltaInvariantMass(bool isTruth = false);
         int GetEjectedNucleonCount();
         double Calc_q3();
         double Calc_Enu();

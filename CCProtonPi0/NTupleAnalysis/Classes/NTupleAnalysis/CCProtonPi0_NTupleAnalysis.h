@@ -10,6 +10,7 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 ================================================================================
 */
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstdlib>
 #include <string>
@@ -135,6 +136,7 @@ class CCProtonPi0_NTupleAnalysis
         void OpenTextFile(std::string file_name, std::ofstream &file);
         std::string GetPlaylist(const int run, int type);
         void printBins(const TH1* hist, const std::string var_name, bool useLowEdge = false);
+        void printBins(const TH2* hist, const std::string var_name);
         void RunTimeError(std::string message);
 
         // Returns a "new" MnvH1D or MnvH2D 

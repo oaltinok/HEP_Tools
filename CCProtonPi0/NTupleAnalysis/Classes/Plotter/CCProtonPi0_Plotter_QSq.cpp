@@ -358,12 +358,12 @@ void CCProtonPi0_Plotter::Draw_QSq_MaRES_Fit(bool isAreaNorm)
     mc_best->SetLineStyle(1);
     mc_best->SetFillColor(kWhite);
 
-    data_best->SetMarkerStyle(20);
-    data_best->SetMarkerSize(1);
-    data_best->SetMarkerColor(kBlue);
+    data_best->SetMarkerStyle(22);
+    data_best->SetMarkerSize(1.2);
+    data_best->SetMarkerColor(kGreen+2);
     data_best->SetLineWidth(1);
     data_best->SetLineStyle(1);
-    data_best->SetLineColor(kBlue);
+    data_best->SetLineColor(kGreen+2);
 
     TCanvas* c = new TCanvas("c","c",640,480);
 
@@ -534,11 +534,14 @@ void CCProtonPi0_Plotter::Draw_QSq_DeltaSuppression_v2(std::string var_name)
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
 
-    std::string data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/Data/Analyzed/CrossSection.root";
-    std::string mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/MC/Analyzed/CrossSection.root";
+    std::string data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Final_XSecs/Data/Analyzed/CrossSection.root";
+    std::string mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Final_XSecs/MC/Analyzed/CrossSection.root";
 
-    TFile* f_data_best = new TFile(rootDir_CrossSection.data.c_str());
-    TFile* f_mc_best = new TFile(rootDir_CrossSection.mc.c_str());
+    std::string data_dir_supp = "/minerva/data/users/oaltinok/NTupleAnalysis_DeltaFactor_Applied/Data/Analyzed/CrossSection.root";
+    std::string mc_dir_supp = "/minerva/data/users/oaltinok/NTupleAnalysis_DeltaFactor_Applied/MC/Analyzed/CrossSection.root";
+
+    TFile* f_data_best = new TFile(data_dir_supp.c_str());
+    TFile* f_mc_best = new TFile(mc_dir_supp.c_str());
 
     TFile* f_data_cv = new TFile(data_dir.c_str());
     TFile* f_mc_cv = new TFile(mc_dir.c_str());
@@ -568,12 +571,12 @@ void CCProtonPi0_Plotter::Draw_QSq_DeltaSuppression_v2(std::string var_name)
     h_mc_cv->SetLineColor(kRed);
     h_mc_cv->SetFillColor(kWhite);
 
-    h_data_best->SetMarkerStyle(20);
+    h_data_best->SetMarkerStyle(22);
+    h_data_best->SetMarkerSize(1.5);
     h_data_best->SetLineStyle(1);
-    h_data_best->SetMarkerSize(1);
-    h_data_best->SetMarkerColor(kBlue);
+    h_data_best->SetMarkerColor(kMagenta+2);
     h_data_best->SetLineWidth(2);
-    h_data_best->SetLineColor(kBlue);
+    h_data_best->SetLineColor(kMagenta+2);
 
     h_mc_best->SetLineWidth(3);
     h_mc_best->SetLineStyle(1);

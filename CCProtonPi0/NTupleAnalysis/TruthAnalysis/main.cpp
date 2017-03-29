@@ -13,6 +13,8 @@ void CheckCommand(int argc);
 
 int main(int argc, char *argv[])
 {
+    (void) argv;
+
     CheckCommand(argc);
 
     time_t timeStart; time(&timeStart);

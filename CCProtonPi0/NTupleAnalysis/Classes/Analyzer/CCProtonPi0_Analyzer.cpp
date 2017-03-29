@@ -298,11 +298,21 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             writeScanFile(); 
         }
 
+        if (truth_isSignal){
+            counter1.increment(1.0);
+            counter1.increment(1.0);
+            double pi0_frac1 = truth_blob1_evis_pizero / truth_blob1_evis_total_truth;
+            double pi0_frac2 = truth_blob2_evis_pizero / truth_blob2_evis_total_truth;
+            if (pi0_frac1 > 0.9) counter2.increment(1.0);
+            if (pi0_frac2 > 0.9) counter2.increment(1.0);
+       
+            std::cout<<truth_blob1_evis_total_truth<<" "<<gamma1_blob_energy<<std::endl;
+        }
         //Study_Flux();
         //Study_BckgSubtraction();
         //Study_W();
         //Study_QSq();
-        Study_2p2h();
+        //Study_2p2h();
         //Study_ProtonSystematics();
         //Study_GENIE_Weights();
         //Study_DeltaResonance();
@@ -1132,31 +1142,20 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
         FillHistogram(interaction.extra_total_energy_2Track, Extra_Energy_Total);
     }
 
-
     // Extra Energy
     FillHistogram(interaction.h_extra_leftover_energy, Extra_Energy_Leftover); 
     FillHistogram(interaction.h_extra_muon_energy, Extra_Energy_Muon); 
     FillHistogram(interaction.h_extra_rejected_energy, Extra_Energy_Rejected); 
 
-
     if (m_isMC && truth_isSignal) FillSignalCharacteristics_Reco(); 
 }
 
-double CCProtonPi0_Analyzer::calcDeltaInvariantMass()
+double CCProtonPi0_Analyzer::calcDeltaInvariantMass(bool isTruth)
 {
-    double invMassSq;
+    TLorentzVector delta_4P = GetDelta4P(isTruth);
+    double M_delta = delta_4P.M(); 
 
-    invMassSq = 
-        (pi0_E + proton_E) * 
-        (pi0_E + proton_E) -
-        (   (pi0_px + proton_px) * 
-            (pi0_px + proton_px) + 
-            (pi0_py + proton_py) * 
-            (pi0_py + proton_py) +
-            (pi0_pz + proton_pz) * 
-            (pi0_pz + proton_pz));
-
-    return sqrt(invMassSq);
+    return M_delta;
 }
 
 void CCProtonPi0_Analyzer::writeScanFile()
@@ -2359,113 +2358,131 @@ double CCProtonPi0_Analyzer::GetCorrectedMuonTheta()
 }
 
 
-void CCProtonPi0_Analyzer::GetDelta_pi_angles()
+void CCProtonPi0_Analyzer::GetDelta_pi_angles(bool isTruth)
 {
     bool isDebug = false;
 
     using namespace std;
 
-    if (m_W > 0 && m_W < 1400){
-        // Fill Pi0 Inv Mass for BckgSubtraction
-        FillHistogram(interaction.pi0_invMass_DeltaRES, pi0_invMass);
+    // --------------------------------------------------------------------
+    // Find Boost from LAB Frame to Delta Rest Frame
+    // --------------------------------------------------------------------
+    TLorentzVector delta_4P = GetDelta4P(isTruth);
+    double M_delta = delta_4P.M(); 
+    if (isDebug) cout<<"Delta Mass = "<<M_delta * MeV_to_GeV<<endl;
 
-        // --------------------------------------------------------------------
-        // Find Boost from LAB Frame to Delta Rest Frame
-        // --------------------------------------------------------------------
-        TLorentzVector delta_4P = GetDelta4P(false);
-        double M_delta = delta_4P.M(); 
-        if (isDebug) cout<<"Delta Mass = "<<M_delta * MeV_to_GeV<<endl;
+    double gamma = delta_4P.Gamma();
+    double boost_x = -(delta_4P.Px()/ (gamma*M_delta));
+    double boost_y = -(delta_4P.Py() / (gamma*M_delta));
+    double boost_z = -(delta_4P.Pz() / (gamma*M_delta));
 
-        double gamma = delta_4P.Gamma();
-        double boost_x = -(delta_4P.Px()/ (gamma*M_delta));
-        double boost_y = -(delta_4P.Py() / (gamma*M_delta));
-        double boost_z = -(delta_4P.Pz() / (gamma*M_delta));
+    if (isDebug){
+        if (isTruth) cout<<"-------Truth-----------"<<endl;
+        cout<<"Delta P (Before) = "<<delta_4P.Vect().Mag()<<endl;
+        cout<<"Delta P (Before) = "<<delta_4P.Vect().x();
+        cout<<" "<<delta_4P.Vect().y();
+        cout<<" "<<delta_4P.Vect().z()<<endl;
+    }
 
-        if (isDebug){
-            cout<<"Delta P (Before) = "<<delta_4P.Vect().Mag()<<std::endl;
-            cout<<"Delta P (Before) = "<<delta_4P.Vect().x();
-            cout<<" "<<delta_4P.Vect().y();
-            cout<<" "<<delta_4P.Vect().z()<<endl;
-        }
+    delta_4P.Boost(boost_x,boost_y,boost_z);
 
-        delta_4P.Boost(boost_x,boost_y,boost_z);
+    if (isDebug){
+        cout<<"Delta P (After) = "<<delta_4P.Vect().Mag()<<std::endl;
+        cout<<"Delta P (After) = "<<delta_4P.Vect().x();
+        cout<<" "<<delta_4P.Vect().y();
+        cout<<" "<<delta_4P.Vect().z()<<endl;
+        cout<<"Delta Mass (After) = "<<delta_4P.M() * MeV_to_GeV<<endl;
+    }
 
-        if (isDebug){
-            cout<<"Delta P (After) = "<<delta_4P.Vect().Mag()<<std::endl;
-            cout<<"Delta P (After) = "<<delta_4P.Vect().x();
-            cout<<" "<<delta_4P.Vect().y();
-            cout<<" "<<delta_4P.Vect().z()<<endl;
-            cout<<"Delta Mass (After) = "<<delta_4P.M() * MeV_to_GeV<<endl;
-        }
+    // --------------------------------------------------------------------
+    // Boost All 4-Momentums to Delta Rest Frame
+    // --------------------------------------------------------------------
+    TLorentzVector beam_4P = isTruth ? Get_Neutrino_4P(mc_incomingE) : Get_Neutrino_4P(m_Enu);
 
-        // --------------------------------------------------------------------
-        // Boost All 4-Momentums to Delta Rest Frame
-        // --------------------------------------------------------------------
-        TLorentzVector beam_4P = Get_Neutrino_4P(m_Enu);
-        TLorentzVector muon_4P(muon_px, muon_py, muon_pz, muon_E); 
-        TLorentzVector pi0_4P(pi0_px, pi0_py, pi0_pz, pi0_E); 
+    double mu_px = isTruth ? truth_muon_4P[0] : muon_px;
+    double mu_py = isTruth ? truth_muon_4P[1] : muon_py;
+    double mu_pz = isTruth ? truth_muon_4P[2] : muon_pz;
+    double mu_E = isTruth ? truth_muon_4P[3] : muon_E;
+    TLorentzVector muon_4P(mu_px, mu_py, mu_pz, mu_E); 
 
-        if (isDebug){
-            cout<<"Before Boost"<<endl;
-            cout<<"beam 4P = ("<<beam_4P.Px()<<", "<<beam_4P.Py()<<", "<<beam_4P.Pz()<<", "<<beam_4P.E()<<")"<<endl;
-            cout<<"muon 4P = ("<<muon_4P.Px()<<", "<<muon_4P.Py()<<", "<<muon_4P.Pz()<<", "<<muon_4P.E()<<")"<<endl;
-            cout<<"pi0 4P = ("<<pi0_4P.Px()<<", "<<pi0_4P.Py()<<", "<<pi0_4P.Pz()<<", "<<pi0_4P.E()<<")"<<endl;
-        }
+    double pi_px = isTruth ? truth_pi0_4P[0] : pi0_px;
+    double pi_py = isTruth ? truth_pi0_4P[1] : pi0_py;
+    double pi_pz = isTruth ? truth_pi0_4P[2] : pi0_pz;
+    double pi_E = isTruth ? truth_pi0_4P[3] : pi0_E;
+    TLorentzVector pi0_4P(pi_px, pi_py, pi_pz, pi_E); 
 
-        beam_4P.Boost(boost_x,boost_y,boost_z);
-        muon_4P.Boost(boost_x,boost_y,boost_z);
-        pi0_4P.Boost(boost_x,boost_y,boost_z);
+    if (isDebug){
+        cout<<"Before Boost"<<endl;
+        cout<<"beam 4P = ("<<beam_4P.Px()<<", "<<beam_4P.Py()<<", "<<beam_4P.Pz()<<", "<<beam_4P.E()<<")"<<endl;
+        cout<<"muon 4P = ("<<muon_4P.Px()<<", "<<muon_4P.Py()<<", "<<muon_4P.Pz()<<", "<<muon_4P.E()<<")"<<endl;
+        cout<<"pi0 4P = ("<<pi0_4P.Px()<<", "<<pi0_4P.Py()<<", "<<pi0_4P.Pz()<<", "<<pi0_4P.E()<<")"<<endl;
+    }
 
-        if (isDebug){
-            cout<<"After Boost"<<endl;
-            cout<<"beam 4P = ("<<beam_4P.Px()<<", "<<beam_4P.Py()<<", "<<beam_4P.Pz()<<", "<<beam_4P.E()<<")"<<endl;
-            cout<<"muon 4P = ("<<muon_4P.Px()<<", "<<muon_4P.Py()<<", "<<muon_4P.Pz()<<", "<<muon_4P.E()<<")"<<endl;
-            cout<<"pi0 4P = ("<<pi0_4P.Px()<<", "<<pi0_4P.Py()<<", "<<pi0_4P.Pz()<<", "<<pi0_4P.E()<<")"<<endl;
-        }
+    beam_4P.Boost(boost_x,boost_y,boost_z);
+    muon_4P.Boost(boost_x,boost_y,boost_z);
+    pi0_4P.Boost(boost_x,boost_y,boost_z);
 
-        // --------------------------------------------------------------------
-        // Form Axes
-        // --------------------------------------------------------------------
-        TVector3 beam_3P = beam_4P.Vect();
-        TVector3 muon_3P = muon_4P.Vect();
-        
-        // Z Axis -- Momentum Transfer Axis
-        TVector3 axis_z(beam_3P.Px() - muon_3P.Px(), beam_3P.Py() - muon_3P.Py(), beam_3P.Pz() - muon_3P.Pz());
-        TVector3 unit_axis_z = axis_z.Unit();
+    if (isDebug){
+        cout<<"After Boost"<<endl;
+        cout<<"beam 4P = ("<<beam_4P.Px()<<", "<<beam_4P.Py()<<", "<<beam_4P.Pz()<<", "<<beam_4P.E()<<")"<<endl;
+        cout<<"muon 4P = ("<<muon_4P.Px()<<", "<<muon_4P.Py()<<", "<<muon_4P.Pz()<<", "<<muon_4P.E()<<")"<<endl;
+        cout<<"pi0 4P = ("<<pi0_4P.Px()<<", "<<pi0_4P.Py()<<", "<<pi0_4P.Pz()<<", "<<pi0_4P.E()<<")"<<endl;
+    }
 
-        // Y Axis -- Beam x Muon
-        TVector3 axis_y = beam_3P.Cross(muon_3P);
-        TVector3 unit_axis_y = axis_y.Unit();
+    // --------------------------------------------------------------------
+    // Form Axes
+    // --------------------------------------------------------------------
+    TVector3 beam_3P = beam_4P.Vect();
+    TVector3 muon_3P = muon_4P.Vect();
 
-        // X Axis -- Right Handed Coordinate System y_axis x z_axis = x_axis
-        TVector3 axis_x = axis_y.Cross(axis_z);
-        TVector3 unit_axis_x = axis_x.Unit();
+    // Z Axis -- Momentum Transfer Axis
+    TVector3 axis_z(beam_3P.Px() - muon_3P.Px(), beam_3P.Py() - muon_3P.Py(), beam_3P.Pz() - muon_3P.Pz());
+    TVector3 unit_axis_z = axis_z.Unit();
 
-        // --------------------------------------------------------------------
-        // Calculate Angles
-        // --------------------------------------------------------------------
-        TVector3 pi0_3P = pi0_4P.Vect();
-        TVector3 unit_pi0_3P = pi0_3P.Unit();
-        double pion_P = pi0_3P.Mag();
+    // Y Axis -- Beam x Muon
+    TVector3 axis_y = beam_3P.Cross(muon_3P);
+    TVector3 unit_axis_y = axis_y.Unit();
 
-        double cos_theta_z = unit_pi0_3P.Dot(unit_axis_z);
+    // X Axis -- Right Handed Coordinate System y_axis x z_axis = x_axis
+    TVector3 axis_x = axis_y.Cross(axis_z);
+    TVector3 unit_axis_x = axis_x.Unit();
 
-        double theta_x = acos(unit_pi0_3P.Dot(unit_axis_x)); 
-        double theta_z = acos(cos_theta_z); 
+    // --------------------------------------------------------------------
+    // Calculate Angles
+    // --------------------------------------------------------------------
+    TVector3 pi0_3P = pi0_4P.Vect();
+    TVector3 unit_pi0_3P = pi0_3P.Unit();
+    double pion_P = pi0_3P.Mag();
 
-        double Px = pion_P*cos(theta_x);
+    double cos_theta_z = unit_pi0_3P.Dot(unit_axis_z);
 
-        double phi_x = acos(Px/(pion_P*sin(theta_z)));
-        double phi = phi_x * TMath::RadToDeg();    
-        
-        //std::cout<<phi<<" "<<cos(theta_z)<<std::endl;
-        FillHistogram(interaction.Delta_pi_P, pion_P*MeV_to_GeV);
-        FillHistogram(interaction.Delta_pi_theta, cos_theta_z);
-        FillHistogram(interaction.Delta_pi_phi, phi);
-        FillHistogram(interaction.Delta_pi_phi_theta, phi, cos_theta_z);
-        FillHistogram(interaction.Delta_pi_P_theta, pion_P*MeV_to_GeV, cos_theta_z);
+    double theta_x = acos(unit_pi0_3P.Dot(unit_axis_x)); 
+    double theta_y = acos(unit_pi0_3P.Dot(unit_axis_y)); 
+    double theta_z = acos(cos_theta_z); 
 
-        if (isDebug) cout<<endl;
+    double Px = pion_P*cos(theta_x);
+    double Py = pion_P*cos(theta_y);
+
+    double phi_x = acos(Px/(pion_P*sin(theta_z)));
+    double phi = phi_x * TMath::RadToDeg();    
+
+    // Convert to 360
+    if (Py < 0 ){
+        phi = 360 - phi;
+    }
+
+    if (isTruth){
+        m_delta_pi_theta_true = cos_theta_z;
+        m_delta_pi_phi_true = phi;
+    }else{
+        m_delta_pi_theta_reco = cos_theta_z;
+        m_delta_pi_phi_reco = phi;
+    }
+
+    if (isDebug){
+        cout<<"pion_theta = "<<cos_theta_z<<endl;
+        cout<<"pion_phi = "<<phi<<endl;
+        cout<<endl;
     }
 }
 
@@ -2699,10 +2716,10 @@ void CCProtonPi0_Analyzer::Study_ProtonSystematics()
 void CCProtonPi0_Analyzer::setCounterNames()
 {
     // Single Use Counters 
-    counter1.setName("LowAngle(QSq < 0.6)");
-    counter2.setName("LowAngle(QSq > 0.6)");
-    counter3.setName("HighAngle(QSq < 0.6))");
-    counter4.setName("HighAngle(QSq > 0.6)");
+    counter1.setName("N(Shower)");
+    counter2.setName("N(ShowerOut)");
+    counter3.setName("N/A");
+    counter4.setName("N/A");
 
     n2p2h.setName("N(2p2h)");
     for (int i = 0; i < 3; ++i){
@@ -2852,19 +2869,31 @@ void CCProtonPi0_Analyzer::Study_BckgSubtraction()
     }
 }
 
-
 void CCProtonPi0_Analyzer::Study_W()
 {
     double W_reco = m_W * MeV_to_GeV;
-    double deltaInvMass = calcDeltaInvariantMass() * MeV_to_GeV;
+    double deltaInvMass = calcDeltaInvariantMass(false) * MeV_to_GeV;
 
     FillHistogram(interaction.W_p_pi0, deltaInvMass);
-    
     FillHistogram(interaction.W_All, W_reco);
+
     if (nProtonCandidates == 0){
         FillHistogram(interaction.W_1, W_reco);
     }else{
         FillHistogram(interaction.W_2, W_reco);
+    }
+    
+    // Shifted W
+    for (int i = 0; i < 151; ++i){
+        double W_shifted = m_isMC ? (m_W - i) * MeV_to_GeV : W_reco;
+        FillHistogram(interaction.W_Shift[i], W_shifted);
+        if (m_isMC){
+            if (truth_isSignal) {
+                FillHistogram(interaction.W_Shift_Signal[i], W_shifted);
+            }else{
+                FillHistogram(interaction.W_Shift_Bckg[i], W_shifted);
+            }
+        }
     }
 }
 
@@ -2886,11 +2915,29 @@ void CCProtonPi0_Analyzer::Study_DeltaResonance()
     //}
 
     if (nProtonCandidates > 0){
-        GetDelta_pi_angles(); // Paper references polarization
-        //GetDeltaPolarization(); // Mann Style -- No proof
-        //GetDeltaTransverse();
         if (m_W > 0 && m_W < 1400){
-            FillHistogram(interaction.deltaInvMass, calcDeltaInvariantMass() * MeV_to_GeV);
+
+            GetDelta_pi_angles(false); // Reco Values
+
+            double deltaInvMass_reco = calcDeltaInvariantMass(false) * MeV_to_GeV;
+            FillHistogram(interaction.deltaInvMass, deltaInvMass_reco);
+
+            // Fill Pi0 Inv Mass for BckgSubtraction
+            FillHistogram(interaction.pi0_invMass_DeltaRES, pi0_invMass);
+
+            // Fill Reco Values
+            FillHistogram(interaction.Delta_pi_theta, m_delta_pi_theta_reco);
+            FillHistogram(interaction.Delta_pi_phi, m_delta_pi_phi_reco);
+
+            // Fill Unfolding Matrices
+            if (truth_isSignal){
+                GetDelta_pi_angles(true); // Truth Values
+                
+                double deltaInvMass_true = calcDeltaInvariantMass(true) * MeV_to_GeV;
+                FillHistogram(interaction.deltaInvMass_response, deltaInvMass_reco, deltaInvMass_true);
+                FillHistogram(interaction.Delta_pi_theta_response, m_delta_pi_theta_reco, m_delta_pi_theta_true);
+                FillHistogram(interaction.Delta_pi_phi_response, m_delta_pi_phi_reco, m_delta_pi_phi_true);
+            }
         }
     }
 }
@@ -3049,23 +3096,21 @@ void CCProtonPi0_Analyzer::Study_2p2h()
     double QSq_reco = m_QSq * MeVSq_to_GeVSq;
     double q0_reco = (m_Enu - muon_E) * MeV_to_GeV;
     double q3_reco = Calc_q3() * MeV_to_GeV;
+    double reco_muon_theta = GetCorrectedMuonTheta();
 
     // For All Events
     FillHistogram(interaction.vertex_energy_All, vertex_blob_energy);
     FillHistogram(interaction.vertex_evis_All, vertex_blob_evis );    
-    FillHistogram(interaction.q3_q0_All, q3_reco, q0_reco);    
-    FillHistogram(interaction.W_QSq_All, W_reco, QSq_reco);    
+    FillHistogram(interaction.q3_q0, q3_reco, q0_reco);    
+    FillHistogram(interaction.W_QSq, W_reco, QSq_reco);    
+    FillHistogram(interaction.muon_theta_muon_KE, cos(reco_muon_theta), muon_KE * MeV_to_GeV);    
 
     if (nProtonCandidates == 0){
         FillHistogram(interaction.vertex_energy_1Track, vertex_blob_energy);
         FillHistogram(interaction.vertex_evis_1Track, vertex_blob_evis );
-        FillHistogram(interaction.q3_q0_1Track, q3_reco, q0_reco);    
-        FillHistogram(interaction.W_QSq_1Track, W_reco, QSq_reco);    
     }else{
         FillHistogram(interaction.vertex_energy_2Track, vertex_blob_energy);
         FillHistogram(interaction.vertex_evis_2Track, vertex_blob_evis );
-        FillHistogram(interaction.q3_q0_2Track, q3_reco, q0_reco);    
-        FillHistogram(interaction.W_QSq_2Track, W_reco, QSq_reco);    
     }
 }
 

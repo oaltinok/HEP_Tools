@@ -167,7 +167,7 @@ void CCProtonPi0_CrossSection::init_Enu()
     Enu.isEv = true;
 
     Enu.plot_title = "Total Cross Section for E_{#nu}";
-    Enu.plot_xlabel = "E_{#nu} (GeV)";
+    Enu.plot_xlabel = "Neutrino Energy (GeV)";
     Enu.plot_ylabel = "#sigma(E_{#nu}) (10^{-40} cm^{2}/nucleon)";
 
     Enu.nIterations = 4;

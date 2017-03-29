@@ -146,7 +146,7 @@ void CCProtonPi0_Plotter::Systematics_DrawErrorSummary_Group(std::string data_va
 
     data_var = data_var + "_" + group_name;
 
-    DrawErrorSummary(data, data_var, plotDir, false);
+    DrawErrorSummary_PaperStyle(data, data_var, plotDir, false);
 
     delete data;
     delete f_xsec_data;
@@ -242,46 +242,47 @@ void CCProtonPi0_Plotter::Systematics_DrawErrorSummary_GENIE(MnvH1D* hist, std::
 
 void CCProtonPi0_Plotter::Systematics_WriteTables(std::string var_name)
 {
-    std::string plotDir = Folder_List::plotDir_Systematics_Summary;
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    std::string root_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Final_XSecs/Data/Analyzed/CrossSection.root";
     TFile* f_data = new TFile(rootDir_CrossSection.data.c_str());
 
     std::string var;
     MnvH1D* hist = NULL;
 
     // Original
-//    var = var_name + "_" + "all";
-//    hist = GetMnvH1D(f_data, var);
-//    Systematics_WriteTable_Fraction(hist, var);
-//    Systematics_WriteTable_BinByBin(hist, var);
-//    delete hist;
-// 
-//    // Background Subtracted 
-//    var = var_name + "_" + "bckg_subtracted";
-//    hist = GetMnvH1D(f_data, var);
-//    Systematics_WriteTable_Fraction(hist, var);
-//    Systematics_WriteTable_BinByBin(hist, var);
-//    delete hist;
-// 
-//    // Unfolded 
-//    var = var_name + "_" + "unfolded";
-//    hist = GetMnvH1D(f_data, var);
-//    Systematics_WriteTable_Fraction(hist, var);
-//    Systematics_WriteTable_BinByBin(hist, var);
-//    delete hist;
-// 
-//    // Efficiency Corrected 
-//    var = var_name + "_" + "efficiency_corrected";
-//    hist = GetMnvH1D(f_data, var);
-//    Systematics_WriteTable_Fraction(hist, var);
-//    Systematics_WriteTable_BinByBin(hist, var);
-//    delete hist;
-// 
-//    // Flux Integrated 
-//    var = var_name + "_" + "flux_integrated";
-//    hist = GetMnvH1D(f_data, var);
-//    Systematics_WriteTable_Fraction(hist, var);
-//    Systematics_WriteTable_BinByBin(hist, var);
-//    delete hist;
+    var = var_name + "_" + "all";
+    hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
+ 
+    // Background Subtracted 
+    var = var_name + "_" + "bckg_subtracted";
+    hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
+ 
+    // Unfolded 
+    var = var_name + "_" + "unfolded";
+    hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
+ 
+    // Efficiency Corrected 
+    var = var_name + "_" + "efficiency_corrected";
+    hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
+ 
+    // Flux Integrated 
+    var = var_name + "_" + "flux_integrated";
+    hist = GetMnvH1D(f_data, var);
+    Systematics_WriteTable_Fraction(hist, var);
+    Systematics_WriteTable_BinByBin(hist, var);
+    delete hist;
  
     // Cross Section 
     var = var_name + "_" + "xsec";
@@ -342,21 +343,26 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_Fraction(MnvH1D* hist, std::str
 
 void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::string var_name)
 {
+    bool forMATLAB = true;
+
     // Open Text File
-    std::string file_name = Folder_List::plotDir_Systematics_Summary + "Table_BinByBin_" + var_name + ".txt";
+    std::string label = forMATLAB ? "MATLAB" : "Excel";
+    std::string file_name = Folder_List::plotDir_Systematics_Summary + "Table_BinByBin_" + var_name + "_" + label + ".txt";
     ofstream file;
     OpenTextFile(file_name, file);
 
-    // Write Header
-    file<<std::left;
-    file.width(16); file<<"BinRange"<<" ";    
-    file.width(12); file<<"(I)Detector"<<" "; 
-    file.width(12); file<<"(II)GENIE"<<" "; 
-    file.width(12); file<<"(III)FSI"<<" "; 
-    file.width(12); file<<"(IV)Flux"<<" "; 
-    file.width(12); file<<"(V)Other"<<" "; 
-    file.width(12); file<<"Total"; 
-    file<<std::endl;
+    if (!forMATLAB){
+        // Write Header
+        file<<std::left;
+        file.width(16); file<<"BinRange"<<" ";    
+        file.width(12); file<<"(I)Detector"<<" "; 
+        file.width(12); file<<"(II)GENIE"<<" "; 
+        file.width(12); file<<"(III)FSI"<<" "; 
+        file.width(12); file<<"(IV)Flux"<<" "; 
+        file.width(12); file<<"(V)Other"<<" "; 
+        file.width(12); file<<"Total"; 
+        file<<std::endl;
+    }
 
     // Get Errors
     TH1D* h_err_total = new TH1D(hist->GetTotalError(false,true));
@@ -378,7 +384,9 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::str
         double other = h_err_other->GetBinContent(i);
         double total = h_err_total->GetBinContent(i);
 
-        file.width(16); file<<Form("%2.1f - %2.1f",bin_min,bin_min+bin_width)<<" ";    
+        if (!forMATLAB){
+            file.width(16); file<<Form("%2.1f - %2.1f",bin_min,bin_min+bin_width)<<" ";    
+        }
         file.width(12); file<<Form("%3.2f",detector*100)<<" ";
         file.width(12); file<<Form("%3.2f",genie*100)<<" ";
         file.width(12); file<<Form("%3.2f",fsi*100)<<" ";

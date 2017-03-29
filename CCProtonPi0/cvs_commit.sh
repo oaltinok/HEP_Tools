@@ -1,18 +1,19 @@
-CCPROTONPI0_V="v3_08"
+CCPROTONPI0_V="v3_09_Thesis"
 cvs commit -m "${CCPROTONPI0_V}
 CCProtonPi0 Updates:
 	No major changes
 
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	CC-RES Suppression Event Reweighing
-		Turned off by default
+	Labels corrected for the cross-section plots
 
-	Plot styles exactly matched with 
-        PRD 94, 052005 (2016) 
+	W Shift to match data using QSq_Fitter
 
-	TruthAnalyzer
-		BeforeFSI and After FSI using finer binning
+	Plots Improved for Signal Kinematics Cut
+		Neutrino Energy XSec plot before and after FSI extended to 0 GeV
+		W distribution extended to greater than 1.8
+
+	GENIE Tuning as in Thesis
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

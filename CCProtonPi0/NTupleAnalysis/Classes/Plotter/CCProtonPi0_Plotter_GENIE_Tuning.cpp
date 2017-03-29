@@ -36,8 +36,8 @@ void CCProtonPi0_Plotter::Draw_Comparison_DeltaFactor(std::string var_name)
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
 
-    std::string final_data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/Data/Analyzed/CrossSection.root";
-    std::string final_mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/MC/Analyzed/CrossSection.root";
+    std::string final_data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Final_XSecs/Data/Analyzed/CrossSection.root";
+    std::string final_mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Final_XSecs/MC/Analyzed/CrossSection.root";
 
     std::string deltafactor_data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_DeltaFactor_Applied/Data/Analyzed/CrossSection.root";
     std::string deltafactor_mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_DeltaFactor_Applied/MC/Analyzed/CrossSection.root";
@@ -63,11 +63,11 @@ void CCProtonPi0_Plotter::Draw_Comparison_DeltaFactor(std::string var_name)
     TH1D* h_data_final = GetBinNormalizedTH1D(data_final, true);
     TH1D* h_mc_final = GetBinNormalizedTH1D(mc_final, true);
 
-    h_data_deltafactor->SetMarkerStyle(20);
-    h_data_deltafactor->SetMarkerSize(1);
-    h_data_deltafactor->SetMarkerColor(kBlue);
+    h_data_deltafactor->SetMarkerStyle(22);
+    h_data_deltafactor->SetMarkerSize(1.5);
+    h_data_deltafactor->SetMarkerColor(kMagenta);
     h_data_deltafactor->SetLineWidth(2);
-    h_data_deltafactor->SetLineColor(kBlue);
+    h_data_deltafactor->SetLineColor(kMagenta);
 
     h_mc_deltafactor->SetLineWidth(3);
     h_mc_deltafactor->SetLineColor(kBlue);
@@ -156,8 +156,11 @@ void CCProtonPi0_Plotter::Draw_Comparison_Nominal(std::string var_name)
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
 
-    std::string final_data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/Data/Analyzed/CrossSection.root";
-    std::string final_mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/MC/Analyzed/CrossSection.root";
+    //std::string final_data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/Data/Analyzed/CrossSection.root";
+    //std::string final_mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Best/MC/Analyzed/CrossSection.root";
+
+    std::string final_data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis/Data/Analyzed/CrossSection.root";
+    std::string final_mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CrossSection.root";
 
     std::string nominal_data_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Nominal/Data/Analyzed/CrossSection.root";
     std::string nominal_mc_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Nominal/MC/Analyzed/CrossSection.root";
@@ -167,7 +170,7 @@ void CCProtonPi0_Plotter::Draw_Comparison_Nominal(std::string var_name)
 
     TFile* f_data_nominal = new TFile(nominal_data_dir.c_str());
     TFile* f_mc_nominal = new TFile(nominal_mc_dir.c_str());
-
+    
     // --------------------------------------------------------------------
     // Get Histograms 
     // --------------------------------------------------------------------

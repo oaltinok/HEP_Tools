@@ -111,6 +111,16 @@ double CCProtonPi0_QSqFitter::Calc_Weight(double m, double c, double x)
     return y;
 }
 
+int CCProtonPi0_QSqFitter::GetMinChiSq_W_Shift(bool isSignal)
+{
+    ChiSqVector_W_Shift.clear();
+    FillChiSqVector_W_Shift(isSignal);
+    int min = FindMinChiSq(ChiSqVector_W_Shift);
+
+    std::cout<<"min = "<<min<<std::endl;
+    return min;
+}
+
 int CCProtonPi0_QSqFitter::GetMinChiSq_DeltaFactor()
 {
     FillChiSqVector_DeltaFactor();
@@ -155,6 +165,15 @@ int CCProtonPi0_QSqFitter::FindMinChiSq(std::vector<double> &ChiSqVector)
     }
 
     return current_min_ind;
+}
+
+void CCProtonPi0_QSqFitter::NormalizeHistogram(MnvH1D* h)
+{
+    int NBins = h->GetNbinsX();
+    double area = h->Integral();
+    double nOverFlow = h->GetBinContent(NBins+1);
+    double nUnderFlow = h->GetBinContent(0);
+    h->Scale(1/(area+nOverFlow+nUnderFlow),"",false); // Scale only on CentralValue
 }
 
 void CCProtonPi0_QSqFitter::NormalizeHistogram(TH1D* h)
@@ -282,6 +301,58 @@ void CCProtonPi0_QSqFitter::FillChiSqVector_SB(std::vector<double> &ChiSqVector,
     delete f_mc_SB_pID;
     delete f_mc_SB_LowInvMass;
     delete f_mc_SB_HighInvMass;
+    delete f_mc;
+}
+
+void CCProtonPi0_QSqFitter::FillChiSqVector_W_Shift(bool isSignal)
+{
+    // Read Files
+    std::string data_dir = Folder_List::rootDir_Interaction_data;
+    std::string mc_dir = Folder_List::rootDir_Interaction_mc;
+   
+    TFile* f_data = new TFile(data_dir.c_str());
+    TFile* f_mc = new TFile(mc_dir.c_str());
+
+    for (int i = 0; i < 151; ++i){
+        // Get Histograms
+        MnvH1D* h_data = GetMnvH1D(f_data, Form("%s_%d","W_Shift",i));
+
+        // Background Subtract if Signal
+        if (isSignal){
+            MnvH1D* h_mc_bckg = GetMnvH1D(f_mc, Form("%s_%d","W_Shift_Bckg",i));
+            NormalizeHistogram(h_mc_bckg);
+            h_mc_bckg->Scale(2997.1);
+            h_data->Add(h_mc_bckg, -1);
+            delete h_mc_bckg;
+        }
+
+        MnvH1D* h_mc;
+        if (isSignal){
+            h_mc = GetMnvH1D(f_mc, Form("%s_%d","W_Shift_Signal",i));
+        }else{
+            h_mc = GetMnvH1D(f_mc, Form("%s_%d","W_Shift",i));
+        }
+
+        double ChiSq =  Calc_ChiSq_W_Shift(h_data, h_mc);
+        ChiSqVector_W_Shift.push_back(ChiSq);
+
+        // Clean Memory
+        delete h_data;
+        delete h_mc;
+    }
+
+    if (isDebug){
+        if (isSignal){
+            std::cout<<"ChiSq Vector for W Shift -- Signal Events"<<std::endl;
+        }else{
+            std::cout<<"ChiSq Vector for W Shift"<<std::endl;
+        }
+        for (unsigned int i = 0; i < ChiSqVector_W_Shift.size(); ++i){
+            std::cout<<"\t"<<i<<" "<<ChiSqVector_W_Shift[i]<<std::endl;
+        }
+    }
+
+    delete f_data;
     delete f_mc;
 }
 
@@ -478,6 +549,24 @@ void CCProtonPi0_QSqFitter::AreaNormalize(TH1D* data, TH1D* MC)
     double area_mc = MC->Integral(3,nBins,"width");
     double ratio = area_data/area_mc;
     MC->Scale(ratio);
+}
+
+double CCProtonPi0_QSqFitter::Calc_ChiSq_W_Shift(MnvH1D* data, MnvH1D* MC)
+{
+    MC->Scale(POT_ratio);
+
+    int nBins = data->GetNbinsX();
+    double ChiSq = 0.0;
+
+    for (int i = 1; i <= nBins; ++i){
+        double nData = data->GetBinContent(i);
+        double nMC = MC->GetBinContent(i);
+        double err = data->GetBinError(i);
+
+        ChiSq += std::pow((nData-nMC),2) / std::pow(err,2);
+    }
+
+    return ChiSq;
 }
 
 double CCProtonPi0_QSqFitter::Calc_ChiSq_Delta(TH1D* data, TH1D* MC)

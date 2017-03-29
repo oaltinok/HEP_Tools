@@ -86,6 +86,9 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> W_All;
         std::vector<MnvH1D*> W_1;
         std::vector<MnvH1D*> W_2;
+        std::vector<MnvH1D*> W_Shift;
+        std::vector<MnvH1D*> W_Shift_Bckg;
+        std::vector<MnvH1D*> W_Shift_Signal;
 
         // QSq Study
         std::vector<MnvH1D*> QSq_CV;
@@ -100,13 +103,9 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> vertex_evis_1Track;
         std::vector<MnvH1D*> vertex_evis_2Track;
 
-        std::vector<MnvH2D*> q3_q0_All;
-        std::vector<MnvH2D*> q3_q0_1Track;
-        std::vector<MnvH2D*> q3_q0_2Track;
-
-        std::vector<MnvH2D*> W_QSq_All;
-        std::vector<MnvH2D*> W_QSq_1Track;
-        std::vector<MnvH2D*> W_QSq_2Track;
+        std::vector<MnvH2D*> muon_theta_muon_KE;
+        std::vector<MnvH2D*> q3_q0;
+        std::vector<MnvH2D*> W_QSq;
 
         // Flux Study
         TH2D* Enu_flux_wgt;
@@ -155,10 +154,10 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> deltaInvMass;
         std::vector<MnvH1D*> Polarization;
         std::vector<MnvH1D*> Delta_pi_theta;
-        std::vector<MnvH1D*> Delta_pi_P;
         std::vector<MnvH1D*> Delta_pi_phi;
-        std::vector<MnvH2D*> Delta_pi_phi_theta;
-        std::vector<MnvH2D*> Delta_pi_P_theta;
+        MnvH2D* deltaInvMass_response;
+        MnvH2D* Delta_pi_theta_response;
+        MnvH2D* Delta_pi_phi_response;
         TH1D* resID;
         TH1D* resID_theta;
 

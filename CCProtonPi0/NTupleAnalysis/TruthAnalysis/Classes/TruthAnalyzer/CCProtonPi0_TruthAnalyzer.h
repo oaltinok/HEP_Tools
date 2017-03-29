@@ -15,6 +15,8 @@
 #include <TH2.h>
 #include <TFile.h>
 #include <PlotUtils/MnvH1D.h>
+#include <TVector3.h>
+#include <TLorentzVector.h>
 
 #include "Cintex/Cintex.h"
 #include "../../../Libraries/Folder_List.h"
@@ -83,6 +85,22 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> W_mc_truth_all_signal_IntType;
         std::vector<MnvH1D*> Enu_mc_truth_all_signal_IntType;
        
+        // Delta RES Study 
+        MnvH1D* deltaInvMass_all_signal;
+        MnvH1D* deltaInvMass_delta_res;
+        MnvH1D* deltaInvMass_other_res;
+        MnvH1D* deltaInvMass_non_res;
+        
+        MnvH1D* Delta_pi_theta_all_signal;
+        MnvH1D* Delta_pi_theta_delta_res;
+        MnvH1D* Delta_pi_theta_other_res;
+        MnvH1D* Delta_pi_theta_non_res;
+        
+        MnvH1D* Delta_pi_phi_all_signal;
+        MnvH1D* Delta_pi_phi_delta_res;
+        MnvH1D* Delta_pi_phi_other_res;
+        MnvH1D* Delta_pi_phi_non_res;
+
         std::vector<MnvH1D*> CV_weight;
         std::vector<MnvH1D*> CV_weight_2p2h;
         std::vector<MnvH1D*> CV_weight_Delta;
@@ -157,6 +175,8 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         int GetFSIType();
         int GetIntType();
         void CountFSIType(int type);
+        void CountFSIType_FeedOut();
+        void CountSignalFeed();
         bool isMother_DIS_Fragment(int ind);
         double GetPercent(CCProtonPi0_Counter nAll, CCProtonPi0_Counter nOther);
         int Get_nFS_pions();
@@ -169,6 +189,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void FillHistogram(MnvH1D *hist, double var);
         void FillHistogram(TH1D* hist, double var);
         void FillSignal_Test();
+        void FillSignalOut_Kinematics();
         void FillSignal_XSec_Variables();
         void FillSignal_XSec_Variables_BeforeFSI();
         void FillSignal_XSec_Variables_FSIType(int type);
@@ -192,6 +213,11 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void writeTextFile();
         double GetDeltaFactor(double QSq, double A, double Q0);
         std::vector<double> GetDeltaFactorWeights();
+
+        double calcDeltaInvariantMass();
+        void GetDelta_pi_angles();
+        TLorentzVector Get_Neutrino_4P(const double Enu);
+        TLorentzVector GetDelta4P();
 
         // GENIE Tuning
         void initUpdatedGenieWeights();
@@ -228,6 +254,13 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Counter nBckg;
 
         // FSI
+        CCProtonPi0_Counter nFSI_FeedOut;
+        CCProtonPi0_Counter nFSI_FeedOut_Abs;
+        CCProtonPi0_Counter nFSI_FeedOut_MultiPi;
+        CCProtonPi0_Counter nFSI_FeedOut_Cex;
+        CCProtonPi0_Counter nFSI_FeedOut_Other;
+
+        CCProtonPi0_Counter nFSI_FeedIn;
         CCProtonPi0_Counter nFSI_NonInteracting;
         CCProtonPi0_Counter nFSI_Elastic;
         CCProtonPi0_Counter nFSI_Inelastic;
@@ -248,7 +281,14 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         // Temp
         CCProtonPi0_Counter nTempCounter1;
         CCProtonPi0_Counter nTempCounter2;
-        
+        CCProtonPi0_Counter DeltaStudy_nAll;
+        CCProtonPi0_Counter DeltaStudy_nDeltaRES;
+        CCProtonPi0_Counter DeltaStudy_nOtherRES;
+        CCProtonPi0_Counter DeltaStudy_nNonRES;
+
+        CCProtonPi0_Counter nShowers;
+        CCProtonPi0_Counter nShowers_Out;
+       
         double cvweight;
         double cvweight_2p2h;
         double cvweight_Delta;
@@ -260,6 +300,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         double updated_genie_wgt_MvRES[7];
         double updated_genie_wgt_Rvn1pi[7];
         double updated_genie_wgt_Rvp1pi[7];
+
+        bool isSignal_EnuLow();
+        bool isSignal_WHigh();
 
         void Get2p2hErr();
         void FillVertErrorBand_2p2h(MnvH1D* h, double var);

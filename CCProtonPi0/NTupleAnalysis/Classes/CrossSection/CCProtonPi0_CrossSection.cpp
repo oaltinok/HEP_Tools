@@ -122,7 +122,12 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_AfterFSI(XSec &var)
     
     // Calculate Final Cross Section
     var.xsec_AfterFSI = Calc_FinalCrossSection(var.flux_integrated_AfterFSI, var.name, "_xsec_AfterFSI"); 
- 
+  
+    // Add Labels
+    var.xsec_AfterFSI->SetTitle(var.plot_title.c_str());
+    var.xsec_AfterFSI->GetXaxis()->SetTitle(var.plot_xlabel.c_str());
+    var.xsec_AfterFSI->GetYaxis()->SetTitle(var.plot_ylabel.c_str());
+
     Scale_XSecHist(var.xsec_AfterFSI, var.smallest_bin_width);
 
     std::cout<<"Done!"<<std::endl;
@@ -140,6 +145,11 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_BeforeFSI(XSec &var)
     // Calculate Final Cross Section
     var.xsec_BeforeFSI = Calc_FinalCrossSection(var.flux_integrated_BeforeFSI, var.name, "_xsec_BeforeFSI"); 
  
+    // Add Labels
+    var.xsec_BeforeFSI->SetTitle(var.plot_title.c_str());
+    var.xsec_BeforeFSI->GetXaxis()->SetTitle(var.plot_xlabel.c_str());
+    var.xsec_BeforeFSI->GetYaxis()->SetTitle(var.plot_ylabel.c_str());
+
     Scale_XSecHist(var.xsec_BeforeFSI, var.smallest_bin_width);
 
     std::cout<<"Done!"<<std::endl;
@@ -159,6 +169,11 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_FSIType(XSec &var)
         // Calculate Final Cross Section
         var.xsec_FSIType[i] = Calc_FinalCrossSection(var.flux_integrated_FSIType[i], var.name, Form("%s_%d","_xsec_FSIType",i)); 
 
+        // Add Labels
+        var.xsec_FSIType[i]->SetTitle(var.plot_title.c_str());
+        var.xsec_FSIType[i]->GetXaxis()->SetTitle(var.plot_xlabel.c_str());
+        var.xsec_FSIType[i]->GetYaxis()->SetTitle(var.plot_ylabel.c_str());
+
         Scale_XSecHist(var.xsec_FSIType[i], var.smallest_bin_width);
     }
     std::cout<<"Done!"<<std::endl;
@@ -177,6 +192,11 @@ void CCProtonPi0_CrossSection::Calc_CrossSection_IntType(XSec &var)
 
         // Calculate Final Cross Section
         var.xsec_IntType[i] = Calc_FinalCrossSection(var.flux_integrated_IntType[i], var.name, Form("%s_%d","_xsec_IntType",i)); 
+
+        // Add Labels
+        var.xsec_IntType[i]->SetTitle(var.plot_title.c_str());
+        var.xsec_IntType[i]->GetXaxis()->SetTitle(var.plot_xlabel.c_str());
+        var.xsec_IntType[i]->GetYaxis()->SetTitle(var.plot_ylabel.c_str());
 
         Scale_XSecHist(var.xsec_IntType[i], var.smallest_bin_width);
     }
@@ -462,7 +482,6 @@ MnvH1D* CCProtonPi0_CrossSection::Integrate_Flux(MnvH1D* data_efficiency_correct
             flux_unv[i]->Scale(cv_flux_integral);
             flux_unv[i]->Scale(1/unv_flux_integral[i]);
         }
-
     }
     std::cout<<"Done!"<<std::endl;
 

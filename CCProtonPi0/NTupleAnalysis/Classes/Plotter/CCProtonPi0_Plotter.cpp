@@ -11,6 +11,7 @@ using namespace PlotUtils;
 
 void CCProtonPi0_Plotter::plotHistograms()
 {
+    isPaperComparison = false;
     thesisStyle = true;
 
     if (thesisStyle){
@@ -57,12 +58,13 @@ void CCProtonPi0_Plotter::plotHistograms()
     //plotGENIEXSec();
     //UnfoldingStudy();
     //GENIE_Tuning_Study();
-    Systematics();
+    //Systematics();
     //W_Studies();
     //QSq_Studies();
     //Studies_2p2h();
     //DeltaRes_Studies();
     //PlotFluxHistograms();
+    //XSec_Tables();
 }
 
 void CCProtonPi0_Plotter::getPOT_MC()
@@ -970,11 +972,11 @@ void CCProtonPi0_Plotter::plotInteraction_MCOnly()
     std::cout<<"Plotting Interaction MC Only"<<std::endl;
     std::string plotDir = Folder_List::plotDir_Interaction;
 
-    //plot_SignalKinematics();
-    plot_CV_weights();
+    plot_SignalKinematics();
+    //plot_CV_weights();
 
-    Draw2DHist(rootDir_Interaction,"Enu_flux_wgt",plotDir);
-    Draw2DHist(rootDir_Interaction,"Enu_cvweight",plotDir);
+    //Draw2DHist(rootDir_Interaction,"Enu_flux_wgt",plotDir);
+    //Draw2DHist(rootDir_Interaction,"Enu_cvweight",plotDir);
 
     //DrawStackedMC(rootDir_Interaction,"Enu",plotDir);
     //DrawStackedMC(rootDir_Interaction,"QSq",plotDir);
@@ -1666,10 +1668,7 @@ void CCProtonPi0_Plotter::plot_SignalKinematics(std::string var, std::string typ
     TFile* f_Root = new TFile(root_dir.c_str());
     TCanvas* c1 = new TCanvas("c","c",1280,800);
     THStack *hs = new THStack("hs","Signal Events");
-    TLegend *legend = new TLegend(0.75,0.5,0.95,0.9);  
-    legend->SetTextFont(42);
-    legend->SetTextSize(0.04);
-
+ 
     std::string var_name = var + "_QE";
     TH1D* h_QE = (TH1D*)f_Root->Get(var_name.c_str());
     h_QE->SetFillColor(kRed);
@@ -1736,6 +1735,12 @@ void CCProtonPi0_Plotter::plot_SignalKinematics(std::string var, std::string typ
         h_Coh->SetFillStyle(3001);
     }
 
+    bool isTruthW_All = (var.compare("truth_w") == 0) && (type.compare("all") == 0);
+    double min_x = isTruthW_All ? 0.20 : 0.65;
+    double max_x = isTruthW_All ? 0.40 : 0.85;
+    
+    TLegend *legend = new TLegend(min_x,0.5,max_x,0.9);  
+    ApplyStyle_Legend(legend);
     legend->AddEntry(h_RES_1232, "RES: #Delta(1232)", "f");
     legend->AddEntry(h_RES_1535, "RES: N(1535)", "f");
     legend->AddEntry(h_RES_1520, "RES: N(1520)", "f");
@@ -1763,6 +1768,22 @@ void CCProtonPi0_Plotter::plot_SignalKinematics(std::string var, std::string typ
     hs->GetYaxis()->SetTitle(h_RES_1232->GetYaxis()->GetTitle());
 
     legend->Draw();
+
+
+    if (isTruthW_All) {
+        // Arrow
+        TLine line;
+        line.SetLineWidth(4); 
+        line.SetLineStyle(1);
+        line.SetLineColor(1);
+        line.DrawLine(1.8,0,1.8,16000);
+
+        TArrow arrow;
+        arrow.SetLineWidth(4); 
+        arrow.SetLineStyle(1);
+        arrow.SetLineColor(1); 
+        arrow.DrawArrow(1.8,16000,1.8-0.1,16000,0.01,"|>");
+    }
 
     std::string plot_type;
     if (isStacked) plot_type = "_" + type + "_Stacked.png";
@@ -2314,8 +2335,14 @@ double CCProtonPi0_Plotter::Integrate(MnvH1D* hist, int start, int end)
 
 void CCProtonPi0_Plotter::PlotXSecVar(std::string var_name, std::string data_var, std::string mc_var, std::string plotDir, std::string plotName)
 {
-    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
-    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+    std::string data_final = "/minerva/data/users/oaltinok/NTupleAnalysis_Final_XSecs/Data/Analyzed/CrossSection.root";
+    std::string mc_final = "/minerva/data/users/oaltinok/NTupleAnalysis_Final_XSecs/MC/Analyzed/CrossSection.root";
+
+    TFile* f_xsec_data = new TFile(data_final.c_str());
+    TFile* f_xsec_mc = new TFile(mc_final.c_str());
+
+    //TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
+    //TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
 
     bool isXSec;
     if (data_var.compare("xsec") == 0 ) isXSec = true;
@@ -2328,9 +2355,12 @@ void CCProtonPi0_Plotter::PlotXSecVar(std::string var_name, std::string data_var
     MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
     MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
 
-    // Remove Error Bands from MC
-    mc->ClearAllErrorBands();
-   
+    // Remove Error Bands from MC Except bckg_estimated
+    std::size_t found = mc_var.find("estimated");
+    if (found == std::string::npos){
+        mc->ClearAllErrorBands();
+    }
+
     if (thesisStyle){
         DrawDataMC_Thesis(data, mc, plotName, plotDir, isXSec);
     }else{
@@ -2340,8 +2370,12 @@ void CCProtonPi0_Plotter::PlotXSecVar(std::string var_name, std::string data_var
     // Rename for Error Summary
     data_var = "data_" + data_var;
     mc_var = "mc_" + mc_var;
-    DrawErrorSummary_PaperStyle(data, data_var, plotDir);
-    DrawErrorSummary_PaperStyle(mc, mc_var, plotDir);
+    //DrawErrorSummary_PaperStyle(data, data_var, plotDir);
+    //DrawErrorSummary_PaperStyle(mc, mc_var, plotDir);
+
+    DrawErrorSummary(data, data_var, plotDir);
+    DrawErrorSummary(mc, mc_var, plotDir);
+
 
     delete data;
     delete mc;
@@ -2388,13 +2422,16 @@ void CCProtonPi0_Plotter::PlotXSecVar_IntType(std::string var_name, std::string 
     MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
     MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
     mc->ClearAllErrorBands();
-   
+    double total_area = mc->Integral();
+
     MnvH1D* temp = NULL;
     std::vector<MnvH1D*> mc_IntType;
     for (int i = 0; i < nIntType; ++i){
         hist_name = var_name + "_xsec_IntType_" + std::to_string((long long int)i);
         temp = GetMnvH1D(f_xsec_mc, hist_name);
         temp->ClearAllErrorBands();
+        double temp_area = temp->Integral();
+        std::cout<<hist_name<<" "<<temp_area<<" "<<temp_area/total_area<<std::endl;
         mc_IntType.push_back(temp);
     }
 
@@ -2470,13 +2507,13 @@ void CCProtonPi0_Plotter::PlotXSecVar_WithMiniBoone(std::string var_name, std::s
 void CCProtonPi0_Plotter::plotCrossSection()
 {
     plot_muon_P = true;
-    plot_muon_theta = false;
-    plot_pi0_P = false;
-    plot_pi0_KE = false;
-    plot_pi0_theta = false;
-    plot_QSq = false;
-    plot_Enu = false;
-    plot_W = false;
+    plot_muon_theta = true;
+    plot_pi0_P = true;
+    plot_pi0_KE = true;
+    plot_pi0_theta = true;
+    plot_QSq = true;
+    plot_Enu = true;
+    plot_W = true;
 
     //plotOriginalData();
     //plotBackgroundEstimated();
@@ -2514,16 +2551,16 @@ void CCProtonPi0_Plotter::Systematics()
     //Systematics_CheckErrorSummary(rootDir_CutHists.mc, "invMass_mc_reco_all");
     //Systematics_CheckErrorSummary(rootDir_CrossSection.mc, "invMass_mc_reco_all");
     
-    //Systematics_XSec();
+    Systematics_XSec();
     //Systematics_invMass();
     
-    Systematics_WriteTables("muon_P");
-//    Systematics_WriteTables("muon_theta");
-//    Systematics_WriteTables("pi0_P");
-//    Systematics_WriteTables("pi0_KE");
-//    Systematics_WriteTables("pi0_theta");
-//    Systematics_WriteTables("QSq");
-//    Systematics_WriteTables("Enu");
+    //Systematics_WriteTables("muon_P");
+    //Systematics_WriteTables("muon_theta");
+    //Systematics_WriteTables("pi0_P");
+    //Systematics_WriteTables("pi0_KE");
+    //Systematics_WriteTables("pi0_theta");
+    //Systematics_WriteTables("QSq");
+    //Systematics_WriteTables("Enu");
    
 }
 
@@ -2581,8 +2618,140 @@ void CCProtonPi0_Plotter::W_Studies()
     //printBins_W();
     //init_W_FitResults();
     //plot_W_FitResults();
-    plot_W_FitMinuit(1.0,1.0,1.0);
-    plot_W_FitMinuit(0.931897,0.01,1.78231);
+    //plot_W_FitMinuit(1.0,1.0,1.0);
+    //plot_W_FitMinuit(0.931897,0.01,1.78231);
+
+
+    //DrawDataMC_Thesis(rootDir_Interaction, "W_Shift_0", plotDir);
+    //DrawDataMC_Thesis(rootDir_Interaction, "W_Shift_50", plotDir);
+    //DrawDataMC_Thesis(rootDir_Interaction, "W_Shift_100", plotDir);
+    //DrawDataMC_Thesis(rootDir_Interaction, "W_Shift_150", plotDir);
+
+    Draw_W_Shift(true); // Signal
+    Draw_W_Shift(false); // All
+}
+
+void CCProtonPi0_Plotter::Draw_W_Shift(bool isSignal)
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    TFile* f_data = new TFile(rootDir_Interaction.data.c_str());
+    TFile* f_mc = new TFile(rootDir_Interaction.mc.c_str());
+
+    // --------------------------------------------------------------------
+    // Get Histograms 
+    // --------------------------------------------------------------------
+
+    MnvH1D* data_cv = GetMnvH1D(f_data, "W_Shift_0");
+    // Background Subtract if Signal
+    if (isSignal){
+        MnvH1D* h_mc_bckg = GetMnvH1D(f_mc, Form("%s_%d","W_Shift_Bckg",0));
+        NormalizeHistogram(h_mc_bckg);
+        h_mc_bckg->Scale(2997.1);
+        data_cv->Add(h_mc_bckg, -1);
+        delete h_mc_bckg;
+    }
+    MnvH1D* mc_cv = isSignal ? GetMnvH1D(f_mc, "W_Shift_Signal_0") : GetMnvH1D(f_mc, "W_Shift_0");
+ 
+    // Best Fit -- Lowest ChiSq 
+    CCProtonPi0_QSqFitter QSqFitter;
+    int ind = QSqFitter.GetMinChiSq_W_Shift(isSignal);
+
+    MnvH1D* mc_Best = isSignal ? GetMnvH1D(f_mc, Form("%s_%d","W_Shift_Signal",ind)) : GetMnvH1D(f_mc, Form("%s_%d","W_Shift",ind));
+    MnvH1D* data_Best = GetMnvH1D(f_data, "W_Shift_0");
+    if (isSignal){
+        MnvH1D* h_mc_bckg = GetMnvH1D(f_mc, Form("%s_%d","W_Shift_Bckg",ind));
+        NormalizeHistogram(h_mc_bckg);
+        h_mc_bckg->Scale(2997.1);
+        data_Best->Add(h_mc_bckg, -1);
+        delete h_mc_bckg;
+    }     
+
+    data_cv->SetMarkerStyle(20);
+    data_cv->SetMarkerSize(1);
+    data_cv->SetMarkerColor(kBlack);
+    data_cv->SetLineWidth(1);
+    data_cv->SetLineColor(kBlack);
+    
+    if (isSignal){
+        data_Best->SetMarkerStyle(20);
+        data_Best->SetMarkerSize(1);
+        data_Best->SetMarkerColor(kBlue);
+        data_Best->SetLineWidth(1);
+        data_Best->SetLineColor(kBlue);
+    }
+
+    mc_cv->Scale(POT_ratio);
+    mc_cv->SetLineWidth(3);
+    mc_cv->SetLineColor(kRed);
+    mc_cv->SetFillColor(kWhite);
+
+    mc_Best->Scale(POT_ratio);
+    mc_Best->SetLineWidth(3);
+    mc_Best->SetLineStyle(1);
+    mc_Best->SetLineColor(kBlue);
+    mc_Best->SetFillColor(kWhite);
+    
+    TCanvas* c = new TCanvas("c","c",800,800);
+
+    if (thesisStyle){
+        data_cv->GetXaxis()->SetTitleFont(62);
+        data_cv->GetXaxis()->SetTitleSize(0.06);
+        data_cv->GetXaxis()->CenterTitle();
+        data_cv->GetXaxis()->SetTitleOffset(1.15);
+        data_cv->GetXaxis()->SetLabelFont(42);
+        data_cv->GetXaxis()->SetLabelSize(0.05);
+        data_cv->GetXaxis()->SetNdivisions(408);
+
+        data_cv->GetYaxis()->SetTitleFont(62);
+        data_cv->GetYaxis()->SetTitleSize(0.06);
+        //data_cv->GetYaxis()->CenterTitle();
+        data_cv->GetYaxis()->SetTitleOffset(1.1);
+        data_cv->GetYaxis()->SetLabelFont(42);
+        data_cv->GetYaxis()->SetLabelSize(0.05);
+        TGaxis::SetMaxDigits(3);
+    }
+
+    data_cv->SetMaximum(data_cv->GetMaximum()*1.5);
+    data_cv->SetMinimum(0.0);
+    data_cv->Draw("E1 X0");
+    mc_cv->Draw("HIST SAME");
+    mc_Best->Draw("HIST SAME");
+    if (isSignal) data_Best->Draw("E1 X0 SAME");
+
+    // TLegend
+    TLegend *legend = new TLegend(0.20,0.75,0.65,0.90);  
+    ApplyStyle_Legend(legend);
+    legend->AddEntry(data_cv, "Central Value Data W", "lep");
+    legend->AddEntry(mc_cv, "Central Value GENIE W", "l");
+    if (isSignal) legend->AddEntry(data_Best, "Data based on -20 Shift GENIE", "lep");
+    legend->AddEntry(mc_Best, "-20 MeV Shift GENIE W", "l");
+    legend->Draw();
+
+    // Add Text
+//    TLatex text;
+//    text.SetNDC();
+//    text.SetTextSize(0.03);
+//    text.DrawLatex(0.20,0.86,Form("%s%3.2f", "CV #chi^{2}/d.o.f. = ", Calc_ChiSq(data_cv, mc_cv)/12));
+//    text.DrawLatex(0.20,0.82,Form("-%d%s%3.2f", ind, " MeV #chi^{2}/d.o.f = ", Calc_ChiSq(data_cv, mc_Best)/12));
+
+    // Save Plot 
+    gStyle->SetOptStat(0); 
+    c->Update();
+    std::string plot_name;
+    if (isSignal){
+        plot_name = Form("%s%s",plotDir.c_str(),"W_Shift_Fit_Signal.png");
+    }else{
+        plot_name = Form("%s%s",plotDir.c_str(),"W_Shift_Fit.png");
+    }
+    c->Print(plot_name.c_str(), "png");
+
+    delete data_cv;
+    delete mc_cv;
+    delete mc_Best;
+    delete c;
+    delete f_data;
+    delete f_mc;
 }
 
 void CCProtonPi0_Plotter::BckgSubtraction_Studies()
@@ -2656,7 +2825,7 @@ void CCProtonPi0_Plotter::QSq_Studies()
     
     // MaRES Fit
     //Draw_QSq_MaRES_Plots();
-    Draw_QSq_MaRES_Fit(false); // POT
+    //Draw_QSq_MaRES_Fit(false); // POT
     //Draw_QSq_MaRES_Fit(true); // Area
     //Draw_QSq_MaRES_AreaNorm();
     
@@ -2714,8 +2883,9 @@ double CCProtonPi0_Plotter::Calc_ChiSq(TH1* data, TH1* MC)
     for (int i = 1; i <= nBins; ++i){
         double nData = data->GetBinContent(i);
         double nMC = MC->GetBinContent(i);
+        double err = data->GetBinError(i);
        
-        ChiSq += std::pow((nData-nMC),2) / nMC;
+        ChiSq += std::pow((nData-nMC),2) / std::pow(err,2);
         nPoints++;
     }
 
@@ -2728,63 +2898,474 @@ void CCProtonPi0_Plotter::DeltaRes_Studies()
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
     
-    Draw1DHist(rootDir_Interaction, "resID", plotDir);
-    Draw1DHist(rootDir_Interaction, "resID_theta", plotDir);
+    //Draw1DHist(rootDir_Interaction, "resID", plotDir);
+    //Draw1DHist(rootDir_Interaction, "resID_theta", plotDir);
 //
-//    DrawDataMC_Signal(rootDir_Interaction, "deltaInvMass", plotDir, 883.973);
-//    DrawDataMC_Signal(rootDir_Interaction, "Delta_pi_P", plotDir, 883.973);
-//    DrawDataMC_Signal(rootDir_Interaction, "Delta_pi_theta", plotDir, 883.973);
-//    DrawDataMC_Signal(rootDir_Interaction, "Delta_pi_phi", plotDir, 883.973);
-//
-//    DrawMnvH2D_Signal(rootDir_Interaction, "Delta_pi_phi_theta", plotDir, 883.973, false);
-//    DrawMnvH2D_Signal(rootDir_Interaction, "Delta_pi_phi_theta", plotDir, 883.973, true);
-//
-//    DrawMnvH2D_Signal(rootDir_Interaction, "Delta_pi_P_theta", plotDir, 883.973, false);
-//    DrawMnvH2D_Signal(rootDir_Interaction, "Delta_pi_P_theta", plotDir, 883.973, true);
+    //Draw1DHist(rootDir_Truth, "Delta_pi_theta_all_signal", plotDir);
+    //Draw1DHist(rootDir_Truth, "Delta_pi_theta_delta_res", plotDir);
+    //Draw1DHist(rootDir_Truth, "Delta_pi_theta_other_res", plotDir);
+    //Draw1DHist(rootDir_Truth, "Delta_pi_theta_non_res", plotDir);
+
+    Draw1DHist(rootDir_Truth, "deltaInvMass_delta_res", plotDir);
+    Draw1DHist(rootDir_Truth, "deltaInvMass_other_res", plotDir);
+    Draw1DHist(rootDir_Truth, "deltaInvMass_non_res", plotDir);
+
+    //DrawDataMC_Signal(rootDir_Interaction, "deltaInvMass", plotDir, 883.973);
+    //DrawDataMC_Signal(rootDir_Interaction, "Delta_pi_theta", plotDir, 883.973);
+    //DrawDataMC_Signal(rootDir_Interaction, "Delta_pi_phi", plotDir, 883.973);
+
+    //DrawNormalizedMigrationHistogram(rootDir_Interaction, "deltaInvMass_response", plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Interaction, "Delta_pi_theta_response", plotDir);
+    //DrawNormalizedMigrationHistogram(rootDir_Interaction, "Delta_pi_phi_response", plotDir);
+
+    //DrawDataMC_Unfolded(rootDir_Interaction, "deltaInvMass", plotDir, 883.973);
+    //DrawDataMC_Unfolded(rootDir_Interaction, "Delta_pi_theta", plotDir, 883.973);
+    //DrawDataMC_Unfolded(rootDir_Interaction, "Delta_pi_phi", plotDir, 883.973);
+
+    //DrawDataMC_EffCorrected(rootDir_Interaction, "deltaInvMass", plotDir, 883.973);
+    //DrawDataMC_EffCorrected(rootDir_Interaction, "Delta_pi_theta", plotDir, 883.973);
+    //DrawDataMC_EffCorrected(rootDir_Interaction, "Delta_pi_phi", plotDir, 883.973);
+
+    DrawDataMC_EffCorrected_Stacked(rootDir_Interaction, "deltaInvMass", plotDir, 883.973);
+    //DrawDataMC_EffCorrected_Stacked(rootDir_Interaction, "Delta_pi_phi", plotDir, 883.973);
+    //DrawDataMC_EffCorrected_Stacked(rootDir_Interaction, "Delta_pi_theta", plotDir, 883.973);
+    //Delta_pi_theta_Fit();
+    //Delta_pi_phi_Fit();
 }
 
 void CCProtonPi0_Plotter::Studies_2p2h()
 {
     std::string plotDir = Folder_List::plotDir_OtherStudies;
     
-    DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_energy_1Track", plotDir, 1288.07);
-    DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_energy_2Track", plotDir, 1709.03);
-    DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_energy_All", plotDir, 2997.1);
+    //DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_energy_1Track", plotDir, 1288.07);
+    //DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_energy_2Track", plotDir, 1709.03);
+    //DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_energy_All", plotDir, 2997.1);
 
-    DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_evis_1Track", plotDir, 1288.07);
-    DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_evis_2Track", plotDir, 1709.03);
-    DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_evis_All", plotDir, 2997.1);
+    //DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_evis_1Track", plotDir, 1288.07);
+    //DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_evis_2Track", plotDir, 1709.03);
+    //DrawDataStackedMC_Signal(rootDir_Interaction, "vertex_evis_All", plotDir, 2997.1);
 
-    DrawDataMC_Signal(rootDir_Interaction, "vertex_energy_1Track", plotDir, 1288.07);
-    DrawDataMC_Signal(rootDir_Interaction, "vertex_energy_2Track", plotDir, 1709.03);
-    DrawDataMC_Signal(rootDir_Interaction, "vertex_energy_All", plotDir, 2997.1);
+    //DrawDataMC_Signal(rootDir_Interaction, "vertex_energy_1Track", plotDir, 1288.07);
+    //DrawDataMC_Signal(rootDir_Interaction, "vertex_energy_2Track", plotDir, 1709.03);
+    //DrawDataMC_Signal(rootDir_Interaction, "vertex_energy_All", plotDir, 2997.1);
 
-    DrawDataMC_Signal(rootDir_Interaction, "vertex_evis_1Track", plotDir, 1288.07);
-    DrawDataMC_Signal(rootDir_Interaction, "vertex_evis_2Track", plotDir, 1709.03);
-    DrawDataMC_Signal(rootDir_Interaction, "vertex_evis_All", plotDir, 2997.1);
+    //DrawDataMC_Signal(rootDir_Interaction, "vertex_evis_1Track", plotDir, 1288.07);
+    //DrawDataMC_Signal(rootDir_Interaction, "vertex_evis_2Track", plotDir, 1709.03);
+    //DrawDataMC_Signal(rootDir_Interaction, "vertex_evis_All", plotDir, 2997.1);
 
-    DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_energy_1Track", plotDir, 1288.07);
-    DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_energy_2Track", plotDir, 1709.03);
-    DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_energy_All", plotDir, 2997.1);
+    //DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_energy_1Track", plotDir, 1288.07);
+    //DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_energy_2Track", plotDir, 1709.03);
+    //DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_energy_All", plotDir, 2997.1);
 
-    DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_evis_1Track", plotDir, 1288.07);
-    DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_evis_2Track", plotDir, 1709.03);
-    DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_evis_All", plotDir, 2997.1);
+    //DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_evis_1Track", plotDir, 1288.07);
+    //DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_evis_2Track", plotDir, 1709.03);
+    //DrawDataMCSignal_Diff(rootDir_Interaction, "vertex_evis_All", plotDir, 2997.1);
 
-    DrawMnvH2D(rootDir_Interaction.data, "q3_q0_All_0", plotDir);
-    DrawMnvH2D(rootDir_Interaction.mc, "q3_q0_All_0", plotDir);
+    //DrawMnvH2D(rootDir_Interaction.data, "muon_theta_muon_KE_0", plotDir);
+    //DrawMnvH2D(rootDir_Interaction.mc, "muon_theta_muon_KE_0", plotDir);
 
-    DrawMnvH2D(rootDir_Interaction.data, "W_QSq_All_0", plotDir);
-    DrawMnvH2D(rootDir_Interaction.mc, "W_QSq_All_0", plotDir);
+    //DrawMnvH2D(rootDir_Interaction.data, "q3_q0_0", plotDir);
+    //DrawMnvH2D(rootDir_Interaction.mc, "q3_q0_0", plotDir);
 
-    DrawDataMCSignal_Diff_2D(rootDir_Interaction, "q3_q0_1Track", plotDir, 1288.07);
-    DrawDataMCSignal_Diff_2D(rootDir_Interaction, "q3_q0_2Track", plotDir, 1709.03);
-    DrawDataMCSignal_Diff_2D(rootDir_Interaction, "q3_q0_All", plotDir, 2997.1);
+    //DrawMnvH2D(rootDir_Interaction.data, "W_QSq_0", plotDir);
+    //DrawMnvH2D(rootDir_Interaction.mc, "W_QSq_0", plotDir);
 
-    DrawDataMCSignal_Diff_2D(rootDir_Interaction, "W_QSq_1Track", plotDir, 1288.07);
-    DrawDataMCSignal_Diff_2D(rootDir_Interaction, "W_QSq_2Track", plotDir, 1709.03);
-    DrawDataMCSignal_Diff_2D(rootDir_Interaction, "W_QSq_All", plotDir, 2997.1);
+    //DrawDataMCSignal_Diff_2D(rootDir_Interaction, "muon_theta_muon_KE", plotDir, 2997.1);
+    DrawDataMCSignal_Diff_2D(rootDir_Interaction, "q3_q0", plotDir, 2997.1);
+    //DrawDataMCSignal_Diff_2D(rootDir_Interaction, "W_QSq", plotDir, 2997.1);
 }
 
+
+void CCProtonPi0_Plotter::Delta_pi_phi_Fit()
+{
+    double nBckg = 883.793;
+    std::string var_name = "Delta_pi_phi";
+
+    TFile* f_mc = new TFile(rootDir_Interaction.mc.c_str());
+    
+    // Background Subtraction
+    MnvH1D* data = GetBckgSubtractedData(rootDir_Interaction, var_name, nBckg);
+    MnvH1D* mc = GetMnvH1D(f_mc, Form("%s_%d",var_name.c_str(),1));
+
+    // Unfolding
+    std::string var = var_name + "_response";
+    MnvH2D* response = GetMnvH2D(f_mc, var);
+
+    MnvH1D* data_unfolded = 0;
+    MinervaUnfold::MnvUnfold::Get().UnfoldHisto(data_unfolded, response, data, RooUnfold::kBayes, 4, true);
+
+    // Efficiency Correction
+    TFile* f_truth = new TFile(rootDir_Truth.mc.c_str()); 
+    var = var_name + "_all_signal";
+    MnvH1D* mc_all_signal = GetMnvH1D(f_truth, var);
+    MnvH1D* eff_curve = new MnvH1D(*mc);
+    eff_curve->Divide(mc, mc_all_signal);
+
+    MnvH1D* data_eff_corrected = new MnvH1D(*data_unfolded);
+
+    data_eff_corrected->Divide(data_unfolded, eff_curve);
+    var_name = var_name + "_eff_corrected";
+
+    // Plot Data vs MC
+    MnvPlotter* plotter = new MnvPlotter();
+    plotter->SetRootEnv();
+    ApplyStyle(plotter);
+    TCanvas* canvas = new TCanvas("c1");
+
+    plotter->headroom = 1.75;
+    plotter->data_line_width = 2;
+    plotter->data_marker_size = 1.5;
+    gStyle->SetEndErrorSize(6);
+
+    data_eff_corrected->GetXaxis()->SetNdivisions(505);
+    mc_all_signal->GetXaxis()->SetNdivisions(505);
+    plotter->DrawDataMCWithErrorBand(data_eff_corrected, mc_all_signal, POT_ratio, "N", false, NULL, NULL, false, true);
+
+    // Fit
+    const double a = 2258;
+    const double a1 = 2113.5;
+    const double a2 = 2403.2;
+
+    const double b = -482.5;
+    const double b1 = -687.4;
+    const double b2 = -277.6;
+
+    std::vector<double> phi_x;
+    std::vector<double> phi_y;
+    std::vector<double> phi_y1;
+    std::vector<double> phi_y2;
+    for (double i = 0.0; i <= 360; ++i){
+        phi_x.push_back(i);
+
+        double y = a + b*sin(i * TMath::DegToRad());
+        double y1 = a1 + b2*sin(i * TMath::DegToRad()); 
+        double y2 = a2 + b1*sin(i * TMath::DegToRad()); 
+
+        phi_y.push_back(y);
+        phi_y1.push_back(y1);
+        phi_y2.push_back(y2);
+    }
+
+    int size = phi_x.size();
+    double arr_x[size];
+    double arr_y[size];
+    double arr_y1[size];
+    double arr_y2[size];
+    for (int i = 0; i < size; i++){
+        arr_x[i] = phi_x[i];
+        arr_y[i] = phi_y[i];
+        arr_y1[i] = phi_y1[i];
+        arr_y2[i] = phi_y2[i];
+    }
+
+    TGraph* fit_y = new TGraph(size, arr_x, arr_y);
+    fit_y->SetLineColor(kBlue);
+    fit_y->SetLineWidth(2);
+    fit_y->SetLineStyle(1);
+    fit_y->Draw("SAMEL");
+
+    TGraph* fit_y1 = new TGraph(size, arr_x, arr_y1);
+    fit_y1->SetLineColor(kBlue);
+    fit_y1->SetLineWidth(1);
+    fit_y1->SetLineStyle(7);
+    fit_y1->Draw("SAMEL");
+
+    TGraph* fit_y2 = new TGraph(size, arr_x, arr_y2);
+    fit_y2->SetLineColor(kBlue);
+    fit_y2->SetLineWidth(1);
+    fit_y2->SetLineStyle(7);
+    fit_y2->Draw("SAMEL");
+
+    // Calc ChiSq
+    int nBins = data_eff_corrected->GetNbinsX();
+    double ChiSq_Fit = 0.0; 
+    for (int i = 1; i <= nBins; ++i){
+        double nData = data_eff_corrected->GetBinContent(i);
+        double bin = data_eff_corrected->GetBinCenter(i);
+        double err = data_eff_corrected->GetBinError(i);
+        double nFit = a + b * sin( bin * TMath::DegToRad());
+        double ChiSq = std::pow((nData-nFit),2) / std::pow(err,2);
+        //std::cout<<"nData = "<<nData<<" nFit = "<<nFit<<" Err = "<<err<<" Chi = "<<ChiSq<<std::endl; 
+        ChiSq_Fit += ChiSq;
+    }
+
+    mc_all_signal->Scale(POT_ratio);
+    double ChiSq = Calc_ChiSq(data_eff_corrected, mc_all_signal);
+        
+    std::cout<<"Delta_pi_phi ChiSq = "<<ChiSq<<std::endl;
+    std::cout<<"Delta_pi_phi ChiSq/dof = "<<ChiSq/9.0<<std::endl;
+    std::cout<<"Delta_pi_phi Fit ChiSq = "<<ChiSq_Fit<<std::endl;
+    std::cout<<"Delta_pi_phi Fit ChiSq/dof = "<<ChiSq_Fit/8.0<<std::endl;
+
+    // Add Legend
+    data_eff_corrected->SetMarkerStyle(20);
+    data_eff_corrected->SetMarkerSize(1);
+    data_eff_corrected->SetMarkerColor(kBlack);
+    data_eff_corrected->SetLineWidth(2);
+    data_eff_corrected->SetLineColor(kBlack);
+
+    mc_all_signal->SetLineWidth(3);
+    mc_all_signal->SetLineColor(kRed);
+    mc_all_signal->SetFillColor(kWhite);
+
+    TLegend *legend = new TLegend(0.55,0.70,0.90,0.9);  
+    ApplyStyle_Legend(legend);
+    legend->SetTextSize(0.05);
+    legend->AddEntry(data_eff_corrected, "Data (3.33e20 POT)", "lep");
+    legend->AddEntry(mc_all_signal, "Simulation", "l");
+    legend->AddEntry(fit_y, "Fit to Data", "l");
+    legend->Draw();
+    
+    TLatex text;
+    text.SetNDC();
+    text.SetTextColor(kBlue);
+    text.SetTextSize(0.03);
+    text.SetTextAlign(22);
+    text.DrawLatex(0.30,0.87,"POT Normalized");
+
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    std::string out_name = plotDir + var_name + "_Fit" + ".pdf"; 
+
+    canvas->Print(out_name.c_str(),"pdf");
+
+    delete data;
+    delete mc;
+    delete response;
+    delete data_unfolded;
+    delete mc_all_signal;
+    delete eff_curve;
+    delete data_eff_corrected;
+    delete f_truth;
+    delete f_mc;
+    delete canvas;
+    delete plotter;
+}
+
+void CCProtonPi0_Plotter::Delta_pi_theta_Fit()
+{
+    double nBckg = 883.793;
+    std::string var_name = "Delta_pi_theta";
+
+    TFile* f_mc = new TFile(rootDir_Interaction.mc.c_str());
+    
+    // Background Subtraction
+    MnvH1D* data = GetBckgSubtractedData(rootDir_Interaction, var_name, nBckg);
+    MnvH1D* mc = GetMnvH1D(f_mc, Form("%s_%d",var_name.c_str(),1));
+
+    // Unfolding
+    std::string var = var_name + "_response";
+    MnvH2D* response = GetMnvH2D(f_mc, var);
+
+    MnvH1D* data_unfolded = 0;
+    MinervaUnfold::MnvUnfold::Get().UnfoldHisto(data_unfolded, response, data, RooUnfold::kBayes, 4, true);
+
+    // Efficiency Correction
+    TFile* f_truth = new TFile(rootDir_Truth.mc.c_str()); 
+    var = var_name + "_all_signal";
+    MnvH1D* mc_all_signal = GetMnvH1D(f_truth, var);
+    MnvH1D* eff_curve = new MnvH1D(*mc);
+    eff_curve->Divide(mc, mc_all_signal);
+
+    MnvH1D* data_eff_corrected = new MnvH1D(*data_unfolded);
+
+    data_eff_corrected->Divide(data_unfolded, eff_curve);
+    var_name = var_name + "_eff_corrected";
+
+    // Plot Data vs MC
+    MnvPlotter* plotter = new MnvPlotter();
+    plotter->SetRootEnv();
+    ApplyStyle(plotter);
+    TCanvas* canvas = new TCanvas("c1");
+
+    plotter->headroom = 1.75;
+    plotter->data_line_width = 2;
+    plotter->data_marker_size = 1.5;
+    gStyle->SetEndErrorSize(6);
+
+    data_eff_corrected->GetXaxis()->SetNdivisions(505);
+    mc_all_signal->GetXaxis()->SetNdivisions(505);
+    plotter->DrawDataMCWithErrorBand(data_eff_corrected, mc_all_signal, POT_ratio, "N", false, NULL, NULL, false, true);
+
+    // Fit
+    const double a = 1931;
+    const double a1 = 1809;
+    const double a2 = 2053;
+
+    const double b = 294.1;
+    const double b1 = 153.6;
+    const double b2 = 434.6;
+
+    const double c = 1081;
+    const double c1 = 803.6;
+    const double c2 = 1358.8;
+
+    std::vector<double> cos_theta_x;
+    std::vector<double> cos_theta_y;
+    std::vector<double> cos_theta_y1;
+    std::vector<double> cos_theta_y2;
+    for (double i = -1.0; i <= 1.0; i = i + 0.01){
+        cos_theta_x.push_back(i);
+
+        double y = a + b*i + c*std::pow(i,2); 
+        double y1 = a1 + b1*i + c1*std::pow(i,2); 
+        double y2 = a2 + b2*i + c2*std::pow(i,2); 
+
+        cos_theta_y.push_back(y);
+        cos_theta_y1.push_back(y1);
+        cos_theta_y2.push_back(y2);
+    }
+
+    int size = cos_theta_x.size();
+    double arr_x[size];
+    double arr_y[size];
+    double arr_y1[size];
+    double arr_y2[size];
+    for (int i = 0; i < size; i++){
+        arr_x[i] = cos_theta_x[i];
+        arr_y[i] = cos_theta_y[i];
+        arr_y1[i] = cos_theta_y1[i];
+        arr_y2[i] = cos_theta_y2[i];
+    }
+
+    TGraph* fit_y = new TGraph(size, arr_x, arr_y);
+    fit_y->SetLineColor(kBlue);
+    fit_y->SetLineWidth(2);
+    fit_y->SetLineStyle(1);
+    fit_y->Draw("SAMEL");
+
+    TGraph* fit_y1 = new TGraph(size, arr_x, arr_y1);
+    fit_y1->SetLineColor(kBlue);
+    fit_y1->SetLineWidth(1);
+    fit_y1->SetLineStyle(7);
+    fit_y1->Draw("SAMEL");
+
+    TGraph* fit_y2 = new TGraph(size, arr_x, arr_y2);
+    fit_y2->SetLineColor(kBlue);
+    fit_y2->SetLineWidth(1);
+    fit_y2->SetLineStyle(7);
+    fit_y2->Draw("SAMEL");
+
+    // Calc ChiSq
+    int nBins = data_eff_corrected->GetNbinsX();
+    double ChiSq_Fit = 0.0; 
+    for (int i = 1; i <= nBins; ++i){
+        double nData = data_eff_corrected->GetBinContent(i);
+        double bin = data_eff_corrected->GetBinCenter(i);
+        double err = data_eff_corrected->GetBinError(i);
+        double nFit = a + b * bin + c * std::pow(bin,2);
+        double ChiSq = std::pow((nData-nFit),2) / std::pow(err,2);
+        //std::cout<<"nData = "<<nData<<" nFit = "<<nFit<<" Err = "<<err<<" Chi = "<<ChiSq<<std::endl; 
+        ChiSq_Fit += ChiSq;
+    }
+
+    mc_all_signal->Scale(POT_ratio);
+    double ChiSq = Calc_ChiSq(data_eff_corrected, mc_all_signal);
+        
+    std::cout<<"Delta_pi_theta ChiSq = "<<ChiSq<<std::endl;
+    std::cout<<"Delta_pi_theta ChiSq/dof = "<<ChiSq/9.0<<std::endl;
+    std::cout<<"Delta_pi_theta Fit ChiSq = "<<ChiSq_Fit<<std::endl;
+    std::cout<<"Delta_pi_theta Fit ChiSq/dof = "<<ChiSq_Fit/7.0<<std::endl;
+
+    // Add Legend
+    data_eff_corrected->SetMarkerStyle(20);
+    data_eff_corrected->SetMarkerSize(1);
+    data_eff_corrected->SetMarkerColor(kBlack);
+    data_eff_corrected->SetLineWidth(2);
+    data_eff_corrected->SetLineColor(kBlack);
+
+    mc_all_signal->SetLineWidth(3);
+    mc_all_signal->SetLineColor(kRed);
+    mc_all_signal->SetFillColor(kWhite);
+
+    TLegend *legend = new TLegend(0.55,0.70,0.90,0.9);  
+    ApplyStyle_Legend(legend);
+    legend->SetTextSize(0.05);
+    legend->AddEntry(data_eff_corrected, "Data (3.33e20 POT)", "lep");
+    legend->AddEntry(mc_all_signal, "Simulation", "l");
+    legend->AddEntry(fit_y, "Fit to Data", "l");
+    legend->Draw();
+    
+    TLatex text;
+    text.SetNDC();
+    text.SetTextColor(kBlue);
+    text.SetTextSize(0.03);
+    text.SetTextAlign(22);
+    text.DrawLatex(0.30,0.87,"POT Normalized");
+
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    std::string out_name = plotDir + var_name + "_Fit" + ".pdf"; 
+
+    canvas->Print(out_name.c_str(),"pdf");
+
+    delete data;
+    delete mc;
+    delete response;
+    delete data_unfolded;
+    delete mc_all_signal;
+    delete eff_curve;
+    delete data_eff_corrected;
+    delete f_truth;
+    delete f_mc;
+    delete canvas;
+    delete plotter;
+}
+
+void CCProtonPi0_Plotter::XSec_Tables()
+{
+    // Systematics 
+    Systematics_WriteTables("muon_P");
+    Systematics_WriteTables("muon_theta");
+    Systematics_WriteTables("pi0_P");
+    Systematics_WriteTables("pi0_KE");
+    Systematics_WriteTables("pi0_theta");
+    Systematics_WriteTables("QSq");
+    Systematics_WriteTables("Enu");
+
+    std::string nominal_xsecs_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Nominal/Data/Analyzed/CrossSection.root";
+    Single_XSec_Table(nominal_xsecs_dir, "muon_P_xsec", "Nominal");
+    Single_XSec_Table(nominal_xsecs_dir, "muon_theta_xsec", "Nominal");
+    
+    Single_XSec_Table(nominal_xsecs_dir, "pi0_P_xsec", "Nominal");
+    Single_XSec_Table(nominal_xsecs_dir, "pi0_KE_xsec", "Nominal");
+    Single_XSec_Table(nominal_xsecs_dir, "pi0_theta_xsec", "Nominal");
+    
+    Single_XSec_Table(nominal_xsecs_dir, "QSq_xsec", "Nominal");
+    Single_XSec_Table(nominal_xsecs_dir, "Enu_xsec", "Nominal");
+
+    std::string final_xsecs_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_Final_XSecs/Data/Analyzed/CrossSection.root";
+    Single_XSec_Table(final_xsecs_dir, "muon_P_xsec", "Final");
+    Single_XSec_Table(final_xsecs_dir, "muon_theta_xsec", "Final");
+    
+    Single_XSec_Table(final_xsecs_dir, "pi0_P_xsec", "Final");
+    Single_XSec_Table(final_xsecs_dir, "pi0_KE_xsec", "Final");
+    Single_XSec_Table(final_xsecs_dir, "pi0_theta_xsec", "Final");
+    
+    Single_XSec_Table(final_xsecs_dir, "QSq_xsec", "Final");
+    Single_XSec_Table(final_xsecs_dir, "Enu_xsec", "Final");
+
+    std::string delta_factor_xsecs_dir = "/minerva/data/users/oaltinok/NTupleAnalysis_DeltaFactor_Applied/Data/Analyzed/CrossSection.root";
+    Single_XSec_Table(delta_factor_xsecs_dir, "muon_P_xsec", "DeltaFactor_Applied");
+    Single_XSec_Table(delta_factor_xsecs_dir, "muon_theta_xsec", "DeltaFactor_Applied");
+    
+    Single_XSec_Table(delta_factor_xsecs_dir, "pi0_P_xsec", "DeltaFactor_Applied");
+    Single_XSec_Table(delta_factor_xsecs_dir, "pi0_KE_xsec", "DeltaFactor_Applied");
+    Single_XSec_Table(delta_factor_xsecs_dir, "pi0_theta_xsec", "DeltaFactor_Applied");
+    
+    Single_XSec_Table(delta_factor_xsecs_dir, "QSq_xsec", "DeltaFactor_Applied");
+    Single_XSec_Table(delta_factor_xsecs_dir, "Enu_xsec", "DeltaFactor_Applied");
+
+
+}
+
+void CCProtonPi0_Plotter::Single_XSec_Table(std::string root_dir, std::string var_name, std::string xsec_type)
+{
+    TFile* f = new TFile(root_dir.c_str());
+
+    MnvH1D* hist = GetMnvH1D(f, var_name);
+    std::string var = var_name + "_" + xsec_type;
+    NormalizeToNormBinWidth(hist);
+    printBins(hist, var, true);
+    delete hist;
+}
 #endif
 

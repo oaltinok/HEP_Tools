@@ -800,6 +800,22 @@ void CCProtonPi0_NTupleAnalysis::ReInitFluxReweighter(enum FluxReweighter::EPlay
     frw = new FluxReweighter(14, applyNuEConstraint, playlist, new_flux, old_flux);
 }
 
+void CCProtonPi0_NTupleAnalysis::printBins(const TH2* hist, const std::string var_name)
+{
+    std::cout<<"Printing Bin Content for "<<var_name<<std::endl;
+
+    int nBinsX = hist->GetNbinsX();
+    int nBinsY = hist->GetNbinsY();
+
+    for (int y = nBinsY; y >= 1; --y){
+        for (int x = 1; x <= nBinsX; ++x){
+            double content = hist->GetBinContent(x,y);
+            std::cout<<content<<" ";
+        }
+        std::cout<<std::endl;
+    }
+}
+
 void CCProtonPi0_NTupleAnalysis::printBins(const TH1* hist, const std::string var_name, bool useLowEdge)
 {
     std::cout<<std::left;
@@ -823,15 +839,18 @@ void CCProtonPi0_NTupleAnalysis::printBins(const TH1* hist, const std::string va
         }else{
             std::cout.width(12); std::cout<<hist->GetBinCenter(i);
         }
-        std::cout.width(12); std::cout<<content;
-        std::cout.width(12); std::cout<<content/nEntries*100;
+        std::cout.width(12); std::cout<<std::setprecision(3)<<content;
+        std::cout.width(12); std::cout<<std::setprecision(3)<<content/nEntries*100;
         std::cout<<std::endl;
     }
 
     std::cout.width(12); std::cout<<"Total";
-    std::cout.width(12); std::cout<<total;
-    std::cout.width(12); std::cout<<total/nEntries*100;
+    std::cout.width(12); std::cout<<std::setprecision(3)<<total;
+    std::cout.width(12); std::cout<<std::setprecision(3)<<total/nEntries*100;
     std::cout<<std::endl;
+
+    std::cout<<"UnderFlow = "<<hist->GetBinContent(0)<<std::endl;
+    std::cout<<"OverFlow = "<<hist->GetBinContent(nBins+1)<<std::endl;
 
 }
 

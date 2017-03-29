@@ -365,7 +365,7 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     legend->SetTextSize(0.04);
     legend->SetTextFont(42);
     legend->Draw();
-
+//
 //    // Add Pi0 InvMass Lines
 //    TLine line;
 //    line.SetLineWidth(3);
@@ -383,7 +383,7 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
 //    // High Inv Mass Region
 //    line.DrawLine(200.0,0,200.0,hist_max);
 //    arrow.DrawArrow(200.0,hist_max,200+20,hist_max,0.01,">");     
-
+//
     // Add Weights as Text to Modified Plot 
     //if (ind != 0){
     //    int nPars = 3;
@@ -435,7 +435,7 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     h_data_mc_ratio->SetMaximum(1.5);
 
     // X axis ratio plot settings
-    h_data_mc_ratio->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    h_data_mc_ratio->GetXaxis()->SetTitle("#gamma#gamma Invariant Mass [MeV]");
     h_data_mc_ratio->GetXaxis()->SetNdivisions(408);
     h_data_mc_ratio->GetXaxis()->CenterTitle();
     h_data_mc_ratio->GetXaxis()->SetTitleFont(62);

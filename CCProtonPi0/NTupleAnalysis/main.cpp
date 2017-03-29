@@ -16,6 +16,7 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 
 #include "Cintex/Cintex.h"
 #include "Classes/SideBandTool/CCProtonPi0_SideBandTool.h"
+#include <PlotUtils/MnvPlotter.h>
 
 using namespace std;
 
@@ -31,7 +32,9 @@ void Calculate_CrossSection(bool isMC);
 void FitSideBands();
 void FitMinuit();
 void FitMinuit_W();
+void ApplyStyle(PlotUtils::MnvPlotter* plotter);
 void Fit(std::string fileName, std::string plotName);
+void Fit(std::string rootDir_data, std::string rootDir_mc, std::string plotName);
 void Fit_QSq();
 void calc_ChiSq(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t iflag);
 void calc_ChiSq_W(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t iflag);

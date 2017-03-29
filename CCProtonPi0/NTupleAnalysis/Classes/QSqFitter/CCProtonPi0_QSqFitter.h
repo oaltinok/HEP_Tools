@@ -12,12 +12,14 @@ class CCProtonPi0_QSqFitter: public CCProtonPi0_NTupleAnalysis
 
         int GetMinChiSq(bool isAreaNorm);
         int GetMinChiSq_DeltaFactor();
+        int GetMinChiSq_W_Shift(bool isSignal = false);
 
         std::vector<double> MaRESVector_up;
         std::vector<double> ChiSqVector_up;
         std::vector<double> MaRESVector_dn;
         std::vector<double> ChiSqVector_dn;
         std::vector<double> ChiSqVector_DeltaFactor;
+        std::vector<double> ChiSqVector_W_Shift;
 
     private:
         static const double GENIE_MaRES;
@@ -34,10 +36,14 @@ class CCProtonPi0_QSqFitter: public CCProtonPi0_NTupleAnalysis
         void FillChiSqVector_AreaNorm(std::vector<double> &ChiSqVector, bool isUpShift);
         void FillChiSqVector_SB(std::vector<double> &ChiSqVector, bool isUpShift);
         void FillChiSqVector_DeltaFactor();
+        void FillChiSqVector_W_Shift(bool isSignal);
         void NormalizeHistogram(TH1D* h);
+        void NormalizeHistogram(MnvH1D* h);
         void AreaNormalize(TH1D* data, TH1D* MC);
+
         double Calc_ChiSq(TH1D* data, TH1D* MC);
         double Calc_ChiSq_Delta(TH1D* data, TH1D* MC);
+        double Calc_ChiSq_W_Shift(MnvH1D* data, MnvH1D* MC);
         double Calc_Slope(double x1, double x2, double y1, double y2);
         double Calc_Constant(double m, double x, double y);
         double Calc_Weight(double m, double c, double x);

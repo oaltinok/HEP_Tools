@@ -61,7 +61,7 @@ void CCProtonPi0_Plotter::plot_W_FitMinuit(double wgt_DeltaRES, double wgt_Other
     mc_NonRES->SetLineColor(kRed+1);
     mc_NonRES->SetFillStyle(1001);
 
-    TCanvas* c = new TCanvas("c","c",1280,800);
+    TCanvas* c = new TCanvas("c","c",800,800);
     THStack *hs = new THStack("hs","W Minuit Fit");
     hs->Add(mc_DeltaRES);
     hs->Add(mc_OtherRES);
@@ -83,7 +83,8 @@ void CCProtonPi0_Plotter::plot_W_FitMinuit(double wgt_DeltaRES, double wgt_Other
     // ------------------------------------------------------------------------
     // Plot Labels 
     // ------------------------------------------------------------------------
-    TLegend *legend = new TLegend(0.6,0.7,0.8,0.9);  
+    TLegend *legend = new TLegend(0.5,0.7,0.8,0.9);  
+    ApplyStyle_Legend(legend);
     legend->AddEntry(data, "Data (3.33e20 POT)", "lep" );
     legend->AddEntry(mc_DeltaRES, "#Delta(1232) resonance","f");
     legend->AddEntry(mc_OtherRES, "Other resonances","f");
@@ -223,7 +224,7 @@ void CCProtonPi0_Plotter::W_Fit_Data(std::string fit_name, double* pars_deltaRES
    
     // Plot MC Signal and Bckg Subtracted Data
     MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
+    TCanvas* c = new TCanvas("c","c",800,800);
 
     plotter->headroom = 1.75;
     plotter->data_line_width = 2;
@@ -293,7 +294,8 @@ void CCProtonPi0_Plotter::W_Fit_Data(std::string fit_name, double* pars_deltaRES
     h_mc_signal->SetLineColor(kRed);
     h_mc_signal->SetFillColor(kWhite);
 
-    TLegend *legend = new TLegend(0.65,0.65,0.9,0.9);  
+    TLegend *legend = new TLegend(0.40,0.65,0.9,0.9);  
+    ApplyStyle_Legend(legend);
     legend->AddEntry(h_data, "Data (3.33e20 POT)", "lep");
     legend->AddEntry(h_mc_signal, "Simulation", "l");
     legend->AddEntry(fit_total, "Fit to Data", "l");
@@ -376,7 +378,7 @@ void CCProtonPi0_Plotter::W_Fit_MC_DeltaRES()
    
     // Plot MC Signal deltaRES 
     MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
+    TCanvas* c = new TCanvas("c","c",800,800);
 
     plotter->headroom = 1.75;
     plotter->DrawMCWithErrorBand(h_mc_signal);
@@ -408,7 +410,8 @@ void CCProtonPi0_Plotter::W_Fit_MC_DeltaRES()
     h_mc_signal->SetLineColor(kRed);
     h_mc_signal->SetFillColor(kWhite);
 
-    TLegend *legend = new TLegend(0.65,0.80,0.9,0.9);  
+    TLegend *legend = new TLegend(0.40,0.80,0.85,0.9);  
+    ApplyStyle_Legend(legend);
     legend->AddEntry(h_mc_signal, "Signal: #Delta(1232) RES", "le");
     legend->AddEntry(fit_deltaRES, "Fit: #Delta(1232) RES", "l");
     legend->Draw();
@@ -466,7 +469,7 @@ void CCProtonPi0_Plotter::W_Fit_MC_OtherRES()
    
     // Plot MC Signal deltaRES 
     MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
+    TCanvas* c = new TCanvas("c","c",800,800);
 
     plotter->headroom = 1.75;
     plotter->DrawMCWithErrorBand(h_mc_signal);
@@ -498,10 +501,12 @@ void CCProtonPi0_Plotter::W_Fit_MC_OtherRES()
     h_mc_signal->SetLineColor(kRed);
     h_mc_signal->SetFillColor(kWhite);
 
-    TLegend *legend = new TLegend(0.65,0.80,0.9,0.9);  
+    TLegend *legend = new TLegend(0.40,0.80,0.9,0.9);  
+    ApplyStyle_Legend(legend);
     legend->AddEntry(h_mc_signal, "Signal: Other RES", "le");
     legend->AddEntry(fit_otherRES, "Fit: Other RES", "l");
     legend->Draw();
+
     // ------------------------------------------------------------------------
     // Calc ChiSq
     // ------------------------------------------------------------------------
@@ -556,7 +561,7 @@ void CCProtonPi0_Plotter::W_Fit_MC_NonRES()
    
     // Plot MC Signal deltaRES 
     MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
+    TCanvas* c = new TCanvas("c","c",800,800);
 
     plotter->headroom = 1.75;
     plotter->DrawMCWithErrorBand(h_mc_signal);
@@ -596,7 +601,8 @@ void CCProtonPi0_Plotter::W_Fit_MC_NonRES()
     h_mc_signal->SetLineColor(kRed);
     h_mc_signal->SetFillColor(kWhite);
 
-    TLegend *legend = new TLegend(0.65,0.80,0.9,0.9);  
+    TLegend *legend = new TLegend(0.40,0.80,0.9,0.9);  
+    ApplyStyle_Legend(legend);
     legend->AddEntry(h_mc_signal, "Signal: Non-RES", "le");
     legend->AddEntry(fit_nonRES, "Fit: Non-RES", "l");
     legend->Draw();
@@ -633,7 +639,7 @@ void CCProtonPi0_Plotter::W_Fit_MC_NonRES()
     text.SetNDC();
     text.SetTextSize(0.03);
     text.DrawLatex(0.20,0.85,Form("#chi^{2}/dof = %3.2f", ChiSq_dof));
-    text.DrawLatex(0.20,0.82,Form("dof = %d-%d", nPoints, 3));
+    text.DrawLatex(0.20,0.82,Form("dof = %d-%d", nPoints, 6));
 
     // Plot 
     c->Update();
@@ -661,7 +667,7 @@ void CCProtonPi0_Plotter::W_Fit_MC()
    
     // Plot MC Signal 
     MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",1280,800);
+    TCanvas* c = new TCanvas("c","c",800,800);
 
     plotter->headroom = 1.75;
     plotter->DrawMCWithErrorBand(h_mc_signal);
@@ -721,7 +727,8 @@ void CCProtonPi0_Plotter::W_Fit_MC()
     h_mc_signal->SetLineColor(kRed);
     h_mc_signal->SetFillColor(kWhite);
 
-    TLegend *legend = new TLegend(0.65,0.65,0.9,0.9);  
+    TLegend *legend = new TLegend(0.40,0.65,0.9,0.9);  
+    ApplyStyle_Legend(legend);
     legend->AddEntry(h_mc_signal, "Signal", "le");
     legend->AddEntry(fit_total, "Fit to Simulation", "l");
     legend->AddEntry(fit_deltaRES, "Fit: #Delta(1232) RES", "l");

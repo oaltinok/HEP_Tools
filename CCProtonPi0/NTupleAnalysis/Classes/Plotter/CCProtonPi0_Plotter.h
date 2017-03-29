@@ -29,6 +29,7 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 #include <TLegend.h>
 #include <TColor.h>
 #include <TLine.h>
+#include <TArrow.h>
 #include <TPad.h>
 #include <TPaveStats.h>
 #include <TPaveText.h>
@@ -76,6 +77,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
 
     private:
         bool thesisStyle;
+        bool isPaperComparison;
 
         rootDir rootDir_PC;
         rootDir rootDir_GENIEXSec;
@@ -156,6 +158,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void BckgSubtraction_Studies();
         void QSq_Studies();
         void Studies_2p2h();
+        void Draw_W_Shift(bool isSignal);
         void Draw_QSq_EnuFit(std::string data_dir, std::string mc_dir, std::string var_name, double* pars);
         void Draw_QSq_MaRES_Fit(bool isAreaNorm);
         void Draw_QSq_MaRES_Fit_SB();
@@ -274,6 +277,9 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataMC_Thesis(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec = false);
         void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec = false);
         void DrawDataMC_Signal(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);
+        void DrawDataMC_Unfolded(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);
+        void DrawDataMC_EffCorrected(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);
+        void DrawDataMC_EffCorrected_Stacked(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);
         void DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isPOTNorm, bool isXSec = false);
         void DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGraph* otherData, std::string var_name, std::string ext_data_name, std::string plotDir);
         void DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D* mc_BeforeFSI, std::string var_name,  std::string plotDir);
@@ -290,9 +296,13 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataMCSignal_Diff_2D(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);
 
         // Other
+        void XSec_Tables();
+        void Single_XSec_Table(std::string root_dir, std::string var_name, std::string xsec_type);
         MnvH1D* GetBckgSubtractedData(rootDir& dir, std::string var_name, double nBckg);
         MnvH2D* GetBckgSubtractedData_2D(rootDir& dir, std::string var_name, double nBckg);
         void PlotDelta();
+        void Delta_pi_theta_Fit();
+        void Delta_pi_phi_Fit();
         void DrawBackgroundSubtraction(bool isMC);
         void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors = true);
         void DrawErrorSummary_PaperStyle(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors = true);

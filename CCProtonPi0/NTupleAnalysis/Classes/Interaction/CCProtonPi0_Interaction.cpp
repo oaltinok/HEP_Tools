@@ -290,8 +290,8 @@ void CCProtonPi0_Interaction::initHistograms()
         pi0_invMass_DeltaRES.push_back(temp);
 
         // Delta Resonance Study
-        temp = new MnvH1D( Form("%s_%d","deltaInvMass",i),"Reconstructed p#pi^{0} Invariant Mass",15, 0.5, 2.0);
-        temp->GetXaxis()->SetTitle("Reconstructed p#pi^{0} Inv. Mass [GeV]");
+        temp = new MnvH1D( Form("%s_%d","deltaInvMass",i),"p#pi^{0} Invariant Mass",16, 1.0, 1.8);
+        temp->GetXaxis()->SetTitle("p#pi^{0} Inv. Mass [GeV]");
         temp->GetYaxis()->SetTitle("N(Events)");
         deltaInvMass.push_back(temp);
 
@@ -305,26 +305,10 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         Delta_pi_theta.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","Delta_pi_phi",i),"#phi_{#pi^{0}} in #Delta Rest Frame",10,0.0,180.0);
-        temp->GetXaxis()->SetTitle("#phi");
+        temp = new MnvH1D( Form("%s_%d","Delta_pi_phi",i),"#phi_{#pi^{0}} in #Delta Rest Frame",10,0.0,360.0);
+        temp->GetXaxis()->SetTitle("#phi [deg]");
         temp->GetYaxis()->SetTitle("N(Events)");
         Delta_pi_phi.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","Delta_pi_P",i),"P_{#pi^{0}} in #Delta Rest Frame",10,0.0,1.0);
-        temp->GetXaxis()->SetTitle("#pi^{0} Momentum in #Delta Rest Frame [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        Delta_pi_P.push_back(temp);
-
-        temp2D = new MnvH2D( Form("%s_%d","Delta_pi_phi_theta",i),"#phi_{#pi^{0}} vs #theta_{#pi^{0}}in #Delta Rest Frame",10,0.0,180.0,10,-1.0,1.0);
-        temp2D->GetXaxis()->SetTitle("#phi");
-        temp2D->GetYaxis()->SetTitle("cos(#theta)");
-        Delta_pi_phi_theta.push_back(temp2D);
-
-        temp2D = new MnvH2D( Form("%s_%d","Delta_pi_P_theta",i),"P_{#pi^{0}} vs #theta_{#pi^{0}}in #Delta Rest Frame",10,-1.0,1.0,10,0.0,1.0);
-        temp2D->GetXaxis()->SetTitle("Pion Momentum in #Delta Rest Frame [GeV]");
-        temp2D->GetYaxis()->SetTitle("cos(#theta)");
-        Delta_pi_P_theta.push_back(temp2D);
-
 
         // 2p2h Study
         temp = new MnvH1D( Form("%s_%d","vertex_energy_1Track",i),"Vertex Blob Energy (r = 90mm)",binList.vertex_energy.get_nBins(), binList.vertex_energy.get_min(), binList.vertex_energy.get_max() );
@@ -357,36 +341,33 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.vertex_evis.get_width()));
         vertex_evis_All.push_back(temp);
 
-        temp2D = new MnvH2D( Form("%s_%d","q3_q0_All",i),"q0 vs q3", 20, 0.0, 3.0, 20, 0.0, 3.0);
-        temp2D->GetXaxis()->SetTitle("3-Momentum Transfer [GeV]");
-        temp2D->GetYaxis()->SetTitle("Energy Transfer [GeV]");
-        q3_q0_All.push_back(temp2D);
+        temp2D = new MnvH2D( Form("%s_%d","muon_theta_muon_KE",i),"T_{#mu} vs cos(#theta_{#mu})", 14, 0.92, 1.0, 14, 1.6, 3.0);
+        temp2D->GetXaxis()->SetTitle("muon cos#theta");
+        temp2D->GetYaxis()->SetTitle("muon kinetic energy (GeV)");
+        muon_theta_muon_KE.push_back(temp2D);
+
+        temp2D = new MnvH2D( Form("%s_%d","q3_q0",i),"q0 vs q3", 15, 0.0, 1.5, 15, 0.0, 1.5);
+        temp2D->GetXaxis()->SetTitle("three-momentum transfer (GeV)");
+        temp2D->GetYaxis()->SetTitle("energy transfer (GeV)");
+        q3_q0.push_back(temp2D);
  
-        temp2D = new MnvH2D( Form("%s_%d","q3_q0_1Track",i),"q0 vs q3", 20, 0.0, 3.0, 20, 0.0, 3.0);
-        temp2D->GetXaxis()->SetTitle("3-Momentum Transfer [GeV]");
-        temp2D->GetYaxis()->SetTitle("Energy Transfer [GeV]");
-        q3_q0_1Track.push_back(temp2D);
-  
-        temp2D = new MnvH2D( Form("%s_%d","q3_q0_2Track",i),"q0 vs q3", 20, 0.0, 3.0, 20, 0.0, 3.0);
-        temp2D->GetXaxis()->SetTitle("3-Momentum Transfer [GeV]");
-        temp2D->GetYaxis()->SetTitle("Energy Transfer [GeV]");
-        q3_q0_2Track.push_back(temp2D);
- 
-        temp2D = new MnvH2D( Form("%s_%d","W_QSq_All",i),"Q^2 vs W", 20, 0.0, 2.0, 20, 0.0, 2.0);
-        temp2D->GetXaxis()->SetTitle("W [GeV]");
-        temp2D->GetYaxis()->SetTitle("Q^{2} [GeV^{2}]");
-        W_QSq_All.push_back(temp2D);
- 
-        temp2D = new MnvH2D( Form("%s_%d","W_QSq_1Track",i),"Q^2 vs W", 20, 0.0, 2.0, 20, 0.0, 2.0);
-        temp2D->GetXaxis()->SetTitle("W [GeV]");
-        temp2D->GetYaxis()->SetTitle("Q^{2} [GeV^{2}]");
-        W_QSq_1Track.push_back(temp2D);
-  
-        temp2D = new MnvH2D( Form("%s_%d","W_QSq_2Track",i),"Q^2 vs W", 20, 0.0, 2.0, 20, 0.0, 2.0);
-        temp2D->GetXaxis()->SetTitle("W [GeV]");
-        temp2D->GetYaxis()->SetTitle("Q^{2} [GeV^{2}]");
-        W_QSq_2Track.push_back(temp2D);
+        temp2D = new MnvH2D( Form("%s_%d","W_QSq",i),"Q^2 vs W", 15, 0.0, 2.0, 15, 0.0, 1.5);
+        temp2D->GetXaxis()->SetTitle("W (GeV)");
+        temp2D->GetYaxis()->SetTitle("Q^{2} (GeV^{2})");
+        W_QSq.push_back(temp2D);
     }
+    
+    deltaInvMass_response = new MnvH2D( "deltaInvMass_response","p#pi^{0} Invariant Mass",16, 1.0, 1.8, 16, 1.0, 1.8);
+    deltaInvMass_response->GetXaxis()->SetTitle("p#pi^{0} Inv. Mass [GeV]");
+    deltaInvMass_response->GetYaxis()->SetTitle("Truth p#pi^{0} Inv. Mass [GeV]");
+
+    Delta_pi_theta_response = new MnvH2D( "Delta_pi_theta_response","P_{#pi^{0}} in #Delta Rest Frame",10,-1.0,1.0,10,-1.0,1.0);
+    Delta_pi_theta_response->GetXaxis()->SetTitle("cos(#theta) in #Delta Rest Frame");
+    Delta_pi_theta_response->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_phi_response = new MnvH2D( "Delta_pi_phi_response","P_{#pi^{0}} in #Delta Rest Frame",10,0.0,360.0,10,0.0,360.0);
+    Delta_pi_phi_response->GetXaxis()->SetTitle("#phi #Delta Rest Frame [deg]");
+    Delta_pi_phi_response->GetYaxis()->SetTitle("N(Events)");
 
     resID = new TH1D( "resID","Resonance ID",10,0.0,10.0);
     resID->GetXaxis()->SetTitle("RES ID");
@@ -1045,6 +1026,23 @@ void CCProtonPi0_Interaction::initHistograms()
     Err_MuonTracking->GetXaxis()->SetTitle("Error used as (wgt = 1 #pm error)");
     Err_MuonTracking->GetYaxis()->SetTitle("N(Events)");
 
+    for (int i = 0; i < 151; ++i){
+        temp = new MnvH1D( Form("%s_%d","W_Shift",i),"",13,0.5,1.8);
+        temp->GetXaxis()->SetTitle("W (GeV)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        W_Shift.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","W_Shift_Bckg",i),"",13,0.5,1.8);
+        temp->GetXaxis()->SetTitle("W (GeV)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        W_Shift_Bckg.push_back(temp);
+
+        temp = new MnvH1D( Form("%s_%d","W_Shift_Signal",i),"",13,0.5,1.8);
+        temp->GetXaxis()->SetTitle("W (GeV)");
+        temp->GetYaxis()->SetTitle("N(Events)");
+        W_Shift_Signal.push_back(temp);
+    
+    }
 
 }
 
@@ -1089,10 +1087,7 @@ void CCProtonPi0_Interaction::writeHistograms()
        
         Polarization[i]->Write();
         Delta_pi_theta[i]->Write();
-        Delta_pi_P[i]->Write();
         Delta_pi_phi[i]->Write();
-        Delta_pi_phi_theta[i]->Write();
-        Delta_pi_P_theta[i]->Write();
 
         // 2p2h Study 
         vertex_energy_All[i]->Write();
@@ -1101,12 +1096,9 @@ void CCProtonPi0_Interaction::writeHistograms()
         vertex_evis_All[i]->Write();
         vertex_evis_1Track[i]->Write();
         vertex_evis_2Track[i]->Write();
-        q3_q0_All[i]->Write();
-        q3_q0_1Track[i]->Write();
-        q3_q0_2Track[i]->Write();
-        W_QSq_All[i]->Write();
-        W_QSq_1Track[i]->Write();
-        W_QSq_2Track[i]->Write();
+        muon_theta_muon_KE[i]->Write();
+        q3_q0[i]->Write();
+        W_QSq[i]->Write();
 
         // Other Event Parameters 
         deltaInvMass[i]->Write();
@@ -1135,7 +1127,11 @@ void CCProtonPi0_Interaction::writeHistograms()
         QSq_CV[i]->Write();
         QSq_MaRES[i]->Write();
     }
-    
+
+    deltaInvMass_response->Write();
+    Delta_pi_theta_response->Write();
+    Delta_pi_phi_response->Write();
+
     resID->Write();
     resID_theta->Write();
 
@@ -1329,6 +1325,12 @@ void CCProtonPi0_Interaction::writeHistograms()
     // Flux Study
     Enu_flux_wgt->Write();
     Enu_cvweight->Write();
+
+    for (int i = 0; i < 151; ++i){
+        W_Shift[i]->Write();
+        W_Shift_Bckg[i]->Write();
+        W_Shift_Signal[i]->Write();
+    }
 
     f->Close();
 }
