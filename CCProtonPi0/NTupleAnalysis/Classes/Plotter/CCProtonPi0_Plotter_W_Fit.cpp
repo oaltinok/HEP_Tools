@@ -133,10 +133,10 @@ void CCProtonPi0_Plotter::plot_W_FitResults()
     double pars_fixed_non_nonRES_G2[3] = {pars_MC_nonRES_G2[0], pars_MC_nonRES_G2[1], pars_MC_nonRES_G2[2]};
     W_Fit_Data("FixedNonRES", pars_fixed_non_deltaRES, pars_fixed_non_otherRES, pars_fixed_non_nonRES_G1, pars_fixed_non_nonRES_G2, 6);
 
-    W_Fit_MC();
-    W_Fit_MC_DeltaRES();
-    W_Fit_MC_OtherRES();
-    W_Fit_MC_NonRES();
+    //W_Fit_MC();
+    //W_Fit_MC_DeltaRES();
+    //W_Fit_MC_OtherRES();
+    //W_Fit_MC_NonRES();
     //W_Fit_MC_Errors();
 }
 
@@ -201,7 +201,8 @@ void CCProtonPi0_Plotter::printBins_W()
 
 void CCProtonPi0_Plotter::W_Fit_Data(std::string fit_name, double* pars_deltaRES, double* pars_otherRES, double* pars_nonRES_G1, double* pars_nonRES_G2, int nPars)
 {
-    std::string plotDir = Folder_List::plotDir_OtherStudies;
+    //std::string plotDir = Folder_List::plotDir_OtherStudies;
+    std::string plotDir = Folder_List::plotDir_Paper;
 
     // ------------------------------------------------------------------------
     // First Plot Data vs MC using MnvPlotter

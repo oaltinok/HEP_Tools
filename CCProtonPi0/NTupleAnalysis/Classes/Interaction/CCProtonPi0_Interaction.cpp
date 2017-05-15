@@ -289,27 +289,6 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetYaxis()->SetTitle("N(Events)");
         pi0_invMass_DeltaRES.push_back(temp);
 
-        // Delta Resonance Study
-        temp = new MnvH1D( Form("%s_%d","deltaInvMass",i),"p#pi^{0} Invariant Mass",16, 1.0, 1.8);
-        temp->GetXaxis()->SetTitle("p#pi^{0} Inv. Mass [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        deltaInvMass.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","Polarization",i),"Pion Polarization in #Delta Rest Frame",10,-1,1);
-        temp->GetXaxis()->SetTitle("Polarization");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        Polarization.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","Delta_pi_theta",i),"cos(#theta_{#pi^{0}}) in #Delta Rest Frame",10,-1.0,1.0);
-        temp->GetXaxis()->SetTitle("cos(#theta)");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        Delta_pi_theta.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","Delta_pi_phi",i),"#phi_{#pi^{0}} in #Delta Rest Frame",10,0.0,360.0);
-        temp->GetXaxis()->SetTitle("#phi [deg]");
-        temp->GetYaxis()->SetTitle("N(Events)");
-        Delta_pi_phi.push_back(temp);
-
         // 2p2h Study
         temp = new MnvH1D( Form("%s_%d","vertex_energy_1Track",i),"Vertex Blob Energy (r = 90mm)",binList.vertex_energy.get_nBins(), binList.vertex_energy.get_min(), binList.vertex_energy.get_max() );
         temp->GetXaxis()->SetTitle("Vertex Blob Energy [MeV]");
@@ -340,35 +319,13 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("Vertex Blob Visible Energy [MeV]");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.vertex_evis.get_width()));
         vertex_evis_All.push_back(temp);
-
-        temp2D = new MnvH2D( Form("%s_%d","muon_theta_muon_KE",i),"T_{#mu} vs cos(#theta_{#mu})", 14, 0.92, 1.0, 14, 1.6, 3.0);
-        temp2D->GetXaxis()->SetTitle("muon cos#theta");
-        temp2D->GetYaxis()->SetTitle("muon kinetic energy (GeV)");
-        muon_theta_muon_KE.push_back(temp2D);
-
-        temp2D = new MnvH2D( Form("%s_%d","q3_q0",i),"q0 vs q3", 15, 0.0, 1.5, 15, 0.0, 1.5);
-        temp2D->GetXaxis()->SetTitle("three-momentum transfer (GeV)");
-        temp2D->GetYaxis()->SetTitle("energy transfer (GeV)");
-        q3_q0.push_back(temp2D);
  
         temp2D = new MnvH2D( Form("%s_%d","W_QSq",i),"Q^2 vs W", 15, 0.0, 2.0, 15, 0.0, 1.5);
         temp2D->GetXaxis()->SetTitle("W (GeV)");
         temp2D->GetYaxis()->SetTitle("Q^{2} (GeV^{2})");
         W_QSq.push_back(temp2D);
     }
-    
-    deltaInvMass_response = new MnvH2D( "deltaInvMass_response","p#pi^{0} Invariant Mass",16, 1.0, 1.8, 16, 1.0, 1.8);
-    deltaInvMass_response->GetXaxis()->SetTitle("p#pi^{0} Inv. Mass [GeV]");
-    deltaInvMass_response->GetYaxis()->SetTitle("Truth p#pi^{0} Inv. Mass [GeV]");
-
-    Delta_pi_theta_response = new MnvH2D( "Delta_pi_theta_response","P_{#pi^{0}} in #Delta Rest Frame",10,-1.0,1.0,10,-1.0,1.0);
-    Delta_pi_theta_response->GetXaxis()->SetTitle("cos(#theta) in #Delta Rest Frame");
-    Delta_pi_theta_response->GetYaxis()->SetTitle("N(Events)");
-
-    Delta_pi_phi_response = new MnvH2D( "Delta_pi_phi_response","P_{#pi^{0}} in #Delta Rest Frame",10,0.0,360.0,10,0.0,360.0);
-    Delta_pi_phi_response->GetXaxis()->SetTitle("#phi #Delta Rest Frame [deg]");
-    Delta_pi_phi_response->GetYaxis()->SetTitle("N(Events)");
-
+   
     resID = new TH1D( "resID","Resonance ID",10,0.0,10.0);
     resID->GetXaxis()->SetTitle("RES ID");
     resID->GetYaxis()->SetTitle("N(Events)");
@@ -487,6 +444,141 @@ void CCProtonPi0_Interaction::initHistograms()
     W_response->GetYaxis()->SetTitle("True W [GeV]");
     AddVertErrorBands_MC(W_response);
     AddLatErrorBands_MC(W_response);
+
+    deltaInvMass_all = new MnvH1D( "deltaInvMass_all","Data All", 16, 1.0, 1.8 );
+    deltaInvMass_all->GetXaxis()->SetTitle("p-#pi{0} Inv. Mass [GeV]");
+    deltaInvMass_all->GetYaxis()->SetTitle("N(Events)");
+
+    deltaInvMass_mc_truth_signal = new MnvH1D( "deltaInvMass_mc_truth_signal","MC Truth Signal", 16, 1.0, 1.8 );
+    deltaInvMass_mc_truth_signal->GetXaxis()->SetTitle("p-#pi{0} Inv. Mass [GeV]");
+    deltaInvMass_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(deltaInvMass_mc_truth_signal);
+
+    deltaInvMass_mc_reco_all = new MnvH1D( "deltaInvMass_mc_reco_all","MC All Reconstructed", 16, 1.0, 1.8 );
+    deltaInvMass_mc_reco_all->GetXaxis()->SetTitle("p-#pi{0} Inv. Mass [GeV]");
+    deltaInvMass_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(deltaInvMass_mc_reco_all);
+
+    deltaInvMass_mc_reco_signal = new MnvH1D( "deltaInvMass_mc_reco_signal","MC Reconstructed Signal", 16, 1.0, 1.8 );
+    deltaInvMass_mc_reco_signal->GetXaxis()->SetTitle("p-#pi{0} Inv. Mass [GeV]");
+    deltaInvMass_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(deltaInvMass_mc_reco_signal);
+
+    deltaInvMass_mc_reco_bckg = new MnvH1D( "deltaInvMass_mc_reco_bckg","MC Reconstructed Background ", 16, 1.0, 1.8 );
+    deltaInvMass_mc_reco_bckg->GetXaxis()->SetTitle("p-#pi{0} Inv. Mass [GeV]");
+    deltaInvMass_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(deltaInvMass_mc_reco_bckg);
+
+    deltaInvMass_response = new MnvH2D( "deltaInvMass_response","Signal", 16, 1.0, 1.8, 16, 1.0, 1.8 );
+    deltaInvMass_response->GetXaxis()->SetTitle("Reco p-#pi{0} Inv. Mass [GeV]");
+    deltaInvMass_response->GetYaxis()->SetTitle("True p-#pi{0} Inv. Mass [GeV]");
+    AddLeadingErrorBands_MC(deltaInvMass_response);
+
+    Delta_pi_theta_all = new MnvH1D( "Delta_pi_theta_all","Data All", 10, -1.0, 1.0);
+    Delta_pi_theta_all->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_all->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_theta_mc_truth_signal = new MnvH1D( "Delta_pi_theta_mc_truth_signal","MC Truth Signal", 10, -1.0, 1.0);
+    Delta_pi_theta_mc_truth_signal->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(Delta_pi_theta_mc_truth_signal);
+
+    Delta_pi_theta_mc_reco_all = new MnvH1D( "Delta_pi_theta_mc_reco_all","MC All Reconstructed", 10, -1.0, 1.0);
+    Delta_pi_theta_mc_reco_all->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(Delta_pi_theta_mc_reco_all);
+
+    Delta_pi_theta_mc_reco_signal = new MnvH1D( "Delta_pi_theta_mc_reco_signal","MC Reconstructed Signal", 10, -1.0, 1.0);
+    Delta_pi_theta_mc_reco_signal->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(Delta_pi_theta_mc_reco_signal);
+
+    Delta_pi_theta_mc_reco_bckg = new MnvH1D( "Delta_pi_theta_mc_reco_bckg","MC Reconstructed Background ", 10, -1.0, 1.0);
+    Delta_pi_theta_mc_reco_bckg->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(Delta_pi_theta_mc_reco_bckg);
+
+    Delta_pi_theta_response = new MnvH2D( "Delta_pi_theta_response","Signal", 10, -1.0, 1.0, 10, -1.0, 1.0);
+    Delta_pi_theta_response->GetXaxis()->SetTitle("Reco cos(#theta)");
+    Delta_pi_theta_response->GetYaxis()->SetTitle("Reco cos(#theta)");
+    AddLeadingErrorBands_MC(Delta_pi_theta_response);
+
+    Delta_pi_phi_all = new MnvH1D( "Delta_pi_phi_all","Data All", 10, 0.0, 360.0);
+    Delta_pi_phi_all->GetXaxis()->SetTitle("#phi");
+    Delta_pi_phi_all->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_phi_mc_truth_signal = new MnvH1D( "Delta_pi_phi_mc_truth_signal","MC Truth Signal", 10, 0.0, 360.0);
+    Delta_pi_phi_mc_truth_signal->GetXaxis()->SetTitle("#phi");
+    Delta_pi_phi_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(Delta_pi_phi_mc_truth_signal);
+
+    Delta_pi_phi_mc_reco_all = new MnvH1D( "Delta_pi_phi_mc_reco_all","MC All Reconstructed", 10, 0.0, 360.0);
+    Delta_pi_phi_mc_reco_all->GetXaxis()->SetTitle("#phi");
+    Delta_pi_phi_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(Delta_pi_phi_mc_reco_all);
+
+    Delta_pi_phi_mc_reco_signal = new MnvH1D( "Delta_pi_phi_mc_reco_signal","MC Reconstructed Signal", 10, 0.0, 360.0);
+    Delta_pi_phi_mc_reco_signal->GetXaxis()->SetTitle("#phi");
+    Delta_pi_phi_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(Delta_pi_phi_mc_reco_signal);
+
+    Delta_pi_phi_mc_reco_bckg = new MnvH1D( "Delta_pi_phi_mc_reco_bckg","MC Reconstructed Background ", 10, 0.0, 360.0);
+    Delta_pi_phi_mc_reco_bckg->GetXaxis()->SetTitle("#phi");
+    Delta_pi_phi_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    AddLeadingErrorBands_MC(Delta_pi_phi_mc_reco_bckg);
+
+    Delta_pi_phi_response = new MnvH2D( "Delta_pi_phi_response","Signal", 10, 0.0, 360.0, 10, 0.0, 360.0);
+    Delta_pi_phi_response->GetXaxis()->SetTitle("Reco #phi");
+    Delta_pi_phi_response->GetYaxis()->SetTitle("Reco #phi");
+    AddLeadingErrorBands_MC(Delta_pi_phi_response);
+
+    muon_theta_muon_KE_all = new MnvH2D( "muon_theta_muon_KE_all","Data All", 14, 0.92, 1.0, 14, 1.6, 3.0);
+    muon_theta_muon_KE_all->GetXaxis()->SetTitle("muon cos(#theta)");
+    muon_theta_muon_KE_all->GetYaxis()->SetTitle("muon kinetic energy (GeV)");
+
+    muon_theta_muon_KE_mc_truth_signal = new MnvH2D( "muon_theta_muon_KE_mc_truth_signal","MC Truth Signal", 14, 0.92, 1.0, 14, 1.6, 3.0);
+    muon_theta_muon_KE_mc_truth_signal->GetXaxis()->SetTitle("muon cos(#theta)");
+    muon_theta_muon_KE_mc_truth_signal->GetYaxis()->SetTitle("muon kinetic energy (GeV)");
+    AddLeadingErrorBands_MC(muon_theta_muon_KE_mc_truth_signal);
+
+    muon_theta_muon_KE_mc_reco_all = new MnvH2D( "muon_theta_muon_KE_mc_reco_all","MC All Reconstructed", 14, 0.92, 1.0, 14, 1.6, 3.0);
+    muon_theta_muon_KE_mc_reco_all->GetXaxis()->SetTitle("muon cos(#theta)");
+    muon_theta_muon_KE_mc_reco_all->GetYaxis()->SetTitle("muon kinetic energy (GeV)");
+    AddLeadingErrorBands_MC(muon_theta_muon_KE_mc_reco_all);
+
+    muon_theta_muon_KE_mc_reco_signal = new MnvH2D( "muon_theta_muon_KE_mc_reco_signal","MC Reconstructed Signal", 14, 0.92, 1.0, 14, 1.6, 3.0);
+    muon_theta_muon_KE_mc_reco_signal->GetXaxis()->SetTitle("muon cos(#theta)");
+    muon_theta_muon_KE_mc_reco_signal->GetYaxis()->SetTitle("muon kinetic energy (GeV)");
+    AddLeadingErrorBands_MC(muon_theta_muon_KE_mc_reco_signal);
+
+    muon_theta_muon_KE_mc_reco_bckg = new MnvH2D( "muon_theta_muon_KE_mc_reco_bckg","MC Reconstructed Background ", 14, 0.92, 1.0, 14, 1.6, 3.0);
+    muon_theta_muon_KE_mc_reco_bckg->GetXaxis()->SetTitle("muon cos(#theta)");
+    muon_theta_muon_KE_mc_reco_bckg->GetYaxis()->SetTitle("muon kinetic energy (GeV)");
+    AddLeadingErrorBands_MC(muon_theta_muon_KE_mc_reco_bckg);
+
+    q3_q0_all = new MnvH2D( "q3_q0_all","Data All", 15, 0.0, 1.5, 15, 0.0, 1.5);
+    q3_q0_all->GetXaxis()->SetTitle("three-momentum transfer (GeV)");
+    q3_q0_all->GetYaxis()->SetTitle("energy transfer (GeV)");
+
+    q3_q0_mc_truth_signal = new MnvH2D( "q3_q0_mc_truth_signal","MC Truth Signal", 15, 0.0, 1.5, 15, 0.0, 1.5);
+    q3_q0_mc_truth_signal->GetXaxis()->SetTitle("three-momentum transfer (GeV)");
+    q3_q0_mc_truth_signal->GetYaxis()->SetTitle("energy transfer (GeV)");
+    AddLeadingErrorBands_MC(q3_q0_mc_truth_signal);
+
+    q3_q0_mc_reco_all = new MnvH2D( "q3_q0_mc_reco_all","MC All Reconstructed", 15, 0.0, 1.5, 15, 0.0, 1.5);
+    q3_q0_mc_reco_all->GetXaxis()->SetTitle("three-momentum transfer (GeV)");
+    q3_q0_mc_reco_all->GetYaxis()->SetTitle("energy transfer (GeV)");
+    AddLeadingErrorBands_MC(q3_q0_mc_reco_all);
+
+    q3_q0_mc_reco_signal = new MnvH2D( "q3_q0_mc_reco_signal","MC Reconstructed Signal", 15, 0.0, 1.5, 15, 0.0, 1.5);
+    q3_q0_mc_reco_signal->GetXaxis()->SetTitle("three-momentum transfer (GeV)");
+    q3_q0_mc_reco_signal->GetYaxis()->SetTitle("energy transfer (GeV)");
+    AddLeadingErrorBands_MC(q3_q0_mc_reco_signal);
+
+    q3_q0_mc_reco_bckg = new MnvH2D( "q3_q0_mc_reco_bckg","MC Reconstructed Background ", 15, 0.0, 1.5, 15, 0.0, 1.5);
+    q3_q0_mc_reco_bckg->GetXaxis()->SetTitle("three-momentum transfer (GeV)");
+    q3_q0_mc_reco_bckg->GetYaxis()->SetTitle("energy transfer (GeV)");
+    AddLeadingErrorBands_MC(q3_q0_mc_reco_bckg);
 
     // QSq Error, Diff
     WSq_QSq_Diff = new TH2D( "WSq_QSq_Diff","Q^{2} Difference vs W^{2}",binList.wSq.get_nBins(), binList.wSq.get_min(), binList.wSq.get_max(),binList.QSq_Diff.get_nBins(), binList.QSq_Diff.get_min(), binList.QSq_Diff.get_max() );
@@ -1043,7 +1135,6 @@ void CCProtonPi0_Interaction::initHistograms()
         W_Shift_Signal.push_back(temp);
     
     }
-
 }
 
 void CCProtonPi0_Interaction::writeHistograms()
@@ -1085,10 +1176,6 @@ void CCProtonPi0_Interaction::writeHistograms()
         W_1Track[i]->Write();
         W_2Track[i]->Write();
        
-        Polarization[i]->Write();
-        Delta_pi_theta[i]->Write();
-        Delta_pi_phi[i]->Write();
-
         // 2p2h Study 
         vertex_energy_All[i]->Write();
         vertex_energy_1Track[i]->Write();
@@ -1096,12 +1183,7 @@ void CCProtonPi0_Interaction::writeHistograms()
         vertex_evis_All[i]->Write();
         vertex_evis_1Track[i]->Write();
         vertex_evis_2Track[i]->Write();
-        muon_theta_muon_KE[i]->Write();
-        q3_q0[i]->Write();
         W_QSq[i]->Write();
-
-        // Other Event Parameters 
-        deltaInvMass[i]->Write();
 
         // Extra Energy
         extra_leftover_energy_1Track[i]->Write();
@@ -1128,10 +1210,6 @@ void CCProtonPi0_Interaction::writeHistograms()
         QSq_MaRES[i]->Write();
     }
 
-    deltaInvMass_response->Write();
-    Delta_pi_theta_response->Write();
-    Delta_pi_phi_response->Write();
-
     resID->Write();
     resID_theta->Write();
 
@@ -1155,7 +1233,40 @@ void CCProtonPi0_Interaction::writeHistograms()
     W_mc_reco_signal->Write();
     W_mc_reco_bckg->Write();
     W_response->Write();
+ 
+    deltaInvMass_all->Write();
+    deltaInvMass_mc_truth_signal->Write();
+    deltaInvMass_mc_reco_all->Write();
+    deltaInvMass_mc_reco_signal->Write();
+    deltaInvMass_mc_reco_bckg->Write();
+    deltaInvMass_response->Write();
     
+    Delta_pi_theta_all->Write();
+    Delta_pi_theta_mc_truth_signal->Write();
+    Delta_pi_theta_mc_reco_all->Write();
+    Delta_pi_theta_mc_reco_signal->Write();
+    Delta_pi_theta_mc_reco_bckg->Write();
+    Delta_pi_theta_response->Write();
+    
+    Delta_pi_phi_all->Write();
+    Delta_pi_phi_mc_truth_signal->Write();
+    Delta_pi_phi_mc_reco_all->Write();
+    Delta_pi_phi_mc_reco_signal->Write();
+    Delta_pi_phi_mc_reco_bckg->Write();
+    Delta_pi_phi_response->Write();
+     
+    muon_theta_muon_KE_all->Write();
+    muon_theta_muon_KE_mc_truth_signal->Write();
+    muon_theta_muon_KE_mc_reco_all->Write();
+    muon_theta_muon_KE_mc_reco_signal->Write();
+    muon_theta_muon_KE_mc_reco_bckg->Write();
+   
+    q3_q0_all->Write();
+    q3_q0_mc_truth_signal->Write();
+    q3_q0_mc_reco_all->Write();
+    q3_q0_mc_reco_signal->Write();
+    q3_q0_mc_reco_bckg->Write();
+
     // Short Proton
     nProtons->Write();
     proton_true_P_1Track->Write();

@@ -141,6 +141,7 @@ namespace Folder_List
     const std::string plotDir_Efficiency = "EfficiencyCorrected/";
 
     // Default Plot Dirs
+    const std::string plotDir_Paper = output + plotOut + "Paper/";
     const std::string plotDir_OtherStudies = output + plotOut + "OtherStudies/";
     const std::string plotDir_Systematics = output + plotOut + "Systematics/";
     const std::string plotDir_CutHists = output + plotOut + "CutHists/";

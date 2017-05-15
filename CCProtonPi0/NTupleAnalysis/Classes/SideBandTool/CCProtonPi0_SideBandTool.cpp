@@ -193,10 +193,10 @@ void CCProtonPi0_SideBandTool::Plot()
 {
     // Plot Fit Results on Invariant Mass
     Plot(Original);
-    Plot(Michel);
-    Plot(pID);
-    Plot(LowInvMass);
-    Plot(HighInvMass);
+    //Plot(Michel);
+    //Plot(pID);
+    //Plot(LowInvMass);
+    //Plot(HighInvMass);
 
     // Plot XSec Variables in Each Side Band
    
@@ -216,21 +216,21 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb)
     // Fit Results
     Plot(sb, 0); // Raw
     Plot(sb, 1); // Modified
-//
-//    Plot(sb, sb.muon_P, 0, "muon_P");
-//    Plot(sb, sb.muon_P, 1, "muon_P");
-//    Plot(sb, sb.muon_theta, 0, "muon_theta");
-//    Plot(sb, sb.muon_theta, 1, "muon_theta");
-//    Plot(sb, sb.pi0_P, 0, "pi0_P");
-//    Plot(sb, sb.pi0_P, 1, "pi0_P");
-//    Plot(sb, sb.pi0_KE, 0, "pi0_KE");
-//    Plot(sb, sb.pi0_KE, 1, "pi0_KE");
-//    Plot(sb, sb.pi0_theta, 0, "pi0_theta");
-//    Plot(sb, sb.pi0_theta, 1, "pi0_theta");
-//    Plot(sb, sb.neutrino_E, 0, "neutrino_E");
-//    Plot(sb, sb.neutrino_E, 1, "neutrino_E");
-//    Plot(sb, sb.QSq, 0, "QSq");
-//    Plot(sb, sb.QSq, 1, "QSq");
+
+    //Plot(sb, sb.muon_P, 0, "muon_P");
+    //Plot(sb, sb.muon_P, 1, "muon_P");
+    //Plot(sb, sb.muon_theta, 0, "muon_theta");
+    //Plot(sb, sb.muon_theta, 1, "muon_theta");
+    //Plot(sb, sb.pi0_P, 0, "pi0_P");
+    //Plot(sb, sb.pi0_P, 1, "pi0_P");
+    //Plot(sb, sb.pi0_KE, 0, "pi0_KE");
+    //Plot(sb, sb.pi0_KE, 1, "pi0_KE");
+    //Plot(sb, sb.pi0_theta, 0, "pi0_theta");
+    //Plot(sb, sb.pi0_theta, 1, "pi0_theta");
+    //Plot(sb, sb.neutrino_E, 0, "neutrino_E");
+    //Plot(sb, sb.neutrino_E, 1, "neutrino_E");
+    //Plot(sb, sb.QSq, 0, "QSq");
+    //Plot(sb, sb.QSq, 1, "QSq");
 //    Plot(sb, sb.W, 0, "W");
 //    Plot(sb, sb.W, 1, "W");
 }
@@ -270,19 +270,19 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
  
     // Get Histograms -- Use new Histograms not to change originals
     ColorHists(data, signal, WithPi0, QELike, SinglePiPlus, Other);
-    TH1D* h_data = new TH1D(data->GetCVHistoWithStatError());
-    TH1D* h_signal = new TH1D(signal->GetCVHistoWithStatError());
-    TH1D* h_WithPi0 = new TH1D(WithPi0->GetCVHistoWithStatError());
-    TH1D* h_QELike = new TH1D(QELike->GetCVHistoWithStatError());
-    TH1D* h_SinglePiPlus = new TH1D(SinglePiPlus->GetCVHistoWithStatError());
-    TH1D* h_Other = new TH1D(Other->GetCVHistoWithStatError());
+    TH1D* h_data = new TH1D(data->GetBinNormalizedCopy().GetCVHistoWithError());
+    TH1D* h_signal = new TH1D(signal->GetBinNormalizedCopy().GetCVHistoWithError());
+    TH1D* h_WithPi0 = new TH1D(WithPi0->GetBinNormalizedCopy().GetCVHistoWithError());
+    TH1D* h_QELike = new TH1D(QELike->GetBinNormalizedCopy().GetCVHistoWithError());
+    TH1D* h_SinglePiPlus = new TH1D(SinglePiPlus->GetBinNormalizedCopy().GetCVHistoWithError());
+    TH1D* h_Other = new TH1D(Other->GetBinNormalizedCopy().GetCVHistoWithError());
   
     // MC Total depend on the Modification
     //      If Raws - take the mc_total directly
     //      If Modified - Add all mc models;
     TH1D* h_mc_total;
     if (ind == 0){
-        h_mc_total = new TH1D(mc_total->GetCVHistoWithStatError());
+        h_mc_total = new TH1D(mc_total->GetBinNormalizedCopy().GetCVHistoWithError());
     }else{
         h_mc_total = new TH1D(*h_signal);
         h_mc_total->Add(h_WithPi0);
@@ -290,6 +290,15 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
         h_mc_total->Add(h_SinglePiPlus);
         h_mc_total->Add(h_Other);
     }
+
+    // Scale Histograms
+    double mc_ratio = POT_ratio; 
+    h_mc_total->Scale(mc_ratio);
+    h_signal->Scale(mc_ratio);
+    h_WithPi0->Scale(mc_ratio);
+    h_QELike->Scale(mc_ratio);
+    h_SinglePiPlus->Scale(mc_ratio);
+    h_Other->Scale(mc_ratio);
 
     // ------------------------------------------------------------------------
     // Unique Plot for Single Error Band, Single Universe
@@ -303,19 +312,29 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     //TH1D* h_QELike = new TH1D(*(QELike->GetVertErrorBand(err_band)->GetHist(hist_ind)));
     //TH1D* h_SinglePiPlus = new TH1D(*(SinglePiPlus->GetVertErrorBand(err_band)->GetHist(hist_ind)));
     //TH1D* h_Other = new TH1D(*(Other->GetVertErrorBand(err_band)->GetHist(hist_ind)));
-    //TH1D* h_mc_total = new TH1D(*(mc_total->GetVertErrorBand(err_band)->GetHist(hist_ind)));
+    //TH1D* h_mc_total;
+    //if (ind == 0){
+    //    h_mc_total = new TH1D(*(mc_total->GetVertErrorBand(err_band)->GetHist(hist_ind)));
+    //}else{
+    //    h_mc_total = new TH1D(*h_signal);
+    //    h_mc_total->Add(h_WithPi0);
+    //    h_mc_total->Add(h_QELike);
+    //    h_mc_total->Add(h_SinglePiPlus);
+    //    h_mc_total->Add(h_Other);
+    //}
     //ColorHists(h_data, h_signal, h_WithPi0, h_QELike, h_SinglePiPlus, h_Other);
+ 
+    //// Scale Histograms
+    //h_data->Scale(1,"width");
+    //double mc_ratio = POT_ratio; 
+    //h_mc_total->Scale(mc_ratio,"width");
+    //h_signal->Scale(mc_ratio,"width");
+    //h_WithPi0->Scale(mc_ratio,"width");
+    //h_QELike->Scale(mc_ratio,"width");
+    //h_SinglePiPlus->Scale(mc_ratio,"width");
+    //h_Other->Scale(mc_ratio,"width");
+    // ------------------------------------------------------------------------
    
-
-    // Scale Histograms
-    h_data->Scale(1,"width");
-    double mc_ratio = POT_ratio; 
-    h_mc_total->Scale(mc_ratio,"width");
-    h_signal->Scale(mc_ratio,"width");
-    h_WithPi0->Scale(mc_ratio,"width");
-    h_QELike->Scale(mc_ratio,"width");
-    h_SinglePiPlus->Scale(mc_ratio,"width");
-    h_Other->Scale(mc_ratio,"width");
 
     // Create Canvas and Divide it into two
     TCanvas* c = new TCanvas("c","c",1280,1280);
@@ -365,7 +384,7 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     legend->SetTextSize(0.04);
     legend->SetTextFont(42);
     legend->Draw();
-//
+
 //    // Add Pi0 InvMass Lines
 //    TLine line;
 //    line.SetLineWidth(3);
@@ -383,32 +402,33 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
 //    // High Inv Mass Region
 //    line.DrawLine(200.0,0,200.0,hist_max);
 //    arrow.DrawArrow(200.0,hist_max,200+20,hist_max,0.01,">");     
-//
-    // Add Weights as Text to Modified Plot 
-    //if (ind != 0){
-    //    int nPars = 3;
-    //    int nPoints = 136;
 
-    //    TLatex* text = new TLatex;
-    //    text->SetTextSize(0.03);
-    //    text->SetNDC();
-    //    text->DrawLatex(0.6, 0.64, Form("Fit Results with %d points, %d pars", nPoints, nPars));
-    //    text->DrawLatex(0.6, 0.61, Form("Before Fit #chi^{2} = %3.2f", ChiSq_before_fit[0]));
-    //    text->DrawLatex(0.6, 0.58, Form("Before Fit #chi^{2}/dof = %3.2f", ChiSq_before_fit[0]/(nPoints-nPars)));
-    //    text->DrawLatex(0.6, 0.55, Form("After Fit #chi^{2} = %3.2f", ChiSq_after_fit[0]));
-    //    text->DrawLatex(0.6, 0.52, Form("After Fit #chi^{2}/dof = %3.2f", ChiSq_after_fit[0]/(nPoints-nPars)));
-    //    text->DrawLatex(0.6, 0.49, Form("#color[4]{wgt(ChargedPion) = %3.2f#pm %3.2f}", wgt_SinglePiPlus[0], err_SinglePiPlus[0]));
-    //    text->DrawLatex(0.6, 0.46, Form("wgt(QELike) = %3.2f#pm %3.2f", wgt_QELike[0], err_QELike[0]));
-    //    text->DrawLatex(0.6, 0.43, Form("#color[2]{wgt(WithPi0) = %3.2f#pm %3.2f}", wgt_WithPi0[0], err_WithPi0[0]));
-    //    delete text;
-    //}
+    // Add Weights as Text to Modified Plot 
+    if (ind != 0){
+        int nPars = 3;
+        int nPoints = 136;
+
+        TLatex* text = new TLatex;
+        text->SetTextSize(0.03);
+        text->SetNDC();
+        text->DrawLatex(0.55, 0.60, Form("Fit Results with %d points, %d pars", nPoints, nPars));
+        text->DrawLatex(0.55, 0.57, Form("Before Fit #chi^{2} = %3.2f", ChiSq_before_fit[0]));
+        text->DrawLatex(0.55, 0.54, Form("Before Fit #chi^{2}/dof = %3.2f", ChiSq_before_fit[0]/(nPoints-nPars)));
+        text->DrawLatex(0.55, 0.51, Form("After Fit #chi^{2} = %3.2f", ChiSq_after_fit[0]));
+        text->DrawLatex(0.55, 0.48, Form("After Fit #chi^{2}/dof = %3.2f", ChiSq_after_fit[0]/(nPoints-nPars)));
+        text->DrawLatex(0.55, 0.45, Form("#color[4]{wgt(ChargedPion) = %3.2f#pm %3.2f}", wgt_SinglePiPlus[0], err_SinglePiPlus[0]));
+        text->DrawLatex(0.55, 0.42, Form("wgt(QELike) = %3.2f#pm %3.2f", wgt_QELike[0], err_QELike[0]));
+        text->DrawLatex(0.55, 0.39, Form("#color[2]{wgt(WithPi0) = %3.2f#pm %3.2f}", wgt_WithPi0[0], err_WithPi0[0]));
+        delete text;
+    }
     
     // Add Plot-ChiSq
     TLatex* text = new TLatex;
     text->SetNDC();
     text->SetTextSize(0.04);
     text->SetTextColor(kBlue);
-    double plot_chisq = calc_ChiSq(data, signal, WithPi0, QELike, SinglePiPlus, Other);
+    //double plot_chisq = calc_ChiSq(data, signal, WithPi0, QELike, SinglePiPlus, Other);
+    double plot_chisq = calc_ChiSq(h_data, h_signal, h_WithPi0, h_QELike, h_SinglePiPlus, h_Other);
     double nPoints = h_data->GetNbinsX()-1;
     //text->DrawLatex(0.15, 0.85, Form("Plot #chi^{2} = %3.2f", plot_chisq));
     text->DrawLatex(0.15, 0.85, Form("Plot #chi^{2}/dof = %3.2f", plot_chisq/nPoints));
@@ -435,6 +455,7 @@ void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string va
     h_data_mc_ratio->SetMaximum(1.5);
 
     // X axis ratio plot settings
+    //h_data_mc_ratio->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
     h_data_mc_ratio->GetXaxis()->SetTitle("#gamma#gamma Invariant Mass [MeV]");
     h_data_mc_ratio->GetXaxis()->SetNdivisions(408);
     h_data_mc_ratio->GetXaxis()->CenterTitle();
@@ -572,11 +593,13 @@ void CCProtonPi0_SideBandTool::ApplyFitResults(XSec_Var &xsec_var)
 
 double CCProtonPi0_SideBandTool::calc_ChiSq(TH1D* data, TH1D* signal, TH1D* WithPi0, TH1D* QELike, TH1D* SinglePiPlus, TH1D* Other)
 {
-    double mc_ratio = POT_ratio;
+    //double mc_ratio = POT_ratio;
+    double mc_ratio = 1.0;
     double chi_sq = 0.0;
 
     for (int i = 1; i <= data->GetNbinsX(); ++i){
         // Get N(Events) in Single Bin
+        double err = data->GetBinError(i);
         double nData = data->GetBinContent(i);
         if (nData == 0) continue;
         double nSignal = signal->GetBinContent(i);
@@ -588,7 +611,7 @@ double CCProtonPi0_SideBandTool::calc_ChiSq(TH1D* data, TH1D* signal, TH1D* With
         // Add All MC and scale them
         double nMC_total = (nSignal + nWithPi0 + nQELike + nSinglePiPlus + nOther) * mc_ratio;
         
-        double delta = pow((nData-nMC_total),2) / nData;
+        double delta = pow((nData-nMC_total),2) / pow(err,2);
         chi_sq += delta;
     }
     return chi_sq;

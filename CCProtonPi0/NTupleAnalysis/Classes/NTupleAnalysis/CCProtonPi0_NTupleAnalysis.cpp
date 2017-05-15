@@ -6,7 +6,7 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "DeltaSuppressed";
+const std::string CCProtonPi0_NTupleAnalysis::version = "Tuned";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
@@ -50,7 +50,7 @@ const double CCProtonPi0_NTupleAnalysis::electroProdMvRes1sig    = 0.03 * genieM
 // Pion production parameters and errors from deuterium fit
 const double CCProtonPi0_NTupleAnalysis::deuteriumMaRes          = 0.94;
 const double CCProtonPi0_NTupleAnalysis::deuteriumMaRes1sig      = 0.05;
-const double CCProtonPi0_NTupleAnalysis::deuteriumNonResNorm     = 0.46;
+const double CCProtonPi0_NTupleAnalysis::deuteriumNonResNorm     = 0.43; // 0.46 for GENIE v2.6.2
 const double CCProtonPi0_NTupleAnalysis::deuteriumNonResNorm1sig = 0.04;
 const double CCProtonPi0_NTupleAnalysis::deuteriumResNorm        = 1.15;
 const double CCProtonPi0_NTupleAnalysis::deuteriumResNorm1sig    = 0.07;
@@ -139,6 +139,17 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data(MnvHistoType* h)
 }
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH1D>(MnvH1D* h);
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_Data<MnvH2D>(MnvH2D* h);
+
+    template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLeadingErrorBands_Data(MnvHistoType* h)
+{
+    AddVertErrorBandAndFillWithCV_Genie(h);
+    AddVertErrorBandAndFillWithCV_Flux(h);
+    AddVertErrorBandAndFillWithCV_2p2h(h);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLeadingErrorBands_Data<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLeadingErrorBands_Data<MnvH2D>(MnvH2D* h);
+
 
 // Truth Tree Only have GENIE and Flux Errors, others are handled as Data
     template<class MnvHistoType>
@@ -235,7 +246,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBandAndFillWithCV_Genie(MnvHistoTyp
     h->AddVertErrorBandAndFillWithCV("GENIE_MaRES"             ,2);
     h->AddVertErrorBandAndFillWithCV("GENIE_MvRES"             ,2);
     //h->AddVertErrorBandAndFillWithCV("GENIE_NormCCQE"          ,2);
-    //h->AddVertErrorBandAndFillWithCV("GENIE_NormCCRES"         ,2);
+    h->AddVertErrorBandAndFillWithCV("GENIE_NormCCRES"         ,2);
     h->AddVertErrorBandAndFillWithCV("GENIE_NormDISCC"         ,2);
     h->AddVertErrorBandAndFillWithCV("GENIE_NormNCRES"         ,2);
     h->AddVertErrorBandAndFillWithCV("GENIE_RDecBR1gamma"      ,2);
@@ -488,6 +499,17 @@ template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC<MnvH1D>(MnvH1D* h
 template void CCProtonPi0_NTupleAnalysis::AddVertErrorBands_MC<MnvH2D>(MnvH2D* h);
 
     template<class MnvHistoType>
+void CCProtonPi0_NTupleAnalysis::AddLeadingErrorBands_MC(MnvHistoType* h)
+{
+    AddVertErrorBand_Genie(h);
+    AddVertErrorBand_Flux(h);
+    AddVertErrorBand_2p2h(h);
+}
+template void CCProtonPi0_NTupleAnalysis::AddLeadingErrorBands_MC<MnvH1D>(MnvH1D* h);
+template void CCProtonPi0_NTupleAnalysis::AddLeadingErrorBands_MC<MnvH2D>(MnvH2D* h);
+
+
+    template<class MnvHistoType>
 void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_Flux(MnvHistoType* h)
 {
     frw->AddFluxErrorBand(h);
@@ -523,7 +545,7 @@ void CCProtonPi0_NTupleAnalysis::AddVertErrorBand_Genie(MnvHistoType* h)
     h->AddVertErrorBand("GENIE_MaRES"             ,2);
     h->AddVertErrorBand("GENIE_MvRES"             ,2);
     //h->AddVertErrorBand("GENIE_NormCCQE"          ,2);
-    //h->AddVertErrorBand("GENIE_NormCCRES"         ,2);
+    h->AddVertErrorBand("GENIE_NormCCRES"         ,2);
     h->AddVertErrorBand("GENIE_NormDISCC"         ,2);
     h->AddVertErrorBand("GENIE_NormNCRES"         ,2);
     h->AddVertErrorBand("GENIE_RDecBR1gamma"      ,2);

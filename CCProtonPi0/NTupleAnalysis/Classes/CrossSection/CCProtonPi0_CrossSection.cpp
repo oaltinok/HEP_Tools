@@ -337,6 +337,22 @@ MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_b
     // [0] is for CV Value
     mc_bckg->Scale(N_Background_Data[0],"",false);
 
+    // Correct MnvErrorBand Central Values -- Errors Calculated wrt ErrBand CV in Plotting
+    text_out<<"Normalizing Error Band Central Values for mc_bckg"<<std::endl;
+    std::vector<std::string> vert_errs = mc_bckg->GetVertErrorBandNames();
+    for (unsigned int i = 0; i < vert_errs.size(); ++i){
+        TH1D* pUnv = dynamic_cast<TH1D*>(mc_bckg->GetVertErrorBand(vert_errs[i]));
+        NormalizeHistogram(pUnv);
+        pUnv->Scale(N_Background_Data[0]);
+    }
+    std::vector<std::string> lat_errs = mc_bckg->GetLatErrorBandNames();
+    for (unsigned int i = 0; i < lat_errs.size(); ++i){
+        TH1D* pUnv = dynamic_cast<TH1D*>(mc_bckg->GetLatErrorBand(lat_errs[i]));
+        NormalizeHistogram(pUnv);
+        pUnv->Scale(N_Background_Data[0]);
+    }
+
+
     // Subtracted Background -- Use TH1D::Add to add only to Central Value Histogram
     bckg_subtracted->TH1D::Add(mc_bckg,-1);
 
@@ -394,6 +410,21 @@ MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_b
         text_out<<"\tEstimated Background in Data = "<<mc_bckg_all_universes[i]->Integral()<<std::endl;
         text_out<<"\tBackground Subtracted Data = "<<bckg_subtracted_all_universes[i]->Integral()<<std::endl;
         text_out<<std::endl;
+    }
+
+    // Correct MnvErrorBand Central Values -- Errors Calculated wrt ErrBand CV in Plotting
+    text_out<<"Normalizing Error Band Central Values for bckg_subtracted"<<std::endl;
+    vert_errs = bckg_subtracted->GetVertErrorBandNames();
+    for (unsigned int i = 0; i < vert_errs.size(); ++i){
+        TH1D* pUnv = dynamic_cast<TH1D*>(bckg_subtracted->GetVertErrorBand(vert_errs[i]));
+        NormalizeHistogram(pUnv);
+        pUnv->Scale(N_Background_Data[0]);
+    }
+    lat_errs = bckg_subtracted->GetLatErrorBandNames();
+    for (unsigned int i = 0; i < lat_errs.size(); ++i){
+        TH1D* pUnv = dynamic_cast<TH1D*>(bckg_subtracted->GetLatErrorBand(lat_errs[i]));
+        NormalizeHistogram(pUnv);
+        pUnv->Scale(N_Background_Data[0]);
     }
 
     // Estimated Background

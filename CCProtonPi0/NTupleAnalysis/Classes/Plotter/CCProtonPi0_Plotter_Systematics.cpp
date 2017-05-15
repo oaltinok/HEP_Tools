@@ -22,6 +22,39 @@ void CCProtonPi0_Plotter::Systematics_invMass()
     Systematics_DrawErrorSummary("invMass_all", "invMass_mc_reco_all");
 }
 
+void CCProtonPi0_Plotter::Systematics_ErrorEvolution(std::string var_name, std::string err_name, int unv)
+{
+    Systematics_SingleUniverse(var_name, "bckg_subtracted", err_name, unv); 
+    Systematics_SingleUniverse(var_name, "unfolded", err_name, unv); 
+    Systematics_SingleUniverse(var_name, "efficiency_corrected", err_name, unv); 
+    Systematics_SingleUniverse(var_name, "xsec", err_name, unv); 
+}
+
+void CCProtonPi0_Plotter::Systematics_SingleUniverse(std::string var_name, std::string data_type, std::string err_name, int unv)
+{
+    std::string plotDir = Folder_List::plotDir_OtherStudies;
+
+    TFile* f = new TFile(rootDir_CrossSection.data.c_str());
+    std::string var = var_name + "_" + data_type;
+
+    MnvH1D* hist = GetMnvH1D(f, var);
+    double norm_bin_width = hist->GetNormBinWidth();
+
+    TH1D* h = NULL;
+
+    if (err_name.compare("CV") == 0){
+        h = GetBinNormalizedTH1D(hist); 
+    }else{
+        MnvVertErrorBand* err = hist->GetVertErrorBand(err_name);
+        h = err->GetHist(unv);
+        h->Scale(norm_bin_width, "width");
+    }
+
+    std::string plot_name = var + "_" + err_name;
+    Draw1DHist(h, plot_name, plotDir);
+
+}
+
 void CCProtonPi0_Plotter::Systematics_XSec()
 {
     Systematics_DrawErrorSummary("muon_P_xsec", "muon_P_xsec");
@@ -343,7 +376,7 @@ void CCProtonPi0_Plotter::Systematics_WriteTable_Fraction(MnvH1D* hist, std::str
 
 void CCProtonPi0_Plotter::Systematics_WriteTable_BinByBin(MnvH1D* hist, std::string var_name)
 {
-    bool forMATLAB = true;
+    bool forMATLAB = false;
 
     // Open Text File
     std::string label = forMATLAB ? "MATLAB" : "Excel";
@@ -441,7 +474,7 @@ void CCProtonPi0_Plotter::Systematics_SetErrorSummaryGroups()
     genieGroup.push_back("GENIE_MaRES"             );
     genieGroup.push_back("GENIE_MvRES"             );
     //genieGroup.push_back("GENIE_NormCCQE"          );
-    //genieGroup.push_back("GENIE_NormCCRES"         );
+    genieGroup.push_back("GENIE_NormCCRES"         );
     genieGroup.push_back("GENIE_NormDISCC"         );
     genieGroup.push_back("GENIE_NormNCRES"         );
     genieGroup.push_back("GENIE_Rvn1pi"            );

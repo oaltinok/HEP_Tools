@@ -25,6 +25,7 @@ DefaultPlotFolder_List=(Muon
 		Interaction
         CutHists
         Systematics 
+        Paper 
         OtherStudies)
 
 SystematicsList=(Summary

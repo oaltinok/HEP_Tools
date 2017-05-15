@@ -119,6 +119,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void PlotXSecVar_FSIType(std::string var_name, std::string plotDir);
         void PlotXSecVar_IntType(std::string var_name, std::string plotDir);
         
+        void plotPaperPlots();
         void plotCrossSection();
         void plotOriginalData();
         void plotBackgroundSubtracted();
@@ -310,6 +311,9 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawEfficiencyCurve(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);
         void DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir);
+        void Get_2p2h_UpperLimit();
+        void Polarization_FSI_2D();
+        void Polarization_FSI(bool isBeforeFSI, std::string var_name);
 
         // Helper
         double FormTObjArray_BckgType(TFile* f_mc, std::string var_name, TObjArray* mc_hists, double &hist_max, double &bin_width); 
@@ -361,6 +365,8 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void Systematics_WriteTables(std::string var_name);
         void Systematics_WriteTable_Fraction(MnvH1D* hist, std::string var_name);
         void Systematics_WriteTable_BinByBin(MnvH1D* hist, std::string var_name);
+        void Systematics_ErrorEvolution(std::string var_name, std::string err_name, int unv);
+        void Systematics_SingleUniverse(std::string var_name, std::string data_type, std::string err_name, int unv);
         TH1D* GetTotalErrorInGroup(MnvH1D* hist, std::vector<std::string> errGroup, bool area_normalized = false);
 
 };

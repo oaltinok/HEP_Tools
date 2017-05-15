@@ -8,22 +8,17 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false; 
-    nMaxEvents = 100;
+    nMaxEvents = 10000;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
-    isDataAnalysis = false;
+    isDataAnalysis = true;
     isScanRun = false;
     fillErrors_ByHand = true; // Affects only Vertical Error Bands - Lateral Bands always filled ByHand
     
-    applyGENIETuning_DeltaSuppression = false;
-
-    applyGENIETuning_Delta = true;
-    reduce_err_Delta = true;
+    applyGENIETuning_Complete = true;
     
-    applyGENIETuning_NonRes = true;
-    reduce_err_MaRES = false;
-    reduce_err_Rvn1pi = false;
+    applyGENIETuning_DeltaSuppression = false;
 
     applyBckgConstraints_CV = true;
     applyBckgConstraints_Unv = true;
@@ -298,28 +293,17 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
             writeScanFile(); 
         }
 
-        if (truth_isSignal){
-            counter1.increment(1.0);
-            counter1.increment(1.0);
-            double pi0_frac1 = truth_blob1_evis_pizero / truth_blob1_evis_total_truth;
-            double pi0_frac2 = truth_blob2_evis_pizero / truth_blob2_evis_total_truth;
-            if (pi0_frac1 > 0.9) counter2.increment(1.0);
-            if (pi0_frac2 > 0.9) counter2.increment(1.0);
-       
-            std::cout<<truth_blob1_evis_total_truth<<" "<<gamma1_blob_energy<<std::endl;
-        }
         //Study_Flux();
         //Study_BckgSubtraction();
         //Study_W();
         //Study_QSq();
-        //Study_2p2h();
         //Study_ProtonSystematics();
         //Study_GENIE_Weights();
         //Study_DeltaResonance();
+        //Study_NonRES();
     } // end for-loop
 
     if (!m_isMC) AddErrorBands_Data();
-
 
     //--------------------------------------------------------------------------
     // Write Text Files
@@ -495,6 +479,24 @@ void CCProtonPi0_Analyzer::fill_XSecVars()
     fill_QSq();
     fill_Enu();
     fill_W();
+    
+    // 2p2h Search
+    fill_muon_theta_muon_KE();
+    fill_q3_q0();
+
+    // Delta(1232) enriched sub-sample 
+    if (nProtonCandidates > 0){
+        if (m_W > 0 && m_W < 1400){
+            // Proton-Pion Invariant Mass
+            fill_deltaInvMass();
+
+            // Polarization Angles
+            GetDelta_pi_angles(false); // Reco Values
+            if (truth_isSignal) GetDelta_pi_angles(true); // Truth Values
+            fill_Delta_pi_theta();
+            fill_Delta_pi_phi();
+        }
+    }
 }
 
 void CCProtonPi0_Analyzer::fillPi0BlobReco()
@@ -972,8 +974,9 @@ bool CCProtonPi0_Analyzer::getCutStatistics()
     //      If there is no Side Band, Fill for Every Event
     //      Else fill according to Side Band
     if (NoSideBand){
+        double reco_theta = GetCorrectedMuonTheta();
         FillHistogramWithVertErrors(cutList.SideBand_muon_P, muon_P*MeV_to_GeV);
-        FillHistogramWithVertErrors(cutList.SideBand_muon_theta, muon_theta_beam*TMath::RadToDeg());
+        FillHistogramWithVertErrors(cutList.SideBand_muon_theta, reco_theta*TMath::RadToDeg());
         FillHistogramWithVertErrors(cutList.SideBand_pi0_P, pi0_P*MeV_to_GeV);
         FillHistogramWithVertErrors(cutList.SideBand_pi0_KE, pi0_KE*MeV_to_GeV);
         FillHistogramWithVertErrors(cutList.SideBand_pi0_theta, pi0_theta_beam*TMath::RadToDeg());
@@ -1108,7 +1111,6 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
     FillHistogram(interaction.updated_wgt_Rvn1pi, updated_genie_wgt_Rvn1pi[2]);
     FillHistogram(interaction.updated_wgt_Rvn1pi, updated_genie_wgt_Rvn1pi[4]);
 
-
     // Inclusive -- All Events
     FillHistogram(interaction.Enu, m_Enu * MeV_to_GeV);
     FillHistogram(interaction.QSq, m_QSq * MeVSq_to_GeVSq);
@@ -1127,6 +1129,20 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
         FillHistogram(interaction.QSq_2Track, m_QSq * MeVSq_to_GeVSq);
         FillHistogram(interaction.WSq_2Track, m_WSq * MeVSq_to_GeVSq);
         FillHistogram(interaction.W_2Track, m_W * MeV_to_GeV);
+    }
+
+
+
+    // Vertex Energy & Evis 
+    FillHistogram(interaction.vertex_energy_All, vertex_blob_energy);
+    FillHistogram(interaction.vertex_evis_All, vertex_blob_evis );    
+
+    if (nProtonCandidates == 0){
+        FillHistogram(interaction.vertex_energy_1Track, vertex_blob_energy);
+        FillHistogram(interaction.vertex_evis_1Track, vertex_blob_evis );
+    }else{
+        FillHistogram(interaction.vertex_energy_2Track, vertex_blob_energy);
+        FillHistogram(interaction.vertex_evis_2Track, vertex_blob_evis );
     }
 
     // Extra Energy
@@ -1691,6 +1707,126 @@ void CCProtonPi0_Analyzer::fill_pi0_theta()
     }
 }
 
+void CCProtonPi0_Analyzer::fill_deltaInvMass()
+{
+
+    double deltaInvMass_reco = calcDeltaInvariantMass(false) * MeV_to_GeV;
+
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithLeadingErrors(interaction.deltaInvMass_mc_reco_all, deltaInvMass_reco);
+        if (truth_isSignal){
+            double deltaInvMass_true = calcDeltaInvariantMass(true) * MeV_to_GeV;
+            // MC Truth Signal
+            FillHistogramWithLeadingErrors(interaction.deltaInvMass_mc_truth_signal, deltaInvMass_true);
+            // MC Reco Signal
+            FillHistogramWithLeadingErrors(interaction.deltaInvMass_mc_reco_signal, deltaInvMass_reco);
+            // MC Reco vs True -- Response
+            FillHistogramWithLeadingErrors(interaction.deltaInvMass_response, deltaInvMass_reco, deltaInvMass_true);
+        }else{
+            // MC Reco Background
+            FillHistogramWithLeadingErrors(interaction.deltaInvMass_mc_reco_bckg, deltaInvMass_reco);
+        }
+    }else{
+        // Data
+        FillHistogram(interaction.deltaInvMass_all, deltaInvMass_reco);
+    }
+}
+
+void CCProtonPi0_Analyzer::fill_Delta_pi_theta()
+{
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithLeadingErrors(interaction.Delta_pi_theta_mc_reco_all, m_delta_pi_theta_reco);
+        if (truth_isSignal){
+            // MC Truth Signal
+            FillHistogramWithLeadingErrors(interaction.Delta_pi_theta_mc_truth_signal, m_delta_pi_theta_true);
+            // MC Reco Signal
+            FillHistogramWithLeadingErrors(interaction.Delta_pi_theta_mc_reco_signal, m_delta_pi_theta_reco);
+            // MC Reco vs True -- Response
+            FillHistogramWithLeadingErrors(interaction.Delta_pi_theta_response, m_delta_pi_theta_reco, m_delta_pi_theta_true);
+        }else{
+            // MC Reco Background
+            FillHistogramWithLeadingErrors(interaction.Delta_pi_theta_mc_reco_bckg, m_delta_pi_theta_reco);
+        }
+    }else{
+        // Data
+        FillHistogram(interaction.Delta_pi_theta_all, m_delta_pi_theta_reco);
+    }
+}
+
+void CCProtonPi0_Analyzer::fill_Delta_pi_phi()
+{
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithLeadingErrors(interaction.Delta_pi_phi_mc_reco_all, m_delta_pi_phi_reco);
+        if (truth_isSignal){
+            // MC Truth Signal
+            FillHistogramWithLeadingErrors(interaction.Delta_pi_phi_mc_truth_signal, m_delta_pi_phi_true);
+            // MC Reco Signal
+            FillHistogramWithLeadingErrors(interaction.Delta_pi_phi_mc_reco_signal, m_delta_pi_phi_reco);
+            // MC Reco vs True -- Response
+            FillHistogramWithLeadingErrors(interaction.Delta_pi_phi_response, m_delta_pi_phi_reco, m_delta_pi_phi_true);
+        }else{
+            // MC Reco Background 
+            FillHistogramWithLeadingErrors(interaction.Delta_pi_phi_mc_reco_bckg, m_delta_pi_phi_reco);
+        }
+    }else{
+        // Data
+        FillHistogram(interaction.Delta_pi_phi_all, m_delta_pi_phi_reco);
+    }
+}
+
+void CCProtonPi0_Analyzer::fill_q3_q0()
+{
+    double q0_reco = (m_Enu - muon_E) * MeV_to_GeV;
+    double q3_reco = Calc_q3(false) * MeV_to_GeV; // Reco Value
+
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithLeadingErrors(interaction.q3_q0_mc_reco_all, q3_reco, q0_reco);
+        if (truth_isSignal){
+            double q0_true = (m_Enu_Truth - truth_muon_4P[3]) * MeV_to_GeV;
+            double q3_true = Calc_q3(true) * MeV_to_GeV; // True Value
+            // MC Truth Signal
+            FillHistogramWithLeadingErrors(interaction.q3_q0_mc_truth_signal, q3_true, q0_true);
+            // MC Reco Signal
+            FillHistogramWithLeadingErrors(interaction.q3_q0_mc_reco_signal, q3_reco, q0_reco);
+        }else{
+            // MC Reco Background
+            FillHistogramWithLeadingErrors(interaction.q3_q0_mc_reco_bckg, q3_reco, q0_reco);
+        }
+    }else{
+        // Data
+        FillHistogram(interaction.q3_q0_all, q3_reco, q0_reco);
+    }
+}
+
+void CCProtonPi0_Analyzer::fill_muon_theta_muon_KE()
+{
+    double muon_theta_reco = cos( GetCorrectedMuonTheta() );
+    double muon_KE_reco = muon_KE * MeV_to_GeV;
+
+    if (m_isMC){
+        // MC Reco All
+        FillHistogramWithLeadingErrors(interaction.muon_theta_muon_KE_mc_reco_all, muon_theta_reco, muon_KE_reco);
+        if (truth_isSignal){
+            double muon_theta_true = cos(truth_muon_theta_beam);
+            double muon_KE_true = (truth_muon_4P[3] - muon_mass) * MeV_to_GeV;
+            // MC Truth Signal
+            FillHistogramWithLeadingErrors(interaction.muon_theta_muon_KE_mc_truth_signal, muon_theta_true, muon_KE_true);
+            // MC Reco Signal
+            FillHistogramWithLeadingErrors(interaction.muon_theta_muon_KE_mc_reco_signal, muon_theta_reco, muon_KE_reco);
+        }else{
+            // MC Reco Background
+            FillHistogramWithLeadingErrors(interaction.muon_theta_muon_KE_mc_reco_bckg, muon_theta_reco, muon_KE_reco);
+        }
+    }else{
+        // Data
+        FillHistogram(interaction.muon_theta_muon_KE_all, muon_theta_reco, muon_KE_reco);
+    }
+}
+
 void CCProtonPi0_Analyzer::fillMuonReco()
 {
     // Get Muon Theta From Nodes
@@ -1930,19 +2066,22 @@ void CCProtonPi0_Analyzer::CalcEventWeight()
             else if (truth_isBckg_Compact_WithPi0) cvweight *= cv_wgt_WithPi0;
         }
             
-        //std::cout<<std::endl;
-        //std::cout<<"cvweight Before GENIE Tuning = "<<cvweight<<std::endl;
-        if (applyGENIETuning_Delta){
+        if (applyGENIETuning_Complete){
+
             // Delta decay anisotropy weighting per DocDB 9850.  Weight is 1.0 for non-delta resonance interactions.
             cvweight_Delta *= ( 1.0 + truth_genie_wgt_Theta_Delta2Npi[4] ) / 2.0;
             cvweight *= cvweight_Delta;
-        }
 
-        if (applyGENIETuning_NonRes && IsGenie_NonRES_n_piplus()){
-            // NonRES 1pi constraint
-            cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvn1pi[2] - 1); // From Phil R.
-            cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvp1pi[2] - 1); // From Phil R.
-            cvweight *= cvweight_NonRes1pi;
+            if ( IsGenieRvn1pi() || IsGenieRvp1pi() ){
+                cvweight_NonRes1pi *= deuteriumNonResNorm;
+                cvweight *= cvweight_NonRes1pi;
+            }
+        
+            if ( IsGenieCCRes() ){
+                cvweight_CCRES *= deuteriumResNorm; 
+                cvweight_CCRES *= GetMaResWeight(deuteriumResNorm);
+                cvweight *= cvweight_CCRES;
+            }
         }
 
         if ( applyGENIETuning_DeltaSuppression && IsGenieCCRes() ){
@@ -1953,12 +2092,10 @@ void CCProtonPi0_Analyzer::CalcEventWeight()
         }
 
         UpdateGENIESystematics();
-        //std::cout<<"cvweight After GENIE Tuning = "<<cvweight<<std::endl;
     }else{
         cvweight = 1.0; 
     }
 }
-
 
 void CCProtonPi0_Analyzer::FillInvMass_TruthMatch()
 {
@@ -2333,8 +2470,9 @@ void CCProtonPi0_Analyzer::fill_SideBand_Other()
     bool fill_HighInvMass = sideBand_HighInvMass && isHighInvMassEvent;
 
     if (fill_Michel || fill_pID || fill_LowInvMass || fill_HighInvMass){
+        double reco_theta = GetCorrectedMuonTheta();
         FillHistogramWithVertErrors(cutList.SideBand_muon_P, muon_P*MeV_to_GeV);
-        FillHistogramWithVertErrors(cutList.SideBand_muon_theta, muon_theta_beam*TMath::RadToDeg());
+        FillHistogramWithVertErrors(cutList.SideBand_muon_theta, reco_theta*TMath::RadToDeg());
         FillHistogramWithVertErrors(cutList.SideBand_pi0_P, pi0_P*MeV_to_GeV);
         FillHistogramWithVertErrors(cutList.SideBand_pi0_KE, pi0_KE*MeV_to_GeV);
         FillHistogramWithVertErrors(cutList.SideBand_pi0_theta, pi0_theta_beam*TMath::RadToDeg());
@@ -2486,62 +2624,6 @@ void CCProtonPi0_Analyzer::GetDelta_pi_angles(bool isTruth)
     }
 }
 
-
-void CCProtonPi0_Analyzer::GetDeltaPolarization()
-{
-    bool isDebug = false;
-
-    using namespace std;
-
-    if (m_W > 0 && m_W < 1400){
-        TVector3 unit_beam_muon = GetNeutrinoCrossMuon(false);
-
-        TLorentzVector delta_4P = GetDelta4P(false);
-
-        // Find Boost from LAB Frame to Delta Rest Frame
-        double M_delta = delta_4P.M(); 
-        if (isDebug) cout<<"Delta Mass = "<<M_delta * MeV_to_GeV<<endl;
-
-        double gamma = delta_4P.Gamma();
-        double boost_x = -(delta_4P.Px()/ (gamma*M_delta));
-        double boost_y = -(delta_4P.Py() / (gamma*M_delta));
-        double boost_z = -(delta_4P.Pz() / (gamma*M_delta));
-
-        if (isDebug){
-            cout<<"Delta P (Before) = "<<delta_4P.Vect().Mag()<<std::endl;
-            cout<<"Delta P (Before) = "<<delta_4P.Vect().x();
-            cout<<" "<<delta_4P.Vect().y();
-            cout<<" "<<delta_4P.Vect().z()<<endl;
-        }
-
-        delta_4P.Boost(boost_x,boost_y,boost_z);
-
-        if (isDebug){
-            cout<<"Delta P (After) = "<<delta_4P.Vect().Mag()<<std::endl;
-            cout<<"Delta P (After) = "<<delta_4P.Vect().x();
-            cout<<" "<<delta_4P.Vect().y();
-            cout<<" "<<delta_4P.Vect().z()<<endl;
-            cout<<"Delta Mass (After) = "<<delta_4P.M() * MeV_to_GeV<<endl;
-        }
-
-        // Boost Pion to Delta Rest Frame
-        TLorentzVector pion_4P(pi0_px, pi0_py, pi0_pz, pi0_E); 
-        pion_4P.Boost(boost_x,boost_y,boost_z);
-        TVector3 unit_pion_P = pion_4P.Vect().Unit();
-        if (isDebug){
-            cout<<"Unit pion_P = "<<unit_pion_P.Mag()<<endl;
-        }
-
-        double polarization = unit_beam_muon.Dot(unit_pion_P);
-
-        FillHistogram(interaction.Polarization, polarization);
-
-        if (isDebug){
-            cout<<"Polarization = "<<polarization<<endl;
-        }
-    }
-}
-
 void CCProtonPi0_Analyzer::GetDeltaTransverse()
 {
     if (nProtonCandidates > 0){
@@ -2571,7 +2653,6 @@ void CCProtonPi0_Analyzer::GetDeltaTransverse()
         }
     }
 }
-
 
 TVector3 CCProtonPi0_Analyzer::GetNeutrinoCrossMuon(bool isTruth)
 {
@@ -2790,13 +2871,13 @@ bool CCProtonPi0_Analyzer::IsGenieCCRes()
 bool CCProtonPi0_Analyzer::IsGenieRvn1pi()
 {
     // Weight is NOT equal to 1 for Rvn1pi events
-    return truth_genie_wgt_Rvn1pi[2] != 1;
+    return truth_genie_wgt_Rvn1pi[2] < 1;
 }
 
 bool CCProtonPi0_Analyzer::IsGenieRvp1pi()
 {
     // Weight is NOT equal to 1 for Rvp1pi events
-    return truth_genie_wgt_Rvp1pi[2] != 1;
+    return truth_genie_wgt_Rvp1pi[2] < 1;
 }
 
 bool CCProtonPi0_Analyzer::IsGenieNonRES()
@@ -2805,7 +2886,7 @@ bool CCProtonPi0_Analyzer::IsGenieNonRES()
     if ( IsGenieRvn1pi() || IsGenieRvp1pi() ) return true;
 
     // NonRES 2pi
-    if ( truth_genie_wgt_Rvn2pi[2] != 1 || truth_genie_wgt_Rvp2pi[2] != 1) return true;
+    if ( truth_genie_wgt_Rvn2pi[2] < 1 || truth_genie_wgt_Rvp2pi[2] < 1) return true;
 
     return false;
 }
@@ -2897,9 +2978,18 @@ void CCProtonPi0_Analyzer::Study_W()
     }
 }
 
+void CCProtonPi0_Analyzer::Study_NonRES()
+{
+    if ( IsGenieRvn1pi() || IsGenieRvp1pi() ){
+        cout<<"GENIE Tag!";
+        cout<<"\tmc_intType = "<<mc_intType<<" mc_w = "<<mc_w<<endl;
+    }else if (mc_intType == 3){
+        cout<<"mc_intType = "<<mc_intType<<" mc_w = "<<mc_w<<endl;
+    }
+}
+
 void CCProtonPi0_Analyzer::Study_DeltaResonance()
 {
-
     //if (IsGenieCCRes()){
     //    double wgt = truth_genie_wgt_Theta_Delta2Npi[4];
     //    if (wgt == 1.0){
@@ -2913,33 +3003,6 @@ void CCProtonPi0_Analyzer::Study_DeltaResonance()
     //        std::cout<<" "<<std::endl;
     //    }
     //}
-
-    if (nProtonCandidates > 0){
-        if (m_W > 0 && m_W < 1400){
-
-            GetDelta_pi_angles(false); // Reco Values
-
-            double deltaInvMass_reco = calcDeltaInvariantMass(false) * MeV_to_GeV;
-            FillHistogram(interaction.deltaInvMass, deltaInvMass_reco);
-
-            // Fill Pi0 Inv Mass for BckgSubtraction
-            FillHistogram(interaction.pi0_invMass_DeltaRES, pi0_invMass);
-
-            // Fill Reco Values
-            FillHistogram(interaction.Delta_pi_theta, m_delta_pi_theta_reco);
-            FillHistogram(interaction.Delta_pi_phi, m_delta_pi_phi_reco);
-
-            // Fill Unfolding Matrices
-            if (truth_isSignal){
-                GetDelta_pi_angles(true); // Truth Values
-                
-                double deltaInvMass_true = calcDeltaInvariantMass(true) * MeV_to_GeV;
-                FillHistogram(interaction.deltaInvMass_response, deltaInvMass_reco, deltaInvMass_true);
-                FillHistogram(interaction.Delta_pi_theta_response, m_delta_pi_theta_reco, m_delta_pi_theta_true);
-                FillHistogram(interaction.Delta_pi_phi_response, m_delta_pi_phi_reco, m_delta_pi_phi_true);
-            }
-        }
-    }
 }
 
 void CCProtonPi0_Analyzer::Study_QSq()
@@ -3075,43 +3138,24 @@ void CCProtonPi0_Analyzer::writeEventTypeTableLine(CCProtonPi0_Counter &counter,
     eventTypeTable<<std::endl; 
 }
 
-double CCProtonPi0_Analyzer::Calc_q3()
+double CCProtonPi0_Analyzer::Calc_q3(bool isTruth)
 {
+    double t_Enu = isTruth ? m_Enu_Truth : m_Enu;
+    double t_muon_Px = isTruth ? truth_muon_4P[0] : muon_px;
+    double t_muon_Py = isTruth ? truth_muon_4P[1] : muon_py;
+    double t_muon_Pz = isTruth ? truth_muon_4P[2] : muon_pz;
+    
     double nu_Px = 0.0;
-    double nu_Py = m_Enu * sin(beam_theta);
-    double nu_Pz = m_Enu * cos(beam_theta);
+    double nu_Py = t_Enu * sin(beam_theta);
+    double nu_Pz = t_Enu * cos(beam_theta);
 
-    double dPx = nu_Px - muon_px;
-    double dPy = nu_Py - muon_py;
-    double dPz = nu_Pz - muon_pz;
+    double dPx = nu_Px - t_muon_Px;
+    double dPy = nu_Py - t_muon_Py;
+    double dPz = nu_Pz - t_muon_Pz;
 
     double dP = HEP_Functions::calcMomentum(dPx, dPy, dPz);
 
     return dP;
-}
-
-void CCProtonPi0_Analyzer::Study_2p2h()
-{
-    double W_reco = m_W * MeV_to_GeV;
-    double QSq_reco = m_QSq * MeVSq_to_GeVSq;
-    double q0_reco = (m_Enu - muon_E) * MeV_to_GeV;
-    double q3_reco = Calc_q3() * MeV_to_GeV;
-    double reco_muon_theta = GetCorrectedMuonTheta();
-
-    // For All Events
-    FillHistogram(interaction.vertex_energy_All, vertex_blob_energy);
-    FillHistogram(interaction.vertex_evis_All, vertex_blob_evis );    
-    FillHistogram(interaction.q3_q0, q3_reco, q0_reco);    
-    FillHistogram(interaction.W_QSq, W_reco, QSq_reco);    
-    FillHistogram(interaction.muon_theta_muon_KE, cos(reco_muon_theta), muon_KE * MeV_to_GeV);    
-
-    if (nProtonCandidates == 0){
-        FillHistogram(interaction.vertex_energy_1Track, vertex_blob_energy);
-        FillHistogram(interaction.vertex_evis_1Track, vertex_blob_evis );
-    }else{
-        FillHistogram(interaction.vertex_energy_2Track, vertex_blob_energy);
-        FillHistogram(interaction.vertex_evis_2Track, vertex_blob_evis );
-    }
 }
 
 void CCProtonPi0_Analyzer::Study_Flux()

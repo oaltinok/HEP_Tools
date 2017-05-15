@@ -86,10 +86,16 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> Enu_mc_truth_all_signal_IntType;
        
         // Delta RES Study 
+        MnvH1D* delta_anisotropy;
         MnvH1D* deltaInvMass_all_signal;
         MnvH1D* deltaInvMass_delta_res;
         MnvH1D* deltaInvMass_other_res;
         MnvH1D* deltaInvMass_non_res;
+         
+        MnvH2D* Delta_pi_theta_pi_P_all_signal;
+        MnvH2D* Delta_pi_theta_pi_P_delta_res;
+        MnvH2D* Delta_pi_theta_pi_P_other_res;
+        MnvH2D* Delta_pi_theta_pi_P_non_res;
         
         MnvH1D* Delta_pi_theta_all_signal;
         MnvH1D* Delta_pi_theta_delta_res;
@@ -100,6 +106,16 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         MnvH1D* Delta_pi_phi_delta_res;
         MnvH1D* Delta_pi_phi_other_res;
         MnvH1D* Delta_pi_phi_non_res;
+        
+        MnvH1D* Delta_pi_theta_all_signal_BeforeFSI;
+        MnvH1D* Delta_pi_theta_delta_res_BeforeFSI;
+        MnvH1D* Delta_pi_theta_other_res_BeforeFSI;
+        MnvH1D* Delta_pi_theta_non_res_BeforeFSI;
+        
+        MnvH1D* Delta_pi_phi_all_signal_BeforeFSI;
+        MnvH1D* Delta_pi_phi_delta_res_BeforeFSI;
+        MnvH1D* Delta_pi_phi_other_res_BeforeFSI;
+        MnvH1D* Delta_pi_phi_non_res_BeforeFSI;
 
         std::vector<MnvH1D*> CV_weight;
         std::vector<MnvH1D*> CV_weight_2p2h;
@@ -166,11 +182,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_QSqFitter QSqFitter;
 
         bool applyGENIETuning_DeltaSuppression;
-        bool applyGENIETuning_Delta;
-        bool applyGENIETuning_NonRes;
-        bool reduce_err_Delta;
-        bool reduce_err_MaRES;
-        bool reduce_err_Rvn1pi;
+        bool applyGENIETuning_Complete;
 
         int GetFSIType();
         int GetIntType();
@@ -216,8 +228,10 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
 
         double calcDeltaInvariantMass();
         void GetDelta_pi_angles();
+        void GetDelta_pi_angles_BeforeFSI();
         TLorentzVector Get_Neutrino_4P(const double Enu);
         TLorentzVector GetDelta4P();
+        TLorentzVector GetDelta4P_BeforeFSI();
 
         // GENIE Tuning
         void initUpdatedGenieWeights();
@@ -296,6 +310,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         double cvweight_NonRes1pi;
         double err_2p2h;
         double updated_genie_wgt_Theta_Delta2Npi[7];
+        double updated_genie_wgt_NormCCRES[7];
         double updated_genie_wgt_MaRES[7];
         double updated_genie_wgt_MvRES[7];
         double updated_genie_wgt_Rvn1pi[7];

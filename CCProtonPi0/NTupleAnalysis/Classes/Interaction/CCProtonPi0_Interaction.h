@@ -103,8 +103,6 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> vertex_evis_1Track;
         std::vector<MnvH1D*> vertex_evis_2Track;
 
-        std::vector<MnvH2D*> muon_theta_muon_KE;
-        std::vector<MnvH2D*> q3_q0;
         std::vector<MnvH2D*> W_QSq;
 
         // Flux Study
@@ -135,6 +133,44 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         MnvH1D* W_mc_truth_signal;
         MnvH2D* W_response;
 
+        // Delta Invariant Mass
+        MnvH1D* deltaInvMass_all;
+        MnvH1D* deltaInvMass_mc_reco_all;
+        MnvH1D* deltaInvMass_mc_reco_signal;
+        MnvH1D* deltaInvMass_mc_reco_bckg;
+        MnvH1D* deltaInvMass_mc_truth_signal;
+        MnvH2D* deltaInvMass_response;
+
+        // Polarization Angle: Theta 
+        MnvH1D* Delta_pi_theta_all;
+        MnvH1D* Delta_pi_theta_mc_reco_all;
+        MnvH1D* Delta_pi_theta_mc_reco_signal;
+        MnvH1D* Delta_pi_theta_mc_reco_bckg;
+        MnvH1D* Delta_pi_theta_mc_truth_signal;
+        MnvH2D* Delta_pi_theta_response;
+
+        // Polarization Angle: Phi 
+        MnvH1D* Delta_pi_phi_all;
+        MnvH1D* Delta_pi_phi_mc_reco_all;
+        MnvH1D* Delta_pi_phi_mc_reco_signal;
+        MnvH1D* Delta_pi_phi_mc_reco_bckg;
+        MnvH1D* Delta_pi_phi_mc_truth_signal;
+        MnvH2D* Delta_pi_phi_response;
+
+        // 2p2h -- muon_theta_muon_KE 
+        MnvH2D* muon_theta_muon_KE_all;
+        MnvH2D* muon_theta_muon_KE_mc_reco_all;
+        MnvH2D* muon_theta_muon_KE_mc_reco_signal;
+        MnvH2D* muon_theta_muon_KE_mc_reco_bckg;
+        MnvH2D* muon_theta_muon_KE_mc_truth_signal;
+
+        // 2p2h -- q3_q0 
+        MnvH2D* q3_q0_all;
+        MnvH2D* q3_q0_mc_reco_all;
+        MnvH2D* q3_q0_mc_reco_signal;
+        MnvH2D* q3_q0_mc_reco_bckg;
+        MnvH2D* q3_q0_mc_truth_signal;
+
         // Vertical Error Band -- Errors 
         TH1D* Err_NeutronResponse;  
         TH1D* Err_PionResponse;  
@@ -151,13 +187,6 @@ class CCProtonPi0_Interaction : public CCProtonPi0_NTupleAnalysis
         TH1D* Birks_shift_rand_numbers;
 
         // Delta Resonance
-        std::vector<MnvH1D*> deltaInvMass;
-        std::vector<MnvH1D*> Polarization;
-        std::vector<MnvH1D*> Delta_pi_theta;
-        std::vector<MnvH1D*> Delta_pi_phi;
-        MnvH2D* deltaInvMass_response;
-        MnvH2D* Delta_pi_theta_response;
-        MnvH2D* Delta_pi_phi_response;
         TH1D* resID;
         TH1D* resID_theta;
 

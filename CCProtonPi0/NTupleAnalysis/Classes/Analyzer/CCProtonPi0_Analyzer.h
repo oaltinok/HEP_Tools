@@ -70,6 +70,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void fill_pi0_P();
         void fill_pi0_KE();
         void fill_pi0_theta();
+        void fill_deltaInvMass();
+        void fill_Delta_pi_theta();
+        void fill_Delta_pi_phi();
+        void fill_muon_theta_muon_KE();
+        void fill_q3_q0();
         void initCVWeights();
         void specifyRunTime();
         void openTextFiles();
@@ -95,6 +100,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillHistogramWithVertErrors(MnvH1D* hist, double var);
         void FillHistogramWithVertErrors(MnvH2D* hist, double xval, double yval);
         void FillHistogramWithVertErrors(vector<MnvH1D*> &hist, double var);
+        void FillHistogramWithLeadingErrors(MnvH1D* hist, double var);
+        void FillHistogramWithLeadingErrors(MnvH2D* hist, double xval, double yval);
 
         // Vertical Error Band
         void FillVertErrorBand_ByHand(MnvH1D* h, double var, std::string error_name, std::vector<double> errors);
@@ -274,7 +281,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void fillInteractionReco();
         double calcDeltaInvariantMass(bool isTruth = false);
         int GetEjectedNucleonCount();
-        double Calc_q3();
+        double Calc_q3(bool isTruth);
         double Calc_Enu();
         double Calc_Enu_Cal();
         TLorentzVector Get_Neutrino_4P(const double Enu) const;
@@ -295,7 +302,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void Study_Flux();
         void Study_QSq();
         void Study_DeltaResonance();
-        void Study_2p2h();
+        void Study_NonRES();
         double GetDeltaFactor(double QSq, double A, double Q0);
         std::vector<double> GetDeltaFactorWeights();
 
@@ -328,6 +335,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         // GENIE Tuning
         double err_2p2h;
         double updated_genie_wgt_Theta_Delta2Npi[7];
+        double updated_genie_wgt_NormCCRES[7];
         double updated_genie_wgt_MaRES[7];
         double updated_genie_wgt_MvRES[7];
         double updated_genie_wgt_Rvn1pi[7];
@@ -377,12 +385,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         bool m_isModeReduce;
         bool isScanRun;
         bool isDataAnalysis;
-        bool applyGENIETuning_Delta;
+        bool applyGENIETuning_Complete;
         bool applyGENIETuning_DeltaSuppression;
-        bool applyGENIETuning_NonRes;
-        bool reduce_err_Delta;
-        bool reduce_err_MaRES;
-        bool reduce_err_Rvn1pi;
         bool applyBckgConstraints_CV;
         bool applyBckgConstraints_Unv;
         bool applyProtonScore;

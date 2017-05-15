@@ -8,19 +8,13 @@ using namespace PlotUtils;
 void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 {
     // Control Flow
-    bool applyMaxEvents = true;
-    double nMaxEvents = 1000000;
+    bool applyMaxEvents = false;
+    double nMaxEvents = 100000000;
 
     fillErrors_ByHand = true;
     
+    applyGENIETuning_Complete = true;
     applyGENIETuning_DeltaSuppression = false;
-
-    applyGENIETuning_Delta = true;
-    reduce_err_Delta = true;
-
-    applyGENIETuning_NonRes = true;
-    reduce_err_MaRES = false;
-    reduce_err_Rvn1pi = false;
 
     //------------------------------------------------------------------------
     // Create chain
@@ -86,6 +80,10 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
             if (truth_isSignal_BeforeFSI){
                 nSignal_BeforeFSI.increment(cvweight);
                 FillSignal_XSec_Variables_BeforeFSI();
+
+                if (truth_W_exp > 0.0 && truth_W_exp < 1400){
+                    GetDelta_pi_angles_BeforeFSI();
+                }
             }
 
             CountSignalFeed();
@@ -959,6 +957,10 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     truth_w_2p2h->GetYaxis()->SetTitle("N(Events)");
 
     // Delta RES Study
+    delta_anisotropy = new MnvH1D( "delta_anisotropy","Theta_Delta2Npi GENIE 1#sigma Weights", 80,0.0,2.0);
+    delta_anisotropy->GetXaxis()->SetTitle("Theta_Delta2Npi GENIE 1#sigma Weights");
+    delta_anisotropy->GetYaxis()->SetTitle("N(Events)");
+
     deltaInvMass_all_signal = new MnvH1D( "deltaInvMass_all_signal","Reconstructed p#pi^{0} Invariant Mass", 16, 1.0, 1.8);
     deltaInvMass_all_signal->GetXaxis()->SetTitle("p#pi^{0} Inv. Mass [GeV]");
     deltaInvMass_all_signal->GetYaxis()->SetTitle("N(Events)");
@@ -974,6 +976,22 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     deltaInvMass_non_res = new MnvH1D( "deltaInvMass_non_res","Reconstructed p#pi^{0} Invariant Mass", 16, 1.0, 1.8);
     deltaInvMass_non_res->GetXaxis()->SetTitle("p#pi^{0} Inv. Mass [GeV]");
     deltaInvMass_non_res->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_theta_pi_P_all_signal = new MnvH2D( "Delta_pi_theta_pi_P_all_signal"," ", 10, -1.0, 1.0, 10, 0.0, 1.0);
+    Delta_pi_theta_pi_P_all_signal->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_pi_P_all_signal->GetYaxis()->SetTitle("P_{#pi^{0}} in Lab Frame (GeV)");
+
+    Delta_pi_theta_pi_P_delta_res = new MnvH2D( "Delta_pi_theta_pi_P_delta_res"," ", 10, -1.0, 1.0, 10, 0.0, 1.0);
+    Delta_pi_theta_pi_P_delta_res->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_pi_P_delta_res->GetYaxis()->SetTitle("P_{#pi^{0}} in Lab Frame (GeV)");
+
+    Delta_pi_theta_pi_P_other_res = new MnvH2D( "Delta_pi_theta_pi_P_other_res"," ", 10, -1.0, 1.0, 10, 0.0, 1.0);
+    Delta_pi_theta_pi_P_other_res->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_pi_P_other_res->GetYaxis()->SetTitle("P_{#pi^{0}} in Lab Frame (GeV)");
+
+    Delta_pi_theta_pi_P_non_res = new MnvH2D( "Delta_pi_theta_pi_P_non_res"," ", 10, -1.0, 1.0, 10, 0.0, 1.0);
+    Delta_pi_theta_pi_P_non_res->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_pi_P_non_res->GetYaxis()->SetTitle("P_{#pi^{0}} in Lab Frame (GeV)");
 
     Delta_pi_theta_all_signal = new MnvH1D( "Delta_pi_theta_all_signal"," ", 10, -1.0, 1.0);
     Delta_pi_theta_all_signal->GetXaxis()->SetTitle("cos(#theta)");
@@ -1006,6 +1024,38 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     Delta_pi_phi_non_res = new MnvH1D( "Delta_pi_phi_non_res"," ", 10, 0.0, 360);
     Delta_pi_phi_non_res->GetXaxis()->SetTitle("#phi [deg]");
     Delta_pi_phi_non_res->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_theta_all_signal_BeforeFSI = new MnvH1D( "Delta_pi_theta_all_signal_BeforeFSI"," ", 10, -1.0, 1.0);
+    Delta_pi_theta_all_signal_BeforeFSI->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_theta_delta_res_BeforeFSI = new MnvH1D( "Delta_pi_theta_delta_res_BeforeFSI"," ", 10, -1.0, 1.0);
+    Delta_pi_theta_delta_res_BeforeFSI->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_delta_res_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_theta_other_res_BeforeFSI = new MnvH1D( "Delta_pi_theta_other_res_BeforeFSI"," ", 10, -1.0, 1.0);
+    Delta_pi_theta_other_res_BeforeFSI->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_other_res_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_theta_non_res_BeforeFSI = new MnvH1D( "Delta_pi_theta_non_res_BeforeFSI"," ", 10, -1.0, 1.0);
+    Delta_pi_theta_non_res_BeforeFSI->GetXaxis()->SetTitle("cos(#theta)");
+    Delta_pi_theta_non_res_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_phi_all_signal_BeforeFSI = new MnvH1D( "Delta_pi_phi_all_signal_BeforeFSI"," ", 10, 0.0, 360);
+    Delta_pi_phi_all_signal_BeforeFSI->GetXaxis()->SetTitle("#phi [deg]");
+    Delta_pi_phi_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_phi_delta_res_BeforeFSI = new MnvH1D( "Delta_pi_phi_delta_res_BeforeFSI"," ", 10, 0.0, 360);
+    Delta_pi_phi_delta_res_BeforeFSI->GetXaxis()->SetTitle("#phi [deg]");
+    Delta_pi_phi_delta_res_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_phi_other_res_BeforeFSI = new MnvH1D( "Delta_pi_phi_other_res_BeforeFSI"," ", 10, 0.0, 360);
+    Delta_pi_phi_other_res_BeforeFSI->GetXaxis()->SetTitle("#phi [deg]");
+    Delta_pi_phi_other_res_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
+
+    Delta_pi_phi_non_res_BeforeFSI = new MnvH1D( "Delta_pi_phi_non_res_BeforeFSI"," ", 10, 0.0, 360);
+    Delta_pi_phi_non_res_BeforeFSI->GetXaxis()->SetTitle("#phi [deg]");
+    Delta_pi_phi_non_res_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
 
 }
 
@@ -1158,7 +1208,6 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
     //h->FillVertErrorBand("GENIE_MaCCQEshape"       ,var, truth_genie_wgt_MaCCQEshape[2]      , truth_genie_wgt_MaCCQEshape[4]      , cvweight);
     h->FillVertErrorBand("GENIE_MaNCEL"            ,var, truth_genie_wgt_MaNCEL[2]           , truth_genie_wgt_MaNCEL[4]           , cvweight);
     //h->FillVertErrorBand("GENIE_NormCCQE"          ,var, truth_genie_wgt_NormCCQE[2]         , truth_genie_wgt_NormCCQE[4]         , cvweight);
-    //h->FillVertErrorBand("GENIE_NormCCRES"         ,var, truth_genie_wgt_NormCCRES[2]        , truth_genie_wgt_NormCCRES[4]        , cvweight);
     h->FillVertErrorBand("GENIE_NormDISCC"         ,var, truth_genie_wgt_NormDISCC[2]        , truth_genie_wgt_NormDISCC[4]        , cvweight);
     h->FillVertErrorBand("GENIE_NormNCRES"         ,var, truth_genie_wgt_NormNCRES[2]        , truth_genie_wgt_NormNCRES[4]        , cvweight);
     h->FillVertErrorBand("GENIE_RDecBR1gamma"      ,var, truth_genie_wgt_RDecBR1gamma[2]     , truth_genie_wgt_RDecBR1gamma[4]     , cvweight);
@@ -1166,6 +1215,7 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie(MnvH1D* h, double var)
     h->FillVertErrorBand("GENIE_Rvp2pi"            ,var, truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           , cvweight);
     h->FillVertErrorBand("GENIE_VecFFCCQEshape"    ,var, truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   , cvweight);
 
+    h->FillVertErrorBand("GENIE_NormCCRES"         ,var, updated_genie_wgt_NormCCRES[2]        , updated_genie_wgt_NormCCRES[4]        , cvweight);
     h->FillVertErrorBand("GENIE_Theta_Delta2Npi"   ,var, updated_genie_wgt_Theta_Delta2Npi[2]  , updated_genie_wgt_Theta_Delta2Npi[4]  , cvweight);
     h->FillVertErrorBand("GENIE_MaRES"             ,var, updated_genie_wgt_MaRES[2]            , updated_genie_wgt_MaRES[4]            , cvweight);
     h->FillVertErrorBand("GENIE_MvRES"             ,var, updated_genie_wgt_MvRES[2]            , updated_genie_wgt_MvRES[4]            , cvweight);
@@ -1198,7 +1248,6 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie_ByHand(MnvH1D* h, double
     //FillVertErrorBand_ByHand(h, var, "GENIE_MaCCQEshape"       , truth_genie_wgt_MaCCQEshape[2]      , truth_genie_wgt_MaCCQEshape[4]      );
     FillVertErrorBand_ByHand(h, var, "GENIE_MaNCEL"            , truth_genie_wgt_MaNCEL[2]           , truth_genie_wgt_MaNCEL[4]           );
     //FillVertErrorBand_ByHand(h, var, "GENIE_NormCCQE"          , truth_genie_wgt_NormCCQE[2]         , truth_genie_wgt_NormCCQE[4]         );
-    //FillVertErrorBand_ByHand(h, var, "GENIE_NormCCRES"         , truth_genie_wgt_NormCCRES[2]        , truth_genie_wgt_NormCCRES[4]        );
     FillVertErrorBand_ByHand(h, var, "GENIE_NormDISCC"         , truth_genie_wgt_NormDISCC[2]        , truth_genie_wgt_NormDISCC[4]        );
     FillVertErrorBand_ByHand(h, var, "GENIE_NormNCRES"         , truth_genie_wgt_NormNCRES[2]        , truth_genie_wgt_NormNCRES[4]        );
     FillVertErrorBand_ByHand(h, var, "GENIE_RDecBR1gamma"      , truth_genie_wgt_RDecBR1gamma[2]     , truth_genie_wgt_RDecBR1gamma[4]     );
@@ -1206,6 +1255,7 @@ void CCProtonPi0_TruthAnalyzer::FillVertErrorBand_Genie_ByHand(MnvH1D* h, double
     FillVertErrorBand_ByHand(h, var, "GENIE_Rvp2pi"            , truth_genie_wgt_Rvp2pi[2]           , truth_genie_wgt_Rvp2pi[4]           );
     FillVertErrorBand_ByHand(h, var, "GENIE_VecFFCCQEshape"    , truth_genie_wgt_VecFFCCQEshape[2]   , truth_genie_wgt_VecFFCCQEshape[4]   );
 
+    FillVertErrorBand_ByHand(h, var, "GENIE_NormCCRES"         , updated_genie_wgt_NormCCRES[2]        , updated_genie_wgt_NormCCRES[4]        );
     FillVertErrorBand_ByHand(h, var, "GENIE_Theta_Delta2Npi"   , updated_genie_wgt_Theta_Delta2Npi[2]  , updated_genie_wgt_Theta_Delta2Npi[4]  );
     FillVertErrorBand_ByHand(h, var, "GENIE_MaRES"             , updated_genie_wgt_MaRES[2]            , updated_genie_wgt_MaRES[4]            );
     FillVertErrorBand_ByHand(h, var, "GENIE_MvRES"             , updated_genie_wgt_MvRES[2]            , updated_genie_wgt_MvRES[4]            );
@@ -1285,19 +1335,24 @@ void CCProtonPi0_TruthAnalyzer::CalcEventWeight()
         err_2p2h = 0.0;
     }
 
-    if (applyGENIETuning_Delta){
-        // Delta decay non-isotropy weighting per DocDB 9850.  Weight is 1.0 for non-delta resonance interactions.
+    if (applyGENIETuning_Complete){
+
+        // Delta decay anisotropy weighting per DocDB 9850.  Weight is 1.0 for non-delta resonance interactions.
         cvweight_Delta *= ( 1.0 + truth_genie_wgt_Theta_Delta2Npi[4] ) / 2.0;
         cvweight *= cvweight_Delta;
+
+        if ( IsGenieRvn1pi() || IsGenieRvp1pi() ){
+            cvweight_NonRes1pi *= deuteriumNonResNorm;
+            cvweight *= cvweight_NonRes1pi;
+        }
+
+        if ( IsGenieCCRes() ){
+            cvweight_CCRES *= deuteriumResNorm; 
+            cvweight_CCRES *= GetMaResWeight(deuteriumResNorm);
+            cvweight *= cvweight_CCRES;
+        }
     }
 
-    if (applyGENIETuning_NonRes && IsGenie_NonRES_n_piplus()){
-        // NonRES 1pi constraint
-        cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvn1pi[2] - 1); // From Phil R.
-        cvweight_NonRes1pi *= 1 + (57.0/50)*(truth_genie_wgt_Rvp1pi[2] - 1); // From Phil R.
-        cvweight *= cvweight_NonRes1pi;
-    }
-  
     if ( applyGENIETuning_DeltaSuppression && IsGenieCCRes() ){
         // Delta Suppression Factor
         double QSq = truth_QSq_exp * MeVSq_to_GeVSq;
@@ -1653,6 +1708,7 @@ void CCProtonPi0_TruthAnalyzer::initUpdatedGenieWeights()
 {
     for (int i = 0; i < 7; ++i){
         updated_genie_wgt_Theta_Delta2Npi[i] = truth_genie_wgt_Theta_Delta2Npi[i];
+        updated_genie_wgt_NormCCRES[i] = truth_genie_wgt_NormCCRES[i];
         updated_genie_wgt_MaRES[i] = truth_genie_wgt_MaRES[i];
         updated_genie_wgt_MvRES[i] = truth_genie_wgt_MvRES[i];
         updated_genie_wgt_Rvn1pi[i] = truth_genie_wgt_Rvn1pi[i];
@@ -1670,32 +1726,29 @@ void CCProtonPi0_TruthAnalyzer::UpdateGENIESystematics()
     // ------------------------------------------------------------------------
     // Now Overwrite them with updated values
     // ------------------------------------------------------------------------
-    if (reduce_err_Delta){
+    if (applyGENIETuning_Complete){
+
         // Delta decay non-isotropy weights per DocDB 9850
         updated_genie_wgt_Theta_Delta2Npi[2] = 2.0 / (1.0 + truth_genie_wgt_Theta_Delta2Npi[4]);
         updated_genie_wgt_Theta_Delta2Npi[4] = 2.0 * truth_genie_wgt_Theta_Delta2Npi[4] / ( 1.0 + truth_genie_wgt_Theta_Delta2Npi[4]); 
-    }
+        if (IsGenieCCRes()){
+            updated_genie_wgt_MaRES[2] = GetMaResWeight(deuteriumMaRes - deuteriumMaRes1sig) / GetMaResWeight(deuteriumMaRes);
+            updated_genie_wgt_MaRES[4] = GetMaResWeight(deuteriumMaRes + deuteriumMaRes1sig) / GetMaResWeight(deuteriumMaRes);
 
-    // CC Resonance errors from deuterium and electroproduction data fits
-    // MaRES and MvRES errors controlled together
-    if (reduce_err_MaRES && IsGenieCCRes()){
-        updated_genie_wgt_MaRES[2] = GetMaResWeight(deuteriumMaRes - deuteriumMaRes1sig) / GetMaResWeight(deuteriumMaRes);
-        updated_genie_wgt_MaRES[4] = GetMaResWeight(deuteriumMaRes + deuteriumMaRes1sig) / GetMaResWeight(deuteriumMaRes);
+            updated_genie_wgt_MvRES[2] = GetMvResWeight(genieMvRes - electroProdMvRes1sig); // GENIE MvRES not changed
+            updated_genie_wgt_MvRES[4] = GetMvResWeight(genieMvRes + electroProdMvRes1sig); // GENIE MvRES not changed
+        
+            updated_genie_wgt_NormCCRES[2] = 1.0 - deuteriumResNorm1sig; 
+            updated_genie_wgt_NormCCRES[4] = 1.0 + deuteriumResNorm1sig; 
+        }
 
-        updated_genie_wgt_MvRES[2] = GetMvResWeight(genieMvRes - electroProdMvRes1sig); // GENIE central value MvRES not changed
-        updated_genie_wgt_MvRES[4] = GetMvResWeight(genieMvRes + electroProdMvRes1sig); // GENIE central value MvRES not changed
-    }
-
-    // Non-resonant 1pi production normalization errors from deuterium fit
-    // Rvn1pi and Rvp1pi errors controlled together
-    if ( reduce_err_Rvn1pi && IsGenieRvn1pi() ){
-        updated_genie_wgt_Rvn1pi[2] = 1.0 - deuteriumNonResNorm1sig;
-        updated_genie_wgt_Rvn1pi[4] = 1.0 + deuteriumNonResNorm1sig;
-    }
-
-    if ( reduce_err_Rvn1pi && IsGenieRvp1pi() ){
-        updated_genie_wgt_Rvp1pi[2] = 1.0 - deuteriumNonResNorm1sig;
-        updated_genie_wgt_Rvp1pi[4] = 1.0 + deuteriumNonResNorm1sig;
+        if (IsGenieRvn1pi() || IsGenieRvp1pi()){
+            updated_genie_wgt_Rvn1pi[2] = 1.0 - deuteriumNonResNorm1sig;
+            updated_genie_wgt_Rvn1pi[4] = 1.0 + deuteriumNonResNorm1sig;
+ 
+            updated_genie_wgt_Rvp1pi[2] = 1.0 - deuteriumNonResNorm1sig;
+            updated_genie_wgt_Rvp1pi[4] = 1.0 + deuteriumNonResNorm1sig;
+        }
     }
 
     bool isDebug = false;
@@ -1704,6 +1757,8 @@ void CCProtonPi0_TruthAnalyzer::UpdateGENIESystematics()
         std::cout<<"Updated GENIE Systematics"<<std::endl;
         std::cout<<"Theta[2] = "<<truth_genie_wgt_Theta_Delta2Npi[2]<<" "<<updated_genie_wgt_Theta_Delta2Npi[2]<<std::endl;
         std::cout<<"Theta[4] = "<<truth_genie_wgt_Theta_Delta2Npi[4]<<" "<<updated_genie_wgt_Theta_Delta2Npi[4]<<std::endl;
+        std::cout<<"NormCCRES[2] = "<<truth_genie_wgt_NormCCRES[2]<<" "<<updated_genie_wgt_NormCCRES[2]<<std::endl;
+        std::cout<<"NormCCRES[4] = "<<truth_genie_wgt_NormCCRES[4]<<" "<<updated_genie_wgt_NormCCRES[4]<<std::endl;
         std::cout<<"MaRES[2] = "<<truth_genie_wgt_MaRES[2]<<" "<<updated_genie_wgt_MaRES[2]<<std::endl;
         std::cout<<"MaRES[4] = "<<truth_genie_wgt_MaRES[4]<<" "<<updated_genie_wgt_MaRES[4]<<std::endl;
         std::cout<<"MvRES[2] = "<<truth_genie_wgt_MvRES[2]<<" "<<updated_genie_wgt_MvRES[2]<<std::endl;
@@ -1726,7 +1781,7 @@ void CCProtonPi0_TruthAnalyzer::FillGENIE_Tuning()
 
     FillHistogram(h_err_2p2h, 1-err_2p2h);
     FillHistogram(h_err_2p2h, 1+err_2p2h);
-    
+  
     FillHistogram(genie_wgt_Theta_Delta2Npi, truth_genie_wgt_Theta_Delta2Npi[2]);
     FillHistogram(genie_wgt_Theta_Delta2Npi, truth_genie_wgt_Theta_Delta2Npi[4]);
 
@@ -1828,6 +1883,162 @@ TLorentzVector CCProtonPi0_TruthAnalyzer::Get_Neutrino_4P(const double Enu)
     TLorentzVector beam_4P(Px,Py,Pz,Enu);
 
     return beam_4P;
+}
+
+void CCProtonPi0_TruthAnalyzer::GetDelta_pi_angles_BeforeFSI()
+{
+    bool isDebug = false;
+
+    using namespace std;
+
+    // ------------------------------------------------------------------------
+    // Get Proton and Pi0 Indice
+    // ------------------------------------------------------------------------
+    int proton_i = -1;
+    int pi0_i = -1;
+
+    for (int i = 0; i < mc_er_nPart; ++i){
+        if (mc_er_status[i] != 14) continue;
+   
+        if (mc_er_ID[i] == 111) pi0_i = i;    
+        if (mc_er_ID[i] == 2212) proton_i = i;
+    }
+
+    if (proton_i == -1 || pi0_i == -1){
+        RunTimeError("Not Signal Before FSI");
+    }
+
+    // --------------------------------------------------------------------
+    // Form Proton-Pion System
+    // --------------------------------------------------------------------
+    double delta_4P_v[4];
+    delta_4P_v[0] = mc_er_Px[proton_i] + mc_er_Px[pi0_i];
+    delta_4P_v[1] = mc_er_Py[proton_i] + mc_er_Py[pi0_i];
+    delta_4P_v[2] = mc_er_Pz[proton_i] + mc_er_Pz[pi0_i];
+    delta_4P_v[3] = mc_er_E[proton_i] + mc_er_E[pi0_i];
+
+    TLorentzVector delta_4P(delta_4P_v); 
+
+    // --------------------------------------------------------------------
+    // Find Boost from LAB Frame to Delta Rest Frame
+    // --------------------------------------------------------------------
+    double M_delta = delta_4P.M(); 
+    if (isDebug) cout<<"Delta Mass = "<<M_delta * MeV_to_GeV<<endl;
+
+    double gamma = delta_4P.Gamma();
+    double boost_x = -(delta_4P.Px()/ (gamma*M_delta));
+    double boost_y = -(delta_4P.Py() / (gamma*M_delta));
+    double boost_z = -(delta_4P.Pz() / (gamma*M_delta));
+
+    if (isDebug){
+        cout<<"Delta P (Before) = "<<delta_4P.Vect().Mag()<<endl;
+        cout<<"Delta P (Before) = "<<delta_4P.Vect().x();
+        cout<<" "<<delta_4P.Vect().y();
+        cout<<" "<<delta_4P.Vect().z()<<endl;
+    }
+
+    delta_4P.Boost(boost_x,boost_y,boost_z);
+
+    if (isDebug){
+        cout<<"Delta P (After) = "<<delta_4P.Vect().Mag()<<std::endl;
+        cout<<"Delta P (After) = "<<delta_4P.Vect().x();
+        cout<<" "<<delta_4P.Vect().y();
+        cout<<" "<<delta_4P.Vect().z()<<endl;
+        cout<<"Delta Mass (After) = "<<delta_4P.M() * MeV_to_GeV<<endl;
+    }
+
+    // --------------------------------------------------------------------
+    // Boost All 4-Momentums to Delta Rest Frame
+    // --------------------------------------------------------------------
+    TLorentzVector beam_4P = Get_Neutrino_4P(mc_incomingE);
+
+    TLorentzVector muon_4P(truth_muon_4P[0], truth_muon_4P[1], truth_muon_4P[2], truth_muon_4P[3]); 
+    TLorentzVector pi0_4P(mc_er_Px[pi0_i], mc_er_Py[pi0_i], mc_er_Pz[pi0_i], mc_er_E[pi0_i]); 
+
+    if (isDebug){
+        cout<<"Before Boost"<<endl;
+        cout<<"beam 4P = ("<<beam_4P.Px()<<", "<<beam_4P.Py()<<", "<<beam_4P.Pz()<<", "<<beam_4P.E()<<")"<<endl;
+        cout<<"muon 4P = ("<<muon_4P.Px()<<", "<<muon_4P.Py()<<", "<<muon_4P.Pz()<<", "<<muon_4P.E()<<")"<<endl;
+        cout<<"Muon Mass = "<<muon_4P.M()<<endl;
+        cout<<"pi0 4P = ("<<pi0_4P.Px()<<", "<<pi0_4P.Py()<<", "<<pi0_4P.Pz()<<", "<<pi0_4P.E()<<")"<<endl;
+        cout<<"pi0 Mass = "<<pi0_4P.M()<<endl;
+    }
+
+    beam_4P.Boost(boost_x, boost_y, boost_z);
+    muon_4P.Boost(boost_x, boost_y, boost_z);
+    pi0_4P.Boost(boost_x, boost_y, boost_z);
+
+    if (isDebug){
+        cout<<"After Boost"<<endl;
+        cout<<"beam 4P = ("<<beam_4P.Px()<<", "<<beam_4P.Py()<<", "<<beam_4P.Pz()<<", "<<beam_4P.E()<<")"<<endl;
+        cout<<"muon 4P = ("<<muon_4P.Px()<<", "<<muon_4P.Py()<<", "<<muon_4P.Pz()<<", "<<muon_4P.E()<<")"<<endl;
+        cout<<"Muon Mass = "<<muon_4P.M()<<endl;
+        cout<<"pi0 4P = ("<<pi0_4P.Px()<<", "<<pi0_4P.Py()<<", "<<pi0_4P.Pz()<<", "<<pi0_4P.E()<<")"<<endl;
+        cout<<"pi0 Mass = "<<pi0_4P.M()<<endl;
+    }
+
+    // --------------------------------------------------------------------
+    // Form Axes
+    // --------------------------------------------------------------------
+    TVector3 beam_3P = beam_4P.Vect();
+    TVector3 muon_3P = muon_4P.Vect();
+
+    // Z Axis -- Momentum Transfer Axis
+    TVector3 axis_z(beam_3P.Px() - muon_3P.Px(), beam_3P.Py() - muon_3P.Py(), beam_3P.Pz() - muon_3P.Pz());
+    TVector3 unit_axis_z = axis_z.Unit();
+
+    // Y Axis -- Beam x Muon
+    TVector3 axis_y = beam_3P.Cross(muon_3P);
+    TVector3 unit_axis_y = axis_y.Unit();
+
+    // X Axis -- Right Handed Coordinate System y_axis x z_axis = x_axis
+    TVector3 axis_x = axis_y.Cross(axis_z);
+    TVector3 unit_axis_x = axis_x.Unit();
+
+    // --------------------------------------------------------------------
+    // Calculate Angles
+    // --------------------------------------------------------------------
+    TVector3 pi0_3P = pi0_4P.Vect();
+    TVector3 unit_pi0_3P = pi0_3P.Unit();
+    double pion_P = pi0_3P.Mag();
+
+    double cos_theta_z = unit_pi0_3P.Dot(unit_axis_z);
+
+    double theta_x = acos(unit_pi0_3P.Dot(unit_axis_x)); 
+    double theta_y = acos(unit_pi0_3P.Dot(unit_axis_y)); 
+    double theta_z = acos(cos_theta_z); 
+
+    double Px = pion_P*cos(theta_x);
+    double Py = pion_P*cos(theta_y);
+
+    double phi_x = acos(Px/(pion_P*sin(theta_z)));
+    double phi = phi_x * TMath::RadToDeg();    
+
+    // Convert to 360
+    if (Py < 0 ){
+        phi = 360 - phi;
+    }
+
+    Delta_pi_theta_all_signal_BeforeFSI->Fill(cos_theta_z,cvweight);
+    Delta_pi_phi_all_signal_BeforeFSI->Fill(phi,cvweight);
+
+    int signal_type = GetIntType();
+    if (signal_type == 0){ 
+        Delta_pi_theta_delta_res_BeforeFSI->Fill(cos_theta_z, cvweight);
+        Delta_pi_phi_delta_res_BeforeFSI->Fill(phi, cvweight);
+    } else if (signal_type == 1){
+        Delta_pi_theta_other_res_BeforeFSI->Fill(cos_theta_z, cvweight);
+        Delta_pi_phi_other_res_BeforeFSI->Fill(phi, cvweight);
+    } else if (signal_type == 2){
+        Delta_pi_theta_non_res_BeforeFSI->Fill(cos_theta_z, cvweight);
+        Delta_pi_phi_non_res_BeforeFSI->Fill(phi, cvweight);
+    }
+
+    if (isDebug){
+        cout<<"pion_theta = "<<cos_theta_z<<endl;
+        cout<<"pion_phi = "<<phi<<endl;
+        cout<<endl;
+    }
 }
 
 void CCProtonPi0_TruthAnalyzer::GetDelta_pi_angles()
@@ -1933,17 +2144,21 @@ void CCProtonPi0_TruthAnalyzer::GetDelta_pi_angles()
         phi = 360 - phi;
     }
 
+    Delta_pi_theta_pi_P_all_signal->Fill(cos_theta_z, truth_pi0_P * MeV_to_GeV, cvweight);
     Delta_pi_theta_all_signal->Fill(cos_theta_z,cvweight);
     Delta_pi_phi_all_signal->Fill(phi,cvweight);
 
     int signal_type = GetIntType();
     if (signal_type == 0){ 
+        Delta_pi_theta_pi_P_delta_res->Fill(cos_theta_z, truth_pi0_P * MeV_to_GeV, cvweight);
         Delta_pi_theta_delta_res->Fill(cos_theta_z, cvweight);
         Delta_pi_phi_delta_res->Fill(phi, cvweight);
     } else if (signal_type == 1){
+        Delta_pi_theta_pi_P_other_res->Fill(cos_theta_z, truth_pi0_P * MeV_to_GeV, cvweight);
         Delta_pi_theta_other_res->Fill(cos_theta_z, cvweight);
         Delta_pi_phi_other_res->Fill(phi, cvweight);
     } else if (signal_type == 2){
+        Delta_pi_theta_pi_P_non_res->Fill(cos_theta_z, truth_pi0_P * MeV_to_GeV, cvweight);
         Delta_pi_theta_non_res->Fill(cos_theta_z, cvweight);
         Delta_pi_phi_non_res->Fill(phi, cvweight);
     }
@@ -2094,6 +2309,7 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     truth_w_Non_RES->Write();
     truth_w_2p2h->Write();
 
+    delta_anisotropy->Write();
     deltaInvMass_all_signal->Write();
     deltaInvMass_delta_res->Write();
     deltaInvMass_other_res->Write();
@@ -2103,11 +2319,26 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     Delta_pi_phi_delta_res->Write();
     Delta_pi_phi_other_res->Write();
     Delta_pi_phi_non_res->Write();
-    
+     
+    Delta_pi_theta_pi_P_all_signal->Write();
+    Delta_pi_theta_pi_P_delta_res->Write();
+    Delta_pi_theta_pi_P_other_res->Write();
+    Delta_pi_theta_pi_P_non_res->Write();
+   
     Delta_pi_theta_all_signal->Write();
     Delta_pi_theta_delta_res->Write();
     Delta_pi_theta_other_res->Write();
     Delta_pi_theta_non_res->Write();
+
+    Delta_pi_phi_all_signal_BeforeFSI->Write();
+    Delta_pi_phi_delta_res_BeforeFSI->Write();
+    Delta_pi_phi_other_res_BeforeFSI->Write();
+    Delta_pi_phi_non_res_BeforeFSI->Write();
+    
+    Delta_pi_theta_all_signal_BeforeFSI->Write();
+    Delta_pi_theta_delta_res_BeforeFSI->Write();
+    Delta_pi_theta_other_res_BeforeFSI->Write();
+    Delta_pi_theta_non_res_BeforeFSI->Write();
 
     f->Close();
 }

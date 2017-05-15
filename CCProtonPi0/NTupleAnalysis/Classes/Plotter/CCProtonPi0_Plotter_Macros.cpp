@@ -136,7 +136,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     }
 
     // Print Plot
-    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all_",norm_label.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all_",norm_label.c_str(),".pdf"), "pdf");
 
     delete c;
     delete plotter;
@@ -229,7 +229,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgType(rootDir &dir, std::string v
 
 
     // Print Plot
-    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_Type_",norm_label.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_Type_",norm_label.c_str(),".pdf"), "pdf");
 
     delete c;
     delete plotter;
@@ -437,7 +437,7 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     //        const std::string &     Ytitle = "",
     //        bool    ignoreUngrouped = false  
     //        )   
-    plotter->DrawErrorSummary(hist,"N", true, true, 0.0);
+    plotter->DrawErrorSummary(hist,"N", false, true, 0.0);
 
     // ------------------------------------------------------------------------
     // Legend 
@@ -499,8 +499,8 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     legend->Draw();
 
     // Print Plot
-    std::string out_name = plotDir + "Errors_" + var_name + ".png";
-    c->Print(out_name.c_str(), "png");
+    std::string out_name = plotDir + "Errors_" + var_name + ".pdf";
+    c->Print(out_name.c_str(), "pdf");
 
     delete h_total;
     delete h_stat;
@@ -531,7 +531,7 @@ void CCProtonPi0_Plotter::DrawErrorBand(MnvH1D* hist, std::string error_name, in
     plotter->AddHistoTitle(hist->GetTitle());
 
     // Print Plot
-    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_Error_", error_name.c_str() ,".png"), "png");
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_Error_", error_name.c_str() ,".pdf"), "pdf");
 
     delete c;
     delete plotter;
@@ -636,7 +636,7 @@ void CCProtonPi0_Plotter::DrawDataMC_EffCorrected_Stacked(rootDir& dir, std::str
     // ------------------------------------------------------------------------
     // Efficiency Correction
     // ------------------------------------------------------------------------
-    MnvH1D* mc = GetMnvH1D(f_mc, Form("%s_%d",var_name.c_str(),1));
+    MnvH1D* mc = GetMnvH1D(f_mc, Form("%s_%s",var_name.c_str(),"mc_reco_signal"));
 
     TFile* f_truth = new TFile(rootDir_Truth.mc.c_str()); 
     var = var_name + "_all_signal";
@@ -651,14 +651,17 @@ void CCProtonPi0_Plotter::DrawDataMC_EffCorrected_Stacked(rootDir& dir, std::str
 
     std::vector<MnvH1D*> mc_IntType;
     var = var_name + "_delta_res";
+    //var = var_name + "_delta_res_BeforeFSI";
     MnvH1D* mc_delta_res = GetMnvH1D(f_truth, var);
     mc_IntType.push_back(mc_delta_res);
 
     var = var_name + "_other_res";
+    //var = var_name + "_other_res_BeforeFSI";
     MnvH1D* mc_other_res = GetMnvH1D(f_truth, var);
     mc_IntType.push_back(mc_other_res);
 
-    var = var_name + "_non_res";
+    //var = var_name + "_non_res";
+    var = var_name + "_non_res_BeforeFSI";
     MnvH1D* mc_non_res = GetMnvH1D(f_truth, var);
     mc_IntType.push_back(mc_non_res);
 
@@ -683,8 +686,8 @@ void CCProtonPi0_Plotter::DrawDataMC_Thesis(rootDir& dir, std::string var_name, 
     TFile* f_mc = new TFile(rootDir_mc.c_str());
     TFile* f_data = new TFile(rootDir_data.c_str());
 
-    //std::string var = Form("%s_%d",var_name.c_str(),0);
-    std::string var = var_name;
+    std::string var = Form("%s_%d",var_name.c_str(),0);
+    //std::string var = var_name;
 
     MnvH1D* mc = (MnvH1D*)f_mc->Get(var.c_str());
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
@@ -755,10 +758,10 @@ void CCProtonPi0_Plotter::DrawDataMC_Thesis(MnvH1D* data, MnvH1D* mc, std::strin
     gStyle->SetOptStat(0); 
     c->Update();
     std::string out_name;
-    out_name = plotDir + var_name + "_POT" + ".png"; 
+    out_name = plotDir + var_name + "_POT" + ".pdf"; 
     //out_name = plotDir + var_name + "_POT" + ".pdf"; 
 
-    c->Print(out_name.c_str(),"png");
+    c->Print(out_name.c_str(),"pdf");
     //c->Print(out_name.c_str(),"pdf");
 
     delete c;
@@ -951,9 +954,9 @@ void CCProtonPi0_Plotter::DrawDataMC_WithRatio(MnvH1D* data, MnvH1D* mc, std::st
     gStyle->SetOptStat(0); 
     c->Update();
     std::string out_name;
-    out_name = plotDir + var_name + "_" + norm_label + ".png"; 
+    out_name = plotDir + var_name + "_" + norm_label + ".pdf"; 
 
-    c->Print(out_name.c_str(),"png");
+    c->Print(out_name.c_str(),"pdf");
 
     delete pad1;
     delete pad2;
@@ -1011,9 +1014,9 @@ void CCProtonPi0_Plotter::DrawDataMC_WithOtherData(MnvH1D* data, MnvH1D* mc, TGr
     gStyle->SetOptStat(0); 
     c->Update();
     std::string out_name;
-    out_name = plotDir + var_name + "_" + ext_data_name + ".png"; 
+    out_name = plotDir + var_name + "_" + ext_data_name + ".pdf"; 
 
-    c->Print(out_name.c_str(),"png");
+    c->Print(out_name.c_str(),"pdf");
 
     delete c;
     delete plotter;
@@ -1279,9 +1282,18 @@ void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vect
             const char *     yaxislabel = "",
             bool     cov_area_normalize = false   
        )    
-    */
-    plotter->DrawDataStackedMC(h_data, mc_hists, 1.0, "N", "Data (3.33e20 POT)", 0, 0, 1001);
-    //plotter->DrawDataStackedMC(h_data, mc_hists, POT_ratio, "N", "Data (3.33e20 POT)", 0, 0, 1001);
+       */
+
+    std::string var_name_lower = var_name;
+    for (unsigned int i = 0; i < var_name_lower.size(); ++i){
+        var_name_lower[i] = tolower(var_name_lower[i]);
+    }
+    std::size_t is_delta = var_name_lower.find("delta");
+    if (is_delta == std::string::npos ){
+        plotter->DrawDataStackedMC(h_data, mc_hists, 1.0, "N", "Data (3.33e20 POT)", 0, 0, 1001);
+    }else{
+        plotter->DrawDataStackedMC(h_data, mc_hists, POT_ratio, "N", "Data (3.33e20 POT)", 0, 0, 1001);
+    }
 
     h_data_stat_only->Draw("SAME E1 X0");
 
@@ -1493,9 +1505,9 @@ void CCProtonPi0_Plotter::DrawDataMC_BeforeFSI(MnvH1D* data, MnvH1D* mc, MnvH1D*
     gStyle->SetOptStat(0); 
     c->Update();
     std::string out_name;
-    out_name = plotDir + var_name + "_xsec_BeforeFSI" + ".png"; 
+    out_name = plotDir + var_name + "_xsec_BeforeFSI" + ".pdf"; 
 
-    c->Print(out_name.c_str(),"png");
+    c->Print(out_name.c_str(),"pdf");
 
     delete legend;
     delete c;
@@ -1529,7 +1541,7 @@ void CCProtonPi0_Plotter::DrawDataMCRatio(MnvH1D* data, MnvH1D* mc, std::string 
     AddNormBox(plotter, isPOTNorm, mc_ratio);
 
     // Print Plot
-    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_ratio_",norm_label.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_ratio_",norm_label.c_str(),".pdf"), "pdf");
 
     delete c;
     delete plotter;
@@ -1550,7 +1562,7 @@ void CCProtonPi0_Plotter::DrawMCWithErrorBand(rootDir& dir, std::string var_name
     plotter->DrawMCWithErrorBand(mc);
 
     // Print Plot
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".pdf"), "pdf");
 
     delete c;
     delete plotter;
@@ -1606,7 +1618,7 @@ void CCProtonPi0_Plotter::DrawMnvH2D(MnvH2D* hist2D, std::string var_name, std::
     gStyle->SetOptStat(0); 
     c->Update();
 
-    c->Print(Form("%s%s_%s%s",plotDir.c_str(),var_name.c_str(),plot_label.c_str(), ".png"), "png");
+    c->Print(Form("%s%s_%s%s",plotDir.c_str(),var_name.c_str(),plot_label.c_str(), ".pdf"), "pdf");
 
     delete p;
     delete c;
@@ -1619,7 +1631,7 @@ void CCProtonPi0_Plotter::DrawMnvH2D_Signal(rootDir root_dir, std::string var_na
 
     if (isMC){
         f = new TFile(root_dir.mc.c_str());
-        var_name = var_name + "_1";
+        var_name = var_name + "_mc_reco_signal";
         hist2D = GetMnvH2D(f, var_name);
     }else{
         f = new TFile(root_dir.data.c_str());
@@ -1690,7 +1702,7 @@ void CCProtonPi0_Plotter::Draw1DHist(TH1* hist1D, std::string var_name, std::str
     TCanvas* c = new TCanvas("c","c",800,800);
     if(isLogScale) c->SetLogy();
 
-    hist1D->Scale(0.1,"width");
+    //hist1D->Scale(0.1,"width");
 
     // Plot Options
     hist1D->SetLineColor(kRed);
@@ -1717,7 +1729,8 @@ void CCProtonPi0_Plotter::Draw1DHist(TH1* hist1D, std::string var_name, std::str
         TGaxis::SetMaxDigits(3);
     }
     
-    hist1D->SetMaximum(hist1D->GetMaximum()*1.20);
+    hist1D->SetMaximum(hist1D->GetMaximum()*1.50);
+    hist1D->SetMinimum(0.0);
     hist1D->Draw("HIST");
 
     // Find Peak
@@ -1748,7 +1761,7 @@ void CCProtonPi0_Plotter::Draw1DHist(TH1* hist1D, std::string var_name, std::str
 
     gStyle->SetOptStat(0); 
 
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".pdf"), "pdf");
 
     delete c;
     delete hist1D;
@@ -1792,7 +1805,7 @@ void CCProtonPi0_Plotter::Draw1DHist_Threshold(rootDir& dir, std::string var_nam
     text.SetTextSize(0.03);
     text.DrawLatex(0.78,0.7,Form("%s%3.2f", "Peak at ",max_bin_value));
 
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".pdf"), "pdf");
 
     delete c;
     delete f; 
@@ -1853,7 +1866,7 @@ void CCProtonPi0_Plotter::Draw2DHist(rootDir& dir, std::string var_name, std::st
 
     gPad->Update();
 
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".pdf"), "pdf");
 
     delete p;
     delete c;
@@ -1886,7 +1899,7 @@ void CCProtonPi0_Plotter::Draw3DHist(rootDir& dir, std::string var_name, std::st
     hist3D->Draw("BOX");
     gPad->Update();
 
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".pdf"), "pdf");
 
     delete p;
     delete c;
@@ -1952,7 +1965,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgAll(rootDir &dir, std::string var_na
     plotter->DrawStackedMC(mc_hists,1,"TR");
 
     // Print Plot
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_all.png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_all.pdf"), "pdf");
 
     delete c;
     delete plotter;
@@ -2006,7 +2019,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_BckgType(rootDir &dir, std::string var_n
     }
 
     // Print Plot
-    c->Print(Form("%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_Type",".png"), "png");
+    c->Print(Form("%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_bckg_Type",".pdf"), "pdf");
 
     delete c;
     delete plotter;
@@ -2090,7 +2103,7 @@ void CCProtonPi0_Plotter::DrawStackedMC_GammaByPDG(rootDir &dir, std::string var
 
     legend->Draw();
 
-    c->Print(Form("%s%s%d%s%s%s",plotDir.c_str(),"gamma_",gammaID,"_mc_",var_name.c_str(),"_by_particle.png"), "png");
+    c->Print(Form("%s%s%d%s%s%s",plotDir.c_str(),"gamma_",gammaID,"_mc_",var_name.c_str(),"_by_particle.pdf"), "pdf");
 
     delete legend;
     delete hs;
@@ -2238,7 +2251,7 @@ void CCProtonPi0_Plotter::DrawEfficiencyCurve(rootDir& dir, std::string var_name
     gPad->Update();
     gStyle->SetOptStat(0); 
 
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".pdf"), "pdf");
     delete c;
     delete hist1D;
     delete f;
@@ -2392,7 +2405,7 @@ void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::
     }
 
     // Print Plot
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_signal.png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_signal.pdf"), "pdf");
 
     delete c;
     delete plotter;
@@ -2418,7 +2431,7 @@ void CCProtonPi0_Plotter::DrawNormalizedMigrationHistogram(rootDir &dir, std::st
     //ApplyStyle(plotter);
     plotter->DrawNormalizedMigrationHistogram(hist2D, true, false, false);
 
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_migration.png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_migration.pdf"), "pdf");
 
     delete c;
     delete plotter;
@@ -2439,7 +2452,7 @@ void CCProtonPi0_Plotter::DrawTGraph(rootDir &dir, std::string var_name, std::st
     // Plot 
     graph->Draw();
     c->Update();
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".pdf"), "pdf");
 
     delete c;
     delete f;
@@ -2540,7 +2553,7 @@ void CCProtonPi0_Plotter::DrawBackgroundSubtraction(bool isMC)
     std::string tag;
     if(isMC) tag = "_MC";
     else tag = "_Data";
-    c->Print(Form("%s%s%s%s",plotDir.c_str(),"Background_Subtraction",tag.c_str(),".png"), "png");
+    c->Print(Form("%s%s%s%s",plotDir.c_str(),"Background_Subtraction",tag.c_str(),".pdf"), "pdf");
 
     delete c;
     delete plotter;
@@ -2735,9 +2748,9 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_WithSignalTypes(rootDir &dir, std::s
     gStyle->SetOptStat(0); 
     c->Update();
     std::string out_name;
-    out_name = plotDir + var_name + "_xsec_IntType" + ".png"; 
+    out_name = plotDir + var_name + "_xsec_IntType" + ".pdf"; 
 
-    c->Print(out_name.c_str(),"png");
+    c->Print(out_name.c_str(),"pdf");
 
     delete legend;
     delete c;
@@ -2753,11 +2766,11 @@ MnvH1D* CCProtonPi0_Plotter::GetBckgSubtractedData(rootDir& dir, std::string var
     TFile* f_mc  = new TFile(dir.mc.c_str());
 
     // Get Data Histogram
-    std::string var = var_name + "_0";
+    std::string var = var_name + "_all";
     MnvH1D* h_data = GetMnvH1D(f_data,var); 
 
     // Get MC Background and Normalize
-    var = var_name + "_2";
+    var = var_name + "_mc_reco_bckg";
     MnvH1D* h_mc_bckg = GetMnvH1D(f_mc,var);
     NormalizeHistogram(h_mc_bckg);
     h_mc_bckg->Scale(nBckg);
@@ -2779,11 +2792,11 @@ MnvH2D* CCProtonPi0_Plotter::GetBckgSubtractedData_2D(rootDir& dir, std::string 
     TFile* f_mc  = new TFile(dir.mc.c_str());
 
     // Get Data Histogram
-    std::string var = var_name + "_0";
+    std::string var = var_name + "_all";
     MnvH2D* h_data = GetMnvH2D(f_data,var); 
 
     // Get MC Background and Normalize
-    var = var_name + "_2";
+    var = var_name + "_mc_reco_bckg";
     MnvH2D* h_mc_bckg = GetMnvH2D(f_mc,var);
     NormalizeHistogram(h_mc_bckg);
     h_mc_bckg->Scale(nBckg);
@@ -2890,9 +2903,9 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_Signal(rootDir &dir, std::string var
     gStyle->SetOptStat(0); 
     c->Update();
     std::string out_name;
-    out_name = plotDir + var_name + "_Signal" + ".png"; 
+    out_name = plotDir + var_name + "_Signal" + ".pdf"; 
 
-    c->Print(out_name.c_str(),"png");
+    c->Print(out_name.c_str(),"pdf");
 
     delete legend;
     delete c;
@@ -2934,7 +2947,7 @@ void CCProtonPi0_Plotter::DrawDataMCSignal_Diff(rootDir& dir, std::string var_na
     // Save Plot 
     //gStyle->SetOptStat(0); 
     c->Update();
-    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_Ratio.png"), "png");
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_Ratio.pdf"), "pdf");
 
     delete c;
     delete data;
@@ -2951,7 +2964,7 @@ void CCProtonPi0_Plotter::DrawDataMCSignal_Diff_2D(rootDir& dir, std::string var
 
     TFile* f_mc = new TFile(rootDir_mc.c_str());
 
-    std::string var = Form("%s_%d",var_name.c_str(),1);
+    std::string var = Form("%s_%s",var_name.c_str(),"mc_reco_signal");
 
     MnvH2D* data = GetBckgSubtractedData_2D(dir, var_name, nBckg);
     MnvH2D* mc = GetMnvH2D(f_mc, var);
@@ -2969,12 +2982,22 @@ void CCProtonPi0_Plotter::DrawDataMCSignal_Diff_2D(rootDir& dir, std::string var
     var = var_name + "_Diff";
     DrawMnvH2D(diff, var, plotDir, false);
 
+    TH2D* errors = new TH2D(data->GetTotalError(true,true));
+
+
+    std::cout<<"Printing Data"<<std::endl;
     printBins(data,var_name);
+    std::cout<<"Printing MC"<<std::endl;
     printBins(mc,var_name);
+    std::cout<<"Printing Diff"<<std::endl;
     printBins(diff,var_name);
+    std::cout<<"Printing Errors"<<std::endl;
+    printBins(errors,var_name);
+
 
     delete diff;
     delete data;
+    delete errors;
     delete mc;
     delete f_mc;
 }

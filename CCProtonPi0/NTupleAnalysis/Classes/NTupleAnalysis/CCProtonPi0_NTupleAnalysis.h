@@ -15,6 +15,7 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "Cintex/Cintex.h"
 #include <TROOT.h>
@@ -151,6 +152,9 @@ class CCProtonPi0_NTupleAnalysis
             void AddVertErrorBands_Data(MnvHistoType* h);
 
         template<class MnvHistoType>
+            void AddLeadingErrorBands_Data(MnvHistoType* h);
+
+        template<class MnvHistoType>
             void AddVertErrorBands_TruthTree(MnvHistoType* h);
 
         template<class MnvHistoType>
@@ -247,6 +251,9 @@ class CCProtonPi0_NTupleAnalysis
         // Vertical Error Bands
         template<class MnvHistoType>
             void AddVertErrorBands_MC(MnvHistoType* h);
+
+        template<class MnvHistoType>
+            void AddLeadingErrorBands_MC(MnvHistoType* h);
 
         template<class MnvHistoType>
             void AddVertErrorBand_Flux(MnvHistoType* h);
