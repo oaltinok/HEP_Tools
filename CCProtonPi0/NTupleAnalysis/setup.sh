@@ -37,6 +37,9 @@ VariableList=(xsec_pi0_P
         xsec_QSq
         xsec_Enu
         xsec_W
+        xsec_deltaInvMass
+        xsec_Delta_pi_theta
+        xsec_Delta_pi_phi
         xsec_muon_P
         xsec_muon_theta)
 

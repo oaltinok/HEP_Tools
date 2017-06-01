@@ -22,9 +22,6 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
     }
     OpenTextFile(text_out_name, text_out);
 
-    // Results w/o systematics
-    RemoveErrorBands = false;
-
     OpenRootFiles();
     initHistograms();
     initXSecs();
@@ -35,6 +32,7 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
 void CCProtonPi0_CrossSection::Calc_CrossSections()
 {
     Calc_Normalized_NBackground();
+    Calc_Normalized_NBackground_DeltaRich();
 
     // Regular Cross Section Calculation
     Calc_CrossSection(muon_P);   
@@ -45,6 +43,9 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection(QSq);   
     Calc_CrossSection(W);   
     Calc_CrossSection(Enu);   
+    Calc_CrossSection(deltaInvMass);   
+    Calc_CrossSection(Delta_pi_theta);   
+    Calc_CrossSection(Delta_pi_phi);   
   
     // After FSI Cross Section Calculation
     Calc_CrossSection_AfterFSI(muon_P);   
@@ -54,7 +55,10 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection_AfterFSI(pi0_theta);   
     Calc_CrossSection_AfterFSI(QSq);   
     Calc_CrossSection_AfterFSI(W);   
-    Calc_CrossSection_AfterFSI(Enu);   
+    Calc_CrossSection_AfterFSI(Enu);
+    Calc_CrossSection_AfterFSI(deltaInvMass);   
+    Calc_CrossSection_AfterFSI(Delta_pi_theta);   
+    Calc_CrossSection_AfterFSI(Delta_pi_phi);   
 
     // Before FSI Cross Section Calculation
     Calc_CrossSection_BeforeFSI(muon_P);   
@@ -65,7 +69,10 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection_BeforeFSI(QSq);   
     Calc_CrossSection_BeforeFSI(W);   
     Calc_CrossSection_BeforeFSI(Enu);   
-  
+    Calc_CrossSection_BeforeFSI(deltaInvMass);   
+    Calc_CrossSection_BeforeFSI(Delta_pi_theta);   
+    Calc_CrossSection_BeforeFSI(Delta_pi_phi);   
+ 
     // FSI Type Cross Section Calculation
     Calc_CrossSection_FSIType(muon_P);   
     Calc_CrossSection_FSIType(muon_theta);   
@@ -75,7 +82,10 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection_FSIType(QSq);   
     Calc_CrossSection_FSIType(W);   
     Calc_CrossSection_FSIType(Enu);   
- 
+    Calc_CrossSection_FSIType(deltaInvMass);   
+    Calc_CrossSection_FSIType(Delta_pi_theta);   
+    Calc_CrossSection_FSIType(Delta_pi_phi);   
+
     // Int Type Cross Section Calculation
     Calc_CrossSection_IntType(muon_P);   
     Calc_CrossSection_IntType(muon_theta);   
@@ -85,6 +95,9 @@ void CCProtonPi0_CrossSection::Calc_CrossSections()
     Calc_CrossSection_IntType(QSq);   
     Calc_CrossSection_IntType(W);   
     Calc_CrossSection_IntType(Enu);   
+    Calc_CrossSection_IntType(deltaInvMass);   
+    Calc_CrossSection_IntType(Delta_pi_theta);   
+    Calc_CrossSection_IntType(Delta_pi_phi);   
 
     writeHistograms();
 }
@@ -95,7 +108,7 @@ void CCProtonPi0_CrossSection::Calc_CrossSection(XSec &var)
     std::cout<<"Calculating Cross Section for "<<var.name<<std::endl;
 
     // Data Correction
-    var.bckg_subtracted = Subtract_Background(var.all, var.mc_reco_bckg, var.bckg_estimated,var.name);
+    var.bckg_subtracted = Subtract_Background(var.all, var.mc_reco_bckg, var.bckg_estimated, var.name, var.isDeltaRich);
     var.unfolded = Unfold_Data(var.bckg_subtracted, var.response, var.name, var.nIterations);   
     var.efficiency_corrected = Efficiency_Divide(var.unfolded, var.eff, var.name);   
 
@@ -287,6 +300,71 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     ClearAllUniversesVector(signal_invMass);
 }
 
+void CCProtonPi0_CrossSection::Calc_Normalized_NBackground_DeltaRich()
+{
+    text_out<<"\nCalculating N(Background) in Data in Delta Rich Sector"<<std::endl;
+   
+    // ------------------------------------------------------------------------
+    // Get Histograms for All Universes
+    // ------------------------------------------------------------------------
+    std::vector<TH1D*> data_invMass_DeltaRich;
+    std::vector<TH1D*> bckg_invMass_DeltaRich;
+    std::vector<TH1D*> signal_invMass_DeltaRich;
+    
+    std::vector<std::string> all_err_bands;
+    std::vector<std::string> bckg_err_bands;
+    std::vector<int> all_hist_ind;
+    std::vector<int> bckg_hist_ind;
+
+    GetAllUniverses(invMass_DeltaRich_all, data_invMass_DeltaRich, all_err_bands, all_hist_ind);
+    GetAllUniverses(invMass_DeltaRich_mc_reco_bckg, bckg_invMass_DeltaRich, bckg_err_bands, bckg_hist_ind);
+
+    // Get signal_invMass_DeltaRich (Background Subtracted)
+    //      Start as data hist (will subtract bckg to get correct signal in data)
+    for (unsigned int i = 0; i < data_invMass_DeltaRich.size(); ++i){
+        TH1D* temp = new TH1D(*data_invMass_DeltaRich[i]);
+        temp->SetName("invMass_DeltaRich_fit_signal");
+        signal_invMass_DeltaRich.push_back(temp);
+    }
+    
+    // POT Normalize MC Background Histogram if we are using Data
+    if (!m_isMC){
+        for (unsigned int i = 0; i < bckg_invMass_DeltaRich.size(); ++i){
+            bckg_invMass_DeltaRich[i]->Scale(POT_ratio);    
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // Estimate N(Background) in Data in each universe
+    // ------------------------------------------------------------------------
+    for (unsigned int i = 0; i < data_invMass_DeltaRich.size(); ++i){
+        text_out<<"Estimating Background in Error Band: "<<all_err_bands[i]<<" Universe = "<<all_hist_ind[i]<<std::endl;
+
+        // Subtract bckg hist from data hist
+        signal_invMass_DeltaRich[i]->Add(bckg_invMass_DeltaRich[i],-1); 
+
+        N_Background_Data_DeltaRich.push_back(bckg_invMass_DeltaRich[i]->Integral());
+        
+        double N_Signal_Data = signal_invMass_DeltaRich[i]->Integral();
+        double N_All_Data = data_invMass_DeltaRich[i]->Integral();
+
+        double percent_signal = N_Signal_Data/N_All_Data*100;
+        double percent_bckg = N_Background_Data[i]/N_All_Data*100.0;
+
+        text_out<<std::endl;
+        text_out<<"\tAll Events in Data (Signal Region) = "<<N_All_Data<<std::endl; 
+        text_out<<"\tBackground in Data (Signal Region) = "<<N_Background_Data[i]<<" "<<percent_bckg<<std::endl; 
+        text_out<<"\tSignal in Data (Signal Region) = "<<N_Signal_Data<<" "<<percent_signal<<std::endl; 
+        text_out<<std::endl;
+        text_out<<std::endl;
+    }
+
+    // Clear Allocated Memory
+    ClearAllUniversesVector(data_invMass_DeltaRich);
+    ClearAllUniversesVector(bckg_invMass_DeltaRich);
+    ClearAllUniversesVector(signal_invMass_DeltaRich);
+}
+
 void CCProtonPi0_CrossSection::NormalizeHistogram(TH1D* h)
 {
     text_out<<"\tNormalizing Background Shape on TH1D"<<std::endl;
@@ -313,9 +391,11 @@ void CCProtonPi0_CrossSection::NormalizeHistogram(MnvH1D* h)
     text_out<<"\tDone!"<<std::endl;
 }
 
-MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name)
+MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name, bool isDeltaRich)
 {
     text_out<<"Subtracting Background for "<<var_name<<std::endl;
+    
+    std::vector<double> N_Bckg = isDeltaRich ? N_Background_Data_DeltaRich : N_Background_Data;
 
     // Init MnvH1D
     MnvH1D* bckg_subtracted = new MnvH1D(*data); 
@@ -335,7 +415,7 @@ MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_b
 
     // Estimate N Background in Variable
     // [0] is for CV Value
-    mc_bckg->Scale(N_Background_Data[0],"",false);
+    mc_bckg->Scale(N_Bckg[0],"",false);
 
     // Correct MnvErrorBand Central Values -- Errors Calculated wrt ErrBand CV in Plotting
     text_out<<"Normalizing Error Band Central Values for mc_bckg"<<std::endl;
@@ -343,13 +423,13 @@ MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_b
     for (unsigned int i = 0; i < vert_errs.size(); ++i){
         TH1D* pUnv = dynamic_cast<TH1D*>(mc_bckg->GetVertErrorBand(vert_errs[i]));
         NormalizeHistogram(pUnv);
-        pUnv->Scale(N_Background_Data[0]);
+        pUnv->Scale(N_Bckg[0]);
     }
     std::vector<std::string> lat_errs = mc_bckg->GetLatErrorBandNames();
     for (unsigned int i = 0; i < lat_errs.size(); ++i){
         TH1D* pUnv = dynamic_cast<TH1D*>(mc_bckg->GetLatErrorBand(lat_errs[i]));
         NormalizeHistogram(pUnv);
-        pUnv->Scale(N_Background_Data[0]);
+        pUnv->Scale(N_Bckg[0]);
     }
 
 
@@ -400,7 +480,7 @@ MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_b
         NormalizeHistogram(mc_bckg_all_universes[i]);
 
         // Estimate N Background in Variable
-        mc_bckg_all_universes[i]->Scale(N_Background_Data[i+1]);
+        mc_bckg_all_universes[i]->Scale(N_Bckg[i+1]);
 
         text_out<<"\tBackground Subtracted Data = "<<bckg_subtracted_all_universes[i]->Integral()<<std::endl;
         // Subtracted Background
@@ -418,13 +498,13 @@ MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_b
     for (unsigned int i = 0; i < vert_errs.size(); ++i){
         TH1D* pUnv = dynamic_cast<TH1D*>(bckg_subtracted->GetVertErrorBand(vert_errs[i]));
         NormalizeHistogram(pUnv);
-        pUnv->Scale(N_Background_Data[0]);
+        pUnv->Scale(N_Bckg[0]);
     }
     lat_errs = bckg_subtracted->GetLatErrorBandNames();
     for (unsigned int i = 0; i < lat_errs.size(); ++i){
         TH1D* pUnv = dynamic_cast<TH1D*>(bckg_subtracted->GetLatErrorBand(lat_errs[i]));
         NormalizeHistogram(pUnv);
-        pUnv->Scale(N_Background_Data[0]);
+        pUnv->Scale(N_Bckg[0]);
     }
 
     // Estimated Background
@@ -547,7 +627,6 @@ MnvH1D* CCProtonPi0_CrossSection::Calc_FinalCrossSection(MnvH1D* flux_integrated
     return h_xs;
 }
 
-
 void CCProtonPi0_CrossSection::initXSecs()
 {
     // See CCProtonPi0_CrossSection_Style.cpp for Definitions 
@@ -559,6 +638,9 @@ void CCProtonPi0_CrossSection::initXSecs()
     init_QSq();
     init_W();
     init_Enu();
+    init_deltaInvMass();
+    init_Delta_pi_theta();
+    init_Delta_pi_phi();
 }
 
 void CCProtonPi0_CrossSection::OpenRootFiles()
@@ -592,11 +674,13 @@ void CCProtonPi0_CrossSection::initHistograms()
     invMass_mc_reco_signal = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_signal");
     invMass_mc_reco_bckg = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_bckg");
 
-    if (RemoveErrorBands){
-        invMass_all->ClearAllErrorBands();
-        invMass_mc_reco_signal->ClearAllErrorBands();
-        invMass_mc_reco_bckg->ClearAllErrorBands();
-    }
+    // Pi0 Invariant Mass -- Delta Rich Sample
+    if (m_isMC) invMass_DeltaRich_all = GetMnvH1D(f_mc_cutHists, "invMass_DeltaRich_mc_reco_all");
+    else invMass_DeltaRich_all = GetMnvH1D(f_data_cutHists, "invMass_DeltaRich_all");
+
+    invMass_DeltaRich_mc_reco_signal = GetMnvH1D(f_mc_cutHists, "invMass_DeltaRich_mc_reco_signal");
+    invMass_DeltaRich_mc_reco_bckg = GetMnvH1D(f_mc_cutHists, "invMass_DeltaRich_mc_reco_bckg");
+
 }
 
 
@@ -682,24 +766,6 @@ void CCProtonPi0_CrossSection::initHistograms(XSec &var)
     hist_name = var.name + "_response";
     var.response = GetMnvH2D(var.f_mc, hist_name);
 
-    // For
-    if (RemoveErrorBands){
-        var.all->ClearAllErrorBands();
-        var.mc_reco_signal->ClearAllErrorBands();
-        var.mc_reco_bckg->ClearAllErrorBands();
-        var.mc_truth_all_signal->ClearAllErrorBands();
-        var.mc_truth_signal->ClearAllErrorBands();
-        var.eff->ClearAllErrorBands();
-        var.efficiency_corrected_AfterFSI->ClearAllErrorBands();
-        var.efficiency_corrected_BeforeFSI->ClearAllErrorBands();
-        for (int i = 0; i < nFSIType; ++i){
-            var.efficiency_corrected_FSIType[i]->ClearAllErrorBands();
-        }
-        for (int i = 0; i < nIntType; ++i){
-            var.efficiency_corrected_IntType[i]->ClearAllErrorBands();
-        }
-        var.response->ClearAllErrorBands();
-    }
 }
 
 double CCProtonPi0_CrossSection::GetFluxHistContent(TH1* hist, double low1, double low2)
@@ -810,7 +876,7 @@ void CCProtonPi0_CrossSection::RebinFluxHistogram()
     // ------------------------------------------------------------------------
     // Before and After FSI -- Fine Binned Simulation
     // ------------------------------------------------------------------------
-    h_flux_rebinned_BeforeFSI = new MnvH1D( "h_flux_rebinned_BeforeFSI","Flux (rebinned_BeforeFSI)", 20, 0.0, 10.0);
+    h_flux_rebinned_BeforeFSI = new MnvH1D( "h_flux_rebinned_BeforeFSI","Flux (rebinned_BeforeFSI)", binList.size_Enu_Fine, binList.a_Enu_Fine);
     h_flux_rebinned_BeforeFSI->GetXaxis()->SetTitle("E_{#nu} [GeV]");
     h_flux_rebinned_BeforeFSI->GetYaxis()->SetTitle("#nu_{#mu} s/cm^{2}/P.O.T./GeV");
 
@@ -834,7 +900,7 @@ void CCProtonPi0_CrossSection::RebinFluxHistogram(TH1* rebinned, TH1* reference)
 
 void CCProtonPi0_CrossSection::RebinFluxHistogram_BeforeFSI(TH1* rebinned, TH1* reference)
 {
-    for (int i = 1; i <= 20; i++){
+    for (int i = 1; i <= 30; i++){
         double flux = reference->GetBinContent(i);
         rebinned->SetBinContent(i,flux);
     }
@@ -935,7 +1001,11 @@ void CCProtonPi0_CrossSection::writeHistograms()
     invMass_all->Write();
     invMass_mc_reco_signal->Write();
     invMass_mc_reco_bckg->Write();
-    
+ 
+    invMass_DeltaRich_all->Write();
+    invMass_DeltaRich_mc_reco_signal->Write();
+    invMass_DeltaRich_mc_reco_bckg->Write();
+   
     writeHistograms(muon_P);
     writeHistograms(muon_theta);
     writeHistograms(pi0_P);
@@ -944,6 +1014,9 @@ void CCProtonPi0_CrossSection::writeHistograms()
     writeHistograms(QSq);
     writeHistograms(W);
     writeHistograms(Enu);
+    writeHistograms(deltaInvMass);
+    writeHistograms(Delta_pi_theta);
+    writeHistograms(Delta_pi_phi);
 
     f_out->Close();
 }

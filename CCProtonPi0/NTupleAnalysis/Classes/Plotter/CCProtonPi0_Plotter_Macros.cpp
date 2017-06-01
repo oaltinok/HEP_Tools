@@ -49,6 +49,11 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     // ------------------------------------------------------------------------
     var = Form("%s_%d",var_name.c_str(),0);
     MnvH1D* data = (MnvH1D*)f_data->Get(var.c_str()); 
+    data->SetMarkerStyle(20);
+    data->SetMarkerSize(1);
+    data->SetMarkerColor(kBlack);
+    data->SetLineWidth(2);
+    data->SetLineColor(kBlack);
     max_bin = data->GetMaximumBin();
     hist_max = (hist_max + data->GetBinContent(max_bin))*1.2;
     bin_width = data->GetBinWidth(1);
@@ -67,30 +72,31 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     // Fill TObjArray - For MC Histograms
     // ------------------------------------------------------------------------
     TObjArray* mc_hists = new TObjArray;
-    MnvH1D* temp;
 
     // Get All Background
     var = Form("%s_%d",var_name.c_str(),2);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Background");
-    temp->SetLineColor(kRed);
-    temp->SetFillColor(kRed);
-    mc_hists->Add(temp);
-    area_mc += temp->Integral() * mc_ratio;
+    MnvH1D* background = (MnvH1D*)f_mc->Get(var.c_str());
+    background->SetTitle("Background");
+    background->SetLineColor(kRed);
+    background->SetFillColor(kRed);
+    mc_hists->Add(background);
+    area_mc += background->Integral() * mc_ratio;
 
+    std::cout<<"Background = "<<background->Integral("width")<<std::endl;
     // Get Signal
     var = Form("%s_%d",var_name.c_str(),1);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Signal");
-    temp->SetLineColor(kGreen);
-    temp->SetFillColor(kGreen);
-    mc_hists->Add(temp);
-    area_mc += temp->Integral() * mc_ratio;
+    MnvH1D* signal = (MnvH1D*)f_mc->Get(var.c_str());
+    signal->SetTitle("Signal");
+    signal->SetLineColor(kGreen);
+    signal->SetFillColor(kGreen);
+    mc_hists->Add(signal);
+    area_mc += signal->Integral() * mc_ratio;
 
     // ------------------------------------------------------------------------
     // Plot 
     // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
+    ApplyStyle(plotter);
     TCanvas* c = new TCanvas("c","c",1280,800);
 
     plotter->headroom = 1.75;
@@ -98,7 +104,7 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     plotter->data_marker_size = 1.5;
     gStyle->SetEndErrorSize(6);
 
-    plotter->DrawDataStackedMC(data, mc_hists,mc_ratio ,"TR","Data",0);
+    plotter->DrawDataStackedMC(data, mc_hists,mc_ratio ,"N","Data (3.33e20 POT)",0);
 
     // Add Normalization Labels
     TLatex text;
@@ -107,8 +113,6 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     text.SetTextSize(0.03);
     text.SetTextAlign(22);
     text.DrawLatex(0.30,0.87,"POT Normalized");
-    text.DrawLatex(0.30,0.83,"Data POT: 3.33E+20");
-
  
     // If Cut Histogram - Add Cut Arrows
     if (nCutArrows == 1){
@@ -121,10 +125,10 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
     // Add Pi0 InvMass Line
     std::size_t found = var_name.find("invMass");
     if (found != std::string::npos){
-        TLine pi0Mass;
-        pi0Mass.SetLineWidth(2);
-        pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,hist_max);
+        TArrow arrow;
+        arrow.SetLineWidth(2);
+        arrow.SetLineColor(kBlue);
+        arrow.DrawArrow(134.98,hist_max/8,134.98,0, 0.01); 
     }
 
     // Add Delta+ InvMass Line
@@ -135,6 +139,23 @@ void CCProtonPi0_Plotter::DrawDataStackedMC_BckgAll(rootDir &dir, std::string va
         deltaMass.DrawLine(1.232,0,1.232,hist_max);
     }
 
+    // ------------------------------------------------------------------------
+    // Legend 
+    // ------------------------------------------------------------------------
+    double leg_x_min = 0.60;
+    double leg_x_max = 0.90;
+    double leg_y_min = 0.60;
+    double leg_y_max = 0.85;
+
+    TLegend *legend = new TLegend(leg_x_min, leg_y_min, leg_x_max, leg_y_max);
+    ApplyStyle_Legend(legend);
+    //legend->SetTextSize(0.04);
+    legend->AddEntry(data, "Data #scale[0.85]{(3.33e20 POT)}", "lep" );
+    legend->AddEntry(signal, "Signal","f");
+    legend->AddEntry(background, "Background","f");
+    legend->Draw();
+
+ 
     // Print Plot
     c->Print(Form("%s%s%s%s%s",plotDir.c_str(),var_name.c_str(),"_bckg_all_",norm_label.c_str(),".pdf"), "pdf");
 
@@ -282,7 +303,6 @@ void CCProtonPi0_Plotter::ApplyStyle_Errors(MnvPlotter* plotter, bool groupError
     plotter->legend_offset_x = -0.2;
     plotter->legend_offset_y = 0.0;
 
-
     if (groupErrors){
         //-- define colors of the standard errors
         plotter->error_color_map.clear();
@@ -420,12 +440,34 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     // Plot 
     // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",800,800);
+    plotter->SetRootEnv();
+    
+    gStyle->SetStripDecimals(false);
+    gStyle->SetEndErrorSize(4);
+    gStyle->SetCanvasDefW(640);
+    gStyle->SetCanvasDefH(480); 
+    gStyle->SetOptStat(0); 
 
+    plotter->headroom = 1.75;
+    plotter->legend_text_size = 0.04;
+    plotter->legend_text_font = 42; // default 62 (bold)
+    
+    plotter->data_line_width = 2;
+
+    plotter->axis_minimum = 0.01;
+    plotter->axis_maximum = 0.5;
+    plotter->axis_title_font_x   = 42;
+    plotter->axis_title_size_x   = 0.06;
+    plotter->axis_title_offset_x = 1.1;
+    plotter->axis_title_font_y   = 42;
+    plotter->axis_title_size_y   = 0.06;
+    plotter->axis_title_offset_y = 0.8;
+    plotter->axis_label_size = 0.05;
+    plotter->axis_label_font = 42;
+ 
     ApplyStyle_Errors(plotter, groupErrors);
 
-    plotter->axis_maximum = 0.5;
-
+    TCanvas* c = new TCanvas("c");
     //bool MnvPlotter::DrawErrorSummary   (   MnvH1D *    h,
     //        const std::string &     legPos = "TR",
     //        const bool  includeStat = true,
@@ -437,7 +479,7 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     //        const std::string &     Ytitle = "",
     //        bool    ignoreUngrouped = false  
     //        )   
-    plotter->DrawErrorSummary(hist,"N", false, true, 0.0);
+    plotter->DrawErrorSummary(hist,"N", true, true, 0.0);
 
     // ------------------------------------------------------------------------
     // Legend 
@@ -483,13 +525,13 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     //h_other->SetLineColor(kGreen+3);
     h_other->SetLineColor(kOrange+2);
     
-    TLegend *legend = new TLegend(0.25,0.74,0.85,0.90);  
+    TLegend *legend = new TLegend(0.35,0.74,0.85,0.90);  
     ApplyStyle_Legend(legend);
     legend->SetNColumns(2);
     legend->SetTextSize(0.04);
     legend->AddEntry(h_total, "Total Error", "l" );
     legend->AddEntry(h_stat, "Statistical", "l" );
-    legend->SetColumnSeparation(0.04);
+    //legend->SetColumnSeparation(0.0);
     legend->SetEntrySeparation(0.12);
     legend->AddEntry(h_xsec, "X-Sec Model", "l");
     legend->AddEntry(h_detector, "Detector", "l");
@@ -694,44 +736,66 @@ void CCProtonPi0_Plotter::DrawDataMC_Thesis(rootDir& dir, std::string var_name, 
     DrawDataMC_Thesis(data, mc, var_name, plotDir);
 }
 
-void CCProtonPi0_Plotter::DrawDataMC_Thesis(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec)
+void CCProtonPi0_Plotter::DrawDataMC_WithBackground(std::string var_name, std::string plotDir)
 {
     std::cout<<"Plotting for "<<var_name<<std::endl;
 
-    double mc_ratio = isXSec ? 1.0 : POT_ratio;
+    TFile* f_xsec_data = new TFile(rootDir_CrossSection.data.c_str());
+    TFile* f_xsec_mc = new TFile(rootDir_CrossSection.mc.c_str());
 
-    // ------------------------------------------------------------------------
-    // Plot 
-    // ------------------------------------------------------------------------
-    //MnvPlotter* plotter = new MnvPlotter();
-    //plotter->SetRootEnv();
-    //ApplyStyle(plotter);
-    //TCanvas* c = new TCanvas("c");
+    std::string data_var = var_name + "_all";
+    std::string mc_var = var_name + "_mc_reco_all";
+    std::string bckg_var = var_name + "_mc_reco_bckg";
+
+    MnvH1D* data = GetMnvH1D(f_xsec_data, data_var);
+    MnvH1D* mc = GetMnvH1D(f_xsec_mc, mc_var);
+    data->GetXaxis()->SetNdivisions(5,4,0);
+    mc->GetXaxis()->SetNdivisions(5,4,0);
     
+    data->GetYaxis()->SetNdivisions(5,4,0);
+    mc->GetYaxis()->SetNdivisions(5,4,0);
+ 
+    data->GetYaxis()->CenterTitle();
+    mc->GetYaxis()->CenterTitle();
+
+    data->SetTitle("Data (3.33e20 POT)");
+    mc->SetTitle("Simulation");
+  
+    mc->ClearAllErrorBands();
+
+    // ------------------------------------------------------------------------
+    // Plot Data vs MC 
+    // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
-    TCanvas* c = new TCanvas("c","c",800,800);
-
-    MnvH1D* tempData = new MnvH1D(*data);
-    MnvH1D* tempMC = new MnvH1D(*mc);
-   
-    tempData->GetXaxis()->SetNdivisions(408);
-    tempMC->GetXaxis()->SetNdivisions(408);
-   
-    tempData->SetTitle("Data (3.33e20 POT)");
-    tempMC->SetTitle("Simulation");
-
-    //tempData->GetXaxis()->SetTitle("P_{#mu} [GeV]");
-    //tempMC->GetXaxis()->SetTitle("P_{#mu} [GeV]");
+    plotter->SetRootEnv();
+       
+    gStyle->SetStripDecimals(false);
+    gStyle->SetEndErrorSize(4);
+    gStyle->SetCanvasDefW(640);
+    gStyle->SetCanvasDefH(480); 
+    gStyle->SetOptStat(0); 
 
     plotter->headroom = 1.75;
-    plotter->axis_title_offset_y = 1.1;
+    plotter->legend_text_size = 0.04;
+    plotter->legend_text_font = 42; // default 62 (bold)
+
     plotter->data_line_width = 2;
-    plotter->data_marker_size = 1.5;
-    gStyle->SetEndErrorSize(6);
-  
+
+    plotter->axis_minimum = 0.01;
+    plotter->axis_title_font_x   = 42;
+    plotter->axis_title_size_x   = 0.06;
+    plotter->axis_title_offset_x = 1.1;
+    plotter->axis_title_font_y   = 42;
+    plotter->axis_title_size_y   = 0.06;
+    plotter->axis_title_offset_y = 0.8;
+    plotter->axis_label_size = 0.05;
+    plotter->axis_label_font = 42;
+     
     if (var_name.compare("pi0_theta_xsec_data_MC") == 0){
         plotter->axis_title_offset_y = 1.2;
     }
+ 
+    TCanvas* c = new TCanvas("c");
 
     //    void MnvPlotter::DrawDataMCWithErrorBand    (   const MnvH1D *  dataHist,
     //            const MnvH1D *  mcHist,
@@ -744,7 +808,27 @@ void CCProtonPi0_Plotter::DrawDataMC_Thesis(MnvH1D* data, MnvH1D* mc, std::strin
     //            const bool  statPlusSys = false  
     //            const bool isSmooth = false
     //            )   
-    plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "TR", true, NULL, NULL, false, true, false);
+    plotter->DrawDataMCWithErrorBand(data, mc, POT_ratio, "N", true, NULL, NULL, false, true, false);
+
+   
+    // ------------------------------------------------------------------------
+    // Add Background Histogram
+    // ------------------------------------------------------------------------
+    MnvH1D* mnv_bckg = GetMnvH1D(f_xsec_mc, bckg_var);
+    mnv_bckg->ClearAllErrorBands();
+    std::cout<<"MnvBckg Integral = "<<mnv_bckg->Integral("width")<<std::endl;
+    TH1D* bckg = GetBinNormalizedTH1D(mnv_bckg, false);
+    std::cout<<"bckg Integral = "<<bckg->Integral()<<std::endl;
+    bckg->Scale(POT_ratio);
+    bckg->SetTitle("Background");
+    bckg->SetLineWidth(2);
+    bckg->SetLineColor(kGray+2);
+    bckg->SetFillColor(kGray+2);
+    bckg->SetFillStyle(3010);
+    bckg->GetXaxis()->SetNdivisions(5,5,0);
+    bckg->GetYaxis()->SetNdivisions(5,5,0);
+    bckg->GetYaxis()->CenterTitle();
+    bckg->Draw("HIST SAME");
 
     // Add Normalization Labels
     TLatex text;
@@ -754,15 +838,148 @@ void CCProtonPi0_Plotter::DrawDataMC_Thesis(MnvH1D* data, MnvH1D* mc, std::strin
     text.SetTextAlign(22);
     text.DrawLatex(0.30,0.87,"POT Normalized");
 
-    // Plot Output
-    gStyle->SetOptStat(0); 
-    c->Update();
-    std::string out_name;
-    out_name = plotDir + var_name + "_POT" + ".pdf"; 
-    //out_name = plotDir + var_name + "_POT" + ".pdf"; 
+    // Add Legend
+    data->SetMarkerStyle(plotter->data_marker);
+    data->SetMarkerSize(plotter->data_marker_size);
+    data->SetMarkerColor(plotter->data_color);
+    data->SetLineColor(plotter->data_color);
+    data->SetLineWidth(plotter->data_line_width);
 
+    mc->SetLineColor(plotter->mc_color);
+    mc->SetLineWidth(plotter->mc_line_width);
+    mc->SetLineStyle(plotter->mc_line_style);
+    mc->SetFillColor(plotter->mc_error_color);
+    mc->SetFillStyle(plotter->mc_error_style);
+
+    double leg_x_min = 0.50;
+    double leg_x_max = 0.80;
+    double leg_y_min = 0.65;
+    double leg_y_max = 0.90;
+
+    TLegend *legend = new TLegend(leg_x_min, leg_y_min, leg_x_max, leg_y_max);
+    ApplyStyle_Legend(legend);
+
+    legend->AddEntry(data, "Data (3.33e20 POT)", "lep" );
+    legend->AddEntry(mc, "Simulation", "fl");
+    legend->AddEntry(bckg, "Background", "f");
+    legend->Draw();
+
+    // Plot Output
+    std::string out_name = plotDir + var_name + "_POT" + ".pdf"; 
     c->Print(out_name.c_str(),"pdf");
-    //c->Print(out_name.c_str(),"pdf");
+
+    delete c;
+    delete plotter;
+    delete data;
+    delete mc;
+    delete bckg;
+    delete mnv_bckg;
+}
+
+void CCProtonPi0_Plotter::DrawDataMC_Thesis(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec)
+{
+    std::cout<<"Plotting for "<<var_name<<std::endl;
+
+    double mc_ratio = isXSec ? 1.0 : POT_ratio;
+
+    MnvH1D* tempData = new MnvH1D(*data);
+    MnvH1D* tempMC = new MnvH1D(*mc);
+    
+    tempData->GetXaxis()->SetNdivisions(5,4,0);
+    tempMC->GetXaxis()->SetNdivisions(5,4,0);
+    
+    tempData->GetYaxis()->SetNdivisions(5,4,0);
+    tempMC->GetYaxis()->SetNdivisions(5,4,0);
+ 
+    tempData->GetYaxis()->CenterTitle();
+    tempMC->GetYaxis()->CenterTitle();
+
+    tempData->SetTitle("Data (3.33e20 POT)");
+    tempMC->SetTitle("Simulation");
+
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    plotter->SetRootEnv();
+       
+    gStyle->SetStripDecimals(false);
+    gStyle->SetEndErrorSize(4);
+    gStyle->SetCanvasDefW(640);
+    gStyle->SetCanvasDefH(480); 
+    gStyle->SetOptStat(0); 
+
+    plotter->headroom = 1.75;
+    plotter->legend_text_size = 0.04;
+    plotter->legend_text_font = 42; // default 62 (bold)
+
+    plotter->data_line_width = 2;
+
+    //plotter->axis_minimum = 0.01;
+    plotter->axis_title_font_x   = 42;
+    plotter->axis_title_size_x   = 0.06;
+    plotter->axis_title_offset_x = 1.1;
+    plotter->axis_title_font_y   = 42;
+    plotter->axis_title_size_y   = 0.06;
+    plotter->axis_title_offset_y = 0.8;
+    plotter->axis_label_size = 0.05;
+    plotter->axis_label_font = 42;
+     
+    if (var_name.compare("pi0_theta_xsec_data_MC") == 0){
+        plotter->axis_title_offset_y = 1.2;
+    }
+ 
+    TCanvas* c = new TCanvas("c");
+
+    //    void MnvPlotter::DrawDataMCWithErrorBand    (   const MnvH1D *  dataHist,
+    //            const MnvH1D *  mcHist,
+    //            const Double_t  mcScale = 1.0,
+    //            const std::string &     legPos = "L",
+    //            const bool  useHistTitles = false,
+    //            const MnvH1D *  bkgdHist = NULL,
+    //            const MnvH1D *  dataBkgdHist = NULL,
+    //            const bool  covAreaNormalize = false,
+    //            const bool  statPlusSys = false  
+    //            const bool isSmooth = false
+    //            )   
+    plotter->DrawDataMCWithErrorBand(tempData, tempMC, mc_ratio, "N", true, NULL, NULL, false, true, false);
+
+    // Add Normalization Labels
+    TLatex text;
+    text.SetNDC();
+    text.SetTextColor(kBlue);
+    text.SetTextSize(0.03);
+    text.SetTextAlign(22);
+    text.DrawLatex(0.30,0.87,"POT Normalized");
+
+    // Add Legend
+    tempData->SetMarkerStyle(plotter->data_marker);
+    tempData->SetMarkerSize(plotter->data_marker_size);
+    tempData->SetMarkerColor(plotter->data_color);
+    tempData->SetLineColor(plotter->data_color);
+    tempData->SetLineWidth(plotter->data_line_width);
+
+    tempMC->SetLineColor(plotter->mc_color);
+    tempMC->SetLineWidth(plotter->mc_line_width);
+    tempMC->SetLineStyle(plotter->mc_line_style);
+    tempMC->SetFillColor(plotter->mc_error_color);
+    tempMC->SetFillStyle(plotter->mc_error_style);
+
+    double leg_x_min = 0.50;
+    double leg_x_max = 0.80;
+    double leg_y_min = 0.70;
+    double leg_y_max = 0.90;
+
+    TLegend *legend = new TLegend(leg_x_min, leg_y_min, leg_x_max, leg_y_max);
+    ApplyStyle_Legend(legend);
+
+    legend->AddEntry(tempData, "Data (3.33e20 POT)", "lep" );
+    legend->AddEntry(tempMC, "Simulation", "fl");
+    legend->Draw();
+
+    // Plot Output
+    std::string out_name = plotDir + var_name + "_POT" + ".pdf"; 
+    c->Print(out_name.c_str(),"pdf");
 
     delete c;
     delete plotter;
@@ -1283,17 +1500,7 @@ void CCProtonPi0_Plotter::DrawDataMC_IntType(MnvH1D* data, MnvH1D* mc, std::vect
             bool     cov_area_normalize = false   
        )    
        */
-
-    std::string var_name_lower = var_name;
-    for (unsigned int i = 0; i < var_name_lower.size(); ++i){
-        var_name_lower[i] = tolower(var_name_lower[i]);
-    }
-    std::size_t is_delta = var_name_lower.find("delta");
-    if (is_delta == std::string::npos ){
-        plotter->DrawDataStackedMC(h_data, mc_hists, 1.0, "N", "Data (3.33e20 POT)", 0, 0, 1001);
-    }else{
-        plotter->DrawDataStackedMC(h_data, mc_hists, POT_ratio, "N", "Data (3.33e20 POT)", 0, 0, 1001);
-    }
+    plotter->DrawDataStackedMC(h_data, mc_hists, 1.0, "N", "Data (3.33e20 POT)", 0, 0, 1001);
 
     h_data_stat_only->Draw("SAME E1 X0");
 
@@ -1735,14 +1942,14 @@ void CCProtonPi0_Plotter::Draw1DHist(TH1* hist1D, std::string var_name, std::str
 
     // Find Peak
     int max_bin = hist1D->GetMaximumBin();
-    int max_value = hist1D->GetBinContent(max_bin);
+    double max_value = hist1D->GetBinContent(max_bin);
     double max_bin_location = hist1D->GetBinCenter(max_bin);
     std::cout<<"\tPeak = "<<max_bin_location<<std::endl;
 
     // Calculate FWHM
-    int bin1 = hist1D->FindFirstBinAbove(hist1D->GetMaximum()/2);
-    int bin2 = hist1D->FindLastBinAbove(hist1D->GetMaximum()/2);
-    double fwhm = hist1D->GetBinCenter(bin2) - hist1D->GetBinCenter(bin1);
+    int bin1 = hist1D->FindFirstBinAbove(max_value/2);
+    int bin2 = hist1D->FindLastBinAbove(max_value/2);
+    double fwhm = (hist1D->GetBinLowEdge(bin2) + hist1D->GetBinWidth(bin2)) - hist1D->GetBinLowEdge(bin1);
     std::cout<<"\tFWHM = "<<fwhm<<std::endl;
 
     if (!thesisStyle){ 
@@ -1912,6 +2119,9 @@ void CCProtonPi0_Plotter::AddCutArrow(MnvPlotter* plotter, CutArrow &cutArrow, d
     double ymin = 0;
     double ymax = hist_max;
     std::string arrow_direction = cutArrow.arrow_direction;
+    plotter->arrow_line_width = 2;
+    plotter->arrow_line_style = 1;
+    plotter->arrow_type = "";
 
     plotter->AddCutArrow(cut_location, ymin, ymax, arrow_length, arrow_direction); 
 }
@@ -2352,31 +2562,32 @@ void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::
     // Fill TObjArray - For MC Histograms
     // ------------------------------------------------------------------------
     TObjArray* mc_hists = new TObjArray;
-    MnvH1D* temp;
+    MnvH1D* signal;
 
     // ------------------------------------------------------------------------
     // Get Signal
     // ------------------------------------------------------------------------
     var = Form("%s_%d",var_name.c_str(),1);
-    temp = (MnvH1D*)f_mc->Get(var.c_str());
-    temp->SetTitle("Signal");
-    temp->SetLineColor(kGreen);
-    temp->SetFillColor(kGreen);
+    signal = (MnvH1D*)f_mc->Get(var.c_str());
+    signal->SetTitle("Signal");
+    signal->SetLineColor(kGreen);
+    signal->SetFillColor(kGreen);
 
     // Get Stat1s
-    max_bin = temp->GetMaximumBin();
-    hist_max = hist_max + temp->GetBinContent(max_bin);
-    bin_width = temp->GetBinWidth(1);
+    max_bin = signal->GetMaximumBin();
+    hist_max = hist_max + signal->GetBinContent(max_bin);
+    bin_width = signal->GetBinWidth(1);
 
     // Add to TObjArray
-    mc_hists->Add(temp);
+    mc_hists->Add(signal);
 
     // ------------------------------------------------------------------------
     // Plot  - If you want A Log Plot, axis_minimum = 0.1
     // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
+    ApplyStyle(plotter);
     TCanvas* c = new TCanvas(var_name.c_str(),var_name.c_str(),1280,800);
-    plotter->DrawStackedMC(mc_hists,1,"TR",0);
+    plotter->DrawStackedMC(mc_hists,1,"N",0);
 
     // If Cut Histogram - Add Cut Arrows
     if (nCutArrows == 1){
@@ -2386,13 +2597,13 @@ void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::
         AddCutArrow(plotter, cutArrow2, hist_max, bin_width);
     }
 
-    // Add Pi0 InvMass Line
+    // Add Pi0 Mass Line
     std::size_t found = var_name.find("invMass");
     if (found != std::string::npos){
-        TLine pi0Mass;
-        pi0Mass.SetLineWidth(2);
-        pi0Mass.SetLineColor(kBlue);
-        pi0Mass.DrawLine(134.98,0,134.98,hist_max);
+        TArrow arrow;
+        arrow.SetLineWidth(2);
+        arrow.SetLineColor(kBlue);
+        arrow.DrawArrow(134.98,hist_max/8,134.98,0, 0.01); 
     }
 
     // Add Delta+ InvMass Line
@@ -2403,6 +2614,21 @@ void CCProtonPi0_Plotter::DrawSignalMC(rootDir &dir, std::string var_name, std::
         deltaMass.SetLineColor(kBlue);
         deltaMass.DrawLine(1.232,0,1.232,hist_max);
     }
+
+    // ------------------------------------------------------------------------
+    // Legend 
+    // ------------------------------------------------------------------------
+    //double leg_x_min = 0.60;
+    //double leg_x_max = 0.90;
+    //double leg_y_min = 0.80;
+    //double leg_y_max = 0.85;
+
+    //TLegend *legend = new TLegend(leg_x_min, leg_y_min, leg_x_max, leg_y_max);
+    //ApplyStyle_Legend(legend);
+    ////legend->SetTextSize(0.04);
+    //legend->AddEntry(signal, "Signal","f");
+    //legend->Draw();
+
 
     // Print Plot
     c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),"_mc_signal.pdf"), "pdf");

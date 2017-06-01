@@ -30,6 +30,10 @@ const int CCProtonPi0_BinList::size_QSq = 8;
 const double CCProtonPi0_BinList::a_Enu[] = {0, 1.5, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0, 20.0};
 const int CCProtonPi0_BinList::size_Enu = 11;
 
+const double CCProtonPi0_BinList::a_Enu_Fine[] = {0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0,
+        5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0};
+const int CCProtonPi0_BinList::size_Enu_Fine = 30;
+
 CCProtonPi0_BinList::CCProtonPi0_BinList()
 {
     // -------------------------------------------------------------------------
@@ -46,7 +50,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     pi0_theta.setBin(18, 0.0, 180.0);
     QSq.setBin(40,0.0,2.0);
     beamE.setBin(40,0,20.0);
-    w.setBin(15,0.5,2.0);
+    w.setBin(12,0.6,1.8);
    
     // Truth Histograms
     mc_w.setBin(40,0.5,2.0);
@@ -72,7 +76,9 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     fraction2.setBin(200,-0.5,1.5);
     vertex_z.setBin(114,4300.0,10000.0);
     vertex_x_y.setBin(200,-1000.0,1000.0);
-    deltaInvMass.setBin(30,0.0,3.0);
+    deltaInvMass.setBin(12,1.0,1.6);
+    Delta_pi_theta.setBin(10,-1.0,1.0);
+    Delta_pi_phi.setBin(10,0.0,360.0);
     preFilter_Status.setBin(4,0,4);
     preFilter_RejectedEnergy.setBin(50,0.0,5000.0);
     strip_numbers.setBin(127,1,127);

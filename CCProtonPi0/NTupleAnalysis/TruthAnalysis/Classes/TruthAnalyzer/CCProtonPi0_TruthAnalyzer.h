@@ -44,6 +44,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         MnvH1D* Enu_mc_truth_all_signal;
         MnvH1D* QSq_mc_truth_all_signal;
         MnvH1D* W_mc_truth_all_signal;
+        MnvH1D* deltaInvMass_mc_truth_all_signal;
+        MnvH1D* Delta_pi_theta_mc_truth_all_signal;
+        MnvH1D* Delta_pi_phi_mc_truth_all_signal;
 
         // Cross Section Variables After FSI
         MnvH1D* muon_P_mc_truth_all_signal_AfterFSI;
@@ -54,6 +57,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         MnvH1D* Enu_mc_truth_all_signal_AfterFSI;
         MnvH1D* QSq_mc_truth_all_signal_AfterFSI;
         MnvH1D* W_mc_truth_all_signal_AfterFSI;
+        MnvH1D* deltaInvMass_mc_truth_all_signal_AfterFSI;
+        MnvH1D* Delta_pi_theta_mc_truth_all_signal_AfterFSI;
+        MnvH1D* Delta_pi_phi_mc_truth_all_signal_AfterFSI;
 
         // Cross Section Variables Before FSI
         MnvH1D* muon_P_mc_truth_all_signal_BeforeFSI;
@@ -64,6 +70,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         MnvH1D* Enu_mc_truth_all_signal_BeforeFSI;
         MnvH1D* QSq_mc_truth_all_signal_BeforeFSI;
         MnvH1D* W_mc_truth_all_signal_BeforeFSI;
+        MnvH1D* deltaInvMass_mc_truth_all_signal_BeforeFSI;
+        MnvH1D* Delta_pi_theta_mc_truth_all_signal_BeforeFSI;
+        MnvH1D* Delta_pi_phi_mc_truth_all_signal_BeforeFSI;
 
         // Cross Section Variables by FSI Type
         std::vector<MnvH1D*> muon_P_mc_truth_all_signal_FSIType;
@@ -74,6 +83,9 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> QSq_mc_truth_all_signal_FSIType;
         std::vector<MnvH1D*> W_mc_truth_all_signal_FSIType;
         std::vector<MnvH1D*> Enu_mc_truth_all_signal_FSIType;
+        std::vector<MnvH1D*> deltaInvMass_mc_truth_all_signal_FSIType;
+        std::vector<MnvH1D*> Delta_pi_theta_mc_truth_all_signal_FSIType;
+        std::vector<MnvH1D*> Delta_pi_phi_mc_truth_all_signal_FSIType;
  
         // Cross Section Variables by Interaction Type
         std::vector<MnvH1D*> muon_P_mc_truth_all_signal_IntType;
@@ -84,39 +96,13 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> QSq_mc_truth_all_signal_IntType;
         std::vector<MnvH1D*> W_mc_truth_all_signal_IntType;
         std::vector<MnvH1D*> Enu_mc_truth_all_signal_IntType;
+        std::vector<MnvH1D*> deltaInvMass_mc_truth_all_signal_IntType;
+        std::vector<MnvH1D*> Delta_pi_theta_mc_truth_all_signal_IntType;
+        std::vector<MnvH1D*> Delta_pi_phi_mc_truth_all_signal_IntType;
        
         // Delta RES Study 
         MnvH1D* delta_anisotropy;
-        MnvH1D* deltaInvMass_all_signal;
-        MnvH1D* deltaInvMass_delta_res;
-        MnvH1D* deltaInvMass_other_res;
-        MnvH1D* deltaInvMass_non_res;
          
-        MnvH2D* Delta_pi_theta_pi_P_all_signal;
-        MnvH2D* Delta_pi_theta_pi_P_delta_res;
-        MnvH2D* Delta_pi_theta_pi_P_other_res;
-        MnvH2D* Delta_pi_theta_pi_P_non_res;
-        
-        MnvH1D* Delta_pi_theta_all_signal;
-        MnvH1D* Delta_pi_theta_delta_res;
-        MnvH1D* Delta_pi_theta_other_res;
-        MnvH1D* Delta_pi_theta_non_res;
-        
-        MnvH1D* Delta_pi_phi_all_signal;
-        MnvH1D* Delta_pi_phi_delta_res;
-        MnvH1D* Delta_pi_phi_other_res;
-        MnvH1D* Delta_pi_phi_non_res;
-        
-        MnvH1D* Delta_pi_theta_all_signal_BeforeFSI;
-        MnvH1D* Delta_pi_theta_delta_res_BeforeFSI;
-        MnvH1D* Delta_pi_theta_other_res_BeforeFSI;
-        MnvH1D* Delta_pi_theta_non_res_BeforeFSI;
-        
-        MnvH1D* Delta_pi_phi_all_signal_BeforeFSI;
-        MnvH1D* Delta_pi_phi_delta_res_BeforeFSI;
-        MnvH1D* Delta_pi_phi_other_res_BeforeFSI;
-        MnvH1D* Delta_pi_phi_non_res_BeforeFSI;
-
         std::vector<MnvH1D*> CV_weight;
         std::vector<MnvH1D*> CV_weight_2p2h;
         std::vector<MnvH1D*> CV_weight_Delta;
@@ -183,7 +169,14 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
 
         bool applyGENIETuning_DeltaSuppression;
         bool applyGENIETuning_Complete;
+        double m_deltaInvMass;
+        double m_deltaInvMass_BeforeFSI;
+        double m_Delta_pi_theta;
+        double m_Delta_pi_theta_BeforeFSI;
+        double m_Delta_pi_phi;
+        double m_Delta_pi_phi_BeforeFSI;
 
+        bool isDeltaRichSample();
         int GetFSIType();
         int GetIntType();
         void CountFSIType(int type);
@@ -195,6 +188,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         void AddErrorBands_FillWithCV(MnvH1D* hist);
         void AddOtherErrorBands_FillWithCV();
         void CalcEventWeight();
+        void CalcDeltaRichKinematics();
         int GetBackgroundTypeInd();
         void FillGENIE_Tuning();
         void FillHistogram(vector<MnvH1D*> &hist, double var);
@@ -266,6 +260,8 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_Counter nSignalOut_Acceptance;
         CCProtonPi0_Counter nSignalOut_Kinematics;
         CCProtonPi0_Counter nBckg;
+        CCProtonPi0_Counter nMuonAngle_Large;
+        CCProtonPi0_Counter nMuonAngle_Small;
 
         // FSI
         CCProtonPi0_Counter nFSI_FeedOut;

@@ -216,6 +216,12 @@ class CCProtonPi0_CutList : public CCProtonPi0_NTupleAnalysis
         MnvH1D* invMass_mc_reco_all;
         MnvH1D* invMass_mc_reco_signal;
         MnvH1D* invMass_mc_reco_bckg;
+ 
+        // Background Subtraction
+        MnvH1D* invMass_DeltaRich_all;
+        MnvH1D* invMass_DeltaRich_mc_reco_all;
+        MnvH1D* invMass_DeltaRich_mc_reco_signal;
+        MnvH1D* invMass_DeltaRich_mc_reco_bckg;
 
         // Studies
         TH2D* signal_gamma_E_cos_openingAngle;

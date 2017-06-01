@@ -121,6 +121,9 @@ namespace Folder_List
     // Plot Dirs
     //-------------------------------------------------------------------------
     // CrossSection Plot Dirs
+    const std::string xsec_Delta_pi_phi = output + plotOut + "xsec_Delta_pi_phi/";
+    const std::string xsec_Delta_pi_theta = output + plotOut + "xsec_Delta_pi_theta/";
+    const std::string xsec_deltaInvMass = output + plotOut + "xsec_deltaInvMass/";
     const std::string xsec_Enu = output + plotOut + "xsec_Enu/";
     const std::string xsec_QSq = output + plotOut + "xsec_QSq/";
     const std::string xsec_W = output + plotOut + "xsec_W/";

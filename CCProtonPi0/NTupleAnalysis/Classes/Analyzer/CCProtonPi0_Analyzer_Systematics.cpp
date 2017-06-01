@@ -15,6 +15,9 @@ void CCProtonPi0_Analyzer::AddErrorBands_Data()
     AddVertErrorBands_Data(interaction.QSq_all);
     AddVertErrorBands_Data(interaction.Enu_all);
     AddVertErrorBands_Data(interaction.W_all);
+    AddVertErrorBands_Data(interaction.deltaInvMass_all);
+    AddVertErrorBands_Data(interaction.Delta_pi_theta_all);
+    AddVertErrorBands_Data(interaction.Delta_pi_phi_all);
     AddVertErrorBands_Data(interaction.QSq_MaRES[0]);
 
     AddLatErrorBands_Data(pi0.pi0_P_all);
@@ -25,11 +28,9 @@ void CCProtonPi0_Analyzer::AddErrorBands_Data()
     AddLatErrorBands_Data(interaction.QSq_all);
     AddLatErrorBands_Data(interaction.Enu_all);
     AddLatErrorBands_Data(interaction.W_all);
-
-    // Delta(1232) enriched Sample
-    AddLeadingErrorBands_Data(interaction.deltaInvMass_all);
-    AddLeadingErrorBands_Data(interaction.Delta_pi_theta_all);
-    AddLeadingErrorBands_Data(interaction.Delta_pi_phi_all);
+    AddLatErrorBands_Data(interaction.deltaInvMass_all);
+    AddLatErrorBands_Data(interaction.Delta_pi_theta_all);
+    AddLatErrorBands_Data(interaction.Delta_pi_phi_all);
     
     // 2p2h Search
     AddLeadingErrorBands_Data(interaction.muon_theta_muon_KE_all);
@@ -873,6 +874,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy(std::string err_name)
     double QSq_i;
     double WSq_i;
     double W_i;
+    double deltaInvMass_i;
 
     for (int i = 0; i < 2; ++i){
 
@@ -895,6 +897,20 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy(std::string err_name)
             WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
             W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
 
+            double proton_E_i = proton_energy_shifts[0] + proton_E;
+            double proton_E_shift_wgt = (proton_E_i - proton_E) / proton_E;
+
+            double proton_px_i = (1.0 + proton_E_shift_wgt) * proton_px; 
+            double proton_py_i = (1.0 + proton_E_shift_wgt) * proton_py; 
+            double proton_pz_i = (1.0 + proton_E_shift_wgt) * proton_pz; 
+            double delta_4P_i[4];
+            delta_4P_i[0] = proton_px_i + pi0_px;
+            delta_4P_i[1] = proton_py_i + pi0_py;
+            delta_4P_i[2] = proton_pz_i + pi0_pz;
+            delta_4P_i[3] = proton_E_i + pi0_E;
+            TLorentzVector delta_lorentz_i(delta_4P_i); 
+            deltaInvMass_i = delta_lorentz_i.M() * MeV_to_GeV; 
+
             PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
 
         }else{
@@ -909,6 +925,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy(std::string err_name)
             double Enu_shift = (Enu_i - m_Enu) * MeV_to_GeV;
             double QSq_shift = (QSq_i - m_QSq) * MeVSq_to_GeVSq;
             double W_shift = (W_i - m_W) * MeV_to_GeV;
+            double deltaInvMass_shift = deltaInvMass_i - deltaInvMass_reco;
 
             //-----------------------------------------------------------------
             // pi0_P
@@ -997,6 +1014,42 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy(std::string err_name)
                 FillLatErrorBand_SingleUniverse(interaction.Enu_response, err_name, i, m_Enu * MeV_to_GeV, m_Enu_Truth * MeV_to_GeV, Enu_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_bckg, err_name, i, m_Enu * MeV_to_GeV, Enu_shift);
+            }
+
+            if (isDeltaRichSample()){
+                //-----------------------------------------------------------------
+                // deltaInvMass 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_all, err_name, i, deltaInvMass_reco, deltaInvMass_shift);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_truth_signal, err_name, i, deltaInvMass_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_signal, err_name, i, deltaInvMass_reco, deltaInvMass_shift);
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_response, err_name, i, deltaInvMass_reco, deltaInvMass_true, deltaInvMass_shift, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_bckg, err_name, i, deltaInvMass_reco, deltaInvMass_shift);
+                }
+                //-----------------------------------------------------------------
+                // Delta_pi_theta 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_all, err_name, i, m_delta_pi_theta_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_truth_signal, err_name, i, m_delta_pi_theta_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_signal, err_name, i, m_delta_pi_theta_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_response, err_name, i, m_delta_pi_theta_reco, m_delta_pi_theta_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_bckg, err_name, i, m_delta_pi_theta_reco, 0.0);
+                }
+                //-----------------------------------------------------------------
+                // Delta_pi_phi 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_all, err_name, i, m_delta_pi_phi_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_truth_signal, err_name, i, m_delta_pi_phi_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_signal, err_name, i, m_delta_pi_phi_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_response, err_name, i, m_delta_pi_phi_reco, m_delta_pi_phi_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_bckg, err_name, i, m_delta_pi_phi_reco, 0.0);
+                }
             }
         }else{
             // Did not passed cuts
@@ -1014,6 +1067,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks()
     double QSq_i;
     double WSq_i;
     double W_i;
+    double deltaInvMass_i;
 
     // For each event Birks_random_shifts is different
     Calc_Birks_random_shifts();
@@ -1026,10 +1080,23 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks()
             for (int p = 0; p < nProtonCandidates; ++p ){
                 total_proton_KE_i += (1.0 + Birks_random_shifts2D[p][i]) * all_protons_KE[p]; 
             }
+
             Enu_i = Calc_Enu_shifted(muon_E, pi0_E, total_proton_KE_i); // Use actual muon energy and pi0 energy but shifted proton kinetic energy
             QSq_i = Calc_QSq(Enu_i, muon_E, muon_P, reco_muon_theta); // Use actual muon energy
             WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
             W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
+
+            double proton_px_i = (1.0 + Birks_random_shifts2D[0][i]) * proton_px; 
+            double proton_py_i = (1.0 + Birks_random_shifts2D[0][i]) * proton_py; 
+            double proton_pz_i = (1.0 + Birks_random_shifts2D[0][i]) * proton_pz; 
+            double proton_E_i = (1.0 + Birks_random_shifts2D[0][i]) * proton_E; 
+            double delta_4P_i[4];
+            delta_4P_i[0] = proton_px_i + pi0_px;
+            delta_4P_i[1] = proton_py_i + pi0_py;
+            delta_4P_i[2] = proton_pz_i + pi0_pz;
+            delta_4P_i[3] = proton_E_i + pi0_E;
+            TLorentzVector delta_lorentz_i(delta_4P_i); 
+            deltaInvMass_i = delta_lorentz_i.M() * MeV_to_GeV; 
 
             PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i);
         }else{
@@ -1044,6 +1111,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks()
             double Enu_shift = (Enu_i - m_Enu) * MeV_to_GeV;
             double QSq_shift = (QSq_i - m_QSq) * MeVSq_to_GeVSq;
             double W_shift = (W_i - m_W) * MeV_to_GeV;
+            double deltaInvMass_shift = deltaInvMass_i - deltaInvMass_reco;
 
             //-----------------------------------------------------------------
             // pi0_P
@@ -1132,6 +1200,41 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks()
                 FillLatErrorBand_SingleUniverse(interaction.Enu_response, err_name, i, m_Enu * MeV_to_GeV, m_Enu_Truth * MeV_to_GeV, Enu_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_bckg, err_name, i, m_Enu * MeV_to_GeV, Enu_shift);
+            }
+            if (isDeltaRichSample()){
+                //-----------------------------------------------------------------
+                // deltaInvMass 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_all, err_name, i, deltaInvMass_reco, deltaInvMass_shift);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_truth_signal, err_name, i, deltaInvMass_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_signal, err_name, i, deltaInvMass_reco, deltaInvMass_shift);
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_response, err_name, i, deltaInvMass_reco, deltaInvMass_true, deltaInvMass_shift, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_bckg, err_name, i, deltaInvMass_reco, deltaInvMass_shift);
+                }
+                //-----------------------------------------------------------------
+                // Delta_pi_theta 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_all, err_name, i, m_delta_pi_theta_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_truth_signal, err_name, i, m_delta_pi_theta_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_signal, err_name, i, m_delta_pi_theta_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_response, err_name, i, m_delta_pi_theta_reco, m_delta_pi_theta_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_bckg, err_name, i, m_delta_pi_theta_reco, 0.0);
+                }
+                //-----------------------------------------------------------------
+                // Delta_pi_phi 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_all, err_name, i, m_delta_pi_phi_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_truth_signal, err_name, i, m_delta_pi_phi_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_signal, err_name, i, m_delta_pi_phi_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_response, err_name, i, m_delta_pi_phi_reco, m_delta_pi_phi_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_bckg, err_name, i, m_delta_pi_phi_reco, 0.0);
+                }
             }
         }else{
             // Did not passed cuts
@@ -1150,6 +1253,9 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
         double gamma1_E_i = (1.0 + em_energy_random_shifts[i]) * gamma1_E;
         double gamma2_E_i = (1.0 + em_energy_random_shifts[i]) * gamma2_E;
         double pi0_invMass_i = std::sqrt(2*gamma1_E_i*gamma2_E_i*(1-pi0_cos_openingAngle));
+        double pi0_px_i = (1.0 + em_energy_random_shifts[i]) * pi0_px;
+        double pi0_py_i = (1.0 + em_energy_random_shifts[i]) * pi0_py;
+        double pi0_pz_i = (1.0 + em_energy_random_shifts[i]) * pi0_pz;
         double pi0_P_i = (1.0 + em_energy_random_shifts[i]) * pi0_P;
         double pi0_E_i = sqrt(pi0_P_i*pi0_P_i + pi0_mass*pi0_mass);
         double pi0_KE_i = pi0_E_i - pi0_mass;
@@ -1157,6 +1263,14 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
         double QSq_i = Calc_QSq(Enu_i, muon_E, muon_P, reco_muon_theta); // Use actual muon energy
         double WSq_i = Calc_WSq(Enu_i, QSq_i, muon_E); // Use actual muon energy
         double W_i = (WSq_i > 0) ? sqrt(WSq_i) : -1; 
+
+        double delta_4P_i[4];
+        delta_4P_i[0] = proton_px + pi0_px_i;
+        delta_4P_i[1] = proton_py + pi0_py_i;
+        delta_4P_i[2] = proton_pz + pi0_pz_i;
+        delta_4P_i[3] = proton_E + pi0_E_i;
+        TLorentzVector delta_lorentz_i(delta_4P_i); 
+        double deltaInvMass_i = delta_lorentz_i.M() * MeV_to_GeV; 
 
         bool PassedCuts = IsEnuInRange(Enu_i) && IsWInRange(W_i) && IsInvMassInRange(pi0_invMass_i) && !IsOpeningAngleSmallAndEnergyLow(gamma1_E_i, gamma2_E_i);
 
@@ -1166,6 +1280,7 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
             double Enu_shift = (Enu_i - m_Enu) * MeV_to_GeV;
             double QSq_shift = (QSq_i - m_QSq) * MeVSq_to_GeVSq;
             double W_shift = (W_i - m_W) * MeV_to_GeV;
+            double deltaInvMass_shift = deltaInvMass_i - deltaInvMass_reco;
 
             //-----------------------------------------------------------------
             // pi0_P
@@ -1254,6 +1369,41 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale()
                 FillLatErrorBand_SingleUniverse(interaction.Enu_response, err_name, i, m_Enu * MeV_to_GeV, m_Enu_Truth * MeV_to_GeV, Enu_shift, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_bckg, err_name, i, m_Enu * MeV_to_GeV, Enu_shift);
+            }
+            if (isDeltaRichSample()){
+                //-----------------------------------------------------------------
+                // deltaInvMass 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_all, err_name, i, deltaInvMass_reco, deltaInvMass_shift);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_truth_signal, err_name, i, deltaInvMass_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_signal, err_name, i, deltaInvMass_reco, deltaInvMass_shift);
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_response, err_name, i, deltaInvMass_reco, deltaInvMass_true, deltaInvMass_shift, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_bckg, err_name, i, deltaInvMass_reco, deltaInvMass_shift);
+                }
+                //-----------------------------------------------------------------
+                // Delta_pi_theta 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_all, err_name, i, m_delta_pi_theta_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_truth_signal, err_name, i, m_delta_pi_theta_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_signal, err_name, i, m_delta_pi_theta_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_response, err_name, i, m_delta_pi_theta_reco, m_delta_pi_theta_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_bckg, err_name, i, m_delta_pi_theta_reco, 0.0);
+                }
+                //-----------------------------------------------------------------
+                // Delta_pi_phi 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_all, err_name, i, m_delta_pi_phi_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_truth_signal, err_name, i, m_delta_pi_phi_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_signal, err_name, i, m_delta_pi_phi_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_response, err_name, i, m_delta_pi_phi_reco, m_delta_pi_phi_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_bckg, err_name, i, m_delta_pi_phi_reco, 0.0);
+                }
             }
         }else{
             // Does not satisfy cuts
@@ -1374,6 +1524,43 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum()
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_bckg, err_name, i, m_Enu * MeV_to_GeV, Enu_shift);
             }
+
+            if (isDeltaRichSample()){
+                //-----------------------------------------------------------------
+                // deltaInvMass 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_all, err_name, i, deltaInvMass_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_truth_signal, err_name, i, deltaInvMass_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_signal, err_name, i, deltaInvMass_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_response, err_name, i, deltaInvMass_reco, deltaInvMass_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_bckg, err_name, i, deltaInvMass_reco, 0.0);
+                }
+                //-----------------------------------------------------------------
+                // Delta_pi_theta 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_all, err_name, i, m_delta_pi_theta_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_truth_signal, err_name, i, m_delta_pi_theta_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_signal, err_name, i, m_delta_pi_theta_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_response, err_name, i, m_delta_pi_theta_reco, m_delta_pi_theta_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_bckg, err_name, i, m_delta_pi_theta_reco, 0.0);
+                }
+                //-----------------------------------------------------------------
+                // Delta_pi_phi 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_all, err_name, i, m_delta_pi_phi_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_truth_signal, err_name, i, m_delta_pi_phi_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_signal, err_name, i, m_delta_pi_phi_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_response, err_name, i, m_delta_pi_phi_reco, m_delta_pi_phi_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_bckg, err_name, i, m_delta_pi_phi_reco, 0.0);
+                }
+
+            }
         }else{
             // Does not satisfy cuts
         }
@@ -1488,6 +1675,42 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonTheta()
             }else{
                 FillLatErrorBand_SingleUniverse(interaction.Enu_mc_reco_bckg, err_name, i, m_Enu * MeV_to_GeV, 0.0);
             }
+
+            if (isDeltaRichSample()){
+                //-----------------------------------------------------------------
+                // deltaInvMass 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_all, err_name, i, deltaInvMass_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_truth_signal, err_name, i, deltaInvMass_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_signal, err_name, i, deltaInvMass_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_response, err_name, i, deltaInvMass_reco, deltaInvMass_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.deltaInvMass_mc_reco_bckg, err_name, i, deltaInvMass_reco, 0.0);
+                }
+                //-----------------------------------------------------------------
+                // Delta_pi_theta 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_all, err_name, i, m_delta_pi_theta_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_truth_signal, err_name, i, m_delta_pi_theta_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_signal, err_name, i, m_delta_pi_theta_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_response, err_name, i, m_delta_pi_theta_reco, m_delta_pi_theta_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_theta_mc_reco_bckg, err_name, i, m_delta_pi_theta_reco, 0.0);
+                }
+                //-----------------------------------------------------------------
+                // Delta_pi_phi 
+                //-----------------------------------------------------------------
+                FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_all, err_name, i, m_delta_pi_phi_reco, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_truth_signal, err_name, i, m_delta_pi_phi_true, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_signal, err_name, i, m_delta_pi_phi_reco, 0.0);
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_response, err_name, i, m_delta_pi_phi_reco, m_delta_pi_phi_true, 0.0, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(interaction.Delta_pi_phi_mc_reco_bckg, err_name, i, m_delta_pi_phi_reco, 0.0);
+                }
+            }
         }else{
             // Did NOT passed Cuts!
         }
@@ -1526,6 +1749,14 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_invMass(std::string err
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_signal, err_name, i, pi0_invMass, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_bckg, err_name, i, pi0_invMass, 0.0);
+            }
+            if (isDeltaRichSample()){
+                FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_all, err_name, i, pi0_invMass, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_signal, err_name, i, pi0_invMass, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_bckg, err_name, i, pi0_invMass, 0.0);
+                }
             }
         }else{
             // Did Not passed cuts
@@ -1570,6 +1801,14 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_ProtonEnergy_Birks_invMass()
             }else{
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_bckg, err_name, i, pi0_invMass, 0.0);
             }
+            if (isDeltaRichSample()){
+                FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_all, err_name, i, pi0_invMass, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_signal, err_name, i, pi0_invMass, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_bckg, err_name, i, pi0_invMass, 0.0);
+                }
+            }
         }else{
             // Did Not passed cuts
         }
@@ -1602,6 +1841,15 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_EM_EnergyScale_invMass()
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_signal, err_name, i, pi0_invMass, pi0_invMass_shift);
             }else{
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_bckg, err_name, i, pi0_invMass, pi0_invMass_shift);
+            }
+            
+            if (isDeltaRichSample()){
+                FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_all, err_name, i, pi0_invMass, pi0_invMass_shift);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_signal, err_name, i, pi0_invMass, pi0_invMass_shift);
+                }else{
+                    FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_bckg, err_name, i, pi0_invMass, pi0_invMass_shift);
+                }
             }
         }else{
             // Does not satisfy cuts
@@ -1636,6 +1884,14 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonMomentum_invMass()
             }else{
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_bckg, err_name, i, pi0_invMass, 0.0);
             }
+            if (isDeltaRichSample()){
+                FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_all, err_name, i, pi0_invMass, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_signal, err_name, i, pi0_invMass, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_bckg, err_name, i, pi0_invMass, 0.0);
+                }
+            }
         }else{
             // Does not satisfy cuts
         }
@@ -1662,6 +1918,14 @@ void CCProtonPi0_Analyzer::FillLatErrorBand_MuonTheta_invMass()
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_signal, err_name, i, pi0_invMass, 0.0);
             }else{
                 FillLatErrorBand_SingleUniverse(cutList.invMass_mc_reco_bckg, err_name, i, pi0_invMass, 0.0);
+            }
+            if (isDeltaRichSample()){
+                FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_all, err_name, i, pi0_invMass, 0.0);
+                if (truth_isSignal){
+                    FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_signal, err_name, i, pi0_invMass, 0.0);
+                }else{
+                    FillLatErrorBand_SingleUniverse(cutList.invMass_DeltaRich_mc_reco_bckg, err_name, i, pi0_invMass, 0.0);
+                }
             }
         }else{
             // Not satisfied cuts

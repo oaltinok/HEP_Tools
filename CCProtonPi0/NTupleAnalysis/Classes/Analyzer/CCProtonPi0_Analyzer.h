@@ -24,6 +24,7 @@
 #include <TVector3.h>
 #include <TLorentzVector.h>
 #include <sstream>
+#include <unordered_map>
 
 #include "PlotUtils/MnvNormalization.h"
 #include "PlotUtils/HistogramUtils.h"
@@ -86,6 +87,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         int GetBackgroundTypeInd();
         int GetSignalTypeInd();
         bool IsInvMassInRange(double invMass);
+        bool IsProtonPi0(std::vector<int> hadrons);
         bool IsOpeningAngleSmallAndEnergyLow(double E_g1, double E_g2);
         void FillHistogram(vector<MnvH1D*> &hist, double var);
         void FillHistogram(vector<MnvH2D*> &hist, double var1, double var2);
@@ -262,6 +264,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
 
         void CorrectNTupleVariables();
         void CorrectEMShowerCalibration();
+        void ReviseBackground();
         void CalcEventWeight();
         void AddErrorBands_Data();
         double GetMINOSCorrection();
@@ -303,6 +306,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void Study_QSq();
         void Study_DeltaResonance();
         void Study_NonRES();
+        void Study_Paper();
         double GetDeltaFactor(double QSq, double A, double Q0);
         std::vector<double> GetDeltaFactorWeights();
 
@@ -378,6 +382,8 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double m_WSq_Truth;
         double m_W;
         double m_W_Truth;
+        double deltaInvMass_reco;
+        double deltaInvMass_true;
 
         // Other Variables
         bool fillErrors_ByHand;
@@ -428,6 +434,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void printCounters();
         void writeEventTypeTable();
         void writeEventTypeTableLine(CCProtonPi0_Counter &counter, CCProtonPi0_Counter &base);
+        bool isDeltaRichSample();
         vector<double> PDG_pi0_Mother;
         vector<double> PDG_pi0_GrandMother;
         CCProtonPi0_Counter nSignalOut_Acceptance;
@@ -455,6 +462,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_BckgConstrainer BckgConstrainer;
         CCProtonPi0_QSqFitter QSqFitter;
 
+        double avg_Enu;
+        double avg_Enu_10;
+        double n_data;
+        double n_data_10;
         // Central Value Background Constraints
         double cv_wgt_SinglePiPlus;
         double cv_wgt_QELike;

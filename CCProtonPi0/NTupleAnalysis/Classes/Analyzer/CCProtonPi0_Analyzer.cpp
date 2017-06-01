@@ -8,7 +8,7 @@ using namespace std;
 void CCProtonPi0_Analyzer::specifyRunTime()
 {
     applyMaxEvents = false; 
-    nMaxEvents = 10000;
+    nMaxEvents = 100;
     if(!m_isMC) nMaxEvents = nMaxEvents * POT_ratio;
 
     // Control Flow
@@ -54,6 +54,10 @@ void CCProtonPi0_Analyzer::specifyRunTime()
 
     latest_ScanID = 0.0;
 
+    avg_Enu = 0;
+    avg_Enu_10 = 0;
+    n_data = 0;
+    n_data_10 = 0;
     // Counter Names
     setCounterNames();
 }
@@ -124,9 +128,13 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
             break;
         }
 
+        // Revise NTuple Variables -- These functions save updated versions to reduced.root
+        if (m_isMC && !truth_isSignal) ReviseBackground();
+
         CalcEventWeight();
 
         CorrectEMShowerCalibration();
+
         Calc_EventKinematics();
         if (truth_isSignal) Calc_EventKinematics_Truth();
 
@@ -134,11 +142,13 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         isPassedAllCuts = getCutStatistics();
         if( !isPassedAllCuts ) continue;
 
+
         tree->Fill();
     }
 
     if (!m_isMC){
         AddVertErrorBands_Data(cutList.invMass_all);
+        AddVertErrorBands_Data(cutList.invMass_DeltaRich_all);
         AddVertErrorBands_Data(cutList.hCut_pi0invMass[0]);
         AddVertErrorBands_Data(cutList.SideBand_muon_P[0]);
         AddVertErrorBands_Data(cutList.SideBand_muon_theta[0]);
@@ -150,6 +160,7 @@ void CCProtonPi0_Analyzer::reduce(string playlist)
         AddVertErrorBands_Data(cutList.SideBand_neutrino_E[0]);
 
         AddLatErrorBands_Data(cutList.invMass_all);
+        AddLatErrorBands_Data(cutList.invMass_DeltaRich_all);
         AddLatErrorBands_Data(cutList.hCut_pi0invMass[0]);
         //        AddLatErrorBands_Data(cutList.SideBand_muon_P[0]);
         //        AddLatErrorBands_Data(cutList.SideBand_muon_theta[0]);
@@ -292,10 +303,23 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
         if ( isScanRun && nProtonCandidates > 0 && pi0_KE > 400) {
             writeScanFile(); 
         }
+        counter1.increment(cvweight);
+        if (nProtonCandidates > 0) counter2.increment(cvweight);
+        if (isDeltaRichSample()) counter3.increment(cvweight);
 
+        if (truth_isSignal){
+            n_data++;
+            avg_Enu += m_Enu * MeV_to_GeV;
+            if((m_Enu * MeV_to_GeV) < 10.0){
+                n_data_10++;
+                avg_Enu_10 += m_Enu * MeV_to_GeV;
+            }
+        }
+
+        //Study_Paper();
         //Study_Flux();
         //Study_BckgSubtraction();
-        //Study_W();
+        Study_W();
         //Study_QSq();
         //Study_ProtonSystematics();
         //Study_GENIE_Weights();
@@ -304,6 +328,14 @@ void CCProtonPi0_Analyzer::analyze(string playlist)
     } // end for-loop
 
     if (!m_isMC) AddErrorBands_Data();
+
+    //--------------------------------------------------------------------------
+    // Studies Outside Loop 
+    //--------------------------------------------------------------------------
+    avg_Enu = avg_Enu / n_data;
+    avg_Enu_10 = avg_Enu_10 / n_data_10;
+    std::cout<<"Average Neutrino Energy = "<<avg_Enu<<std::endl;
+    std::cout<<"Average Neutrino Energy less than 10 GeV = "<<avg_Enu_10<<std::endl;
 
     //--------------------------------------------------------------------------
     // Write Text Files
@@ -487,12 +519,7 @@ void CCProtonPi0_Analyzer::fill_XSecVars()
     // Delta(1232) enriched sub-sample 
     if (nProtonCandidates > 0){
         if (m_W > 0 && m_W < 1400){
-            // Proton-Pion Invariant Mass
             fill_deltaInvMass();
-
-            // Polarization Angles
-            GetDelta_pi_angles(false); // Reco Values
-            if (truth_isSignal) GetDelta_pi_angles(true); // Truth Values
             fill_Delta_pi_theta();
             fill_Delta_pi_phi();
         }
@@ -1131,8 +1158,6 @@ void CCProtonPi0_Analyzer::fillInteractionReco()
         FillHistogram(interaction.W_2Track, m_W * MeV_to_GeV);
     }
 
-
-
     // Vertex Energy & Evis 
     FillHistogram(interaction.vertex_energy_All, vertex_blob_energy);
     FillHistogram(interaction.vertex_evis_All, vertex_blob_evis );    
@@ -1515,6 +1540,12 @@ void CCProtonPi0_Analyzer::fill_BackgroundSubtractionHists()
         if (truth_isSignal)  FillHistogramWithVertErrors(cutList.invMass_mc_reco_signal, pi0_invMass);
         else FillHistogramWithVertErrors(cutList.invMass_mc_reco_bckg, pi0_invMass);
 
+        if (isDeltaRichSample()){
+            FillHistogramWithVertErrors(cutList.invMass_DeltaRich_mc_reco_all, pi0_invMass);
+            if (truth_isSignal)  FillHistogramWithVertErrors(cutList.invMass_DeltaRich_mc_reco_signal, pi0_invMass);
+            else FillHistogramWithVertErrors(cutList.invMass_DeltaRich_mc_reco_bckg, pi0_invMass);
+        }
+
         // Fill Lateral Error Bands
         FillLatErrorBand_EM_EnergyScale_invMass();
         FillLatErrorBand_MuonMomentum_invMass();
@@ -1525,6 +1556,7 @@ void CCProtonPi0_Analyzer::fill_BackgroundSubtractionHists()
         FillLatErrorBand_ProtonEnergy_invMass("ProtonEnergy_BetheBloch");
     }else{
         FillHistogram(cutList.invMass_all, pi0_invMass);
+        if (isDeltaRichSample()) FillHistogram(cutList.invMass_DeltaRich_all, pi0_invMass);
     }
 }
 
@@ -1709,23 +1741,19 @@ void CCProtonPi0_Analyzer::fill_pi0_theta()
 
 void CCProtonPi0_Analyzer::fill_deltaInvMass()
 {
-
-    double deltaInvMass_reco = calcDeltaInvariantMass(false) * MeV_to_GeV;
-
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithLeadingErrors(interaction.deltaInvMass_mc_reco_all, deltaInvMass_reco);
+        FillHistogramWithVertErrors(interaction.deltaInvMass_mc_reco_all, deltaInvMass_reco);
         if (truth_isSignal){
-            double deltaInvMass_true = calcDeltaInvariantMass(true) * MeV_to_GeV;
             // MC Truth Signal
-            FillHistogramWithLeadingErrors(interaction.deltaInvMass_mc_truth_signal, deltaInvMass_true);
+            FillHistogramWithVertErrors(interaction.deltaInvMass_mc_truth_signal, deltaInvMass_true);
             // MC Reco Signal
-            FillHistogramWithLeadingErrors(interaction.deltaInvMass_mc_reco_signal, deltaInvMass_reco);
+            FillHistogramWithVertErrors(interaction.deltaInvMass_mc_reco_signal, deltaInvMass_reco);
             // MC Reco vs True -- Response
-            FillHistogramWithLeadingErrors(interaction.deltaInvMass_response, deltaInvMass_reco, deltaInvMass_true);
+            FillHistogramWithVertErrors(interaction.deltaInvMass_response, deltaInvMass_reco, deltaInvMass_true);
         }else{
             // MC Reco Background
-            FillHistogramWithLeadingErrors(interaction.deltaInvMass_mc_reco_bckg, deltaInvMass_reco);
+            FillHistogramWithVertErrors(interaction.deltaInvMass_mc_reco_bckg, deltaInvMass_reco);
         }
     }else{
         // Data
@@ -1737,17 +1765,17 @@ void CCProtonPi0_Analyzer::fill_Delta_pi_theta()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithLeadingErrors(interaction.Delta_pi_theta_mc_reco_all, m_delta_pi_theta_reco);
+        FillHistogramWithVertErrors(interaction.Delta_pi_theta_mc_reco_all, m_delta_pi_theta_reco);
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithLeadingErrors(interaction.Delta_pi_theta_mc_truth_signal, m_delta_pi_theta_true);
+            FillHistogramWithVertErrors(interaction.Delta_pi_theta_mc_truth_signal, m_delta_pi_theta_true);
             // MC Reco Signal
-            FillHistogramWithLeadingErrors(interaction.Delta_pi_theta_mc_reco_signal, m_delta_pi_theta_reco);
+            FillHistogramWithVertErrors(interaction.Delta_pi_theta_mc_reco_signal, m_delta_pi_theta_reco);
             // MC Reco vs True -- Response
-            FillHistogramWithLeadingErrors(interaction.Delta_pi_theta_response, m_delta_pi_theta_reco, m_delta_pi_theta_true);
+            FillHistogramWithVertErrors(interaction.Delta_pi_theta_response, m_delta_pi_theta_reco, m_delta_pi_theta_true);
         }else{
             // MC Reco Background
-            FillHistogramWithLeadingErrors(interaction.Delta_pi_theta_mc_reco_bckg, m_delta_pi_theta_reco);
+            FillHistogramWithVertErrors(interaction.Delta_pi_theta_mc_reco_bckg, m_delta_pi_theta_reco);
         }
     }else{
         // Data
@@ -1759,17 +1787,17 @@ void CCProtonPi0_Analyzer::fill_Delta_pi_phi()
 {
     if (m_isMC){
         // MC Reco All
-        FillHistogramWithLeadingErrors(interaction.Delta_pi_phi_mc_reco_all, m_delta_pi_phi_reco);
+        FillHistogramWithVertErrors(interaction.Delta_pi_phi_mc_reco_all, m_delta_pi_phi_reco);
         if (truth_isSignal){
             // MC Truth Signal
-            FillHistogramWithLeadingErrors(interaction.Delta_pi_phi_mc_truth_signal, m_delta_pi_phi_true);
+            FillHistogramWithVertErrors(interaction.Delta_pi_phi_mc_truth_signal, m_delta_pi_phi_true);
             // MC Reco Signal
-            FillHistogramWithLeadingErrors(interaction.Delta_pi_phi_mc_reco_signal, m_delta_pi_phi_reco);
+            FillHistogramWithVertErrors(interaction.Delta_pi_phi_mc_reco_signal, m_delta_pi_phi_reco);
             // MC Reco vs True -- Response
-            FillHistogramWithLeadingErrors(interaction.Delta_pi_phi_response, m_delta_pi_phi_reco, m_delta_pi_phi_true);
+            FillHistogramWithVertErrors(interaction.Delta_pi_phi_response, m_delta_pi_phi_reco, m_delta_pi_phi_true);
         }else{
             // MC Reco Background 
-            FillHistogramWithLeadingErrors(interaction.Delta_pi_phi_mc_reco_bckg, m_delta_pi_phi_reco);
+            FillHistogramWithVertErrors(interaction.Delta_pi_phi_mc_reco_bckg, m_delta_pi_phi_reco);
         }
     }else{
         // Data
@@ -2217,7 +2245,11 @@ void CCProtonPi0_Analyzer::Calc_EventKinematics()
     m_QSq = Calc_QSq(m_Enu, muon_E, muon_P, reco_muon_theta);
     m_WSq = Calc_WSq(m_Enu, m_QSq, muon_E);
     m_W = m_WSq > 0 ? sqrt(m_WSq) : -1.0;
-
+    
+    if (isDeltaRichSample()){
+        deltaInvMass_reco = calcDeltaInvariantMass(false) * MeV_to_GeV;
+        GetDelta_pi_angles(false); // Reco Values
+    }
 }
 
 void CCProtonPi0_Analyzer::Calc_EventKinematics_Truth()
@@ -2226,6 +2258,11 @@ void CCProtonPi0_Analyzer::Calc_EventKinematics_Truth()
     m_QSq_Truth = truth_QSq_exp;
     m_WSq_Truth = truth_WSq_exp;
     m_W_Truth = truth_W_exp > 0.0 ? truth_W_exp : -1.0;
+
+    if (isDeltaRichSample()){
+        deltaInvMass_true = calcDeltaInvariantMass(true) * MeV_to_GeV;
+        GetDelta_pi_angles(true);  // True Values
+    }
 }
 
 void CCProtonPi0_Analyzer::FillBackgroundCharacteristics()
@@ -2797,9 +2834,9 @@ void CCProtonPi0_Analyzer::Study_ProtonSystematics()
 void CCProtonPi0_Analyzer::setCounterNames()
 {
     // Single Use Counters 
-    counter1.setName("N(Shower)");
-    counter2.setName("N(ShowerOut)");
-    counter3.setName("N/A");
+    counter1.setName("N(All)");
+    counter2.setName("N(With Proton)");
+    counter3.setName("N(DeltaRich)");
     counter4.setName("N/A");
 
     n2p2h.setName("N(2p2h)");
@@ -3164,6 +3201,114 @@ void CCProtonPi0_Analyzer::Study_Flux()
     FillHistogram(interaction.Enu_flux_wgt, Enu, cvweight_Flux);
     FillHistogram(interaction.Enu_cvweight, Enu, cvweight);
 }
+
+void CCProtonPi0_Analyzer::Study_Paper()
+{
+
+}
+
+bool CCProtonPi0_Analyzer::IsProtonPi0(std::vector<int> hadrons)
+{
+    int nPi0 = 0;
+    int nProton = 0;
+    int nOther = 0;
+    for (unsigned int i = 0; i < hadrons.size(); ++i){
+        //std::cout<<hadrons[i]<<std::endl;
+        if (hadrons[i] == 111) nPi0++;
+        else if (hadrons[i] == 2212) nProton++;
+        else nOther++;
+    }
+
+    if (nPi0 == 1 && nProton == 1) return true;
+    else return false;
+}
+
+void CCProtonPi0_Analyzer::ReviseBackground()
+{
+
+    bool isDebug = false;
+
+    // Make All False
+    bool WithPi0 = false;
+    bool QELike = false;
+    bool ChargedMeson = false;
+    bool Other = false;
+    
+    // -------------------------------------------------------------------------
+    // Count Final State Particles 
+    // -------------------------------------------------------------------------
+    int nAntiMuon = 0;
+    int nPiZero = 0;
+    int nNucleon = 0;
+    int nChargedMeson = 0;
+    int nOther = 0;
+
+    if(isDebug) std::cout<<ev_run<<" "<<ev_subrun<<" "<<ev_gate<<std::endl;
+
+    for (int i = 0; i < mc_er_nPart; ++i){
+
+        // Check only Stable Final State Particles
+        if (mc_er_status[i] != 1) continue;
+
+        int PDG = mc_er_ID[i];
+
+        if (isDebug){
+            std::cout<<PDG<<" ";
+        }
+
+        if (std::abs(PDG) == 13 || PDG > 10000) continue;
+
+        if (PDG == 2212 || PDG == 2112) nNucleon++;
+        else if (PDG == 111) nPiZero++;
+        else if (std::abs(PDG) == 211 || std::abs(PDG) == 311) nChargedMeson++;
+        else nOther++;
+    }
+
+    if (isDebug) std::cout<<std::endl;
+
+    // -------------------------------------------------------------------------
+    // Background Types 
+    // -------------------------------------------------------------------------
+    if (truth_isSignalOut_Acceptance) Other = true;
+    else if (nAntiMuon > 0) Other = true;
+    else if (nPiZero > 0 || truth_isSignalOut_Kinematics) WithPi0 = true;
+    else if (nNucleon > 0 && nChargedMeson == 0 && nOther == 0) QELike = true;
+    else if (nChargedMeson > 0) ChargedMeson = true;
+    else Other = true;
+
+    if (isDebug){
+        if (truth_isBckg_Compact_WithPi0 && !WithPi0){
+            std::cout<<"Printing Event Record"<<std::endl;
+            for (int i = 0; i < mc_er_nPart; ++i){
+                std::cout<<"\t"<<mc_er_status[i]<<"\t"<<mc_er_ID[i]<<std::endl;
+            }
+            std::cout<<"Printing Detector Trajectory"<<std::endl;
+            std::cout<<"ID\tStatus\tPDG\tMother"<<std::endl;
+            for (int i = 0; i < detmc_traj_id_sz; ++i){
+                std::cout<<detmc_traj_id[i]<<"\t";
+                std::cout<<detmc_traj_status[i]<<"\t";
+                std::cout<<detmc_traj_pdg[i]<<"\t";
+                std::cout<<detmc_traj_mother[i]<<std::endl;
+            }
+        }
+        std::cout<<"\tWithPi0 = "<<truth_isBckg_Compact_WithPi0<<" "<<WithPi0<<std::endl;
+        std::cout<<"\tQELike = "<<truth_isBckg_Compact_QELike<<" "<<QELike<<std::endl;
+        std::cout<<"\tChargedMeson = "<<truth_isBckg_Compact_SinglePiPlus<<" "<<ChargedMeson<<std::endl;
+        std::cout<<"\tOther = "<<truth_isBckg_Compact_Other<<" "<<Other<<std::endl;
+    }
+
+    truth_isBckg_Compact_WithPi0 = WithPi0;
+    truth_isBckg_Compact_QELike = QELike;
+    truth_isBckg_Compact_SinglePiPlus = ChargedMeson;
+    truth_isBckg_Compact_Other = Other;
+
+}
+
+bool CCProtonPi0_Analyzer::isDeltaRichSample()
+{
+    return (nProtonCandidates > 0) && (m_W > 0 && m_W < 1400);
+}
+
 
 #endif //CCProtonPi0_Analyzer_cpp
 

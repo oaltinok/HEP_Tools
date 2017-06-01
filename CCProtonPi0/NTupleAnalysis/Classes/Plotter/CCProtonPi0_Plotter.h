@@ -20,28 +20,30 @@ Author:        Ozgur Altinok  - ozgur.altinok@tufts.edu
 #define CCProtonPi0_Plotter_H
 #include <numeric>
 
+#include "Cintex/Cintex.h"
+#include <MinervaUnfold/MnvUnfold.h>
+#include <PlotUtils/MnvFluxConstraint.h>
+#include <PlotUtils/MnvPlotter.h>
+#include <PlotUtils/POTCounter.h>
+#include <PlotUtils/TargetUtils.h>
+#include <TArrow.h>
+#include <TAxis.h>
 #include <TCanvas.h>
+#include <TColor.h>
 #include <TF1.h>
 #include <TFile.h>
 #include <TGraph.h>
 #include <THStack.h>
 #include <TLatex.h>
 #include <TLegend.h>
-#include <TColor.h>
 #include <TLine.h>
-#include <TArrow.h>
 #include <TPad.h>
+#include <TMatrixD.h>
 #include <TPaveStats.h>
 #include <TPaveText.h>
 #include <TStyle.h>
 #include <TVectorD.h>
 #include <TVirtualFitter.h>
-#include <PlotUtils/MnvPlotter.h>
-#include <PlotUtils/MnvFluxConstraint.h>
-#include <PlotUtils/POTCounter.h>
-#include <PlotUtils/TargetUtils.h>
-#include <MinervaUnfold/MnvUnfold.h>
-#include "Cintex/Cintex.h"
 
 #include "../NTupleAnalysis/CCProtonPi0_NTupleAnalysis.h"
 #include "../BinList/CCProtonPi0_BinList.h"
@@ -112,6 +114,9 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         bool plot_QSq;
         bool plot_W;
         bool plot_Enu;
+        bool plot_deltaInvMass;
+        bool plot_Delta_pi_theta;
+        bool plot_Delta_pi_phi;
 
         void PlotXSecVar(std::string var_name, std::string data_var, std::string mc_var, std::string plotDir, std::string plotName);
         void PlotXSecVar_WithMiniBoone(std::string var_name, std::string plotDir);
@@ -132,6 +137,60 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void plotCrossSection_Check(std::string var_name, std::string plotDir);
         void CheckAllUniverses(std::string test_name, MnvH1D* data, MnvH1D* mc);
         void CompareUniversesBinByBin(const std::vector<TH1D*> data_hists, const std::vector<TH1D*> mc_hists, std::string err_name, std::string test_name);
+
+        // Paper Specific Plots
+        void DrawPaper_vertex_energy(bool is1Track);
+        void DrawPaper_extra_total_energy(bool is1Track);
+        void DrawPaper_Enu(bool is1Track);
+
+        void DrawPaper_InvMass_DataMC();
+        void DrawPaper_InvMass_SignalMC();
+        
+        void DrawPaper_Error_muon_P();
+        void DrawPaper_Error_pi0_KE();
+
+        void DrawPaper_xsec_muon_P();
+        void DrawPaper_xsec_muon_theta();
+        void DrawPaper_xsec_pi0_KE();
+        void DrawPaper_xsec_pi0_theta();
+        void DrawPaper_xsec_QSq();
+        void DrawPaper_xsec_Enu();
+        void DrawPaper_xsec_W();
+        
+        void DrawPaper_xsec_muon_P_BeforeFSI();
+        void DrawPaper_xsec_muon_theta_BeforeFSI();
+        void DrawPaper_xsec_pi0_KE_BeforeFSI();
+        void DrawPaper_xsec_pi0_theta_BeforeFSI();
+        void DrawPaper_xsec_QSq_BeforeFSI();
+        void DrawPaper_xsec_Enu_BeforeFSI();
+        void DrawPaper_xsec_deltaInvMass_BeforeFSI();
+
+        void DrawPaper_xsec_muon_P_FSIType();
+        void DrawPaper_xsec_muon_theta_FSIType();
+        void DrawPaper_xsec_pi0_KE_FSIType();
+        void DrawPaper_xsec_pi0_theta_FSIType();
+        void DrawPaper_xsec_QSq_FSIType();
+        void DrawPaper_xsec_Enu_FSIType();
+
+        void DrawPaper_xsec_muon_P_IntType();
+        void DrawPaper_xsec_muon_theta_IntType();
+        void DrawPaper_xsec_pi0_KE_IntType();
+        void DrawPaper_xsec_pi0_theta_IntType();
+        void DrawPaper_xsec_QSq_IntType();
+        void DrawPaper_xsec_W_IntType();
+        void DrawPaper_xsec_Enu_IntType();
+        void DrawPaper_xsec_deltaInvMass_IntType();
+        void DrawPaper_xsec_Delta_pi_theta_IntType();
+        void DrawPaper_xsec_Delta_pi_phi_IntType();
+        
+        void Supplement_Tables();
+        void Supplement_XSec();
+        void Supplement_Errors();
+        void Supplement_Flux();
+        void Supplement_Correlation();
+        void Supplement_XSec(std::string var_name, std::ofstream& file, std::string bin_format);
+        void Supplement_Errors(std::string var_name, std::ofstream& file, std::string bin_format);
+        void Supplement_Correlation(std::string var_name, std::ofstream& file, std::string bin_format, std::string bin_name);
 
         // Data vs MC
         void plotInteraction_DataMC();
@@ -276,6 +335,7 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawDataMC(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC_Thesis(rootDir& dir, std::string var_name, std::string plotDir);
         void DrawDataMC_Thesis(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec = false);
+        void DrawDataMC_WithBackground(std::string var_name, std::string plotDir);
         void DrawDataMC(MnvH1D* data, MnvH1D* mc, std::string var_name, std::string plotDir, bool isXSec = false);
         void DrawDataMC_Signal(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);
         void DrawDataMC_Unfolded(rootDir& dir, std::string var_name, std::string plotDir, double nBckg);

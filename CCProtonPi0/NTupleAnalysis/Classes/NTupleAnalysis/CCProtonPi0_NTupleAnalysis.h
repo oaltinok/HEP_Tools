@@ -139,6 +139,7 @@ class CCProtonPi0_NTupleAnalysis
         void printBins(const TH1* hist, const std::string var_name, bool useLowEdge = false);
         void printBins(const TH2* hist, const std::string var_name);
         void RunTimeError(std::string message);
+        double Average_1DHist(const TH1* hist);
 
         // Returns a "new" MnvH1D or MnvH2D 
         MnvH1D* GetMnvH1D(TFile* f, std::string var_name);

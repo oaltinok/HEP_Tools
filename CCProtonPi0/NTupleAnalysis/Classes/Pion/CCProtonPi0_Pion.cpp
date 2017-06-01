@@ -87,7 +87,7 @@ void CCProtonPi0_Pion::initHistograms()
         // Other
         temp = new MnvH1D( Form("%s_%d","photonEnergy_Asymmetry",i),"Photon Energy Asymmetry",bin_photonEnergy_Asymmetry.get_nBins(), bin_photonEnergy_Asymmetry.get_min(), bin_photonEnergy_Asymmetry.get_max());
         temp->GetXaxis()->SetTitle("Photon Energy Asymmetry - E_{#gamma_{1}}/E_{$gamma_{2}}");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         photonEnergy_Asymmetry.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","invMass",i),"Reconstructed Pi0 Invariant Mass",bin_invMass.get_nBins(), bin_invMass.get_min(), bin_invMass.get_max() );
@@ -97,28 +97,28 @@ void CCProtonPi0_Pion::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","cos_openingAngle",i),"Cosine Opening Angle",40,-1.0,1.0);
         temp->GetXaxis()->SetTitle("cos(#theta_{#gamma#gamma})");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         cos_openingAngle.push_back(temp);
 
         // Standard Histograms 
         temp = new MnvH1D( Form("%s_%d","E",i),"Reconstructed Pion Energy",binList.size_pi0_P, binList.a_pi0_P);
         temp->GetXaxis()->SetTitle("Reconstructed E_{#pi^{0}} [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         E.push_back(temp);
         
         temp = new MnvH1D( Form("%s_%d","P",i),"Reconstructed Pion Momentum",binList.size_pi0_P, binList.a_pi0_P);
         temp->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         P.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","KE",i),"Reconstructed Pion Kinetic Energy",binList.size_pi0_KE, binList.a_pi0_KE);
         temp->GetXaxis()->SetTitle("Reconstructed T_{#pi^{0}} [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         KE.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","theta",i),"Reconstructed Pion Theta", binList.size_pi0_theta, binList.a_pi0_theta);
         temp->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         theta.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","phi",i),"Reconstructed Pion Phi",binList.angle.get_nBins(), binList.angle.get_min(), binList.angle.get_max() );
@@ -133,117 +133,117 @@ void CCProtonPi0_Pion::initHistograms()
 
     // Cross Section Variables
     pi0_P_all = new MnvH1D( "pi0_P_all","Data All P_{#pi^{0}}",binList.size_pi0_P, binList.a_pi0_P);
-    pi0_P_all->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    pi0_P_all->GetYaxis()->SetTitle("N(Events)");
+    pi0_P_all->GetXaxis()->SetTitle("Pion Momentum (GeV/c)");
+    pi0_P_all->GetYaxis()->SetTitle("Events/Bin");
 
     pi0_P_mc_reco_all = new MnvH1D( "pi0_P_mc_reco_all","MC Reco All P_{#pi^{0}}",binList.size_pi0_P, binList.a_pi0_P);
-    pi0_P_mc_reco_all->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    pi0_P_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    pi0_P_mc_reco_all->GetXaxis()->SetTitle("Pion Momentum (GeV/c)");
+    pi0_P_mc_reco_all->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_P_mc_reco_all);
     AddLatErrorBands_MC(pi0_P_mc_reco_all);
     
     pi0_P_mc_truth_signal = new MnvH1D( "pi0_P_mc_truth_signal","MC Truth Signal P_{#pi^{0}}",binList.size_pi0_P, binList.a_pi0_P);
-    pi0_P_mc_truth_signal->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    pi0_P_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
+    pi0_P_mc_truth_signal->GetXaxis()->SetTitle("Pion Momentum (GeV/c)");
+    pi0_P_mc_truth_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_P_mc_truth_signal);
     AddLatErrorBands_MC(pi0_P_mc_truth_signal);
 
     pi0_P_mc_reco_signal = new MnvH1D( "pi0_P_mc_reco_signal","MC Reconstructed Signal P_{#pi^{0}}",binList.size_pi0_P, binList.a_pi0_P);
-    pi0_P_mc_reco_signal->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    pi0_P_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    pi0_P_mc_reco_signal->GetXaxis()->SetTitle("Pion Momentum (GeV/c)");
+    pi0_P_mc_reco_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_P_mc_reco_signal);
     AddLatErrorBands_MC(pi0_P_mc_reco_signal);
 
     pi0_P_mc_reco_bckg = new MnvH1D( "pi0_P_mc_reco_bckg","MC Reconstructed Background P_{#pi^{0}}",binList.size_pi0_P, binList.a_pi0_P);
-    pi0_P_mc_reco_bckg->GetXaxis()->SetTitle("P_{#pi^{0}} [GeV]");
-    pi0_P_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    pi0_P_mc_reco_bckg->GetXaxis()->SetTitle("Pion Momentum (GeV/c)");
+    pi0_P_mc_reco_bckg->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_P_mc_reco_bckg);
     AddLatErrorBands_MC(pi0_P_mc_reco_bckg);
 
     pi0_P_response = new MnvH2D( "pi0_P_response","Momentum for Signal Events",binList.size_pi0_P, binList.a_pi0_P,binList.size_pi0_P, binList.a_pi0_P);
-    pi0_P_response->GetXaxis()->SetTitle("Reconstructed P_{#pi^{0}} [GeV]");
-    pi0_P_response->GetYaxis()->SetTitle("True P_{#pi^{0}} [GeV]");
+    pi0_P_response->GetXaxis()->SetTitle("Reconstructed Pion Momentum (GeV/c)");
+    pi0_P_response->GetYaxis()->SetTitle("True Pion Momentum (GeV/c)");
     AddVertErrorBands_MC(pi0_P_response);
     AddLatErrorBands_MC(pi0_P_response);
 
     //Pi0 Kinetic Energy
     pi0_KE_all = new MnvH1D( "pi0_KE_all","Data All T_{#pi^{0}}", binList.size_pi0_KE, binList.a_pi0_KE);
-    pi0_KE_all->GetXaxis()->SetTitle("T_{#pi^{0}} [GeV]");
-    pi0_KE_all->GetYaxis()->SetTitle("N(Events)");
+    pi0_KE_all->GetXaxis()->SetTitle("Pion Kinetic Energy (GeV)");
+    pi0_KE_all->GetYaxis()->SetTitle("Events/Bin");
 
     pi0_KE_mc_reco_all = new MnvH1D( "pi0_KE_mc_reco_all","MC Reco All T_{#pi^{0}}", binList.size_pi0_KE, binList.a_pi0_KE);
-    pi0_KE_mc_reco_all->GetXaxis()->SetTitle("T_{#pi^{0}} [GeV]");
-    pi0_KE_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    pi0_KE_mc_reco_all->GetXaxis()->SetTitle("Pion Kinetic Energy (GeV)");
+    pi0_KE_mc_reco_all->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_KE_mc_reco_all);
     AddLatErrorBands_MC(pi0_KE_mc_reco_all);
     
     pi0_KE_mc_truth_signal = new MnvH1D( "pi0_KE_mc_truth_signal","MC Truth Signal T_{#pi^{0}}", binList.size_pi0_KE, binList.a_pi0_KE);
-    pi0_KE_mc_truth_signal->GetXaxis()->SetTitle("T_{#pi^{0}} [GeV]");
-    pi0_KE_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
+    pi0_KE_mc_truth_signal->GetXaxis()->SetTitle("Pion Kinetic Energy (GeV)");
+    pi0_KE_mc_truth_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_KE_mc_truth_signal);
     AddLatErrorBands_MC(pi0_KE_mc_truth_signal);
 
     pi0_KE_mc_reco_signal = new MnvH1D( "pi0_KE_mc_reco_signal","MC Reconstructed Signal T_{#pi^{0}}", binList.size_pi0_KE, binList.a_pi0_KE);
-    pi0_KE_mc_reco_signal->GetXaxis()->SetTitle("T_{#pi^{0}} [GeV]");
-    pi0_KE_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    pi0_KE_mc_reco_signal->GetXaxis()->SetTitle("Pion Kinetic Energy (GeV)");
+    pi0_KE_mc_reco_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_KE_mc_reco_signal);
     AddLatErrorBands_MC(pi0_KE_mc_reco_signal);
 
     pi0_KE_mc_reco_bckg = new MnvH1D( "pi0_KE_mc_reco_bckg","MC Reconstructed Background T_{#pi^{0}}", binList.size_pi0_KE, binList.a_pi0_KE);
-    pi0_KE_mc_reco_bckg->GetXaxis()->SetTitle("T_{#pi^{0}} [GeV]");
-    pi0_KE_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    pi0_KE_mc_reco_bckg->GetXaxis()->SetTitle("Pion Kinetic Energy (GeV)");
+    pi0_KE_mc_reco_bckg->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_KE_mc_reco_bckg);
     AddLatErrorBands_MC(pi0_KE_mc_reco_bckg);
 
     pi0_KE_response = new MnvH2D( "pi0_KE_response","Kinetic Energy for Signal Events", binList.size_pi0_KE, binList.a_pi0_KE,  binList.size_pi0_KE, binList.a_pi0_KE);
-    pi0_KE_response->GetXaxis()->SetTitle("Reconstructed T_{#pi^{0}} [GeV]");
-    pi0_KE_response->GetYaxis()->SetTitle("True T_{#pi^{0}} [GeV]");
+    pi0_KE_response->GetXaxis()->SetTitle("Reconstructed Pion Kinetic Energy (GeV)");
+    pi0_KE_response->GetYaxis()->SetTitle("True Pion Kinetic Energy (GeV)");
     AddVertErrorBands_MC(pi0_KE_response);
     AddLatErrorBands_MC(pi0_KE_response);
 
     //Pi0 Theta 
     pi0_theta_all = new MnvH1D( "pi0_theta_all","Data All #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_all->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
-    pi0_theta_all->GetYaxis()->SetTitle("N(Events)");
+    pi0_theta_all->GetXaxis()->SetTitle("Pion Angle (deg)");
+    pi0_theta_all->GetYaxis()->SetTitle("Events/Bin");
 
     pi0_theta_mc_reco_all = new MnvH1D( "pi0_theta_mc_reco_all","MC Reco All #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_mc_reco_all->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
-    pi0_theta_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    pi0_theta_mc_reco_all->GetXaxis()->SetTitle("Pion Angle (deg)");
+    pi0_theta_mc_reco_all->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_theta_mc_reco_all);
     AddLatErrorBands_MC(pi0_theta_mc_reco_all);
     
     pi0_theta_mc_truth_signal = new MnvH1D( "pi0_theta_mc_truth_signal","MC Truth Signal #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_mc_truth_signal->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
-    pi0_theta_mc_truth_signal->GetYaxis()->SetTitle("N(Events)");
+    pi0_theta_mc_truth_signal->GetXaxis()->SetTitle("Pion Angle (deg)");
+    pi0_theta_mc_truth_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_theta_mc_truth_signal);
     AddLatErrorBands_MC(pi0_theta_mc_truth_signal);
 
     pi0_theta_mc_reco_signal = new MnvH1D( "pi0_theta_mc_reco_signal","MC Reconstructed Signal #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_mc_reco_signal->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
-    pi0_theta_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    pi0_theta_mc_reco_signal->GetXaxis()->SetTitle("Pion Angle (deg)");
+    pi0_theta_mc_reco_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_theta_mc_reco_signal);
     AddLatErrorBands_MC(pi0_theta_mc_reco_signal);
 
     pi0_theta_mc_reco_bckg = new MnvH1D( "pi0_theta_mc_reco_bckg","MC Reconstructed Background #theta_{#pi^{0}}", binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_mc_reco_bckg->GetXaxis()->SetTitle("#theta_{#pi^{0}} [degree]");
-    pi0_theta_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    pi0_theta_mc_reco_bckg->GetXaxis()->SetTitle("Pion Angle (deg)");
+    pi0_theta_mc_reco_bckg->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(pi0_theta_mc_reco_bckg);
     AddLatErrorBands_MC(pi0_theta_mc_reco_bckg);
 
     pi0_theta_response = new MnvH2D( "pi0_theta_response","Theta for Signal Events", binList.size_pi0_theta, binList.a_pi0_theta, binList.size_pi0_theta, binList.a_pi0_theta);
-    pi0_theta_response->GetXaxis()->SetTitle("Reconstructed #theta_{#pi^{0}} [degree]");
-    pi0_theta_response->GetYaxis()->SetTitle("True #theta_{#pi^{0}} [degree]");
+    pi0_theta_response->GetXaxis()->SetTitle("Reconstructed Pion Angle (deg)");
+    pi0_theta_response->GetYaxis()->SetTitle("True Pion Angle (deg)");
     AddVertErrorBands_MC(pi0_theta_response);
     AddLatErrorBands_MC(pi0_theta_response);
 
     // Truth Energy - Gamma 1
     gamma1_true_E = new TH1D( "gamma1_true_E","Leading Photon True Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
     gamma1_true_E->GetXaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
-    gamma1_true_E->GetYaxis()->SetTitle("N(Events)");
+    gamma1_true_E->GetYaxis()->SetTitle("Events/Bin");
  
     gamma1_reco_error_E = new TH1D( "gamma1_reco_error_E","Error on Reconstructed Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     gamma1_reco_error_E->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
-    gamma1_reco_error_E->GetYaxis()->SetTitle("N(Events)");
+    gamma1_reco_error_E->GetYaxis()->SetTitle("Events/Bin");
  
     gamma1_reco_E_true_E = new TH2D( "gamma1_reco_E_true_E","Leading Photon True vs Reconstructed Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
     gamma1_reco_E_true_E->GetXaxis()->SetTitle("Reco E_{#gamma_{1}} [GeV]");
@@ -256,11 +256,11 @@ void CCProtonPi0_Pion::initHistograms()
     // Truth Energy - Gamma 2
     gamma2_true_E = new TH1D( "gamma2_true_E","Secondary Photon True Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
     gamma2_true_E->GetXaxis()->SetTitle("True E_{#gamma_{1}} [GeV]");
-    gamma2_true_E->GetYaxis()->SetTitle("N(Events)");
+    gamma2_true_E->GetYaxis()->SetTitle("Events/Bin");
  
     gamma2_reco_error_E = new TH1D( "gamma2_reco_error_E","Error on Reconstructed Energy",binList.error.get_nBins(), binList.error.get_min(), binList.error.get_max() );
     gamma2_reco_error_E->GetXaxis()->SetTitle("(E_{Reco}-E_{True})/E_{True}");
-    gamma2_reco_error_E->GetYaxis()->SetTitle("N(Events)");
+    gamma2_reco_error_E->GetYaxis()->SetTitle("Events/Bin");
  
     gamma2_reco_E_true_E = new TH2D( "gamma2_reco_E_true_E","Secondary Photon True vs Reconstructed Energy",bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max(),bin_photonP.get_nBins(), bin_photonP.get_min(), bin_photonP.get_max());
     gamma2_reco_E_true_E->GetXaxis()->SetTitle("Reco E_{#gamma_{1}} [GeV]");
@@ -344,11 +344,11 @@ void CCProtonPi0_Pion::initHistograms()
 
     KE_true = new TH1D( "KE_true","#pi^{0} True Kinetic Energy",binList.size_pi0_KE, binList.a_pi0_KE);
     KE_true->GetXaxis()->SetTitle("KE_{True} [GeV]");
-    KE_true->GetYaxis()->SetTitle("N(Events)");
+    KE_true->GetYaxis()->SetTitle("Events/Bin");
 
     KE_reco = new TH1D( "KE_reco","#pi^{0} Reconstructed Kinetic Energy",binList.size_pi0_KE, binList.a_pi0_KE);
     KE_reco->GetXaxis()->SetTitle("KE_{Reco} [GeV]");
-    KE_reco->GetYaxis()->SetTitle("N(Events)");
+    KE_reco->GetYaxis()->SetTitle("Events/Bin");
 
     KE_Diff = new TH1D( "KE_Diff","Difference on #pi^{0} Kinetic Energy",bin_KE_Diff.get_nBins(), bin_KE_Diff.get_min(), bin_KE_Diff.get_max() );
     KE_Diff->GetXaxis()->SetTitle("KE_{Reco}-KE_{True} [GeV]");

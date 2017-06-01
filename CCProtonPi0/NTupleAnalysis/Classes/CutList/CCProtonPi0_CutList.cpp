@@ -58,52 +58,52 @@ void CCProtonPi0_CutList::initHistograms()
         // --------------------------------------------------------------------
         temp = new MnvH1D( Form("%s_%d","hCut_nVertices",i),"N(Vertices)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Vertex)");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_nVertices.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_nTracks",i),"N(Tracks)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Tracks)");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_nTracks.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_nTracks2",i),"N(Tracks_Close) + N(Tracks_Far)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Tracks_Close) + N(Tracks_Far) - should be same with nTracks");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_nTracks2.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Close",i),"N(Close Tracks)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Tracks_Close)");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_nTracks_Close.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Far",i),"N(Far Tracks)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Tracks_Far)");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_nTracks_Far.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_nTracks_Discarded",i),"N(Tracks Discarded)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Tracks_Discarded)");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_nTracks_Discarded.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_Michel",i),"Michel Electrons",binList.true_false.get_nBins(), binList.true_false.get_min(), binList.true_false.get_max() );
         temp->GetXaxis()->SetTitle("0 = No Michel, 1 = Michel");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_Michel.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_nProtonCandidates",i),"N(Proton Candidates)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Proton Candidates)");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_nProtonCandidates.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_nShowerCandidates",i),"N(Shower Candidates)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Shower Candidates)");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_nShowerCandidates.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d","hCut_pi0invMass",i),"Reconstructed Pi0 Invariant Mass All",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
-        temp->GetXaxis()->SetTitle("Reconstructed Pi0 Invariant Mass [MeV]");
-        temp->GetYaxis()->SetTitle(Form("Candidates / %3.2f [MeV]",binList.pi0_invMass.get_width()));
+        temp = new MnvH1D( Form("%s_%d","hCut_pi0invMass",i),"Pi0 InvMass",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
+        temp->GetXaxis()->SetTitle("M_{#gamma#gamma} (MeV)");
+        temp->GetYaxis()->SetTitle("Events/ (10 MeV)");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
             AddLatErrorBands_MC(temp);
@@ -112,7 +112,7 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","hCut_W",i),"Hadronic Invariant Mass W", 30, 0.0, 3.0);
         temp->GetXaxis()->SetTitle("W [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_W.push_back(temp);
 
         // --------------------------------------------------------------------
@@ -120,7 +120,7 @@ void CCProtonPi0_CutList::initHistograms()
         // --------------------------------------------------------------------
         temp = new MnvH1D( Form("%s_%d","hCut_1Track_nShowerCandidates",i),"N(Shower Candidates)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Shower Candidates)");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_1Track_nShowerCandidates.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_1Track_eVis_nuclearTarget",i),"Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
@@ -155,7 +155,7 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","hCut_1Track_W",i),"Hadronic Invariant Mass W", 30, 0.0, 3.0);
         temp->GetXaxis()->SetTitle("W [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_1Track_W.push_back(temp);
 
         // --------------------------------------------------------------------
@@ -163,7 +163,7 @@ void CCProtonPi0_CutList::initHistograms()
         // --------------------------------------------------------------------
         temp = new MnvH1D( Form("%s_%d","hCut_2Track_nShowerCandidates",i),"N(Shower Candidates)",binList.multiplicity.get_nBins(), binList.multiplicity.get_min(), binList.multiplicity.get_max() );
         temp->GetXaxis()->SetTitle("N(Shower Candidates)");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_2Track_nShowerCandidates.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","hCut_2Track_eVis_nuclearTarget",i),"Visible Energy in Nuclear Target",binList.eVis_nuclearTarget.get_nBins(), binList.eVis_nuclearTarget.get_min(), binList.eVis_nuclearTarget.get_max() );
@@ -208,7 +208,7 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","hCut_2Track_W",i),"Hadronic Invariant Mass W", 30, 0.0, 3.0);
         temp->GetXaxis()->SetTitle("W [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         hCut_2Track_W.push_back(temp);
 
         // --------------------------------------------------------------------
@@ -216,7 +216,7 @@ void CCProtonPi0_CutList::initHistograms()
         // --------------------------------------------------------------------
         temp = new MnvH1D( Form("%s_%d","SideBand_muon_P",i),"Muon Momentum",binList.size_muon_P, binList.a_muon_P);
         temp->GetXaxis()->SetTitle("Muon Momentum [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
         }
@@ -224,7 +224,7 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","SideBand_muon_theta",i),"Muon Theta",binList.size_muon_theta, binList.a_muon_theta);
         temp->GetXaxis()->SetTitle("Muon Theta [degree]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
         }
@@ -232,7 +232,7 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","SideBand_pi0_P",i),"#pi^{0} Momentum",binList.size_pi0_P, binList.a_pi0_P);
         temp->GetXaxis()->SetTitle("#pi^{0} Momentum [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
         }
@@ -240,7 +240,7 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","SideBand_pi0_KE",i),"#pi^{0} Kinetic Energy",binList.size_pi0_KE, binList.a_pi0_KE);
         temp->GetXaxis()->SetTitle("#pi^{0} Kinetic Energy [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
         }
@@ -248,7 +248,7 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","SideBand_pi0_theta",i),"#pi^{0} Theta",binList.size_pi0_theta, binList.a_pi0_theta);
         temp->GetXaxis()->SetTitle("#pi^{0} Theta [degree]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
         }
@@ -256,7 +256,7 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","SideBand_neutrino_E",i),"Neutrino Energy",binList.size_Enu, binList.a_Enu);
         temp->GetXaxis()->SetTitle("Neutrino Energy [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
         }
@@ -264,7 +264,7 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","SideBand_QSq",i),"Q^{2}",binList.size_QSq, binList.a_QSq);
         temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
         }
@@ -272,7 +272,7 @@ void CCProtonPi0_CutList::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","SideBand_W",i),"W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
         temp->GetXaxis()->SetTitle("W [GeV]");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         if (m_isMC){
             AddVertErrorBands_MC(temp);
         }
@@ -285,105 +285,105 @@ void CCProtonPi0_CutList::initHistograms()
     // ------------------------------------------------------------------------
     truth_QSq_QE = new TH1D("truth_QSq_QE","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     truth_QSq_QE->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_QE->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_QE->GetYaxis()->SetTitle("Events/Bin");
 
     truth_QSq_RES_1232 = new TH1D("truth_QSq_RES_1232","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     truth_QSq_RES_1232->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_RES_1232->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_RES_1232->GetYaxis()->SetTitle("Events/Bin");
 
     truth_QSq_RES_1535 = new TH1D("truth_QSq_RES_1535","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     truth_QSq_RES_1535->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_RES_1535->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_RES_1535->GetYaxis()->SetTitle("Events/Bin");
 
     truth_QSq_RES_1520 = new TH1D("truth_QSq_RES_1520","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     truth_QSq_RES_1520->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_RES_1520->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_RES_1520->GetYaxis()->SetTitle("Events/Bin");
 
     truth_QSq_RES_Other = new TH1D("truth_QSq_RES_Other","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     truth_QSq_RES_Other->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_RES_Other->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_RES_Other->GetYaxis()->SetTitle("Events/Bin");
 
     truth_QSq_DIS = new TH1D("truth_QSq_DIS","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     truth_QSq_DIS->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_DIS->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_DIS->GetYaxis()->SetTitle("Events/Bin");
 
     truth_QSq_2p2h = new TH1D("truth_QSq_2p2h","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     truth_QSq_2p2h->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_2p2h->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_2p2h->GetYaxis()->SetTitle("Events/Bin");
 
     truth_QSq_Non_RES = new TH1D("truth_QSq_Non_RES","Q^{2} for Signal Events",binList.mc_QSq.get_nBins(), binList.mc_QSq.get_min(), binList.mc_QSq.get_max());
     truth_QSq_Non_RES->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
-    truth_QSq_Non_RES->GetYaxis()->SetTitle("N(Events)");
+    truth_QSq_Non_RES->GetYaxis()->SetTitle("Events/Bin");
 
     // ------------------------------------------------------------------------
     // Signal incomingE
     // ------------------------------------------------------------------------
     truth_Enu_QE = new TH1D("truth_Enu_QE","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     truth_Enu_QE->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_QE->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_QE->GetYaxis()->SetTitle("Events/Bin");
 
     truth_Enu_RES_1232 = new TH1D("truth_Enu_RES_1232","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     truth_Enu_RES_1232->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_RES_1232->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_RES_1232->GetYaxis()->SetTitle("Events/Bin");
 
     truth_Enu_RES_1535 = new TH1D("truth_Enu_RES_1535","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     truth_Enu_RES_1535->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_RES_1535->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_RES_1535->GetYaxis()->SetTitle("Events/Bin");
 
     truth_Enu_RES_1520 = new TH1D("truth_Enu_RES_1520","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     truth_Enu_RES_1520->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_RES_1520->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_RES_1520->GetYaxis()->SetTitle("Events/Bin");
 
     truth_Enu_RES_Other = new TH1D("truth_Enu_RES_Other","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     truth_Enu_RES_Other->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_RES_Other->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_RES_Other->GetYaxis()->SetTitle("Events/Bin");
 
     truth_Enu_DIS = new TH1D("truth_Enu_DIS","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     truth_Enu_DIS->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_DIS->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_DIS->GetYaxis()->SetTitle("Events/Bin");
 
     truth_Enu_2p2h = new TH1D("truth_Enu_2p2h","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     truth_Enu_2p2h->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_2p2h->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_2p2h->GetYaxis()->SetTitle("Events/Bin");
 
     truth_Enu_Non_RES = new TH1D("truth_Enu_Non_RES","E_{#nu} for Signal Events",binList.mc_incomingE.get_nBins(), binList.mc_incomingE.get_min(), binList.mc_incomingE.get_max());
     truth_Enu_Non_RES->GetXaxis()->SetTitle("E_{#nu} [GeV]");
-    truth_Enu_Non_RES->GetYaxis()->SetTitle("N(Events)");
+    truth_Enu_Non_RES->GetYaxis()->SetTitle("Events/Bin");
 
     // ------------------------------------------------------------------------
     // Signal w
     // ------------------------------------------------------------------------
     truth_w_QE = new TH1D("truth_w_QE","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     truth_w_QE->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_QE->GetYaxis()->SetTitle("N(Events)");
+    truth_w_QE->GetYaxis()->SetTitle("Events/Bin");
 
     truth_w_RES_1232 = new TH1D("truth_w_RES_1232","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     truth_w_RES_1232->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_RES_1232->GetYaxis()->SetTitle("N(Events)");
+    truth_w_RES_1232->GetYaxis()->SetTitle("Events/Bin");
 
     truth_w_RES_1535 = new TH1D("truth_w_RES_1535","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     truth_w_RES_1535->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_RES_1535->GetYaxis()->SetTitle("N(Events)");
+    truth_w_RES_1535->GetYaxis()->SetTitle("Events/Bin");
 
     truth_w_RES_1520 = new TH1D("truth_w_RES_1520","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     truth_w_RES_1520->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_RES_1520->GetYaxis()->SetTitle("N(Events)");
+    truth_w_RES_1520->GetYaxis()->SetTitle("Events/Bin");
 
     truth_w_RES_Other = new TH1D("truth_w_RES_Other","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     truth_w_RES_Other->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_RES_Other->GetYaxis()->SetTitle("N(Events)");
+    truth_w_RES_Other->GetYaxis()->SetTitle("Events/Bin");
 
     truth_w_DIS = new TH1D("truth_w_DIS","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     truth_w_DIS->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_DIS->GetYaxis()->SetTitle("N(Events)");
+    truth_w_DIS->GetYaxis()->SetTitle("Events/Bin");
 
     truth_w_2p2h = new TH1D("truth_w_2p2h","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     truth_w_2p2h->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_2p2h->GetYaxis()->SetTitle("N(Events)");
+    truth_w_2p2h->GetYaxis()->SetTitle("Events/Bin");
 
     truth_w_Non_RES = new TH1D("truth_w_Non_RES","W for Signal Events",binList.mc_w.get_nBins(), binList.mc_w.get_min(), binList.mc_w.get_max());
     truth_w_Non_RES->GetXaxis()->SetTitle("W [GeV]");
-    truth_w_Non_RES->GetYaxis()->SetTitle("N(Events)");
+    truth_w_Non_RES->GetYaxis()->SetTitle("Events/Bin");
 
     // Pi0 Invariant Mass - Used for Correction Fit
     pi0_invMass_1Track = new TH1D("pi0_invMass_1Track","#pi^{0} Invariant Mass 1 Track",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
@@ -392,152 +392,174 @@ void CCProtonPi0_CutList::initHistograms()
     // Michel Electron - Truth Match
     michel_piplus_time_diff = new TH1D("michel_piplus_time_diff","Michel Prong Time Difference piplus",50,0.0,5000.0);
     michel_piplus_time_diff->GetXaxis()->SetTitle("Time Difference [ns]");
-    michel_piplus_time_diff->GetYaxis()->SetTitle("N(Events)");
+    michel_piplus_time_diff->GetYaxis()->SetTitle("Events/Bin");
 
     michel_neutron_time_diff = new TH1D("michel_neutron_time_diff","Michel Prong Time Difference neutron",50,0.0,5000.0);
     michel_neutron_time_diff->GetXaxis()->SetTitle("Time Difference [ns]");
-    michel_neutron_time_diff->GetYaxis()->SetTitle("N(Events)");
+    michel_neutron_time_diff->GetYaxis()->SetTitle("Events/Bin");
 
     michel_proton_time_diff = new TH1D("michel_proton_time_diff","Michel Prong Time Difference proton",50,0.0,5000.0);
     michel_proton_time_diff->GetXaxis()->SetTitle("Time Difference [ns]");
-    michel_proton_time_diff->GetYaxis()->SetTitle("N(Events)");
+    michel_proton_time_diff->GetYaxis()->SetTitle("Events/Bin");
 
     michel_piminus_time_diff = new TH1D("michel_piminus_time_diff","Michel Prong Time Difference piminus",50,0.0,5000.0);
     michel_piminus_time_diff->GetXaxis()->SetTitle("Time Difference [ns]");
-    michel_piminus_time_diff->GetYaxis()->SetTitle("N(Events)");
+    michel_piminus_time_diff->GetYaxis()->SetTitle("Events/Bin");
 
     michel_other_time_diff = new TH1D("michel_other_time_diff","Michel Prong Time Difference other",50,0.0,5000.0);
     michel_other_time_diff->GetXaxis()->SetTitle("Time Difference [ns]");
-    michel_other_time_diff->GetYaxis()->SetTitle("N(Events)");
+    michel_other_time_diff->GetYaxis()->SetTitle("Events/Bin");
 
     // Energy
     michel_piplus_energy = new TH1D("michel_piplus_energy","Michel Prong Energy piplus",50,0.0,100.0);
     michel_piplus_energy->GetXaxis()->SetTitle("Energy [MeV]");
-    michel_piplus_energy->GetYaxis()->SetTitle("N(Events)");
+    michel_piplus_energy->GetYaxis()->SetTitle("Events/Bin");
 
     michel_neutron_energy = new TH1D("michel_neutron_energy","Michel Prong Energy neutron",50,0.0,100.0);
     michel_neutron_energy->GetXaxis()->SetTitle("Energy [MeV]");
-    michel_neutron_energy->GetYaxis()->SetTitle("N(Events)");
+    michel_neutron_energy->GetYaxis()->SetTitle("Events/Bin");
 
     michel_proton_energy = new TH1D("michel_proton_energy","Michel Prong Energy proton",50,0.0,100.0);
     michel_proton_energy->GetXaxis()->SetTitle("Energy [MeV]");
-    michel_proton_energy->GetYaxis()->SetTitle("N(Events)");
+    michel_proton_energy->GetYaxis()->SetTitle("Events/Bin");
 
     michel_piminus_energy = new TH1D("michel_piminus_energy","Michel Prong Energy piminus",50,0.0,100.0);
     michel_piminus_energy->GetXaxis()->SetTitle("Energy [MeV]");
-    michel_piminus_energy->GetYaxis()->SetTitle("N(Events)");
+    michel_piminus_energy->GetYaxis()->SetTitle("Events/Bin");
 
     michel_other_energy = new TH1D("michel_other_energy","Michel Prong Energy other",50,0.0,100.0);
     michel_other_energy->GetXaxis()->SetTitle("Energy [MeV]");
-    michel_other_energy->GetYaxis()->SetTitle("N(Events)");
+    michel_other_energy->GetYaxis()->SetTitle("Events/Bin");
 
     // Distance 
     michel_piplus_distance = new TH1D("michel_piplus_distance","Michel Prong Distance piplus",50,0.0,1000.0);
     michel_piplus_distance->GetXaxis()->SetTitle("Distance [mm]");
-    michel_piplus_distance->GetYaxis()->SetTitle("N(Events)");
+    michel_piplus_distance->GetYaxis()->SetTitle("Events/Bin");
 
     michel_neutron_distance = new TH1D("michel_neutron_distance","Michel Prong Distance neutron",50,0.0,1000.0);
     michel_neutron_distance->GetXaxis()->SetTitle("Distance [mm]");
-    michel_neutron_distance->GetYaxis()->SetTitle("N(Events)");
+    michel_neutron_distance->GetYaxis()->SetTitle("Events/Bin");
 
     michel_proton_distance = new TH1D("michel_proton_distance","Michel Prong Distance proton",50,0.0,1000.0);
     michel_proton_distance->GetXaxis()->SetTitle("Distance [mm]");
-    michel_proton_distance->GetYaxis()->SetTitle("N(Events)");
+    michel_proton_distance->GetYaxis()->SetTitle("Events/Bin");
 
     michel_piminus_distance = new TH1D("michel_piminus_distance","Michel Prong Distance piminus",50,0.0,1000.0);
     michel_piminus_distance->GetXaxis()->SetTitle("Distance [mm]");
-    michel_piminus_distance->GetYaxis()->SetTitle("N(Events)");
+    michel_piminus_distance->GetYaxis()->SetTitle("Events/Bin");
 
     michel_other_distance = new TH1D("michel_other_distance","Michel Prong Distance other",50,0.0,1000.0);
     michel_other_distance->GetXaxis()->SetTitle("Distance [mm]");
-    michel_other_distance->GetYaxis()->SetTitle("N(Events)");
+    michel_other_distance->GetYaxis()->SetTitle("Events/Bin");
 
     // Longitudinal Distance
     michel_piplus_distance_z = new TH1D("michel_piplus_distance_z","Michel Prong Longitudinal Distance piplus",50,0.0,125.0);
     michel_piplus_distance_z->GetXaxis()->SetTitle("Longitudinal Distance [mm]");
-    michel_piplus_distance_z->GetYaxis()->SetTitle("N(Events)");
+    michel_piplus_distance_z->GetYaxis()->SetTitle("Events/Bin");
 
     michel_neutron_distance_z = new TH1D("michel_neutron_distance_z","Michel Prong Longitudinal Distance neutron",50,0.0,125.0);
     michel_neutron_distance_z->GetXaxis()->SetTitle("Longitudinal Distance [mm]");
-    michel_neutron_distance_z->GetYaxis()->SetTitle("N(Events)");
+    michel_neutron_distance_z->GetYaxis()->SetTitle("Events/Bin");
 
     michel_proton_distance_z = new TH1D("michel_proton_distance_z","Michel Prong Longitudinal Distance proton",50,0.0,125.0);
     michel_proton_distance_z->GetXaxis()->SetTitle("Longitudinal Distance [mm]");
-    michel_proton_distance_z->GetYaxis()->SetTitle("N(Events)");
+    michel_proton_distance_z->GetYaxis()->SetTitle("Events/Bin");
 
     michel_piminus_distance_z = new TH1D("michel_piminus_distance_z","Michel Prong Longitudinal Distance piminus",50,0.0,125.0);
     michel_piminus_distance_z->GetXaxis()->SetTitle("Longitudinal Distance [mm]");
-    michel_piminus_distance_z->GetYaxis()->SetTitle("N(Events)");
+    michel_piminus_distance_z->GetYaxis()->SetTitle("Events/Bin");
 
     michel_other_distance_z = new TH1D("michel_other_distance_z","Michel Prong Longitudinal Distance other",50,0.0,125.0);
     michel_other_distance_z->GetXaxis()->SetTitle("Longitudinal Distance [mm]");
-    michel_other_distance_z->GetYaxis()->SetTitle("N(Events)");
+    michel_other_distance_z->GetYaxis()->SetTitle("Events/Bin");
 
 
 
     // Pi0 Invariant Mass - Truth Match
     signal_invMass_pizero = new TH1D("signal_invMass_pizero","#pi^{0} Invariant Mass - Most PDG: pizero",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     signal_invMass_pizero->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    signal_invMass_pizero->GetYaxis()->SetTitle("N(Events)");
+    signal_invMass_pizero->GetYaxis()->SetTitle("Events/Bin");
 
     signal_invMass_piplus = new TH1D("signal_invMass_piplus","#pi^{0} Invariant Mass - Most PDG: piplus",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     signal_invMass_piplus->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    signal_invMass_piplus->GetYaxis()->SetTitle("N(Events)");
+    signal_invMass_piplus->GetYaxis()->SetTitle("Events/Bin");
 
     signal_invMass_proton = new TH1D("signal_invMass_proton","#pi^{0} Invariant Mass - Most PDG: proton",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     signal_invMass_proton->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    signal_invMass_proton->GetYaxis()->SetTitle("N(Events)");
+    signal_invMass_proton->GetYaxis()->SetTitle("Events/Bin");
 
     signal_invMass_neutron = new TH1D("signal_invMass_neutron","#pi^{0} Invariant Mass - Most PDG: neutron",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     signal_invMass_neutron->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    signal_invMass_neutron->GetYaxis()->SetTitle("N(Events)");
+    signal_invMass_neutron->GetYaxis()->SetTitle("Events/Bin");
 
     signal_invMass_other = new TH1D("signal_invMass_other","#pi^{0} Invariant Mass - Most PDG: other",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     signal_invMass_other->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    signal_invMass_other->GetYaxis()->SetTitle("N(Events)");
+    signal_invMass_other->GetYaxis()->SetTitle("Events/Bin");
 
     background_invMass_pizero = new TH1D("background_invMass_pizero","#pi^{0} Invariant Mass - Most PDG: pizero",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     background_invMass_pizero->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    background_invMass_pizero->GetYaxis()->SetTitle("N(Events)");
+    background_invMass_pizero->GetYaxis()->SetTitle("Events/Bin");
 
     background_invMass_piplus = new TH1D("background_invMass_piplus","#pi^{0} Invariant Mass - Most PDG: piplus",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     background_invMass_piplus->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    background_invMass_piplus->GetYaxis()->SetTitle("N(Events)");
+    background_invMass_piplus->GetYaxis()->SetTitle("Events/Bin");
 
     background_invMass_proton = new TH1D("background_invMass_proton","#pi^{0} Invariant Mass - Most PDG: proton",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     background_invMass_proton->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    background_invMass_proton->GetYaxis()->SetTitle("N(Events)");
+    background_invMass_proton->GetYaxis()->SetTitle("Events/Bin");
 
     background_invMass_neutron = new TH1D("background_invMass_neutron","#pi^{0} Invariant Mass - Most PDG: neutron",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     background_invMass_neutron->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    background_invMass_neutron->GetYaxis()->SetTitle("N(Events)");
+    background_invMass_neutron->GetYaxis()->SetTitle("Events/Bin");
 
     background_invMass_other = new TH1D("background_invMass_other","#pi^{0} Invariant Mass - Most PDG: other",binList.pi0_invMass.get_nBins(), binList.pi0_invMass.get_min(), binList.pi0_invMass.get_max() );
     background_invMass_other->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    background_invMass_other->GetYaxis()->SetTitle("N(Events)");
+    background_invMass_other->GetYaxis()->SetTitle("Events/Bin");
 
     // Pi0 Invariant Mass - Background Subtraction
     invMass_all = new MnvH1D("invMass_all","Data #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
     invMass_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    invMass_all->GetYaxis()->SetTitle("N(Events)");
+    invMass_all->GetYaxis()->SetTitle("Events/Bin");
 
     invMass_mc_reco_all = new MnvH1D("invMass_mc_reco_all","MC Reconstructed #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
     invMass_mc_reco_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    invMass_mc_reco_all->GetYaxis()->SetTitle("N(Events)");
+    invMass_mc_reco_all->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(invMass_mc_reco_all);
     AddLatErrorBands_MC(invMass_mc_reco_all);
 
     invMass_mc_reco_signal = new MnvH1D("invMass_mc_reco_signal","Signal #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
     invMass_mc_reco_signal->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    invMass_mc_reco_signal->GetYaxis()->SetTitle("N(Events)");
+    invMass_mc_reco_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(invMass_mc_reco_signal);
     AddLatErrorBands_MC(invMass_mc_reco_signal);
 
     invMass_mc_reco_bckg = new MnvH1D("invMass_mc_reco_bckg","Background #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
     invMass_mc_reco_bckg->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    invMass_mc_reco_bckg->GetYaxis()->SetTitle("N(Events)");
+    invMass_mc_reco_bckg->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(invMass_mc_reco_bckg);
     AddLatErrorBands_MC(invMass_mc_reco_bckg);
+
+    invMass_DeltaRich_all = new MnvH1D("invMass_DeltaRich_all","Data #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
+    invMass_DeltaRich_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    invMass_DeltaRich_all->GetYaxis()->SetTitle("Events/Bin");
+
+    invMass_DeltaRich_mc_reco_all = new MnvH1D("invMass_DeltaRich_mc_reco_all","MC Reconstructed #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
+    invMass_DeltaRich_mc_reco_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    invMass_DeltaRich_mc_reco_all->GetYaxis()->SetTitle("Events/Bin");
+    AddVertErrorBands_MC(invMass_DeltaRich_mc_reco_all);
+    AddLatErrorBands_MC(invMass_DeltaRich_mc_reco_all);
+
+    invMass_DeltaRich_mc_reco_signal = new MnvH1D("invMass_DeltaRich_mc_reco_signal","Signal #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
+    invMass_DeltaRich_mc_reco_signal->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    invMass_DeltaRich_mc_reco_signal->GetYaxis()->SetTitle("Events/Bin");
+    AddVertErrorBands_MC(invMass_DeltaRich_mc_reco_signal);
+    AddLatErrorBands_MC(invMass_DeltaRich_mc_reco_signal);
+
+    invMass_DeltaRich_mc_reco_bckg = new MnvH1D("invMass_DeltaRich_mc_reco_bckg","Background #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
+    invMass_DeltaRich_mc_reco_bckg->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
+    invMass_DeltaRich_mc_reco_bckg->GetYaxis()->SetTitle("Events/Bin");
+    AddVertErrorBands_MC(invMass_DeltaRich_mc_reco_bckg);
+    AddLatErrorBands_MC(invMass_DeltaRich_mc_reco_bckg);
 
     int nBins = 20;
     double min_photon_E = 0.0;
@@ -650,7 +672,7 @@ void CCProtonPi0_CutList::writeCutTableHeader(ofstream &file)
 {
     file<<std::left;
     file.width(35); file<<"Cut"<<" "; 
-    file.width(12); file<<"N(Events)"<<" ";    
+    file.width(12); file<<"Events/Bin"<<" ";    
     file.width(12); file<<"N(Signal)"<<" ";      
     file.width(12); file<<"Eff(All)"<<" ";      
     file.width(12); file<<"Eff(MINOS)"<<" ";      
@@ -921,6 +943,11 @@ void CCProtonPi0_CutList::writeHistograms()
     invMass_mc_reco_all->Write();
     invMass_mc_reco_signal->Write();
     invMass_mc_reco_bckg->Write();
+
+    invMass_DeltaRich_all->Write();
+    invMass_DeltaRich_mc_reco_all->Write();
+    invMass_DeltaRich_mc_reco_signal->Write();
+    invMass_DeltaRich_mc_reco_bckg->Write();
 
     bckg_signal_diff_E_cos_openingAngle->Add(signal_gamma_E_cos_openingAngle, -1);
     bckg_signal_diff_E_cos_openingAngle->Add(bckg_gamma_E_cos_openingAngle, +1);

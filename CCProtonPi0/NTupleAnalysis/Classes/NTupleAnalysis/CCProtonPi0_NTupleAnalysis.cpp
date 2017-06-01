@@ -6,7 +6,7 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "Tuned";
+const std::string CCProtonPi0_NTupleAnalysis::version = "RevisedBackground";
 
 const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
 
@@ -1095,6 +1095,22 @@ void CCProtonPi0_NTupleAnalysis::init2p2hFitResults()
     fit_2p2h_nn.push_back(0.0551371);
     fit_2p2h_nn.push_back(0.121867);
     fit_2p2h_nn.push_back(0.981287);
+}
+
+double CCProtonPi0_NTupleAnalysis::Average_1DHist(const TH1* hist)
+{
+    double sum = 0;
+    double count = 0 ;
+    for (int i = 1; i <= hist->GetNbinsX(); ++i){
+        double bin_content = hist->GetBinContent(i);
+        double bin_val = hist->GetBinCenter(i);
+        count += bin_content;
+        sum += bin_content * bin_val;
+    }
+
+    double average = sum/count;
+
+    return average;
 }
 
 #endif

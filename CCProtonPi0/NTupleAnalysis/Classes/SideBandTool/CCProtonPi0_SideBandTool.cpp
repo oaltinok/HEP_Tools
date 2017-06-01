@@ -199,7 +199,6 @@ void CCProtonPi0_SideBandTool::Plot()
     //Plot(HighInvMass);
 
     // Plot XSec Variables in Each Side Band
-   
     //std::cout<<"Plotting Data MC With Error Band"<<std::endl;
     //DrawDataMCWithErrorBand(Original);
     //DrawDataMCWithErrorBand(Michel);
@@ -237,6 +236,7 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb)
 
 void CCProtonPi0_SideBandTool::Plot(SideBand &sb, int ind)
 {
+    //Plot_NoRatio(ind, sb.name, "pi0_InvMass",
     Plot(ind, sb.name, "pi0_InvMass",
                 sb.data, 
                 sb.mc_total, 
@@ -257,6 +257,212 @@ void CCProtonPi0_SideBandTool::Plot(SideBand &sb, XSec_Var &xsec_var, int ind, s
                 xsec_var.QELike[ind], 
                 xsec_var.SinglePiPlus[ind], 
                 xsec_var.Other[ind]);
+}
+
+void CCProtonPi0_SideBandTool::Plot_NoRatio(int ind, std::string sb_name, std::string var_name, MnvH1D* data, MnvH1D* mc_total, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other)
+{
+    (void) mc_total;
+    std::string type;
+    if (ind == 0) type = "Nominal";
+    else type = "Fitted";
+
+    std::string norm = "POT";
+    std::string plot_title = "Side Band: " + sb_name + " " + type + " " + norm + " Normalized";
+
+    // Get Histograms -- Use new Histograms not to change originals
+    MnvH1D* h_data = new MnvH1D(*data);
+    h_data->GetYaxis()->CenterTitle();
+    h_data->GetXaxis()->SetNdivisions(5,5,0);
+    h_data->GetYaxis()->SetNdivisions(5,5,0);
+
+    MnvH1D* h_signal = new MnvH1D(*signal);
+    h_signal->GetYaxis()->CenterTitle();
+    h_signal->SetFillColor(kGreen);
+    h_signal->SetLineColor(kGreen);
+    h_signal->SetFillStyle(3001);
+    h_signal->GetXaxis()->SetNdivisions(5,5,0);
+    h_signal->GetYaxis()->SetNdivisions(5,5,0);
+
+    MnvH1D* h_WithPi0 = new MnvH1D(*WithPi0);
+    h_WithPi0->GetYaxis()->CenterTitle();
+    h_WithPi0->SetFillColor(kRed);
+    h_WithPi0->SetLineColor(kRed);
+    h_WithPi0->SetFillStyle(3001);
+    h_WithPi0->GetXaxis()->SetNdivisions(5,5,0);
+    h_WithPi0->GetYaxis()->SetNdivisions(5,5,0);
+  
+    MnvH1D* h_QELike = new MnvH1D(*QELike);
+    h_QELike->GetYaxis()->CenterTitle();
+    h_QELike->SetFillColor(kOrange);
+    h_QELike->SetLineColor(kOrange);
+    h_QELike->SetFillStyle(3001);
+    h_QELike->GetXaxis()->SetNdivisions(5,5,0);
+    h_QELike->GetYaxis()->SetNdivisions(5,5,0);
+ 
+    MnvH1D* h_SinglePiPlus = new MnvH1D(*SinglePiPlus);
+    h_SinglePiPlus->GetYaxis()->CenterTitle();
+    h_SinglePiPlus->SetFillColor(kBlue);
+    h_SinglePiPlus->SetLineColor(kBlue);
+    h_SinglePiPlus->SetFillStyle(3001);
+    h_SinglePiPlus->GetXaxis()->SetNdivisions(5,5,0);
+    h_SinglePiPlus->GetYaxis()->SetNdivisions(5,5,0);
+
+    MnvH1D* h_Other = new MnvH1D(*Other);
+    h_Other->GetYaxis()->CenterTitle();
+    h_Other->SetFillColor(kGray);
+    h_Other->SetLineColor(kGray);
+    h_Other->SetFillStyle(3001);
+    h_Other->GetXaxis()->SetNdivisions(5,5,0);
+    h_Other->GetYaxis()->SetNdivisions(5,5,0);
+  
+    // Clear Error Bars
+    h_signal->ClearAllErrorBands();
+    h_WithPi0->ClearAllErrorBands();
+    h_QELike->ClearAllErrorBands();
+    h_SinglePiPlus->ClearAllErrorBands();
+    h_Other->ClearAllErrorBands();
+
+    TObjArray* mc_hists = new TObjArray;
+    mc_hists->Add(h_Other);
+    mc_hists->Add(h_SinglePiPlus);
+    mc_hists->Add(h_QELike);
+    mc_hists->Add(h_WithPi0);
+    mc_hists->Add(h_signal);
+ 
+    // ------------------------------------------------------------------------
+    // Plot 
+    // ------------------------------------------------------------------------
+    MnvPlotter* plotter = new MnvPlotter();
+    plotter->SetRootEnv();
+ 
+    gStyle->SetCanvasDefW(640);
+    gStyle->SetCanvasDefH(480); // 4x3 aspect ratio
+    gStyle->SetPadRightMargin(0.05);
+    gStyle->SetEndErrorSize(2);
+    gStyle->SetStripDecimals(false);
+
+    plotter->axis_minimum = 0.01;
+    plotter->legend_text_size  = 0.04;
+    plotter->legend_text_font = 42; // default 62 (bold)
+    plotter->data_marker_size = 0.8;
+    plotter->axis_title_font_x   = 42;
+    plotter->axis_title_size_x   = 0.06;
+    plotter->axis_title_offset_x = 1.1;
+    plotter->axis_title_font_y   = 42;
+    plotter->axis_title_size_y   = 0.06;
+    plotter->axis_title_offset_y = 1.0;
+    plotter->axis_label_size = 0.05;
+    plotter->axis_label_font = 42;
+    plotter->headroom = 1.75;
+
+    plotter->mc_line_width = 0;
+    
+    TCanvas* c = new TCanvas("c");
+
+    /*
+       void MnvPlotter::DrawDataStackedMC(
+            const MnvH1D *  dataHist,
+            const TObjArray *    mcHists,
+            const Double_t   mcScale = 1.0,
+            const std::string &  legPos = "L",
+            const std::string &  dataName = "Data",
+            const Int_t  mcBaseColor = 2,
+            const Int_t  mcColorOffset = 1,
+            const Int_t  mcFillStyle = 3001,
+            const char *     xaxislabel = "",
+            const char *     yaxislabel = "",
+            bool     cov_area_normalize = false   
+       )    
+    */
+    plotter->DrawDataStackedMC(h_data, mc_hists, POT_ratio, "N", "Data (3.33e20 POT)", 0, 0, 3001);
+
+    // Add Legend
+    double leg_x_min = 0.55;
+    double leg_x_max = 0.90;
+    double leg_y_min = 0.55;
+    double leg_y_max = 0.85;
+
+    h_data->SetMarkerStyle(plotter->data_marker);
+    h_data->SetMarkerSize(plotter->data_marker_size);
+    h_data->SetMarkerColor(plotter->data_color);
+    h_data->SetLineColor(plotter->data_color);
+    h_data->SetLineWidth(plotter->data_line_width);
+
+    TLegend *legend = new TLegend(leg_x_min, leg_y_min, leg_x_max, leg_y_max);
+    legend->SetBorderSize(0);
+    legend->SetFillColor(-1);
+    legend->SetFillStyle(0);
+    legend->SetTextFont(42);
+    legend->SetTextSize(0.04);
+    legend->AddEntry(h_data, "Data", "lep");
+    legend->AddEntry(h_signal, "Signal", "f");
+    legend->AddEntry(h_WithPi0, "Bkgrd: #pi^{0} + meson(s)", "f");
+    legend->AddEntry(h_QELike, "Bkgrd: zero meson", "f");
+    legend->AddEntry(h_SinglePiPlus, "Bkgrd: charged meson(s)", "f");
+    legend->AddEntry(h_Other, "Bkgrd: other", "f");
+    legend->SetTextSize(0.04);
+    legend->SetTextFont(42);
+    legend->Draw();
+
+    // Add Alines if Original Side Band
+    if (sb_name.compare("Original") == 0) {
+        double max_bin = h_data->GetMaximumBin();
+        double hist_max = h_data->GetBinContent(max_bin)*1.2;
+
+        TLine line;
+        TArrow arrow;
+        // Cut Line at 60 MeV
+        line.SetLineWidth(2);
+        line.SetLineStyle(2);
+        line.SetLineColor(kBlack);
+        arrow.SetLineWidth(2);
+        arrow.SetLineColor(kBlack);
+        line.DrawLine(60.0, 0.0, 60.0, hist_max);
+        arrow.DrawArrow(60.0, hist_max, 50.0, hist_max, 0.01);
+
+        line.DrawLine(200.0, 0.0, 200.0, hist_max);
+        arrow.DrawArrow(200.0, hist_max, 210.0, hist_max, 0.01);
+
+        arrow.SetLineColor(kBlue);
+        arrow.DrawArrow(134.98,hist_max/8,134.98,0, 0.01); 
+    } 
+
+    // Add Normalization Label
+    TLatex norm_text;
+    norm_text.SetNDC();
+    norm_text.SetTextColor(kBlue);
+    norm_text.SetTextSize(0.03);
+    norm_text.SetTextAlign(22);
+    norm_text.DrawLatex(0.35,0.85,"POT Normalized");
+
+    double info_text_x = 0.85;
+    double info_text_y = 0.85;
+    TLatex info_text;
+    info_text.SetNDC();
+    info_text.SetTextColor(kBlack);
+    info_text.SetTextFont(62);
+    info_text.SetTextAlign(12);
+    info_text.SetTextSize(0.04);
+    if ( ind == 0) info_text.DrawLatex(info_text_x, info_text_y, "(a)");
+    else info_text.DrawLatex(info_text_x, info_text_y, "(b)");
+
+    // Plot Output
+    c->Update();
+    std::string plotDir = Folder_List::plotDir_Paper;
+    std::string out_name;
+    out_name = plotDir + var_name + "_" + sb_name + "_" + type + "_" + norm + ".pdf"; 
+
+    c->Print(out_name.c_str(),"pdf");
+
+    delete h_data;
+    delete h_signal;
+    delete h_WithPi0;
+    delete h_QELike;
+    delete h_SinglePiPlus;
+    delete h_Other;
+    delete legend;
+    delete c;
+    delete plotter;
 }
 
 void CCProtonPi0_SideBandTool::Plot(int ind, std::string sb_name, std::string var_name, MnvH1D* data, MnvH1D* mc_total, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other)

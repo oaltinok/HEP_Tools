@@ -8,6 +8,8 @@ nSignal_BeforeFSI	284412.8	2.5
 nSignalOut_Acceptance	100377.3	0.9
 nSignalOut_Kinematics	78801.9	0.7
 nBckg	10973324.9	97.5
+nMuonAngle_Small	8327634.5	74.0
+nMuonAngle_Large	2924481.2	26.0
 
 nFSI_FeedOut	71686.2	0.7
 nFSI_FeedOut_Abs	48883.4	0.4
@@ -37,11 +39,11 @@ nSignal_2p2h	1804.0	0.6
 Muon	0.0	0.0
 AntiMuon	0.0	0.0
 
-DeltaStudy_nAll	145301.0	52.1
-DeltaStudy_nDeltaRES	110995.5	76.4
-DeltaStudy_nOtherRES	13228.1	9.1
-DeltaStudy_nNonRES	21077.4	14.5
+DeltaStudy_nAll	0.0	0.0
+DeltaStudy_nDeltaRES	0.0	-nan
+DeltaStudy_nOtherRES	0.0	-nan
+DeltaStudy_nNonRES	0.0	-nan
 
-nShowers	319206.0	100.0
-nShowers_Out	60616.0	19.0
+nShowers	0.0	-nan
+nShowers_Out	0.0	-nan
 

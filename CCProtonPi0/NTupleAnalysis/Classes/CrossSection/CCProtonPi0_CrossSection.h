@@ -26,6 +26,7 @@ struct XSec
 {
     std::string name;
     bool isEv;
+    bool isDeltaRich;
     
     // Style
     std::string plot_title;
@@ -86,11 +87,11 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
     private:
         CCProtonPi0_BinList binList;
 
-        bool RemoveErrorBands;
         bool m_isMC;
         double min_invMass;
         double max_invMass;
         std::vector<double> N_Background_Data;
+        std::vector<double> N_Background_Data_DeltaRich;
 
         // Flux File
         MnvH1D* h_flux_minervaLE_FHC;
@@ -104,6 +105,10 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         MnvH1D* invMass_mc_reco_signal;
         MnvH1D* invMass_mc_reco_bckg;
 
+        MnvH1D* invMass_DeltaRich_all;
+        MnvH1D* invMass_DeltaRich_mc_reco_signal;
+        MnvH1D* invMass_DeltaRich_mc_reco_bckg;
+
         XSec muon_P;
         XSec muon_theta;
         XSec pi0_P;
@@ -112,6 +117,9 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         XSec QSq;
         XSec W;
         XSec Enu;
+        XSec deltaInvMass;
+        XSec Delta_pi_theta;
+        XSec Delta_pi_phi;
         
         // Output Text File
         std::string text_out_name;
@@ -139,6 +147,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void AddLabels_XSecHist(XSec &var);
         void Scale_XSecHist(MnvH1D* xsec_hist, double smallest_bin_width);
         void Calc_Normalized_NBackground();
+        void Calc_Normalized_NBackground_DeltaRich();
         void NormalizeHistogram(TH1D* h);
         void NormalizeHistogram(MnvH1D* h);
         double GetFluxHistContent(TH1* hist, double low1, double low2);
@@ -158,7 +167,10 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void init_W();
         void init_QSq();
         void init_Enu();
-        MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name);
+        void init_deltaInvMass();
+        void init_Delta_pi_theta();
+        void init_Delta_pi_phi();
+        MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name, bool isDeltaRich);
         MnvH1D* Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name, int nIter);
         MnvH1D* Efficiency_Divide(MnvH1D* unfolded, MnvH1D* eff, std::string var_name);
         MnvH1D* Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name, std::string hist_name);

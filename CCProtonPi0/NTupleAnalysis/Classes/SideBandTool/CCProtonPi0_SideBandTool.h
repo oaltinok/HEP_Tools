@@ -160,6 +160,7 @@ class CCProtonPi0_SideBandTool : public CCProtonPi0_NTupleAnalysis
         void Plot(SideBand &sb, int ind);
         void Plot(SideBand &sb, XSec_Var &xsec_var, int ind, std::string var_name);
         void Plot(int ind, std::string sb_name, std::string var_name, MnvH1D* data, MnvH1D* mc_total, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other);
+        void Plot_NoRatio(int ind, std::string sb_name, std::string var_name, MnvH1D* data, MnvH1D* mc_total, MnvH1D* signal, MnvH1D* WithPi0, MnvH1D* QELike, MnvH1D* SinglePiPlus, MnvH1D* Other);
         void ColorHists(TH1D* data, TH1D* signal, TH1D* WithPi0, TH1D* QELike, TH1D* SinglePiPlus, TH1D* Other);
         double calc_ChiSq(TH1D* data, TH1D* signal, TH1D* WithPi0, TH1D* QELike, TH1D* SinglePiPlus, TH1D* Other);
 

@@ -284,10 +284,6 @@ void CCProtonPi0::Calc_TrueEventKinematics(Minerva::GenMinInteraction* truthEven
 }
 
 // Compact Background Types
-//      QE Like
-//      Single Charge Pion
-//      Background With Pi0
-//      Other
 void CCProtonPi0::tagBackground_Compact(Minerva::GenMinInteraction* truthEvent) const
 {
     Minerva::TG4Trajectories::iterator it_mcpart;
@@ -310,9 +306,8 @@ void CCProtonPi0::tagBackground_Compact(Minerva::GenMinInteraction* truthEvent) 
 
     // Counters
     int nAntiMuon = 0;
+    int nChargedMeson = 0;
     int nNucleon = 0;
-    int nPiPlus = 0;
-    int nPiMinus = 0;
     int nPiZero = 0;
     int nOther = 0;
 
@@ -326,12 +321,12 @@ void CCProtonPi0::tagBackground_Compact(Minerva::GenMinInteraction* truthEvent) 
         particle_ID = (*it_mcpart)->GetTrackId();
         primary_particle_ID.push_back(particle_ID);
 
-        // Count Primary Particles
+        // Skip Muon
         if ( particle_PDG == PDG::muon ) continue;
-        else if ( particle_PDG == -(PDG::muon)) nAntiMuon++;
-        else if ( (particle_PDG == PDG::proton) || (particle_PDG == PDG::neutron) ) nNucleon++;
-        else if ( particle_PDG == PDG::pi ) nPiPlus++;
-        else if ( particle_PDG == -(PDG::pi) ) nPiMinus++;
+
+        if ( particle_PDG == -(PDG::muon)) nAntiMuon++;
+        else if (particle_PDG == PDG::proton || particle_PDG == PDG::neutron) nNucleon++;
+        else if ( std::abs(particle_PDG) == PDG::pi || std::abs(particle_PDG) == PDG::K) nChargedMeson++;
         else if ( particle_PDG == PDG::pi0 ){
             nPiZero++;
             primary_Pi0_ID.push_back(particle_ID);
@@ -370,8 +365,8 @@ void CCProtonPi0::tagBackground_Compact(Minerva::GenMinInteraction* truthEvent) 
     if (isSignalOut_Acceptance) Other = true;
     else if (nAntiMuon > 0) Other = true;
     else if (nPiZero > 0 || isSignalOut_Kinematics) WithPi0 = true;
-    else if (nNucleon > 0 && nPiPlus == 0 && nPiMinus == 0 && nOther == 0) QELike = true;
-    else if (nPiPlus > 0 && nPiMinus == 0 && nOther == 0) SinglePiPlus = true;
+    else if (nNucleon > 0 && nChargedMeson == 0 && nOther == 0) QELike = true;
+    else if (nChargedMeson > 0) SinglePiPlus = true;
     else Other = true;
 
     truthEvent->filtertaglist()->setOrAddFilterTag( "isBckg_Compact_WithPi0", WithPi0);

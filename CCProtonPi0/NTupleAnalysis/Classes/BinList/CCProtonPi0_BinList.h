@@ -43,6 +43,9 @@ class CCProtonPi0_BinList
         static const double a_Enu[];
         static const int size_Enu;
 
+        static const double a_Enu_Fine[];
+        static const int size_Enu_Fine;
+
         // Cross Section Variables
         CCProtonPi0_SingleBin muon_P;
         CCProtonPi0_SingleBin muon_theta;
@@ -77,6 +80,8 @@ class CCProtonPi0_BinList
         CCProtonPi0_SingleBin vertex_z;
         CCProtonPi0_SingleBin vertex_x_y;
         CCProtonPi0_SingleBin deltaInvMass;
+        CCProtonPi0_SingleBin Delta_pi_theta;
+        CCProtonPi0_SingleBin Delta_pi_phi;
         CCProtonPi0_SingleBin preFilter_Status;
         CCProtonPi0_SingleBin preFilter_RejectedEnergy;
         CCProtonPi0_SingleBin strip_numbers;

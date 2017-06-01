@@ -53,7 +53,7 @@ void CCProtonPi0_Proton::initHistograms()
 
         temp = new MnvH1D( Form("%s_%d","trackKinked",i),"Proton Track Kinked or NOT",bin_trackKinked.get_nBins(), bin_trackKinked.get_min(), bin_trackKinked.get_max() );
         temp->GetXaxis()->SetTitle("Proton Track Kinked or NOT");
-        temp->GetYaxis()->SetTitle("N(Events)");
+        temp->GetYaxis()->SetTitle("Events/Bin");
         trackKinked.push_back(temp);
 
         temp = new MnvH1D( Form("%s_%d","partScore",i),"Proton Particle Score (LLR)",binList.particleScore_LLR.get_nBins(), binList.particleScore_LLR.get_min(), binList.particleScore_LLR.get_max() );
@@ -129,23 +129,23 @@ void CCProtonPi0_Proton::initHistograms()
     // dEdX Uncertainties 
     energy_shift_BetheBloch = new TH1D( "energy_shift_BetheBloch","Proton Energy Shift by BetheBloch", 100,-50,50);
     energy_shift_BetheBloch->GetXaxis()->SetTitle("Energy Shift [MeV]");
-    energy_shift_BetheBloch->GetYaxis()->SetTitle("N(Events)");
+    energy_shift_BetheBloch->GetYaxis()->SetTitle("Events/Bin");
 
     energy_shift_Birks = new TH1D( "energy_shift_Birks","Proton Energy Shift by Birks", 100,-50,50);
     energy_shift_Birks->GetXaxis()->SetTitle("Energy Shift [MeV]");
-    energy_shift_Birks->GetYaxis()->SetTitle("N(Events)");
+    energy_shift_Birks->GetYaxis()->SetTitle("Events/Bin");
 
     energy_shift_MEU = new TH1D( "energy_shift_MEU","Proton Energy Shift by MEU", 100,-50,50);
     energy_shift_MEU->GetXaxis()->SetTitle("Energy Shift [MeV]");
-    energy_shift_MEU->GetYaxis()->SetTitle("N(Events)");
+    energy_shift_MEU->GetYaxis()->SetTitle("Events/Bin");
 
     energy_shift_Mass = new TH1D( "energy_shift_Mass","Proton Energy Shift by Mass", 100,-50,50);
     energy_shift_Mass->GetXaxis()->SetTitle("Energy Shift [MeV]");
-    energy_shift_Mass->GetYaxis()->SetTitle("N(Events)");
+    energy_shift_Mass->GetYaxis()->SetTitle("Events/Bin");
 
     energy_shift_Nominal = new TH1D( "energy_shift_Nominal","Proton Energy Shift by Nominal", 100,-50,50);
     energy_shift_Nominal->GetXaxis()->SetTitle("Energy Shift [MeV]");
-    energy_shift_Nominal->GetYaxis()->SetTitle("N(Events)");
+    energy_shift_Nominal->GetYaxis()->SetTitle("Events/Bin");
 
 }
 
