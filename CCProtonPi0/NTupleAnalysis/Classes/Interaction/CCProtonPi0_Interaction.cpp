@@ -185,7 +185,8 @@ void CCProtonPi0_Interaction::initHistograms()
         W_2Track.push_back(temp);
         
         temp = new MnvH1D( Form("%s_%d","vertex_z",i),"Reconstructed Interaction Vertex",binList.vertex_z.get_nBins(), binList.vertex_z.get_min(), binList.vertex_z.get_max() );
-        temp->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
+        //temp->GetXaxis()->SetTitle("z = 4293 Target, #bf{z = 5810 Interaction Region}, z = 8614 ECAL, z = 9088 HCAL");
+        temp->GetXaxis()->SetTitle("z = 5810 Interaction Region, z = 8614 ECAL");
         temp->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.vertex_z.get_width()));
         vertex_z.push_back(temp);
 
@@ -405,69 +406,69 @@ void CCProtonPi0_Interaction::initHistograms()
     AddVertErrorBands_MC(Enu_response);
     AddLatErrorBands_MC(Enu_response);
 
-    W_all = new MnvH1D( "W_all","Data All W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    W_all = new MnvH1D( "W_all","Data All W", binList.size_W, binList.a_W);
     W_all->GetXaxis()->SetTitle("W_{exp} (GeV)");
     W_all->GetYaxis()->SetTitle("Events/Bin");
 
-    W_mc_truth_signal = new MnvH1D( "W_mc_truth_signal","MC Truth Signal W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    W_mc_truth_signal = new MnvH1D( "W_mc_truth_signal","MC Truth Signal W", binList.size_W, binList.a_W);
     W_mc_truth_signal->GetXaxis()->SetTitle("W_{exp} (GeV)");
     W_mc_truth_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(W_mc_truth_signal);
     AddLatErrorBands_MC(W_mc_truth_signal);
 
-    W_mc_reco_all = new MnvH1D( "W_mc_reco_all","MC All Reconstructed W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    W_mc_reco_all = new MnvH1D( "W_mc_reco_all","MC All Reconstructed W", binList.size_W, binList.a_W);
     W_mc_reco_all->GetXaxis()->SetTitle("W_{exp} (GeV)");
     W_mc_reco_all->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(W_mc_reco_all);
     AddLatErrorBands_MC(W_mc_reco_all);
 
-    W_mc_reco_signal = new MnvH1D( "W_mc_reco_signal","MC Reconstructed Signal W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    W_mc_reco_signal = new MnvH1D( "W_mc_reco_signal","MC Reconstructed Signal W", binList.size_W, binList.a_W);
     W_mc_reco_signal->GetXaxis()->SetTitle("W_{exp} (GeV)");
     W_mc_reco_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(W_mc_reco_signal);
     AddLatErrorBands_MC(W_mc_reco_signal);
 
-    W_mc_reco_bckg = new MnvH1D( "W_mc_reco_bckg","MC Reconstructed Background W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    W_mc_reco_bckg = new MnvH1D( "W_mc_reco_bckg","MC Reconstructed Background W", binList.size_W, binList.a_W);
     W_mc_reco_bckg->GetXaxis()->SetTitle("W_{exp} (GeV)");
     W_mc_reco_bckg->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(W_mc_reco_bckg);
     AddLatErrorBands_MC(W_mc_reco_bckg);
 
-    W_response = new MnvH2D( "W_response","Signal W",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max(),binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max() );
+    W_response = new MnvH2D( "W_response","Signal W", binList.size_W, binList.a_W, binList.size_W, binList.a_W);
     W_response->GetXaxis()->SetTitle("Reconstructed W_{exp} (GeV)");
     W_response->GetYaxis()->SetTitle("True W_{exp} (GeV)");
     AddVertErrorBands_MC(W_response);
     AddLatErrorBands_MC(W_response);
 
-    deltaInvMass_all = new MnvH1D( "deltaInvMass_all","Data All", binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
+    deltaInvMass_all = new MnvH1D( "deltaInvMass_all","Data All", binList.size_deltaInvMass, binList.a_deltaInvMass);
     deltaInvMass_all->GetXaxis()->SetTitle("p#pi^{0} Invariant Mass (GeV)");
     deltaInvMass_all->GetYaxis()->SetTitle("Events/Bin");
 
-    deltaInvMass_mc_truth_signal = new MnvH1D( "deltaInvMass_mc_truth_signal","MC Truth Signal", binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
+    deltaInvMass_mc_truth_signal = new MnvH1D( "deltaInvMass_mc_truth_signal","MC Truth Signal", binList.size_deltaInvMass, binList.a_deltaInvMass);
     deltaInvMass_mc_truth_signal->GetXaxis()->SetTitle("p#pi^{0} Invariant Mass (GeV)");
     deltaInvMass_mc_truth_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(deltaInvMass_mc_truth_signal);
     AddLatErrorBands_MC(deltaInvMass_mc_truth_signal);
 
-    deltaInvMass_mc_reco_all = new MnvH1D( "deltaInvMass_mc_reco_all","MC All Reconstructed",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
+    deltaInvMass_mc_reco_all = new MnvH1D( "deltaInvMass_mc_reco_all","MC All Reconstructed", binList.size_deltaInvMass, binList.a_deltaInvMass);
     deltaInvMass_mc_reco_all->GetXaxis()->SetTitle("p#pi^{0} Invariant Mass (GeV)");
     deltaInvMass_mc_reco_all->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(deltaInvMass_mc_reco_all);
     AddLatErrorBands_MC(deltaInvMass_mc_reco_all);
 
-    deltaInvMass_mc_reco_signal = new MnvH1D( "deltaInvMass_mc_reco_signal","MC Reconstructed Signal", binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
+    deltaInvMass_mc_reco_signal = new MnvH1D( "deltaInvMass_mc_reco_signal","MC Reconstructed Signal", binList.size_deltaInvMass, binList.a_deltaInvMass);
     deltaInvMass_mc_reco_signal->GetXaxis()->SetTitle("p#pi^{0} Invariant Mass (GeV)");
     deltaInvMass_mc_reco_signal->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(deltaInvMass_mc_reco_signal);
     AddLatErrorBands_MC(deltaInvMass_mc_reco_signal);
 
-    deltaInvMass_mc_reco_bckg = new MnvH1D( "deltaInvMass_mc_reco_bckg","MC Reconstructed Background ",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
+    deltaInvMass_mc_reco_bckg = new MnvH1D( "deltaInvMass_mc_reco_bckg","MC Reconstructed Background ", binList.size_deltaInvMass, binList.a_deltaInvMass);
     deltaInvMass_mc_reco_bckg->GetXaxis()->SetTitle("p#pi^{0} Invariant Mass (GeV)");
     deltaInvMass_mc_reco_bckg->GetYaxis()->SetTitle("Events/Bin");
     AddVertErrorBands_MC(deltaInvMass_mc_reco_bckg);
     AddLatErrorBands_MC(deltaInvMass_mc_reco_bckg);
 
-    deltaInvMass_response = new MnvH2D( "deltaInvMass_response","Signal", binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max(), binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
+    deltaInvMass_response = new MnvH2D( "deltaInvMass_response","Signal", binList.size_deltaInvMass, binList.a_deltaInvMass, binList.size_deltaInvMass, binList.a_deltaInvMass);
     deltaInvMass_response->GetXaxis()->SetTitle("Reco p#pi^{0} Invariant Mass (GeV)");
     deltaInvMass_response->GetYaxis()->SetTitle("True p#pi^{0} Invariant Mass (GeV)");
     AddVertErrorBands_MC(deltaInvMass_response);
@@ -1127,6 +1128,7 @@ void CCProtonPi0_Interaction::initHistograms()
     Err_MuonTracking->GetXaxis()->SetTitle("Error used as (wgt = 1 #pm error)");
     Err_MuonTracking->GetYaxis()->SetTitle("Events/Bin");
 
+
     for (int i = 0; i < 151; ++i){
         temp = new MnvH1D( Form("%s_%d","W_Shift",i),"",13,0.5,1.8);
         temp->GetXaxis()->SetTitle("W_{exp} (GeV)");
@@ -1142,7 +1144,6 @@ void CCProtonPi0_Interaction::initHistograms()
         temp->GetXaxis()->SetTitle("W_{exp} (GeV)");
         temp->GetYaxis()->SetTitle("Events/Bin");
         W_Shift_Signal.push_back(temp);
-    
     }
 }
 
@@ -1217,6 +1218,8 @@ void CCProtonPi0_Interaction::writeHistograms()
         W_2[i]->Write();
         QSq_CV[i]->Write();
         QSq_MaRES[i]->Write();
+
+        vertex_z[i]->Write();
     }
 
     resID->Write();

@@ -464,7 +464,12 @@ void CCProtonPi0_Plotter::DrawErrorSummary(MnvH1D* hist, std::string var_name, s
     plotter->axis_title_offset_y = 0.8;
     plotter->axis_label_size = 0.05;
     plotter->axis_label_font = 42;
- 
+
+    std::size_t found = var_name.find("delta");
+    if (found != std::string::npos){
+        std::cout<<"\t\tFound!"<<std::endl;
+        plotter->axis_maximum = 0.75;
+    }
     ApplyStyle_Errors(plotter, groupErrors);
 
     TCanvas* c = new TCanvas("c");
@@ -2414,6 +2419,47 @@ void CCProtonPi0_Plotter::Save2DHistPoints(rootDir& dir, std::string var_name, s
     }   
 
     text.close();   
+}
+
+void CCProtonPi0_Plotter::DrawEfficiencyCurve(TH1D* hist1D, std::string var_name, std::string plotDir)
+{
+    // Create Canvas
+    TCanvas* c = new TCanvas("c","c",800,800);
+
+    // Plot Options
+    hist1D->GetYaxis()->SetTitle("Reconstruction Efficiency");
+    hist1D->SetMinimum(0.0);
+    hist1D->SetMaximum(0.15);
+    hist1D->SetLineColor(kRed);
+    hist1D->SetLineWidth(3);
+    hist1D->SetFillColor(kWhite);
+
+    if (thesisStyle){
+        //hist1D->GetXaxis()->SetTitle("P_{#mu}");
+        hist1D->GetXaxis()->SetTitleFont(62);
+        hist1D->GetXaxis()->SetTitleSize(0.06);
+        hist1D->GetXaxis()->CenterTitle();
+        hist1D->GetXaxis()->SetTitleOffset(1.15);
+        hist1D->GetXaxis()->SetLabelFont(42);
+        hist1D->GetXaxis()->SetLabelSize(0.05);
+        hist1D->GetXaxis()->SetNdivisions(408);
+
+        hist1D->GetYaxis()->SetTitleFont(62);
+        hist1D->GetYaxis()->SetTitleSize(0.06);
+        //hist1D->GetYaxis()->CenterTitle();
+        hist1D->GetYaxis()->SetTitleOffset(1.2);
+        hist1D->GetYaxis()->SetLabelFont(42);
+        hist1D->GetYaxis()->SetLabelSize(0.05);
+        TGaxis::SetMaxDigits(3);
+    }
+
+    hist1D->Draw("HIST");
+    gPad->Update();
+    gStyle->SetOptStat(0); 
+
+    c->Print(Form("%s%s%s",plotDir.c_str(),var_name.c_str(),".pdf"), "pdf");
+    delete c;
+    delete hist1D;
 }
 
 void CCProtonPi0_Plotter::DrawEfficiencyCurve(rootDir& dir, std::string var_name, std::string plotDir)

@@ -33,7 +33,6 @@ CCProtonPi0_Proton::CCProtonPi0_Proton(bool isModeReduce, bool isMC) : CCProtonP
         bin_KE.setBin(20, 0.0, 2.0);
         bin_trackLength.setBin(25,0.0,250.0);
         bin_trackKinked.setBin(2,0.0,2.0);
-        bin_theta_Diff.setBin(40,-5.0,5.0);
         
         initHistograms();        
     }
@@ -97,9 +96,9 @@ void CCProtonPi0_Proton::initHistograms()
     theta_error->GetXaxis()->SetTitle("(#theta_{Reco}-#theta_{True})/#theta_{True}");
     theta_error->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.error.get_width()));
  
-    theta_Diff = new TH1D( "theta_Diff","Difference on Proton Theta",bin_theta_Diff.get_nBins(), bin_theta_Diff.get_min(), bin_theta_Diff.get_max() );
-    theta_Diff->GetXaxis()->SetTitle("#theta_{Reco}-#theta_{True} [degree]");
-    theta_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_theta_Diff.get_width()));
+    theta_diff = new TH1D( "theta_diff","difference on Proton Theta",binList.theta_diff.get_nBins(), binList.theta_diff.get_min(), binList.theta_diff.get_max() );
+    theta_diff->GetXaxis()->SetTitle("#theta_{Reco}-#theta_{True} [degree]");
+    theta_diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",binList.theta_diff.get_width()));
 
     proton_P_response = new MnvH2D( "proton_P_response","True vs Reconstructed Proton Momentum",bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max(), bin_P.get_nBins(), bin_P.get_min(), bin_P.get_max());
     proton_P_response->GetXaxis()->SetTitle("Reconstructed P_{p} [GeV]");
@@ -126,6 +125,10 @@ void CCProtonPi0_Proton::initHistograms()
     E_Diff->GetXaxis()->SetTitle("E_{Reco}-E_{True} [GeV]");
     E_Diff->GetYaxis()->SetTitle(Form("Events / %3.2f ",bin_E_Diff.get_width()));
 
+    proton_KE_mc_truth_signal = new TH1D( "proton_KE_mc_truth_signal","Proton Kinetic Energy for Signal Events",binList.proton_KE.get_nBins(), binList.proton_KE.get_min(), binList.proton_KE.get_max());
+    proton_KE_mc_truth_signal->GetXaxis()->SetTitle("T_{p} (GeV)");
+    proton_KE_mc_truth_signal->GetYaxis()->SetTitle("Events/(0.025 GeV)");
+    
     // dEdX Uncertainties 
     energy_shift_BetheBloch = new TH1D( "energy_shift_BetheBloch","Proton Energy Shift by BetheBloch", 100,-50,50);
     energy_shift_BetheBloch->GetXaxis()->SetTitle("Energy Shift [MeV]");
@@ -166,7 +169,7 @@ void CCProtonPi0_Proton::writeHistograms()
 
     proton_theta_response->Write();
     theta_error->Write();
-    theta_Diff->Write();
+    theta_diff->Write();
 
     proton_P_response->Write();
     P_error->Write();
@@ -176,6 +179,8 @@ void CCProtonPi0_Proton::writeHistograms()
 
     E_Diff->Write();
     P_Diff->Write();
+
+    proton_KE_mc_truth_signal->Write();
 
     energy_shift_BetheBloch->Write();
     energy_shift_Birks->Write();

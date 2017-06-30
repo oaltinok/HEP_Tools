@@ -32,7 +32,7 @@ void CCProtonPi0_CrossSection::init_muon_theta()
  
     muon_theta.plot_title = "Differential Cross Section for #theta_{#mu}";
     muon_theta.plot_xlabel = "Muon Angle (deg)";
-    muon_theta.plot_ylabel = "d#sigma/d#theta_{#mu} (10^{-40} cm^{2}/nucleon/deg)";
+    muon_theta.plot_ylabel = " d#sigma/d#theta_{#mu} (10^{-40} cm^{2}/nucleon/deg)";
 
     muon_theta.nIterations = 1;
     
@@ -224,7 +224,7 @@ void CCProtonPi0_CrossSection::init_Delta_pi_theta()
 
     Delta_pi_theta.plot_title = "Total Cross Section for cos(#theta)";
     Delta_pi_theta.plot_xlabel = "cos(#theta)";
-    Delta_pi_theta.plot_ylabel = "d#sigma/dcos(#theta) (10^{-40} cm^{2}/nucleon)";
+    Delta_pi_theta.plot_ylabel = "d#sigma/dcos#theta (10^{-40} cm^{2}/nucleon/0.1)";
 
     Delta_pi_theta.nIterations = 4;
 

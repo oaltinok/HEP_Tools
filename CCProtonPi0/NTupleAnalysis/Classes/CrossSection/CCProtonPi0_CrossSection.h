@@ -100,14 +100,22 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         double cv_flux_integral;
         std::vector<double> unv_flux_integral;
 
+        //NuWro Predictions
+        MnvH1D* NuWro_muon_P;
+        MnvH1D* NuWro_muon_theta;
+        MnvH1D* NuWro_pi0_KE;
+        MnvH1D* NuWro_pi0_theta;
+        MnvH1D* NuWro_QSq;
+        MnvH1D* NuWro_W;
+        MnvH1D* NuWro_Enu;
+        MnvH1D* NuWro_deltaInvMass;
+        MnvH1D* NuWro_Delta_pi_theta;
+        MnvH1D* NuWro_Delta_pi_phi;
+
         // Pi0 Invariant Mass
         MnvH1D* invMass_all;
         MnvH1D* invMass_mc_reco_signal;
         MnvH1D* invMass_mc_reco_bckg;
-
-        MnvH1D* invMass_DeltaRich_all;
-        MnvH1D* invMass_DeltaRich_mc_reco_signal;
-        MnvH1D* invMass_DeltaRich_mc_reco_bckg;
 
         XSec muon_P;
         XSec muon_theta;
@@ -147,7 +155,6 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void AddLabels_XSecHist(XSec &var);
         void Scale_XSecHist(MnvH1D* xsec_hist, double smallest_bin_width);
         void Calc_Normalized_NBackground();
-        void Calc_Normalized_NBackground_DeltaRich();
         void NormalizeHistogram(TH1D* h);
         void NormalizeHistogram(MnvH1D* h);
         double GetFluxHistContent(TH1* hist, double low1, double low2);
@@ -157,6 +164,8 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void writeHistograms(XSec &var);
         void initHistograms();
         void initHistograms(XSec &var);
+        void initHistograms_NuWro();
+        void fillHistograms_NuWro();
         void initFluxHistograms();
         void initXSecs();
         void init_muon_P();
@@ -170,7 +179,7 @@ class CCProtonPi0_CrossSection : public CCProtonPi0_NTupleAnalysis
         void init_deltaInvMass();
         void init_Delta_pi_theta();
         void init_Delta_pi_phi();
-        MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name, bool isDeltaRich);
+        MnvH1D* Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name);
         MnvH1D* Unfold_Data(MnvH1D* bckg_subtracted, MnvH2D* response, std::string var_name, int nIter);
         MnvH1D* Efficiency_Divide(MnvH1D* unfolded, MnvH1D* eff, std::string var_name);
         MnvH1D* Integrate_Flux(MnvH1D* data_efficiency_corrected, std::string var_name, std::string hist_name);

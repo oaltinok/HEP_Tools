@@ -40,11 +40,29 @@ class CCProtonPi0_BinList
         static const double a_QSq[];
         static const int size_QSq;
 
+        static const double a_NuWro_QSq[];
+        static const int size_NuWro_QSq;
+
         static const double a_Enu[];
         static const int size_Enu;
 
         static const double a_Enu_Fine[];
         static const int size_Enu_Fine;
+
+        static const double a_deltaInvMass[];
+        static const int size_deltaInvMass;
+
+        static const double a_deltaInvMass2[];
+        static const int size_deltaInvMass2;
+
+        static const double a_W[];
+        static const int size_W;
+
+        static const double a_Delta_pi_theta[];
+        static const int size_Delta_pi_theta;
+
+        static const double a_Delta_pi_phi[];
+        static const int size_Delta_pi_phi;
 
         // Cross Section Variables
         CCProtonPi0_SingleBin muon_P;
@@ -63,10 +81,12 @@ class CCProtonPi0_BinList
 
         // Standard Bins
         CCProtonPi0_SingleBin proton_theta;
+        CCProtonPi0_SingleBin proton_KE;
         CCProtonPi0_SingleBin muon_thetaX;
         CCProtonPi0_SingleBin muon_thetaY;
         CCProtonPi0_SingleBin true_false;
         CCProtonPi0_SingleBin error;
+        CCProtonPi0_SingleBin theta_diff;
         CCProtonPi0_SingleBin ratio;
         CCProtonPi0_SingleBin angle;
         CCProtonPi0_SingleBin particleScore;

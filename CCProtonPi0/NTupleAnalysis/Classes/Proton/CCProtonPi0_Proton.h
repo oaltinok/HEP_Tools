@@ -28,6 +28,7 @@ class CCProtonPi0_Proton : public CCProtonPi0_Particle
         MnvH2D* proton_theta_response;
         MnvH2D* proton_P_response;
 
+        TH1D* proton_KE_mc_truth_signal;
         TH1D* energy_shift_BetheBloch;
         TH1D* energy_shift_Birks;
         TH1D* energy_shift_MEU;

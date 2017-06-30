@@ -116,6 +116,28 @@ namespace Folder_List
     const std::string rootDir_Pion_Sample = rootOut + MC + analyzed + "Pion_Train.root";
     const std::string rootDir_Muon_Train = rootOut + MC + analyzed + "Muon_Sample.root";
     const std::string rootDir_Muon_Sample = rootOut + MC + analyzed + "Muon_Train.root";
+    
+    // Results
+    const std::string rootDir_Signal_Original_MC = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_Original/MC/Analyzed/CrossSection.root";
+    const std::string rootDir_Signal_Original_Data = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_Original/Data/Analyzed/CrossSection.root";
+
+    const std::string rootDir_Signal_NoWLimit_Original_MC = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_NoWLimit_Original/MC/Analyzed/CrossSection.root";
+    const std::string rootDir_Signal_NoWLimit_Original_Data = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_NoWLimit_Original/Data/Analyzed/CrossSection.root";
+
+    const std::string rootDir_Interaction_Signal_Original_MC = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_Original/MC/Analyzed/Interaction.root";
+    const std::string rootDir_Interaction_Signal_Original_Data = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_Original/Data/Analyzed/Interaction.root";
+
+    const std::string rootDir_CutHists_Signal_Original_MC = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_Original/MC/Analyzed/CutHistograms.root";
+    const std::string rootDir_CutHists_Signal_Original_Data = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_Original/Data/Analyzed/CutHistograms.root";
+
+    const std::string rootDir_Signal_DeltaRich_MC = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_DeltaRich/MC/Analyzed/CrossSection.root";
+    const std::string rootDir_Signal_DeltaRich_Data = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_DeltaRich/Data/Analyzed/CrossSection.root";
+
+    const std::string rootDir_Signal_2Bin_DeltaRich_MC = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_2Bin_DeltaRich/MC/Analyzed/CrossSection.root";
+    const std::string rootDir_Signal_2Bin_DeltaRich_Data = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_2Bin_DeltaRich/Data/Analyzed/CrossSection.root";
+
+    const std::string rootDir_Signal_TwoTrack_MC = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_TwoTrack/MC/Analyzed/CrossSection.root";
+    const std::string rootDir_Signal_TwoTrack_Data = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_TwoTrack/Data/Analyzed/CrossSection.root";
 
     //-------------------------------------------------------------------------
     // Plot Dirs
@@ -144,6 +166,7 @@ namespace Folder_List
     const std::string plotDir_Efficiency = "EfficiencyCorrected/";
 
     // Default Plot Dirs
+    const std::string plotDir_Supplement = output + plotOut + "Supplement/";
     const std::string plotDir_Paper = output + plotOut + "Paper/";
     const std::string plotDir_OtherStudies = output + plotOut + "OtherStudies/";
     const std::string plotDir_Systematics = output + plotOut + "Systematics/";

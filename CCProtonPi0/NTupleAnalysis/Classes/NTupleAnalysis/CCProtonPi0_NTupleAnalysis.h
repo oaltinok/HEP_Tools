@@ -64,9 +64,15 @@ class CCProtonPi0_NTupleAnalysis
         static const double mm_to_cm;
         static const double rad_to_deg;
         static const double max_muon_theta;
+        static const double min_proton_KE;
         static const double min_Enu;
+        static const double min_Enu_LowEnu;
+        static const double min_Enu_HighEnu;
         static const double max_Enu;
+        static const double max_Enu_LowEnu;
+        static const double max_Enu_HighEnu;
         static const double max_W;
+        static const double max_W_DeltaRich;
         static const double max_muon_angle;
         static const double muon_mass;
         static const double pi0_mass;
@@ -95,6 +101,14 @@ class CCProtonPi0_NTupleAnalysis
         static const double DeltaFactor_A;
         static const double DeltaFactor_Q0;
 
+        bool isSignalOriginal;
+        bool isSignalOriginal_NoWLimit;
+        bool isSignalTwoTrack;
+        bool isSignalDeltaRich;
+        bool isSignalLowEnu;
+        bool isSignalHighEnu;
+        void InformSignalType();
+
         // 2p2h Events
         std::vector<double> fit_2p2h_CV;
         std::vector<double> fit_2p2h_np;
@@ -103,8 +117,12 @@ class CCProtonPi0_NTupleAnalysis
         double Get_2p2h_wgt(Double_t* neutrino_4P, Double_t* muon_4P, std::vector<double> fit_results);
         
         // Event Kinematics 
+        bool IsProtonLong(double Tp);
         bool IsWInRange(double W);
+        bool IsWInRange_DeltaRich(double W);
         bool IsEnuInRange(double Enu);
+        bool IsEnuInRange_LowEnu(double Enu);
+        bool IsEnuInRange_HighEnu(double Enu);
 
         bool IsEvent2p2h(int type);
 
@@ -142,6 +160,7 @@ class CCProtonPi0_NTupleAnalysis
         double Average_1DHist(const TH1* hist);
 
         // Returns a "new" MnvH1D or MnvH2D 
+        TH1D* GetTH1D(TFile* f, std::string var_name);
         MnvH1D* GetMnvH1D(TFile* f, std::string var_name);
         MnvH2D* GetMnvH2D(TFile* f, std::string var_name);
 

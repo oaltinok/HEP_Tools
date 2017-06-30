@@ -50,35 +50,63 @@ void ApplyStyle(MnvPlotter* plotter)
     gStyle->SetEndErrorSize(4);
 }
 
-void Fit(std::string rootDir_data, std::string rootDir_mc, std::string plotName)
+void Fit(std::string rootDir_data, std::string rootDir_mc, std::string plotName, std::string histName_data, std::string histName_mc)
 {
-    std::string histName = "QSq_xsec";
-    //std::string histName = "q2-xsec-data";
-
     TFile* f_data = new TFile(rootDir_data.c_str(), "read");
     TFile* f_mc = new TFile(rootDir_mc.c_str(), "read");
 
-    MnvH1D* data = new MnvH1D( * dynamic_cast<MnvH1D*>(f_data->Get(histName.c_str())) );
-    MnvH1D* mc = new MnvH1D( * dynamic_cast<MnvH1D*>(f_mc->Get(histName.c_str())) );
+    MnvH1D* data = new MnvH1D( * dynamic_cast<MnvH1D*>(f_data->Get(histName_data.c_str())) );
+    MnvH1D* mc = new MnvH1D( * dynamic_cast<MnvH1D*>(f_mc->Get(histName_mc.c_str())) );
    
+    data->GetXaxis()->SetNdivisions(5,4,0);
+    mc->GetXaxis()->SetNdivisions(5,4,0);
+    
+    data->GetYaxis()->SetNdivisions(5,4,0);
+    mc->GetYaxis()->SetNdivisions(5,4,0);
+ 
+    data->GetYaxis()->CenterTitle();
+    mc->GetYaxis()->CenterTitle();
+
+    data->SetTitle("Data (3.33e20 POT)");
+    data->GetXaxis()->SetTitle("Q^{2} (GeV^{2})");
+    mc->SetTitle("Simulation");
+ 
+    // Remove Error Bands from MC
+    mc->ClearAllErrorBands();
+    
     // ------------------------------------------------------------------------
     //  Plot Data MC using MnvPlotter
     // ------------------------------------------------------------------------
     MnvPlotter* plotter = new MnvPlotter();
     plotter->SetRootEnv();
-    ApplyStyle(plotter);
-
-    TCanvas* c1 = new TCanvas("c1");
- 
-    data->SetTitle("Data (3.33e20 POT)");
-    data->GetXaxis()->SetTitle("Q^{2} (GeV^{2})");
-    mc->SetTitle("Simulation");
-
-    std::cout<<"Data Integral = "<<data->Integral()<<std::endl;
-    // Remove Error Bands from MC
-    mc->ClearAllErrorBands();
+    
+    gStyle->SetStripDecimals(false);
+    gStyle->SetEndErrorSize(4);
+    gStyle->SetCanvasDefW(640);
+    gStyle->SetCanvasDefH(480); 
+    gStyle->SetOptStat(0); 
+    gStyle->SetPadRightMargin(0.05);
 
     plotter->headroom = 1.75;
+    plotter->legend_text_size = 0.04;
+    plotter->legend_text_font = 42; // default 62 (bold)
+    
+    plotter->data_line_width = 2;
+
+    plotter->axis_minimum = 0.01;
+    plotter->axis_title_font_x   = 42;
+    plotter->axis_title_size_x   = 0.06;
+    plotter->axis_title_offset_x = 1.1;
+    plotter->axis_title_font_y   = 42;
+    plotter->axis_title_size_y   = 0.06;
+    plotter->axis_title_offset_y = 0.8;
+    plotter->axis_label_size = 0.05;
+    plotter->axis_label_font = 42;
+  
+    TCanvas* c1 = new TCanvas("c1");
+
+    std::cout<<"Data Integral = "<<data->Integral()<<std::endl;
+
     plotter->DrawDataMCWithErrorBand(data, mc, 1.0, "TR", true, NULL, NULL, false, true, false);
 
     // ------------------------------------------------------------------------
@@ -126,30 +154,44 @@ void Fit(std::string rootDir_data, std::string rootDir_mc, std::string plotName)
     text.SetTextAlign(22);
     text.DrawLatex(0.30,0.87,"POT Normalized");
 
-    std::string output_folder = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Ana/CCProtonPi0/NTupleAnalysis/Output/Plots/OtherStudies/";
+    std::string output_folder = "/minerva/app/users/oaltinok/cmtuser/Minerva_v10r8p9/Ana/CCProtonPi0/NTupleAnalysis/Output/Plots/Paper/";
     std::string output = output_folder + plotName;    
  
     c1->Print(output.c_str(),"pdf");
 }
 
-void Fit_QSq()
+void Fit_QSq_Trung()
 {
     ROOT::Cintex::Cintex::Enable();
 
     std::string data_Trung_HighEnu = "/minerva/app/users/ltrung/cmtuser/Minerva_v10r6p13/Ana/CCPi0/ana/make_hists/q2-xsec-data-high-enu.root"; 
     std::string data_Trung_LowEnu = "/minerva/app/users/ltrung/cmtuser/Minerva_v10r6p13/Ana/CCPi0/ana/make_hists/q2-xsec-data-low-enu.root"; 
 
-    //std::string data_rootDir_HighEnu = "/minerva/data/users/oaltinok/NTupleAnalysis_QSq_HighEnu_4/Data/Analyzed/CrossSection.root";
-    //std::string data_rootDir_LowEnu  = "/minerva/data/users/oaltinok/NTupleAnalysis_QSq_LowEnu_4/Data/Analyzed/CrossSection.root";
-    //std::string mc_rootDir_HighEnu = "/minerva/data/users/oaltinok/NTupleAnalysis_QSq_HighEnu_4/MC/Analyzed/CrossSection.root";
-    //std::string mc_rootDir_LowEnu  = "/minerva/data/users/oaltinok/NTupleAnalysis_QSq_LowEnu_4/MC/Analyzed/CrossSection.root";
+    std::string plot_HighEnu = "Trung_QSq_HighEnu_ROOT_Fit.pdf"; 
+    std::string plot_LowEnu = "Trung_QSq_LowEnu_ROOT_Fit.pdf"; 
+    
+    Fit(data_Trung_HighEnu, data_Trung_HighEnu, plot_HighEnu, "q2-xsec-data", "q2-xsec-data");
+    Fit(data_Trung_LowEnu, data_Trung_LowEnu, plot_LowEnu, "q2-xsec-data", "q2-xsec-data");
+}
+
+void Fit_QSq_Ozgur()
+{
+    std::string data_rootDir_HighEnu = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_HighEnu/Data/Analyzed/CrossSection.root";
+    std::string data_rootDir_LowEnu = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_LowEnu/Data/Analyzed/CrossSection.root";
+
+    std::string mc_rootDir_HighEnu = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_HighEnu/MC/Analyzed/CrossSection.root";
+    std::string mc_rootDir_LowEnu = "/minerva/data/users/oaltinok/NTupleAnalysis_Signal_LowEnu/MC/Analyzed/CrossSection.root";
 
     std::string plot_HighEnu = "QSq_HighEnu_ROOT_Fit.pdf"; 
     std::string plot_LowEnu = "QSq_LowEnu_ROOT_Fit.pdf"; 
 
-    //Fit(data_rootDir_HighEnu, mc_rootDir_HighEnu, plot_HighEnu);
-    //Fit(data_rootDir_LowEnu, mc_rootDir_LowEnu, plot_LowEnu);
-    
-    Fit(data_Trung_HighEnu, data_Trung_HighEnu, plot_HighEnu);
-    Fit(data_Trung_LowEnu, data_Trung_LowEnu, plot_LowEnu);
+    Fit(data_rootDir_HighEnu, mc_rootDir_HighEnu, plot_HighEnu, "QSq_xsec", "QSq_xsec");
+    Fit(data_rootDir_LowEnu, mc_rootDir_LowEnu, plot_LowEnu, "QSq_xsec", "QSq_xsec");
 }
+
+void Fit_QSq()
+{
+    Fit_QSq_Ozgur();
+    Fit_QSq_Trung();
+}
+

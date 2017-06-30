@@ -539,28 +539,6 @@ void CCProtonPi0_CutList::initHistograms()
     AddVertErrorBands_MC(invMass_mc_reco_bckg);
     AddLatErrorBands_MC(invMass_mc_reco_bckg);
 
-    invMass_DeltaRich_all = new MnvH1D("invMass_DeltaRich_all","Data #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
-    invMass_DeltaRich_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    invMass_DeltaRich_all->GetYaxis()->SetTitle("Events/Bin");
-
-    invMass_DeltaRich_mc_reco_all = new MnvH1D("invMass_DeltaRich_mc_reco_all","MC Reconstructed #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
-    invMass_DeltaRich_mc_reco_all->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    invMass_DeltaRich_mc_reco_all->GetYaxis()->SetTitle("Events/Bin");
-    AddVertErrorBands_MC(invMass_DeltaRich_mc_reco_all);
-    AddLatErrorBands_MC(invMass_DeltaRich_mc_reco_all);
-
-    invMass_DeltaRich_mc_reco_signal = new MnvH1D("invMass_DeltaRich_mc_reco_signal","Signal #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
-    invMass_DeltaRich_mc_reco_signal->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    invMass_DeltaRich_mc_reco_signal->GetYaxis()->SetTitle("Events/Bin");
-    AddVertErrorBands_MC(invMass_DeltaRich_mc_reco_signal);
-    AddLatErrorBands_MC(invMass_DeltaRich_mc_reco_signal);
-
-    invMass_DeltaRich_mc_reco_bckg = new MnvH1D("invMass_DeltaRich_mc_reco_bckg","Background #pi^{0} Invariant Mass",binList.pi0_invMass_signal.get_nBins(), binList.pi0_invMass_signal.get_min(), binList.pi0_invMass_signal.get_max() );
-    invMass_DeltaRich_mc_reco_bckg->GetXaxis()->SetTitle("#pi^{0} Invariant Mass [MeV]");
-    invMass_DeltaRich_mc_reco_bckg->GetYaxis()->SetTitle("Events/Bin");
-    AddVertErrorBands_MC(invMass_DeltaRich_mc_reco_bckg);
-    AddLatErrorBands_MC(invMass_DeltaRich_mc_reco_bckg);
-
     int nBins = 20;
     double min_photon_E = 0.0;
     double max_photon_E = 1.0;
@@ -943,11 +921,6 @@ void CCProtonPi0_CutList::writeHistograms()
     invMass_mc_reco_all->Write();
     invMass_mc_reco_signal->Write();
     invMass_mc_reco_bckg->Write();
-
-    invMass_DeltaRich_all->Write();
-    invMass_DeltaRich_mc_reco_all->Write();
-    invMass_DeltaRich_mc_reco_signal->Write();
-    invMass_DeltaRich_mc_reco_bckg->Write();
 
     bckg_signal_diff_E_cos_openingAngle->Add(signal_gamma_E_cos_openingAngle, -1);
     bckg_signal_diff_E_cos_openingAngle->Add(bckg_gamma_E_cos_openingAngle, +1);

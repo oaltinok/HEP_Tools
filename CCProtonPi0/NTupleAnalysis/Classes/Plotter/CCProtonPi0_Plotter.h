@@ -162,8 +162,13 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawPaper_xsec_pi0_KE_BeforeFSI();
         void DrawPaper_xsec_pi0_theta_BeforeFSI();
         void DrawPaper_xsec_QSq_BeforeFSI();
+        void DrawPaper_xsec_W_BeforeFSI();
         void DrawPaper_xsec_Enu_BeforeFSI();
+        void DrawPaper_xsec_Enu10_BeforeFSI();
         void DrawPaper_xsec_deltaInvMass_BeforeFSI();
+        void DrawPaper_xsec_deltaInvMass2_BeforeFSI();
+        void DrawPaper_xsec_Delta_pi_theta_BeforeFSI();
+        void DrawPaper_xsec_Delta_pi_phi_BeforeFSI();
 
         void DrawPaper_xsec_muon_P_FSIType();
         void DrawPaper_xsec_muon_theta_FSIType();
@@ -178,19 +183,26 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void DrawPaper_xsec_pi0_theta_IntType();
         void DrawPaper_xsec_QSq_IntType();
         void DrawPaper_xsec_W_IntType();
+        void DrawPaper_xsec_W_NoLimit_IntType();
         void DrawPaper_xsec_Enu_IntType();
         void DrawPaper_xsec_deltaInvMass_IntType();
+        void DrawPaper_xsec_deltaInvMass2_IntType();
         void DrawPaper_xsec_Delta_pi_theta_IntType();
+        void DrawPaper_xsec_Delta_pi_theta_2Bin_IntType();
         void DrawPaper_xsec_Delta_pi_phi_IntType();
+        void DrawPaper_xsec_Delta_pi_phi_2Bin_IntType();
         
+        void DrawPaper_Delta_pi_theta_2Bin();
+        void DrawPaper_Delta_pi_phi_2Bin();
+
         void Supplement_Tables();
         void Supplement_XSec();
         void Supplement_Errors();
         void Supplement_Flux();
         void Supplement_Correlation();
-        void Supplement_XSec(std::string var_name, std::ofstream& file, std::string bin_format);
-        void Supplement_Errors(std::string var_name, std::ofstream& file, std::string bin_format);
-        void Supplement_Correlation(std::string var_name, std::ofstream& file, std::string bin_format, std::string bin_name);
+        void Supplement_XSec(std::string var_name, std::string root_dir, std::ofstream& file, std::string bin_format, std::string xsec_format);
+        void Supplement_Errors(std::string var_name, std::string root_dir, std::ofstream& file, std::string bin_format);
+        void Supplement_Correlation(std::string var_name, std::string root_dir, std::ofstream& file, std::string bin_format, std::string bin_name);
 
         // Data vs MC
         void plotInteraction_DataMC();
@@ -363,15 +375,18 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         MnvH2D* GetBckgSubtractedData_2D(rootDir& dir, std::string var_name, double nBckg);
         void PlotDelta();
         void Delta_pi_theta_Fit();
+        void Delta_pi_theta_diff_Fit();
         void Delta_pi_phi_Fit();
         void DrawBackgroundSubtraction(bool isMC);
         void DrawErrorSummary(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors = true);
         void DrawErrorSummary_PaperStyle(MnvH1D* hist, std::string var_name, std::string plotDir, bool groupErrors = true);
         void DrawTGraph(rootDir &dir, std::string var_name, std::string plotDir);
         void DrawEfficiencyCurve(rootDir& dir, std::string var_name, std::string plotDir);
+        void DrawEfficiencyCurve(TH1D* hist1D, std::string var_name, std::string plotDir);
         void DrawStackedMC_GammaEvis(rootDir &dir, int gammaID, std::string plotDir);
         void DrawStackedMC_GammaByPDG(rootDir &dir, std::string var_name, int gammaID, std::string plotDir);
         void Get_2p2h_UpperLimit();
+        double SumArea_2p2hSearch(TH1* hist, int x_min, int x_max, int y_min, int y_max);
         void Polarization_FSI_2D();
         void Polarization_FSI(bool isBeforeFSI, std::string var_name);
 
@@ -429,6 +444,13 @@ class CCProtonPi0_Plotter : public CCProtonPi0_NTupleAnalysis
         void Systematics_SingleUniverse(std::string var_name, std::string data_type, std::string err_name, int unv);
         TH1D* GetTotalErrorInGroup(MnvH1D* hist, std::vector<std::string> errGroup, bool area_normalized = false);
 
+        void Supplement_XSec_CSV();
+        void Supplement_XSec_CSV(std::string var_name, std::string root_dir, std::string xsec_format);
+        void Supplement_Errors_CSV();
+        void Supplement_Errors_CSV(std::string var_name, std::string root_dir);
+        void Supplement_Correlation_CSV();
+        void Supplement_Correlation_CSV(std::string var_name, std::string root_dir, std::string bin_name);
+        void Supplement_Flux_CSV();
 };
 
 #endif

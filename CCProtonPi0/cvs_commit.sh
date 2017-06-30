@@ -1,27 +1,19 @@
-CCPROTONPI0_V="v3_11"
+CCPROTONPI0_V="v3_12_Paper"
 cvs commit -m "${CCPROTONPI0_V}
-v3_11
+v3_12_Final_Paper
 CCProtonPi0 Updates:
 	No major changes
 
 ---------------------------------------------------------------------------------------------------
 NTupleAnalysis Updates:
-	Background Classification is Changed
-		Now checking particle content out of nucleus
+	New Signal Types 
 
-	New Cross Section Variables
-		deltaInvMass, Delta_pi_theta, Delta_pi_phi
-		Their lateral error bands are not ready.
-			I will implement in next version
-	
-	Many Plot and Table Improvements for Paper and Wine & Cheese 
-	
-	Collected all unique functions for paper plots under single file
-		CCProtonPi0_Plotter_Paper.cpp
-		CCProtonPi0_Plotter_Supplement.cpp
-		Functions have duplicated code, due to unique requirements from Tony
+	QSq Fit for LowEnu and HighEnu repeated
 
-	Added Missing Implementation Files to CVS
+	Finalized Paper Plots
+
+	Fixed a bug with Lateral Error bars with new signal types
+
 " .
 
 cvs tag -F ${CCPROTONPI0_V} .

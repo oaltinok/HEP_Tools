@@ -21,12 +21,12 @@ class CCProtonPi0_Particle : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> phi;
 
         TH1D* theta_error;
+        TH1D* theta_diff;
         TH1D* cos_theta_error;
         TH1D* KE_error;
         TH1D* P_error;
         TH1D* E_error;
 
-        TH1D* theta_Diff;
         TH1D* P_Diff;
         TH1D* E_Diff;
     
@@ -42,7 +42,6 @@ class CCProtonPi0_Particle : public CCProtonPi0_NTupleAnalysis
         CCProtonPi0_SingleBin bin_KE;
         CCProtonPi0_SingleBin bin_E_Diff;
         CCProtonPi0_SingleBin bin_P_Diff;
-        CCProtonPi0_SingleBin bin_theta_Diff;
           
         // File Locations
         std::string rootDir;

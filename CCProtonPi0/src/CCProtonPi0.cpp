@@ -1119,7 +1119,6 @@ StatusCode CCProtonPi0::reconstructEvent( Minerva::PhysicsEvent *event, Minerva:
         else return StatusCode::SUCCESS; 
     }
 
-
     debug()<<"FINISH: Michel Electron Search"<<endmsg;
 
     //==========================================================================
@@ -3361,7 +3360,7 @@ bool CCProtonPi0::PreFilterPi0(Minerva::PhysicsEvent *event, Minerva::GenMinInte
     // Visible Energy Limits for the PreFilter [MeV]
     // Other = Tracker + ECAL + HCAL
     const double max_Evis_Target = 20;
-    const double min_Evis_Other = 50; // energy smaller than  50 Mev must be ignored - Can't be a Pi0
+    const double min_Evis_Other = 50; // energy smaller than  50 MeV must be ignored - Can't be a Pi0
     const double max_Evis_Other = 2500; // energy bigger than 2500 MeV must be ignored - DIS Events
 
     const double inter_mod_z   = 45.0; // From geometry spreadsheet

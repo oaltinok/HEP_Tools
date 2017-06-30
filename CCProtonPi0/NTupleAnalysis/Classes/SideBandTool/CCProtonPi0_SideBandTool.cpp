@@ -277,9 +277,10 @@ void CCProtonPi0_SideBandTool::Plot_NoRatio(int ind, std::string sb_name, std::s
 
     MnvH1D* h_signal = new MnvH1D(*signal);
     h_signal->GetYaxis()->CenterTitle();
-    h_signal->SetFillColor(kGreen);
-    h_signal->SetLineColor(kGreen);
-    h_signal->SetFillStyle(3001);
+    h_signal->SetFillColor(kGreen+1);
+    h_signal->SetLineColor(kGreen+1);
+    h_signal->SetFillStyle(3002);
+    h_signal->SetLineWidth(2);
     h_signal->GetXaxis()->SetNdivisions(5,5,0);
     h_signal->GetYaxis()->SetNdivisions(5,5,0);
 
@@ -287,15 +288,17 @@ void CCProtonPi0_SideBandTool::Plot_NoRatio(int ind, std::string sb_name, std::s
     h_WithPi0->GetYaxis()->CenterTitle();
     h_WithPi0->SetFillColor(kRed);
     h_WithPi0->SetLineColor(kRed);
-    h_WithPi0->SetFillStyle(3001);
+    h_WithPi0->SetFillStyle(3002);
+    h_WithPi0->SetLineWidth(2);
     h_WithPi0->GetXaxis()->SetNdivisions(5,5,0);
     h_WithPi0->GetYaxis()->SetNdivisions(5,5,0);
   
     MnvH1D* h_QELike = new MnvH1D(*QELike);
     h_QELike->GetYaxis()->CenterTitle();
-    h_QELike->SetFillColor(kOrange);
-    h_QELike->SetLineColor(kOrange);
-    h_QELike->SetFillStyle(3001);
+    h_QELike->SetFillColor(kOrange-1);
+    h_QELike->SetLineColor(kOrange-1);
+    h_QELike->SetFillStyle(3002);
+    h_QELike->SetLineWidth(2);
     h_QELike->GetXaxis()->SetNdivisions(5,5,0);
     h_QELike->GetYaxis()->SetNdivisions(5,5,0);
  
@@ -303,15 +306,17 @@ void CCProtonPi0_SideBandTool::Plot_NoRatio(int ind, std::string sb_name, std::s
     h_SinglePiPlus->GetYaxis()->CenterTitle();
     h_SinglePiPlus->SetFillColor(kBlue);
     h_SinglePiPlus->SetLineColor(kBlue);
-    h_SinglePiPlus->SetFillStyle(3001);
+    h_SinglePiPlus->SetFillStyle(3002);
+    h_SinglePiPlus->SetLineWidth(2);
     h_SinglePiPlus->GetXaxis()->SetNdivisions(5,5,0);
     h_SinglePiPlus->GetYaxis()->SetNdivisions(5,5,0);
 
     MnvH1D* h_Other = new MnvH1D(*Other);
     h_Other->GetYaxis()->CenterTitle();
-    h_Other->SetFillColor(kGray);
-    h_Other->SetLineColor(kGray);
-    h_Other->SetFillStyle(3001);
+    h_Other->SetFillColor(kGray+2);
+    h_Other->SetLineColor(kGray+2);
+    h_Other->SetFillStyle(3002);
+    h_Other->SetLineWidth(2);
     h_Other->GetXaxis()->SetNdivisions(5,5,0);
     h_Other->GetYaxis()->SetNdivisions(5,5,0);
   
@@ -355,7 +360,7 @@ void CCProtonPi0_SideBandTool::Plot_NoRatio(int ind, std::string sb_name, std::s
     plotter->axis_label_font = 42;
     plotter->headroom = 1.75;
 
-    plotter->mc_line_width = 0;
+    plotter->mc_line_width = 2;
     
     TCanvas* c = new TCanvas("c");
 
@@ -374,7 +379,7 @@ void CCProtonPi0_SideBandTool::Plot_NoRatio(int ind, std::string sb_name, std::s
             bool     cov_area_normalize = false   
        )    
     */
-    plotter->DrawDataStackedMC(h_data, mc_hists, POT_ratio, "N", "Data (3.33e20 POT)", 0, 0, 3001);
+    plotter->DrawDataStackedMC(h_data, mc_hists, POT_ratio, "N", "Data (3.33e20 POT)", 0, 0, 3002);
 
     // Add Legend
     double leg_x_min = 0.55;
@@ -405,6 +410,7 @@ void CCProtonPi0_SideBandTool::Plot_NoRatio(int ind, std::string sb_name, std::s
     legend->Draw();
 
     // Add Alines if Original Side Band
+    //if (false) {
     if (sb_name.compare("Original") == 0) {
         double max_bin = h_data->GetMaximumBin();
         double hist_max = h_data->GetBinContent(max_bin)*1.2;

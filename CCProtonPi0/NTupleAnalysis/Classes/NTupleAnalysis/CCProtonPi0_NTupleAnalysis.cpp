@@ -6,9 +6,9 @@
 using namespace PlotUtils;
 
 // Initialize Constants
-const std::string CCProtonPi0_NTupleAnalysis::version = "RevisedBackground";
+const std::string CCProtonPi0_NTupleAnalysis::version = "RevisedSignal";
 
-const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-3; 
+const double CCProtonPi0_NTupleAnalysis::EPSILON = 1.0e-1; 
 
 const double CCProtonPi0_NTupleAnalysis::data_POT = 3.33153e+20;
 const double CCProtonPi0_NTupleAnalysis::mc_POT = 2.21867e+21; 
@@ -17,12 +17,20 @@ const double CCProtonPi0_NTupleAnalysis::POT_ratio = data_POT/mc_POT;
 const double CCProtonPi0_NTupleAnalysis::POT_ratio_2p2h = mc_POT/mc_2p2h_POT;
 
 const double CCProtonPi0_NTupleAnalysis::max_muon_theta = 25; // degree
-const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
-//const double CCProtonPi0_NTupleAnalysis::max_Enu = 4000; // MeV -- QSq Enu Study
-const double CCProtonPi0_NTupleAnalysis::max_Enu = 20000; // MeV
-//const double CCProtonPi0_NTupleAnalysis::min_Enu = 4000; // MeV -- QSq Enu Study
-const double CCProtonPi0_NTupleAnalysis::max_W = 1800; // MeV
 
+const double CCProtonPi0_NTupleAnalysis::min_Enu = 1500; // MeV
+const double CCProtonPi0_NTupleAnalysis::max_Enu = 20000; // MeV
+
+const double CCProtonPi0_NTupleAnalysis::min_Enu_LowEnu = 1500; // MeV
+const double CCProtonPi0_NTupleAnalysis::max_Enu_LowEnu = 4000; // MeV
+
+const double CCProtonPi0_NTupleAnalysis::min_Enu_HighEnu = 4000; // MeV
+const double CCProtonPi0_NTupleAnalysis::max_Enu_HighEnu = 10000; // MeV
+
+const double CCProtonPi0_NTupleAnalysis::max_W = 1800; // MeV
+const double CCProtonPi0_NTupleAnalysis::max_W_DeltaRich = 1400; // MeV
+
+const double CCProtonPi0_NTupleAnalysis::min_proton_KE = 100; // MeV
 
 const double CCProtonPi0_NTupleAnalysis::SENTINEL = -9.9;
 const double CCProtonPi0_NTupleAnalysis::MeV_to_GeV = pow(10,-3);
@@ -68,6 +76,14 @@ CCProtonPi0_NTupleAnalysis::CCProtonPi0_NTupleAnalysis()
     // Required for MINERvA Framework Classes
     ROOT::Cintex::Cintex::Enable();
 
+    // Signal Type
+    isSignalOriginal = true;
+    isSignalOriginal_NoWLimit = false;
+    isSignalDeltaRich = false;
+    isSignalTwoTrack = false;
+    isSignalLowEnu = false;
+    isSignalHighEnu = false;
+
     // For Adding Error Bars, Initialize FluxReweighter with minerva1
     // It will be updated according to playlist of the run during Analysis Stage
     std::cout<<"Initializing FluxReweighter for Flux Error Band"<<std::endl;
@@ -86,6 +102,18 @@ CCProtonPi0_NTupleAnalysis::CCProtonPi0_NTupleAnalysis()
     init2p2hFitResults();
 }
 
+void CCProtonPi0_NTupleAnalysis::InformSignalType()
+{
+    std::cout<<"<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>"<<std::endl;
+    if (isSignalOriginal) std::cout<<"\t\tSignal Type: Original"<<std::endl;
+    if (isSignalOriginal_NoWLimit) std::cout<<"\t\tSignal Type: Original No W Limit"<<std::endl;
+    if (isSignalDeltaRich) std::cout<<"\t\tSignal Type: Delta Rich"<<std::endl;
+    if (isSignalTwoTrack) std::cout<<"\t\tSignal Type: Two Track"<<std::endl;
+    if (isSignalLowEnu) std::cout<<"\t\tSignal Type: Low Enu"<<std::endl;
+    if (isSignalHighEnu) std::cout<<"\t\tSignal Type: High Enu"<<std::endl;
+    std::cout<<"<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>"<<std::endl;
+}
+
 void CCProtonPi0_NTupleAnalysis::OpenTextFile(std::string file_name, std::ofstream &file)
 {
     file.open(file_name.c_str());
@@ -95,6 +123,13 @@ void CCProtonPi0_NTupleAnalysis::OpenTextFile(std::string file_name, std::ofstre
     }else{
         std::cout<<"\t"<<file_name<<std::endl;
     }
+}
+
+TH1D* CCProtonPi0_NTupleAnalysis::GetTH1D(TFile* f, std::string var_name)
+{
+    TH1D* h = new TH1D( * dynamic_cast<TH1D*>(f->Get(var_name.c_str())) );
+    h->SetDirectory(NULL);
+    return h;
 }
 
 MnvH1D* CCProtonPi0_NTupleAnalysis::GetMnvH1D(TFile* f, std::string var_name)
@@ -876,16 +911,51 @@ void CCProtonPi0_NTupleAnalysis::printBins(const TH1* hist, const std::string va
 
 }
 
-bool CCProtonPi0_NTupleAnalysis::IsWInRange(double W)
+bool CCProtonPi0_NTupleAnalysis::IsProtonLong(double Tp)
 {
-    if (W <= max_W) return true;
+    if (Tp >= min_proton_KE) return true;
+    else return false;
+}
+
+bool CCProtonPi0_NTupleAnalysis::IsWInRange(double W)                          
+{
+    if (isSignalOriginal_NoWLimit) return true;
+
+    if (isSignalDeltaRich){
+        return IsWInRange_DeltaRich(W);
+    }else{
+        if (W <= max_W) return true;
+        else return false;
+    }
+}
+
+bool CCProtonPi0_NTupleAnalysis::IsWInRange_DeltaRich(double W)
+{
+    if (W <= max_W_DeltaRich) return true;
     else return false;
 }
 
 bool CCProtonPi0_NTupleAnalysis::IsEnuInRange(double Enu)
 {
-    if (Enu >= min_Enu && Enu <= max_Enu) return true;
-    //if (Enu >= min_Enu && Enu < max_Enu) return true; // QSq Study
+    if (isSignalLowEnu){
+        return IsEnuInRange_LowEnu(Enu);
+    }else if (isSignalHighEnu){
+        return IsEnuInRange_HighEnu(Enu);
+    }else{
+        if (Enu >= min_Enu && Enu <= max_Enu) return true;
+        else return false;
+    }
+}
+
+bool CCProtonPi0_NTupleAnalysis::IsEnuInRange_LowEnu(double Enu)
+{
+    if (Enu >= min_Enu_LowEnu && Enu <= max_Enu_LowEnu) return true;
+    else return false;
+}
+
+bool CCProtonPi0_NTupleAnalysis::IsEnuInRange_HighEnu(double Enu)
+{
+    if (Enu >= min_Enu_HighEnu && Enu <= max_Enu_HighEnu) return true;
     else return false;
 }
 

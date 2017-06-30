@@ -92,7 +92,7 @@ bool CCProtonPi0::tagSignal(Minerva::GenMinInteraction* truthEvent) const
 
     bool isSignal = isCCNeutrino && isFSGood && isAcceptanceGood && isKinematicsGood;
     bool isSignalOut_Acceptance = isCCNeutrino && isFSGood && !isAcceptanceGood && isKinematicsGood;
-    bool isSignalOut_Kinematics= isCCNeutrino && isFSGood && isAcceptanceGood && !isKinematicsGood;
+    bool isSignalOut_Kinematics = isCCNeutrino && isFSGood && isAcceptanceGood && !isKinematicsGood;
 
     double t_Enu = truthEvent->incomingEnergy(); 
     double W_exp = truthEvent->getDoubleData("W_exp");

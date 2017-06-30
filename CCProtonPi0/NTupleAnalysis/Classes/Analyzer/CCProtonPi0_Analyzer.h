@@ -245,10 +245,10 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         std::vector< std::vector<double> > Birks_random_shifts2D;
         
         // Delta RES - Polarization
-        double m_delta_pi_theta_reco;
-        double m_delta_pi_theta_true;
-        double m_delta_pi_phi_reco;
-        double m_delta_pi_phi_true;
+        double Delta_pi_theta_reco;
+        double Delta_pi_theta_true;
+        double Delta_pi_phi_reco;
+        double Delta_pi_phi_true;
 
         // Proton Systematics
         void FillProtonEnergyShiftVector(std::vector<double> &energy_shifts, Double_t shifts[10]);
@@ -264,15 +264,20 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
 
         void CorrectNTupleVariables();
         void CorrectEMShowerCalibration();
+        void ReviseSignal();
         void ReviseBackground();
         void CalcEventWeight();
         void AddErrorBands_Data();
         double GetMINOSCorrection();
         void GetDeltaPolarization();
         void GetDelta_pi_angles(bool isTruth);
+        std::vector<double> Calc_Delta_pi_angles(TLorentzVector proton_4P, TLorentzVector pi0_4P, TLorentzVector muon_4P, TLorentzVector beam_4P);
         void GetDeltaTransverse();
         TVector3 GetNeutrinoCrossMuon(bool isTruth);
         TLorentzVector GetDelta4P(bool isTruth);
+        TLorentzVector GetEnergyShiftedProton4P(double E_i);
+        TLorentzVector GetEnergyShiftedMuon4P(double E_i);
+        TLorentzVector GetThetaShiftedMuon4P(double theta_i);
 
         //  Interaction Specific Functions
         void FillSignalCharacteristics(bool isMinosMatched);
@@ -280,9 +285,11 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void FillBackgroundCharacteristics();
         int Get_nFS_pions();
         bool isMother_DIS_Fragment(int ind);
+        bool isMotherPiPlus(int mother);
         void fillInteractionMC();
         void fillInteractionReco();
         double calcDeltaInvariantMass(bool isTruth = false);
+        double calcDeltaInvariantMass(TLorentzVector proton, TLorentzVector pi0);
         int GetEjectedNucleonCount();
         double Calc_q3(bool isTruth);
         double Calc_Enu();
@@ -428,6 +435,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         double max_Pi0_invMass;
         double min_Delta_invMass;
         double max_Delta_invMass;
+        double min_proton_KE;
         double nMaxEvents;
         void updateCounters();
         void update_EventTypeCounters(int i);
@@ -435,6 +443,7 @@ class CCProtonPi0_Analyzer : public CCProtonPi0_NTupleAnalysis
         void writeEventTypeTable();
         void writeEventTypeTableLine(CCProtonPi0_Counter &counter, CCProtonPi0_Counter &base);
         bool isDeltaRichSample();
+        bool isDeltaRichSample_Truth();
         vector<double> PDG_pi0_Mother;
         vector<double> PDG_pi0_GrandMother;
         CCProtonPi0_Counter nSignalOut_Acceptance;

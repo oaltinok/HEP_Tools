@@ -26,6 +26,7 @@ DefaultPlotFolder_List=(Muon
         CutHists
         Systematics 
         Paper 
+        Supplement 
         OtherStudies)
 
 SystematicsList=(Summary

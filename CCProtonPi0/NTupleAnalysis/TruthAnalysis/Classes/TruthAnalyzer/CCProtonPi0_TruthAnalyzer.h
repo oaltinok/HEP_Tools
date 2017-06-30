@@ -47,6 +47,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         MnvH1D* deltaInvMass_mc_truth_all_signal;
         MnvH1D* Delta_pi_theta_mc_truth_all_signal;
         MnvH1D* Delta_pi_phi_mc_truth_all_signal;
+        TH1D* proton_KE_mc_truth_all_signal;
 
         // Cross Section Variables After FSI
         MnvH1D* muon_P_mc_truth_all_signal_AfterFSI;
@@ -119,6 +120,7 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         std::vector<MnvH1D*> updated_wgt_Rvn1pi;
 
         // Test Histograms
+        TH1D* nProtons;
         TH1D* Test_pi0_P;
         TH1D* Test_pi0_theta;
 
@@ -176,7 +178,13 @@ class CCProtonPi0_TruthAnalyzer : public CCProtonPi0_NTupleAnalysis
         double m_Delta_pi_phi;
         double m_Delta_pi_phi_BeforeFSI;
 
+        void CountProtons();
+        void CountMuonAcceptance();
+        void ReviseSignal();
+        void ReviseSignal_BeforeFSI();
         bool isDeltaRichSample();
+        bool isDeltaRichSample_BeforeFSI();
+        bool isTwoTrackSample_BeforeFSI();
         int GetFSIType();
         int GetIntType();
         void CountFSIType(int type);

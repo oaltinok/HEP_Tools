@@ -23,8 +23,8 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
     OpenTextFile(text_out_name, text_out);
 
     OpenRootFiles();
-    initHistograms();
     initXSecs();
+    initHistograms();
 
     std::cout<<"Done!"<<std::endl;
 }
@@ -32,7 +32,6 @@ CCProtonPi0_CrossSection::CCProtonPi0_CrossSection(bool isMC) : CCProtonPi0_NTup
 void CCProtonPi0_CrossSection::Calc_CrossSections()
 {
     Calc_Normalized_NBackground();
-    Calc_Normalized_NBackground_DeltaRich();
 
     // Regular Cross Section Calculation
     Calc_CrossSection(muon_P);   
@@ -108,7 +107,7 @@ void CCProtonPi0_CrossSection::Calc_CrossSection(XSec &var)
     std::cout<<"Calculating Cross Section for "<<var.name<<std::endl;
 
     // Data Correction
-    var.bckg_subtracted = Subtract_Background(var.all, var.mc_reco_bckg, var.bckg_estimated, var.name, var.isDeltaRich);
+    var.bckg_subtracted = Subtract_Background(var.all, var.mc_reco_bckg, var.bckg_estimated, var.name);
     var.unfolded = Unfold_Data(var.bckg_subtracted, var.response, var.name, var.nIterations);   
     var.efficiency_corrected = Efficiency_Divide(var.unfolded, var.eff, var.name);   
 
@@ -300,71 +299,6 @@ void CCProtonPi0_CrossSection::Calc_Normalized_NBackground()
     ClearAllUniversesVector(signal_invMass);
 }
 
-void CCProtonPi0_CrossSection::Calc_Normalized_NBackground_DeltaRich()
-{
-    text_out<<"\nCalculating N(Background) in Data in Delta Rich Sector"<<std::endl;
-   
-    // ------------------------------------------------------------------------
-    // Get Histograms for All Universes
-    // ------------------------------------------------------------------------
-    std::vector<TH1D*> data_invMass_DeltaRich;
-    std::vector<TH1D*> bckg_invMass_DeltaRich;
-    std::vector<TH1D*> signal_invMass_DeltaRich;
-    
-    std::vector<std::string> all_err_bands;
-    std::vector<std::string> bckg_err_bands;
-    std::vector<int> all_hist_ind;
-    std::vector<int> bckg_hist_ind;
-
-    GetAllUniverses(invMass_DeltaRich_all, data_invMass_DeltaRich, all_err_bands, all_hist_ind);
-    GetAllUniverses(invMass_DeltaRich_mc_reco_bckg, bckg_invMass_DeltaRich, bckg_err_bands, bckg_hist_ind);
-
-    // Get signal_invMass_DeltaRich (Background Subtracted)
-    //      Start as data hist (will subtract bckg to get correct signal in data)
-    for (unsigned int i = 0; i < data_invMass_DeltaRich.size(); ++i){
-        TH1D* temp = new TH1D(*data_invMass_DeltaRich[i]);
-        temp->SetName("invMass_DeltaRich_fit_signal");
-        signal_invMass_DeltaRich.push_back(temp);
-    }
-    
-    // POT Normalize MC Background Histogram if we are using Data
-    if (!m_isMC){
-        for (unsigned int i = 0; i < bckg_invMass_DeltaRich.size(); ++i){
-            bckg_invMass_DeltaRich[i]->Scale(POT_ratio);    
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // Estimate N(Background) in Data in each universe
-    // ------------------------------------------------------------------------
-    for (unsigned int i = 0; i < data_invMass_DeltaRich.size(); ++i){
-        text_out<<"Estimating Background in Error Band: "<<all_err_bands[i]<<" Universe = "<<all_hist_ind[i]<<std::endl;
-
-        // Subtract bckg hist from data hist
-        signal_invMass_DeltaRich[i]->Add(bckg_invMass_DeltaRich[i],-1); 
-
-        N_Background_Data_DeltaRich.push_back(bckg_invMass_DeltaRich[i]->Integral());
-        
-        double N_Signal_Data = signal_invMass_DeltaRich[i]->Integral();
-        double N_All_Data = data_invMass_DeltaRich[i]->Integral();
-
-        double percent_signal = N_Signal_Data/N_All_Data*100;
-        double percent_bckg = N_Background_Data[i]/N_All_Data*100.0;
-
-        text_out<<std::endl;
-        text_out<<"\tAll Events in Data (Signal Region) = "<<N_All_Data<<std::endl; 
-        text_out<<"\tBackground in Data (Signal Region) = "<<N_Background_Data[i]<<" "<<percent_bckg<<std::endl; 
-        text_out<<"\tSignal in Data (Signal Region) = "<<N_Signal_Data<<" "<<percent_signal<<std::endl; 
-        text_out<<std::endl;
-        text_out<<std::endl;
-    }
-
-    // Clear Allocated Memory
-    ClearAllUniversesVector(data_invMass_DeltaRich);
-    ClearAllUniversesVector(bckg_invMass_DeltaRich);
-    ClearAllUniversesVector(signal_invMass_DeltaRich);
-}
-
 void CCProtonPi0_CrossSection::NormalizeHistogram(TH1D* h)
 {
     text_out<<"\tNormalizing Background Shape on TH1D"<<std::endl;
@@ -391,11 +325,11 @@ void CCProtonPi0_CrossSection::NormalizeHistogram(MnvH1D* h)
     text_out<<"\tDone!"<<std::endl;
 }
 
-MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name, bool isDeltaRich)
+MnvH1D* CCProtonPi0_CrossSection::Subtract_Background(MnvH1D* data, MnvH1D* mc_bckg, MnvH1D* &bckg_estimated, std::string var_name)
 {
     text_out<<"Subtracting Background for "<<var_name<<std::endl;
     
-    std::vector<double> N_Bckg = isDeltaRich ? N_Background_Data_DeltaRich : N_Background_Data;
+    std::vector<double> N_Bckg = N_Background_Data;
 
     // Init MnvH1D
     MnvH1D* bckg_subtracted = new MnvH1D(*data); 
@@ -674,13 +608,8 @@ void CCProtonPi0_CrossSection::initHistograms()
     invMass_mc_reco_signal = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_signal");
     invMass_mc_reco_bckg = GetMnvH1D(f_mc_cutHists, "invMass_mc_reco_bckg");
 
-    // Pi0 Invariant Mass -- Delta Rich Sample
-    if (m_isMC) invMass_DeltaRich_all = GetMnvH1D(f_mc_cutHists, "invMass_DeltaRich_mc_reco_all");
-    else invMass_DeltaRich_all = GetMnvH1D(f_data_cutHists, "invMass_DeltaRich_all");
-
-    invMass_DeltaRich_mc_reco_signal = GetMnvH1D(f_mc_cutHists, "invMass_DeltaRich_mc_reco_signal");
-    invMass_DeltaRich_mc_reco_bckg = GetMnvH1D(f_mc_cutHists, "invMass_DeltaRich_mc_reco_bckg");
-
+    initHistograms_NuWro();
+    fillHistograms_NuWro();
 }
 
 
@@ -701,6 +630,170 @@ void CCProtonPi0_CrossSection::initFluxHistograms()
 
     // Add Missing Error Bands after rebinning
     AddErrorBands_FluxHistogram();
+}
+
+void CCProtonPi0_CrossSection::initHistograms_NuWro()
+{
+    NuWro_muon_P = new MnvH1D( "NuWro_muon_P",muon_P.plot_title.c_str(), binList.size_muon_P, binList.a_muon_P);
+    NuWro_muon_P->GetXaxis()->SetTitle(muon_P.plot_xlabel.c_str());
+    NuWro_muon_P->GetYaxis()->SetTitle(muon_P.plot_ylabel.c_str());
+
+    NuWro_muon_theta = new MnvH1D( "NuWro_muon_theta",muon_theta.plot_title.c_str(), binList.size_muon_theta, binList.a_muon_theta);
+    NuWro_muon_theta->GetXaxis()->SetTitle(muon_theta.plot_xlabel.c_str());
+    NuWro_muon_theta->GetYaxis()->SetTitle(muon_theta.plot_ylabel.c_str());
+
+    NuWro_pi0_KE = new MnvH1D( "NuWro_pi0_KE",pi0_KE.plot_title.c_str(), binList.size_pi0_KE, binList.a_pi0_KE);
+    NuWro_pi0_KE->GetXaxis()->SetTitle(pi0_KE.plot_xlabel.c_str());
+    NuWro_pi0_KE->GetYaxis()->SetTitle(pi0_KE.plot_ylabel.c_str());
+
+    NuWro_pi0_theta = new MnvH1D( "NuWro_pi0_theta",pi0_theta.plot_title.c_str(), binList.size_pi0_theta, binList.a_pi0_theta);
+    NuWro_pi0_theta->GetXaxis()->SetTitle(pi0_theta.plot_xlabel.c_str());
+    NuWro_pi0_theta->GetYaxis()->SetTitle(pi0_theta.plot_ylabel.c_str());
+
+    NuWro_QSq = new MnvH1D( "NuWro_QSq",QSq.plot_title.c_str(), binList.size_NuWro_QSq, binList.a_NuWro_QSq);
+    NuWro_QSq->GetXaxis()->SetTitle(QSq.plot_xlabel.c_str());
+    NuWro_QSq->GetYaxis()->SetTitle(QSq.plot_ylabel.c_str());
+
+    NuWro_Enu = new MnvH1D( "NuWro_Enu",Enu.plot_title.c_str(), binList.size_Enu, binList.a_Enu);
+    NuWro_Enu->GetXaxis()->SetTitle(Enu.plot_xlabel.c_str());
+    NuWro_Enu->GetYaxis()->SetTitle(Enu.plot_ylabel.c_str());
+
+    NuWro_W = new MnvH1D( "NuWro_W",W.plot_title.c_str(), 12, 0.6, 1.8);
+    NuWro_W->GetXaxis()->SetTitle(W.plot_xlabel.c_str());
+    NuWro_W->GetYaxis()->SetTitle(W.plot_ylabel.c_str());
+
+    NuWro_deltaInvMass = new MnvH1D( "NuWro_deltaInvMass",deltaInvMass.plot_title.c_str(), 12, 1.0, 1.6);
+    NuWro_deltaInvMass->GetXaxis()->SetTitle(deltaInvMass.plot_xlabel.c_str());
+    NuWro_deltaInvMass->GetYaxis()->SetTitle(deltaInvMass.plot_ylabel.c_str());
+
+    NuWro_Delta_pi_theta = new MnvH1D( "NuWro_Delta_pi_theta",Delta_pi_theta.plot_title.c_str(), 10, -1.0, 1.0);
+    NuWro_Delta_pi_theta->GetXaxis()->SetTitle(Delta_pi_theta.plot_xlabel.c_str());
+    NuWro_Delta_pi_theta->GetYaxis()->SetTitle(Delta_pi_theta.plot_ylabel.c_str());
+
+    NuWro_Delta_pi_phi = new MnvH1D( "NuWro_Delta_pi_phi",Delta_pi_phi.plot_title.c_str(), 10, 0.0, 360.0);
+    NuWro_Delta_pi_phi->GetXaxis()->SetTitle(Delta_pi_phi.plot_xlabel.c_str());
+    NuWro_Delta_pi_phi->GetYaxis()->SetTitle(Delta_pi_phi.plot_ylabel.c_str());
+}
+
+void CCProtonPi0_CrossSection::fillHistograms_NuWro()
+{
+    NuWro_muon_P->SetBinContent(1, 2.15702e-40);
+    NuWro_muon_P->SetBinContent(2, 4.14217e-40);
+    NuWro_muon_P->SetBinContent(3, 3.92447e-40);
+    NuWro_muon_P->SetBinContent(4, 2.92186e-40);
+    NuWro_muon_P->SetBinContent(5, 1.69869e-40);
+    NuWro_muon_P->SetBinContent(6, 9.18812e-41);
+    NuWro_muon_P->SetBinContent(7, 4.83039e-41);
+    NuWro_muon_P->SetBinContent(8, 2.74999e-41);
+    NuWro_muon_P->Scale(1e40);
+    
+    NuWro_muon_theta->SetBinContent(1, 1.47167e-41);
+    NuWro_muon_theta->SetBinContent(2, 4.32192e-41);
+    NuWro_muon_theta->SetBinContent(3, 6.00486e-41);
+    NuWro_muon_theta->SetBinContent(4, 6.38084e-41);
+    NuWro_muon_theta->SetBinContent(5, 6.34503e-41);
+    NuWro_muon_theta->SetBinContent(6, 6.17674e-41);
+    NuWro_muon_theta->SetBinContent(7, 5.68976e-41);
+    NuWro_muon_theta->SetBinContent(8, 4.75877e-41);
+    NuWro_muon_theta->SetBinContent(9, 3.70103e-41);
+    NuWro_muon_theta->Scale(1e40);
+    
+    NuWro_pi0_KE->SetBinContent(1, 1.59413e-39);
+    NuWro_pi0_KE->SetBinContent(2, 3.40741e-39);
+    NuWro_pi0_KE->SetBinContent(3, 2.12336e-39);
+    NuWro_pi0_KE->SetBinContent(4, 1.33632e-39); 
+    NuWro_pi0_KE->SetBinContent(5, 7.84893e-40);
+    NuWro_pi0_KE->SetBinContent(6, 4.62629e-40); 
+    NuWro_pi0_KE->SetBinContent(7, 3.29426e-40);
+    NuWro_pi0_KE->Scale(1e40);
+ 
+    NuWro_pi0_theta->SetBinContent(1, 2.23437e-42);
+    NuWro_pi0_theta->SetBinContent(2, 7.0182e-42);
+    NuWro_pi0_theta->SetBinContent(3, 1.21673e-41);
+    NuWro_pi0_theta->SetBinContent(4, 1.45305e-41);
+    NuWro_pi0_theta->SetBinContent(5, 1.33489e-41);
+    NuWro_pi0_theta->SetBinContent(6, 1.13151e-41);
+    NuWro_pi0_theta->SetBinContent(7, 1.07135e-41);
+    NuWro_pi0_theta->SetBinContent(8, 9.26689e-42);
+    NuWro_pi0_theta->SetBinContent(9, 7.95635e-42);
+    NuWro_pi0_theta->SetBinContent(10, 6.08006e-42); 
+    NuWro_pi0_theta->SetBinContent(11, 2.48502e-42);
+    NuWro_pi0_theta->Scale(1e40);
+
+    NuWro_QSq->SetBinContent(1, 9.76819e-40);
+    NuWro_QSq->SetBinContent(2, 1.29335e-39);
+    NuWro_QSq->SetBinContent(3, 1.22819e-39);
+    NuWro_QSq->SetBinContent(4, 1.0137e-39);
+    NuWro_QSq->SetBinContent(5, 7.26169e-40);
+    NuWro_QSq->SetBinContent(6, 4.95332e-40);
+    NuWro_QSq->SetBinContent(7, 2.53658e-40);
+    NuWro_QSq->SetBinContent(8, 1.11002e-40);
+    NuWro_QSq->Scale(1e40);
+
+    NuWro_W->SetBinContent(1, 9.30986e-42);
+    NuWro_W->SetBinContent(2, 2.22004e-41);
+    NuWro_W->SetBinContent(3, 4.22525e-41);
+    NuWro_W->SetBinContent(4, 1.08854e-40);
+    NuWro_W->SetBinContent(5, 3.65949e-40);
+    NuWro_W->SetBinContent(6, 1.55403e-39);
+    NuWro_W->SetBinContent(7, 2.57239e-39);
+    NuWro_W->SetBinContent(8, 2.04531e-39);
+    NuWro_W->SetBinContent(9, 1.74452e-39);
+    NuWro_W->SetBinContent(10, 1.51321e-39);
+    NuWro_W->SetBinContent(11, 1.25039e-39);
+    NuWro_W->SetBinContent(12, 9.35283e-40);
+    NuWro_W->Scale(1e40);
+
+    NuWro_Enu->SetBinContent(1, 0.0);
+    NuWro_Enu->SetBinContent(2, 7.32875e-40);
+    NuWro_Enu->SetBinContent(3, 1.20116e-39);
+    NuWro_Enu->SetBinContent(4, 1.15649e-39);
+    NuWro_Enu->SetBinContent(5, 1.67951e-39);
+    NuWro_Enu->SetBinContent(6, 1.8196e-39);
+    NuWro_Enu->SetBinContent(7, 2.02539e-39);
+    NuWro_Enu->SetBinContent(8, 2.09287e-39);
+    NuWro_Enu->SetBinContent(9, 2.04311e-39);
+    NuWro_Enu->SetBinContent(10, 2.07627e-39);
+    NuWro_Enu->SetBinContent(11, 2.07613e-39);
+    NuWro_Enu->Scale(1e40);
+
+    NuWro_deltaInvMass->SetBinContent(1, 0.0);
+    NuWro_deltaInvMass->SetBinContent(2, 3.0078e-40);
+    NuWro_deltaInvMass->SetBinContent(3, 9.65361e-40);
+    NuWro_deltaInvMass->SetBinContent(4, 1.63854e-39);
+    NuWro_deltaInvMass->SetBinContent(5, 2.11549e-39);
+    NuWro_deltaInvMass->SetBinContent(6, 1.4638e-39);
+    NuWro_deltaInvMass->SetBinContent(7, 9.72523e-40);
+    NuWro_deltaInvMass->SetBinContent(8, 7.00388e-40);
+    NuWro_deltaInvMass->SetBinContent(9, 4.46873e-40);
+    NuWro_deltaInvMass->SetBinContent(10, 2.67838e-40);
+    NuWro_deltaInvMass->SetBinContent(11, 1.33203e-40);
+    NuWro_deltaInvMass->SetBinContent(12, 6.0156e-41); 
+    NuWro_deltaInvMass->Scale(1e40);
+    
+    NuWro_Delta_pi_theta->SetBinContent(1, 4.1214e-40);
+    NuWro_Delta_pi_theta->SetBinContent(2, 3.10448e-40);
+    NuWro_Delta_pi_theta->SetBinContent(3, 2.63899e-40);
+    NuWro_Delta_pi_theta->SetBinContent(4, 2.2845e-40);
+    NuWro_Delta_pi_theta->SetBinContent(5, 1.96223e-40);
+    NuWro_Delta_pi_theta->SetBinContent(6, 2.00878e-40);
+    NuWro_Delta_pi_theta->SetBinContent(7, 1.89062e-40);
+    NuWro_Delta_pi_theta->SetBinContent(8, 1.80468e-40);
+    NuWro_Delta_pi_theta->SetBinContent(9, 1.597e-40);
+    NuWro_Delta_pi_theta->SetBinContent(10, 1.46809e-40);
+    NuWro_Delta_pi_theta->Scale(1e40);
+    
+    NuWro_Delta_pi_phi->SetBinContent(1, 1.16373e-42);
+    NuWro_Delta_pi_phi->SetBinContent(2, 1.2811e-42);
+    NuWro_Delta_pi_phi->SetBinContent(3, 1.25524e-42);
+    NuWro_Delta_pi_phi->SetBinContent(4, 1.34277e-42);
+    NuWro_Delta_pi_phi->SetBinContent(5, 1.31293e-42);
+    NuWro_Delta_pi_phi->SetBinContent(6, 1.29503e-42);
+    NuWro_Delta_pi_phi->SetBinContent(7, 1.35669e-42);
+    NuWro_Delta_pi_phi->SetBinContent(8, 1.20153e-42);
+    NuWro_Delta_pi_phi->SetBinContent(9, 1.23137e-42);
+    NuWro_Delta_pi_phi->SetBinContent(10, 1.27115e-42);
+    NuWro_Delta_pi_phi->Scale(1e40);
 }
 
 void CCProtonPi0_CrossSection::initHistograms(XSec &var)
@@ -1001,11 +1094,19 @@ void CCProtonPi0_CrossSection::writeHistograms()
     invMass_all->Write();
     invMass_mc_reco_signal->Write();
     invMass_mc_reco_bckg->Write();
- 
-    invMass_DeltaRich_all->Write();
-    invMass_DeltaRich_mc_reco_signal->Write();
-    invMass_DeltaRich_mc_reco_bckg->Write();
-   
+
+    // NuWro Predictions
+    NuWro_muon_P->Write();
+    NuWro_muon_theta->Write();
+    NuWro_pi0_KE->Write();
+    NuWro_pi0_theta->Write();
+    NuWro_QSq->Write();
+    NuWro_Enu->Write();
+    NuWro_W->Write();
+    NuWro_deltaInvMass->Write();
+    NuWro_Delta_pi_theta->Write();
+    NuWro_Delta_pi_phi->Write();
+
     writeHistograms(muon_P);
     writeHistograms(muon_theta);
     writeHistograms(pi0_P);
@@ -1022,4 +1123,5 @@ void CCProtonPi0_CrossSection::writeHistograms()
 }
 
 #endif
+
 

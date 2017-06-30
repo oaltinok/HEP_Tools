@@ -27,12 +27,33 @@ const int CCProtonPi0_BinList::size_pi0_theta = 11;
 const double CCProtonPi0_BinList::a_QSq[] = {0, 0.10, 0.25, 0.40, 0.60, 0.85, 1.15, 1.55, 2.0};
 const int CCProtonPi0_BinList::size_QSq = 8;
 
+const double CCProtonPi0_BinList::a_NuWro_QSq[] = {0, 0.1, 0.2, 0.4, 0.6, 0.8, 1.1, 1.6, 2.0};
+const int CCProtonPi0_BinList::size_NuWro_QSq = 8;
+
 const double CCProtonPi0_BinList::a_Enu[] = {0, 1.5, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0, 20.0};
 const int CCProtonPi0_BinList::size_Enu = 11;
 
 const double CCProtonPi0_BinList::a_Enu_Fine[] = {0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0,
         5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0};
 const int CCProtonPi0_BinList::size_Enu_Fine = 30;
+
+const double CCProtonPi0_BinList::a_deltaInvMass[] = {1.0, 1.1, 1.15, 1.20, 1.25, 1.30, 1.40, 1.60};
+const int CCProtonPi0_BinList::size_deltaInvMass = 7;
+
+const double CCProtonPi0_BinList::a_deltaInvMass2[] = {1.0, 1.1, 1.15, 1.20, 1.25, 1.30, 1.40, 1.60, 1.80};
+const int CCProtonPi0_BinList::size_deltaInvMass2 = 8;
+
+//const double CCProtonPi0_BinList::a_W[] = {0.6, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8};
+//const int CCProtonPi0_BinList::size_W = 10;
+
+const double CCProtonPi0_BinList::a_W[] = {0.6, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0};
+const int CCProtonPi0_BinList::size_W = 17;
+
+const double CCProtonPi0_BinList::a_Delta_pi_phi[] = {0.0, 10.0, 45.0, 90.0, 135.0, 180.0, 225.0, 270.0, 315.0, 350.0, 360.0};
+const int CCProtonPi0_BinList::size_Delta_pi_phi = 10;
+
+const double CCProtonPi0_BinList::a_Delta_pi_theta[] = {-1.0, -0.98, -0.8, -0.6, -0.4, -0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 0.98, 1.0};
+const int CCProtonPi0_BinList::size_Delta_pi_theta = 12;
 
 CCProtonPi0_BinList::CCProtonPi0_BinList()
 {
@@ -51,9 +72,10 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     QSq.setBin(40,0.0,2.0);
     beamE.setBin(40,0,20.0);
     w.setBin(12,0.6,1.8);
+    proton_KE.setBin(60, 0.0, 1.5);
    
     // Truth Histograms
-    mc_w.setBin(40,0.5,2.0);
+    mc_w.setBin(30,0.5,2.0);
     mc_QSq.setBin(40,0.0,2.0);
     mc_incomingE.setBin(40,0,20.0);
 
@@ -64,6 +86,7 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     proton_theta.setBin(12, 0.0, 25.0);
     true_false.setBin(2,0.0,2.0);
     error.setBin(80, -1.0, 1.0);
+    theta_diff.setBin(40, -10.0, 10.0);
     ratio.setBin(50, 0.0, 4.0);
     angle.setBin(18, 0.0, 180.0);
     particleScore.setBin(100,0.0,1.0);
@@ -74,11 +97,13 @@ CCProtonPi0_BinList::CCProtonPi0_BinList()
     multiplicity.setBin(15,0.0,15.0);
     fraction.setBin(11,0,1.1);
     fraction2.setBin(200,-0.5,1.5);
-    vertex_z.setBin(114,4300.0,10000.0);
+    vertex_z.setBin(28,5800.0,8600.0);
     vertex_x_y.setBin(200,-1000.0,1000.0);
     deltaInvMass.setBin(12,1.0,1.6);
-    Delta_pi_theta.setBin(10,-1.0,1.0);
-    Delta_pi_phi.setBin(10,0.0,360.0);
+    //Delta_pi_theta.setBin(10, -1.0, 1.0);
+    Delta_pi_theta.setBin(2, -1.0, 1.0);
+    //Delta_pi_phi.setBin(8, 0.0, 360.0);
+    Delta_pi_phi.setBin(2, 0.0, 360.0);
     preFilter_Status.setBin(4,0,4);
     preFilter_RejectedEnergy.setBin(50,0.0,5000.0);
     strip_numbers.setBin(127,1,127);

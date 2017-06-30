@@ -9,7 +9,7 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
 {
     // Control Flow
     bool applyMaxEvents = false;
-    double nMaxEvents = 100000000;
+    double nMaxEvents = 10000;
 
     fillErrors_ByHand = true;
     
@@ -61,29 +61,19 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
         // Count Events Only inside the Fidicual Volume
         if (truth_isFidVol){
 
-            // QSq Study
-            //if ( !IsEnuInRange(mc_incomingE)) continue;
-
             FillGENIE_Tuning();
+            
+            if (truth_isSignal) ReviseSignal();
+            if (truth_isSignal_BeforeFSI) ReviseSignal_BeforeFSI();
 
             // Count Signal Out due to Acceptance or Kinematics
             if (truth_isSignalOut_Acceptance) nSignalOut_Acceptance.increment(cvweight);
             if (truth_isSignalOut_Kinematics) nSignalOut_Kinematics.increment(cvweight);
+            CountMuonAcceptance();
 
             // Count Signal and Background inside Fiducial Volume
             if (truth_isSignal) nSignal.increment(cvweight);
             else nBckg.increment(cvweight);
-
-            // Count if Muon Angle is Small or Large
-
-            TVector3 muon_3P(mc_primFSLepton[0], mc_primFSLepton[1], mc_primFSLepton[2]);
-            TVector3 unit_muon_3P = muon_3P.Unit();
-            TVector3 unit_z_axis(0.0, 0.0, 1.0);
-
-            double muon_angle = acos(unit_muon_3P.Dot(unit_z_axis));
-            muon_angle = muon_angle * rad_to_deg;
-            if (muon_angle > 25) nMuonAngle_Large.increment(cvweight);
-            else nMuonAngle_Small.increment(cvweight);
             
             if (truth_isSignalOut_Kinematics){
                 FillSignalOut_Kinematics();    
@@ -92,9 +82,7 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
             if (truth_isSignal_BeforeFSI){
                 nSignal_BeforeFSI.increment(cvweight);
 
-                if (truth_W_exp_BeforeFSI > 0 && truth_W_exp_BeforeFSI < 1400){
-                    GetDelta_pi_angles_BeforeFSI(); // Also Calculates the deltaInvMass_BeforeFSI
-                }
+                GetDelta_pi_angles_BeforeFSI(); // Also Calculates the deltaInvMass_BeforeFSI
 
                 FillSignal_XSec_Variables_BeforeFSI();
             }
@@ -102,6 +90,8 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
             CountSignalFeed();
          
             if (truth_isSignal){
+                
+                CountProtons();
 
                 CalcDeltaRichKinematics();
 
@@ -130,9 +120,82 @@ void CCProtonPi0_TruthAnalyzer::Loop(std::string playlist)
     writeHistograms();
 }
 
+void CCProtonPi0_TruthAnalyzer::CountProtons()
+{
+    double count = 0;
+    for (int i = 0; i < mc_nFSPart; ++i){
+        if (mc_FSPartPDG[i] == 2212) count++; 
+    }
+
+    FillHistogram(nProtons, count);
+}
+
+void CCProtonPi0_TruthAnalyzer::CountMuonAcceptance()
+{
+    TVector3 muon_3P(mc_primFSLepton[0], mc_primFSLepton[1], mc_primFSLepton[2]);
+    TVector3 unit_muon_3P = muon_3P.Unit();
+    TVector3 unit_z_axis(0.0, 0.0, 1.0);
+
+    double muon_angle = acos(unit_muon_3P.Dot(unit_z_axis));
+    muon_angle = muon_angle * rad_to_deg;
+    if (muon_angle > 25) nMuonAngle_Large.increment(cvweight);
+    else nMuonAngle_Small.increment(cvweight);
+}
+
+bool CCProtonPi0_TruthAnalyzer::isTwoTrackSample_BeforeFSI()
+{
+    // ------------------------------------------------------------------------
+    // Get Proton 
+    // ------------------------------------------------------------------------
+    int proton_i = -1;
+    int nProtons = 0;
+
+    for (int i = 0; i < mc_er_nPart; ++i){
+        if (mc_er_status[i] != 14) continue;
+   
+        if (mc_er_ID[i] == 2212){
+            proton_i = i;
+            nProtons++;
+        }
+    }
+
+    if (proton_i == -1 || nProtons != 1){
+        RunTimeError("Not Signal Before FSI");
+    }
+
+    double Tp = mc_er_E[proton_i] - proton_mass;
+    return IsProtonLong(Tp);
+}
+
+bool CCProtonPi0_TruthAnalyzer::isDeltaRichSample_BeforeFSI()
+{
+    // ------------------------------------------------------------------------
+    // Get Proton 
+    // ------------------------------------------------------------------------
+    int proton_i = -1;
+    int nProtons = 0;
+
+    for (int i = 0; i < mc_er_nPart; ++i){
+        if (mc_er_status[i] != 14) continue;
+   
+        if (mc_er_ID[i] == 2212){
+            proton_i = i;
+            nProtons++;
+        }
+    }
+
+    if (proton_i == -1 || nProtons != 1){
+        RunTimeError("Not Signal Before FSI");
+    }
+
+    double Tp = mc_er_E[proton_i] - proton_mass;
+    return (IsWInRange_DeltaRich(truth_W_exp_BeforeFSI) && IsProtonLong(Tp));
+}
+
 bool CCProtonPi0_TruthAnalyzer::isDeltaRichSample()
 {
-    return (truth_W_exp > 0.0 && truth_W_exp < 1400);
+    double Tp = truth_proton_4P[3] - proton_mass;
+    return (IsWInRange_DeltaRich(truth_W_exp) && IsProtonLong(Tp));
 }
 
 void CCProtonPi0_TruthAnalyzer::CalcDeltaRichKinematics()
@@ -436,6 +499,8 @@ CCProtonPi0_TruthAnalyzer::CCProtonPi0_TruthAnalyzer() :
     openTextFiles();
     
     resetCounters();
+
+    InformSignalType();
     
     std::cout<<"Finished"<<std::endl;
 }
@@ -590,13 +655,17 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     // ------------------------------------------------------------------------
     // Test Variables
     // ------------------------------------------------------------------------
+    nProtons = new TH1D("nProtons","N(Protons) in Signal",10,0.0,10.0);
+    nProtons->GetXaxis()->SetTitle("N(Protons)");
+    nProtons->GetYaxis()->SetTitle("Events/Bin");
+    
     Test_pi0_P = new TH1D("Test_pi0_P","Pi0 Momentum Check",40,-100,100);
     Test_pi0_P->GetXaxis()->SetTitle("P_{Trajectory} - P_{EventRecord} [Mev]");
-    Test_pi0_P->GetYaxis()->SetTitle("NEvents()");
+    Test_pi0_P->GetYaxis()->SetTitle("N(Events)");
 
     Test_pi0_theta = new TH1D("Test_pi0_theta","Pi0 Angle Check",40,-10,10);
     Test_pi0_theta->GetXaxis()->SetTitle("#theta_{Trajectory} - #theta_{EventRecord} [degree]");
-    Test_pi0_theta->GetYaxis()->SetTitle("NEvents()");
+    Test_pi0_theta->GetYaxis()->SetTitle("N(Events)");
 
     // ------------------------------------------------------------------------
     // Muon Variables
@@ -642,12 +711,12 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     QSq_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(QSq_mc_truth_all_signal);
 
-    W_mc_truth_all_signal = new MnvH1D( "W_mc_truth_all_signal","W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+    W_mc_truth_all_signal = new MnvH1D( "W_mc_truth_all_signal","W for Signal Events",binList.size_W, binList.a_W);
     W_mc_truth_all_signal->GetXaxis()->SetTitle("W_{exp} (GeV)");
     W_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(W_mc_truth_all_signal);
 
-    deltaInvMass_mc_truth_all_signal = new MnvH1D( "deltaInvMass_mc_truth_all_signal","deltaInvMass for Signal Events",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
+    deltaInvMass_mc_truth_all_signal = new MnvH1D( "deltaInvMass_mc_truth_all_signal","deltaInvMass for Signal Events", binList.size_deltaInvMass, binList.a_deltaInvMass);
     deltaInvMass_mc_truth_all_signal->GetXaxis()->SetTitle("deltaInvMass");
     deltaInvMass_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(deltaInvMass_mc_truth_all_signal);
@@ -662,6 +731,10 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     Delta_pi_phi_mc_truth_all_signal->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(Delta_pi_phi_mc_truth_all_signal);
 
+    proton_KE_mc_truth_all_signal = new TH1D( "proton_KE_mc_truth_all_signal","Proton Kinetic Energy for Signal Events",binList.proton_KE.get_nBins(), binList.proton_KE.get_min(), binList.proton_KE.get_max());
+    proton_KE_mc_truth_all_signal->GetXaxis()->SetTitle("T_{p} (GeV)");
+    proton_KE_mc_truth_all_signal->GetYaxis()->SetTitle("Events/(0.025 GeV)");
+    
     // ------------------------------------------------------------------------
     // Muon Variables -- Before FSI
     // ------------------------------------------------------------------------
@@ -716,12 +789,12 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     deltaInvMass_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(deltaInvMass_mc_truth_all_signal_BeforeFSI);
 
-    Delta_pi_theta_mc_truth_all_signal_BeforeFSI = new MnvH1D( "Delta_pi_theta_mc_truth_all_signal_BeforeFSI","",40, -1.0, 1.0);
+    Delta_pi_theta_mc_truth_all_signal_BeforeFSI = new MnvH1D( "Delta_pi_theta_mc_truth_all_signal_BeforeFSI","",binList.size_Delta_pi_theta, binList.a_Delta_pi_theta);
     Delta_pi_theta_mc_truth_all_signal_BeforeFSI->GetXaxis()->SetTitle("Delta_pi_theta");
     Delta_pi_theta_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(Delta_pi_theta_mc_truth_all_signal_BeforeFSI);
 
-    Delta_pi_phi_mc_truth_all_signal_BeforeFSI = new MnvH1D( "Delta_pi_phi_mc_truth_all_signal_BeforeFSI","",40, 0.0, 360.0);
+    Delta_pi_phi_mc_truth_all_signal_BeforeFSI = new MnvH1D( "Delta_pi_phi_mc_truth_all_signal_BeforeFSI","",binList.size_Delta_pi_phi, binList.a_Delta_pi_phi);
     Delta_pi_phi_mc_truth_all_signal_BeforeFSI->GetXaxis()->SetTitle("Delta_pi_phi");
     Delta_pi_phi_mc_truth_all_signal_BeforeFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(Delta_pi_phi_mc_truth_all_signal_BeforeFSI);
@@ -780,12 +853,12 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
     deltaInvMass_mc_truth_all_signal_AfterFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(deltaInvMass_mc_truth_all_signal_AfterFSI);
 
-    Delta_pi_theta_mc_truth_all_signal_AfterFSI = new MnvH1D( "Delta_pi_theta_mc_truth_all_signal_AfterFSI","",40, -1.0, 1.0);
+    Delta_pi_theta_mc_truth_all_signal_AfterFSI = new MnvH1D( "Delta_pi_theta_mc_truth_all_signal_AfterFSI","",binList.size_Delta_pi_theta, binList.a_Delta_pi_theta);
     Delta_pi_theta_mc_truth_all_signal_AfterFSI->GetXaxis()->SetTitle("Delta_pi_theta");
     Delta_pi_theta_mc_truth_all_signal_AfterFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(Delta_pi_theta_mc_truth_all_signal_AfterFSI);
 
-    Delta_pi_phi_mc_truth_all_signal_AfterFSI = new MnvH1D( "Delta_pi_phi_mc_truth_all_signal_AfterFSI","",40, 0.0, 360.0);
+    Delta_pi_phi_mc_truth_all_signal_AfterFSI = new MnvH1D( "Delta_pi_phi_mc_truth_all_signal_AfterFSI","",binList.size_Delta_pi_phi, binList.a_Delta_pi_phi);
     Delta_pi_phi_mc_truth_all_signal_AfterFSI->GetXaxis()->SetTitle("Delta_pi_phi");
     Delta_pi_phi_mc_truth_all_signal_AfterFSI->GetYaxis()->SetTitle("N(Events)");
     AddVertErrorBands_TruthTree(Delta_pi_phi_mc_truth_all_signal_AfterFSI);
@@ -830,19 +903,19 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         AddVertErrorBands_TruthTree(temp);
         Enu_mc_truth_all_signal_FSIType.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d", "QSq_mc_truth_all_signal_FSIType",i),"Q^{2} for Signal Events",binList.size_QSq, binList.a_QSq);
+        temp = new MnvH1D( Form("%s_%d", "QSq_mc_truth_all_signal_FSIType",i),"Q^{2} for Signal Events", binList.size_QSq, binList.a_QSq);
         temp->GetXaxis()->SetTitle("Q^{2} [GeV^{2}]");
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBands_TruthTree(temp);
         QSq_mc_truth_all_signal_FSIType.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d", "W_mc_truth_all_signal_FSIType",i), "W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+        temp = new MnvH1D( Form("%s_%d", "W_mc_truth_all_signal_FSIType",i), "W for Signal Events", binList.size_W, binList.a_W);
         temp->GetXaxis()->SetTitle("W_{exp} (GeV)");
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBands_TruthTree(temp);
         W_mc_truth_all_signal_FSIType.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","deltaInvMass_mc_truth_all_signal_FSIType",i),"",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
+  
+        temp = new MnvH1D( Form("%s_%d","deltaInvMass_mc_truth_all_signal_FSIType",i),"", binList.size_deltaInvMass, binList.a_deltaInvMass);
         temp->GetXaxis()->SetTitle("deltaInvMass");
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBands_TruthTree(temp);
@@ -907,13 +980,13 @@ void CCProtonPi0_TruthAnalyzer::initHistograms()
         AddVertErrorBands_TruthTree(temp);
         QSq_mc_truth_all_signal_IntType.push_back(temp);
 
-        temp = new MnvH1D( Form("%s_%d", "W_mc_truth_all_signal_IntType",i), "W for Signal Events",binList.w.get_nBins(), binList.w.get_min(), binList.w.get_max());
+        temp = new MnvH1D( Form("%s_%d", "W_mc_truth_all_signal_IntType",i), "W for Signal Events",binList.size_W, binList.a_W);
         temp->GetXaxis()->SetTitle("W_{exp} (GeV)");
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBands_TruthTree(temp);
         W_mc_truth_all_signal_IntType.push_back(temp);
-
-        temp = new MnvH1D( Form("%s_%d","deltaInvMass_mc_truth_all_signal_IntType",i),"",binList.deltaInvMass.get_nBins(), binList.deltaInvMass.get_min(), binList.deltaInvMass.get_max());
+        
+        temp = new MnvH1D( Form("%s_%d","deltaInvMass_mc_truth_all_signal_IntType",i),"",binList.size_deltaInvMass, binList.a_deltaInvMass);
         temp->GetXaxis()->SetTitle("deltaInvMass");
         temp->GetYaxis()->SetTitle("N(Events)");
         AddVertErrorBands_TruthTree(temp);
@@ -1511,11 +1584,9 @@ void CCProtonPi0_TruthAnalyzer::FillSignal_XSec_Variables_IntType(int type)
     FillHistogram(Enu_mc_truth_all_signal_IntType[type], mc_incomingE * MeV_to_GeV);
     FillHistogram(QSq_mc_truth_all_signal_IntType[type], truth_QSq_exp * MeVSq_to_GeVSq);
     FillHistogram(W_mc_truth_all_signal_IntType[type], truth_W_exp * MeV_to_GeV);
-    if (isDeltaRichSample()){
-        FillHistogram(deltaInvMass_mc_truth_all_signal_IntType[type], m_deltaInvMass);
-        FillHistogram(Delta_pi_theta_mc_truth_all_signal_IntType[type], m_Delta_pi_theta);
-        FillHistogram(Delta_pi_phi_mc_truth_all_signal_IntType[type], m_Delta_pi_phi);
-    }
+    FillHistogram(deltaInvMass_mc_truth_all_signal_IntType[type], m_deltaInvMass);
+    FillHistogram(Delta_pi_theta_mc_truth_all_signal_IntType[type], m_Delta_pi_theta);
+    FillHistogram(Delta_pi_phi_mc_truth_all_signal_IntType[type], m_Delta_pi_phi);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillSignal_XSec_Variables_FSIType(int type)
@@ -1528,11 +1599,9 @@ void CCProtonPi0_TruthAnalyzer::FillSignal_XSec_Variables_FSIType(int type)
     FillHistogram(Enu_mc_truth_all_signal_FSIType[type], mc_incomingE * MeV_to_GeV);
     FillHistogram(QSq_mc_truth_all_signal_FSIType[type], truth_QSq_exp * MeVSq_to_GeVSq);
     FillHistogram(W_mc_truth_all_signal_FSIType[type], truth_W_exp * MeV_to_GeV);
-    if (isDeltaRichSample()){
-        FillHistogram(deltaInvMass_mc_truth_all_signal_FSIType[type], m_deltaInvMass);
-        FillHistogram(Delta_pi_theta_mc_truth_all_signal_FSIType[type], m_Delta_pi_theta);
-        FillHistogram(Delta_pi_phi_mc_truth_all_signal_FSIType[type], m_Delta_pi_phi);
-    }
+    FillHistogram(deltaInvMass_mc_truth_all_signal_FSIType[type], m_deltaInvMass);
+    FillHistogram(Delta_pi_theta_mc_truth_all_signal_FSIType[type], m_Delta_pi_theta);
+    FillHistogram(Delta_pi_phi_mc_truth_all_signal_FSIType[type], m_Delta_pi_phi);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillSignal_XSec_Variables_BeforeFSI()
@@ -1545,11 +1614,9 @@ void CCProtonPi0_TruthAnalyzer::FillSignal_XSec_Variables_BeforeFSI()
     FillHistogram(QSq_mc_truth_all_signal_BeforeFSI, truth_QSq_exp_BeforeFSI * MeVSq_to_GeVSq);
     FillHistogram(W_mc_truth_all_signal_BeforeFSI, truth_W_exp_BeforeFSI * MeV_to_GeV);
     FillHistogram(Enu_mc_truth_all_signal_BeforeFSI, truth_Enu_BeforeFSI * MeV_to_GeV);
-    if (truth_W_exp_BeforeFSI > 0 && truth_W_exp_BeforeFSI < 1400){
-        FillHistogram(deltaInvMass_mc_truth_all_signal_BeforeFSI, m_deltaInvMass_BeforeFSI);
-        FillHistogram(Delta_pi_theta_mc_truth_all_signal_BeforeFSI, m_Delta_pi_theta_BeforeFSI);
-        FillHistogram(Delta_pi_phi_mc_truth_all_signal_BeforeFSI, m_Delta_pi_phi_BeforeFSI);
-    }
+    FillHistogram(deltaInvMass_mc_truth_all_signal_BeforeFSI, m_deltaInvMass_BeforeFSI);
+    FillHistogram(Delta_pi_theta_mc_truth_all_signal_BeforeFSI, m_Delta_pi_theta_BeforeFSI);
+    FillHistogram(Delta_pi_phi_mc_truth_all_signal_BeforeFSI, m_Delta_pi_phi_BeforeFSI);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillSignal_XSec_Variables()
@@ -1562,11 +1629,12 @@ void CCProtonPi0_TruthAnalyzer::FillSignal_XSec_Variables()
     FillHistogram(Enu_mc_truth_all_signal, mc_incomingE * MeV_to_GeV);
     FillHistogram(QSq_mc_truth_all_signal, truth_QSq_exp * MeVSq_to_GeVSq);
     FillHistogram(W_mc_truth_all_signal, truth_W_exp * MeV_to_GeV);
-    if (isDeltaRichSample()){
-        FillHistogram(deltaInvMass_mc_truth_all_signal, m_deltaInvMass);
-        FillHistogram(Delta_pi_theta_mc_truth_all_signal, m_Delta_pi_theta);
-        FillHistogram(Delta_pi_phi_mc_truth_all_signal, m_Delta_pi_phi);
-    }
+    FillHistogram(deltaInvMass_mc_truth_all_signal, m_deltaInvMass);
+    FillHistogram(Delta_pi_theta_mc_truth_all_signal, m_Delta_pi_theta);
+    FillHistogram(Delta_pi_phi_mc_truth_all_signal, m_Delta_pi_phi);
+
+    double proton_KE = (truth_proton_4P[3] - proton_mass) * MeV_to_GeV;
+    FillHistogram(proton_KE_mc_truth_all_signal, proton_KE);
 
     // After FSI -- Same XSec with Finer Binning
     FillHistogram(muon_P_mc_truth_all_signal_AfterFSI, truth_muon_P * MeV_to_GeV);
@@ -1577,11 +1645,9 @@ void CCProtonPi0_TruthAnalyzer::FillSignal_XSec_Variables()
     FillHistogram(Enu_mc_truth_all_signal_AfterFSI, mc_incomingE * MeV_to_GeV);
     FillHistogram(QSq_mc_truth_all_signal_AfterFSI, truth_QSq_exp * MeVSq_to_GeVSq);
     FillHistogram(W_mc_truth_all_signal_AfterFSI, truth_W_exp * MeV_to_GeV);
-    if (isDeltaRichSample()){
-        FillHistogram(deltaInvMass_mc_truth_all_signal_AfterFSI, m_deltaInvMass);
-        FillHistogram(Delta_pi_theta_mc_truth_all_signal_AfterFSI, m_Delta_pi_theta);
-        FillHistogram(Delta_pi_phi_mc_truth_all_signal_AfterFSI, m_Delta_pi_phi);
-    }
+    FillHistogram(deltaInvMass_mc_truth_all_signal_AfterFSI, m_deltaInvMass);
+    FillHistogram(Delta_pi_theta_mc_truth_all_signal_AfterFSI, m_Delta_pi_theta);
+    FillHistogram(Delta_pi_phi_mc_truth_all_signal_AfterFSI, m_Delta_pi_phi);
 }
 
 void CCProtonPi0_TruthAnalyzer::FillSignal_InteractionType()
@@ -2210,11 +2276,59 @@ bool CCProtonPi0_TruthAnalyzer::isSignal_WHigh()
     return false;
 }
 
+void CCProtonPi0_TruthAnalyzer::ReviseSignal()
+{
+    if (isSignalOriginal) return;
+
+    if (isSignalOriginal_NoWLimit){
+        truth_isSignal = truth_isSignal || (truth_isSignalOut_Kinematics && isSignal_WHigh());
+    }
+
+    if (isSignalTwoTrack){
+        double Tp = truth_proton_4P[3] - proton_mass;
+        truth_isSignal = IsProtonLong(Tp);
+    }
+
+    if (isSignalDeltaRich){
+        truth_isSignal = isDeltaRichSample();
+    }
+
+    if (isSignalLowEnu){
+        truth_isSignal = IsEnuInRange_LowEnu(mc_incomingE);
+    }
+
+    if (isSignalHighEnu){
+        truth_isSignal = IsEnuInRange_HighEnu(mc_incomingE);
+    }
+}
+
+void CCProtonPi0_TruthAnalyzer::ReviseSignal_BeforeFSI()
+{
+    if (isSignalOriginal) return;
+
+    if (isSignalTwoTrack){
+        truth_isSignal_BeforeFSI = isTwoTrackSample_BeforeFSI();
+    }
+
+    if (isSignalDeltaRich){
+        truth_isSignal_BeforeFSI = isDeltaRichSample_BeforeFSI();
+    }
+
+    if (isSignalLowEnu){
+        truth_isSignal_BeforeFSI = IsEnuInRange_LowEnu(mc_incomingE);
+    }
+
+    if (isSignalHighEnu){
+        truth_isSignal_BeforeFSI = IsEnuInRange_HighEnu(mc_incomingE);
+    }
+}
+
 void CCProtonPi0_TruthAnalyzer::writeHistograms()
 {
     f->cd();
 
     // Test Variables
+    nProtons->Write();
     Test_pi0_P->Write();
     Test_pi0_theta->Write();
 
@@ -2230,6 +2344,7 @@ void CCProtonPi0_TruthAnalyzer::writeHistograms()
     deltaInvMass_mc_truth_all_signal->Write();
     Delta_pi_theta_mc_truth_all_signal->Write();
     Delta_pi_phi_mc_truth_all_signal->Write();
+    proton_KE_mc_truth_all_signal->Write();
 
     // Cross Section Variables -- Before FSI
     muon_P_mc_truth_all_signal_BeforeFSI->Write();

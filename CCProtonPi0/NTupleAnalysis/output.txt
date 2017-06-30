@@ -1,0 +1,36 @@
+
+[1mRooFit v3.55 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2012 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+Initializing FluxReweighter for Flux Error Band
+Applying flux constraint to nu histogram
+Applying flux constraint to nubar histogram
+MC Playlists Selected!
+
+
+
+======================================================================
+Calculating Cross Section...
+======================================================================
+Initializing FluxReweighter for Flux Error Band
+Applying flux constraint to nu histogram
+Applying flux constraint to nubar histogram
+Initializing CCProtonPi0_CrossSection
+	Output/TextFiles/CrossSection_Log_MC.txt
+	Root File: /minerva/data/users/oaltinok/NTupleAnalysis/MC/Analyzed/CrossSection.root
+Applying flux constraint to nu histogram
+Applying flux constraint to nubar histogram
+Done!
+
+-----------------------------------------------------------------------
+Calculating Cross Section for Enu After FSI
+Integrating Flux for Enu
+Flux Integration for Neutrino Energy!
+Done!
+Detector Mass         = 5.37945e+06
+Number of C atoms     = 0.236926
+Number of Nucleons    = 3.23958
+Done!
+-----------------------------------------------------------------------
+Time to Complete = 0' 7" or 7 seconds
